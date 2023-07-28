@@ -1,0 +1,10 @@
+{
+    "cosmos-hub": {
+        "toCanto": "channel-358",
+        "fromCanto": "channel-2"
+    },
+    "gravity-bridge": {
+        "toCanto": "channel-88",
+        "fromCanto": "channel-0"
+    }
+}

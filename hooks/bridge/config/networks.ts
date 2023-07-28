@@ -1,0 +1,16 @@
+import { BaseNetwork } from "@/config/interfaces/networks";
+import * as ALL_NETWORKS from "@/config/networks";
+
+export const TEST_BRIDGE_NETWORKS: BaseNetwork[] = [
+  ALL_NETWORKS.MUMBAI_TESTNET,
+  ALL_NETWORKS.FANTOM_TESTNET,
+  ALL_NETWORKS.GOERLI_TESTNET,
+  ALL_NETWORKS.AVALANCHE_TESTNET,
+  ALL_NETWORKS.OPTIMISM_TESTNET,
+];
+
+export const MAIN_BRIDGE_NETWORKS: BaseNetwork[] = [
+  ALL_NETWORKS.ETH_MAINNET,
+  ALL_NETWORKS.COSMOS_HUB,
+  ALL_NETWORKS.GRAVITY_BRIDGE,
+];
