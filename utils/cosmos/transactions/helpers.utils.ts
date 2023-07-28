@@ -149,7 +149,6 @@ function generatePostBodyBroadcast(
   txRaw: TxToSend,
   broadcastMode: string = BroadcastMode.Sync
 ) {
-  console.log("binary");
   return `{ "tx_bytes": [${txRaw.message
     .serializeBinary()
     .toString()}], "mode": "${broadcastMode}" }`;

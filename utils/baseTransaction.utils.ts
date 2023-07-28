@@ -23,9 +23,7 @@ export async function performSingleTransaction(
       return await performEVMTransaction(tx, signer);
     case "COSMOS":
       // perform cosmos tx
-      const returned = await performCosmosTransaction(tx, signer);
-      console.log(returned);
-      return returned;
+      return await performCosmosTransaction(tx, signer);
     default:
       return NEW_ERROR(
         "useTransactionStore::performSingleTransaction: unknown tx type"
