@@ -28,7 +28,10 @@ export interface BridgeHookReturn {
     token: (id: string) => void;
     method: (method: BridgingMethod) => void;
   };
-  bridge: () => PromiseWithError<Transaction[]>;
+  bridge: (
+    ethAccount: string,
+    amount: string
+  ) => PromiseWithError<Transaction[]>;
 }
 
 export interface BridgeHookState {

@@ -39,3 +39,27 @@ export async function tryFetchMultipleEndpoints<T>(
   }
   return NEW_ERROR("tryFetchMultipleEndpoints: no endpoints were successful");
 }
+
+const MAX_TRIES = 5;
+export async function tryFetchWithRetry<T>(
+  url: string,
+  numTries?: number,
+  options?: RequestInit
+): PromiseWithError<T> {
+  let numberOfTries = 0;
+  while (numberOfTries < (numTries ?? MAX_TRIES)) {
+    const result = await tryFetch<T>(url, options);
+    if (!result.error) {
+      return result;
+    }
+    numberOfTries++;
+    await sleep(4000);
+  }
+  return NEW_ERROR(
+    "tryFetchWithRetry: no response after " + numberOfTries + " tries"
+  );
+}
+
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

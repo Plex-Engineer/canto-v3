@@ -14,6 +14,7 @@ import { Contract } from "web3";
 import { OFT_ABI } from "@/config/abis";
 import { getProviderWithoutSigner } from "@/utils/evm/helpers.utils";
 import { getTokenBalance } from "@/utils/evm/erc20.utils";
+import { ZERO_ADDRESS } from "@/config/consts/addresses";
 
 export async function bridgeLayerZero(
   fromNetwork: BaseNetwork,
@@ -111,7 +112,7 @@ const _oftTransferTx = (
     toLZChainId,
     toAddressBytes,
     amount,
-    [ethAddress, "0x", "0x"],
+    [ethAddress, ZERO_ADDRESS, []],
   ],
   value: gas,
 });

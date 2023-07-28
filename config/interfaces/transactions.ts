@@ -21,6 +21,14 @@ export type Transaction = {
       // ethAccount: string;
     }
 );
+type TransactionStatus = "NONE" | "SIGNING" | "PENDING" | "SUCCESS" | "ERROR";
+
+export interface TransactionWithStatus {
+  tx: Transaction;
+  status: TransactionStatus;
+  hash?: string;
+  error?: Error;
+}
 
 ///
 /// Cosmos Transaction Interfaces
@@ -32,12 +40,12 @@ export interface CosmosTxContext {
   memo: string;
   ethAddress: string;
 }
-interface Fee {
+export interface Fee {
   amount: string;
   denom: string;
   gas: string;
 }
-interface Sender {
+export interface Sender {
   accountAddress: string;
   sequence: number;
   accountNumber: number;
@@ -52,9 +60,18 @@ export interface Chain {
 ///
 /// For EIP-712
 ///
+export interface EIP712FeeObject {
+  amount: {
+    amount: string;
+    denom: string;
+  }[];
+  gas: string;
+  feePayer: string;
+}
 export interface UnsignedCosmosMessages {
   eipMsg: EIP712Message;
   cosmosMsg: CosmosNativeMessage;
+  // fee must be converted to correct type before sending
   fee: Fee;
   typesObject: object;
 }

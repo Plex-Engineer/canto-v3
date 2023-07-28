@@ -155,7 +155,10 @@ export default function useBridgeOut(
   ///
   /// external functions
   ///
-  async function bridgeOut(): PromiseWithError<Transaction[]> {
+  async function bridgeOut(
+    ethAccount: string,
+    amount: string
+  ): PromiseWithError<Transaction[]> {
     // check basic parameters to make sure they exist
     if (!state.selectedToken) {
       return NEW_ERROR("useBridgeOut::bridgeOut: no token selected");
@@ -175,31 +178,32 @@ export default function useBridgeOut(
         transactions = await bridgeLayerZero(
           state.fromNetwork,
           state.toNetwork,
-          "0x1E480827489E3eA19f82EF213b67200A76C0DF58",
+          ethAccount,
           state.selectedToken,
-          "100"
+          amount
         );
         break;
       case BridgingMethod.IBC: {
         transactions = await txIBCOut(
           Number(state.fromNetwork.chainId),
-          "0x1E480827489E3eA19f82EF213b67200A76C0DF58",
-          "gravity1qqzky5czd8jtxp7k96w0d9th2vjxcxaeyxgjqz",
+          ethAccount,
+          "cosmos address",
           state.toNetwork as CosmosNetwork,
           state.selectedToken as IBCToken,
-          "10000"
+          amount
         );
         break;
       }
       default:
-        transactions = NEW_ERROR(
+        return NEW_ERROR(
           "useBridgeOut::bridgeOut: invalid transaction method: " +
             state.selectedMethod
         );
-        break;
     }
     if (transactions.error) {
-      return NEW_ERROR("useBridgeOut::bridgeOut::" + transactions.error.message);
+      return NEW_ERROR(
+        "useBridgeOut::bridgeOut::" + transactions.error.message
+      );
     }
     return transactions;
   }

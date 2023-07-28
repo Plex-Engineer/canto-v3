@@ -137,7 +137,10 @@ export default function useBridgeIn(
   ///
   /// external functions
   ///
-  async function bridgeIn(): PromiseWithError<Transaction[]> {
+  async function bridgeIn(
+    ethAccount: string,
+    amount: string
+  ): PromiseWithError<Transaction[]> {
     // check basic parameters to make sure they exist
     if (!state.selectedToken) {
       return NEW_ERROR("useBridgeIn::bridgeIn: no token selected");
@@ -152,18 +155,18 @@ export default function useBridgeIn(
       case BridgingMethod.GRAVITY_BRIDGE:
         transactions = await bridgeInGravity(
           Number(state.fromNetwork.chainId),
-          "0x1E480827489E3eA19f82EF213b67200A76C0DF58",
+          ethAccount,
           state.selectedToken,
-          "100"
+          amount
         );
         break;
       case BridgingMethod.LAYER_ZERO:
         transactions = await bridgeLayerZero(
           state.fromNetwork,
           state.toNetwork,
-          "0x1E480827489E3eA19f82EF213b67200A76C0DF58",
+          ethAccount,
           state.selectedToken,
-          "100000000000"
+          amount
         );
         break;
       case BridgingMethod.IBC: {

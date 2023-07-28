@@ -3,9 +3,13 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  ReturnWithError,
 } from "@/config/interfaces/errors";
 import {
   CosmosTxContext,
+  EIP712FeeObject,
+  Fee,
+  Sender,
   UnsignedCosmosMessages,
 } from "@/config/interfaces/transactions";
 import { ethToCantoAddress } from "@/utils/address.utils";
@@ -19,11 +23,24 @@ import {
   signatureToWeb3Extension,
 } from "@tharsis/transactions";
 import { createTransactionWithMultipleMessages } from "@tharsis/proto";
+import { signTypedData } from "wagmi/actions";
+interface CosmosAccountReturn {
+  account: {
+    base_account: {
+      account_number: number;
+      sequence: number;
+      address: string;
+      pub_key: {
+        key: string;
+      } | null;
+    };
+  };
+}
 
 export async function getCosmosAccount(
   ethAddress: string,
   chainId: number
-): PromiseWithError<any> {
+): PromiseWithError<CosmosAccountReturn> {
   const { data: cantoAddress, error } = await ethToCantoAddress(ethAddress);
   if (error) {
     return NEW_ERROR("getCosmosAccount::" + error.message);
@@ -33,9 +50,10 @@ export async function getCosmosAccount(
   if (apiEndpointError) {
     return NEW_ERROR("getCosmosAccount::" + apiEndpointError.message);
   }
-  const { data: result, error: fetchError } = await tryFetch(
-    apiEndpoint + `/cosmos/auth/v1beta1/accounts/${cantoAddress}`
-  );
+  const { data: result, error: fetchError } =
+    await tryFetch<CosmosAccountReturn>(
+      apiEndpoint + `/cosmos/auth/v1beta1/accounts/${cantoAddress}`
+    );
   if (fetchError) {
     return NEW_ERROR("getCosmosAccount::" + fetchError.message);
   }
@@ -47,12 +65,14 @@ export async function signAndBroadcastCosmosTransaction(
   tx: UnsignedCosmosMessages
 ): PromiseWithError<any> {
   try {
+    //create correct fee object for EIP712
+    const feeObj = generateFeeObj(tx.fee, context.sender.accountAddress);
     const message = generateMessageWithMultipleTransactions(
       context.sender.accountNumber.toString(),
       context.sender.sequence.toString(),
       context.chain.cosmosChainId,
       context.memo,
-      tx.fee,
+      feeObj,
       [tx.eipMsg]
     );
     const eipToSign = createEIP712(
@@ -60,6 +80,7 @@ export async function signAndBroadcastCosmosTransaction(
       context.chain.chainId,
       message
     );
+    // const signature = await signTypedData(eipToSign);
     const signature = await window.ethereum.request({
       method: "eth_signTypedData_v4",
       params: [context.ethAddress, JSON.stringify(eipToSign)],
@@ -74,7 +95,7 @@ export async function signAndBroadcastCosmosTransaction(
       context.memo,
       tx.fee.amount,
       tx.fee.denom,
-      Number(tx.fee.gas),
+      parseInt(tx.fee.gas, 10),
       "ethsecp256",
       context.sender.pubkey,
       context.sender.sequence,
@@ -113,7 +134,7 @@ export async function signAndBroadcastCosmosTransaction(
 
 interface TxToSend {
   message: {
-    toBinary: () => Uint8Array;
+    serializeBinary: () => Uint8Array;
   };
   path: string;
 }
@@ -125,10 +146,50 @@ enum BroadcastMode {
 }
 
 function generatePostBodyBroadcast(
-  txRaw: any,
+  txRaw: TxToSend,
   broadcastMode: string = BroadcastMode.Sync
 ) {
+  console.log("binary");
   return `{ "tx_bytes": [${txRaw.message
-    .toBinary()
+    .serializeBinary()
     .toString()}], "mode": "${broadcastMode}" }`;
+}
+
+export async function getSenderObj(
+  senderEthAddress: string,
+  chainid: number
+): PromiseWithError<Sender> {
+  const cosmosAccount = await getCosmosAccount(senderEthAddress, chainid);
+  if (cosmosAccount.error) {
+    return NEW_ERROR("getSenderObj::" + cosmosAccount.error.message);
+  }
+  return reformatSender(cosmosAccount.data);
+}
+
+function reformatSender(
+  accountData: CosmosAccountReturn
+): ReturnWithError<Sender> {
+  const baseAccount = accountData.account.base_account;
+  if (baseAccount.pub_key == null) {
+    return NEW_ERROR("reformatSender: pubkey is null");
+  }
+  return NO_ERROR({
+    accountAddress: baseAccount.address,
+    sequence: baseAccount.sequence,
+    accountNumber: baseAccount.account_number,
+    pubkey: baseAccount.pub_key.key,
+  });
+}
+
+function generateFeeObj(fee: Fee, feePayer: string): EIP712FeeObject {
+  return {
+    amount: [
+      {
+        amount: fee.amount,
+        denom: fee.denom,
+      },
+    ],
+    gas: fee.gas,
+    feePayer,
+  };
 }
