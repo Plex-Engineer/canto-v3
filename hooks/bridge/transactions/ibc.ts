@@ -39,7 +39,8 @@ export async function txIBCOut(
     return NEW_ERROR("txIBCOut::" + ethToCantoError.message);
   }
 
-  const channelId = IBC_CHANNELS[receivingChain.id];
+  const channelId =
+    IBC_CHANNELS[receivingChain.id as keyof typeof IBC_CHANNELS];
   if (!channelId || !channelId.fromCanto) {
     return NEW_ERROR("txIBCOut: invalid channel id: " + receivingChain.id);
   }

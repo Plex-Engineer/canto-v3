@@ -126,7 +126,7 @@ export default function useBridgeOut(
         chainId: string;
         methods: BridgingMethod[];
       }[]
-    ).find((method: any) => method.chainId === network.id).methods;
+    ).find((method: any) => method.chainId === network.id)?.methods;
     if (!supportedMethods) {
       throw new Error(
         "useBridgeOut::setNetwork: no supported methods for network: " + id
@@ -142,7 +142,8 @@ export default function useBridgeOut(
   }
 
   // sets selected bridging method only it actually exists on the token
-  function setMethod(method: BridgingMethod): void {
+  function setMethod(selectMethod: string): void {
+    const method = selectMethod as BridgingMethod;
     if (!state.availableMethods.includes(method)) {
       throw new Error("setMethod: Invalid method: " + method);
     }

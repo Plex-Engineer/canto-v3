@@ -81,6 +81,7 @@ export async function signAndBroadcastCosmosTransaction(
       message
     );
     // const signature = await signTypedData(eipToSign);
+    // @ts-ignore
     const signature = await window.ethereum.request({
       method: "eth_signTypedData_v4",
       params: [context.ethAddress, JSON.stringify(eipToSign)],

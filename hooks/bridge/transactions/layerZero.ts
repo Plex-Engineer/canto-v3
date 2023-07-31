@@ -27,7 +27,7 @@ export async function bridgeLayerZero(
   if (!isValidEthAddress(ethAddress)) {
     return NEW_ERROR("bridgeLayerZero: invalid eth address: " + ethAddress);
   }
-  const toLZChainId = LZ_CHAIN_IDS[toNetwork.id];
+  const toLZChainId = LZ_CHAIN_IDS[toNetwork.id as keyof typeof LZ_CHAIN_IDS];
   if (!toLZChainId) {
     return NEW_ERROR("bridgeLayerZero: invalid lz chainId: " + toNetwork.id);
   }

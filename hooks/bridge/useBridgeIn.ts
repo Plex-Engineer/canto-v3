@@ -82,7 +82,7 @@ export default function useBridgeIn(
       throw new Error("useBridgeIn::setNetwork::" + networkError.message);
     }
     const tokens = BRIDGE_IN_TOKEN_LIST.chainTokenList[
-      network.id
+      network.id as keyof typeof BRIDGE_IN_TOKEN_LIST.chainTokenList
     ] as BridgeToken[];
     if (!tokens || tokens.length === 0) {
       throw new Error(
@@ -124,7 +124,9 @@ export default function useBridgeIn(
   }
 
   // sets selected bridging method only it actually exists on the token
-  function setMethod(method: BridgingMethod): void {
+  function setMethod(selectMethod: string): void {
+    const method = selectMethod as BridgingMethod;
+
     if (!state.availableMethods.includes(method)) {
       throw new Error("useBridgeIn::setMethod: Invalid method: " + method);
     }
