@@ -10,16 +10,17 @@ export default function TestPage() {
   console.log(transactionStore.transactions);
   return (
     <div>
-      {" "}
-      <button
-        onClick={() =>
-          bridgeOut.bridge(signer?.account.address, "100").then((val) => {
-            transactionStore.addTransactions(val.data, signer);
-          })
-        }
-      >
-        bridge out
-      </button>
+      {signer && (
+        <button
+          onClick={() =>
+            bridgeOut.bridge(signer?.account.address, "100").then((val) => {
+              transactionStore.addTransactions(val.data, signer);
+            })
+          }
+        >
+          bridge out
+        </button>
+      )}
       {transactionStore.transactions.map((txList, idx) => (
         <ul key={idx}>
           <li>txList: {idx}</li>
