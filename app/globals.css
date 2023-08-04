@@ -15,7 +15,7 @@
     color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
     :root {
         --border-dark-only-color: #ffffff;
         --shadow: #ffffff;
@@ -27,7 +27,7 @@
         --surface-color: #393e43;
         --text-color: #e1e1e1;
     }
-}
+} */
 
 body {
     background-color: var(--background-color);

@@ -1,7 +1,9 @@
+import Text from "@/components/text";
+
 export default function BridgePage() {
   return (
     <div>
-      <h1>Bridge Page</h1>
+      <Text>Bridge Page</Text>
     </div>
   );
 }
