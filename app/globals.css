@@ -4,6 +4,7 @@
 
 :root {
     --text-light-color: #ffffff;
+    --primary-90-color: #222222;
     --card-background-color: #c1c1c1;
     --text-light-30-color: #ffffff4c;
     --extra-failure-color: #ef4444;
@@ -88,4 +89,22 @@ body {
     background-color: var(--card-background-color);
     color: var(--text-dark-color);
     min-height: 100vh;
+
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.row {
+    display: flex;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
 }

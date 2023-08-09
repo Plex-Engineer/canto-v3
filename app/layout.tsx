@@ -1,8 +1,8 @@
 import StyledComponentsRegistry from "@/lib/registry";
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import InfoBar from "@/components/info_bar/infoBar";
+import Footer from "@/components/footer/footer";
 
 export const metadata: Metadata = {
   title: "Canto v3",
@@ -47,6 +47,7 @@ export default function RootLayout({
             ]}
           />
           {children}
+          <Footer />
         </StyledComponentsRegistry>
       </body>
     </html>
