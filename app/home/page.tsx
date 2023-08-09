@@ -1,7 +1,11 @@
+import Text from "@/components/text";
+
 export default function HomePage() {
   return (
     <div>
-      <h1>Home Page</h1>
+      <Text size="x-lg" name="proto_mono">
+        Home Page
+      </Text>
     </div>
   );
 }

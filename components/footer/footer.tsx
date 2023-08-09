@@ -47,8 +47,8 @@ const Footer = () => {
             style={{
               margin: "8px",
             }}
-          />{" "}
-          1.0094 USDT
+          />
+          $1.0094
         </Text>
       </div>
     </div>
