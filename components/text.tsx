@@ -1,5 +1,4 @@
 import localFont from "next/font/local";
-import { styled } from "styled-components";
 
 const rm_mono = localFont({
   src: "../fonts/rm-mono-regular.ttf",
@@ -23,6 +22,7 @@ interface Props {
     | "secondary-light"
     | "secondary-dark";
   color?: string;
+  style?: React.CSSProperties;
   children: React.ReactNode;
 }
 
@@ -42,7 +42,7 @@ const themes = {
   "secondary-dark": "var(--text-dark-40-color)",
 };
 
-const Text = ({ name, weight, size, children, color, theme }: Props) => {
+const Text = ({ name, weight, size, children, color, theme, style }: Props) => {
   return (
     <p
       style={{
@@ -55,6 +55,7 @@ const Text = ({ name, weight, size, children, color, theme }: Props) => {
         lineHeight: "140%",
         letterSpacing: "-0.32px",
         color: color == null ? themes[theme ?? "primary-dark"] : color,
+        ...style,
       }}
     >
       {children}
