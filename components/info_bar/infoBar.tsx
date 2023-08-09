@@ -14,7 +14,7 @@ interface Props {
 const InfoBar = ({ values }: Props) => {
   return (
     <div className={styles.container}>
-      <Marquee delay={1} pauseOnHover speed={20}>
+      <Marquee delay={1} pauseOnHover speed={20} autoFill>
         <div className={styles.content}>
           {values.map((value) => (
             <>
