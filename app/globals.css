@@ -3,16 +3,65 @@
 @tailwind utilities;
 
 :root {
-    --border-dark-only-color: #ffffff00;
-    --shadow: #cdcdcd;
-    --primary-color: #111111;
-    --background-color: #c1c1c1;
-    --stroke-color: #b3b3b3;
+    --text-light-color: #ffffff;
+    --card-background-color: #c1c1c1;
+    --text-light-30-color: #ffffff4c;
+    --extra-failure-color: #ef4444;
+    --text-dark-30-color: #1111114c;
+    --extra-success-color: #06fc99;
+    --text-light-40-color: #ffffff66;
+    --card-subtle-color: #cacaca;
+    --text-dark-40-color: #11111166;
+    --card-primary-color: #111111;
+    --border-optional-color: #ffffff00;
+    --extra-shadow: #cdcdcd;
+    --border-stroke-color: #b3b3b3;
     --border-radius: 0;
-    --sub-surface-color: #dfdfdf;
-    --surface-color: #f1f1f1;
-    --text-color: #111111;
-    color-scheme: light;
+    --text-dark-color: #111111;
+    --card-sub-surface-color: #dfdfdf;
+    --card-surface-color: #f1f1f1;
+
+    background-color: var(--card-primary-color);
+}
+
+.dark {
+    --text-light-color: #ffffff;
+    --card-background-color: #c1c1c1;
+    --text-light-30-color: #ffffff4c;
+    --extra-failure-color: #ef4444;
+    --text-dark-30-color: #1111114c;
+    --extra-success-color: #06fc99;
+    --text-light-40-color: #ffffff66;
+    --card-subtle-color: #cacaca;
+    --text-dark-40-color: #11111166;
+    --card-primary-color: #111111;
+    --border-optional-color: #ffffff00;
+    --extra-shadow: #cdcdcd;
+    --border-stroke-color: #b3b3b3;
+    --border-radius: 0;
+    --text-dark-color: #111111;
+    --card-sub-surface-color: #dfdfdf;
+    --card-surface-color: #f1f1f1;
+}
+
+.experimental {
+    --text-light-color: #ffffff;
+    --card-background-color: #0b0b0b;
+    --text-light-30-color: #ffffff4c;
+    --extra-failure-color: #ef4444;
+    --text-dark-30-color: #ededed4c;
+    --extra-success-color: #06fc99;
+    --text-light-40-color: #ffffff66;
+    --card-subtle-color: #ffffff;
+    --text-dark-40-color: #ececec66;
+    --card-primary-color: #0ee489;
+    --border-optional-color: #ffffff00;
+    --extra-shadow: #cdcdcd;
+    --border-stroke-color: #3d3d3d;
+    --border-radius: 5;
+    --text-dark-color: #ececec;
+    --card-sub-surface-color: #292929;
+    --card-surface-color: #1e1e1e;
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -29,7 +78,14 @@
     }
 } */
 
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+}
+
 body {
-    background-color: var(--background-color);
-    color: var(--text-color);
+    background-color: var(--card-background-color);
+    color: var(--text-dark-color);
+    min-height: 100vh;
 }
