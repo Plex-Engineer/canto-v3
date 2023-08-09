@@ -17,6 +17,12 @@ interface Props {
   name?: "rm_mono" | "proto_mono";
   weight?: "regular" | "bold";
   size?: "xx-sm" | "x-sm" | "sm" | "reg" | "lg" | "x-lg";
+  theme?:
+    | "primary-light"
+    | "primary-dark"
+    | "secondary-light"
+    | "secondary-dark";
+  color?: string;
   children: React.ReactNode;
 }
 
@@ -29,17 +35,14 @@ const sizes = {
   "x-lg": 24,
 };
 
-// const Text = styled.p<Props>`
-//   font-family: ${(props) => props.name};
-//   font-weight: ${(props) => props.weight};
-//   font-size: ${(props) => props.size};
-//   line-height: 140%;
-//   letter-spacing: -0.32px;
-// `;
+const themes = {
+  "primary-light": "var(--text-light-color)",
+  "primary-dark": "var(--text-dark-color)",
+  "secondary-light": "var(--card-subtle-color, #CACACA)",
+  "secondary-dark": "var(--text-dark-40-color)",
+};
 
-//using inline
-
-const Text = ({ name, weight, size, children }: Props) => {
+const Text = ({ name, weight, size, children, color, theme }: Props) => {
   return (
     <p
       style={{
@@ -51,6 +54,7 @@ const Text = ({ name, weight, size, children }: Props) => {
         fontSize: sizes[size ?? "reg"],
         lineHeight: "140%",
         letterSpacing: "-0.32px",
+        color: color == null ? themes[theme ?? "primary-dark"] : color,
       }}
     >
       {children}
