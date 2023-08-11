@@ -1,0 +1,48 @@
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    width: 28px;
+  }
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-link {
+  padding: 0 1rem;
+
+  &::after {
+    content: "";
+    display: block;
+    height: 1px;
+    transform: translateX(-15%) scaleX(0);
+
+    transition: transform 0.3s, height 0.3s;
+  }
+
+  &:hover::after {
+    content: "";
+    display: block;
+    width: 140%;
+    transform: translateX(-15%) scaleX(1);
+    height: 10px;
+    border: 2px solid var(--card-primary-color);
+    border-top: none;
+  }
+}
+.wallet-connect {
+  background-color: yellowgreen;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 80px 1fr 80px;
+  height: 60px;
+  //   background-color: #999;
+}
