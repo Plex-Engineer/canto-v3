@@ -76,6 +76,9 @@ export default function useBridgeOut(
 
   // sets selected token and loads the available networks it can be bridge to
   function setToken(id: string): void {
+    //make sure new token was actually selected
+    if (state.selectedToken?.id === id) return;
+    
     const { data: token, error: tokenError } = getToken(id);
     if (tokenError) {
       throw new Error("useBridgeOut::setToken::" + tokenError.message);
@@ -111,6 +114,9 @@ export default function useBridgeOut(
 
   // sets selected network and loads the available methods for bridging
   function setNetwork(id: string): void {
+    //make sure new network was actually selected
+    if (state.toNetwork?.id === id) return;
+
     const { data: network, error: networkError } = getNetwork(id);
     if (networkError) {
       throw new Error("useBridgeOut::setNetwork: invalid network id: " + id);
@@ -144,6 +150,9 @@ export default function useBridgeOut(
   // sets selected bridging method only it actually exists on the token
   function setMethod(selectMethod: string): void {
     const method = selectMethod as BridgingMethod;
+    //make sure new method was actually selected
+    if (method === state.selectedMethod) return;
+
     if (!state.availableMethods.includes(method)) {
       throw new Error("setMethod: Invalid method: " + method);
     }

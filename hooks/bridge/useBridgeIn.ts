@@ -77,6 +77,9 @@ export default function useBridgeIn(
 
   // sets network and finds tokens for that network
   function setNetwork(id: string): void {
+    //make sure new network was actually selected
+    if (state.fromNetwork?.id === id) return;
+    
     const { data: network, error: networkError } = getNetwork(id);
     if (networkError) {
       throw new Error("useBridgeIn::setNetwork::" + networkError.message);
@@ -103,6 +106,9 @@ export default function useBridgeIn(
 
   // sets selected token and loads bridging methods for that token
   function setToken(id: string): void {
+    //make sure new token was actually selected
+    if (state.selectedToken?.id === id) return;
+
     const { data: token, error: tokenError } = getToken(id);
     if (tokenError) {
       throw new Error("useBridgeIn::setToken::" + tokenError.message);
@@ -126,6 +132,8 @@ export default function useBridgeIn(
   // sets selected bridging method only it actually exists on the token
   function setMethod(selectMethod: string): void {
     const method = selectMethod as BridgingMethod;
+    //make sure new method was actually selected
+    if (method === state.selectedMethod) return;
 
     if (!state.availableMethods.includes(method)) {
       throw new Error("useBridgeIn::setMethod: Invalid method: " + method);

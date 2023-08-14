@@ -16,5 +16,5 @@ export default function useAutoSelect(
         return setter(items[0].id);
       }
     }
-  }, [JSON.stringify(items)]);
+  }, [items]);
 }

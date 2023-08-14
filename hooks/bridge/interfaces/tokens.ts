@@ -5,6 +5,18 @@ export enum BridgingMethod {
   IBC = "1",
   LAYER_ZERO = "2",
 }
+export function bridgeMethodToString(method: BridgingMethod): string {
+  switch (method) {
+    case BridgingMethod.GRAVITY_BRIDGE:
+      return "Gravity Bridge";
+    case BridgingMethod.IBC:
+      return "IBC";
+    case BridgingMethod.LAYER_ZERO:
+      return "Layer Zero";
+    default:
+      return "Unknown";
+  }
+}
 
 export type BridgeToken = (BridgeInToken | BridgeOutToken) &
   (ERC20Token | IBCToken);
