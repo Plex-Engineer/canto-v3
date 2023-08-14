@@ -78,7 +78,7 @@ export default function useBridgeOut(
   function setToken(id: string): void {
     //make sure new token was actually selected
     if (state.selectedToken?.id === id) return;
-    
+
     const { data: token, error: tokenError } = getToken(id);
     if (tokenError) {
       throw new Error("useBridgeOut::setToken::" + tokenError.message);
@@ -197,7 +197,7 @@ export default function useBridgeOut(
         transactions = await txIBCOut(
           Number(state.fromNetwork.chainId),
           ethAccount,
-          "cosmos address",
+          "osmos address",
           state.toNetwork as CosmosNetwork,
           state.selectedToken as IBCToken,
           amount

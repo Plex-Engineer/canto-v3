@@ -97,7 +97,11 @@ export default function TestPage() {
         <button
           style={{ background: "black", color: "white" }}
           onClick={() =>
-            bridgeOut.bridge(signer?.account.address, "100").then((val) => {
+            bridgeOut.bridge(signer?.account.address, "842").then((val) => {
+              if (val.error) {
+                console.log(val.error);
+                return;
+              }
               transactionStore.addTransactions(val.data, signer);
             })
           }

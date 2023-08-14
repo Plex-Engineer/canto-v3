@@ -7,8 +7,8 @@ import { IBCToken } from "../interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
 import { CosmosNetwork } from "@/config/interfaces/networks";
 import { ethToCantoAddress, isValidEthAddress } from "@/utils/address.utils";
-import { createMsgsConvertERC20 } from "@/utils/cosmos/transactions/convertCoin/messages";
-import { createMsgsIBCOut } from "@/utils/cosmos/transactions/ibc/messages";
+import { createMsgsConvertERC20 } from "@/utils/cosmos/transactions/messages/convertERC20";
+import { createMsgsIBCOut } from "@/utils/cosmos/transactions/messages/ibc";
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
 import { tryFetchMultipleEndpoints } from "@/utils/async.utils";
 

@@ -15,15 +15,14 @@ import {
 import { ethToCantoAddress } from "@/utils/address.utils";
 import { tryFetch } from "@/utils/async.utils";
 import {
-  createEIP712,
   generateMessageWithMultipleTransactions,
-} from "@tharsis/eip712";
+  createEIP712,
+} from "@evmos/eip712";
+import { createTransactionWithMultipleMessages } from "@evmos/proto";
 import {
   createTxRawEIP712,
   signatureToWeb3Extension,
-} from "@tharsis/transactions";
-import { createTransactionWithMultipleMessages } from "@tharsis/proto";
-import { signTypedData } from "wagmi/actions";
+} from "@evmos/transactions";
 interface CosmosAccountReturn {
   account: {
     base_account: {
@@ -65,9 +64,11 @@ export async function signAndBroadcastCosmosTransaction(
   tx: UnsignedCosmosMessages
 ): PromiseWithError<any> {
   try {
-    //create correct fee object for EIP712
+    // create correct fee object for EIP712
     const feeObj = generateFeeObj(tx.fee, context.sender.accountAddress);
-    const message = generateMessageWithMultipleTransactions(
+
+    // create eip payload
+    const eipPayload = generateMessageWithMultipleTransactions(
       context.sender.accountNumber.toString(),
       context.sender.sequence.toString(),
       context.chain.cosmosChainId,
@@ -78,20 +79,10 @@ export async function signAndBroadcastCosmosTransaction(
     const eipToSign = createEIP712(
       tx.typesObject,
       context.chain.chainId,
-      message
+      eipPayload
     );
-    // const signature = await signTypedData(eipToSign);
-    // @ts-ignore
-    const signature = await window.ethereum.request({
-      method: "eth_signTypedData_v4",
-      params: [context.ethAddress, JSON.stringify(eipToSign)],
-    });
-    const extension = signatureToWeb3Extension(
-      context.chain,
-      context.sender,
-      signature
-    );
-    const cosmosTxToBroadcast = createTransactionWithMultipleMessages(
+    // create cosmos payload
+    const cosmosPayload = createTransactionWithMultipleMessages(
       [tx.cosmosMsg],
       context.memo,
       tx.fee.amount,
@@ -103,23 +94,32 @@ export async function signAndBroadcastCosmosTransaction(
       context.sender.accountNumber,
       context.chain.cosmosChainId
     );
-    const raw = createTxRawEIP712(
-      cosmosTxToBroadcast.legacyAmino.body,
-      cosmosTxToBroadcast.legacyAmino.authInfo,
-      extension
+
+    // get signature from metamask
+    const signature = await window.ethereum.request({
+      method: "eth_signTypedData_v4",
+      params: [context.ethAddress, JSON.stringify(eipToSign)],
+    });
+    const signedTx = createTxRawEIP712(
+      cosmosPayload.legacyAmino.body,
+      cosmosPayload.legacyAmino.authInfo,
+      signatureToWeb3Extension(context.chain, context.sender, signature)
     );
+
+    // post tx to rpc
     const postOptions = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: generatePostBodyBroadcast(raw),
+      body: generatePostBodyBroadcast(signedTx),
     };
     const broadcastPost = await tryFetch(
       getCosmosAPIEndpoint(context.chain.chainId).data +
         "/cosmos/tx/v1beta1/txs",
       postOptions
     );
+
     if (broadcastPost.error) {
       return NEW_ERROR(
         "signAndBroadcastCosmosTransaction: " + broadcastPost.error.message
