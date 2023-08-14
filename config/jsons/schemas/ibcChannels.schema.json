@@ -1,0 +1,27 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://canto.io/ibcChannelSchema.json",
+    "title": "IBC Channel List",
+    "description": "An entry in the IBC channel list for a given chain",
+    "type": "object",
+    "properties": {
+        "cosmos-hub": {
+            "$ref": "#/definitions/ibcInfo"
+        }
+    },
+    "definitions": {
+        "ibcInfo": {
+            "type": "object",
+            "properties": {
+                "toCanto": {
+                    "description": "channel from cosmos chain to canto",
+                    "type": "string"
+                },
+                "fromCanto": {
+                    "description": "channel from canto to cosmos chain",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

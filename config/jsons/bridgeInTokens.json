@@ -1,0 +1,143 @@
+{
+    "title": "Canto Bridge In Token List",
+    "description": "List of tokens supported by each chain to bridge into canto, and the bridge method to use",
+    "bridgeMethodInfo": {
+        "0": "gravity bridge",
+        "1": "ibc transfer",
+        "2": "layer zero"
+    },
+    "chainTokenList": {
+        "eth-mainnet": [
+            {
+                "id": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                "chainId": 1,
+                "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                "name": "USDT",
+                "symbol": "USDT",
+                "decimals": 6,
+                "icon": "",
+                "bridgeMethods": [
+                    "0"
+                ]
+            },
+            {
+                "id": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                "chainId": 1,
+                "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                "name": "USDC",
+                "symbol": "USDC",
+                "decimals": 6,
+                "icon": "",
+                "bridgeMethods": [
+                    "0"
+                ]
+            },
+            {
+                "id": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                "chainId": 1,
+                "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                "name": "WETH",
+                "symbol": "WETH",
+                "decimals": 18,
+                "icon": "",
+                "bridgeMethods": [
+                    "0"
+                ]
+            },
+            {
+                "id": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+                "chainId": 1,
+                "address": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+                "name": "wrapped staked eth",
+                "symbol": "wstETH",
+                "decimals": 18,
+                "icon": "",
+                "bridgeMethods": [
+                    "0"
+                ]
+            },
+            {
+                "id": "0x56C03B8C4FA80Ba37F5A7b60CAAAEF749bB5b220",
+                "chainId": 1,
+                "address": "0x56C03B8C4FA80Ba37F5A7b60CAAAEF749bB5b220",
+                "name": "Canto",
+                "symbol": "CANTO",
+                "decimals": 18,
+                "icon": "",
+                "bridgeMethods": [
+                    "2"
+                ]
+            }
+        ],
+        "mumbai-testnet": [
+            {
+                "id": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
+                "chainId": 80001,
+                "address": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
+                "name": "Canto",
+                "symbol": "CANTO",
+                "decimals": 18,
+                "icon": "",
+                "bridgeMethods": [
+                    "2"
+                ]
+            }
+        ],
+        "fantom-testnet": [
+            {
+                "id": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
+                "chainId": 4002,
+                "address": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
+                "name": "Canto",
+                "symbol": "CANTO",
+                "decimals": 18,
+                "icon": "",
+                "bridgeMethods": [
+                    "2"
+                ]
+            }
+        ],
+        "goerli-testnet": [
+            {
+                "id": "0xd310F11Fb1bdd95568a5dB507a891946ec23642D",
+                "chainId": 5,
+                "address": "0xd310F11Fb1bdd95568a5dB507a891946ec23642D",
+                "name": "Canto",
+                "symbol": "CANTO",
+                "decimals": 18,
+                "icon": "",
+                "bridgeMethods": [
+                    "2"
+                ]
+            }
+        ],
+        "avalanche-testnet": [
+            {
+                "id": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
+                "chainid": 43113,
+                "address": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
+                "name": "Canto",
+                "symbol": "CANTO",
+                "decimals": 18,
+                "icon": "",
+                "bridgeMethods": [
+                    "2"
+                ]
+            }
+        ],
+        "optimism-testnet": [
+            {
+                "id": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
+                "chainid": 43113,
+                "address": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
+                "name": "Canto",
+                "symbol": "CANTO",
+                "decimals": 18,
+                "icon": "",
+                "bridgeMethods": [
+                    "2"
+                ]
+            }
+        ]
+    }
+}

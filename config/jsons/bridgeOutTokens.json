@@ -1,0 +1,187 @@
+{
+    "title": "Canto Bridge Out Token List",
+    "description": "List of tokens supported to bridge out, possible chains to send to, and the bridge method to use",
+    "bridgeMethodInfo": {
+        "0": "gravity bridge",
+        "1": "ibc transfer",
+        "2": "layer zero"
+    },
+    "chainTokenList": {
+        "canto-mainnet": [
+            {
+                "id": "0x56C03B8C4FA80Ba37F5A7b60CAAAEF749bB5b220",
+                "chainId": 7700,
+                "address": "0x56C03B8C4FA80Ba37F5A7b60CAAAEF749bB5b220",
+                "name": "Canto",
+                "symbol": "CANTO",
+                "decimals": 18,
+                "icon": "",
+                "bridgeMethods": [
+                    {
+                        "chainId": "eth-mainnet",
+                        "methods": [
+                            "2"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
+                "chainId": 7700,
+                "address": "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
+                "name": "USDC",
+                "symbol": "USDC",
+                "decimals": 6,
+                "icon": "",
+                "ibcDenom": "ibc/17CD484EE7D9723B847D95015FA3EBD1572FD13BC84FB838F55B18A57450F25B",
+                "nativeName": "gravity0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
+                "bridgeMethods": [
+                    {
+                        "chainId": "gravity-bridge",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0xd567B3d7B8FE3C79a1AD8dA978812cfC4Fa05e75",
+                "chainId": 7700,
+                "address": "0xd567B3d7B8FE3C79a1AD8dA978812cfC4Fa05e75",
+                "name": "USDT",
+                "symbol": "USDT",
+                "decimals": 6,
+                "icon": "",
+                "ibcDenom": "ibc/4F6A2DEFEA52CD8D90966ADCB2BD0593D3993AB0DF7F6AEB3EFD6167D79237B0",
+                "nativeName": "gravity0xd567B3d7B8FE3C79a1AD8dA978812cfC4Fa05e75",
+                "bridgeMethods": [
+                    {
+                        "chainId": "gravity-bridge",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x5FD55A1B9FC24967C4dB09C513C3BA0DFa7FF687",
+                "chainId": 7700,
+                "address": "0x5FD55A1B9FC24967C4dB09C513C3BA0DFa7FF687",
+                "name": "ETH",
+                "symbol": "ETH",
+                "decimals": 18,
+                "icon": "",
+                "ibcDenom": "ibc/DC186CA7A8C009B43774EBDC825C935CABA9743504CE6037507E6E5CCE12858A",
+                "nativeName": "gravity0x5FD55A1B9FC24967C4dB09C513C3BA0DFa7FF687",
+                "bridgeMethods": [
+                    {
+                        "chainId": "gravity-bridge",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0xc71aAf8e486e3F33841BB56Ca3FD2aC3fa8D29a8",
+                "chainId": 7700,
+                "address": "0xc71aAf8e486e3F33841BB56Ca3FD2aC3fa8D29a8",
+                "name": "Wrapped Staked ETH",
+                "symbol": "WSTETH",
+                "decimals": 18,
+                "icon": "",
+                "ibcDenom": "ibc/35D050E2A1F7BEAFA783A4A4739DC802A6797E59041341D78D88F5B754948604",
+                "nativeName": "gravity0xc71aAf8e486e3F33841BB56Ca3FD2aC3fa8D29a8",
+                "bridgeMethods": [
+                    {
+                        "chainId": "gravity-bridge",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0xc03345448969Dd8C00e9E4A85d2d9722d093aF8E",
+                "chainId": 7700,
+                "address": "0xc03345448969Dd8C00e9E4A85d2d9722d093aF8E",
+                "name": "Graviton",
+                "symbol": "GRAV",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/gravitybridge/images/grav.svg",
+                "ibcDenom": "ibc/FC9D92EC12BC974E8B6179D411351524CD5C2EBC3CE29D5BA856414FEFA47093",
+                "nativeName": "ugraviton",
+                "bridgeMethods": [
+                    {
+                        "chainId": "gravity-bridge",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0xecEEEfCEE421D8062EF8d6b4D814efe4dc898265",
+                "chainId": 7700,
+                "address": "0xecEEEfCEE421D8062EF8d6b4D814efe4dc898265",
+                "name": "Atom",
+                "symbol": "ATOM",
+                "decimals": 6,
+                "icon": "",
+                "ibcDenom": "ibc/9117A26BA81E29FA4F78F57DC2BD90CD3D26848101BA880445F119B22A1E254E",
+                "nativeName": "uatom",
+                "bridgeMethods": [
+                    {
+                        "chainId": "cosmos-hub",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "canto-testnet": [
+            {
+                "id": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
+                "chainId": 7701,
+                "address": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
+                "name": "Canto",
+                "symbol": "CANTO",
+                "decimals": 18,
+                "icon": "",
+                "bridgeMethods": [
+                    {
+                        "chainId": "mumbai-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    },
+                    {
+                        "chainId": "fantom-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    },
+                    {
+                        "chainId": "goerli-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    },
+                    {
+                        "chainId": "avalanche-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    },
+                    {
+                        "chainId": "optimism-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

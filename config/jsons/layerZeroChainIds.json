@@ -1,0 +1,11 @@
+{
+    "eth-mainnet": 101,
+    "canto-mainnet": 159,
+    
+    "canto-testnet": 10159,
+    "mumbai-testnet": 10109,
+    "fantom-testnet": 10112,
+    "goerli-testnet": 10121,
+    "avalanche-testnet": 10106,
+    "optimism-testnet": 10132
+}

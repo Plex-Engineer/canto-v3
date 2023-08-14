@@ -1,0 +1,26 @@
+.value {
+  color: var(--card-subtle-color, #cacaca);
+}
+.item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.content {
+  display: flex;
+  gap: 5rem;
+}
+.container {
+  display: flex;
+  width: 100vw;
+  height: 32px;
+  padding: 6px 0px;
+
+  align-items: center;
+  background: var(--primary-color, #111);
+}
+
+.shadow {
+  box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
+}
