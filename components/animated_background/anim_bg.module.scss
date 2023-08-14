@@ -1,0 +1,82 @@
+.line {
+  stroke-width: 1.678px;
+  width: 120%;
+  stroke: #06fc99;
+  transform: rotate(attr(data-rotation) deg);
+  position: absolute;
+}
+
+.container {
+  //   border: 1px solid white;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+  background: url("/wires.svg") no-repeat center center fixed;
+  //black color
+}
+
+.moving {
+  width: 10px;
+  transform: translate(0px, -48px);
+  border: 1px solid white;
+  opacity: 0.5;
+  aspect-ratio: 1.23433242507;
+  position: absolute;
+
+  &:nth-of-type(1) {
+    animation: moving 10s linear infinite;
+    animation-delay: 0s;
+  }
+
+  &:nth-of-type(2) {
+    animation: moving 10s linear infinite;
+    animation-delay: 2s;
+  }
+
+  &:nth-of-type(3) {
+    animation: moving 10s linear infinite;
+    animation-delay: 4s;
+  }
+
+  &:nth-of-type(4) {
+    animation: moving 10s linear infinite;
+    animation-delay: 6s;
+  }
+
+  &:nth-of-type(5) {
+    animation: moving 10s linear infinite;
+    animation-delay: 8s;
+  }
+
+  &:nth-of-type(6) {
+    animation: moving 10s linear infinite;
+    animation-delay: 10s;
+  }
+
+  @keyframes moving {
+    from {
+      width: 100px;
+    }
+    to {
+      width: 100vw;
+    }
+  }
+}
+
+.sample {
+  display: flex;
+  width: 600px;
+  height: 400px;
+  padding: 0px 16px 20px 16px;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  background: var(--sub-surface-color, #dfdfdf);
+  box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
+  z-index: 2;
+}

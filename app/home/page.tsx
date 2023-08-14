@@ -1,3 +1,4 @@
+import AnimatedBackground from "@/components/animated_background/animatedBackground";
 import Splash from "@/components/splash/splash";
 import Text from "@/components/text";
 
