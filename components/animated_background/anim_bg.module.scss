@@ -16,13 +16,13 @@
   position: relative;
   overflow: hidden;
   z-index: 0;
-  background: url("/wires.svg") no-repeat center center fixed;
+  background: url("/wires.svg") no-repeat center center;
   //black color
 }
 
 .moving {
   width: 10px;
-  transform: translate(0px, -48px);
+  //   transform: translate(0px, -48px);
   border: 1px solid white;
   opacity: 0.5;
   aspect-ratio: 1.23433242507;
