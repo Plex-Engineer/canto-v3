@@ -1,8 +1,10 @@
 import { GRAVITY_BRIDGE_ABI, WETH_ABI } from "@/config/abis";
 import {
   GRAVITY_BRIDGE_ETH_ADDRESS,
+  PUB_KEY_BOT_ADDRESS,
   WETH_MAINNET_ADDRESS,
 } from "@/config/consts/addresses";
+import { CANTO_BOT_API_URL } from "@/config/consts/apiUrls";
 import {
   NEW_ERROR,
   NO_ERROR,
@@ -16,11 +18,15 @@ import {
   ethToCantoAddress,
   isValidEthAddress,
 } from "@/utils/address.utils";
+import { tryFetch } from "@/utils/async.utils";
+import { getCantoBalance } from "@/utils/cosmos/cosmosBalance.utils";
+import { createMsgsSend } from "@/utils/cosmos/transactions/messages/messageSend";
 import {
   _approveTx,
   checkTokenAllowance,
   getTokenBalance,
 } from "@/utils/evm/erc20.utils";
+import BigNumber from "bignumber.js";
 
 export async function bridgeInGravity(
   chainId: number,
@@ -34,9 +40,7 @@ export async function bridgeInGravity(
   const { data: cantoReceiverAddress, error: ethToCantoError } =
     await ethToCantoAddress(ethSender);
   if (ethToCantoError) {
-    return NEW_ERROR(
-      "bridgeInGravity::" + ethToCantoError.message
-    );
+    return NEW_ERROR("bridgeInGravity::" + ethToCantoError.message);
   }
   // parameters look good, so create the tx list
   const txList: Transaction[] = [];
@@ -48,23 +52,47 @@ export async function bridgeInGravity(
     CANTO_MAINNET.chainId as number
   );
   if (checkPubKeyError) {
-    return NEW_ERROR(
-      "bridgeInGravity::" + checkPubKeyError.message
-    );
+    return NEW_ERROR("bridgeInGravity::" + checkPubKeyError.message);
   }
   if (!hasPubKey) {
+    const { data: cantoAddress, error: ethToCantoError } =
+      await ethToCantoAddress(ethSender);
+    if (ethToCantoError) {
+      return NEW_ERROR("bridgeInGravity::" + ethToCantoError.message);
+    }
+    // get canto balance to see if enough canto for generating public key
+    const { data: cantoBalance, error: balanceError } = await getCantoBalance(
+      CANTO_MAINNET.chainId as number,
+      cantoAddress
+    );
+    if (balanceError) {
+      return NEW_ERROR("bridgeInGravity::" + balanceError.message);
+    }
+    const enoughCanto = new BigNumber(cantoBalance).gte("300000000000000000");
+    // call api to send canto if not enough canto
+    if (!enoughCanto) {
+      const { error: botError } = await tryFetch(CANTO_BOT_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Request-Headers": "Content-Type, Authorization",
+          "Access-Control-Allow-Origin": "true",
+        },
+        mode: "no-cors",
+        body: JSON.stringify({
+          cantoAddress: cantoAddress,
+          hexAddress: ethSender,
+        }),
+      });
+      if (botError) {
+        return NEW_ERROR("bridgeInGravity::" + botError.message);
+      }
+    }
+
     // must add this to the transaction list to set the public key
-    throw new Error("TODO: GENERATEPUBKEY");
-    // const { data: pubKeyTx, error: pubKeyError } = await _generatePubKey(
-    //   CANTO_MAINNET.chainId as number,
-    //   ethSender
-    // );
-    // if (pubKeyError) {
-    //   return NEW_ERROR(
-    //     "bridgeInGravity::_generatePubKey: " + pubKeyError.message
-    //   );
-    // }
-    // txList.push(...pubKeyTx);
+    txList.push(
+      _generatePubKeyTx(chainId, cantoAddress, "Generate Public Key")
+    );
   }
 
   // check if dealing with WETH, since we might need to wrap ETH
@@ -76,9 +104,7 @@ export async function bridgeInGravity(
       ethSender
     );
     if (balanceError) {
-      return NEW_ERROR(
-        "bridgeInGravity::" + balanceError.message
-      );
+      return NEW_ERROR("bridgeInGravity::" + balanceError.message);
     }
     // check if we need to wrap ETH
     if (wethBalance.isLessThan(amount)) {
@@ -172,3 +198,22 @@ const _wrapTx = (
   params: [],
   value: amount,
 });
+
+const _generatePubKeyTx = (
+  chainId: number,
+  cantoSender: string,
+  description: string
+): Transaction => {
+  const pubKeyTx = createMsgsSend({
+    fromAddress: cantoSender,
+    destinationAddress: PUB_KEY_BOT_ADDRESS,
+    amount: "1",
+    denom: "acanto",
+  });
+  return {
+    chainId,
+    type: "COSMOS",
+    description,
+    msg: pubKeyTx,
+  };
+};

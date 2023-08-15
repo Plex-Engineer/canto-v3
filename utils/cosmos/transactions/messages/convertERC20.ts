@@ -4,9 +4,17 @@ import {
   UnsignedCosmosMessages,
 } from "@/config/interfaces/transactions";
 import { CONVERT_FEE } from "@/config/consts/fees";
-import { generateCosmosEIPTypes } from "../types/base";
-import { MSG_CONVERT_ERC20_TYPES } from "../types/convertCoin";
+import { generateCosmosEIPTypes } from "./base";
 import { MsgConvertERC20 } from "@buf/evmos_evmos.bufbuild_es/evmos/erc20/v1/tx_pb.js";
+
+const MSG_CONVERT_ERC20_TYPES = {
+  MsgValue: [
+    { name: "contract_address", type: "string" },
+    { name: "amount", type: "string" },
+    { name: "receiver", type: "string" },
+    { name: "sender", type: "string" },
+  ],
+};
 interface MsgConvertERC20Params {
   contract_address: string;
   amount: string;

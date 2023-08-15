@@ -10,3 +10,9 @@ export const IBC_FEE = {
   denom: "acanto",
   gas: "3000000",
 };
+
+export const PUB_KEY_FEE = {
+  amount: "250000000000000000",
+  denom: "acanto",
+  gas: "250000",
+};

@@ -7,9 +7,27 @@ import { MsgTransfer } from "@buf/cosmos_ibc.bufbuild_es/ibc/applications/transf
 import { Height } from "@buf/cosmos_ibc.bufbuild_es/ibc/core/client/v1/client_pb.js";
 import { Coin } from "@buf/cosmos_cosmos-sdk.bufbuild_es/cosmos/base/v1beta1/coin_pb";
 import { IBC_FEE } from "@/config/consts/fees";
-import { generateCosmosEIPTypes } from "../types/base";
-import { IBC_MSG_TYPES } from "../types/ibc";
+import { generateCosmosEIPTypes } from "./base";
 
+const IBC_MSG_TYPES = {
+  MsgValue: [
+    { name: "source_port", type: "string" },
+    { name: "source_channel", type: "string" },
+    { name: "token", type: "TypeToken" },
+    { name: "sender", type: "string" },
+    { name: "receiver", type: "string" },
+    { name: "timeout_height", type: "TypeTimeoutHeight" },
+    { name: "timeout_timestamp", type: "uint64" },
+  ],
+  TypeToken: [
+    { name: "denom", type: "string" },
+    { name: "amount", type: "string" },
+  ],
+  TypeTimeoutHeight: [
+    { name: "revision_number", type: "uint64" },
+    { name: "revision_height", type: "uint64" },
+  ],
+};
 interface MessageIBCOutParams {
   // Channel
   sourcePort: string;
