@@ -5,7 +5,7 @@
     "description": "An entry in the IBC channel list for a given chain",
     "type": "object",
     "properties": {
-        "cosmos-hub-4": {
+        "cosmoshub-4": {
             "$ref": "#/definitions/ibcInfo"
         }
     },

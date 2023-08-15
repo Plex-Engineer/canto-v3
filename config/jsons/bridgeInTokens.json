@@ -69,10 +69,10 @@
                 ]
             }
         ],
-        "cosmos-hub-4": [
+        "cosmoshub-4": [
             {
                 "id": "ibc/9117A26BA81E29FA4F78F57DC2BD90CD3D26848101BA880445F119B22A1E254E",
-                "chainId": "cosmos-hub-4",
+                "chainId": "cosmoshub-4",
                 "name": "Atom",
                 "symbol": "ATOM",
                 "decimals": 6,

@@ -1,11 +1,27 @@
 {
+    "akashnet-2": {
+        "toCanto": "channel-59",
+        "fromCanto": "channel-11"
+    },
     "comdex-1": {
         "toCanto": "channel-58",
         "fromCanto": "channel-7"
     },
-    "cosmos-hub-4": {
+    "core-1": {
+        "toCanto": "channel-80",
+        "fromCanto": "channel-17"
+    },
+    "cosmoshub-4": {
         "toCanto": "channel-358",
         "fromCanto": "channel-2"
+    },
+    "crescent-1": {
+        "toCanto": "channel-34",
+        "fromCanto": "channel-9"
+    },
+    "evmos_9001-2": {
+        "toCanto": "channel-62",
+        "fromCanto": "channel-15"
     },
     "gravity-bridge-3": {
         "toCanto": "channel-88",
@@ -15,8 +31,28 @@
         "toCanto": "channel-99",
         "fromCanto": "channel-8"
     },
+    "kava_2222-10": {
+        "toCanto": "channel-87",
+        "fromCanto": "channel-13"
+    },
     "osmosis-1": {
         "toCanto": "channel-550",
         "fromCanto": "channel-5"
+    },
+    "quicksilver-2": {
+        "toCanto": "channel-24",
+        "fromCanto": "channel-19"
+    },
+    "sentinelhub-2": {
+        "toCanto": "channel-71",
+        "fromCanto": "channel-16"
+    },
+    "sommelier-3": {
+        "toCanto": "channel-2",
+        "fromCanto": "channel-10"
+    },
+    "stride-1": {
+        "toCanto": "channel-74",
+        "fromCanto": "channel-18"
     }
 }
