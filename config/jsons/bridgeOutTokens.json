@@ -37,7 +37,7 @@
                 "nativeName": "gravity0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
                 "bridgeMethods": [
                     {
-                        "chainId": "gravity-bridge",
+                        "chainId": "gravity-bridge-3",
                         "methods": [
                             "1"
                         ]
@@ -56,7 +56,7 @@
                 "nativeName": "gravity0xd567B3d7B8FE3C79a1AD8dA978812cfC4Fa05e75",
                 "bridgeMethods": [
                     {
-                        "chainId": "gravity-bridge",
+                        "chainId": "gravity-bridge-3",
                         "methods": [
                             "1"
                         ]
@@ -75,7 +75,7 @@
                 "nativeName": "gravity0x5FD55A1B9FC24967C4dB09C513C3BA0DFa7FF687",
                 "bridgeMethods": [
                     {
-                        "chainId": "gravity-bridge",
+                        "chainId": "gravity-bridge-3",
                         "methods": [
                             "1"
                         ]
@@ -94,7 +94,7 @@
                 "nativeName": "gravity0xc71aAf8e486e3F33841BB56Ca3FD2aC3fa8D29a8",
                 "bridgeMethods": [
                     {
-                        "chainId": "gravity-bridge",
+                        "chainId": "gravity-bridge-3",
                         "methods": [
                             "1"
                         ]
@@ -113,7 +113,7 @@
                 "nativeName": "ugraviton",
                 "bridgeMethods": [
                     {
-                        "chainId": "gravity-bridge",
+                        "chainId": "gravity-bridge-3",
                         "methods": [
                             "1"
                         ]
@@ -132,7 +132,7 @@
                 "nativeName": "uatom",
                 "bridgeMethods": [
                     {
-                        "chainId": "cosmos-hub",
+                        "chainId": "cosmos-hub-4",
                         "methods": [
                             "1"
                         ]

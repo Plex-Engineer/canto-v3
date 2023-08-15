@@ -8,7 +8,7 @@ import {
 const gravityBridgeBlockExplorer = "https://www.mintscan.io/gravity-bridge";
 
 export const GRAVITY_BRIDGE: CosmosNetwork = {
-  id: "gravity-bridge",
+  id: "gravity-bridge-3",
   chainId: "gravity-bridge-3",
   icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/gravitybridge/images/grav.svg",
   name: "Gravity Bridge",
