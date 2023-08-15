@@ -1,4 +1,8 @@
 {
+    "comdex-1": {
+        "toCanto": "channel-58",
+        "fromCanto": "channel-7"
+    },
     "cosmos-hub": {
         "toCanto": "channel-358",
         "fromCanto": "channel-2"
@@ -6,6 +10,10 @@
     "gravity-bridge": {
         "toCanto": "channel-88",
         "fromCanto": "channel-0"
+    },
+    "injective-1": {
+        "toCanto": "channel-99",
+        "fromCanto": "channel-8"
     },
     "osmosis-1": {
         "toCanto": "channel-550",

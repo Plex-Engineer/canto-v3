@@ -157,6 +157,44 @@
                         ]
                     }
                 ]
+            },
+            {
+                "id": "0x3452e23F9c4cC62c70B7ADAd699B264AF3549C19",
+                "chainId": 7700,
+                "address": "0x3452e23F9c4cC62c70B7ADAd699B264AF3549C19",
+                "name": "Comdex",
+                "symbol": "CMDX",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/comdex/images/cmdx.svg",
+                "ibcDenom": "ibc/B0ADAE6558A3E9B2B49FF2EA89A9AEA312431FEB51FCF73650C8C90589F5149B",
+                "nativeName": "ucmdx",
+                "bridgeMethods": [
+                    {
+                        "chainId": "comdex-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x1D54EcB8583Ca25895c512A8308389fFD581F9c9",
+                "chainId": 7700,
+                "address": "0x1D54EcB8583Ca25895c512A8308389fFD581F9c9",
+                "name": "Injective",
+                "symbol": "INJ",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/injective/images/inj.svg",
+                "ibcDenom": "ibc/4E790C04E6F00F971251E227AEA8E19A5AD274BFE18253EF0EDD7707D8AF1F7C",
+                "nativeName": "inj",
+                "bridgeMethods": [
+                    {
+                        "chainId": "injective-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
             }
         ],
         "canto-testnet": [

@@ -20,7 +20,7 @@ export const COSMOS_HUB: CosmosNetwork = {
     return checkCosmosAddress(this.addressPrefix)(address);
   },
   nativeCurrency: {
-    name: "ATOM",
+    name: "Atom",
     baseName: "uatom",
     symbol: "ATOM",
     decimals: 6,
