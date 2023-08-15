@@ -1,5 +1,6 @@
 "use client";
 import { bridgeMethodToString } from "@/hooks/bridge/interfaces/tokens";
+import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
 import useTransactionStore from "@/stores/transactionStore";
 import { useWalletClient } from "wagmi";
@@ -7,11 +8,112 @@ import { useWalletClient } from "wagmi";
 export default function TestPage() {
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({ testnet: false });
+  const bridgeIn = useBridgeIn({ testnet: false });
   const transactionStore = useTransactionStore();
   console.log(transactionStore.transactions);
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", gap: "5rem" }}>
       <div style={{ display: "flex", flexBasis: "column", gap: "2rem" }}>
+        <h1>Bridge In</h1>
+        <div>
+          <h1>Networks</h1>
+          <ul>
+            {bridgeIn.allOptions.networks.map((network) => (
+              <div key={network.id}>
+                <li
+                  style={{
+                    fontWeight: `${
+                      network.id === bridgeIn.selections.fromNetwork?.id ? "bold" : ""
+                    }`,
+                  }}
+                >
+                  name: {network.name}
+                </li>
+                <button
+                  style={{ background: "lightblue" }}
+                  onClick={() => {
+                    bridgeIn.setters.network(network.id);
+                  }}
+                >
+                  select
+                </button>
+              </div>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h1>Tokens</h1>
+          <ul>
+            {bridgeIn.allOptions.tokens.map((token) => (
+              <div key={token.id}>
+                <li
+                  style={{
+                    fontWeight: `${
+                      token.id === bridgeIn.selections.token?.id
+                        ? "bold"
+                        : ""
+                    }`,
+                  }}
+                >
+                  name: {token.name}
+                </li>
+                <button
+                  style={{ background: "lightblue" }}
+                  onClick={() => {
+                    bridgeIn.setters.token(token.id);
+                  }}
+                >
+                  select
+                </button>
+              </div>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h1>Methods</h1>
+          <ul>
+            {bridgeIn.allOptions.methods.map((method) => (
+              <div key={method.toString()}>
+                <li
+                  style={{
+                    fontWeight: `${
+                      method === bridgeIn.selections.method ? "bold" : ""
+                    }`,
+                  }}
+                >
+                  name: {bridgeMethodToString(method)}
+                </li>
+                <button
+                  style={{ background: "lightblue" }}
+                  onClick={() => {
+                    bridgeIn.setters.method(method);
+                  }}
+                >
+                  select
+                </button>
+              </div>
+            ))}
+          </ul>
+        </div>
+        {signer && (
+          <button
+            style={{ background: "black", color: "white" }}
+            onClick={() =>
+              bridgeIn.bridge(signer?.account.address, "842").then((val) => {
+                if (val.error) {
+                  console.log(val.error);
+                  return;
+                }
+                transactionStore.addTransactions(val.data, signer);
+              })
+            }
+          >
+            bridge in
+          </button>
+        )}
+      </div>
+      <div style={{ display: "flex", flexBasis: "column", gap: "2rem" }}>
+          <h1>Bridge Out</h1>
         <div>
           <h1>Tokens</h1>
           <ul>
@@ -92,23 +194,23 @@ export default function TestPage() {
             ))}
           </ul>
         </div>
+        {signer && (
+          <button
+            style={{ background: "black", color: "white" }}
+            onClick={() =>
+              bridgeOut.bridge(signer?.account.address, "842").then((val) => {
+                if (val.error) {
+                  console.log(val.error);
+                  return;
+                }
+                transactionStore.addTransactions(val.data, signer);
+              })
+            }
+          >
+            bridge out
+          </button>
+        )}
       </div>
-      {signer && (
-        <button
-          style={{ background: "black", color: "white" }}
-          onClick={() =>
-            bridgeOut.bridge(signer?.account.address, "842").then((val) => {
-              if (val.error) {
-                console.log(val.error);
-                return;
-              }
-              transactionStore.addTransactions(val.data, signer);
-            })
-          }
-        >
-          bridge out
-        </button>
-      )}
       {transactionStore.transactions.map((txList, idx) => (
         <ul key={idx}>
           <li>txList: {idx}</li>

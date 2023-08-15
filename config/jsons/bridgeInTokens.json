@@ -69,6 +69,21 @@
                 ]
             }
         ],
+        "cosmos-hub": [
+            {
+                "id": "ibc/9117A26BA81E29FA4F78F57DC2BD90CD3D26848101BA880445F119B22A1E254E",
+                "chainId": "cosmos-hub",
+                "name": "Atom",
+                "symbol": "ATOM",
+                "decimals": 6,
+                "icon": "",
+                "ibcDenom": "ibc/9117A26BA81E29FA4F78F57DC2BD90CD3D26848101BA880445F119B22A1E254E",
+                "nativeName": "uatom",
+                "bridgeMethods": [
+                    "1"
+                ]
+            }
+        ],
         "mumbai-testnet": [
             {
                 "id": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",

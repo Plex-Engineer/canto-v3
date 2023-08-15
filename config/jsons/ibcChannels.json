@@ -6,5 +6,9 @@
     "gravity-bridge": {
         "toCanto": "channel-88",
         "fromCanto": "channel-0"
+    },
+    "osmosis-1": {
+        "toCanto": "channel-550",
+        "fromCanto": "channel-5"
     }
 }

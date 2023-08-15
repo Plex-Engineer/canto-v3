@@ -138,6 +138,25 @@
                         ]
                     }
                 ]
+            },
+            {
+                "id": "0x0CE35b0D42608Ca54Eb7bcc8044f7087C18E7717",
+                "chainId": 7700,
+                "address": "0x0CE35b0D42608Ca54Eb7bcc8044f7087C18E7717",
+                "name": "Osmosis",
+                "symbol": "OSMO",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg",
+                "ibcDenom": "ibc/D24B4564BCD51D3D02D9987D92571EAC5915676A9BD6D9B0C1D0254CB8A5EA34",
+                "nativeName": "uosmo",
+                "bridgeMethods": [
+                    {
+                        "chainId": "osmosis-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
             }
         ],
         "canto-testnet": [
