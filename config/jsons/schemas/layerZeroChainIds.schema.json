@@ -1,0 +1,11 @@
+{
+    "title": "Layer Zero Chain ID list",
+    "description": "All layer zero chain ids for given chains (not the same as EVM chain id)",
+    "type": "object",
+    "patternProperties": {
+        "^.*$": {
+            "type": "number"
+        }
+    },
+    "additionalProperties": false
+}

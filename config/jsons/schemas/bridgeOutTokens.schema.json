@@ -1,0 +1,108 @@
+{
+    "title": "Bridge Out Token list schema",
+    "type": "object",
+    "properties": {
+        "title": {
+            "description": "title",
+            "type": "string"
+        },
+        "description": {
+            "description": "description",
+            "type": "string"
+        },
+        "bridgeMethodInfo": {
+            "$ref": "#/definitions/bridgeMethodInfo"
+        },
+        "chainTokenList": {
+            "patternProperties": {
+                "^.*$": {
+                    "description": "bridge out tokens for specified chain",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/bridgeOutToken"
+                    }
+                }
+            }
+        }
+    },
+    "additionalProperties": false,
+    "definitions": {
+        "bridgeMethodInfo": {
+            "type": "object",
+            "patternProperties": {
+                "^[0-9]*$": {
+                    "description": "bridge method",
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        },
+        "bridgeMethods": {
+            "type": "object",
+            "properties": {
+                "chainId": {
+                    "description": "chainId",
+                    "type": "string"
+                },
+                "methods": {
+                    "description": "methods the token can be bridged with to this chain",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "bridgeOutToken": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "id",
+                    "type": "string"
+                },
+                "chainId": {
+                    "description": "chainId",
+                    "type": "number"
+                },
+                "address": {
+                    "description": "address",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "name",
+                    "type": "string"
+                },
+                "symbol": {
+                    "description": "symbol",
+                    "type": "string"
+                },
+                "decimals": {
+                    "description": "decimals",
+                    "type": "number"
+                },
+                "icon": {
+                    "description": "icon",
+                    "type": "string"
+                },
+                "bridgeMethods": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/bridgeMethods"
+                    }
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "id",
+                "chainId",
+                "address",
+                "name",
+                "symbol",
+                "decimals",
+                "icon",
+                "bridgeMethods"
+            ]
+        }
+    }
+}
