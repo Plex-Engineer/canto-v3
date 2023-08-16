@@ -6,9 +6,9 @@ jobs:
   verify-json-validation:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - name: Validate JSON
-        uses: docker://orrosenblatt/validate-json-action:latest
+        uses: GrantBirki/json-yaml-validate@v2.3.0
         env:
-          INPUT_SCHEMA: /config/jsons/schemas/ibcChannels.schema.json
-          INPUT_JSONS: /config/jsons/ibcChannels.json
+          json_schema: /config/jsons/schemas/ibcChannels.schema.json
+          files: /config/jsons/ibcChannels.json
