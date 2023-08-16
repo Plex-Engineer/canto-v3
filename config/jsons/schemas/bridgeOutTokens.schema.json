@@ -111,7 +111,7 @@
                 "icon",
                 "bridgeMethods"
             ],
-            "dependantRequired": {
+            "dependentRequired": {
                 "ibcDenom": [
                     "nativeName"
                 ],
