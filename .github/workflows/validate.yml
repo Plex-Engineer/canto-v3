@@ -9,6 +9,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Validate JSON
         uses: GrantBirki/json-yaml-validate@v2.3.0
-        env:
+        with:
+          comment: "true"
           json_schema: config/jsons/schemas/ibcChannels.schema.json
           files: config/jsons/ibcChannels.json
