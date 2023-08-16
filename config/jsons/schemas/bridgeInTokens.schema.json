@@ -1,5 +1,5 @@
 {
-    "title": "Bridge Out Token list schema",
+    "title": "Bridge In Token list schema",
     "type": "object",
     "properties": {
         "title": {
@@ -26,10 +26,10 @@
             "type": "object",
             "patternProperties": {
                 "^.*$": {
-                    "description": "bridge out tokens for specified chain",
+                    "description": "bridge in tokens for specified chain",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/bridgeOutToken"
+                        "$ref": "#/definitions/bridgeInToken"
                     }
                 }
             }
@@ -37,24 +37,7 @@
     },
     "additionalProperties": false,
     "definitions": {
-        "bridgeMethods": {
-            "type": "object",
-            "properties": {
-                "chainId": {
-                    "description": "chainId",
-                    "type": "string"
-                },
-                "methods": {
-                    "description": "methods the token can be bridged with to this chain",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            },
-            "additionalProperties": false
-        },
-        "bridgeOutToken": {
+        "bridgeInToken": {
             "type": "object",
             "properties": {
                 "id": {
@@ -88,7 +71,7 @@
                 "bridgeMethods": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/bridgeMethods"
+                       "type": "string"
                     }
                 },
                 "ibcDenom": {

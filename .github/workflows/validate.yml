@@ -25,3 +25,9 @@ jobs:
           comment: "true"
           json_schema: config/jsons/schemas/bridgeOutTokens.schema.json
           files: config/jsons/bridgeOutTokens.json
+      - name: Validate Bridge In Tokens
+        uses: GrantBirki/json-yaml-validate@v2.3.0
+        with:
+          comment: "true"
+          json_schema: config/jsons/schemas/bridgeInTokens.schema.json
+          files: config/jsons/bridgeInTokens.json
