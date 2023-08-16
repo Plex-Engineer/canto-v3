@@ -90,6 +90,14 @@
                     "items": {
                         "$ref": "#/definitions/bridgeMethods"
                     }
+                },
+                "ibcDenom": {
+                    "description": "ibcDenom",
+                    "type": "string"
+                },
+                "nativeName": {
+                    "description": "nativeName",
+                    "type": "string"
                 }
             },
             "additionalProperties": false,
@@ -102,7 +110,15 @@
                 "decimals",
                 "icon",
                 "bridgeMethods"
-            ]
+            ],
+            "dependantRequired": {
+                "ibcDenom": [
+                    "nativeName"
+                ],
+                "nativeName": [
+                    "ibcDenom"
+                ]
+            }
         }
     }
 }
