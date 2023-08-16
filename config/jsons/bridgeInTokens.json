@@ -129,7 +129,7 @@
         "avalanche-testnet": [
             {
                 "id": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
-                "chainid": 43113,
+                "chainId": 43113,
                 "address": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
                 "name": "Canto",
                 "symbol": "CANTO",
@@ -143,7 +143,7 @@
         "optimism-testnet": [
             {
                 "id": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
-                "chainid": 43113,
+                "chainId": 43113,
                 "address": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
                 "name": "Canto",
                 "symbol": "CANTO",
