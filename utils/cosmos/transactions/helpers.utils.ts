@@ -67,6 +67,12 @@ export async function signAndBroadcastCosmosTransaction(
     // create correct fee object for EIP712
     const feeObj = generateFeeObj(tx.fee, context.sender.accountAddress);
 
+    // check if multiple messages are included in transactions
+    const eipMsgArray = Array.isArray(tx.eipMsg) ? tx.eipMsg : [tx.eipMsg];
+    const cosmosMsgArray = Array.isArray(tx.cosmosMsg)
+      ? tx.cosmosMsg
+      : [tx.cosmosMsg];
+
     // create eip payload
     const eipPayload = generateMessageWithMultipleTransactions(
       context.sender.accountNumber.toString(),
@@ -74,7 +80,7 @@ export async function signAndBroadcastCosmosTransaction(
       context.chain.cosmosChainId,
       context.memo,
       feeObj,
-      [tx.eipMsg]
+      eipMsgArray
     );
     const eipToSign = createEIP712(
       tx.typesObject,
@@ -83,7 +89,7 @@ export async function signAndBroadcastCosmosTransaction(
     );
     // create cosmos payload
     const cosmosPayload = createTransactionWithMultipleMessages(
-      [tx.cosmosMsg],
+      cosmosMsgArray,
       context.memo,
       tx.fee.amount,
       tx.fee.denom,

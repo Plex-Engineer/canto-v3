@@ -70,8 +70,8 @@ export interface EIP712FeeObject {
   feePayer: string;
 }
 export interface UnsignedCosmosMessages {
-  eipMsg: EIP712Message;
-  cosmosMsg: CosmosNativeMessage;
+  eipMsg: EIP712Message | EIP712Message[];
+  cosmosMsg: CosmosNativeMessage | CosmosNativeMessage[];
   // fee must be converted to correct type before sending
   fee: Fee;
   typesObject: object;

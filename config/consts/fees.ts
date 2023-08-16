@@ -34,3 +34,8 @@ export const REDELEGATE_FEE = {
   denom: "acanto",
   gas: "1000000",
 };
+export const CLAIM_STAKING_REWARD_FEE = {
+  amount: "3000000000000000000",
+  denom: "acanto",
+  gas: "3000000",
+};

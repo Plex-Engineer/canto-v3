@@ -6,6 +6,7 @@ import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
 import useStaking from "@/hooks/staking/useStaking";
 import useTransactionStore from "@/stores/transactionStore";
+import { createMsgsClaimStakingRewards } from "@/utils/cosmos/transactions/messages/staking/claimRewards";
 import { createMsgsDelegate } from "@/utils/cosmos/transactions/messages/staking/delegate";
 import { useWalletClient } from "wagmi";
 
@@ -47,10 +48,8 @@ export default function TestPage() {
         <button
           onClick={() => {
             const tx = createMsgsDelegate({
-              delegatorCantoAddress:
-                "canto address",
-              validatorAddress:
-                "validator address",
+              delegatorCantoAddress: "canto address",
+              validatorAddress: "validator address",
               amount: "1000000000000000000",
               denom: "acanto",
               undelegate: true,
@@ -69,6 +68,27 @@ export default function TestPage() {
           }}
         >
           STAKE
+        </button>
+        <button
+          onClick={() => {
+            const tx = createMsgsClaimStakingRewards({
+              delegatorCantoAddress: "canto address",
+              validatorAddresses: [],
+            });
+            transactionStore.addTransactions(
+              [
+                {
+                  msg: tx,
+                  type: "COSMOS",
+                  chainId: 7700,
+                  description: "claim rewards",
+                },
+              ],
+              signer
+            );
+          }}
+        >
+          STAKE Rewards
         </button>
         <h1>Bridge In</h1>
         <div>
