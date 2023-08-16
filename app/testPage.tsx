@@ -1,5 +1,7 @@
 "use client";
+import { OSMOSIS } from "@/config/networks";
 import { bridgeMethodToString } from "@/hooks/bridge/interfaces/tokens";
+import { txIBCOut } from "@/hooks/bridge/transactions/ibc";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
 import useTransactionStore from "@/stores/transactionStore";
@@ -8,12 +10,36 @@ import { useWalletClient } from "wagmi";
 export default function TestPage() {
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({ testnet: false });
-  const bridgeIn = useBridgeIn({ testnet: false });
+  const bridgeIn = useBridgeIn({ testnet: true });
   const transactionStore = useTransactionStore();
-  console.log(transactionStore.transactions);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "5rem" }}>
-      <div style={{ display: "flex", flexBasis: "column", gap: "2rem" }}>
+      <div
+        style={{ display: "flex", flexBasis: "column", gap: "2rem" }}
+        key={"in"}
+      >
+        <button
+          onClick={() =>
+            txIBCOut(
+              7700,
+              "eth address",
+              "cosmos address",
+              OSMOSIS,
+              {
+                address: "",
+                ibcDenom:
+                  "ibc/F4FA8E78509CC7899084B948754B29532ECC6C8A4052C1223414B49F5DC0B3ED",
+              },
+              "1",
+              true
+            ).then((val) => {
+              console.log(val)
+              transactionStore.addTransactions(val.data, signer);
+            })
+          }
+        >
+          RECOVERY
+        </button>
         <h1>Bridge In</h1>
         <div>
           <h1>Networks</h1>
@@ -23,7 +49,9 @@ export default function TestPage() {
                 <li
                   style={{
                     fontWeight: `${
-                      network.id === bridgeIn.selections.fromNetwork?.id ? "bold" : ""
+                      network.id === bridgeIn.selections.fromNetwork?.id
+                        ? "bold"
+                        : ""
                     }`,
                   }}
                 >
@@ -49,9 +77,7 @@ export default function TestPage() {
                 <li
                   style={{
                     fontWeight: `${
-                      token.id === bridgeIn.selections.token?.id
-                        ? "bold"
-                        : ""
+                      token.id === bridgeIn.selections.token?.id ? "bold" : ""
                     }`,
                   }}
                 >
@@ -99,7 +125,7 @@ export default function TestPage() {
           <button
             style={{ background: "black", color: "white" }}
             onClick={() =>
-              bridgeIn.bridge(signer?.account.address, "842").then((val) => {
+              bridgeIn.bridge(signer?.account.address, "10").then((val) => {
                 if (val.error) {
                   console.log(val.error);
                   return;
@@ -112,8 +138,11 @@ export default function TestPage() {
           </button>
         )}
       </div>
-      <div style={{ display: "flex", flexBasis: "column", gap: "2rem" }}>
-          <h1>Bridge Out</h1>
+      <div
+        style={{ display: "flex", flexBasis: "column", gap: "2rem" }}
+        key={"out"}
+      >
+        <h1>Bridge Out</h1>
         <div>
           <h1>Tokens</h1>
           <ul>
@@ -198,13 +227,15 @@ export default function TestPage() {
           <button
             style={{ background: "black", color: "white" }}
             onClick={() =>
-              bridgeOut.bridge(signer?.account.address, "842").then((val) => {
-                if (val.error) {
-                  console.log(val.error);
-                  return;
-                }
-                transactionStore.addTransactions(val.data, signer);
-              })
+              bridgeOut
+                .bridge(signer?.account.address, "1000000000000000000")
+                .then((val) => {
+                  if (val.error) {
+                    console.log(val.error);
+                    return;
+                  }
+                  transactionStore.addTransactions(val.data, signer);
+                })
             }
           >
             bridge out
@@ -221,6 +252,15 @@ export default function TestPage() {
               </li>
               <li>
                 {idx2}- status: {tx.status}
+              </li>
+              <li>
+                {idx2}-{" "}
+                <a
+                  href={tx.txLink}
+                  style={{ cursor: "pointer", color: "blue" }}
+                >
+                  link
+                </a>
               </li>
             </ul>
           ))}

@@ -482,9 +482,9 @@
                 ]
             },
             {
-                "id": "0xB5124FA2b2cF92B2D469b249433BA1c96BDF536D",
+                "id": "0x9d6F2a9fDB32708e1AC07788cc29D6125ac73027",
                 "chainId": 7700,
-                "address": "0xB5124FA2b2cF92B2D469b249433BA1c96BDF536D",
+                "address": "0x9d6F2a9fDB32708e1AC07788cc29D6125ac73027",
                 "name": "Quicksilver Liquid Staked ATOM",
                 "symbol": "qATOM",
                 "decimals": 6,

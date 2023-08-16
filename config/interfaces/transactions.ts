@@ -28,6 +28,7 @@ export interface TransactionWithStatus {
   status: TransactionStatus;
   hash?: string;
   error?: Error;
+  txLink?: string;
 }
 
 ///

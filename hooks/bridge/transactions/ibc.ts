@@ -7,10 +7,10 @@ import { IBCToken } from "../interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
 import { CosmosNetwork } from "@/config/interfaces/networks";
 import { ethToCantoAddress, isValidEthAddress } from "@/utils/address.utils";
-import { createMsgsConvertERC20 } from "@/utils/cosmos/transactions/messages/convertERC20";
 import { createMsgsIBCOut } from "@/utils/cosmos/transactions/messages/ibc";
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
 import { tryFetchMultipleEndpoints } from "@/utils/async.utils";
+import { _convertERC20Tx } from "./recovery";
 
 export async function txIBCOut(
   chainId: number,
@@ -18,7 +18,8 @@ export async function txIBCOut(
   receiverCosmosAddress: string,
   receivingChain: CosmosNetwork,
   token: IBCToken,
-  amount: string
+  amount: string,
+  recovery: boolean = false
 ): PromiseWithError<Transaction[]> {
   // check params
   if (!isValidEthAddress(senderEthAddress)) {
@@ -63,15 +64,20 @@ export async function txIBCOut(
     return NEW_ERROR("txIBCOut::" + timestampError.message);
   }
 
-  // return the messges
-  return NO_ERROR([
-    _convertERC20Tx(
-      chainId,
-      token.address,
-      amount,
-      senderEthAddress,
-      cantoAddress
-    ),
+  // if recovery, return only the ibc msg
+  const allTxs: Transaction[] = [];
+  if (!recovery) {
+    allTxs.push(
+      _convertERC20Tx(
+        chainId,
+        token.address,
+        amount,
+        senderEthAddress,
+        cantoAddress
+      )
+    );
+  }
+  allTxs.push(
     _ibcOutTx(
       chainId,
       "transfer",
@@ -84,34 +90,16 @@ export async function txIBCOut(
       Number(ibcData.height.revision_height) + 1000,
       blockTimestamp.slice(0, 9) + "00000000000",
       "ibc from canto"
-    ),
-  ]);
+    )
+  );
+
+  return NO_ERROR(allTxs);
 }
 
 /**
  * TRANSACTION CREATORS
  * WILL NOT CHECK FOR VALIDITY OF PARAMS, MUST DO THIS BEFORE USING THESE CONSTRUCTORS
  */
-const _convertERC20Tx = (
-  chainId: number,
-  tokenAddress: string,
-  amount: string,
-  sender: string,
-  receiver: string
-): Transaction => {
-  const convertCoinTx = createMsgsConvertERC20({
-    contract_address: tokenAddress,
-    amount,
-    receiver,
-    sender,
-  });
-  return {
-    chainId,
-    description: "Convert ERC20",
-    type: "COSMOS",
-    msg: convertCoinTx,
-  };
-};
 
 const _ibcOutTx = (
   chainId: number,

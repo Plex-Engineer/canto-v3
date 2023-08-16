@@ -11,6 +11,7 @@ import {
   performSingleTransaction,
   waitForTransaction,
 } from "@/utils/baseTransaction.utils";
+import { getNetworkInfoFromChainId } from "@/utils/networks.utils";
 import { GetWalletClientResult } from "wagmi/actions";
 import { create } from "zustand";
 
@@ -69,12 +70,17 @@ const useTransactionStore = create<TransactionStore>()((set, get) => ({
             status: "ERROR",
             error: txError,
           });
-          throw Error("transactionStore::performTransaction::" + txError.message);
+          throw Error(
+            "transactionStore::performTransaction::" + txError.message
+          );
         }
         // we have a txHash so we can set status to pending
         get().setTxStatus(listIndex, i, {
           status: "PENDING",
           hash: txHash,
+          txLink: getNetworkInfoFromChainId(
+            transactions[i].tx.chainId
+          ).data.blockExplorer?.getTransactionLink(txHash),
         });
         // wait for the result before moving on
         const { data: receipt, error: txReceiptError } =
