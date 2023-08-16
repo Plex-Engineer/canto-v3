@@ -4,7 +4,7 @@ import {
   UnsignedCosmosMessages,
 } from "@/config/interfaces/transactions";
 import { CONVERT_FEE } from "@/config/consts/fees";
-import { generateCosmosEIPTypes } from "./base";
+import { generateCosmosEIPTypes } from "../base";
 import { MsgConvertERC20 } from "@buf/evmos_evmos.bufbuild_es/evmos/erc20/v1/tx_pb.js";
 
 ///

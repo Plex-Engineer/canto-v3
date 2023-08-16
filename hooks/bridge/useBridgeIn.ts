@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
 import { CANTO_MAINNET, CANTO_TESTNET } from "@/config/networks";
 import BRIDGE_IN_TOKEN_LIST from "@/config/jsons/bridgeInTokens.json";
@@ -19,7 +19,6 @@ import { BridgeToken, BridgingMethod } from "./interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
 import { bridgeInGravity } from "./transactions/gravityBridge";
 import { bridgeLayerZero } from "./transactions/layerZero";
-import { getUserNativeTokenBalancesWithDenomTraces } from "@/utils/cosmos/nativeTokens.utils";
 
 export default function useBridgeIn(
   props: BridgeHookInputParams
@@ -38,10 +37,6 @@ export default function useBridgeIn(
     selectedToken: null,
     selectedMethod: null,
   };
-
-  useEffect(() => {
-    getUserNativeTokenBalancesWithDenomTraces(7700, "canto13y2a4xdkn6zdumyhj2xn0rvcsayzcecuhmwl8d").then(console.log)
-  },[])
 
   // state of the entire hook that will be exposed
   const [state, setState] = useState<BridgeHookState>(initialState);

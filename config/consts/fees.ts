@@ -16,3 +16,21 @@ export const PUB_KEY_FEE = {
   denom: "acanto",
   gas: "250000",
 };
+
+export const DELEGATE_FEE = {
+  amount: "300000000000000000",
+  denom: "acanto",
+  gas: "300000",
+};
+
+export const UNDELEGATE_FEE = {
+  amount: "500000000000000000",
+  denom: "acanto",
+  gas: "500000",
+};
+
+export const REDELEGATE_FEE = {
+  amount: "1000000000000000000",
+  denom: "acanto",
+  gas: "1000000",
+};

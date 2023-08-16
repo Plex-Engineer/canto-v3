@@ -1,6 +1,6 @@
 import { Transaction } from "@/config/interfaces/transactions";
-import { createMsgsConvertCoin } from "@/utils/cosmos/transactions/messages/convertCoin";
-import { createMsgsConvertERC20 } from "@/utils/cosmos/transactions/messages/convertERC20";
+import { createMsgsConvertCoin } from "@/utils/cosmos/transactions/messages/convertCoin/convertCoin";
+import { createMsgsConvertERC20 } from "@/utils/cosmos/transactions/messages/convertCoin/convertERC20";
 
 /**
  * TRANSACTION CREATORS

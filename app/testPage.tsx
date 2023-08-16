@@ -4,7 +4,9 @@ import { bridgeMethodToString } from "@/hooks/bridge/interfaces/tokens";
 import { txIBCOut } from "@/hooks/bridge/transactions/ibc";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
+import useStaking from "@/hooks/staking/useStaking";
 import useTransactionStore from "@/stores/transactionStore";
+import { createMsgsDelegate } from "@/utils/cosmos/transactions/messages/staking/delegate";
 import { useWalletClient } from "wagmi";
 
 export default function TestPage() {
@@ -12,6 +14,8 @@ export default function TestPage() {
   const bridgeOut = useBridgeOut({ testnet: false });
   const bridgeIn = useBridgeIn({ testnet: true });
   const transactionStore = useTransactionStore();
+  const staking = useStaking();
+  console.log(transactionStore.transactions);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "5rem" }}>
       <div
@@ -33,12 +37,38 @@ export default function TestPage() {
               "1",
               true
             ).then((val) => {
-              console.log(val)
+              console.log(val);
               transactionStore.addTransactions(val.data, signer);
             })
           }
         >
           RECOVERY
+        </button>
+        <button
+          onClick={() => {
+            const tx = createMsgsDelegate({
+              delegatorCantoAddress:
+                "canto address",
+              validatorAddress:
+                "validator address",
+              amount: "1000000000000000000",
+              denom: "acanto",
+              undelegate: true,
+            });
+            transactionStore.addTransactions(
+              [
+                {
+                  msg: tx,
+                  type: "COSMOS",
+                  chainId: 7700,
+                  description: "delegate",
+                },
+              ],
+              signer
+            );
+          }}
+        >
+          STAKE
         </button>
         <h1>Bridge In</h1>
         <div>

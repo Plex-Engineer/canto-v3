@@ -2,9 +2,11 @@ import { NEW_ERROR, NO_ERROR, ReturnWithError } from "../interfaces/errors";
 import { Chain } from "../interfaces/transactions";
 import { CANTO_MAINNET, CANTO_TESTNET } from "../networks";
 
+export const CANTO_BOT_API_URL = "https://dust.plexnode.org/";
+export const CANTO_DATA_API_URL = "https://canto-api-1.plexnode.wtf";
+
 const CANTO_MAINNET_COSMOS_ENDPOINT = "https://mainnode.plexnode.org:1317";
 const CANTO_TESTNET_COSMOS_ENDPOINT = "https://api-testnet.plexnode.wtf";
-export const CANTO_BOT_API_URL = "https://dust.plexnode.org/";
 
 // should only be called on canto endpoints
 export function getCosmosAPIEndpoint(chainId: number): ReturnWithError<string> {
