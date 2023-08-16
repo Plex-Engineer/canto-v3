@@ -1,6 +1,4 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://canto.io/ibcChannelSchema.json",
     "title": "IBC Channel List",
     "description": "An entry in the IBC channel list for a given chain",
     "type": "object",
