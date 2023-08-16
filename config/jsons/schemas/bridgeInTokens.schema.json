@@ -46,7 +46,10 @@
                 },
                 "chainId": {
                     "description": "chainId",
-                    "type": "number"
+                    "type": [
+                        "number",
+                        "string"
+                    ]
                 },
                 "address": {
                     "description": "address",
@@ -71,7 +74,7 @@
                 "bridgeMethods": {
                     "type": "array",
                     "items": {
-                       "type": "string"
+                        "type": "string"
                     }
                 },
                 "ibcDenom": {
@@ -87,19 +90,28 @@
             "required": [
                 "id",
                 "chainId",
-                "address",
                 "name",
                 "symbol",
                 "decimals",
                 "icon",
                 "bridgeMethods"
             ],
-            "dependencies": {
-                "ibcDenom": [
-                    "nativeName"
-                ],
-                "nativeName": [
+            "if": {
+                "properties": {
+                    "chainId": {
+                        "type": "string"
+                    }
+                }
+            },
+            "then": {
+                "required": [
+                    "nativeName",
                     "ibcDenom"
+                ]
+            },
+            "else": {
+                "required": [
+                    "address"
                 ]
             }
         }
