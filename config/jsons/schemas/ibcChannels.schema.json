@@ -2,8 +2,8 @@
     "title": "IBC Channel List",
     "description": "An entry in the IBC channel list for a given chain",
     "type": "object",
-    "properties": {
-        "cosmos-hub": {
+    "patternProperties": {
+        "^.*$": {
             "$ref": "#/definitions/ibcInfo"
         }
     },
