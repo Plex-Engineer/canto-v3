@@ -9,6 +9,7 @@
             "$ref": "#/definitions/ibcInfo"
         }
     },
+    "additionalProperties": false,
     "definitions": {
         "ibcInfo": {
             "type": "object",

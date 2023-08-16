@@ -10,5 +10,5 @@ jobs:
       - name: Validate JSON
         uses: GrantBirki/json-yaml-validate@v2.3.0
         env:
-          json_schema: /config/jsons/schemas/ibcChannels.schema.json
-          files: /config/jsons/ibcChannels.json
+          json_schema: config/jsons/schemas/ibcChannels.schema.json
+          files: config/jsons/ibcChannels.json
