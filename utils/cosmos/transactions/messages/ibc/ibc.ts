@@ -7,7 +7,7 @@ import { MsgTransfer } from "@buf/cosmos_ibc.bufbuild_es/ibc/applications/transf
 import { Height } from "@buf/cosmos_ibc.bufbuild_es/ibc/core/client/v1/client_pb.js";
 import { Coin } from "@buf/cosmos_cosmos-sdk.bufbuild_es/cosmos/base/v1beta1/coin_pb";
 import { IBC_FEE } from "@/config/consts/fees";
-import { generateCosmosEIPTypes } from "./base";
+import { generateCosmosEIPTypes } from "../base";
 
 const IBC_MSG_TYPES = {
   MsgValue: [
