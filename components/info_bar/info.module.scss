@@ -19,8 +19,20 @@
 
   align-items: center;
   background: var(--primary-color, #111);
+
+  animation: slideIn 0.3s ease-out 1s forwards;
+  transform: translateY(-100%);
 }
 
 .shadow {
   box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0%);
+  }
 }

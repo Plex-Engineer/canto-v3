@@ -1,13 +1,4 @@
-.line {
-  stroke-width: 1.678px;
-  width: 120%;
-  stroke: #06fc99;
-  transform: rotate(attr(data-rotation) deg);
-  position: absolute;
-}
-
 .container {
-  //   border: 1px solid white;
   height: 100%;
   width: 100%;
   display: flex;
@@ -17,52 +8,51 @@
   overflow: hidden;
   z-index: 0;
   background: url("/wires.svg") no-repeat center center;
-  //black color
+  background-size: 100%;
 }
 
 .moving {
   width: 10px;
-  //   transform: translate(0px, -48px);
   border: 1px solid white;
   opacity: 0.5;
   aspect-ratio: 1.23433242507;
   position: absolute;
-
+  --anim-time: 20s;
   &:nth-of-type(1) {
-    animation: moving 10s linear infinite;
+    animation: moving var(--anim-time) linear infinite;
     animation-delay: 0s;
   }
 
   &:nth-of-type(2) {
-    animation: moving 10s linear infinite;
-    animation-delay: 2s;
-  }
-
-  &:nth-of-type(3) {
-    animation: moving 10s linear infinite;
+    animation: moving var(--anim-time) linear infinite;
     animation-delay: 4s;
   }
 
-  &:nth-of-type(4) {
-    animation: moving 10s linear infinite;
-    animation-delay: 6s;
-  }
-
-  &:nth-of-type(5) {
-    animation: moving 10s linear infinite;
+  &:nth-of-type(3) {
+    animation: moving var(--anim-time) linear infinite;
     animation-delay: 8s;
   }
 
+  &:nth-of-type(4) {
+    animation: moving var(--anim-time) linear infinite;
+    animation-delay: 12s;
+  }
+
+  &:nth-of-type(5) {
+    animation: moving var(--anim-time) linear infinite;
+    animation-delay: 16s;
+  }
+
   &:nth-of-type(6) {
-    animation: moving 10s linear infinite;
-    animation-delay: 10s;
+    animation: moving var(--anim-time) linear infinite;
+    animation-delay: 20s;
   }
 
   @keyframes moving {
-    from {
+    0% {
       width: 100px;
     }
-    to {
+    100% {
       width: 100vw;
     }
   }

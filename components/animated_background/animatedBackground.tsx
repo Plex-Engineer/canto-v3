@@ -1,6 +1,5 @@
 import React from "react";
 import styles from "./anim_bg.module.scss";
-import Image from "next/image";
 
 const AnimatedBackground = () => {
   return (
