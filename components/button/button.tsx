@@ -92,7 +92,7 @@ const Button = (props: Props) => {
       case "secondary":
         return "var(--text-dark-color)";
       case "accent":
-        return "var(--text-dark-color)";
+        return "var(--text-only-dark)";
       case undefined:
         return "var(--text-light-color)";
       default:
@@ -134,7 +134,12 @@ const Button = (props: Props) => {
         <Image
           src={props.icon.url}
           style={{
-            filter: props.color == "primary" ? "invert(1)" : "invert(0)",
+            filter:
+              props.color == "primary"
+                ? "invert(var(--light-mode))"
+                : props.color == "accent"
+                ? "invert(0)"
+                : "invert(var(--dark-mode))",
           }}
           alt="icon"
           width={props.icon.size || 16}
@@ -146,7 +151,12 @@ const Button = (props: Props) => {
       {props.isLoading && (
         <Image
           style={{
-            filter: props.color == "primary" ? "invert(1)" : "invert(0)",
+            filter:
+              props.color == "primary"
+                ? "invert(var(--light-mode))"
+                : props.color == "accent"
+                ? "invert(0)"
+                : "invert(var(--dark-mode))",
           }}
           src="/loader.svg"
           alt="loading"

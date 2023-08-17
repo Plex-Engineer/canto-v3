@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --dark-mode: 0;
+    --light-mode: 1;
+}
 .light {
     --text-only-dark: #222222;
     --text-only-light: #ffffff;
@@ -19,10 +23,12 @@
     --border-optional-color: #ffffff00;
     --extra-shadow: #cdcdcd;
     --border-stroke-color: #b3b3b3;
-    --border-radius: 0;
+    --border-radius: 0px;
     --text-dark-color: #111111;
     --card-sub-surface-color: #dfdfdf;
     --card-surface-color: #f1f1f1;
+    --dark-mode: 0;
+    --light-mode: 1;
 }
 
 .dark {
@@ -42,10 +48,13 @@
     --border-optional-color: #ffffff;
     --extra-shadow: #ffffff;
     --border-stroke-color: #393d49;
-    --border-radius: 4;
+    --border-radius: 4px;
     --text-dark-color: #e1e1e1;
     --card-sub-surface-color: #23292e;
     --card-surface-color: #393e43;
+    --dark-mode: 1;
+    --light-mode: 0;
+    --box-shadow: 0;
 }
 
 .experimental {

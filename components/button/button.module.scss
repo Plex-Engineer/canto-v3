@@ -2,23 +2,22 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 3px 3px 0px 0px rgba(17, 17, 17, 0.15);
   transition: all 0.3s ease-in-out;
   user-select: none;
   cursor: pointer;
-
+  border-radius: var(--border-radius, 0);
+  box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
   &:hover {
     filter: saturate(1) contrast(1.25);
 
-    background-color: #1111113e;
-    box-shadow: 4px 4px 0px 0px rgba(17, 17, 17, 0.2);
+    box-shadow: var(--box-shadow, 4px 4px 0px 0px rgba(17, 17, 17, 0.2));
     transition: all 0.1s linear;
   }
 
   &:active {
     filter: saturate(1.2) contrast(0.85);
 
-    box-shadow: 1px 1px 0px 0px rgba(17, 17, 17, 0.3);
+    box-shadow: var(--box-shadow, 1px 1px 0px 0px rgba(17, 17, 17, 0.3));
     transition: all 0.2s ease-out;
   }
 }
