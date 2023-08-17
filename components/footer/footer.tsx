@@ -77,7 +77,7 @@ const StatusText = () => {
         justifyContent: "center",
       }}
     >
-      <div className={styles.status}></div>
+      <span className={styles.status}></span>
       live data feed
     </Text>
   );
