@@ -16,7 +16,7 @@ export default function TestPage() {
   const bridgeIn = useBridgeIn({ testnet: true });
   const transactionStore = useTransactionStore();
   const staking = useStaking();
-  console.log(transactionStore.transactions);
+  console.log(staking);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "5rem" }}>
       <div
