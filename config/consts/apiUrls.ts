@@ -8,6 +8,7 @@ export const CANTO_DATA_API_ENDPOINTS = {
   allValidators: "/v1/staking/validators",
   stakingApr: "/v1/staking/apr",
 };
+export const GRAVITY_BRIDGE_API_URL = "https://info.gravitychain.io:9000";
 
 const CANTO_MAINNET_COSMOS_ENDPOINT = "https://mainnode.plexnode.org:1317";
 const CANTO_TESTNET_COSMOS_ENDPOINT = "https://api-testnet.plexnode.wtf";
