@@ -15,7 +15,7 @@
                 "name": "USDT",
                 "symbol": "USDT",
                 "decimals": 6,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdt.svg",
                 "bridgeMethods": [
                     "0"
                 ]
@@ -27,7 +27,7 @@
                 "name": "USDC",
                 "symbol": "USDC",
                 "decimals": 6,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdc.svg",
                 "bridgeMethods": [
                     "0"
                 ]
@@ -39,7 +39,7 @@
                 "name": "WETH",
                 "symbol": "WETH",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/weth.svg",
                 "bridgeMethods": [
                     "0"
                 ]
@@ -51,7 +51,7 @@
                 "name": "wrapped staked eth",
                 "symbol": "wstETH",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/wsteth.svg",
                 "bridgeMethods": [
                     "0"
                 ]
@@ -63,7 +63,7 @@
                 "name": "Canto",
                 "symbol": "CANTO",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
                 "bridgeMethods": [
                     "2"
                 ]
@@ -76,7 +76,7 @@
                 "name": "Atom",
                 "symbol": "ATOM",
                 "decimals": 6,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
                 "ibcDenom": "ibc/9117A26BA81E29FA4F78F57DC2BD90CD3D26848101BA880445F119B22A1E254E",
                 "nativeName": "uatom",
                 "bridgeMethods": [
@@ -92,7 +92,7 @@
                 "name": "Canto",
                 "symbol": "CANTO",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
                 "bridgeMethods": [
                     "2"
                 ]
@@ -106,7 +106,7 @@
                 "name": "Canto",
                 "symbol": "CANTO",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
                 "bridgeMethods": [
                     "2"
                 ]
@@ -120,7 +120,7 @@
                 "name": "Canto",
                 "symbol": "CANTO",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
                 "bridgeMethods": [
                     "2"
                 ]
@@ -134,7 +134,7 @@
                 "name": "Canto",
                 "symbol": "CANTO",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
                 "bridgeMethods": [
                     "2"
                 ]
@@ -148,7 +148,7 @@
                 "name": "Canto",
                 "symbol": "CANTO",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
                 "bridgeMethods": [
                     "2"
                 ]

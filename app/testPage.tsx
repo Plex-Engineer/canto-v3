@@ -13,7 +13,7 @@ import { useWalletClient } from "wagmi";
 export default function TestPage() {
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({ testnet: false });
-  const bridgeIn = useBridgeIn({ testnet: true });
+  const bridgeIn = useBridgeIn({ testnet: false });
   const transactionStore = useTransactionStore();
   const staking = useStaking();
   console.log(staking);
@@ -132,6 +132,11 @@ export default function TestPage() {
                   }}
                 >
                   name: {token.name}
+                  <img
+                    style={{ height: "15px", width: "15px" }}
+                    src={token.icon}
+                    alt="icon"
+                  />
                 </li>
                 <button
                   style={{ background: "lightblue" }}
@@ -206,6 +211,11 @@ export default function TestPage() {
                   }}
                 >
                   name: {token.name}
+                  <img
+                    style={{ height: "15px", width: "15px" }}
+                    src={token.icon}
+                    alt="icon"
+                  />
                 </li>
                 <button
                   style={{ background: "lightblue" }}

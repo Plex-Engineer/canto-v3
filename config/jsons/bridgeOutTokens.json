@@ -15,7 +15,7 @@
                 "name": "Canto",
                 "symbol": "CANTO",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
                 "bridgeMethods": [
                     {
                         "chainId": "eth-mainnet",
@@ -32,7 +32,7 @@
                 "name": "USDC",
                 "symbol": "USDC",
                 "decimals": 6,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdc.svg",
                 "ibcDenom": "ibc/17CD484EE7D9723B847D95015FA3EBD1572FD13BC84FB838F55B18A57450F25B",
                 "nativeName": "gravity0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
                 "bridgeMethods": [
@@ -51,7 +51,7 @@
                 "name": "USDT",
                 "symbol": "USDT",
                 "decimals": 6,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdt.svg",
                 "ibcDenom": "ibc/4F6A2DEFEA52CD8D90966ADCB2BD0593D3993AB0DF7F6AEB3EFD6167D79237B0",
                 "nativeName": "gravity0xd567B3d7B8FE3C79a1AD8dA978812cfC4Fa05e75",
                 "bridgeMethods": [
@@ -70,7 +70,7 @@
                 "name": "ETH",
                 "symbol": "ETH",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/eth-white.svg",
                 "ibcDenom": "ibc/DC186CA7A8C009B43774EBDC825C935CABA9743504CE6037507E6E5CCE12858A",
                 "nativeName": "gravity0x5FD55A1B9FC24967C4dB09C513C3BA0DFa7FF687",
                 "bridgeMethods": [
@@ -89,7 +89,7 @@
                 "name": "Wrapped Staked ETH",
                 "symbol": "WSTETH",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/wsteth.svg",
                 "ibcDenom": "ibc/35D050E2A1F7BEAFA783A4A4739DC802A6797E59041341D78D88F5B754948604",
                 "nativeName": "gravity0xc71aAf8e486e3F33841BB56Ca3FD2aC3fa8D29a8",
                 "bridgeMethods": [
@@ -127,7 +127,7 @@
                 "name": "Atom",
                 "symbol": "ATOM",
                 "decimals": 6,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
                 "ibcDenom": "ibc/9117A26BA81E29FA4F78F57DC2BD90CD3D26848101BA880445F119B22A1E254E",
                 "nativeName": "uatom",
                 "bridgeMethods": [
