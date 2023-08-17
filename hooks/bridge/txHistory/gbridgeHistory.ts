@@ -13,10 +13,14 @@ import {
 } from "@/utils/evm/helpers.utils";
 import { Contract } from "web3";
 
+interface UserGBridgeInHistory {
+  completed: SendToCosmosEvent[];
+  queued: GBridgeQueueReturn[];
+}
 export async function getUserGBridgeInHistory(
   chainId: number,
   ethAccount: string
-): PromiseWithError<any> {
+): PromiseWithError<UserGBridgeInHistory> {
   const { data: allTransactions, error: eventError } =
     await getUserGBridgeInEvents(chainId, ethAccount);
   if (eventError) {
@@ -58,10 +62,13 @@ interface SendToCosmosEvent {
   txHash: string;
   blockNumber: string;
 }
+
+// searches the gravity bridge contract for events that match the eth address sender
 async function getUserGBridgeInEvents(
   chainId: number,
   ethAddress: string
 ): PromiseWithError<SendToCosmosEvent[]> {
+  // get rpcUrl for chain
   const { data: rpcUrl, error: rpcError } = getRpcUrlFromChainId(chainId);
   if (rpcError) {
     return NEW_ERROR("getUserGBridgeInEvents::" + rpcError.message);
@@ -111,6 +118,8 @@ interface GBridgeQueueReturn {
   seconds_until_confirmed: string;
   sender: string;
 }
+
+// this data comes from the gravity bridge api
 async function getGBridgeQueueForUser(
   ethAccount: string
 ): PromiseWithError<GBridgeQueueReturn[]> {
