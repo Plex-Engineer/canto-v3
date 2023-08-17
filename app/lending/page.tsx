@@ -1,11 +1,8 @@
 import Button from "@/components/button/button";
-import { url } from "inspector";
 
 export default function LendingPage() {
   return (
     <div>
-      <h1>Lending Page</h1>
-
       <div
         style={{
           display: "grid",
@@ -13,6 +10,7 @@ export default function LendingPage() {
           placeItems: "center",
           width: "50%px",
           minHeight: "80%",
+          backgroundColor: "var(--card-sub-surface-color",
         }}
       >
         <Button color="primary" height={"small"}>

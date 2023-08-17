@@ -57,14 +57,17 @@
     --box-shadow: 0;
 }
 
-.experimental {
-    --text-light-color: #ffffff;
+.dark2 {
+    --text-only-dark: #222222;
+    --text-only-light: #ffffff;
+    --primary-90-color: #eeeeee;
+    --text-light-color: #111111;
     --card-background-color: #0b0b0b;
-    --text-light-30-color: #ffffff4c;
+    --text-light-30-color: #1111114c;
     --extra-failure-color: #ef4444;
     --text-dark-30-color: #ededed4c;
     --extra-success-color: #06fc99;
-    --text-light-40-color: #ffffff66;
+    --text-light-40-color: #11111166;
     --card-subtle-color: #ffffff;
     --text-dark-40-color: #ececec66;
     --card-primary-color: #0ee489;
@@ -75,6 +78,9 @@
     --text-dark-color: #ececec;
     --card-sub-surface-color: #292929;
     --card-surface-color: #1e1e1e;
+    --dark-mode: 1;
+    --light-mode: 0;
+    --box-shadow: 0;
 }
 
 /* @media (prefers-color-scheme: dark) {

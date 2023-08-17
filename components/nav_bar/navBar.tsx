@@ -2,12 +2,21 @@ import Link from "next/link";
 import styles from "./navbar.module.scss";
 import Text from "../text";
 import Image from "next/image";
+import Button from "../button/button";
 
 const NavBar = () => {
   return (
     <div className={styles.container}>
       <div className={styles.logo}>
-        <Image src="/tokens/canto.svg" width={50} height={50} alt="canto" />
+        <Image
+          src="/tokens/canto.svg"
+          width={50}
+          height={50}
+          alt="canto"
+          style={{
+            filter: "invert(var(--dark-mode))",
+          }}
+        />
       </div>
 
       <div className={styles["nav-links"]}>
@@ -28,7 +37,9 @@ const NavBar = () => {
         </Link>
       </div>
 
-      <div className={styles["wallet-connect"]}></div>
+      <div className={styles["wallet-connect"]}>
+        <Button color="secondary">Connect Wallet</Button>
+      </div>
     </div>
   );
 };

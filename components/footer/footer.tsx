@@ -30,6 +30,7 @@ const Footer = () => {
             width={16}
             style={{
               margin: "8px",
+              filter: "invert(var(--dark-mode))",
             }}
           />{" "}
           $0.1101
@@ -48,6 +49,7 @@ const Footer = () => {
             width={16}
             style={{
               margin: "8px",
+              filter: "invert(var(--dark-mode))",
             }}
           />
           $1.0094
