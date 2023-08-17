@@ -2,9 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-    --text-light-color: #ffffff;
+.light {
+    --text-only-dark: #222222;
+    --text-only-light: #ffffff;
     --primary-90-color: #222222;
+    --text-light-color: #ffffff;
     --card-background-color: #c1c1c1;
     --text-light-30-color: #ffffff4c;
     --extra-failure-color: #ef4444;
@@ -21,28 +23,29 @@
     --text-dark-color: #111111;
     --card-sub-surface-color: #dfdfdf;
     --card-surface-color: #f1f1f1;
-
-    background-color: var(--card-primary-color);
 }
 
 .dark {
-    --text-light-color: #ffffff;
-    --card-background-color: #c1c1c1;
-    --text-light-30-color: #ffffff4c;
+    --text-only-dark: #222222;
+    --text-only-light: #ffffff;
+    --primary-90-color: #eeeeee;
+    --text-light-color: #111111;
+    --card-background-color: #303438;
+    --text-light-30-color: #1111114c;
     --extra-failure-color: #ef4444;
-    --text-dark-30-color: #1111114c;
+    --text-dark-30-color: #e1e1e14c;
     --extra-success-color: #06fc99;
-    --text-light-40-color: #ffffff66;
-    --card-subtle-color: #cacaca;
-    --text-dark-40-color: #11111166;
-    --card-primary-color: #111111;
-    --border-optional-color: #ffffff00;
-    --extra-shadow: #cdcdcd;
-    --border-stroke-color: #b3b3b3;
-    --border-radius: 0;
-    --text-dark-color: #111111;
-    --card-sub-surface-color: #dfdfdf;
-    --card-surface-color: #f1f1f1;
+    --text-light-40-color: #11111166;
+    --card-subtle-color: #282f35;
+    --text-dark-40-color: #e1e1e166;
+    --card-primary-color: #0ee489;
+    --border-optional-color: #ffffff;
+    --extra-shadow: #ffffff;
+    --border-stroke-color: #393d49;
+    --border-radius: 4;
+    --text-dark-color: #e1e1e1;
+    --card-sub-surface-color: #23292e;
+    --card-surface-color: #393e43;
 }
 
 .experimental {

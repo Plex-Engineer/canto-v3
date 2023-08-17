@@ -28,6 +28,10 @@
     &:active {
       background: #bcbcbc;
     }
+
+    &:not(:has(a)) {
+      padding: 0 2rem;
+    }
   }
 
   a {
