@@ -2,6 +2,7 @@
     "title": "Canto Bridge In Token List",
     "description": "List of tokens supported by each chain to bridge into canto, and the bridge method to use",
     "bridgeMethodInfo": {
+        "comment": "enum for bridge method also noted in ../schemas/bridgeInTokens.schema.json",
         "0": "gravity bridge",
         "1": "ibc transfer",
         "2": "layer zero"

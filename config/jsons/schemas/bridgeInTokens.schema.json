@@ -10,17 +10,6 @@
             "description": "description",
             "type": "string"
         },
-        "bridgeMethodInfo": {
-            "description": "description of bridging methods available",
-            "type": "object",
-            "patternProperties": {
-                "^[0-9]*$": {
-                    "description": "bridge method",
-                    "type": "string"
-                }
-            },
-            "additionalProperties": false
-        },
         "chainTokenList": {
             "description": "chain id with list of bridging tokens",
             "type": "object",
@@ -35,9 +24,18 @@
             }
         }
     },
-    "additionalProperties": false,
+    "additionalProperties": true,
     "definitions": {
+        "bridgeMethod": {
+            "description": "Types of bridge methods, (0 = gravity bridge, 1 = ibc, 2 = layer zero)",
+            "enum": [
+                "0",
+                "1",
+                "2"
+            ]
+        },
         "bridgeInToken": {
+            "description": "could be an erc20 (from evm), or ibc token (from cosmos)",
             "type": "object",
             "properties": {
                 "id": {
@@ -74,7 +72,7 @@
                 "bridgeMethods": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/bridgeMethod"
                     }
                 },
                 "ibcDenom": {

@@ -32,8 +32,7 @@
                 "0",
                 "1",
                 "2"
-            ],
-            "additionalItems": false
+            ]
         },
         "bridgeMethodWithChain": {
             "description": "Type of bridging method along with chain (for bridging out)",
@@ -111,24 +110,11 @@
                 "icon",
                 "bridgeMethods"
             ],
-            "if": {
-                "properties": {
-                    "bridgeMethods": {
-                        "contains": {
-                            "properties": {
-                                "methods": {
-                                    "contains": {
-                                        "const": "1"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "then": {
-                "required": [
-                    "nativeName",
+            "dependencies": {
+                "ibcDenom": [
+                    "nativeName"
+                ],
+                "nativeName": [
                     "ibcDenom"
                 ]
             }
