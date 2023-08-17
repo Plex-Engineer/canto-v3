@@ -1,0 +1,108 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 3px 3px 0px 0px rgba(17, 17, 17, 0.15);
+  transition: all 0.3s ease-in-out;
+  user-select: none;
+  cursor: pointer;
+
+  &:hover {
+    filter: saturate(1) contrast(1.25);
+
+    background-color: #1111113e;
+    box-shadow: 4px 4px 0px 0px rgba(17, 17, 17, 0.2);
+    transition: all 0.1s linear;
+  }
+
+  &:active {
+    filter: saturate(1.2) contrast(0.85);
+
+    box-shadow: 1px 1px 0px 0px rgba(17, 17, 17, 0.3);
+    transition: all 0.2s ease-out;
+  }
+}
+
+.loader {
+  margin-left: 12px;
+  animation: spin 2s linear infinite;
+  //12 steps with 30deg snaps
+  @keyframes spin {
+    0% {
+      transform: -rotate(0deg);
+    }
+    8.332% {
+      transform: rotate(-0deg);
+    }
+    8.333% {
+      transform: rotate(-30deg);
+    }
+    16.665% {
+      transform: rotate(-30deg);
+    }
+
+    16.666% {
+      transform: rotate(-60deg);
+    }
+    24.99% {
+      transform: rotate(-60deg);
+    }
+    25% {
+      transform: rotate(-90deg);
+    }
+    33.332% {
+      transform: rotate(-90deg);
+    }
+    33.333% {
+      transform: rotate(-120deg);
+    }
+    41.665% {
+      transform: rotate(-120deg);
+    }
+    41.666% {
+      transform: rotate(-150deg);
+    }
+    49.99% {
+      transform: rotate(-150deg);
+    }
+    50% {
+      transform: rotate(-180deg);
+    }
+    58.332% {
+      transform: rotate(-180deg);
+    }
+    58.333% {
+      transform: rotate(-210deg);
+    }
+    66.665% {
+      transform: rotate(-210deg);
+    }
+    66.666% {
+      transform: rotate(-240deg);
+    }
+    74.99% {
+      transform: rotate(-240deg);
+    }
+    75% {
+      transform: rotate(-270deg);
+    }
+    83.332% {
+      transform: rotate(-270deg);
+    }
+    83.333% {
+      transform: rotate(-300deg);
+    }
+    91.665% {
+      transform: rotate(-300deg);
+    }
+    91.666% {
+      transform: rotate(-330deg);
+    }
+    99.9% {
+      transform: rotate(-330deg);
+    }
+    100% {
+      transform: rotate(-359deg);
+    }
+  }
+}
