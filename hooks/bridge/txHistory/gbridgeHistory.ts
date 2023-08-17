@@ -13,7 +13,7 @@ import {
 } from "@/utils/evm/helpers.utils";
 import { Contract } from "web3";
 
-interface UserGBridgeInHistory {
+export interface UserGBridgeInHistory {
   completed: SendToCosmosEvent[];
   queued: GBridgeQueueReturn[];
 }
@@ -86,7 +86,6 @@ async function getUserGBridgeInEvents(
       fromBlock: "0",
       toBlock: "latest",
     });
-    console.log(events);
     // format events to readable format
     const formattedEvents: SendToCosmosEvent[] = [];
     events.forEach((event) => {

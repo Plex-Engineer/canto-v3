@@ -25,7 +25,7 @@ interface LayerZeroEvent {
   tokenAddress: string;
   lzChainId: string;
 }
-interface UserLayerZeroHistory {
+export interface UserLayerZeroHistory {
   sendToChain: LayerZeroEvent[];
   receiveFromChain: LayerZeroEvent[];
 }

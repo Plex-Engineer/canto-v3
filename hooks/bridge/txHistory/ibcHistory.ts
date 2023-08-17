@@ -14,7 +14,7 @@ interface IBCTransaction {
   txHash: string;
   timestamp: string;
 }
-interface UserIBCTransactionHistory {
+export interface UserIBCTransactionHistory {
   ibcIn: IBCTransaction[];
   ibcOut: IBCTransaction[];
 }

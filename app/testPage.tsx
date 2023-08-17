@@ -2,12 +2,14 @@
 import { OSMOSIS } from "@/config/networks";
 import { bridgeMethodToString } from "@/hooks/bridge/interfaces/tokens";
 import { txIBCOut } from "@/hooks/bridge/transactions/ibc";
+import { getAllUserBridgeTransactionHistory } from "@/hooks/bridge/txHistory";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
 import useStaking from "@/hooks/staking/useStaking";
 import useTransactionStore from "@/stores/transactionStore";
 import { createMsgsClaimStakingRewards } from "@/utils/cosmos/transactions/messages/staking/claimRewards";
 import { createMsgsDelegate } from "@/utils/cosmos/transactions/messages/staking/delegate";
+import { useEffect } from "react";
 import { useWalletClient } from "wagmi";
 
 export default function TestPage() {
@@ -17,6 +19,12 @@ export default function TestPage() {
   const transactionStore = useTransactionStore();
   const staking = useStaking();
   console.log(staking);
+
+  useEffect(() => {
+    getAllUserBridgeTransactionHistory(
+      ""
+    ).then(console.log);
+  }, []);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "5rem" }}>
       <div
