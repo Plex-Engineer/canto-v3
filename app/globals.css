@@ -27,6 +27,7 @@
     --text-dark-color: #111111;
     --card-sub-surface-color: #dfdfdf;
     --card-surface-color: #f1f1f1;
+    --border-stoke-dark-color: #222;
     --dark-mode: 0;
     --light-mode: 1;
 }
@@ -48,6 +49,7 @@
     --border-optional-color: #ffffff;
     --extra-shadow: #ffffff;
     --border-stroke-color: #393d49;
+    --border-stoke-dark-color: #555555;
     --border-radius: 4px;
     --text-dark-color: #e1e1e1;
     --card-sub-surface-color: #23292e;

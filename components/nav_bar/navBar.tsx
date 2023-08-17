@@ -1,10 +1,15 @@
+"use client";
 import Link from "next/link";
 import styles from "./navbar.module.scss";
 import Text from "../text";
 import Image from "next/image";
 import Button from "../button/button";
+import { usePathname } from "next/navigation";
+import { clsx } from "clsx";
 
 const NavBar = () => {
+  const currentPath = usePathname();
+
   return (
     <div className={styles.container}>
       <div className={styles.logo}>
@@ -20,19 +25,49 @@ const NavBar = () => {
       </div>
 
       <div className={styles["nav-links"]}>
-        <Link href="/" className={styles["nav-link"]}>
+        <Link
+          href="/"
+          className={clsx(
+            styles["nav-link"],
+            currentPath == "/" && styles.active
+          )}
+        >
           <Text>Home</Text>
         </Link>
-        <Link href="/bridge" className={styles["nav-link"]}>
+        <Link
+          href="/bridge"
+          className={clsx(
+            styles["nav-link"],
+            currentPath == "/bridge" && styles.active
+          )}
+        >
           <Text>Bridge</Text>
         </Link>
-        <Link href="/staking" className={styles["nav-link"]}>
+        <Link
+          href="/staking"
+          className={clsx(
+            styles["nav-link"],
+            currentPath == "/staking" && styles.active
+          )}
+        >
           <Text>Staking</Text>
         </Link>
-        <Link href="/lending" className={styles["nav-link"]}>
+        <Link
+          href="/lending"
+          className={clsx(
+            styles["nav-link"],
+            currentPath == "/lending" && styles.active
+          )}
+        >
           <Text>Lending</Text>
         </Link>
-        <Link href="/governance" className={styles["nav-link"]}>
+        <Link
+          href="/governance"
+          className={clsx(
+            styles["nav-link"],
+            currentPath == "/governance" && styles.active
+          )}
+        >
           <Text>Governance</Text>
         </Link>
       </div>

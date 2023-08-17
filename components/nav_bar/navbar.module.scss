@@ -16,6 +16,13 @@
 
 .nav-link {
   padding: 0 1rem;
+  opacity: 0.4;
+  transition: opacity 0.3s, transform 0.3s;
+
+  &:hover {
+    opacity: 1;
+    transform: translateY(4.7px);
+  }
 
   &::after {
     content: "";
@@ -23,7 +30,7 @@
     height: 1px;
     transform: translateX(-15%) scaleX(0);
 
-    transition: transform 0.3s, height 0.3s;
+    transition: transform 0.3s, height 0.3s 0.2s;
   }
 
   &:hover::after {
@@ -37,6 +44,9 @@
   }
 }
 
+.active {
+  opacity: 1;
+}
 .wallet-connect {
   display: flex;
   align-items: center;
