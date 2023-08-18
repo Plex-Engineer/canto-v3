@@ -21,7 +21,7 @@ export default function useStaking() {
   async function getAllValidators() {
     const { data: validators, error: validatorError } = await tryFetch<
       Validator[]
-    >("http://localhost:8010/proxy" + CANTO_DATA_API_ENDPOINTS.allValidators);
+    >(CANTO_DATA_API_URL + CANTO_DATA_API_ENDPOINTS.allValidators);
     if (validatorError) {
       console.error(validatorError);
       return;
@@ -30,7 +30,7 @@ export default function useStaking() {
   }
   async function getStakingApy() {
     const { data: apy, error: apyError } = await tryFetch<string>(
-      "http://localhost:8010/proxy" + CANTO_DATA_API_ENDPOINTS.stakingApr
+      CANTO_DATA_API_URL + CANTO_DATA_API_ENDPOINTS.stakingApr
     );
     if (apyError) {
       console.error(apyError);

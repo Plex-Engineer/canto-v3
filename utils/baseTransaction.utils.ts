@@ -10,6 +10,7 @@ import { performCosmosTransaction } from "./cosmos/performCosmosTx";
 import { waitForTransaction as evmWait } from "wagmi/actions";
 import { tryFetchWithRetry } from "./async.utils";
 import { getCosmosAPIEndpoint } from "@/config/consts/apiUrls";
+import { performKeplrTx } from "./cosmos/performKeplrTx";
 
 // function will know if EVM or COSMOS tx to perform
 // returns hash of tx
@@ -24,6 +25,9 @@ export async function performSingleTransaction(
     case "COSMOS":
       // perform cosmos tx
       return await performCosmosTransaction(tx, signer);
+    case "KEPLR":
+      // perform keplr tx
+      return await performKeplrTx(tx);
     default:
       return NEW_ERROR(
         "useTransactionStore::performSingleTransaction: unknown tx type"
@@ -34,7 +38,7 @@ export async function performSingleTransaction(
 // function type spcecifies how to check on the transaction
 // will return if the transaction was successful/confirmed
 export async function waitForTransaction(
-  txType: "EVM" | "COSMOS",
+  txType: "EVM" | "COSMOS" | "KEPLR",
   chainId: number,
   hash: string
 ): PromiseWithError<{
@@ -70,6 +74,12 @@ export async function waitForTransaction(
       return NO_ERROR({
         status: response.tx_response.code === 0 ? "success" : "fail",
         error: response.tx_response.raw_log,
+      });
+    case "KEPLR":
+      // when keplr transactions are signed, the return will have success or fail, no need to check
+      return NO_ERROR({
+        status: "success",
+        error: "",
       });
     default:
       return NEW_ERROR("waitForTransaction: unknown tx type: " + txType);

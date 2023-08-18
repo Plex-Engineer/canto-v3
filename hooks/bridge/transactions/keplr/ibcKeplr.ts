@@ -3,7 +3,11 @@ import {
   NO_ERROR,
   PromiseWithError,
 } from "@/config/interfaces/errors";
-import { coin, SigningStargateClient } from "@cosmjs/stargate";
+import {
+  coin,
+  DeliverTxResponse,
+  SigningStargateClient,
+} from "@cosmjs/stargate";
 import { IBCToken } from "../../interfaces/tokens";
 import { CosmosNetwork } from "@/config/interfaces/networks";
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
@@ -11,11 +15,9 @@ import { checkPubKey, ethToCantoAddress } from "@/utils/address.utils";
 import { CANTO_MAINNET } from "@/config/networks";
 import { getBlockTimestamp } from "../ibc";
 import { getCosmosAPIEndpoint } from "@/config/consts/apiUrls";
+import { Transaction } from "@/config/interfaces/transactions";
 
-///
-/// keplr transactions will not go through the normal transaction store since not through metamask
-///
-
+// will return keplr transaction to perform, this assums that the user has already signed and is connected
 export async function ibcInKeplr(
   keplrClient: SigningStargateClient,
   cosmosNetwork: CosmosNetwork,
@@ -23,7 +25,7 @@ export async function ibcInKeplr(
   ethReceiver: string,
   ibcToken: IBCToken,
   amount: string
-): PromiseWithError<any> {
+): PromiseWithError<Transaction[]> {
   // make parameter checks
   const { data: hasPubKey, error: checkPubKeyError } = await checkPubKey(
     ethReceiver,
@@ -63,20 +65,24 @@ export async function ibcInKeplr(
     return NEW_ERROR("ibcInKeplr::" + timestampError.message);
   }
 
-  const { data: successfulIBC, error: ibcError } =
-    await signAndBroadcastIBCKeplr(keplrClient, {
-      cosmosAccount: cosmosSender,
-      cantoReceiver: cantoReceiver,
-      amount: amount,
-      denom: ibcToken.nativeName,
-      channelToCanto: ibcChannel.toCanto,
-      timeoutTimestamp: Number(blockTimestamp),
-      memo: "ibcInKeplr",
-    });
-  if (ibcError) {
-    return NEW_ERROR("ibcInKeplr::" + ibcError.message);
-  }
-  return NO_ERROR(successfulIBC);
+  return NO_ERROR([
+    {
+      chainId: cosmosNetwork.chainId,
+      description: "IBC In",
+      type: "KEPLR",
+      tx: async () => {
+        return await signAndBroadcastIBCKeplr(keplrClient, {
+          cosmosAccount: cosmosSender,
+          cantoReceiver: cantoReceiver,
+          amount: amount,
+          denom: ibcToken.nativeName,
+          channelToCanto: ibcChannel.toCanto,
+          timeoutTimestamp: Number(blockTimestamp),
+          memo: "ibcInKeplr",
+        });
+      },
+    },
+  ]);
 }
 
 interface IBCKeplrParams {
@@ -91,7 +97,7 @@ interface IBCKeplrParams {
 async function signAndBroadcastIBCKeplr(
   keplrClient: SigningStargateClient,
   params: IBCKeplrParams
-): PromiseWithError<boolean> {
+): PromiseWithError<DeliverTxResponse> {
   try {
     const ibcResponse = await keplrClient.sendIbcTokens(
       params.cosmosAccount,
@@ -104,11 +110,7 @@ async function signAndBroadcastIBCKeplr(
       "auto",
       params.memo
     );
-    if (ibcResponse.code === 0) {
-      return NO_ERROR(true);
-    } else {
-      return NEW_ERROR("signAndBroadcastIBCKeplr::" + ibcResponse.rawLog);
-    }
+    return NO_ERROR(ibcResponse);
   } catch (err) {
     return NEW_ERROR("signAndBroadcastIBCKeplr::" + (err as Error).message);
   }

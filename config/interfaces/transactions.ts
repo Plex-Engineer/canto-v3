@@ -1,7 +1,9 @@
 import { ContractAbi } from "web3-types";
+import { PromiseWithError } from "./errors";
+import { DeliverTxResponse } from "@cosmjs/stargate";
 // function classes would return calldata that would be saved as a string
 export type Transaction = {
-  chainId: number;
+  chainId: number | string;
   description: string;
 } & (
   | {
@@ -15,10 +17,10 @@ export type Transaction = {
   | {
       type: "COSMOS";
       msg: UnsignedCosmosMessages;
-      // senderObj: Sender;
-      // chain: Chain;
-      // nodeAddress: string;
-      // ethAccount: string;
+    }
+  | {
+      type: "KEPLR";
+      tx: () => PromiseWithError<DeliverTxResponse>;
     }
 );
 type TransactionStatus = "NONE" | "SIGNING" | "PENDING" | "SUCCESS" | "ERROR";

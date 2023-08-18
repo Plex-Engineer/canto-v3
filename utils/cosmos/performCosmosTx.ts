@@ -23,6 +23,9 @@ export async function performCosmosTransaction(
   if (!signer) {
     return NEW_ERROR("performCosmosTx: no signer");
   }
+  if (typeof tx.chainId !== "number") {
+    return NEW_ERROR("performCosmosTx: invalid chainId: " + tx.chainId);
+  }
   const { data: onRightChain, error: chainError } = await checkOnRightChain(
     signer,
     tx.chainId

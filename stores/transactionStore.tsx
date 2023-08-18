@@ -86,7 +86,7 @@ const useTransactionStore = create<TransactionStore>()((set, get) => ({
         const { data: receipt, error: txReceiptError } =
           await waitForTransaction(
             transactions[i].tx.type,
-            transactions[i].tx.chainId,
+            transactions[i].tx.chainId as number,
             txHash
           );
         // check receipt for error

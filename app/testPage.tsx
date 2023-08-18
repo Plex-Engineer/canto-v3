@@ -20,7 +20,7 @@ export default function TestPage() {
   const bridgeIn = useBridgeIn({ testnet: false });
   const transactionStore = useTransactionStore();
   const staking = useStaking();
-  console.log(staking);
+  console.log(transactionStore.transactions);
 
   // keplr testing
   const [keplrClient, setKeplrClient] = useState<SigningStargateClient>();
@@ -37,19 +37,22 @@ export default function TestPage() {
       {
         gasPrice: GasPrice.fromString(
           "300000" + COSMOS_HUB.nativeCurrency.baseName
-        )
+        ),
       }
     );
-    const successIBC = await ibcInKeplr(
+    const successIBC = ibcInKeplr(
       client,
       COSMOS_HUB,
       userAccount,
-      "ethaddress",
+      signer?.account.address,
       {
         nativeName: "uatom",
       },
       "10000"
-    );
+    ).then((val) => {
+      console.log(val);
+      transactionStore.addTransactions(val.data, signer);
+    });
     console.log(successIBC);
   }
 
