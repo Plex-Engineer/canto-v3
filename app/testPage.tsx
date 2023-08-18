@@ -1,7 +1,8 @@
 "use client";
-import { OSMOSIS } from "@/config/networks";
+import { COSMOS_HUB, OSMOSIS } from "@/config/networks";
 import { bridgeMethodToString } from "@/hooks/bridge/interfaces/tokens";
 import { txIBCOut } from "@/hooks/bridge/transactions/ibc";
+import { ibcInKeplr } from "@/hooks/bridge/transactions/keplr/ibcKeplr";
 import { getAllUserBridgeTransactionHistory } from "@/hooks/bridge/txHistory";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
@@ -9,7 +10,8 @@ import useStaking from "@/hooks/staking/useStaking";
 import useTransactionStore from "@/stores/transactionStore";
 import { createMsgsClaimStakingRewards } from "@/utils/cosmos/transactions/messages/staking/claimRewards";
 import { createMsgsDelegate } from "@/utils/cosmos/transactions/messages/staking/delegate";
-import { useEffect } from "react";
+import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
+import { useEffect, useState } from "react";
 import { useWalletClient } from "wagmi";
 
 export default function TestPage() {
@@ -20,13 +22,43 @@ export default function TestPage() {
   const staking = useStaking();
   console.log(staking);
 
+  // keplr testing
+  const [keplrClient, setKeplrClient] = useState<SigningStargateClient>();
+  async function getKeplrInfo() {
+    // use cosmoshub to test functionality
+    await window.keplr.enable(COSMOS_HUB.chainId);
+    const offlineSigner = window.keplr.getOfflineSigner(COSMOS_HUB.chainId);
+    const accounts = await offlineSigner.getAccounts();
+    const userAccount = accounts[0].address;
+    console.log(userAccount);
+    const client = await SigningStargateClient.connectWithSigner(
+      COSMOS_HUB.rpcUrl,
+      offlineSigner,
+      {
+        gasPrice: GasPrice.fromString(
+          "300000" + COSMOS_HUB.nativeCurrency.baseName
+        )
+      }
+    );
+    const successIBC = await ibcInKeplr(
+      client,
+      COSMOS_HUB,
+      userAccount,
+      "ethaddress",
+      {
+        nativeName: "uatom",
+      },
+      "10000"
+    );
+    console.log(successIBC);
+  }
+
   useEffect(() => {
-    getAllUserBridgeTransactionHistory(
-      ""
-    ).then(console.log);
+    getAllUserBridgeTransactionHistory("").then(console.log);
   }, []);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "5rem" }}>
+      <button onClick={getKeplrInfo}>KEPLR TEST</button>
       <div
         style={{ display: "flex", flexBasis: "column", gap: "2rem" }}
         key={"in"}

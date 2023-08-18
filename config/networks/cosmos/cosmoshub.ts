@@ -13,7 +13,7 @@ export const COSMOS_HUB: CosmosNetwork = {
   icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
   name: "Cosmos Hub",
   isTestChain: false,
-  rpcUrl: "https://rpc-cosmoshub.blockapsis.com",
+  rpcUrl: "http://localhost:8010/proxy",
   restEndpoint: "https://api-cosmoshub-ia.cosmosia.notional.ventures",
   addressPrefix: "cosmos",
   checkAddress: function (address) {

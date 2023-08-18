@@ -164,7 +164,7 @@ async function getIBCData(
 /**
  * @param {string} restEndpoint rest endpoint to request counter-party chain timestamp
  */
-async function getBlockTimestamp(
+export async function getBlockTimestamp(
   restEndpoint: string,
   extraEndpoints?: string[],
   latestBlockEndpoint?: string
