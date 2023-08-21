@@ -38,3 +38,8 @@ export interface IBCToken extends ERC20Token {
   ibcDenom: string; // "ibc/..."
   nativeName: string; // ex. uatom, ucre, acanto
 }
+
+// for user balance data on bridge
+export interface UserTokenBalances {
+  [key: string]: string; // token id => balance
+}

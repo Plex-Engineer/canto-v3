@@ -6,4 +6,5 @@ export interface ERC20Token {
   symbol: string;
   decimals: number;
   icon: string;
+  balance?: string;
 }

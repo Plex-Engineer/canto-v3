@@ -19,6 +19,7 @@ import { BridgeToken, BridgingMethod } from "./interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
 import { bridgeInGravity } from "./transactions/gravityBridge";
 import { bridgeLayerZero } from "./transactions/layerZero";
+import useTokenBalances from "../helpers/useTokenBalances";
 
 export default function useBridgeIn(
   props: BridgeHookInputParams
@@ -45,6 +46,12 @@ export default function useBridgeIn(
   /// internal hooks
   ///
 
+  // contains object mapping of the token balances
+  const userTokenBalances = useTokenBalances(
+    state.fromNetwork?.chainId,
+    state.availableTokens,
+    props.userEthAddress
+  );
   // will autoselect the first available network (only network can have default since loaded once)
   useAutoSelect(state.availableNetworks, setNetwork, props.defaults?.networkId);
   // will autoselect the first available token
@@ -79,7 +86,7 @@ export default function useBridgeIn(
   function setNetwork(id: string): void {
     //make sure new network was actually selected
     if (state.fromNetwork?.id === id) return;
-    
+
     const { data: network, error: networkError } = getNetwork(id);
     if (networkError) {
       throw new Error("useBridgeIn::setNetwork::" + networkError.message);
@@ -199,7 +206,10 @@ export default function useBridgeIn(
     testnet: props.testnet ?? false,
     allOptions: {
       networks: state.availableNetworks,
-      tokens: state.availableTokens,
+      tokens: state.availableTokens.map((token) => {
+        const balance = userTokenBalances[token.id];
+        return balance !== undefined ? { ...token, balance } : token;
+      }),
       methods: state.availableMethods,
     },
     selections: {

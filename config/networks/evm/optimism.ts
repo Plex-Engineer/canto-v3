@@ -21,4 +21,5 @@ export const OPTIMISM_TESTNET: EVMNetwork = {
     getAddressLink: getEthAddressLink(optimismBlockExplorer),
     getTransactionLink: getEthTransactionLink(optimismBlockExplorer),
   },
+  multicall3Address: "0xcA11bde05977b3631167028862bE2a173976CA11",
 };

@@ -5,7 +5,7 @@ import {
   BridgeHookState,
 } from "./interfaces/hookParams";
 import BRIDGE_OUT_TOKENS from "@/config/jsons/bridgeOutTokens.json";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useAutoSelect from "../helpers/useAutoSelect";
 import {
   NEW_ERROR,
@@ -19,13 +19,7 @@ import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
 import { Transaction } from "@/config/interfaces/transactions";
 import { bridgeLayerZero } from "./transactions/layerZero";
 import { txIBCOut } from "./transactions/ibc";
-import { tryFetchWithRetry } from "@/utils/async.utils";
-import {
-  USER_CANTO_DATA_API_ENDPOINTS,
-  USER_CANTO_DATA_API_URL,
-} from "@/config/consts/apiUrls";
-import { ERC20_ABI } from "@/config/abis";
-import { multicall } from "wagmi/actions";
+import useTokenBalances from "../helpers/useTokenBalances";
 
 export default function useBridgeOut(
   props: BridgeHookInputParams
@@ -51,72 +45,13 @@ export default function useBridgeOut(
   ///
   /// internal hooks
   ///
-  // state of just the array of balances for the user (if connected)
-  const [balancesState, setBalancesState] = useState<{
-    [key: string]: string[];
-  }>();
-  ///
-  /// internal hooks
-  ///
 
-  useEffect(() => {
-    const multicallConfig = state.availableTokens.map((token) => ({
-      address: token.address,
-      abi: ERC20_ABI,
-      functionName: "balanceOf",
-      args: [props.userEthAddress],
-    }));
-    multicall({
-      contracts: multicallConfig,
-    }).then((res) => {
-      console.log(res);
-      const tokensWithBalances = state.availableTokens.map((token, idx) => {
-        const response = res[idx];
-        return response.status === "success"
-          ? {
-              ...token,
-              balance: (response.result as number).toString(),
-            }
-          : token;
-      });
-      console.log(tokensWithBalances)
-      setState({ ...state, availableTokens: tokensWithBalances });
-    });
-  }, [props.userEthAddress, state.availableTokens.length]);
-
-  // useEffect(() => {
-  //   console.log(props.userEthAddress);
-  //   if (!props.userEthAddress) return;
-  //   tryFetchWithRetry<{
-  //     user: {
-  //       balances: {
-  //         [key: string]: string[];
-  //       };
-  //     };
-  //   }>(
-  //     USER_CANTO_DATA_API_URL +
-  //       USER_CANTO_DATA_API_ENDPOINTS.userData(props.userEthAddress)
-  //   ).then((res) => {
-  //     if (res.error) {
-  //       console.log(res.error);
-  //       return;
-  //     } else {
-  //       setBalancesState(res.data.user.balances);
-  //     }
-  //   });
-  // }, [props.userEthAddress]);
-
-  // useEffect(() => {
-  //   console.log(balancesState);
-  //   console.log(state.availableTokens);
-  //   if (!balancesState) return;
-  //   const tokensWithBalances = state.availableTokens.map((token) => {
-  //     const balanceArray = balancesState[token.address];
-  //     if (!balanceArray) return { ...token };
-  //     return { ...token, balance: balanceArray[0] };
-  //   });
-  //   setState({ ...state, availableTokens: tokensWithBalances });
-  // }, [balancesState]);
+  // contains object mapping of the token balances
+  const userTokenBalances = useTokenBalances(
+    state.fromNetwork?.chainId,
+    state.availableTokens,
+    props.userEthAddress
+  );
 
   // will autoselect the first available token if there are any
   useAutoSelect(state.availableTokens, setToken);
@@ -295,7 +230,10 @@ export default function useBridgeOut(
   return {
     testnet: props.testnet ?? false,
     allOptions: {
-      tokens: state.availableTokens,
+      tokens: state.availableTokens.map((token) => {
+        const balance = userTokenBalances[token.id];
+        return balance !== undefined ? { ...token, balance } : token;
+      }),
       networks: state.availableNetworks,
       methods: state.availableMethods,
     },

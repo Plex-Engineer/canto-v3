@@ -547,7 +547,7 @@
                 "name": "Canto",
                 "symbol": "CANTO",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
                 "bridgeMethods": [
                     {
                         "chainId": "mumbai-testnet",

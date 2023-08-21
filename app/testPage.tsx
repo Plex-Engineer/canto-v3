@@ -189,6 +189,12 @@ export default function TestPage() {
                     alt="icon"
                   />
                 </li>
+                <li>
+                  balance:{" "}
+                  {token.balance
+                    ? formatUnits(BigInt(token.balance), token.decimals)
+                    : "none"}
+                </li>
                 <button
                   style={{ background: "lightblue" }}
                   onClick={() => {
@@ -269,7 +275,8 @@ export default function TestPage() {
                   />
                 </li>
                 <li>
-                  balance: {formatUnits(token.balance ?? "0", token.decimals)}
+                  balance:{" "}
+                  {formatUnits(BigInt(token.balance ?? "0"), token.decimals)}
                 </li>
                 <button
                   style={{ background: "lightblue" }}
