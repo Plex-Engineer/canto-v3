@@ -4,6 +4,7 @@ import { PromiseWithError } from "@/config/interfaces/errors";
 import { Transaction } from "@/config/interfaces/transactions";
 
 export interface BridgeHookInputParams {
+  userEthAddress?: string;
   testnet?: boolean;
   defaults?: {
     networkId?: string;

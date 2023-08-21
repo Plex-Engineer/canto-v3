@@ -1,4 +1,3 @@
-import { getCosmosAPIEndpoint } from "@/config/consts/apiUrls";
 import {
   NEW_ERROR,
   NO_ERROR,
@@ -7,6 +6,7 @@ import {
 } from "@/config/interfaces/errors";
 import { ethToCantoAddress } from "@/utils/address.utils";
 import { tryFetch } from "@/utils/async.utils";
+import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
 
 interface IBCTransaction {
   chainId: number;

@@ -12,7 +12,7 @@ import {
 } from "@/config/interfaces/errors";
 import { ERC20Token } from "@/config/interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
-import { CANTO_MAINNET } from "@/config/networks";
+import { CANTO_MAINNET_COSMOS } from "@/config/networks";
 import {
   checkPubKey,
   ethToCantoAddress,
@@ -49,7 +49,7 @@ export async function bridgeInGravity(
   // check on Canto Mainnet
   const { data: hasPubKey, error: checkPubKeyError } = await checkPubKey(
     ethSender,
-    CANTO_MAINNET.chainId as number
+    CANTO_MAINNET_COSMOS.chainId
   );
   if (checkPubKeyError) {
     return NEW_ERROR("bridgeInGravity::" + checkPubKeyError.message);
@@ -62,7 +62,7 @@ export async function bridgeInGravity(
     }
     // get canto balance to see if enough canto for generating public key
     const { data: cantoBalance, error: balanceError } = await getCantoBalance(
-      CANTO_MAINNET.chainId as number,
+      CANTO_MAINNET_COSMOS.chainId,
       cantoAddress
     );
     if (balanceError) {

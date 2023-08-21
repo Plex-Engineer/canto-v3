@@ -1,4 +1,5 @@
 export * from "./akash";
+export { CANTO_MAINNET_COSMOS, CANTO_TESTNET_COSMOS } from "../canto";
 export * from "./comdex";
 export * from "./cosmoshub";
 export * from "./crescent";

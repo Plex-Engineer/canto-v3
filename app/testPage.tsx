@@ -13,12 +13,19 @@ import { createMsgsClaimStakingRewards } from "@/utils/cosmos/transactions/messa
 import { createMsgsDelegate } from "@/utils/cosmos/transactions/messages/staking/delegate";
 import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
 import { useEffect, useState } from "react";
+import { formatUnits } from "viem";
 import { useWalletClient } from "wagmi";
 
 export default function TestPage() {
   const { data: signer } = useWalletClient();
-  const bridgeOut = useBridgeOut({ testnet: false });
-  const bridgeIn = useBridgeIn({ testnet: false });
+  const bridgeOut = useBridgeOut({
+    testnet: false,
+    userEthAddress: signer?.account.address,
+  });
+  const bridgeIn = useBridgeIn({
+    testnet: false,
+    userEthAddress: signer?.account.address,
+  });
   const transactionStore = useStore(useTransactionStore, (state) => state);
   const staking = useStaking();
   console.log(transactionStore?.transactions);
@@ -261,6 +268,9 @@ export default function TestPage() {
                     alt="icon"
                   />
                 </li>
+                <li>
+                  balance: {formatUnits(token.balance ?? "0", token.decimals)}
+                </li>
                 <button
                   style={{ background: "lightblue" }}
                   onClick={() => {
@@ -370,7 +380,9 @@ export default function TestPage() {
                 </a>
               </li>
               <li>
-                <button onClick={() => transactionStore?.clearTransactions(idx)}>
+                <button
+                  onClick={() => transactionStore?.clearTransactions(idx)}
+                >
                   delete
                 </button>
               </li>

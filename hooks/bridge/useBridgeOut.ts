@@ -1,11 +1,11 @@
-import { CANTO_MAINNET, CANTO_TESTNET } from "@/config/networks";
+import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
 import {
   BridgeHookInputParams,
   BridgeHookReturn,
   BridgeHookState,
 } from "./interfaces/hookParams";
 import BRIDGE_OUT_TOKENS from "@/config/jsons/bridgeOutTokens.json";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAutoSelect from "../helpers/useAutoSelect";
 import {
   NEW_ERROR,
@@ -19,6 +19,13 @@ import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
 import { Transaction } from "@/config/interfaces/transactions";
 import { bridgeLayerZero } from "./transactions/layerZero";
 import { txIBCOut } from "./transactions/ibc";
+import { tryFetchWithRetry } from "@/utils/async.utils";
+import {
+  USER_CANTO_DATA_API_ENDPOINTS,
+  USER_CANTO_DATA_API_URL,
+} from "@/config/consts/apiUrls";
+import { ERC20_ABI } from "@/config/abis";
+import { multicall } from "wagmi/actions";
 
 export default function useBridgeOut(
   props: BridgeHookInputParams
@@ -32,7 +39,7 @@ export default function useBridgeOut(
     availableNetworks: [],
     availableMethods: [],
     // default selections
-    fromNetwork: props.testnet ? CANTO_TESTNET : CANTO_MAINNET,
+    fromNetwork: props.testnet ? CANTO_TESTNET_EVM : CANTO_MAINNET_EVM,
     toNetwork: null,
     selectedToken: null,
     selectedMethod: null,
@@ -44,6 +51,73 @@ export default function useBridgeOut(
   ///
   /// internal hooks
   ///
+  // state of just the array of balances for the user (if connected)
+  const [balancesState, setBalancesState] = useState<{
+    [key: string]: string[];
+  }>();
+  ///
+  /// internal hooks
+  ///
+
+  useEffect(() => {
+    const multicallConfig = state.availableTokens.map((token) => ({
+      address: token.address,
+      abi: ERC20_ABI,
+      functionName: "balanceOf",
+      args: [props.userEthAddress],
+    }));
+    multicall({
+      contracts: multicallConfig,
+    }).then((res) => {
+      console.log(res);
+      const tokensWithBalances = state.availableTokens.map((token, idx) => {
+        const response = res[idx];
+        return response.status === "success"
+          ? {
+              ...token,
+              balance: (response.result as number).toString(),
+            }
+          : token;
+      });
+      console.log(tokensWithBalances)
+      setState({ ...state, availableTokens: tokensWithBalances });
+    });
+  }, [props.userEthAddress, state.availableTokens.length]);
+
+  // useEffect(() => {
+  //   console.log(props.userEthAddress);
+  //   if (!props.userEthAddress) return;
+  //   tryFetchWithRetry<{
+  //     user: {
+  //       balances: {
+  //         [key: string]: string[];
+  //       };
+  //     };
+  //   }>(
+  //     USER_CANTO_DATA_API_URL +
+  //       USER_CANTO_DATA_API_ENDPOINTS.userData(props.userEthAddress)
+  //   ).then((res) => {
+  //     if (res.error) {
+  //       console.log(res.error);
+  //       return;
+  //     } else {
+  //       setBalancesState(res.data.user.balances);
+  //     }
+  //   });
+  // }, [props.userEthAddress]);
+
+  // useEffect(() => {
+  //   console.log(balancesState);
+  //   console.log(state.availableTokens);
+  //   if (!balancesState) return;
+  //   const tokensWithBalances = state.availableTokens.map((token) => {
+  //     const balanceArray = balancesState[token.address];
+  //     if (!balanceArray) return { ...token };
+  //     return { ...token, balance: balanceArray[0] };
+  //   });
+  //   setState({ ...state, availableTokens: tokensWithBalances });
+  // }, [balancesState]);
+
   // will autoselect the first available token if there are any
   useAutoSelect(state.availableTokens, setToken);
   // will autoselect the first available network if there are any

@@ -12,10 +12,10 @@ import { IBCToken } from "../../interfaces/tokens";
 import { CosmosNetwork } from "@/config/interfaces/networks";
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
 import { checkPubKey, ethToCantoAddress } from "@/utils/address.utils";
-import { CANTO_MAINNET } from "@/config/networks";
+import { CANTO_MAINNET_COSMOS } from "@/config/networks";
 import { getBlockTimestamp } from "../ibc";
-import { getCosmosAPIEndpoint } from "@/config/consts/apiUrls";
 import { Transaction } from "@/config/interfaces/transactions";
+import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
 
 // will return keplr transaction to perform, this assums that the user has already signed and is connected
 export async function ibcInKeplr(
@@ -29,7 +29,7 @@ export async function ibcInKeplr(
   // make parameter checks
   const { data: hasPubKey, error: checkPubKeyError } = await checkPubKey(
     ethReceiver,
-    CANTO_MAINNET.chainId as number
+    CANTO_MAINNET_COSMOS.chainId
   );
   if (checkPubKeyError) {
     return NEW_ERROR("ibcInKeplr::" + checkPubKeyError.message);
@@ -59,7 +59,7 @@ export async function ibcInKeplr(
   // get block timeout timestamp
   const { data: blockTimestamp, error: timestampError } =
     await getBlockTimestamp(
-      getCosmosAPIEndpoint(CANTO_MAINNET.chainId as number).data
+      getCosmosAPIEndpoint(CANTO_MAINNET_COSMOS.chainId).data
     );
   if (timestampError) {
     return NEW_ERROR("ibcInKeplr::" + timestampError.message);

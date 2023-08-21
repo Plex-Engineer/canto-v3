@@ -9,8 +9,8 @@ import { Transaction } from "@/config/interfaces/transactions";
 import { performCosmosTransaction } from "./cosmos/performCosmosTx";
 import { waitForTransaction as evmWait } from "wagmi/actions";
 import { tryFetchWithRetry } from "./async.utils";
-import { getCosmosAPIEndpoint } from "@/config/consts/apiUrls";
 import { performKeplrTx } from "./cosmos/performKeplrTx";
+import { getCosmosAPIEndpoint } from "./networks.utils";
 
 // function will know if EVM or COSMOS tx to perform
 // returns hash of tx

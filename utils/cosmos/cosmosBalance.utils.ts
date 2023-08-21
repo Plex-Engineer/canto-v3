@@ -1,13 +1,13 @@
-import { getCosmosAPIEndpoint } from "@/config/consts/apiUrls";
 import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
 } from "@/config/interfaces/errors";
 import { tryFetch } from "../async.utils";
+import { getCosmosAPIEndpoint } from "../networks.utils";
 
 export async function getCantoBalance(
-  chainId: number,
+  chainId: string,
   cantoAddress: string
 ): PromiseWithError<string> {
   const { data: nodeURL, error: urlError } = getCosmosAPIEndpoint(chainId);

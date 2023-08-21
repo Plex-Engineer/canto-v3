@@ -4,29 +4,35 @@ import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { Chain, configureChains, createConfig, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import * as EVM_CHAINS from "@/config/networks/evm";
-import * as CANTO_CHAINS from "@/config/networks/canto";
 
-const formattedChains: Chain[] = [
-  ...Object.values(EVM_CHAINS),
-  ...Object.values(CANTO_CHAINS),
-].map((network) => ({
-  id: Number(network.chainId),
-  iconUrl: network.icon,
-  name: network.name,
-  network: network.name,
-  nativeCurrency: network.nativeCurrency,
-  rpcUrls: {
-    default: { http: [network.rpcUrl] },
-    public: { http: [network.rpcUrl] },
-  },
-  blockExplorers: {
-    default: {
+const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
+  (network) => {
+    const contractInfo = network.multicall3Address
+      ? {
+          multicall3: { address: network.multicall3Address },
+        }
+      : {};
+    return {
+      id: Number(network.chainId),
+      iconUrl: network.icon,
       name: network.name,
-      url: network.blockExplorer?.url as string,
-    },
-  },
-  testnet: network.isTestChain,
-}));
+      network: network.name,
+      nativeCurrency: network.nativeCurrency,
+      rpcUrls: {
+        default: { http: [network.rpcUrl] },
+        public: { http: [network.rpcUrl] },
+      },
+      blockExplorers: {
+        default: {
+          name: network.name,
+          url: network.blockExplorer?.url as string,
+        },
+      },
+      testnet: network.isTestChain,
+      contracts: contractInfo,
+    };
+  }
+);
 
 const { chains, publicClient } = configureChains(formattedChains, [
   publicProvider(),

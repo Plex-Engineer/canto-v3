@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
-import { CANTO_MAINNET, CANTO_TESTNET } from "@/config/networks";
+import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
 import BRIDGE_IN_TOKEN_LIST from "@/config/jsons/bridgeInTokens.json";
 import {
   NEW_ERROR,
@@ -32,7 +32,7 @@ export default function useBridgeIn(
     availableTokens: [],
     availableMethods: [],
     // default selections
-    toNetwork: props.testnet ? CANTO_TESTNET : CANTO_MAINNET,
+    toNetwork: props.testnet ? CANTO_TESTNET_EVM : CANTO_MAINNET_EVM,
     fromNetwork: null,
     selectedToken: null,
     selectedMethod: null,

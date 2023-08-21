@@ -11,6 +11,9 @@ export async function performKeplrTx(
   if (tx.type !== "KEPLR") {
     return NEW_ERROR("performKeplrTx: not keplr tx");
   }
+  if (typeof tx.chainId !== "string") {
+    return NEW_ERROR("performKeplrTx: invalid chainId" + tx.chainId);
+  }
   const txResponse = await tx.tx();
   if (txResponse.error) {
     return NEW_ERROR("performKeplrTx: " + txResponse.error.message);

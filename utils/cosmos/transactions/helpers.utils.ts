@@ -1,4 +1,3 @@
-import { getCosmosAPIEndpoint } from "@/config/consts/apiUrls";
 import {
   NEW_ERROR,
   NO_ERROR,
@@ -14,6 +13,7 @@ import {
 } from "@/config/interfaces/transactions";
 import { ethToCantoAddress } from "@/utils/address.utils";
 import { tryFetch } from "@/utils/async.utils";
+import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
 import {
   generateMessageWithMultipleTransactions,
   createEIP712,
@@ -38,7 +38,7 @@ interface CosmosAccountReturn {
 
 export async function getCosmosAccount(
   ethAddress: string,
-  chainId: number
+  chainId: string | number
 ): PromiseWithError<CosmosAccountReturn> {
   const { data: cantoAddress, error } = await ethToCantoAddress(ethAddress);
   if (error) {
@@ -163,7 +163,7 @@ function generatePostBodyBroadcast(
 
 export async function getSenderObj(
   senderEthAddress: string,
-  chainid: number
+  chainid: string | number
 ): PromiseWithError<Sender> {
   const cosmosAccount = await getCosmosAccount(senderEthAddress, chainid);
   if (cosmosAccount.error) {

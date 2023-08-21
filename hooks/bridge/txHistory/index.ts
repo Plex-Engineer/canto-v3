@@ -8,7 +8,7 @@ import {
   UserLayerZeroHistory,
   getUserLayerZeroHistory,
 } from "./layerZeroHistory";
-import { CANTO_MAINNET, ETH_MAINNET } from "@/config/networks";
+import { CANTO_MAINNET_EVM, ETH_MAINNET } from "@/config/networks";
 
 interface AllUserBridgeTransactionHistory {
   layerZero: UserLayerZeroHistory;
@@ -21,12 +21,12 @@ export async function getAllUserBridgeTransactionHistory(
 ): PromiseWithError<AllUserBridgeTransactionHistory> {
   const [layerZero, gravityBridge, ibc] = await Promise.all([
     getUserLayerZeroHistory(
-      CANTO_MAINNET.chainId as number,
+      CANTO_MAINNET_EVM.chainId as number,
       "0x56C03B8C4FA80Ba37F5A7b60CAAAEF749bB5b220",
       ethAccount
     ),
     getUserGBridgeInHistory(ETH_MAINNET.chainId, ethAccount),
-    getAllIBCTransactions(CANTO_MAINNET.chainId as number, ethAccount),
+    getAllIBCTransactions(CANTO_MAINNET_EVM.chainId as number, ethAccount),
   ]);
   return NO_ERROR({
     layerZero: layerZero.data,

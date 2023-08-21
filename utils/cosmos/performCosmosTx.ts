@@ -6,11 +6,11 @@ import {
 import { Transaction } from "@/config/interfaces/transactions";
 import { GetWalletClientResult } from "wagmi/actions";
 import { checkOnRightChain } from "../baseTransaction.utils";
-import { getCosmosChainObj } from "@/config/consts/apiUrls";
 import {
   getSenderObj,
   signAndBroadcastCosmosTransaction,
 } from "./transactions/helpers.utils";
+import { getCosmosChainObject } from "../networks.utils";
 
 // will return the cosmos txHash of the signed transaction
 export async function performCosmosTransaction(
@@ -35,7 +35,7 @@ export async function performCosmosTransaction(
   }
 
   // create transaction context
-  const { data: chainObj, error: chainObjError } = getCosmosChainObj(
+  const { data: chainObj, error: chainObjError } = getCosmosChainObject(
     tx.chainId
   );
   if (chainObjError) {
