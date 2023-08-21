@@ -15,6 +15,7 @@ const proto_mono = localFont({
 });
 
 interface Props {
+  onClick?: () => void;
   height?: "small" | "medium" | "large" | number;
   width?: "contain" | "fill" | number;
   color?: "primary" | "secondary" | "accent";
@@ -116,8 +117,9 @@ const Button = (props: Props) => {
   };
 
   return (
-    <div
+    <button
       className={styles.container}
+      onClick={props.onClick}
       style={{
         height: getHeight() + "px",
         width: getWidth(),
@@ -165,7 +167,7 @@ const Button = (props: Props) => {
           className={styles.loader}
         ></Image>
       )}
-    </div>
+    </button>
   );
 };
 

@@ -1,8 +1,24 @@
+"use client";
+
 import Button from "@/components/button/button";
+import Modal from "@/components/modal/modal";
+import Text from "@/components/text";
+import { useState } from "react";
 
 export default function LendingPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div>
+      <Modal
+        open={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+        }}
+        width="500px"
+        height="80vh"
+      >
+        <Text name="proto_mono"> This is a text</Text>
+      </Modal>
       <div
         style={{
           display: "grid",
@@ -13,8 +29,14 @@ export default function LendingPage() {
           backgroundColor: "var(--card-sub-surface-color",
         }}
       >
-        <Button color="primary" height={"small"}>
-          Sample Text
+        <Button
+          color="primary"
+          height={"small"}
+          onClick={() => {
+            setIsModalOpen(true);
+          }}
+        >
+          Show Modal
         </Button>
         <Button color="secondary" height={"small"}>
           Sample Text

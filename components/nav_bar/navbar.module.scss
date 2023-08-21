@@ -21,7 +21,7 @@
 
   &:hover {
     opacity: 1;
-    transform: translateY(4.7px);
+    // transform: translateY(4.7px);
   }
 
   &::after {
@@ -30,7 +30,7 @@
     height: 1px;
     transform: translateX(-15%) scaleX(0);
 
-    transition: transform 0.3s, height 0.3s 0.2s;
+    transition: transform 0.3s, height 0.3s 0.1s;
   }
 
   &:hover::after {
