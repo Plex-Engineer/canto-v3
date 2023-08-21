@@ -8,6 +8,7 @@ import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
 import useStaking from "@/hooks/staking/useStaking";
 import useTransactionStore from "@/stores/transactionStore";
+import useStore from "@/stores/useStore";
 import { createMsgsClaimStakingRewards } from "@/utils/cosmos/transactions/messages/staking/claimRewards";
 import { createMsgsDelegate } from "@/utils/cosmos/transactions/messages/staking/delegate";
 import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
@@ -18,9 +19,9 @@ export default function TestPage() {
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({ testnet: false });
   const bridgeIn = useBridgeIn({ testnet: false });
-  const transactionStore = useTransactionStore();
+  const transactionStore = useStore(useTransactionStore, (state) => state);
   const staking = useStaking();
-  console.log(transactionStore.transactions);
+  console.log(transactionStore?.transactions);
 
   // keplr testing
   const [keplrClient, setKeplrClient] = useState<SigningStargateClient>();
@@ -82,7 +83,7 @@ export default function TestPage() {
               true
             ).then((val) => {
               console.log(val);
-              transactionStore.addTransactions(val.data, signer);
+              transactionStore?.addTransactions(val.data, signer);
             })
           }
         >
@@ -97,7 +98,7 @@ export default function TestPage() {
               denom: "acanto",
               undelegate: true,
             });
-            transactionStore.addTransactions(
+            transactionStore?.addTransactions(
               [
                 {
                   msg: tx,
@@ -118,7 +119,7 @@ export default function TestPage() {
               delegatorCantoAddress: "canto address",
               validatorAddresses: [],
             });
-            transactionStore.addTransactions(
+            transactionStore?.addTransactions(
               [
                 {
                   msg: tx,
@@ -228,7 +229,7 @@ export default function TestPage() {
                   console.log(val.error);
                   return;
                 }
-                transactionStore.addTransactions(val.data, signer);
+                transactionStore?.addTransactions(val.data, signer);
               })
             }
           >
@@ -337,7 +338,7 @@ export default function TestPage() {
                     console.log(val.error);
                     return;
                   }
-                  transactionStore.addTransactions(val.data, signer);
+                  transactionStore?.addTransactions(val.data, signer);
                 })
             }
           >
@@ -345,7 +346,10 @@ export default function TestPage() {
           </button>
         )}
       </div>
-      {transactionStore.transactions.map((txList, idx) => (
+      <button onClick={() => transactionStore?.clearTransactions()}>
+        CLEAR ALL TRANSACTIONS
+      </button>
+      {transactionStore?.transactions.map((txList, idx) => (
         <ul key={idx}>
           <li>txList: {idx}</li>
           {txList.map((tx, idx2) => (
@@ -364,6 +368,11 @@ export default function TestPage() {
                 >
                   link
                 </a>
+              </li>
+              <li>
+                <button onClick={() => transactionStore?.clearTransactions(idx)}>
+                  delete
+                </button>
               </li>
             </ul>
           ))}
