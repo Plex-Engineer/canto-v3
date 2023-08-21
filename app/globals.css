@@ -6,6 +6,12 @@
     --dark-mode: 0;
     --light-mode: 1;
 }
+
+::selection {
+    background: var(--border-stoke-dark-color);
+    color: var(--text-light-color);
+}
+
 .light {
     --text-only-dark: #222222;
     --text-only-light: #ffffff;
