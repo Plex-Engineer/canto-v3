@@ -19,10 +19,10 @@ const InfoBar = ({ values }: Props) => {
           {values.map((value) => (
             <>
               <div key={value.name} className={styles.item}>
-                <Text theme="secondary-light" size="x-sm">
+                <Text color="var(--text-only-light" opacity={90} size="x-sm">
                   {value.name}
                 </Text>
-                <Text theme="secondary-light" size="x-sm">
+                <Text color="var(--text-only-light" opacity={90} size="x-sm">
                   {value.value}
                 </Text>
                 <Text
@@ -37,7 +37,9 @@ const InfoBar = ({ values }: Props) => {
                 </Text>
               </div>
 
-              <Text theme="secondary-light">/</Text>
+              <Text color="var(--text-only-light" opacity={90}>
+                /
+              </Text>
             </>
           ))}
         </div>

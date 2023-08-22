@@ -16,6 +16,7 @@ interface Props {
   name?: "rm_mono" | "proto_mono";
   weight?: "regular" | "bold";
   size?: "xx-sm" | "x-sm" | "sm" | "reg" | "lg" | "x-lg";
+  opacity?: number;
   theme?:
     | "primary-light"
     | "primary-dark"
@@ -42,7 +43,16 @@ const themes = {
   "secondary-dark": "var(--text-dark-40-color)",
 };
 
-const Text = ({ name, weight, size, children, color, theme, style }: Props) => {
+const Text = ({
+  name,
+  weight,
+  size,
+  children,
+  color,
+  theme,
+  style,
+  opacity,
+}: Props) => {
   return (
     <p
       style={{
@@ -50,6 +60,7 @@ const Text = ({ name, weight, size, children, color, theme, style }: Props) => {
           name == "proto_mono"
             ? proto_mono.style.fontFamily
             : rm_mono.style.fontFamily,
+        opacity: (opacity ?? 100) / 100,
         fontWeight: weight,
         fontSize: sizes[size ?? "reg"],
         lineHeight: "140%",

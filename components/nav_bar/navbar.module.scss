@@ -16,6 +16,13 @@
 
 .nav-link {
   padding: 0 1rem;
+  opacity: 0.4;
+  transition: opacity 0.3s, transform 0.3s;
+
+  &:hover {
+    opacity: 1;
+    // transform: translateY(4.7px);
+  }
 
   &::after {
     content: "";
@@ -23,7 +30,7 @@
     height: 1px;
     transform: translateX(-15%) scaleX(0);
 
-    transition: transform 0.3s, height 0.3s;
+    transition: transform 0.3s, height 0.3s 0.1s;
   }
 
   &:hover::after {
@@ -36,13 +43,31 @@
     border-top: none;
   }
 }
+
+.active {
+  opacity: 1;
+}
 .wallet-connect {
-  background-color: yellowgreen;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  padding: 12px 30px;
 }
 
 .container {
   display: grid;
-  grid-template-columns: 80px 1fr 80px;
-  height: 60px;
-  //   background-color: #999;
+  grid-template-columns: 80px 1fr 400px;
+
+  animation: fadeIn 0.5s ease-in-out;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }

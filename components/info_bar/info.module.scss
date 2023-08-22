@@ -1,5 +1,28 @@
+.container {
+  display: flex;
+  width: 100vw;
+  height: 32px;
+  padding: 6px 0px;
+
+  align-items: center;
+  background: var(--primary-color, #111);
+
+  transform: translateY(-100%);
+  animation: fadeIn 0.4s ease-in-out 0.4s forwards;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
 .value {
-  color: var(--card-subtle-color, #cacaca);
+  color: var(--text-only-light, #cacaca);
 }
 .item {
   display: flex;
@@ -10,15 +33,6 @@
 .content {
   display: flex;
   gap: 5rem;
-}
-.container {
-  display: flex;
-  width: 100vw;
-  height: 32px;
-  padding: 6px 0px;
-
-  align-items: center;
-  background: var(--primary-color, #111);
 }
 
 .shadow {

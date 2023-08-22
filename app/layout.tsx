@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="light">
         <InfoBar
           values={[
             {
@@ -48,7 +48,8 @@ export default function RootLayout({
         />
         <NavBar />
         {children}
-        {/* <Footer /> */}
+        <div id="modal-root"></div>
+        <Footer />
       </body>
     </html>
   );

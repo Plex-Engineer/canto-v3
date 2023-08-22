@@ -2,6 +2,7 @@
     "title": "Canto Bridge Out Token List",
     "description": "List of tokens supported to bridge out, possible chains to send to, and the bridge method to use",
     "bridgeMethodInfo": {
+        "comment": "enum for bridge method also noted in ../schemas/bridgeOutTokens.schema.json",
         "0": "gravity bridge",
         "1": "ibc transfer",
         "2": "layer zero"
