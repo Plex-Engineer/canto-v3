@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Text from "../text";
 import styles from "./footer.module.scss";
+import FooterButton from "./components/footerButton";
 
 const Footer = () => {
   return (
@@ -11,6 +12,7 @@ const Footer = () => {
         <FooterLink href="https://canto.build/" text="commons" />
         <FooterLink href="https://canto.canny.io/" text="report bug" />
         <FooterLink href="https://v2.canto.io/" text="canto v2" />
+        <FooterButton text="theme" />
       </div>
       <div className={styles.links}>
         <StatusText />
@@ -28,6 +30,7 @@ const Footer = () => {
             width={16}
             style={{
               margin: "8px",
+              filter: "invert(var(--dark-mode))",
             }}
           />{" "}
           $0.1101
@@ -46,6 +49,7 @@ const Footer = () => {
             width={16}
             style={{
               margin: "8px",
+              filter: "invert(var(--dark-mode))",
             }}
           />
           $1.0094
@@ -77,7 +81,7 @@ const StatusText = () => {
         justifyContent: "center",
       }}
     >
-      <div className={styles.status}></div>
+      <span className={styles.status}></span>
       live data feed
     </Text>
   );

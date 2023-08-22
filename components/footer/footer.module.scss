@@ -5,7 +5,7 @@
 
   align-items: center;
   justify-content: space-between;
-  border: 1px solid #222;
+  border: 1px solid var(--border-stoke-dark-color, #222);
 
   .links {
     display: flex;
@@ -27,6 +27,10 @@
 
     &:active {
       background: #bcbcbc;
+    }
+
+    &:not(:has(a)) {
+      padding: 0 2rem;
     }
   }
 

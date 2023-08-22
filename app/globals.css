@@ -3,8 +3,20 @@
 @tailwind utilities;
 
 :root {
-    --text-light-color: #ffffff;
+    --dark-mode: 0;
+    --light-mode: 1;
+}
+
+::selection {
+    background: var(--border-stoke-dark-color);
+    color: var(--text-light-color);
+}
+
+.light {
+    --text-only-dark: #222222;
+    --text-only-light: #ffffff;
     --primary-90-color: #222222;
+    --text-light-color: #ffffff;
     --card-background-color: #c1c1c1;
     --text-light-30-color: #ffffff4c;
     --extra-failure-color: #ef4444;
@@ -17,42 +29,53 @@
     --border-optional-color: #ffffff00;
     --extra-shadow: #cdcdcd;
     --border-stroke-color: #b3b3b3;
-    --border-radius: 0;
+    --border-radius: 0px;
     --text-dark-color: #111111;
     --card-sub-surface-color: #dfdfdf;
     --card-surface-color: #f1f1f1;
-
-    background-color: var(--card-primary-color);
+    --border-stoke-dark-color: #222;
+    --dark-mode: 0;
+    --light-mode: 1;
 }
 
 .dark {
-    --text-light-color: #ffffff;
-    --card-background-color: #c1c1c1;
-    --text-light-30-color: #ffffff4c;
+    --text-only-dark: #222222;
+    --text-only-light: #ffffff;
+    --primary-90-color: #eeeeee;
+    --text-light-color: #111111;
+    --card-background-color: #303438;
+    --text-light-30-color: #1111114c;
     --extra-failure-color: #ef4444;
-    --text-dark-30-color: #1111114c;
+    --text-dark-30-color: #e1e1e14c;
     --extra-success-color: #06fc99;
-    --text-light-40-color: #ffffff66;
-    --card-subtle-color: #cacaca;
-    --text-dark-40-color: #11111166;
-    --card-primary-color: #111111;
-    --border-optional-color: #ffffff00;
-    --extra-shadow: #cdcdcd;
-    --border-stroke-color: #b3b3b3;
-    --border-radius: 0;
-    --text-dark-color: #111111;
-    --card-sub-surface-color: #dfdfdf;
-    --card-surface-color: #f1f1f1;
+    --text-light-40-color: #11111166;
+    --card-subtle-color: #282f35;
+    --text-dark-40-color: #e1e1e166;
+    --card-primary-color: #0ee489;
+    --border-optional-color: #ffffff;
+    --extra-shadow: #ffffff;
+    --border-stroke-color: #393d49;
+    --border-stoke-dark-color: #555555;
+    --border-radius: 4px;
+    --text-dark-color: #e1e1e1;
+    --card-sub-surface-color: #23292e;
+    --card-surface-color: #393e43;
+    --dark-mode: 1;
+    --light-mode: 0;
+    --box-shadow: 0;
 }
 
-.experimental {
-    --text-light-color: #ffffff;
+.dark2 {
+    --text-only-dark: #222222;
+    --text-only-light: #ffffff;
+    --primary-90-color: #eeeeee;
+    --text-light-color: #111111;
     --card-background-color: #0b0b0b;
-    --text-light-30-color: #ffffff4c;
+    --text-light-30-color: #1111114c;
     --extra-failure-color: #ef4444;
     --text-dark-30-color: #ededed4c;
     --extra-success-color: #06fc99;
-    --text-light-40-color: #ffffff66;
+    --text-light-40-color: #11111166;
     --card-subtle-color: #ffffff;
     --text-dark-40-color: #ececec66;
     --card-primary-color: #0ee489;
@@ -63,21 +86,10 @@
     --text-dark-color: #ececec;
     --card-sub-surface-color: #292929;
     --card-surface-color: #1e1e1e;
+    --dark-mode: 1;
+    --light-mode: 0;
+    --box-shadow: 0;
 }
-
-/* @media (prefers-color-scheme: dark) {
-    :root {
-        --border-dark-only-color: #ffffff;
-        --shadow: #ffffff;
-        --primary-color: #0ee489;
-        --background-color: #303438;
-        --stroke-color: #393d49;
-        --border-radius: 4;
-        --sub-surface-color: #23292e;
-        --surface-color: #393e43;
-        --text-color: #e1e1e1;
-    }
-} */
 
 * {
     -webkit-font-smoothing: antialiased;
@@ -89,9 +101,8 @@ body {
     background-color: var(--card-background-color);
     color: var(--text-dark-color);
     min-height: 100vh;
-
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto auto 1fr auto;
 }
 
 .center {

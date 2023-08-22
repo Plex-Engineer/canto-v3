@@ -1,0 +1,83 @@
+.box {
+  width: 100%;
+  aspect-ratio: 1;
+  background-color: var(--card-background-color);
+  transition: background-color 3s ease-in-out;
+  border: 2px solid #11111117;
+  &:hover {
+    background-color: #1111113e;
+    transition: background-color 0.1s ease-in-out;
+  }
+}
+
+.container {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(30, 1fr);
+  grid-template-rows: auto;
+
+  gap: 2px;
+  //black color
+}
+
+.moving {
+  width: 10px;
+  //   transform: translate(0px, -48px);
+  border: 1px solid white;
+  opacity: 0.5;
+  aspect-ratio: 1.23433242507;
+  position: absolute;
+
+  &:nth-of-type(1) {
+    animation: moving 10s linear infinite;
+    animation-delay: 0s;
+  }
+
+  &:nth-of-type(2) {
+    animation: moving 10s linear infinite;
+    animation-delay: 2s;
+  }
+
+  &:nth-of-type(3) {
+    animation: moving 10s linear infinite;
+    animation-delay: 4s;
+  }
+
+  &:nth-of-type(4) {
+    animation: moving 10s linear infinite;
+    animation-delay: 6s;
+  }
+
+  &:nth-of-type(5) {
+    animation: moving 10s linear infinite;
+    animation-delay: 8s;
+  }
+
+  &:nth-of-type(6) {
+    animation: moving 10s linear infinite;
+    animation-delay: 10s;
+  }
+
+  @keyframes moving {
+    from {
+      width: 100px;
+    }
+    to {
+      width: 100vw;
+    }
+  }
+}
+
+.sample {
+  display: flex;
+  width: 600px;
+  height: 400px;
+  padding: 0px 16px 20px 16px;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  background: var(--sub-surface-color, #dfdfdf);
+  box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
+  z-index: 2;
+}

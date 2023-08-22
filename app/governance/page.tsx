@@ -1,7 +1,9 @@
+import AnimatedBackground from "@/components/animated_background/animatedBackground";
+
 export default function GovernancePage() {
   return (
     <div>
-      <h1>Governance Page</h1>
+      <AnimatedBackground />
     </div>
   );
 }
