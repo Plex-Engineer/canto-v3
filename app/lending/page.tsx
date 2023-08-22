@@ -25,7 +25,7 @@ export default function LendingPage() {
           gridTemplateColumns: "repeat(3, 1fr)",
           placeItems: "center",
           width: "50%px",
-          minHeight: "80%",
+          minHeight: "100%",
           backgroundColor: "var(--card-sub-surface-color",
         }}
       >

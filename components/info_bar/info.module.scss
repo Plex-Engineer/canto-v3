@@ -1,16 +1,3 @@
-.value {
-  color: var(--text-only-light, #cacaca);
-}
-.item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.content {
-  display: flex;
-  gap: 5rem;
-}
 .container {
   display: flex;
   width: 100vw;
@@ -33,6 +20,19 @@
       transform: translateY(0);
     }
   }
+}
+.value {
+  color: var(--text-only-light, #cacaca);
+}
+.item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.content {
+  display: flex;
+  gap: 5rem;
 }
 
 .shadow {

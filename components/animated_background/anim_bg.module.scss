@@ -9,51 +9,59 @@
   z-index: 0;
   background: url("/wires.svg") no-repeat center center;
   background-size: 100%;
+  position: absolute;
+  z-index: -5;
 }
 
 .moving {
   width: 10px;
-  border: 1px solid white;
+  border: 2px solid white;
   opacity: 0.5;
   aspect-ratio: 1.23433242507;
   position: absolute;
-  --anim-time: 20s;
+  --anim-step: 0.16666666;
+
+  animation: moving var(--anim-time) var(--direction) ease-in infinite;
+
   &:nth-of-type(1) {
-    animation: moving var(--anim-time) linear infinite;
-    animation-delay: 0s;
+    animation-delay: calc(var(--anim-time) * 0 * var(--anim-step));
   }
 
   &:nth-of-type(2) {
-    animation: moving var(--anim-time) linear infinite;
-    animation-delay: 4s;
+    animation-delay: calc(var(--anim-time) * 1 * var(--anim-step));
   }
 
   &:nth-of-type(3) {
-    animation: moving var(--anim-time) linear infinite;
-    animation-delay: 8s;
+    animation-delay: calc(var(--anim-time) * 2 * var(--anim-step));
   }
 
   &:nth-of-type(4) {
-    animation: moving var(--anim-time) linear infinite;
-    animation-delay: 12s;
+    animation-delay: calc(var(--anim-time) * 3 * var(--anim-step));
   }
 
   &:nth-of-type(5) {
-    animation: moving var(--anim-time) linear infinite;
-    animation-delay: 16s;
+    animation-delay: calc(var(--anim-time) * 4 * var(--anim-step));
   }
 
   &:nth-of-type(6) {
-    animation: moving var(--anim-time) linear infinite;
-    animation-delay: 20s;
+    animation-delay: calc(var(--anim-time) * 5 * var(--anim-step));
   }
+
+  //   &:nth-of-type(7) {
+  //     animation-delay: calc(var(--anim-time) * 6 * var(--anim-step));
+  //     border-color: blue !important;
+  //   }
 
   @keyframes moving {
     0% {
-      width: 100px;
+      width: var(--init-size, 10px);
+    }
+    70% {
+      border-color: #dfdfdf;
     }
     100% {
       width: 100vw;
+      border-color: #c1c1c1;
     }
   }
 }

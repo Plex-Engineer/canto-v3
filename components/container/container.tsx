@@ -8,6 +8,7 @@ interface Props {
   direction?: "row" | "column";
   gap?: number;
   center?: boolean;
+  layer?: number;
 }
 
 const Container = (props: Props) => {
@@ -24,6 +25,7 @@ const Container = (props: Props) => {
         gap: props.gap,
         alignItems: props.center ? "center" : undefined,
         justifyContent: props.center ? "center" : undefined,
+        zIndex: props.layer,
       }}
     >
       {props.children}

@@ -91,20 +91,6 @@
     --box-shadow: 0;
 }
 
-/* @media (prefers-color-scheme: dark) {
-    :root {
-        --border-dark-only-color: #ffffff;
-        --shadow: #ffffff;
-        --primary-color: #0ee489;
-        --background-color: #303438;
-        --stroke-color: #393d49;
-        --border-radius: 4;
-        --sub-surface-color: #23292e;
-        --surface-color: #393e43;
-        --text-color: #e1e1e1;
-    }
-} */
-
 * {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
