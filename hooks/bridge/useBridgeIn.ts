@@ -14,12 +14,18 @@ import {
   BridgeHookState,
 } from "./interfaces/hookParams";
 import useAutoSelect from "../helpers/useAutoSelect";
-import { BaseNetwork } from "@/config/interfaces/networks";
-import { BridgeToken, BridgingMethod } from "./interfaces/tokens";
+import {
+  BaseNetwork,
+  CosmosNetwork,
+  EVMNetwork,
+} from "@/config/interfaces/networks";
+import { BridgeToken, BridgingMethod, IBCToken } from "./interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
 import { bridgeInGravity } from "./transactions/gravityBridge";
 import { bridgeLayerZero } from "./transactions/layerZero";
 import useTokenBalances from "../helpers/useTokenBalances";
+import { ibcInKeplr } from "./transactions/keplr/ibcKeplr";
+import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks.utils";
 
 export default function useBridgeIn(
   props: BridgeHookInputParams
@@ -171,6 +177,13 @@ export default function useBridgeIn(
     // check the selected method to figure out how to create tx
     switch (state.selectedMethod) {
       case BridgingMethod.GRAVITY_BRIDGE:
+        // check to make sure EVM network is selected
+        const gbridgeEVM = isEVMNetwork(state.fromNetwork);
+        if (!gbridgeEVM) {
+          return NEW_ERROR(
+            "useBridgeIn::bridgeIn: gravity bridge only works for EVM networks"
+          );
+        }
         transactions = await bridgeInGravity(
           Number(state.fromNetwork.chainId),
           ethAccount,
@@ -179,16 +192,35 @@ export default function useBridgeIn(
         );
         break;
       case BridgingMethod.LAYER_ZERO:
+        const lzFromEVM = isEVMNetwork(state.fromNetwork);
+        const lzToEVM = isEVMNetwork(state.toNetwork);
+        if (!(lzFromEVM && lzToEVM)) {
+          return NEW_ERROR(
+            "useBridgeIn::bridgeIn: layer zero only works for EVM networks"
+          );
+        }
         transactions = await bridgeLayerZero(
-          state.fromNetwork,
-          state.toNetwork,
+          state.fromNetwork as EVMNetwork,
+          state.toNetwork as EVMNetwork,
           ethAccount,
           state.selectedToken,
           amount
         );
         break;
       case BridgingMethod.IBC: {
-        transactions = NEW_ERROR("useBridgeIn::bridgeIn: IBC not implemented");
+        const ibcFromCosmos = isCosmosNetwork(state.fromNetwork);
+        if (!ibcFromCosmos) {
+          return NEW_ERROR(
+            "useBridgeIn::bridgeIn: IBC only works for Cosmos networks"
+          );
+        }
+        transactions = await ibcInKeplr(
+          state.fromNetwork as CosmosNetwork,
+          "cosmos address",
+          ethAccount,
+          state.selectedToken as IBCToken,
+          amount
+        );
         break;
       }
       default:

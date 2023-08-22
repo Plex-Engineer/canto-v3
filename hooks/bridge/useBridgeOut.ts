@@ -13,13 +13,18 @@ import {
   PromiseWithError,
   ReturnWithError,
 } from "@/config/interfaces/errors";
-import { BaseNetwork, CosmosNetwork } from "@/config/interfaces/networks";
+import {
+  BaseNetwork,
+  CosmosNetwork,
+  EVMNetwork,
+} from "@/config/interfaces/networks";
 import { BridgeToken, BridgingMethod, IBCToken } from "./interfaces/tokens";
 import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
 import { Transaction } from "@/config/interfaces/transactions";
 import { bridgeLayerZero } from "./transactions/layerZero";
 import { txIBCOut } from "./transactions/ibc";
 import useTokenBalances from "../helpers/useTokenBalances";
+import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks.utils";
 
 export default function useBridgeOut(
   props: BridgeHookInputParams
@@ -195,15 +200,28 @@ export default function useBridgeOut(
         );
         break;
       case BridgingMethod.LAYER_ZERO:
+        const lzFromEVM = isEVMNetwork(state.fromNetwork);
+        const lzToEVM = isEVMNetwork(state.toNetwork);
+        if (!(lzFromEVM && lzToEVM)) {
+          return NEW_ERROR(
+            "useBridgeOut::bridgeOut: layer zero only works for EVM networks"
+          );
+        }
         transactions = await bridgeLayerZero(
-          state.fromNetwork,
-          state.toNetwork,
+          state.fromNetwork as EVMNetwork,
+          state.toNetwork as EVMNetwork,
           ethAccount,
           state.selectedToken,
           amount
         );
         break;
       case BridgingMethod.IBC: {
+        const toCosmos = isCosmosNetwork(state.toNetwork);
+        if (!toCosmos) {
+          return NEW_ERROR(
+            "useBridgeOut::bridgeOut: IBC only works for cosmos networks"
+          );
+        }
         transactions = await txIBCOut(
           Number(state.fromNetwork.chainId),
           ethAccount,

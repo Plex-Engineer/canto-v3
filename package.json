@@ -42,6 +42,7 @@
     "zustand": "^4.3.9"
   },
   "devDependencies": {
+    "@keplr-wallet/types": "^0.12.21",
     "@types/lodash.debounce": "^4.0.7",
     "@types/node": "20.4.4",
     "@types/react": "18.2.16",

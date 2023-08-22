@@ -3,7 +3,7 @@ import {
   NO_ERROR,
   PromiseWithError,
 } from "@/config/interfaces/errors";
-import { BaseNetwork } from "@/config/interfaces/networks";
+import { EVMNetwork } from "@/config/interfaces/networks";
 import { isValidEthAddress } from "@/utils/address.utils";
 import { BridgeToken } from "../interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
@@ -17,8 +17,8 @@ import { getTokenBalance } from "@/utils/evm/erc20.utils";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
 
 export async function bridgeLayerZero(
-  fromNetwork: BaseNetwork,
-  toNetwork: BaseNetwork,
+  fromNetwork: EVMNetwork,
+  toNetwork: EVMNetwork,
   ethAddress: string,
   token: BridgeToken,
   amount: string
@@ -50,7 +50,7 @@ export async function bridgeLayerZero(
   // TODO: only works for Canto OFT
   if (fromNetwork.id.split("-")[0] === "canto") {
     const { data: oftBalance, error: balanceError } = await getTokenBalance(
-      fromNetwork.chainId as number,
+      fromNetwork.chainId,
       token.address,
       ethAddress
     );
@@ -61,7 +61,7 @@ export async function bridgeLayerZero(
     if (oftBalance.lt(amount)) {
       txList.push(
         _oftDepositOrWithdrawTx(
-          Number(fromNetwork.chainId),
+          fromNetwork.chainId,
           true,
           token.address,
           new BigNumber(amount).minus(oftBalance).toString(),
@@ -73,7 +73,7 @@ export async function bridgeLayerZero(
   // will need to call transfer from after depositing
   txList.push(
     _oftTransferTx(
-      Number(fromNetwork.chainId),
+      fromNetwork.chainId,
       toLZChainId,
       ethAddress,
       toAddressBytes,

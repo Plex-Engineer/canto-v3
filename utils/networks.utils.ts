@@ -8,6 +8,13 @@ import { Chain } from "@/config/interfaces/transactions";
 import * as NETWORKS from "@/config/networks";
 import * as COSMOS_NETWORKS from "@/config/networks/cosmos";
 
+export function isEVMNetwork(network: BaseNetwork): boolean {
+  return typeof network.chainId === "number";
+}
+export function isCosmosNetwork(network: BaseNetwork): boolean {
+  return typeof network.chainId === "string";
+}
+
 export function getNetworkInfoFromChainId(
   chainId: number | string
 ): ReturnWithError<BaseNetwork> {

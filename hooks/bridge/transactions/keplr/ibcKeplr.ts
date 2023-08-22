@@ -16,16 +16,33 @@ import { CANTO_MAINNET_COSMOS } from "@/config/networks";
 import { getBlockTimestamp } from "../ibc";
 import { Transaction } from "@/config/interfaces/transactions";
 import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
+import { connectToKeplr } from "@/utils/keplr/connectKeplr";
 
 // will return keplr transaction to perform, this assums that the user has already signed and is connected
 export async function ibcInKeplr(
-  keplrClient: SigningStargateClient,
   cosmosNetwork: CosmosNetwork,
   cosmosSender: string,
   ethReceiver: string,
   ibcToken: IBCToken,
   amount: string
 ): PromiseWithError<Transaction[]> {
+  // check if we can obtain the keplr client
+  const { data: keplrClient, error: clientError } = await connectToKeplr(
+    cosmosNetwork
+  );
+  if (clientError) {
+    return NEW_ERROR("ibcInKeplr::" + clientError.message);
+  }
+  // check that client has the same address as the cosmosSender
+  if (keplrClient.address !== cosmosSender) {
+    return NEW_ERROR(
+      "ibcInKeplr: keplr address does not match cosmos sender: " +
+        keplrClient.address +
+        " != " +
+        cosmosSender
+    );
+  }
+
   // make parameter checks
   const { data: hasPubKey, error: checkPubKeyError } = await checkPubKey(
     ethReceiver,
@@ -71,7 +88,7 @@ export async function ibcInKeplr(
       description: "IBC In",
       type: "KEPLR",
       tx: async () => {
-        return await signAndBroadcastIBCKeplr(keplrClient, {
+        return await signAndBroadcastIBCKeplr(keplrClient.client, {
           cosmosAccount: cosmosSender,
           cantoReceiver: cantoReceiver,
           amount: amount,

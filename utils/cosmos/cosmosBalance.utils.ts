@@ -8,7 +8,7 @@ import {
   getCosmosAPIEndpoint,
   getNetworkInfoFromChainId,
 } from "../networks.utils";
-import { IBCToken, UserTokenBalances } from "@/hooks/bridge/interfaces/tokens";
+import { UserTokenBalances } from "@/hooks/bridge/interfaces/tokens";
 import { CosmosNetwork } from "@/config/interfaces/networks";
 
 export async function getCantoBalance(
