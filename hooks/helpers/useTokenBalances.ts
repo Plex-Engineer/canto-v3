@@ -1,6 +1,5 @@
 ///
 /// Hook to get an object of token balances for a given address and available tokens
-/// This will only work on ERC20 tokens
 /// Will return a mappping of token id => balance
 ///
 
@@ -8,11 +7,13 @@ import { ERC20Token } from "@/config/interfaces/tokens";
 import { UserTokenBalances } from "../bridge/interfaces/tokens";
 import { useEffect, useState } from "react";
 import { getEVMTokenBalanceList } from "@/utils/evm/erc20.utils";
+import { getCosmosTokenBalanceList } from "@/utils/cosmos/cosmosBalance.utils";
 
 export default function useTokenBalances(
   chainId: number | string | undefined,
   tokens: ERC20Token[],
-  userEthAddress: string | undefined
+  userEthAddress: string | undefined,
+  userCosmosAddress: string | undefined
 ): UserTokenBalances {
   // state for balances of tokens
   const [userTokenBalances, setUserTokenBalances] = useState<UserTokenBalances>(
@@ -25,9 +26,22 @@ export default function useTokenBalances(
         const { data: balances, error: balancesError } =
           await getEVMTokenBalanceList(chainId, tokens, userEthAddress);
         if (balancesError) {
-          throw new Error(
+          setUserTokenBalances({});
+          console.log(
             "useTokenBalances::setTokenBalances::" + balancesError.message
           );
+          return;
+        }
+        setUserTokenBalances(balances);
+      } else if (typeof chainId === "string" && userCosmosAddress) {
+        const { data: balances, error: balancesError } =
+          await getCosmosTokenBalanceList(chainId, userCosmosAddress);
+        if (balancesError) {
+          setUserTokenBalances({});
+          console.log(
+            "useTokenBalances::setTokenBalances::" + balancesError.message
+          );
+          return;
         }
         setUserTokenBalances(balances);
       } else {
@@ -35,8 +49,10 @@ export default function useTokenBalances(
         setUserTokenBalances({});
       }
     }
-    setTokenBalances();
-  }, [chainId, tokens, userEthAddress]);
+    // timeout will act as debounce, if multiple deps are changed at the same time
+    const setAllBalances = setTimeout(() => setTokenBalances(), 1000);
+    return () => clearTimeout(setAllBalances);
+  }, [chainId, tokens, userEthAddress, userCosmosAddress]);
 
   return userTokenBalances;
 }

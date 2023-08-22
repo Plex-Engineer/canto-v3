@@ -5,6 +5,7 @@ import { Transaction } from "@/config/interfaces/transactions";
 
 export interface BridgeHookInputParams {
   userEthAddress?: string;
+  userCosmosAddress?: string;
   testnet?: boolean;
   defaults?: {
     networkId?: string;

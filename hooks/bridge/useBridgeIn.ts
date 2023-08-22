@@ -50,7 +50,8 @@ export default function useBridgeIn(
   const userTokenBalances = useTokenBalances(
     state.fromNetwork?.chainId,
     state.availableTokens,
-    props.userEthAddress
+    props.userEthAddress,
+    props.userCosmosAddress
   );
   // will autoselect the first available network (only network can have default since loaded once)
   useAutoSelect(state.availableNetworks, setNetwork, props.defaults?.networkId);

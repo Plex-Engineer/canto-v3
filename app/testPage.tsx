@@ -9,6 +9,7 @@ import useBridgeOut from "@/hooks/bridge/useBridgeOut";
 import useStaking from "@/hooks/staking/useStaking";
 import useTransactionStore from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
+import { getCosmosTokenBalanceList } from "@/utils/cosmos/cosmosBalance.utils";
 import { createMsgsClaimStakingRewards } from "@/utils/cosmos/transactions/messages/staking/claimRewards";
 import { createMsgsDelegate } from "@/utils/cosmos/transactions/messages/staking/delegate";
 import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
@@ -17,6 +18,7 @@ import { formatUnits } from "viem";
 import { useWalletClient } from "wagmi";
 
 export default function TestPage() {
+  const [cosmosAddress, setCosmosAddress] = useState<string>("");
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({
     testnet: false,
@@ -25,13 +27,31 @@ export default function TestPage() {
   const bridgeIn = useBridgeIn({
     testnet: false,
     userEthAddress: signer?.account.address,
+    userCosmosAddress: cosmosAddress,
   });
   const transactionStore = useStore(useTransactionStore, (state) => state);
   const staking = useStaking();
   console.log(transactionStore?.transactions);
 
+  useEffect(() => {
+    async function getKeplrInfoForBridge() {
+      const network = bridgeIn.selections.fromNetwork;
+      if (typeof network?.chainId === "string") {
+        try {
+          await window.keplr.enable(network.chainId);
+          const offlineSigner = window.keplr.getOfflineSigner(network.chainId);
+          const accounts = await offlineSigner.getAccounts();
+          const userAccount = accounts[0].address;
+          setCosmosAddress(userAccount);
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    }
+    getKeplrInfoForBridge();
+  }, [bridgeIn.selections.fromNetwork]);
+
   // keplr testing
-  const [keplrClient, setKeplrClient] = useState<SigningStargateClient>();
   async function getKeplrInfo() {
     // use cosmoshub to test functionality
     await window.keplr.enable(COSMOS_HUB.chainId);
@@ -39,6 +59,11 @@ export default function TestPage() {
     const accounts = await offlineSigner.getAccounts();
     const userAccount = accounts[0].address;
     console.log(userAccount);
+    const balanceesss = await getCosmosTokenBalanceList(
+      COSMOS_HUB.chainId,
+      userAccount
+    );
+    console.log(balanceesss);
     const client = await SigningStargateClient.connectWithSigner(
       COSMOS_HUB.rpcUrl,
       offlineSigner,
