@@ -156,4 +156,10 @@ const useTransactionStore = create<TransactionStore>()(
   )
 );
 
+// this is a hack to get around the fact that BigInts are not supported by JSON.stringify
+// @ts-ignore
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
 export default useTransactionStore;

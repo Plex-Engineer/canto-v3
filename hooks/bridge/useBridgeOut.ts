@@ -225,7 +225,7 @@ export default function useBridgeOut(
         transactions = await txIBCOut(
           Number(state.fromNetwork.chainId),
           ethAccount,
-          "osmos address",
+          "comdex address",
           state.toNetwork as CosmosNetwork,
           state.selectedToken as IBCToken,
           amount
