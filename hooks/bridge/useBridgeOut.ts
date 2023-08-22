@@ -1,4 +1,4 @@
-import { CANTO_MAINNET, CANTO_TESTNET } from "@/config/networks";
+import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
 import {
   BridgeHookInputParams,
   BridgeHookReturn,
@@ -19,6 +19,7 @@ import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
 import { Transaction } from "@/config/interfaces/transactions";
 import { bridgeLayerZero } from "./transactions/layerZero";
 import { txIBCOut } from "./transactions/ibc";
+import useTokenBalances from "../helpers/useTokenBalances";
 
 export default function useBridgeOut(
   props: BridgeHookInputParams
@@ -32,7 +33,7 @@ export default function useBridgeOut(
     availableNetworks: [],
     availableMethods: [],
     // default selections
-    fromNetwork: props.testnet ? CANTO_TESTNET : CANTO_MAINNET,
+    fromNetwork: props.testnet ? CANTO_TESTNET_EVM : CANTO_MAINNET_EVM,
     toNetwork: null,
     selectedToken: null,
     selectedMethod: null,
@@ -44,6 +45,15 @@ export default function useBridgeOut(
   ///
   /// internal hooks
   ///
+
+  // contains object mapping of the token balances
+  const userTokenBalances = useTokenBalances(
+    state.fromNetwork?.chainId,
+    state.availableTokens,
+    props.userEthAddress,
+    props.userCosmosAddress
+  );
+
   // will autoselect the first available token if there are any
   useAutoSelect(state.availableTokens, setToken);
   // will autoselect the first available network if there are any
@@ -76,6 +86,9 @@ export default function useBridgeOut(
 
   // sets selected token and loads the available networks it can be bridge to
   function setToken(id: string): void {
+    //make sure new token was actually selected
+    if (state.selectedToken?.id === id) return;
+
     const { data: token, error: tokenError } = getToken(id);
     if (tokenError) {
       throw new Error("useBridgeOut::setToken::" + tokenError.message);
@@ -111,6 +124,9 @@ export default function useBridgeOut(
 
   // sets selected network and loads the available methods for bridging
   function setNetwork(id: string): void {
+    //make sure new network was actually selected
+    if (state.toNetwork?.id === id) return;
+
     const { data: network, error: networkError } = getNetwork(id);
     if (networkError) {
       throw new Error("useBridgeOut::setNetwork: invalid network id: " + id);
@@ -144,6 +160,9 @@ export default function useBridgeOut(
   // sets selected bridging method only it actually exists on the token
   function setMethod(selectMethod: string): void {
     const method = selectMethod as BridgingMethod;
+    //make sure new method was actually selected
+    if (method === state.selectedMethod) return;
+
     if (!state.availableMethods.includes(method)) {
       throw new Error("setMethod: Invalid method: " + method);
     }
@@ -188,7 +207,7 @@ export default function useBridgeOut(
         transactions = await txIBCOut(
           Number(state.fromNetwork.chainId),
           ethAccount,
-          "cosmos address",
+          "osmos address",
           state.toNetwork as CosmosNetwork,
           state.selectedToken as IBCToken,
           amount
@@ -212,7 +231,10 @@ export default function useBridgeOut(
   return {
     testnet: props.testnet ?? false,
     allOptions: {
-      tokens: state.availableTokens,
+      tokens: state.availableTokens.map((token) => {
+        const balance = userTokenBalances[token.id];
+        return balance !== undefined ? { ...token, balance } : token;
+      }),
       networks: state.availableNetworks,
       methods: state.availableMethods,
     },

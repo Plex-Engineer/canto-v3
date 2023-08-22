@@ -8,7 +8,7 @@ import {
 const cosmosHubBlockExplorer = "https://www.mintscan.io/cosmos";
 
 export const COSMOS_HUB: CosmosNetwork = {
-  id: "cosmos-hub",
+  id: "cosmoshub-4",
   chainId: "cosmoshub-4",
   icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
   name: "Cosmos Hub",
@@ -20,7 +20,7 @@ export const COSMOS_HUB: CosmosNetwork = {
     return checkCosmosAddress(this.addressPrefix)(address);
   },
   nativeCurrency: {
-    name: "ATOM",
+    name: "Atom",
     baseName: "uatom",
     symbol: "ATOM",
     decimals: 6,

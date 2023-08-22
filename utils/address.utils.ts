@@ -4,10 +4,10 @@ import {
   PromiseWithError,
 } from "@/config/interfaces/errors";
 import { tryFetch } from "./async.utils";
-import { CANTO_MAINNET } from "@/config/networks";
-import { getCosmosAPIEndpoint } from "@/config/consts/apiUrls";
+import { CANTO_MAINNET_COSMOS } from "@/config/networks";
 import { isAddress as checkHex } from "web3-validator";
 import { getCosmosAccount } from "./cosmos/transactions/helpers.utils";
+import { getCosmosAPIEndpoint } from "./networks.utils";
 
 /**
  * Convert an eth hex address to bech32 canto address.
@@ -18,7 +18,7 @@ export async function ethToCantoAddress(
   ethAddress: string
 ): PromiseWithError<string> {
   const { data: apiEndpoint, error: apiEndpointError } = getCosmosAPIEndpoint(
-    CANTO_MAINNET.chainId as number
+   CANTO_MAINNET_COSMOS.chainId
   );
   if (apiEndpointError) {
     return NEW_ERROR("ethToCantoAddress::" + apiEndpointError.message);
@@ -39,7 +39,7 @@ export async function ethToCantoAddress(
 
 export async function checkPubKey(
   ethAddress: string,
-  chainId: number
+  chainId: string
 ): PromiseWithError<boolean> {
   const { data: cosmosAccount, error } = await getCosmosAccount(
     ethAddress,

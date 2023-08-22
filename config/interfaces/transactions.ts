@@ -1,7 +1,10 @@
 import { ContractAbi } from "web3-types";
+import { PromiseWithError } from "./errors";
+import { DeliverTxResponse } from "@cosmjs/stargate";
 // function classes would return calldata that would be saved as a string
 export type Transaction = {
-  chainId: number;
+  // chainId the wallet must be on to perform the transaction
+  chainId: number | string;
   description: string;
 } & (
   | {
@@ -15,10 +18,10 @@ export type Transaction = {
   | {
       type: "COSMOS";
       msg: UnsignedCosmosMessages;
-      // senderObj: Sender;
-      // chain: Chain;
-      // nodeAddress: string;
-      // ethAccount: string;
+    }
+  | {
+      type: "KEPLR";
+      tx: () => PromiseWithError<DeliverTxResponse>;
     }
 );
 type TransactionStatus = "NONE" | "SIGNING" | "PENDING" | "SUCCESS" | "ERROR";
@@ -28,6 +31,7 @@ export interface TransactionWithStatus {
   status: TransactionStatus;
   hash?: string;
   error?: Error;
+  txLink?: string;
 }
 
 ///
@@ -69,8 +73,8 @@ export interface EIP712FeeObject {
   feePayer: string;
 }
 export interface UnsignedCosmosMessages {
-  eipMsg: EIP712Message;
-  cosmosMsg: CosmosNativeMessage;
+  eipMsg: EIP712Message | EIP712Message[];
+  cosmosMsg: CosmosNativeMessage | CosmosNativeMessage[];
   // fee must be converted to correct type before sending
   fee: Fee;
   typesObject: object;

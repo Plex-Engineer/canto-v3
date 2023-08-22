@@ -21,4 +21,5 @@ export const MUMBAI_TESTNET: EVMNetwork = {
     getAddressLink: getEthAddressLink(polygonScanUrl),
     getTransactionLink: getEthTransactionLink(polygonScanUrl),
   },
+  multicall3Address: "0xcA11bde05977b3631167028862bE2a173976CA11",
 };

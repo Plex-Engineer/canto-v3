@@ -6,11 +6,11 @@ import {
 import { Transaction } from "@/config/interfaces/transactions";
 import { GetWalletClientResult } from "wagmi/actions";
 import { checkOnRightChain } from "../baseTransaction.utils";
-import { getCosmosChainObj } from "@/config/consts/apiUrls";
 import {
   getSenderObj,
   signAndBroadcastCosmosTransaction,
 } from "./transactions/helpers.utils";
+import { getCosmosChainObject } from "../networks.utils";
 
 // will return the cosmos txHash of the signed transaction
 export async function performCosmosTransaction(
@@ -23,6 +23,9 @@ export async function performCosmosTransaction(
   if (!signer) {
     return NEW_ERROR("performCosmosTx: no signer");
   }
+  if (typeof tx.chainId !== "number") {
+    return NEW_ERROR("performCosmosTx: invalid chainId: " + tx.chainId);
+  }
   const { data: onRightChain, error: chainError } = await checkOnRightChain(
     signer,
     tx.chainId
@@ -32,7 +35,7 @@ export async function performCosmosTransaction(
   }
 
   // create transaction context
-  const { data: chainObj, error: chainObjError } = getCosmosChainObj(
+  const { data: chainObj, error: chainObjError } = getCosmosChainObject(
     tx.chainId
   );
   if (chainObjError) {

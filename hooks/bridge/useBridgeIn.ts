@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
-import { CANTO_MAINNET, CANTO_TESTNET } from "@/config/networks";
+import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
 import BRIDGE_IN_TOKEN_LIST from "@/config/jsons/bridgeInTokens.json";
 import {
   NEW_ERROR,
@@ -19,6 +19,7 @@ import { BridgeToken, BridgingMethod } from "./interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
 import { bridgeInGravity } from "./transactions/gravityBridge";
 import { bridgeLayerZero } from "./transactions/layerZero";
+import useTokenBalances from "../helpers/useTokenBalances";
 
 export default function useBridgeIn(
   props: BridgeHookInputParams
@@ -32,7 +33,7 @@ export default function useBridgeIn(
     availableTokens: [],
     availableMethods: [],
     // default selections
-    toNetwork: props.testnet ? CANTO_TESTNET : CANTO_MAINNET,
+    toNetwork: props.testnet ? CANTO_TESTNET_EVM : CANTO_MAINNET_EVM,
     fromNetwork: null,
     selectedToken: null,
     selectedMethod: null,
@@ -45,6 +46,13 @@ export default function useBridgeIn(
   /// internal hooks
   ///
 
+  // contains object mapping of the token balances
+  const userTokenBalances = useTokenBalances(
+    state.fromNetwork?.chainId,
+    state.availableTokens,
+    props.userEthAddress,
+    props.userCosmosAddress
+  );
   // will autoselect the first available network (only network can have default since loaded once)
   useAutoSelect(state.availableNetworks, setNetwork, props.defaults?.networkId);
   // will autoselect the first available token
@@ -77,6 +85,9 @@ export default function useBridgeIn(
 
   // sets network and finds tokens for that network
   function setNetwork(id: string): void {
+    //make sure new network was actually selected
+    if (state.fromNetwork?.id === id) return;
+
     const { data: network, error: networkError } = getNetwork(id);
     if (networkError) {
       throw new Error("useBridgeIn::setNetwork::" + networkError.message);
@@ -103,6 +114,9 @@ export default function useBridgeIn(
 
   // sets selected token and loads bridging methods for that token
   function setToken(id: string): void {
+    //make sure new token was actually selected
+    if (state.selectedToken?.id === id) return;
+
     const { data: token, error: tokenError } = getToken(id);
     if (tokenError) {
       throw new Error("useBridgeIn::setToken::" + tokenError.message);
@@ -126,6 +140,8 @@ export default function useBridgeIn(
   // sets selected bridging method only it actually exists on the token
   function setMethod(selectMethod: string): void {
     const method = selectMethod as BridgingMethod;
+    //make sure new method was actually selected
+    if (method === state.selectedMethod) return;
 
     if (!state.availableMethods.includes(method)) {
       throw new Error("useBridgeIn::setMethod: Invalid method: " + method);
@@ -191,7 +207,10 @@ export default function useBridgeIn(
     testnet: props.testnet ?? false,
     allOptions: {
       networks: state.availableNetworks,
-      tokens: state.availableTokens,
+      tokens: state.availableTokens.map((token) => {
+        const balance = userTokenBalances[token.id];
+        return balance !== undefined ? { ...token, balance } : token;
+      }),
       methods: state.availableMethods,
     },
     selections: {
