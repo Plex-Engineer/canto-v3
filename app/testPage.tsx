@@ -32,7 +32,7 @@ export default function TestPage() {
     userCosmosAddress: cosmosAddress,
   });
   const transactionStore = useStore(useTransactionStore, (state) => state);
-  console.log(transactionStore?.transactions)
+  console.log(transactionStore?.transactions);
 
   useEffect(() => {
     async function getKeplrInfoForBridge() {
@@ -86,11 +86,6 @@ export default function TestPage() {
   }
 
   async function bridgeInTest() {
-    const params = formatParamsBridgeIn({
-      ethAddress: signer?.account.address,
-      userCosmosAddress: cosmosAddress,
-      cantoAddress: cantoAddress,
-    });
     bridgeIn
       .bridge(
         formatParamsBridgeIn({
@@ -134,14 +129,9 @@ export default function TestPage() {
   }
 
   async function bridgeOutTest() {
-    const params = formatParamsBridgeIn({
-      ethAddress: signer?.account.address,
-      userCosmosAddress: cosmosAddress,
-      cantoAddress: cantoAddress,
-    });
     bridgeOut
       .bridge(
-        formatParamsBridgeIn({
+        formatParamsBridgeOut({
           ethAddress: signer?.account.address,
           userCosmosAddress: cosmosAddress,
           cantoAddress: cantoAddress,
@@ -370,17 +360,7 @@ export default function TestPage() {
         {signer && (
           <button
             style={{ background: "black", color: "white" }}
-            onClick={() =>
-              bridgeOut
-                .bridge(signer?.account.address, "1000000000000000000")
-                .then((val) => {
-                  if (val.error) {
-                    console.log(val.error);
-                    return;
-                  }
-                  transactionStore?.addTransactions(val.data, signer);
-                })
-            }
+            onClick={bridgeOutTest}
           >
             bridge out
           </button>

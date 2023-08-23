@@ -208,6 +208,6 @@ export default function useBridgeIn(
       token: setToken,
       method: setMethod,
     },
-    bridge: (params: BridgeHookTxParams) => bridgeIn(params),
+    bridge: bridgeIn,
   };
 }
