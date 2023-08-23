@@ -47,6 +47,7 @@ export interface BridgeHookTxParams {
 }
 
 export interface BridgeHookReturn {
+  direction: "in" | "out";
   testnet: boolean;
   allOptions: {
     networks: BaseNetwork[];

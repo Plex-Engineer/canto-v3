@@ -188,6 +188,7 @@ export default function useBridgeIn(
   }
 
   return {
+    direction: "in",
     testnet: props.testnet ?? false,
     allOptions: {
       networks: state.availableNetworks,

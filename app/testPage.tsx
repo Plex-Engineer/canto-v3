@@ -1,5 +1,4 @@
 "use client";
-import Button from "@/components/button/button";
 import {
   BridgingMethod,
   bridgeMethodToString,
@@ -17,8 +16,21 @@ import { connectToKeplr } from "@/utils/keplr/connectKeplr";
 import { useEffect, useState } from "react";
 import { formatUnits } from "viem";
 import { useWalletClient } from "wagmi";
+import Text from "@/components/text";
+import styles from "./bridge/bridge.module.scss";
+import Image from "next/image";
+import Container from "@/components/container/container";
+import Spacer from "@/components/layout/spacer";
+import Icon from "@/components/icon/icon";
+import Modal from "@/components/modal/modal";
+import Button from "@/components/button/button";
+import { BridgeHookReturn } from "@/hooks/bridge/interfaces/hookParams";
+import AnimatedBackground from "@/components/animated_background/animatedBackground";
+import Tabs from "@/components/tabs/tabs";
 
 export default function TestPage() {
+  const [direction, setDirection] = useState<"in" | "out">("in");
+
   const [cosmosAddress, setCosmosAddress] = useState<string>("");
   const [cantoAddress, setCantoAddress] = useState<string>("");
   const { data: signer } = useWalletClient();
@@ -56,316 +68,71 @@ export default function TestPage() {
     getCantoAddress();
   }, [signer?.account.address]);
 
-  function formatParamsBridgeIn(params: {
-    ethAddress: string;
-    userCosmosAddress: string;
-    cantoAddress: string;
-    method: BridgingMethod;
-    amount: string;
-  }) {
-    switch (params.method) {
-      case BridgingMethod.GRAVITY_BRIDGE:
-        return {
-          sender: params.ethAddress,
-          receiver: params.cantoAddress,
-          amount: params.amount,
-        };
-      case BridgingMethod.IBC:
-        return {
-          sender: params.userCosmosAddress,
-          receiver: params.ethAddress,
-          amount: params.amount,
-        };
-      case BridgingMethod.LAYER_ZERO:
-        return {
-          sender: params.ethAddress,
-          receiver: params.ethAddress,
-          amount: params.amount,
-        };
-    }
-  }
-
-  async function bridgeInTest() {
-    bridgeIn
-      .bridge(
-        formatParamsBridgeIn({
-          ethAddress: signer?.account.address,
-          userCosmosAddress: cosmosAddress,
-          cantoAddress: cantoAddress,
-          method: bridgeIn.selections.method,
-          amount: "1000000000000000000",
-        })
-      )
-      .then((val) => {
-        if (val.error) {
-          console.log(val.error);
-          return;
-        }
-        transactionStore?.addTransactions(val.data, signer);
-      });
-  }
-
-  function formatParamsBridgeOut(params: {
-    ethAddress: string;
-    userCosmosAddress: string;
-    cantoAddress: string;
-    method: BridgingMethod;
-    amount: string;
-  }) {
-    switch (params.method) {
-      case BridgingMethod.IBC:
-        return {
-          sender: params.ethAddress,
-          receiver: params.userCosmosAddress,
-          amount: params.amount,
-        };
-      case BridgingMethod.LAYER_ZERO:
-        return {
-          sender: params.ethAddress,
-          receiver: params.ethAddress,
-          amount: params.amount,
-        };
-    }
-  }
-
-  async function bridgeOutTest() {
-    bridgeOut
-      .bridge(
-        formatParamsBridgeOut({
-          ethAddress: signer?.account.address,
-          userCosmosAddress: cosmosAddress,
-          cantoAddress: cantoAddress,
-          method: bridgeOut.selections.method,
-          amount: "1000000000000000000",
-        })
-      )
-      .then((val) => {
-        if (val.error) {
-          console.log(val.error);
-          return;
-        }
-        transactionStore?.addTransactions(val.data, signer);
-      });
-  }
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "5rem" }}>
-      <button
-        onClick={() => {
-          const tx = createMsgsDelegate({
-            delegatorCantoAddress: "canto address",
-            validatorAddress: "validator address",
-            amount: "1000000000000000000",
-            denom: "acanto",
-            undelegate: true,
-          });
-          transactionStore?.addTransactions(
-            [
-              {
-                msg: tx,
-                type: "COSMOS",
-                chainId: 7700,
-                description: "delegate",
-              },
-            ],
-            signer
-          );
-        }}
-      >
-        STAKE
-      </button>
-      <button
-        onClick={() => {
-          const tx = createMsgsClaimStakingRewards({
-            delegatorCantoAddress: "canto address",
-            validatorAddresses: [],
-          });
-          transactionStore?.addTransactions(
-            [
-              {
-                msg: tx,
-                type: "COSMOS",
-                chainId: 7700,
-                description: "claim rewards",
-              },
-            ],
-            signer
-          );
-        }}
-      >
-        STAKE Rewards
-      </button>
-      <div
-        style={{ display: "flex", flexBasis: "column", gap: "2rem" }}
-        key={"in"}
-      >
-        <h1>Bridge In</h1>
-        <div>
-          <h1>Networks</h1>
-          <ul>
-            {bridgeIn.allOptions.networks.map((network) => (
-              <li key={network.id}>
-                <Button
-                  color={
-                    network.id === bridgeIn.selections.fromNetwork?.id
-                      ? "accent"
-                      : "primary"
-                  }
-                  icon={{
-                    url: network.icon,
-                    position: "left",
-                  }}
-                  onClick={() => {
-                    bridgeIn.setters.network(network.id);
-                  }}
-                >
-                  {network.name}
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h1>Tokens</h1>
-          <ul>
-            {bridgeIn.allOptions.tokens.map((token) => (
-              <li key={token.id}>
-                <Button
-                  color={
-                    token.id === bridgeIn.selections.token?.id
-                      ? "accent"
-                      : "primary"
-                  }
-                  icon={{
-                    url: token.icon,
-                    position: "left",
-                  }}
-                  onClick={() => {
-                    bridgeIn.setters.token(token.id);
-                  }}
-                >
-                  {token.name}
-                  {"  "}
-                  {formatUnits(BigInt(token.balance ?? 0), token.decimals)}
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h1>Methods</h1>
-          <ul>
-            {bridgeIn.allOptions.methods.map((method) => (
-              <li key={method.toString()}>
-                <Button
-                  color={
-                    method === bridgeIn.selections.method ? "accent" : "primary"
-                  }
-                  onClick={() => {
-                    bridgeIn.setters.method(method);
-                  }}
-                >
-                  {bridgeMethodToString(method)}
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        {signer && (
-          <button
-            style={{ background: "black", color: "white" }}
-            onClick={bridgeInTest}
+      <>
+        <AnimatedBackground initSize="400px" direction={direction} time={20} />
+        <Container
+          height="100vm"
+          layer={1}
+          backgroundColor="background: var(--card-background-color, #C1C1C1)"
+          center={{
+            horizontal: true,
+            vertical: true,
+          }}
+        >
+          <Container
+            height="500px"
+            width="700px"
+            backgroundColor="var(--card-sub-surface-color, #DFDFDF)"
           >
-            bridge in
-          </button>
-        )}
-      </div>
-      <div
-        style={{ display: "flex", flexBasis: "column", gap: "2rem" }}
-        key={"out"}
-      >
-        <h1>Bridge Out</h1>
-        <div>
-          <h1>Tokens</h1>
-          <ul>
-            {bridgeOut.allOptions.tokens.map((token) => (
-              <li key={token.id}>
-                <Button
-                  color={
-                    token.id === bridgeOut.selections.token?.id
-                      ? "primary"
-                      : "secondary"
-                  }
-                  icon={{
-                    url: token.icon,
-                    position: "left",
-                  }}
-                  onClick={() => {
-                    bridgeOut.setters.token(token.id);
-                  }}
-                >
-                  {token.name}
-                  {"  "}
-                  {formatUnits(BigInt(token.balance ?? 0), token.decimals)}
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h1>Networks</h1>
-          <ul>
-            {bridgeOut.allOptions.networks.map((network) => (
-              <li key={network.id}>
-                <Button
-                  color={
-                    network.id === bridgeOut.selections.toNetwork?.id
-                      ? "primary"
-                      : "secondary"
-                  }
-                  icon={{
-                    url: network.icon,
-                    position: "left",
-                  }}
-                  onClick={() => {
-                    bridgeOut.setters.network(network.id);
-                  }}
-                >
-                  {network.name}
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h1>Methods</h1>
-          <ul>
-            {bridgeOut.allOptions.methods.map((method) => (
-              <li key={method.toString()}>
-                <Button
-                  color={
-                    method === bridgeOut.selections.method
-                      ? "primary"
-                      : "secondary"
-                  }
-                  onClick={() => {
-                    bridgeOut.setters.method(method);
-                  }}
-                >
-                  {bridgeMethodToString(method)}
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        {signer && (
-          <button
-            style={{ background: "black", color: "white" }}
-            onClick={bridgeOutTest}
-          >
-            bridge out
-          </button>
-        )}
-      </div>
+            <Tabs
+              tabs={[
+                {
+                  title: "BRIDGE IN",
+                  content: (
+                    <Bridge
+                      bridge={bridgeIn}
+                      params={{
+                        signer: signer,
+                        cosmosAddress: cosmosAddress,
+                        cantoAddress: cantoAddress,
+                        transactionStore: transactionStore,
+                      }}
+                    />
+                  ),
+                  onClick: () => setDirection("in"),
+                },
+                {
+                  title: "BRIDGE OUT",
+                  content: (
+                    <Bridge
+                      bridge={bridgeOut}
+                      params={{
+                        signer: signer,
+                        cosmosAddress: cosmosAddress,
+                        cantoAddress: cantoAddress,
+                        transactionStore: transactionStore,
+                      }}
+                    />
+                  ),
+                  onClick: () => setDirection("out"),
+                },
+                {
+                  title: "RECOVERY",
+                  isDisabled: true,
+                  content: <>recovery</>,
+                },
+                {
+                  title: "TX HISTORY",
+                  content: <>tx history</>,
+                },
+              ]}
+            />
+          </Container>
+        </Container>
+      </>
+
       <button onClick={() => transactionStore?.clearTransactions()}>
         CLEAR ALL TRANSACTIONS
       </button>
@@ -403,3 +170,359 @@ export default function TestPage() {
     </div>
   );
 }
+
+interface BridgeProps {
+  bridge: BridgeHookReturn;
+  params: {
+    signer: any;
+    cosmosAddress: string;
+    cantoAddress: string;
+    transactionStore?: any;
+  };
+}
+const Bridge = (props: BridgeProps) => {
+  const [choosingNetwork, setChoosingNetwork] = useState(false);
+  const [choosingToken, setChoosingToken] = useState(false);
+  const [choosingMethod, setChoosingMethod] = useState(false);
+
+  function formatParamsBridgeIn(params: {
+    ethAddress: string;
+    userCosmosAddress: string;
+    cantoAddress: string;
+    method: BridgingMethod;
+    amount: string;
+  }) {
+    switch (params.method) {
+      case BridgingMethod.GRAVITY_BRIDGE:
+        return {
+          sender: params.ethAddress,
+          receiver: params.cantoAddress,
+          amount: params.amount,
+        };
+      case BridgingMethod.IBC:
+        return {
+          sender: params.userCosmosAddress,
+          receiver: params.ethAddress,
+          amount: params.amount,
+        };
+      case BridgingMethod.LAYER_ZERO:
+        return {
+          sender: params.ethAddress,
+          receiver: params.ethAddress,
+          amount: params.amount,
+        };
+    }
+  }
+
+  async function bridgeInTest() {
+    props.bridge
+      .bridge(
+        formatParamsBridgeIn({
+          ethAddress: props.params.signer?.account.address,
+          userCosmosAddress: props.params.cosmosAddress,
+          cantoAddress: props.params.cantoAddress,
+          method: props.bridge.selections.method,
+          amount: "1000",
+        })
+      )
+      .then((val) => {
+        if (val.error) {
+          console.log(val.error);
+          return;
+        }
+        props.params.transactionStore?.addTransactions(
+          val.data,
+          props.params.signer
+        );
+      });
+  }
+
+  function formatParamsBridgeOut(params: {
+    ethAddress: string;
+    userCosmosAddress: string;
+    cantoAddress: string;
+    method: BridgingMethod;
+    amount: string;
+  }) {
+    switch (params.method) {
+      case BridgingMethod.IBC:
+        return {
+          sender: params.ethAddress,
+          receiver: params.userCosmosAddress,
+          amount: params.amount,
+        };
+      case BridgingMethod.LAYER_ZERO:
+        return {
+          sender: params.ethAddress,
+          receiver: params.ethAddress,
+          amount: params.amount,
+        };
+    }
+  }
+
+  async function bridgeOutTest() {
+    props.bridge
+      .bridge(
+        formatParamsBridgeOut({
+          ethAddress: props.params.signer?.account.address,
+          userCosmosAddress: props.params.cosmosAddress,
+          cantoAddress: props.params.cantoAddress,
+          method: props.bridge.selections.method,
+          amount: "1000",
+        })
+      )
+      .then((val) => {
+        if (val.error) {
+          console.log(val.error);
+          return;
+        }
+        props.params.transactionStore?.addTransactions(
+          val.data,
+          props.params.signer
+        );
+      });
+  }
+  return (
+    <>
+      <Modal
+        open={choosingNetwork}
+        onClose={() => {
+          setChoosingNetwork(false);
+        }}
+        width="30rem"
+        height="36rem"
+      >
+        <ul>
+          {props.bridge.allOptions.networks.map((network) => (
+            <li key={network.id}>
+              <Button
+                color={
+                  (
+                    props.bridge.direction === "in"
+                      ? network.id === props.bridge.selections?.fromNetwork?.id
+                      : network.id === props.bridge.selections?.toNetwork?.id
+                  )
+                    ? "accent"
+                    : "primary"
+                }
+                icon={{
+                  url: network.icon,
+                  position: "left",
+                }}
+                onClick={() => {
+                  props.bridge.setters.network(network.id);
+                  setChoosingNetwork(false);
+                }}
+              >
+                {network.name}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </Modal>
+      <Modal
+        open={choosingToken}
+        onClose={() => setChoosingToken(false)}
+        width="30rem"
+        height="36rem"
+      >
+        <Text>Choose a Token</Text>
+        <ul>
+          {props.bridge.allOptions.tokens.map((token) => (
+            <li key={token.id}>
+              <Button
+                color={
+                  token.id === props.bridge.selections.token?.id
+                    ? "accent"
+                    : "primary"
+                }
+                icon={{
+                  url: token.icon,
+                  position: "left",
+                }}
+                onClick={() => {
+                  props.bridge.setters.token(token.id);
+                  setChoosingToken(false);
+                }}
+              >
+                {token.name}
+                {"  "}
+                {formatUnits(BigInt(token.balance ?? 0), token.decimals)}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </Modal>
+      <Modal
+        open={choosingMethod}
+        onClose={() => setChoosingMethod(false)}
+        width="30rem"
+        height="36rem"
+      >
+        <Text>Choose a Method</Text>
+        <ul>
+          {props.bridge.allOptions.methods.map((method) => (
+            <li key={method}>
+              <Button
+                color={
+                  method === props.bridge.selections.method
+                    ? "accent"
+                    : "primary"
+                }
+                onClick={() => {
+                  props.bridge.setters.method(method);
+                  setChoosingMethod(false);
+                }}
+              >
+                {bridgeMethodToString(method)}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </Modal>
+
+      <section className={styles.container}>
+        <div className={styles["network-selection"]}>
+          <Text size="sm">Select Network</Text>
+          <div className={styles["networks-box"]}>
+            <Button
+              color="secondary"
+              height={64}
+              width="fill"
+              onClick={() => {
+                setChoosingNetwork(true);
+              }}
+            >
+              <Container width="50px">
+                <Text size="x-sm" theme="secondary-dark">
+                  From
+                </Text>
+              </Container>
+              <div className={styles.token}>
+                <Image
+                  src={props.bridge.selections.fromNetwork?.icon ?? ""}
+                  alt={`${props.bridge.selections.fromNetwork?.name} icon`}
+                  width={30}
+                  height={30}
+                />
+                <Text size="md" font="proto_mono">
+                  {props.bridge.selections.fromNetwork?.name}
+                </Text>
+              </div>
+              <Icon
+                icon={{
+                  url: "dropdown.svg",
+                  size: 24,
+                }}
+              />
+            </Button>
+            <div className={styles["network-box"]}>
+              <Container width="50px">
+                <Text size="x-sm" theme="secondary-dark">
+                  To
+                </Text>
+              </Container>
+              <div className={styles.token}>
+                <Image
+                  src={props.bridge.selections.toNetwork?.icon ?? ""}
+                  alt={"canto icon"}
+                  width={30}
+                  height={30}
+                />
+                <Text size="md" font="proto_mono">
+                  {props.bridge.selections.toNetwork?.name}
+                </Text>
+              </div>
+            </div>
+          </div>
+        </div>
+        <Spacer height="100px" />
+
+        <div className={styles["token-selection"]}>
+          <Text size="sm">Select Token</Text>
+          <div className={styles["token-box"]}>
+            <Container width="50%">
+              <Button
+                color="secondary"
+                width="fill"
+                height="large"
+                onClick={() => {
+                  setChoosingToken(true);
+                }}
+              >
+                <Container
+                  width="100%"
+                  direction="row"
+                  gap={20}
+                  center={{
+                    vertical: true,
+                  }}
+                >
+                  <Image
+                    src={props.bridge.selections.token?.icon ?? ""}
+                    alt={"graviton icon"}
+                    width={30}
+                    height={30}
+                  />
+                  <Text size="md" font="proto_mono">
+                    {props.bridge.selections.token?.name}
+                  </Text>
+                </Container>
+                <Icon
+                  icon={{
+                    url: "dropdown.svg",
+                    size: 24,
+                  }}
+                />
+              </Button>
+            </Container>
+          </div>
+        </div>
+        <Spacer height="100%" />
+        <div className={styles["token-selection"]}>
+          <Text size="sm">Select Method</Text>
+          <div className={styles["token-box"]}>
+            <Container width="50%">
+              <Button
+                color="secondary"
+                width="fill"
+                height="large"
+                onClick={() => {
+                  setChoosingMethod(true);
+                }}
+              >
+                <Container
+                  width="100%"
+                  direction="row"
+                  gap={20}
+                  center={{
+                    vertical: true,
+                  }}
+                >
+                  <Text size="md" font="proto_mono">
+                    {bridgeMethodToString(props.bridge.selections.method)}
+                  </Text>
+                </Container>
+                <Icon
+                  icon={{
+                    url: "dropdown.svg",
+                    size: 24,
+                  }}
+                />
+              </Button>
+            </Container>
+          </div>
+        </div>
+        <Spacer height="100%" />
+        <Button
+          width="fill"
+          onClick={() => {
+            props.bridge.direction === "in" ? bridgeInTest() : bridgeOutTest();
+          }}
+        >
+          {props.bridge.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
+        </Button>
+      </section>
+    </>
+  );
+};

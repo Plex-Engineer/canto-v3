@@ -207,6 +207,7 @@ export default function useBridgeOut(
   }
 
   return {
+    direction: "out",
     testnet: props.testnet ?? false,
     allOptions: {
       tokens: state.availableTokens.map((token) => {

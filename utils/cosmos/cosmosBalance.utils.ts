@@ -74,7 +74,6 @@ export async function getCosmosTokenBalanceList(
   if (balanceError) {
     return NEW_ERROR("getCosmosTokenBalanceList::" + balanceError.message);
   }
-  console.log(result);
   const balances: UserTokenBalances = {};
   result.balances.forEach((balance) => {
     balances[balance.denom] = balance.amount;
