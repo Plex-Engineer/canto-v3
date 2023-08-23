@@ -11,7 +11,7 @@
   align-items: center;
   background-color: rgba(0, 0, 0, 0.4);
   animation: fade-in 0.15s forwards;
-
+  z-index: 10;
   @keyframes fade-in {
     0% {
       opacity: 0;
@@ -59,9 +59,13 @@
 
 .close {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 6px;
+  right: 6px;
   cursor: pointer;
+  transition: transform 0.2s ease-out;
+  &:hover {
+    transform: rotateZ(90deg);
+  }
 }
 
 .title {
