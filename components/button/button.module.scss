@@ -8,7 +8,7 @@
   border-radius: var(--border-radius, 0);
   box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
   &:hover {
-    filter: saturate(1) contrast(1.25) brightness(1.3);
+    filter: saturate(1) contrast(1.25);
 
     box-shadow: var(--box-shadow, 4px 4px 0px 0px rgba(17, 17, 17, 0.2));
     transition: all 0.1s linear;
