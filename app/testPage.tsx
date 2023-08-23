@@ -1,12 +1,16 @@
 "use client";
 import Button from "@/components/button/button";
-import { bridgeMethodToString } from "@/hooks/bridge/interfaces/tokens";
+import {
+  BridgingMethod,
+  bridgeMethodToString,
+} from "@/hooks/bridge/interfaces/tokens";
 import { getAllUserBridgeTransactionHistory } from "@/hooks/bridge/txHistory";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
 import useStaking from "@/hooks/staking/useStaking";
 import useTransactionStore from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
+import { ethToCantoAddress } from "@/utils/address.utils";
 import { createMsgsClaimStakingRewards } from "@/utils/cosmos/transactions/messages/staking/claimRewards";
 import { createMsgsDelegate } from "@/utils/cosmos/transactions/messages/staking/delegate";
 import { connectToKeplr } from "@/utils/keplr/connectKeplr";
@@ -16,6 +20,7 @@ import { useWalletClient } from "wagmi";
 
 export default function TestPage() {
   const [cosmosAddress, setCosmosAddress] = useState<string>("");
+  const [cantoAddress, setCantoAddress] = useState<string>("");
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({
     testnet: false,
@@ -27,8 +32,7 @@ export default function TestPage() {
     userCosmosAddress: cosmosAddress,
   });
   const transactionStore = useStore(useTransactionStore, (state) => state);
-  const staking = useStaking();
-  console.log(transactionStore?.transactions);
+  console.log(transactionStore?.transactions)
 
   useEffect(() => {
     async function getKeplrInfoForBridge() {
@@ -40,8 +44,71 @@ export default function TestPage() {
   }, [bridgeIn.selections.fromNetwork]);
 
   useEffect(() => {
-    getAllUserBridgeTransactionHistory("").then(console.log);
-  }, []);
+    async function getCantoAddress() {
+      const cantoAddress = await ethToCantoAddress(signer?.account.address);
+      if (cantoAddress.error) {
+        console.log(cantoAddress.error);
+        return;
+      } else {
+        setCantoAddress(cantoAddress.data);
+      }
+    }
+    getCantoAddress();
+  }, [signer?.account.address]);
+
+  function formatParams(params: {
+    ethAddress: string;
+    userCosmosAddress: string;
+    cantoAddress: string;
+    method: BridgingMethod;
+    amount: string;
+  }) {
+    switch (params.method) {
+      case BridgingMethod.GRAVITY_BRIDGE:
+        return {
+          sender: params.ethAddress,
+          receiver: params.cantoAddress,
+          amount: params.amount,
+        };
+      case BridgingMethod.IBC:
+        return {
+          sender: params.userCosmosAddress,
+          receiver: params.ethAddress,
+          amount: params.amount,
+        };
+      case BridgingMethod.LAYER_ZERO:
+        return {
+          sender: params.ethAddress,
+          receiver: params.ethAddress,
+          amount: params.amount,
+        };
+    }
+  }
+
+  async function bridgeInTest() {
+    const params = formatParams({
+      ethAddress: signer?.account.address,
+      userCosmosAddress: cosmosAddress,
+      cantoAddress: cantoAddress,
+    });
+    bridgeIn
+      .bridge(
+        formatParams({
+          ethAddress: signer?.account.address,
+          userCosmosAddress: cosmosAddress,
+          cantoAddress: cantoAddress,
+          method: bridgeIn.selections.method,
+          amount: "1000000000000000000",
+        })
+      )
+      .then((val) => {
+        if (val.error) {
+          console.log(val.error);
+          return;
+        }
+        transactionStore?.addTransactions(val.data, signer);
+      });
+  }
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "5rem" }}>
       <button
@@ -168,15 +235,7 @@ export default function TestPage() {
         {signer && (
           <button
             style={{ background: "black", color: "white" }}
-            onClick={() =>
-              bridgeIn.bridge(signer?.account.address, "10").then((val) => {
-                if (val.error) {
-                  console.log(val.error);
-                  return;
-                }
-                transactionStore?.addTransactions(val.data, signer);
-              })
-            }
+            onClick={bridgeInTest}
           >
             bridge in
           </button>

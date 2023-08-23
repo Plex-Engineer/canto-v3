@@ -5,7 +5,7 @@ import {
 } from "@/config/interfaces/errors";
 import { EVMNetwork } from "@/config/interfaces/networks";
 import { isValidEthAddress } from "@/utils/address.utils";
-import { BridgeToken } from "../interfaces/tokens";
+import { BridgeToken } from "../../interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
 import { encodePacked } from "web3-utils";
@@ -16,27 +16,28 @@ import { getProviderWithoutSigner } from "@/utils/evm/helpers.utils";
 import { getTokenBalance } from "@/utils/evm/erc20.utils";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
 
+// do not need an eth receiver, since it will always be the same as the sender
 export async function bridgeLayerZero(
   fromNetwork: EVMNetwork,
   toNetwork: EVMNetwork,
-  ethAddress: string,
+  ethSender: string,
   token: BridgeToken,
   amount: string
 ): PromiseWithError<Transaction[]> {
   // check all params
-  if (!isValidEthAddress(ethAddress)) {
-    return NEW_ERROR("bridgeLayerZero: invalid eth address: " + ethAddress);
+  if (!isValidEthAddress(ethSender)) {
+    return NEW_ERROR("bridgeLayerZero: invalid eth address: " + ethSender);
   }
   const toLZChainId = LZ_CHAIN_IDS[toNetwork.id as keyof typeof LZ_CHAIN_IDS];
   if (!toLZChainId) {
     return NEW_ERROR("bridgeLayerZero: invalid lz chainId: " + toNetwork.id);
   }
-  const toAddressBytes = encodePacked({ type: "bytes32", value: ethAddress });
+  const toAddressBytes = encodePacked({ type: "bytes32", value: ethSender });
   const { data: gas, error: oftError } = await estimateOFTSendGasFee(
     fromNetwork.rpcUrl,
     toLZChainId,
     token.address,
-    ethAddress,
+    ethSender,
     amount,
     [1, 200000]
   );
@@ -52,7 +53,7 @@ export async function bridgeLayerZero(
     const { data: oftBalance, error: balanceError } = await getTokenBalance(
       fromNetwork.chainId,
       token.address,
-      ethAddress
+      ethSender
     );
     if (balanceError) {
       return NEW_ERROR("bridgeLayerZero::" + balanceError.message);
@@ -75,7 +76,7 @@ export async function bridgeLayerZero(
     _oftTransferTx(
       fromNetwork.chainId,
       toLZChainId,
-      ethAddress,
+      ethSender,
       toAddressBytes,
       token.address,
       amount,

@@ -13,7 +13,7 @@ import { CosmosNetwork } from "@/config/interfaces/networks";
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
 import { checkPubKey, ethToCantoAddress } from "@/utils/address.utils";
 import { CANTO_MAINNET_COSMOS } from "@/config/networks";
-import { getBlockTimestamp } from "../ibc";
+import { getBlockTimestamp } from "../methods/ibc";
 import { Transaction } from "@/config/interfaces/transactions";
 import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
 import { connectToKeplr } from "@/utils/keplr/connectKeplr";

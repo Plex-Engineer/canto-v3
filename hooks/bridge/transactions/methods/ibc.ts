@@ -3,7 +3,7 @@ import {
   NO_ERROR,
   PromiseWithError,
 } from "@/config/interfaces/errors";
-import { IBCToken } from "../interfaces/tokens";
+import { IBCToken } from "../../interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
 import { CosmosNetwork } from "@/config/interfaces/networks";
 import { ethToCantoAddress, isValidEthAddress } from "@/utils/address.utils";

@@ -31,6 +31,7 @@ import BigNumber from "bignumber.js";
 export async function bridgeInGravity(
   chainId: number,
   ethSender: string,
+  cantoReceiver: string,
   token: ERC20Token,
   amount: string
 ): PromiseWithError<Transaction[]> {
@@ -42,6 +43,13 @@ export async function bridgeInGravity(
   if (ethToCantoError) {
     return NEW_ERROR("bridgeInGravity::" + ethToCantoError.message);
   }
+  // check to make sure the ethSender is sending to their own cantoAddress
+  if (cantoReceiverAddress.toLowerCase() !== cantoReceiver.toLowerCase()) {
+    return NEW_ERROR(
+      "bridgeInGravity: ethSender must send to their own cantoAddress"
+    );
+  }
+
   // parameters look good, so create the tx list
   const txList: Transaction[] = [];
 
@@ -143,7 +151,7 @@ export async function bridgeInGravity(
   txList.push(
     _sendToCosmosTx(
       chainId,
-      cantoReceiverAddress,
+      cantoReceiver,
       token.address,
       amount,
       `Bridge ${amount} ${token.symbol} to Canto`
