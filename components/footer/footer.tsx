@@ -18,7 +18,7 @@ const Footer = () => {
         <StatusText />
         <Text
           size="sm"
-          name="proto_mono"
+          font="proto_mono"
           style={{
             padding: "0 14px",
           }}
@@ -37,7 +37,7 @@ const Footer = () => {
         </Text>
         <Text
           size="sm"
-          name="proto_mono"
+          font="proto_mono"
           style={{
             padding: "0 14px",
           }}
@@ -65,7 +65,7 @@ interface PropLink {
 }
 const FooterLink = ({ href, text }: PropLink) => {
   return (
-    <Text size="x-sm" name="proto_mono">
+    <Text size="x-sm" font="proto_mono">
       <a href={href}>{text}</a>
     </Text>
   );
@@ -75,7 +75,7 @@ const StatusText = () => {
   return (
     <Text
       size="x-sm"
-      name="proto_mono"
+      font="proto_mono"
       style={{
         width: "200px",
         justifyContent: "center",
