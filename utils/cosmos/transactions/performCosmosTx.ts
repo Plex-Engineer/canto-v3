@@ -10,8 +10,12 @@ import {
   getSenderObj,
   signAndBroadcastCosmosTransaction,
 } from "./helpers.utils";
-import { getCosmosChainObject } from "../../networks.utils";
+import {
+  getCosmosAPIEndpoint,
+  getCosmosChainObject,
+} from "../../networks.utils";
 import { ethToCantoAddress } from "@/utils/address.utils";
+import { tryFetchWithRetry } from "@/utils/async.utils";
 
 /**
  * @notice performs a cosmos transaction through metamask EIP712
@@ -82,4 +86,31 @@ export async function performCosmosTransactionEIP(
   }
 
   return NO_ERROR(txData.tx_response.txhash);
+}
+
+export async function waitForCosmosTx(
+  chainId: string | number,
+  txHash: string
+): PromiseWithError<{
+  status: string;
+  error: any;
+}> {
+  const { data: endpoint, error: endpointError } =
+    getCosmosAPIEndpoint(chainId);
+  if (endpointError) {
+    return NEW_ERROR("waitForTransaction::" + endpointError.message);
+  }
+  const { data: response, error: fetchError } = await tryFetchWithRetry<{
+    tx_response: {
+      code: number;
+      raw_log: string;
+    };
+  }>(endpoint + "/cosmos/tx/v1beta1/txs/" + txHash, 5);
+  if (fetchError) {
+    return NEW_ERROR("waitForTransaction::" + fetchError.message);
+  }
+  return NO_ERROR({
+    status: response.tx_response.code === 0 ? "success" : "fail",
+    error: response.tx_response.raw_log,
+  });
 }

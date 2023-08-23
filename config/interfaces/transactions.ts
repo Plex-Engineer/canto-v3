@@ -1,6 +1,5 @@
 import { ContractAbi } from "web3-types";
-import { PromiseWithError } from "./errors";
-import { DeliverTxResponse } from "@cosmjs/stargate";
+import { PromiseWithError, ReturnWithError } from "./errors";
 
 export type Transaction = {
   // chainId the wallet must be on to perform the transaction
@@ -21,7 +20,8 @@ export type Transaction = {
     }
   | {
       type: "KEPLR";
-      tx: () => PromiseWithError<DeliverTxResponse>;
+      tx: () => PromiseWithError<unknown>;
+      getHash: (...args: any[]) => ReturnWithError<string>;
     }
 );
 type TransactionStatus = "NONE" | "SIGNING" | "PENDING" | "SUCCESS" | "ERROR";

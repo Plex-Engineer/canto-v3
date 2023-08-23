@@ -19,13 +19,16 @@ export async function performKeplrTx(
   if (typeof tx.chainId !== "string") {
     return NEW_ERROR("performKeplrTx: invalid chainId" + tx.chainId);
   }
-  const txResponse = await tx.tx();
-  if (txResponse.error) {
-    return NEW_ERROR("performKeplrTx: " + txResponse.error.message);
+  const { data: txResponse, error: txError } = await tx.tx();
+  if (txError) {
+    return NEW_ERROR("performKeplrTx: " + txError.message);
   }
-  // no need to check the block explorer for txHash since the response will indicate success
-  if (txResponse.data.code !== 0) {
-    return NEW_ERROR("performKeplrTx: " + txResponse.data.rawLog);
+
+  // get the txHash from the response
+  const { data: txHash, error: hashError } = tx.getHash(txResponse);
+  if (hashError) {
+    return NEW_ERROR("performKeplrTx: " + hashError.message);
   }
-  return NO_ERROR(txResponse.data.transactionHash);
+
+  return NO_ERROR(txHash);
 }
