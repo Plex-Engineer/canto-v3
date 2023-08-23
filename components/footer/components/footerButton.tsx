@@ -29,7 +29,7 @@ const FooterButton = ({ text }: PropLinkButton) => {
         }
       }}
     >
-      <Text size="x-sm" name="proto_mono">
+      <Text size="x-sm" font="proto_mono">
         {text}
       </Text>
     </button>

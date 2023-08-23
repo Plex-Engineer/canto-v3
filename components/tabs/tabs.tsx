@@ -19,7 +19,7 @@ const Tabs = (props: Props) => {
       <TabList>
         {props.tabs.map((tab, index) => (
           <Tab key={index} disabled={tab.isDisabled} onClick={tab.onClick}>
-            <Text name="proto_mono" size="reg">
+            <Text font="proto_mono" size="md">
               {tab.title}
             </Text>
           </Tab>

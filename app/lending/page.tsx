@@ -17,7 +17,7 @@ export default function LendingPage() {
         width="500px"
         height="80vh"
       >
-        <Text name="proto_mono"> This is a text</Text>
+        <Text font="proto_mono"> This is a text</Text>
       </Modal>
       <div
         style={{

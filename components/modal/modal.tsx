@@ -2,6 +2,7 @@ import ReactDOM from "react-dom";
 import styles from "./modal.module.scss";
 import React, { useEffect } from "react";
 import { useScrollLock } from "../utils/scrollLock";
+import Image from "next/image";
 
 interface Props {
   open: boolean;
@@ -46,12 +47,13 @@ const Modal = ({ onClose, children, title, width, height, open }: Props) => {
         }}
       >
         <div className={styles.modal}>
-          <img
+          <Image
             className={styles.close}
             onClick={handleClose}
-            src="icons/close.svg"
+            src="/close.svg"
             alt="close"
-            height={20}
+            height={40}
+            width={40}
           />
           {title && (
             <div className={styles.header}>

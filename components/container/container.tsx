@@ -7,7 +7,10 @@ interface Props {
   backgroundColor?: string;
   direction?: "row" | "column";
   gap?: number;
-  center?: boolean;
+  center?: {
+    horizontal?: boolean;
+    vertical?: boolean;
+  };
   layer?: number;
 }
 
@@ -23,8 +26,8 @@ const Container = (props: Props) => {
         display: "flex",
         flexDirection: props.direction ?? "column",
         gap: props.gap,
-        alignItems: props.center ? "center" : undefined,
-        justifyContent: props.center ? "center" : undefined,
+        justifyContent: props.center?.horizontal ? "center" : "unset",
+        alignItems: props.center?.vertical ? "center" : "unset",
         zIndex: props.layer,
       }}
     >

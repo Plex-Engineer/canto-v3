@@ -3,11 +3,39 @@
 import AnimatedBackground from "@/components/animated_background/animatedBackground";
 import Container from "@/components/container/container";
 import Tabs from "@/components/tabs/tabs";
-import Text from "@/components/text";
+import styles from "./bridge.module.scss";
+import BridgeIn from "./bridgeIn";
+
 import { useState } from "react";
 
 export default function BridgePage() {
   const [direction, setDirection] = useState<"in" | "out">("in");
+
+  function BridgeOut() {
+    return (
+      <>
+        <div className={styles["network-selection"]}></div>
+        <div className={styles["token-selection"]}></div>
+      </>
+    );
+  }
+
+  function TxHistory() {
+    return (
+      <>
+        <div className="transaction-list"></div>
+      </>
+    );
+  }
+
+  function TxRecovery() {
+    return (
+      <>
+        <div className="recovery-list"></div>
+      </>
+    );
+  }
+
   return (
     <>
       <AnimatedBackground initSize="400px" direction={direction} time={20} />
@@ -15,7 +43,10 @@ export default function BridgePage() {
         height="100vm"
         layer={1}
         backgroundColor="background: var(--card-background-color, #C1C1C1)"
-        center
+        center={{
+          horizontal: true,
+          vertical: true,
+        }}
       >
         <Container
           height="500px"
@@ -25,23 +56,23 @@ export default function BridgePage() {
           <Tabs
             tabs={[
               {
-                title: "bridge in",
-                content: <Text>Tab 1</Text>,
+                title: "BRIDGE IN",
+                content: <BridgeIn />,
                 onClick: () => setDirection("in"),
               },
               {
-                title: "bridge out",
-                content: <Text>Tab 2</Text>,
+                title: "BRIDGE OUT",
+                content: BridgeOut(),
                 onClick: () => setDirection("out"),
               },
               {
-                title: "Recovery",
+                title: "RECOVERY",
                 isDisabled: true,
-                content: <Text>Tab 3</Text>,
+                content: TxRecovery(),
               },
               {
-                title: "tx history",
-                content: <Text>Tab 4</Text>,
+                title: "TX HISTORY",
+                content: TxHistory(),
               },
             ]}
           />
