@@ -4,14 +4,15 @@ import {
   PromiseWithError,
 } from "@/config/interfaces/errors";
 import { Transaction } from "@/config/interfaces/transactions";
-import {
-  GetWalletClientResult,
-  prepareWriteContract,
-  writeContract,
-} from "wagmi/actions";
+import { GetWalletClientResult, writeContract } from "wagmi/actions";
 import { checkOnRightChain } from "../baseTransaction.utils";
 
-// will return the txHash of the signed transaction
+/**
+ * @notice performs evm transaction
+ * @param {Transaction} tx transaction to perform
+ * @param {GetWalletClientResult} signer signer to sign transaction with
+ * @returns {PromiseWithError<string>} txHash of transaction or error
+ */
 export async function performEVMTransaction(
   tx: Transaction,
   signer?: GetWalletClientResult

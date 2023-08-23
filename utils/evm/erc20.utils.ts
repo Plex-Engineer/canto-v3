@@ -15,7 +15,13 @@ import { ERC20Token } from "@/config/interfaces/tokens";
 import { multicall } from "wagmi/actions";
 import { UserTokenBalances } from "@/hooks/bridge/interfaces/tokens";
 
-// appends balance property to each object in array
+/**
+ * @notice gets all token balances from ethereum chain
+ * @param {number} chainId chainId to get balances from
+ * @param {ERC20Token[]} tokens tokens to get balances for
+ * @param {string} userEthAddress ethereum address to get balances for
+ * @returns {PromiseWithError<UserTokenBalances>} balances of all tokens as a string or error
+ */
 export async function getEVMTokenBalanceList(
   chainId: number,
   tokens: ERC20Token[],
@@ -46,6 +52,13 @@ export async function getEVMTokenBalanceList(
   }
 }
 
+/**
+ * @notice gets token balance from ethereum chain
+ * @param {number} chainId chainId to get balance from
+ * @param {string} tokenAddress token address to get balance for
+ * @param {string} account ethereum address to get balance for
+ * @returns {PromiseWithError<BigNumber>} balance of token as a string or error
+ */
 export async function getTokenBalance(
   chainId: number,
   tokenAddress: string,
@@ -68,6 +81,15 @@ export async function getTokenBalance(
   }
 }
 
+/**
+ * @notice checks token allowance from ethereum chain
+ * @param {number} chainId chainId to get allowance from
+ * @param {string} tokenAddress token address to get allowance for
+ * @param {string} account ethereum account who holds the token
+ * @param {string} spender ethereum spender to get allowance for
+ * @param {string} amount amount to check allowance for
+ * @returns {PromiseWithError<BigNumber>} true if allowance is greater than amount, false otherwise
+ */
 export async function checkTokenAllowance(
   chainId: number,
   tokenAddress: string,

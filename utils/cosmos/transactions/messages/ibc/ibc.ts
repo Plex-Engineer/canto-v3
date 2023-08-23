@@ -45,6 +45,12 @@ interface MessageIBCOutParams {
   // Memo
   memo: string;
 }
+
+/**
+ * @notice creates eip712 and cosmos proto messages for sending IBC out
+ * @param {MessageIBCOutParams} params IBC out parameters
+ * @returns {UnsignedCosmosMessages} eip and cosmos messages along with types object and fee
+ */
 export function createMsgsIBCOut(
   params: MessageIBCOutParams
 ): UnsignedCosmosMessages {

@@ -12,20 +12,15 @@ import {
   BridgeHookInputParams,
   BridgeHookReturn,
   BridgeHookState,
+  BridgeHookTxParams,
 } from "./interfaces/hookParams";
 import useAutoSelect from "../helpers/useAutoSelect";
-import {
-  BaseNetwork,
-  CosmosNetwork,
-  EVMNetwork,
-} from "@/config/interfaces/networks";
-import { BridgeToken, BridgingMethod, IBCToken } from "./interfaces/tokens";
+import { BaseNetwork } from "@/config/interfaces/networks";
+import { BridgeToken, BridgingMethod } from "./interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
-import { bridgeInGravity } from "./transactions/gravityBridge";
-import { bridgeLayerZero } from "./transactions/layerZero";
 import useTokenBalances from "../helpers/useTokenBalances";
-import { ibcInKeplr } from "./transactions/keplr/ibcKeplr";
-import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks.utils";
+
+import { bridgeInTx } from "./transactions/bridge";
 
 export default function useBridgeIn(
   props: BridgeHookInputParams
@@ -162,8 +157,7 @@ export default function useBridgeIn(
   /// external functions
   ///
   async function bridgeIn(
-    ethAccount: string,
-    amount: string
+    params: BridgeHookTxParams
   ): PromiseWithError<Transaction[]> {
     // check basic parameters to make sure they exist
     if (!state.selectedToken) {
@@ -172,67 +166,25 @@ export default function useBridgeIn(
     if (!state.fromNetwork || !state.toNetwork) {
       return NEW_ERROR("useBridgeIn::bridgeIn: network undefined");
     }
-
-    let transactions: ReturnWithError<Transaction[]>;
-    // check the selected method to figure out how to create tx
-    switch (state.selectedMethod) {
-      case BridgingMethod.GRAVITY_BRIDGE:
-        // check to make sure EVM network is selected
-        const gbridgeEVM = isEVMNetwork(state.fromNetwork);
-        if (!gbridgeEVM) {
-          return NEW_ERROR(
-            "useBridgeIn::bridgeIn: gravity bridge only works for EVM networks"
-          );
-        }
-        transactions = await bridgeInGravity(
-          Number(state.fromNetwork.chainId),
-          ethAccount,
-          state.selectedToken,
-          amount
-        );
-        break;
-      case BridgingMethod.LAYER_ZERO:
-        const lzFromEVM = isEVMNetwork(state.fromNetwork);
-        const lzToEVM = isEVMNetwork(state.toNetwork);
-        if (!(lzFromEVM && lzToEVM)) {
-          return NEW_ERROR(
-            "useBridgeIn::bridgeIn: layer zero only works for EVM networks"
-          );
-        }
-        transactions = await bridgeLayerZero(
-          state.fromNetwork as EVMNetwork,
-          state.toNetwork as EVMNetwork,
-          ethAccount,
-          state.selectedToken,
-          amount
-        );
-        break;
-      case BridgingMethod.IBC: {
-        const ibcFromCosmos = isCosmosNetwork(state.fromNetwork);
-        if (!ibcFromCosmos) {
-          return NEW_ERROR(
-            "useBridgeIn::bridgeIn: IBC only works for Cosmos networks"
-          );
-        }
-        transactions = await ibcInKeplr(
-          state.fromNetwork as CosmosNetwork,
-          "cosmos address",
-          ethAccount,
-          state.selectedToken as IBCToken,
-          amount
-        );
-        break;
-      }
-      default:
-        transactions = NEW_ERROR(
-          "useBridgeIn::bridgeIn: invalid method: " + state.selectedMethod
-        );
-        break;
+    const { data: transactions, error: transactionsError } = await bridgeInTx({
+      from: {
+        network: state.fromNetwork,
+        account: params.sender,
+      },
+      to: {
+        network: state.toNetwork,
+        account: params.receiver,
+      },
+      token: {
+        data: state.selectedToken,
+        amount: params.amount,
+      },
+      method: state.selectedMethod,
+    });
+    if (transactionsError) {
+      return NEW_ERROR("useBridgeIn::bridgeIn::" + transactionsError.message);
     }
-    if (transactions.error) {
-      return NEW_ERROR("useBridgeIn::bridgeIn::" + transactions.error.message);
-    }
-    return transactions;
+    return NO_ERROR(transactions);
   }
 
   return {

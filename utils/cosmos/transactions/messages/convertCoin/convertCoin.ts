@@ -30,6 +30,11 @@ interface MsgConvertCoinParams {
   amount: string;
 }
 
+/**
+ * @notice creates eip712 and cosmos proto messages for converting native token on Canto to ERC20 token
+ * @param {MsgConvertCoinParams} params convert coin parameters
+ * @returns {UnsignedCosmosMessages} eip and cosmos messages along with types object and fee
+ */
 export function createMsgsConvertCoin(
   params: MsgConvertCoinParams
 ): UnsignedCosmosMessages {

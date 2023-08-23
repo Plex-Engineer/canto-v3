@@ -5,7 +5,7 @@ import {
 } from "@/config/interfaces/errors";
 import { EVMNetwork } from "@/config/interfaces/networks";
 import { isValidEthAddress } from "@/utils/address.utils";
-import { BridgeToken } from "../interfaces/tokens";
+import { BridgeToken } from "../../interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
 import { encodePacked } from "web3-utils";
@@ -16,27 +16,37 @@ import { getProviderWithoutSigner } from "@/utils/evm/helpers.utils";
 import { getTokenBalance } from "@/utils/evm/erc20.utils";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
 
+/**
+ * @notice creates a list of transactions that need to be made for bridging through layer zero
+ * @dev do not need an eth receiver, since it will always be the same as the sender
+ * @param {EVMNetwork} fromNetwork network to send from
+ * @param {EVMNetwork} toNetwork network to send to
+ * @param {string} ethSender eth sender address
+ * @param {BridgeToken} token token to bridge
+ * @param {string} amount amount to bridge
+ * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
+ */
 export async function bridgeLayerZero(
   fromNetwork: EVMNetwork,
   toNetwork: EVMNetwork,
-  ethAddress: string,
+  ethSender: string,
   token: BridgeToken,
   amount: string
 ): PromiseWithError<Transaction[]> {
   // check all params
-  if (!isValidEthAddress(ethAddress)) {
-    return NEW_ERROR("bridgeLayerZero: invalid eth address: " + ethAddress);
+  if (!isValidEthAddress(ethSender)) {
+    return NEW_ERROR("bridgeLayerZero: invalid eth address: " + ethSender);
   }
   const toLZChainId = LZ_CHAIN_IDS[toNetwork.id as keyof typeof LZ_CHAIN_IDS];
   if (!toLZChainId) {
     return NEW_ERROR("bridgeLayerZero: invalid lz chainId: " + toNetwork.id);
   }
-  const toAddressBytes = encodePacked({ type: "bytes32", value: ethAddress });
+  const toAddressBytes = encodePacked({ type: "bytes32", value: ethSender });
   const { data: gas, error: oftError } = await estimateOFTSendGasFee(
     fromNetwork.rpcUrl,
     toLZChainId,
     token.address,
-    ethAddress,
+    ethSender,
     amount,
     [1, 200000]
   );
@@ -52,7 +62,7 @@ export async function bridgeLayerZero(
     const { data: oftBalance, error: balanceError } = await getTokenBalance(
       fromNetwork.chainId,
       token.address,
-      ethAddress
+      ethSender
     );
     if (balanceError) {
       return NEW_ERROR("bridgeLayerZero::" + balanceError.message);
@@ -75,7 +85,7 @@ export async function bridgeLayerZero(
     _oftTransferTx(
       fromNetwork.chainId,
       toLZChainId,
-      ethAddress,
+      ethSender,
       toAddressBytes,
       token.address,
       amount,
@@ -138,6 +148,17 @@ const _oftDepositOrWithdrawTx = (
  * TRANSACTION HELPERS
  */
 
+/**
+ * @notice estimates the gas fee for sending OFT
+ * @dev gas is paid for on both chains by the sender (in sending gas token)
+ * @param {string} fromRpc rpc url of the network to send from
+ * @param {number} toLZChainId chain id of the network to send to
+ * @param {string} oftAddress address of the OFT token
+ * @param {string} account address of the account to send to
+ * @param {string} amount amount to send
+ * @param {number[]} adapterParams adapter params for OFT
+ * @returns {PromiseWithError<BigNumber>} gas fee for sending OFT or error
+ */
 export async function estimateOFTSendGasFee(
   fromRpc: string,
   toLZChainId: number,

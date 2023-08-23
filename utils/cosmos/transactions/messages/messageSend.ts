@@ -26,6 +26,11 @@ interface MessageSendParams {
   denom: string;
 }
 
+/**
+ * @notice creates eip712 and cosmos proto messages for sending tokens
+ * @param {MessageSendParams} params send parameters
+ * @returns {UnsignedCosmosMessages} eip and cosmos messages along with types object and fee
+ */
 export function createMsgsSend(
   params: MessageSendParams
 ): UnsignedCosmosMessages {

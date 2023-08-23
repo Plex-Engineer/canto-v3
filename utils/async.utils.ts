@@ -11,6 +11,12 @@ const DEFAULT_HEADER = {
   },
 };
 
+/**
+ * @notice implements try catch for fetch
+ * @param {string} url url to fetch
+ * @param {RequestInit} options options for fetch or default
+ * @returns {PromiseWithError<T>} object of return type T or error
+ */
 export async function tryFetch<T>(
   url: string,
   options?: RequestInit
@@ -27,6 +33,12 @@ export async function tryFetch<T>(
   }
 }
 
+/**
+ * @notice will try to fetch from multiple endpoints until one is successful
+ * @param {string[]} urls array of urls to try
+ * @param {RequestInit} options fetch options or default
+ * @returns {PromiseWithError<T>} object of return type T or error
+ */
 export async function tryFetchMultipleEndpoints<T>(
   urls: string[],
   options?: RequestInit
@@ -41,6 +53,13 @@ export async function tryFetchMultipleEndpoints<T>(
 }
 
 const MAX_TRIES = 5;
+/**
+ * @notice will try to fetch from an endpoint multiple times until successful
+ * @param {string} url url to try
+ * @param {number} numTries max number of tries
+ * @param {RequestInit} options fetch options or default
+ * @returns {PromiseWithError<T>} object of return type T or error
+ */
 export async function tryFetchWithRetry<T>(
   url: string,
   numTries?: number,
@@ -60,6 +79,11 @@ export async function tryFetchWithRetry<T>(
   );
 }
 
-async function sleep(ms: number) {
+/**
+ * @notice sleeps for ms
+ * @param {number} ms milliseconds to sleep for
+ * @returns {Promise<void>} void
+ */
+async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

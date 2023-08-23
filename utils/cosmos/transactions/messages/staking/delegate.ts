@@ -37,6 +37,11 @@ interface MessageDelegateParams {
   undelegate: boolean;
 }
 
+/**
+ * @notice creates eip712 and cosmos proto messages for delegating
+ * @param {MessageDelegateParams} params delegate parameters
+ * @returns {UnsignedCosmosMessages} eip and cosmos messages along with types object and fee
+ */
 export function createMsgsDelegate(
   params: MessageDelegateParams
 ): UnsignedCosmosMessages {

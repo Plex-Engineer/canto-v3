@@ -5,6 +5,11 @@ import {
 } from "@/config/interfaces/errors";
 import { Transaction } from "@/config/interfaces/transactions";
 
+/**
+ * @notice performs keplr transaction
+ * @param {Transaction} tx transaction to perform
+ * @returns {PromiseWithError<string>} txHash of transaction or error
+ */
 export async function performKeplrTx(
   tx: Transaction
 ): PromiseWithError<string> {

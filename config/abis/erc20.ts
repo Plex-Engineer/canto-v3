@@ -1,3 +1,6 @@
+/**
+ * ERC20 Contract ABI
+ */
 export const ERC20_ABI = [
   {
     inputs: [

@@ -1,3 +1,8 @@
+/**
+ * @dev use this for creating all EIP object types in messages
+ * @param msgValues object of msgValue types for EIP712 message
+ * @returns object of types for EIP712 message
+ */
 export function generateCosmosEIPTypes(msgValues: object) {
   const types = {
     EIP712Domain: [

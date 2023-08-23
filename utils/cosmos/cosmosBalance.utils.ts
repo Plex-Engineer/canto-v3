@@ -11,6 +11,12 @@ import {
 import { UserTokenBalances } from "@/hooks/bridge/interfaces/tokens";
 import { CosmosNetwork } from "@/config/interfaces/networks";
 
+/**
+ * @notice gets canto balance from cosmos
+ * @param {string} chainId chainId to get canto balance from
+ * @param {string} cantoAddress canot address to get balance for
+ * @returns {PromiseWithError<string>} balance of canto as a string or error
+ */
 export async function getCantoBalance(
   chainId: string,
   cantoAddress: string
@@ -33,6 +39,12 @@ export async function getCantoBalance(
   return NO_ERROR(result.balance.amount);
 }
 
+/**
+ * @notice gets all token balances from cosmos chain
+ * @param {string} chainId chainId to get balances from
+ * @param {string} cosmosAddress cosmos address to get balances for
+ * @returns {PromiseWithError<UserTokenBalances>} balances of all tokens as a string or error
+ */
 export async function getCosmosTokenBalanceList(
   chainId: string,
   cosmosAddress: string
