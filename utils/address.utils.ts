@@ -18,7 +18,7 @@ export async function ethToCantoAddress(
   ethAddress: string
 ): PromiseWithError<string> {
   const { data: apiEndpoint, error: apiEndpointError } = getCosmosAPIEndpoint(
-   CANTO_MAINNET_COSMOS.chainId
+    CANTO_MAINNET_COSMOS.chainId
   );
   if (apiEndpointError) {
     return NEW_ERROR("ethToCantoAddress::" + apiEndpointError.message);
@@ -37,12 +37,24 @@ export async function ethToCantoAddress(
   return NO_ERROR(result.cosmos_address);
 }
 
-export async function checkPubKey(
+/**
+ *
+ * @dev will check the canto address representation of the ethAddress
+ * @param {string} ethAddress User eth address
+ * @param {string} chainId chainId to check pub key
+ * @returns {boolean} true if the user has a pub key on the chain
+ */
+export async function checkPubKeyETH(
   ethAddress: string,
   chainId: string
 ): PromiseWithError<boolean> {
+  const { data: cantoAddress, error: ethToCantoError } =
+    await ethToCantoAddress(ethAddress);
+  if (ethToCantoError) {
+    return NEW_ERROR("checkPubKey::" + ethToCantoError.message);
+  }
   const { data: cosmosAccount, error } = await getCosmosAccount(
-    ethAddress,
+    cantoAddress,
     chainId
   );
   if (error) {
@@ -59,13 +71,44 @@ export async function checkPubKey(
 
 /**
  *
- * @param cantoAddress address to check
- * @returns if this is a valid canto address
+ * @param {string} cosmosAddress cosmos address to check if public key exists
+ * @param {string} chainId chainId to check public key on
+ * @returns {boolean} true if the user has a pub key on the chain or error
+ */
+export async function checkPubKeyCosmos(
+  cosmosAddress: string,
+  chainId: string
+): PromiseWithError<boolean> {
+  const { data: cosmosAccount, error } = await getCosmosAccount(
+    cosmosAddress,
+    chainId
+  );
+  if (error) {
+    return NEW_ERROR("checkPubKey::" + error.message);
+  }
+  try {
+    return NO_ERROR(
+      cosmosAccount["account"]["base_account"]["pub_key"] != null
+    );
+  } catch (error) {
+    return NEW_ERROR("checkPubKey::" + (error as Error).message);
+  }
+}
+
+/**
+ * @notice checks if a canto address is valid
+ * @param {string} cantoAddress address to check
+ * @returns {boolean} if a valid canto address
  */
 export function isValidCantoAddress(cantoAddress: string): boolean {
   return cantoAddress.startsWith("canto") && cantoAddress.length === 44;
 }
 
+/**
+ * @notice checks if an eth address is valid
+ * @param {string} ethAddress address to check
+ * @returns {boolean} if a valid eth address
+ */
 export function isValidEthAddress(ethAddress: string): boolean {
   return checkHex(ethAddress);
 }

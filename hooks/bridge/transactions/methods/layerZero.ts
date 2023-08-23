@@ -16,7 +16,16 @@ import { getProviderWithoutSigner } from "@/utils/evm/helpers.utils";
 import { getTokenBalance } from "@/utils/evm/erc20.utils";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
 
-// do not need an eth receiver, since it will always be the same as the sender
+/**
+ * @notice creates a list of transactions that need to be made for bridging through layer zero
+ * @dev do not need an eth receiver, since it will always be the same as the sender
+ * @param {EVMNetwork} fromNetwork network to send from
+ * @param {EVMNetwork} toNetwork network to send to
+ * @param {string} ethSender eth sender address
+ * @param {BridgeToken} token token to bridge
+ * @param {string} amount amount to bridge
+ * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
+ */
 export async function bridgeLayerZero(
   fromNetwork: EVMNetwork,
   toNetwork: EVMNetwork,
@@ -139,6 +148,17 @@ const _oftDepositOrWithdrawTx = (
  * TRANSACTION HELPERS
  */
 
+/**
+ * @notice estimates the gas fee for sending OFT
+ * @dev gas is paid for on both chains by the sender (in sending gas token)
+ * @param {string} fromRpc rpc url of the network to send from
+ * @param {number} toLZChainId chain id of the network to send to
+ * @param {string} oftAddress address of the OFT token
+ * @param {string} account address of the account to send to
+ * @param {string} amount amount to send
+ * @param {number[]} adapterParams adapter params for OFT
+ * @returns {PromiseWithError<BigNumber>} gas fee for sending OFT or error
+ */
 export async function estimateOFTSendGasFee(
   fromRpc: string,
   toLZChainId: number,

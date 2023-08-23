@@ -13,6 +13,11 @@ import { CosmosNetwork, EVMNetwork } from "@/config/interfaces/networks";
 import { ibcInKeplr } from "./keplr/ibcKeplr";
 import { txIBCOut } from "./methods/ibc";
 
+/**
+ * @notice creates a list of transactions that need to be made for bridging into canto
+ * @param {BridgeTransactionParams} params parameters for bridging in
+ * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
+ */
 export async function bridgeInTx(
   params: BridgeTransactionParams
 ): PromiseWithError<Transaction[]> {
@@ -72,6 +77,11 @@ export async function bridgeInTx(
   return transactions;
 }
 
+/**
+ * @notice creates a list of transactions that need to be made for bridging out of canto
+ * @param {BridgeTransactionParams} params parameters for bridging out
+ * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
+ */
 export async function bridgeOutTx(
   params: BridgeTransactionParams
 ): PromiseWithError<Transaction[]> {

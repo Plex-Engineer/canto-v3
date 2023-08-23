@@ -6,7 +6,11 @@ import {
 import { CosmosNetwork } from "@/config/interfaces/networks";
 import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
 
-// will return an object {client, address} if successful
+/**
+ * @notice connects to keplr and returns client and address
+ * @param {CosmosNetwork} cosmosNetwork cosmos network to connect to
+ * @returns {PromiseWithError<{client: SigningStargateClient, address: string}>} client and address or error
+ */
 export async function connectToKeplr(
   cosmosNetwork: CosmosNetwork
 ): PromiseWithError<{ client: SigningStargateClient; address: string }> {

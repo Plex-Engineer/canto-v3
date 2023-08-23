@@ -25,6 +25,12 @@ interface MsgConvertERC20Params {
   cantoReceiver: string;
   ethSender: string;
 }
+
+/**
+ * @notice creates eip712 and cosmos proto messages for converting ERC20 to native token on canto
+ * @param {MsgConvertERC20Params} params convert erc20 parameters
+ * @returns {UnsignedCosmosMessages} eip and cosmos messages along with types object and fee
+ */
 export function createMsgsConvertERC20(
   params: MsgConvertERC20Params
 ): UnsignedCosmosMessages {

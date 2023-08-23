@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
-// need this to use all zustand stores with next js (that have async/persist middleware)
+/**
+ * @dev need this to use all zustand stores with next js (that have async/persist middleware)
+ */
 const useStore = <T, F>(
   store: (callback: (state: T) => unknown) => unknown,
   callback: (state: T) => F

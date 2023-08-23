@@ -14,8 +14,9 @@ import { ERC20Token } from "@/config/interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
 import { CANTO_MAINNET_COSMOS } from "@/config/networks";
 import {
-  checkPubKey,
+  checkPubKeyCosmos,
   ethToCantoAddress,
+  isValidCantoAddress,
   isValidEthAddress,
 } from "@/utils/address.utils";
 import { tryFetch } from "@/utils/async.utils";
@@ -28,6 +29,15 @@ import {
 } from "@/utils/evm/erc20.utils";
 import BigNumber from "bignumber.js";
 
+/**
+ * @notice creates a list of transactions that need to be made for bridging into gravity bridge
+ * @param {number} chainId chainId to begin bridging from
+ * @param {string} ethSender eth sender address
+ * @param {string} cantoReceiver canto receiver address
+ * @param {ERC20Token} token token to bridge
+ * @param {string} amount amount to bridge
+ * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
+ */
 export async function bridgeInGravity(
   chainId: number,
   ethSender: string,
@@ -35,18 +45,13 @@ export async function bridgeInGravity(
   token: ERC20Token,
   amount: string
 ): PromiseWithError<Transaction[]> {
+  // check addresses
   if (!isValidEthAddress(ethSender)) {
     return NEW_ERROR("bridgeInGravity: invalid eth address: " + ethSender);
   }
-  const { data: cantoReceiverAddress, error: ethToCantoError } =
-    await ethToCantoAddress(ethSender);
-  if (ethToCantoError) {
-    return NEW_ERROR("bridgeInGravity::" + ethToCantoError.message);
-  }
-  // check to make sure the ethSender is sending to their own cantoAddress
-  if (cantoReceiverAddress.toLowerCase() !== cantoReceiver.toLowerCase()) {
+  if (!isValidCantoAddress(cantoReceiver)) {
     return NEW_ERROR(
-      "bridgeInGravity: ethSender must send to their own cantoAddress"
+      "bridgeInGravity: invalid canto address: " + cantoReceiver
     );
   }
 
@@ -55,8 +60,8 @@ export async function bridgeInGravity(
 
   // check if the user has a public key
   // check on Canto Mainnet
-  const { data: hasPubKey, error: checkPubKeyError } = await checkPubKey(
-    ethSender,
+  const { data: hasPubKey, error: checkPubKeyError } = await checkPubKeyCosmos(
+    cantoReceiver,
     CANTO_MAINNET_COSMOS.chainId
   );
   if (checkPubKeyError) {
@@ -67,6 +72,15 @@ export async function bridgeInGravity(
       await ethToCantoAddress(ethSender);
     if (ethToCantoError) {
       return NEW_ERROR("bridgeInGravity::" + ethToCantoError.message);
+    }
+    // check that the receiver and sender is the same address since EIP will be created
+    if (cantoAddress !== cantoReceiver) {
+      return NEW_ERROR(
+        "bridgeInGravity: canto address and canto receiver are not the same: " +
+          cantoAddress +
+          " != " +
+          cantoReceiver
+      );
     }
     // get canto balance to see if enough canto for generating public key
     const { data: cantoBalance, error: balanceError } = await getCantoBalance(
@@ -162,8 +176,10 @@ export async function bridgeInGravity(
 }
 
 /**
+ * @notice checks if the token address is WETH
  * @dev Function assumes we are on ETH mainnet
- * @param tokenAddress address to check if it is WETH
+ * @param {string} tokenAddress address to check if it is WETH
+ * @returns {boolean} true if tokenAddress is WETH, false otherwise
  */
 function isWETH(tokenAddress: string): boolean {
   return tokenAddress.toLowerCase() === WETH_MAINNET_ADDRESS.toLowerCase();

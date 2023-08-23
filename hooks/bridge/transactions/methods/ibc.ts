@@ -12,6 +12,17 @@ import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
 import { tryFetchMultipleEndpoints } from "@/utils/async.utils";
 import { _convertERC20Tx } from "./recovery";
 
+/**
+ * @notice creates a list of transactions that need to be made for IBC out of canto
+ * @param {number} chainId chainId to send tx on
+ * @param {string} senderEthAddress eth address to send tx from
+ * @param {string} receiverCosmosAddress cosmos address to send tx to
+ * @param {CosmosNetwork} receivingChain chain to send tx to
+ * @param {IBCToken} token token to send
+ * @param {string} amount amount to send
+ * @param {boolean} recovery if this is a recovery tx
+ * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
+ */
 export async function txIBCOut(
   chainId: number,
   senderEthAddress: string,
@@ -146,6 +157,8 @@ interface IBCData {
 }
 /**
  * @param {string} restEndpoint rest endpoint to request counter-party chain timestamp
+ * @param {string[]} extraEndpoints extra endpoints to try if first one fails
+ * @returns {PromiseWithError<IBCData>} IBCData or error
  */
 async function getIBCData(
   restEndpoint: string,
@@ -163,6 +176,9 @@ async function getIBCData(
 
 /**
  * @param {string} restEndpoint rest endpoint to request counter-party chain timestamp
+ * @param {string[]} extraEndpoints extra endpoints to try if first one fails
+ * @param {string} latestBlockEndpoint endpoint to get latest block
+ * @returns {PromiseWithError<string>} timestamp or error
  */
 export async function getBlockTimestamp(
   restEndpoint: string,

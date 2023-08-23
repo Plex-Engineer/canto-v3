@@ -5,6 +5,12 @@ export enum BridgingMethod {
   IBC = "1",
   LAYER_ZERO = "2",
 }
+
+/**
+ *
+ * @param {BridgingMethod} method for bridging
+ * @returns string representation of bridging method
+ */
 export function bridgeMethodToString(method: BridgingMethod): string {
   switch (method) {
     case BridgingMethod.GRAVITY_BRIDGE:

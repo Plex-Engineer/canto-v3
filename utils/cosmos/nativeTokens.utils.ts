@@ -5,20 +5,31 @@ import {
 } from "@/config/interfaces/errors";
 import { tryFetch } from "../async.utils";
 import { getCosmosAPIEndpoint } from "../networks.utils";
+import { getCosmosTokenBalanceList } from "./cosmosBalance.utils";
 
 interface UserNativeTokensWithIBCPath {
-  token: NativeTokenBalance;
+  token: {
+    denom: string;
+    amount: string;
+  };
   ibcPath: {
     path: string;
     base_denom: string;
-  };
+  } | null;
 }
+
+/**
+ * @notice gets all native token balances from cosmos chain with its denom trace
+ * @dev used for identifying unknown ibc tokens
+ * @param {string} chainId chainId to get balances from
+ * @param {string} cosmosAddress cosmos address to get balances for
+ */
 export async function getUserNativeTokenBalancesWithDenomTraces(
-  chainId: number,
-  cantoAddress: string
+  chainId: string,
+  cosmosAddress: string
 ): PromiseWithError<UserNativeTokensWithIBCPath[]> {
   const { data: allTokens, error: tokenError } =
-    await getAllNativeTokenBalances(chainId, cantoAddress);
+    await getCosmosTokenBalanceList(chainId, cosmosAddress);
   if (tokenError) {
     return NEW_ERROR(
       "getUserNativeTokenBalancesWithDenomTraces::" + tokenError.message
@@ -26,41 +37,21 @@ export async function getUserNativeTokenBalancesWithDenomTraces(
   }
   const userTokenList: UserNativeTokensWithIBCPath[] = [];
   await Promise.all(
-    allTokens.map(async (token) => {
-      if (token.denom.startsWith("ibc/")) {
-        const { data: ibcPath } = await getIBCPathAndDenomFromNativeDenom(
-          chainId,
-          token.denom.replace("ibc/", "")
-        );
-        userTokenList.push({ token, ibcPath });
+    Object.entries(allTokens).map(async ([denom, amount]) => {
+      if (denom.startsWith("ibc/")) {
+        const { data: ibcPath, error: ibcPathError } =
+          await getIBCPathAndDenomFromNativeDenom(
+            chainId,
+            denom.replace("ibc/", "")
+          );
+        userTokenList.push({ token: { denom, amount }, ibcPath });
+      } else {
+        userTokenList.push({ token: { denom, amount }, ibcPath: null });
       }
     })
   );
   return NO_ERROR(userTokenList);
 }
-
-interface NativeTokenBalance {
-  denom: string;
-  amount: string;
-}
-async function getAllNativeTokenBalances(
-  chainId: number,
-  cantoAddress: string
-): PromiseWithError<NativeTokenBalance[]> {
-  const { data: nodeUrl, error: nodeError } = getCosmosAPIEndpoint(chainId);
-  if (nodeError) {
-    return NEW_ERROR("getAllNativeTokenBalances: " + nodeError.message);
-  }
-  const { data: result, error: fetchError } = await tryFetch<{
-    balances: NativeTokenBalance[];
-  }>(`${nodeUrl}/cosmos/bank/v1beta1/balances/${cantoAddress}`);
-
-  if (fetchError) {
-    return NEW_ERROR("getAllNativeTokenBalances: " + fetchError.message);
-  }
-  return NO_ERROR(result.balances);
-}
-
 // path will have the channels the token has gone through (ex. "transfer/channel-x/transfer/channel-y/...")
 interface IBCDenomTrace {
   denom_trace: {
@@ -69,8 +60,14 @@ interface IBCDenomTrace {
   };
 }
 // @dev: denom without "ibc/" prefix
+/**
+ * @notice gets ibc path and denom from native denom
+ * @dev denom without "ibc/" prefix
+ * @param {string} chainId chainId to get path from
+ * @param {string} denom denom to get ibc path for
+ */
 async function getIBCPathAndDenomFromNativeDenom(
-  chainId: number,
+  chainId: string,
   denom: string
 ): PromiseWithError<any> {
   const { data: nodeUrl, error: nodeError } = getCosmosAPIEndpoint(chainId);

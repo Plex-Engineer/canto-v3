@@ -19,6 +19,11 @@ interface MessageClaimStakingRewardsMultipleValidatorsParams {
   validatorAddresses: string[];
 }
 
+/**
+ * @notice creates eip712 and cosmos proto messages for claiming staking rewards
+ * @param {MessageClaimStakingRewardsMultipleValidatorsParams} params claim staking rewards parameters
+ * @returns {UnsignedCosmosMessages} eip and cosmos messages along with types object and fee
+ */
 export function createMsgsClaimStakingRewards(
   params: MessageClaimStakingRewardsMultipleValidatorsParams
 ): UnsignedCosmosMessages {

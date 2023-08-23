@@ -28,6 +28,11 @@ interface MessageRedelegateParams {
   denom: string;
 }
 
+/**
+ * @notice creates eip712 and cosmos proto messages for redelegating
+ * @param {MessageRedelegateParams} params redelegate parameters
+ * @returns {UnsignedCosmosMessages} eip and cosmos messages along with types object and fee
+ */
 export function createMsgsRedelegate(
   params: MessageRedelegateParams
 ): UnsignedCosmosMessages {

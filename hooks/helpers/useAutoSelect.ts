@@ -1,6 +1,12 @@
 import { useEffect } from "react";
 
-// will autoselect the first item in an array if no override provided
+/**
+ * @description helper hook to autoselect an item from an array
+ * @dev will autoselect the first item in an array if no override provided
+ * @param {Array<{id: string} | string>} items array of items to select from
+ * @param setter function to set the selected item
+ * @param override optional override to select a specific item
+ */
 export default function useAutoSelect(
   items: Array<{ id: string } | string>,
   setter: (itemId: string) => void,

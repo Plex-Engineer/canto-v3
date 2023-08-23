@@ -56,7 +56,7 @@ export default function TestPage() {
     getCantoAddress();
   }, [signer?.account.address]);
 
-  function formatParams(params: {
+  function formatParamsBridgeIn(params: {
     ethAddress: string;
     userCosmosAddress: string;
     cantoAddress: string;
@@ -86,18 +86,66 @@ export default function TestPage() {
   }
 
   async function bridgeInTest() {
-    const params = formatParams({
+    const params = formatParamsBridgeIn({
       ethAddress: signer?.account.address,
       userCosmosAddress: cosmosAddress,
       cantoAddress: cantoAddress,
     });
     bridgeIn
       .bridge(
-        formatParams({
+        formatParamsBridgeIn({
           ethAddress: signer?.account.address,
           userCosmosAddress: cosmosAddress,
           cantoAddress: cantoAddress,
           method: bridgeIn.selections.method,
+          amount: "1000000000000000000",
+        })
+      )
+      .then((val) => {
+        if (val.error) {
+          console.log(val.error);
+          return;
+        }
+        transactionStore?.addTransactions(val.data, signer);
+      });
+  }
+
+  function formatParamsBridgeOut(params: {
+    ethAddress: string;
+    userCosmosAddress: string;
+    cantoAddress: string;
+    method: BridgingMethod;
+    amount: string;
+  }) {
+    switch (params.method) {
+      case BridgingMethod.IBC:
+        return {
+          sender: params.ethAddress,
+          receiver: params.userCosmosAddress,
+          amount: params.amount,
+        };
+      case BridgingMethod.LAYER_ZERO:
+        return {
+          sender: params.ethAddress,
+          receiver: params.ethAddress,
+          amount: params.amount,
+        };
+    }
+  }
+
+  async function bridgeOutTest() {
+    const params = formatParamsBridgeIn({
+      ethAddress: signer?.account.address,
+      userCosmosAddress: cosmosAddress,
+      cantoAddress: cantoAddress,
+    });
+    bridgeOut
+      .bridge(
+        formatParamsBridgeIn({
+          ethAddress: signer?.account.address,
+          userCosmosAddress: cosmosAddress,
+          cantoAddress: cantoAddress,
+          method: bridgeOut.selections.method,
           amount: "1000000000000000000",
         })
       )
