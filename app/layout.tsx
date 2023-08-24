@@ -1,5 +1,5 @@
 import StyledComponentsRegistry from "@/lib/registry";
-import "./globals.css";
+import "./globals.scss";
 import type { Metadata } from "next";
 import InfoBar from "@/components/info_bar/infoBar";
 import Footer from "@/components/footer/footer";

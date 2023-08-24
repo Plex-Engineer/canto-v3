@@ -1,0 +1,39 @@
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  height: 60px;
+  padding: 0 16px;
+  transition: all 0.2s ease-out;
+  position: relative;
+  &::after {
+    position: absolute;
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(var(--dark-color), 0.1);
+    transform: scaleY(0.6) translateX(-16px);
+    opacity: 0;
+    transition: all 0.2s ease-out;
+  }
+
+  &:hover::after {
+    transform: scaleY(1) translateX(-16px);
+    opacity: 1;
+  }
+
+  &:active::after {
+    transform: scaleY(0.9) translateX(-16px);
+    background-color: rgba(var(--dark-color), 0.3);
+
+    opacity: 0.8;
+  }
+}
