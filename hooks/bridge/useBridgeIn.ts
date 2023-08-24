@@ -26,6 +26,7 @@ import { Transaction } from "@/config/interfaces/transactions";
 import useTokenBalances from "../helpers/useTokenBalances";
 
 import { bridgeInTx } from "./transactions/bridge";
+import { isERC20TokenList } from "@/config/interfaces/tokens";
 
 export default function useBridgeIn(
   props: BridgeHookInputParams
@@ -55,7 +56,7 @@ export default function useBridgeIn(
   // contains object mapping of the token balances
   const userTokenBalances = useTokenBalances(
     state.fromNetwork?.chainId,
-    state.availableTokens,
+    isERC20TokenList(state.availableTokens) ? state.availableTokens : [],
     props.userEthAddress,
     props.userCosmosAddress
   );

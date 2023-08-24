@@ -21,6 +21,7 @@ import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
 import { Transaction } from "@/config/interfaces/transactions";
 import useTokenBalances from "../helpers/useTokenBalances";
 import { bridgeOutTx } from "./transactions/bridge";
+import { isERC20TokenList } from "@/config/interfaces/tokens";
 
 export default function useBridgeOut(
   props: BridgeHookInputParams
@@ -50,7 +51,7 @@ export default function useBridgeOut(
   // contains object mapping of the token balances
   const userTokenBalances = useTokenBalances(
     state.fromNetwork?.chainId,
-    state.availableTokens,
+    isERC20TokenList(state.availableTokens) ? state.availableTokens : [],
     props.userEthAddress,
     props.userCosmosAddress
   );

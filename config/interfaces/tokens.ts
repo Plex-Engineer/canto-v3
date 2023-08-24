@@ -30,3 +30,13 @@ export function isERC20Token(object: any): object is ERC20Token {
     "icon" in object
   );
 }
+
+/**
+ * Checks if array is ERC20Token[]
+ * @param {object} array to check
+ * @returns {boolean} true if array is ERC20Token[]
+ * @see ERC20Token
+ */
+export function isERC20TokenList(array: Array<object>): array is ERC20Token[] {
+  return array.every(isERC20Token);
+}

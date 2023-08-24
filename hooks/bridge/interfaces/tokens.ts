@@ -16,7 +16,8 @@ export type BridgeOutToken = {
 
 // extends ERC20 since all IBC tokens supported on Canto will have
 // an ERC20 representation
-export interface IBCToken extends ERC20Token {
+export interface IBCToken extends Omit<ERC20Token, "address"> {
+  address?: string;
   ibcDenom: string; // "ibc/..."
   nativeName: string; // ex. uatom, ucre, acanto
 }
@@ -37,7 +38,16 @@ export interface UserTokenBalances {
  * @see IBCToken
  */
 export function isIBCToken(object: any): object is IBCToken {
-  return isERC20Token(object) && "ibcDenom" in object && "nativeName" in object;
+  return (
+    "id" in object &&
+    "chainId" in object &&
+    "name" in object &&
+    "symbol" in object &&
+    "decimals" in object &&
+    "icon" in object &&
+    "ibcDenom" in object &&
+    "nativeName" in object
+  );
 }
 
 ///

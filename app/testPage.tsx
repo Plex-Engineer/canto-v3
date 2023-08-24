@@ -224,89 +224,48 @@ interface BridgeProps {
   };
 }
 const Bridge = (props: BridgeProps) => {
-  function formatParamsBridgeIn(params: {
-    ethAddress: string;
-    userCosmosAddress: string;
-    cantoAddress: string;
-    method: BridgingMethod;
-    amount: string;
-  }) {
-    switch (params.method) {
+  // STATES FOR BRIDGE
+  const [amount, setAmount] = useState<string>("");
+  const [inputCosmosAddress, setInputCosmosAddress] = useState<string>("");
+  const [fromAddress, setFromAddress] = useState<string>("");
+  const [toAddress, setToAddress] = useState<string>("");
+
+  useEffect(() => {
+    switch (props.bridge.selections.method) {
       case BridgingMethod.GRAVITY_BRIDGE:
-        return {
-          sender: params.ethAddress,
-          receiver: params.cantoAddress,
-          amount: params.amount,
-        };
+        setFromAddress(props.params.signer?.account.address);
+        setToAddress(props.params.cantoAddress);
+        return;
       case BridgingMethod.IBC:
-        return {
-          sender: params.userCosmosAddress,
-          receiver: params.ethAddress,
-          amount: params.amount,
-        };
-      case BridgingMethod.LAYER_ZERO:
-        return {
-          sender: params.ethAddress,
-          receiver: params.ethAddress,
-          amount: params.amount,
-        };
-    }
-  }
-  async function bridgeInTest() {
-    props.bridge
-      .bridge(
-        formatParamsBridgeIn({
-          ethAddress: props.params.signer?.account.address,
-          userCosmosAddress: props.params.cosmosAddress,
-          cantoAddress: props.params.cantoAddress,
-          method: props.bridge.selections.method,
-          amount: "1000",
-        })
-      )
-      .then((val) => {
-        if (val.error) {
-          console.log(val.error);
-          return;
+        if (props.bridge.direction === "in") {
+          setFromAddress(props.params.cosmosAddress);
+          setToAddress(props.params.signer?.account.address);
+        } else {
+          setFromAddress(props.params.signer?.account.address);
+          setToAddress(inputCosmosAddress);
         }
-        props.params.transactionStore?.addTransactions(
-          val.data,
-          props.params.signer
-        );
-      });
-  }
-  function formatParamsBridgeOut(params: {
-    ethAddress: string;
-    userCosmosAddress: string;
-    cantoAddress: string;
-    method: BridgingMethod;
-    amount: string;
-  }) {
-    switch (params.method) {
-      case BridgingMethod.IBC:
-        return {
-          sender: params.ethAddress,
-          receiver: params.userCosmosAddress,
-          amount: params.amount,
-        };
+        return;
       case BridgingMethod.LAYER_ZERO:
-        return {
-          sender: params.ethAddress,
-          receiver: params.ethAddress,
-          amount: params.amount,
-        };
+        setFromAddress(props.params.signer?.account.address);
+        setToAddress(props.params.signer?.account.address);
+        return;
     }
-  }
-  async function bridgeOutTest() {
+  }, [
+    props.bridge.selections.method,
+    props.params.signer?.account.address,
+    inputCosmosAddress,
+    props.params.cosmosAddress,
+    props.params.cantoAddress,
+    props.bridge.direction,
+  ]);
+
+  async function bridgeTest() {
     props.bridge
-      .bridge(
-        formatParamsBridgeOut({
-          ethAddress: props.params.signer?.account.address,
-          userCosmosAddress: props.params.cosmosAddress,
-          cantoAddress: props.params.cantoAddress,
-          method: props.bridge.selections.method,
-          amount: "1000",
-        })
-      )
+      .bridge({
+        sender: fromAddress,
+        receiver: toAddress,
+        amount,
+      })
       .then((val) => {
         if (val.error) {
           console.log(val.error);
@@ -321,7 +280,7 @@ const Bridge = (props: BridgeProps) => {
 
   const networkSelectors = (
     <>
-      <label>From Network</label>
+      <label>{`From network (${fromAddress})`}</label>
       <Selector
         title="SELECT FROM NETWORK"
         activeItem={props.bridge.selections.fromNetwork}
@@ -336,7 +295,7 @@ const Bridge = (props: BridgeProps) => {
             : () => false
         }
       />
-      <label>To Network</label>
+      <label>{`To network (${toAddress})`}</label>
       <Selector
         title="SELECT TO NETWORK"
         activeItem={props.bridge.selections.toNetwork}
@@ -399,12 +358,18 @@ const Bridge = (props: BridgeProps) => {
           />
         </div>
         <Spacer height="100px" />
-        <Button
-          width="fill"
-          onClick={() => {
-            props.bridge.direction === "in" ? bridgeInTest() : bridgeOutTest();
-          }}
-        >
+        <input
+          placeholder="amount"
+          onChange={(e) => setAmount(e.target.value)}
+        />
+        <Spacer height="100px" />
+        <Spacer height="100px" />
+        <input
+          placeholder="cosmos receiver address"
+          onChange={(e) => setInputCosmosAddress(e.target.value)}
+        />
+        <Spacer height="100px" />
+        <Button width="fill" onClick={bridgeTest}>
           {props.bridge.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
         </Button>
       </section>
