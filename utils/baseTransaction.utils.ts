@@ -6,7 +6,10 @@ import {
 import { GetWalletClientResult, switchNetwork } from "wagmi/actions";
 import { performEVMTransaction } from "./evm/performEVMTx";
 import { Transaction } from "@/config/interfaces/transactions";
-import { performCosmosTransactionEIP } from "./cosmos/transactions/performCosmosTx";
+import {
+  performCosmosTransactionEIP,
+  waitForCosmosTx,
+} from "./cosmos/transactions/performCosmosTx";
 import { waitForTransaction as evmWait } from "wagmi/actions";
 import { tryFetchWithRetry } from "./async.utils";
 import { performKeplrTx } from "./keplr/performKeplrTx";
@@ -50,7 +53,7 @@ export async function performSingleTransaction(
  */
 export async function waitForTransaction(
   txType: "EVM" | "COSMOS" | "KEPLR",
-  chainId: number,
+  chainId: number | string,
   hash: string
 ): PromiseWithError<{
   status: string;
@@ -59,7 +62,7 @@ export async function waitForTransaction(
   switch (txType) {
     case "EVM":
       const receipt = await evmWait({
-        chainId,
+        chainId: chainId as number,
         hash: hash as `0x${string}`,
         confirmations: 1,
       });
@@ -68,30 +71,8 @@ export async function waitForTransaction(
         error: receipt.logs,
       });
     case "COSMOS":
-      const { data: endpoint, error: endpointError } =
-        getCosmosAPIEndpoint(chainId);
-      if (endpointError) {
-        return NEW_ERROR("waitForTransaction::" + endpointError.message);
-      }
-      const { data: response, error: fetchError } = await tryFetchWithRetry<{
-        tx_response: {
-          code: number;
-          raw_log: string;
-        };
-      }>(endpoint + "/cosmos/tx/v1beta1/txs/" + hash, 5);
-      if (fetchError) {
-        return NEW_ERROR("waitForTransaction::" + fetchError.message);
-      }
-      return NO_ERROR({
-        status: response.tx_response.code === 0 ? "success" : "fail",
-        error: response.tx_response.raw_log,
-      });
     case "KEPLR":
-      // when keplr transactions are signed, the return will have success or fail, no need to check
-      return NO_ERROR({
-        status: "success",
-        error: "",
-      });
+      return waitForCosmosTx(chainId, hash);
     default:
       return NEW_ERROR("waitForTransaction: unknown tx type: " + txType);
   }

@@ -159,7 +159,7 @@ enum BroadcastMode {
   Async = "BROADCAST_MODE_ASYNC",
 }
 
-function generatePostBodyBroadcast(
+export function generatePostBodyBroadcast(
   txRaw: TxToSend,
   broadcastMode: string = BroadcastMode.Sync
 ) {
