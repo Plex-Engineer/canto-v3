@@ -2,6 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 import { EVMNetwork } from "@/config/interfaces/networks";
 import { isValidEthAddress } from "@/utils/address.utils";
@@ -188,7 +189,7 @@ export async function estimateOFTSendGasFee(
       )
       .call();
     return NO_ERROR(new BigNumber(gas[0] as string));
-  } catch (error) {
-    return NEW_ERROR("estimateOFTSendGasFee::" + (error as Error).message);
+  } catch (err) {
+    return NEW_ERROR("estimateOFTSendGasFee::" + errMsg(err));
   }
 }

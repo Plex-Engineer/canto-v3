@@ -2,6 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 import { tryFetch } from "./async.utils";
 import { CANTO_MAINNET_COSMOS } from "@/config/networks";
@@ -64,8 +65,8 @@ export async function checkPubKeyETH(
     return NO_ERROR(
       cosmosAccount["account"]["base_account"]["pub_key"] != null
     );
-  } catch (error) {
-    return NEW_ERROR("checkPubKey::" + (error as Error).message);
+  } catch (err) {
+    return NEW_ERROR("checkPubKey::" + errMsg(err));
   }
 }
 
@@ -90,8 +91,8 @@ export async function checkPubKeyCosmos(
     return NO_ERROR(
       cosmosAccount["account"]["base_account"]["pub_key"] != null
     );
-  } catch (error) {
-    return NEW_ERROR("checkPubKey::" + (error as Error).message);
+  } catch (err) {
+    return NEW_ERROR("checkPubKey::" + errMsg(err));
   }
 }
 

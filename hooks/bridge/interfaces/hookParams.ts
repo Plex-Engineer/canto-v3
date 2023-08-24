@@ -1,5 +1,6 @@
 import { BaseNetwork } from "@/config/interfaces/networks";
-import { BridgeToken, BridgingMethod } from "./tokens";
+import { BridgeToken } from "./tokens";
+import { BridgingMethod } from "../interfaces/bridgeMethods";
 import { PromiseWithError } from "@/config/interfaces/errors";
 import { Transaction } from "@/config/interfaces/transactions";
 

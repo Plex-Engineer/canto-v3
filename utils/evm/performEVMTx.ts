@@ -2,6 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 import { Transaction } from "@/config/interfaces/transactions";
 import { GetWalletClientResult, writeContract } from "wagmi/actions";
@@ -47,7 +48,7 @@ export async function performEVMTransaction(
     };
     const { hash } = await writeContract(contractCall);
     return NO_ERROR(hash);
-  } catch (error) {
-    return NEW_ERROR("performEVMTransaction: " + (error as Error).message);
+  } catch (err) {
+    return NEW_ERROR("performEVMTransaction: " + errMsg(err));
   }
 }

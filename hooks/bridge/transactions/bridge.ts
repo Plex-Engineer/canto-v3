@@ -5,11 +5,11 @@ import {
 } from "@/config/interfaces/errors";
 import { BridgeTransactionParams } from "../interfaces/hookParams";
 import { Transaction } from "@/config/interfaces/transactions";
-import { BridgingMethod, IBCToken } from "../interfaces/tokens";
+import { IBCToken, isIBCToken } from "../interfaces/tokens";
+import { BridgingMethod } from "../interfaces/bridgeMethods";
 import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks.utils";
 import { bridgeInGravity } from "./methods/gravityBridge";
 import { bridgeLayerZero } from "./methods/layerZero";
-import { CosmosNetwork, EVMNetwork } from "@/config/interfaces/networks";
 import { ibcInKeplr } from "./keplr/ibcKeplr";
 import { txIBCOut } from "./methods/ibc";
 
@@ -21,19 +21,20 @@ import { txIBCOut } from "./methods/ibc";
 export async function bridgeInTx(
   params: BridgeTransactionParams
 ): PromiseWithError<Transaction[]> {
+  // create tx list
   let transactions: ReturnWithError<Transaction[]>;
+
   // check the selected method to figure out how to create tx
   switch (params.method) {
     case BridgingMethod.GRAVITY_BRIDGE:
       // check to make sure EVM network is selected
-      const gbridgeEVM = isEVMNetwork(params.from.network);
-      if (!gbridgeEVM) {
+      if (!isEVMNetwork(params.from.network)) {
         return NEW_ERROR(
           "bridgeInTx: gravity bridge only works for EVM networks"
         );
       }
       transactions = await bridgeInGravity(
-        Number(params.from.network.chainId),
+        params.from.network.chainId,
         params.from.account,
         params.to.account,
         params.token.data,
@@ -41,29 +42,31 @@ export async function bridgeInTx(
       );
       break;
     case BridgingMethod.LAYER_ZERO:
-      const lzFromEVM = isEVMNetwork(params.from.network);
-      const lzToEVM = isEVMNetwork(params.to.network);
-      if (!(lzFromEVM && lzToEVM)) {
+      if (
+        !(isEVMNetwork(params.from.network) && isEVMNetwork(params.to.network))
+      ) {
         return NEW_ERROR("bridgeInTx: layer zero only works for EVM networks");
       }
       transactions = await bridgeLayerZero(
-        params.from.network as EVMNetwork,
-        params.to.network as EVMNetwork,
+        params.from.network,
+        params.to.network,
         params.from.account,
         params.token.data,
         params.token.amount
       );
       break;
     case BridgingMethod.IBC: {
-      const ibcFromCosmos = isCosmosNetwork(params.from.network);
-      if (!ibcFromCosmos) {
+      if (!isCosmosNetwork(params.from.network)) {
         return NEW_ERROR("bridgeInTx: IBC only works for Cosmos networks");
       }
+      if (!isIBCToken(params.token.data)) {
+        return NEW_ERROR("bridgeInTx: IBC only works for IBC tokens");
+      }
       transactions = await ibcInKeplr(
-        params.from.network as CosmosNetwork,
+        params.from.network,
         params.from.account,
         params.to.account,
-        params.token.data as IBCToken,
+        params.token.data,
         params.token.amount
       );
       break;
@@ -85,36 +88,47 @@ export async function bridgeInTx(
 export async function bridgeOutTx(
   params: BridgeTransactionParams
 ): PromiseWithError<Transaction[]> {
+  // create tx list
   let transactions: ReturnWithError<Transaction[]>;
+
   // check the selected method to figure out how to create tx
   switch (params.method) {
     case BridgingMethod.GRAVITY_BRIDGE:
       return NEW_ERROR("bridgeOutTx: GBRIDGE not implemented");
     case BridgingMethod.LAYER_ZERO:
-      const lzFromEVM = isEVMNetwork(params.from.network);
-      const lzToEVM = isEVMNetwork(params.to.network);
-      if (!(lzFromEVM && lzToEVM)) {
+      if (
+        !(isEVMNetwork(params.from.network) && isEVMNetwork(params.to.network))
+      ) {
         return NEW_ERROR("bridgeOutTx: layer zero only works for EVM networks");
       }
       transactions = await bridgeLayerZero(
-        params.from.network as EVMNetwork,
-        params.to.network as EVMNetwork,
+        params.from.network,
+        params.to.network,
         params.from.account,
         params.token.data,
         params.token.amount
       );
       break;
     case BridgingMethod.IBC: {
-      const toCosmos = isCosmosNetwork(params.to.network);
-      if (!toCosmos) {
-        return NEW_ERROR("bridgeOutTx: IBC only works for cosmos networks");
+      if (
+        !(
+          isEVMNetwork(params.from.network) &&
+          isCosmosNetwork(params.to.network)
+        )
+      ) {
+        return NEW_ERROR(
+          "bridgeOutTx: IBC only works from canto to cosmos networks"
+        );
+      }
+      if (!isIBCToken(params.token.data)) {
+        return NEW_ERROR("bridgeOutTx: IBC only works for IBC tokens");
       }
       transactions = await txIBCOut(
-        Number(params.from.network.chainId),
+        params.from.network.chainId,
         params.from.account,
         params.to.account,
-        params.to.network as CosmosNetwork,
-        params.token.data as IBCToken,
+        params.to.network,
+        params.token.data,
         params.token.amount
       );
       break;

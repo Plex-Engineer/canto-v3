@@ -1,8 +1,4 @@
 "use client";
-import {
-  BridgingMethod,
-  bridgeMethodToString,
-} from "@/hooks/bridge/interfaces/tokens";
 import { getAllUserBridgeTransactionHistory } from "@/hooks/bridge/txHistory";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
@@ -24,10 +20,16 @@ import { BridgeHookReturn } from "@/hooks/bridge/interfaces/hookParams";
 import AnimatedBackground from "@/components/animated_background/animatedBackground";
 import Tabs from "@/components/tabs/tabs";
 import Selector from "./selector/selector";
+import {
+  bridgeMethodToIcon,
+  bridgeMethodToString,
+  BridgingMethod,
+} from "@/hooks/bridge/interfaces/bridgeMethods";
+import { isCosmosNetwork } from "@/utils/networks.utils";
 
 export default function TestPage() {
+  const [txIndex, setTxIndex] = useState<number>(0);
   const [direction, setDirection] = useState<"in" | "out">("in");
-
   const [cosmosAddress, setCosmosAddress] = useState<string>("");
   const [cantoAddress, setCantoAddress] = useState<string>("");
   const { data: signer } = useWalletClient();
@@ -46,7 +48,8 @@ export default function TestPage() {
   useEffect(() => {
     async function getKeplrInfoForBridge() {
       const network = bridgeIn.selections.fromNetwork;
-      const keplrClient = await connectToKeplr(bridgeIn.selections.fromNetwork);
+      if (!network || !isCosmosNetwork(network)) return;
+      const keplrClient = await connectToKeplr(network);
       setCosmosAddress(keplrClient.data?.address);
     }
     getKeplrInfoForBridge();
@@ -129,23 +132,47 @@ export default function TestPage() {
           </Container>
         </Container>
       </>
-
-      <button onClick={() => transactionStore?.clearTransactions()}>
-        CLEAR ALL TRANSACTIONS
-      </button>
-      {transactionStore?.transactions.map((txList, idx) => (
-        <ul key={idx}>
-          <li>txList: {idx}</li>
-          {txList.map((tx, idx2) => (
-            <ul key={idx2}>
+      <Spacer height="100px" />
+      <div
+        style={{
+          border: "solid blue 5px",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <h1
+          style={{
+            display: "flex",
+            flexDirection: "row",
+          }}
+        >
+          TRANSACTIONS{" "}
+          <Button onClick={() => transactionStore?.clearTransactions()}>
+            CLEAR ALL TRANSACTIONS
+          </Button>
+          <Button
+            color={"accent"}
+            onClick={() =>
+              transactionStore?.performTransactions(signer, {
+                txListIndex: txIndex,
+              })
+            }
+          >
+            RETRY TRANSACTION
+          </Button>
+        </h1>
+        <ul>
+          {transactionStore?.transactions[txIndex]?.map((tx, idx) => (
+            <div key={idx}>
+              <li>tx - {idx}</li>
               <li>
-                {idx2}- description: {tx.tx.description}
+                {idx}- description: {tx.tx.description}
               </li>
               <li>
-                {idx2}- status: {tx.status}
+                {idx}- status: {tx.status}
               </li>
               <li>
-                {idx2}-{" "}
+                {idx}-{" "}
                 <a
                   href={tx.txLink}
                   style={{ cursor: "pointer", color: "blue" }}
@@ -153,17 +180,36 @@ export default function TestPage() {
                   link
                 </a>
               </li>
-              <li>
-                <button
-                  onClick={() => transactionStore?.clearTransactions(idx)}
-                >
-                  delete
-                </button>
-              </li>
-            </ul>
+            </div>
           ))}
         </ul>
-      ))}
+        <Spacer height="30px" />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+          }}
+        >
+          <Button
+            onClick={() => {
+              if (txIndex !== 0) setTxIndex((prev) => prev - 1);
+            }}
+          >
+            Backward
+          </Button>
+          <Spacer width="20px" />
+          <Text>Current page: {txIndex + 1}</Text>
+          <Spacer width="20px" />
+          <Button
+            onClick={() => {
+              if (txIndex !== transactionStore?.transactions.length - 1)
+                setTxIndex((prev) => prev + 1);
+            }}
+          >
+            Forward
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -272,56 +318,82 @@ const Bridge = (props: BridgeProps) => {
         );
       });
   }
+
+  const networkSelectors = (
+    <>
+      <label>From Network</label>
+      <Selector
+        title="SELECT FROM NETWORK"
+        activeItem={props.bridge.selections.fromNetwork}
+        items={
+          props.bridge.direction === "in"
+            ? props.bridge.allOptions.networks
+            : []
+        }
+        onChange={
+          props.bridge.direction === "in"
+            ? props.bridge.setters.network
+            : () => false
+        }
+      />
+      <label>To Network</label>
+      <Selector
+        title="SELECT TO NETWORK"
+        activeItem={props.bridge.selections.toNetwork}
+        items={
+          props.bridge.direction === "out"
+            ? props.bridge.allOptions.networks
+            : []
+        }
+        onChange={
+          props.bridge.direction === "out"
+            ? props.bridge.setters.network
+            : () => false
+        }
+      />
+    </>
+  );
+  const tokenSelector = (
+    <>
+      <Text size="sm">Select Token</Text>
+      <Selector
+        title="SELECT TOKEN"
+        activeItem={props.bridge.selections.token}
+        items={props.bridge.allOptions.tokens}
+        onChange={props.bridge.setters.token}
+      />
+    </>
+  );
+
+  const orderedSelectors =
+    props.bridge.direction === "in" ? (
+      <>
+        {networkSelectors}
+        {tokenSelector}
+      </>
+    ) : (
+      <>
+        {tokenSelector}
+        {networkSelectors}
+      </>
+    );
   return (
     <>
       <section className={styles.container}>
         <div className={styles["network-selection"]}>
-          <label>From Network</label>
-          <Selector
-            title="SELECT FROM NETWORK"
-            activeItem={props.bridge.selections.fromNetwork}
-            items={
-              props.bridge.direction === "in"
-                ? props.bridge.allOptions.networks
-                : []
-            }
-            onChange={
-              props.bridge.direction === "in"
-                ? props.bridge.setters.network
-                : () => false
-            }
-          />
-          <label>To Network</label>
-          <Selector
-            title="SELECT TO NETWORK"
-            activeItem={props.bridge.selections.toNetwork}
-            items={
-              props.bridge.direction === "out"
-                ? props.bridge.allOptions.networks
-                : []
-            }
-            onChange={
-              props.bridge.direction === "out"
-                ? props.bridge.setters.network
-                : () => false
-            }
-          />
-          <Text size="sm">Select Token</Text>
-          <Selector
-            title="SELECT TOKEN"
-            activeItem={props.bridge.selections.token}
-            items={props.bridge.allOptions.tokens}
-            onChange={props.bridge.setters.token}
-          />
+          {orderedSelectors}
           <Text size="sm">Select Method</Text>
           <Selector
             title="SELECT METHOD"
             activeItem={{
               name: bridgeMethodToString(props.bridge.selections.method),
+              id: props.bridge.selections.method,
+              icon: bridgeMethodToIcon(props.bridge.selections.method),
             }}
             items={props.bridge.allOptions.methods.map((method) => ({
               name: bridgeMethodToString(method),
-              id: method
+              id: method,
+              icon: bridgeMethodToIcon(method),
             }))}
             onChange={props.bridge.setters.method}
           />

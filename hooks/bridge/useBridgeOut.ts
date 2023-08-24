@@ -15,7 +15,8 @@ import {
   ReturnWithError,
 } from "@/config/interfaces/errors";
 import { BaseNetwork } from "@/config/interfaces/networks";
-import { BridgeToken, BridgingMethod, IBCToken } from "./interfaces/tokens";
+import { BridgeOutToken, isBridgeOutToken } from "./interfaces/tokens";
+import { BridgingMethod } from "./interfaces/bridgeMethods";
 import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
 import { Transaction } from "@/config/interfaces/transactions";
 import useTokenBalances from "../helpers/useTokenBalances";
@@ -29,7 +30,7 @@ export default function useBridgeOut(
     // all options
     availableTokens: BRIDGE_OUT_TOKENS.chainTokenList[
       props.testnet ? "canto-testnet" : "canto-mainnet"
-    ] as BridgeToken[],
+    ] as BridgeOutToken[],
     availableNetworks: [],
     availableMethods: [],
     // default selections
@@ -73,8 +74,11 @@ export default function useBridgeOut(
       ? NO_ERROR(network)
       : NEW_ERROR("useBridgeOut::getNetwork: network not found:" + id);
   }
-  function getToken(id: string): ReturnWithError<BridgeToken> {
+  function getToken(id: string): ReturnWithError<BridgeOutToken> {
     const token = state.availableTokens.find((token) => token.id === id);
+    if (!isBridgeOutToken(token)) {
+      throw new Error("useBridgeOut::getToken: invalid token type: " + id);
+    }
     return token
       ? NO_ERROR(token)
       : NEW_ERROR("useBridgeOut::getToken: token not found:" + id);

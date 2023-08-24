@@ -7,9 +7,9 @@ import { tryFetch } from "../async.utils";
 import {
   getCosmosAPIEndpoint,
   getNetworkInfoFromChainId,
+  isCosmosNetwork,
 } from "../networks.utils";
 import { UserTokenBalances } from "@/hooks/bridge/interfaces/tokens";
-import { CosmosNetwork } from "@/config/interfaces/networks";
 
 /**
  * @notice gets canto balance from cosmos
@@ -55,10 +55,13 @@ export async function getCosmosTokenBalanceList(
   if (chainError) {
     return NEW_ERROR("getCosmosTokenBalanceList::" + chainError.message);
   }
-  if (
-    (cosmosChain as CosmosNetwork).checkAddress &&
-    !(cosmosChain as CosmosNetwork).checkAddress(cosmosAddress)
-  ) {
+  if (!isCosmosNetwork(cosmosChain)) {
+    return NEW_ERROR(
+      "getCosmosTokenBalanceList::Invalid chainId for cosmos: " + chainId
+    );
+  }
+
+  if (!cosmosChain.checkAddress(cosmosAddress)) {
     return NEW_ERROR(
       "getCosmosTokenBalanceList::Invalid address for chain: " + cosmosAddress
     );

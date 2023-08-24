@@ -2,6 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 import {
   Transaction,
@@ -106,7 +107,7 @@ const useTransactionStore = create<TransactionStore>()(
               const { data: receipt, error: txReceiptError } =
                 await waitForTransaction(
                   transactions[i].tx.type,
-                  transactions[i].tx.chainId as number,
+                  transactions[i].tx.chainId,
                   txHash
                 );
               // check receipt for error
@@ -123,10 +124,9 @@ const useTransactionStore = create<TransactionStore>()(
                 status: "SUCCESS",
               });
             }
-          } catch (error) {
+          } catch (err) {
             return NEW_ERROR(
-              "useTransactionStore::performTransactions: " +
-                (error as Error).message
+              "useTransactionStore::performTransactions: " + errMsg(err)
             );
           }
 

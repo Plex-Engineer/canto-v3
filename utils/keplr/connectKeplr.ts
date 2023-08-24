@@ -2,6 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 import { CosmosNetwork } from "@/config/interfaces/networks";
 import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
@@ -35,6 +36,6 @@ export async function connectToKeplr(
     );
     return NO_ERROR({ client, address: accounts[0].address });
   } catch (err) {
-    return NEW_ERROR("connectToKeplr: " + (err as Error).message);
+    return NEW_ERROR("connectToKeplr: " + errMsg(err));
   }
 }

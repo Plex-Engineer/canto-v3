@@ -5,6 +5,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 import { tryFetch } from "@/utils/async.utils";
 import {
@@ -102,7 +103,7 @@ async function getUserGBridgeInEvents(
     });
     return NO_ERROR(formattedEvents);
   } catch (err) {
-    return NEW_ERROR("getUserGBridgeInEvents::" + (err as Error).message);
+    return NEW_ERROR("getUserGBridgeInEvents::" + errMsg(err));
   }
 }
 

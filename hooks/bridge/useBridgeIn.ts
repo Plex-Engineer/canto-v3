@@ -16,7 +16,12 @@ import {
 } from "./interfaces/hookParams";
 import useAutoSelect from "../helpers/useAutoSelect";
 import { BaseNetwork } from "@/config/interfaces/networks";
-import { BridgeToken, BridgingMethod } from "./interfaces/tokens";
+import {
+  BridgeInToken,
+  isBridgeInToken,
+  isBridgeInTokenList,
+} from "./interfaces/tokens";
+import { BridgingMethod } from "./interfaces/bridgeMethods";
 import { Transaction } from "@/config/interfaces/transactions";
 import useTokenBalances from "../helpers/useTokenBalances";
 
@@ -73,8 +78,11 @@ export default function useBridgeIn(
       ? NO_ERROR(network)
       : NEW_ERROR("useBridgeIn::getNetwork: network not found:" + id);
   }
-  function getToken(id: string): ReturnWithError<BridgeToken> {
+  function getToken(id: string): ReturnWithError<BridgeInToken> {
     const token = state.availableTokens.find((token) => token.id === id);
+    if (!isBridgeInToken(token)) {
+      return NEW_ERROR("useBridgeIn::getToken: invalid token type:" + id);
+    }
     return token
       ? NO_ERROR(token)
       : NEW_ERROR("useBridgeIn::getToken: token not found:" + id);
@@ -93,13 +101,20 @@ export default function useBridgeIn(
     if (networkError) {
       throw new Error("useBridgeIn::setNetwork::" + networkError.message);
     }
-    const tokens = BRIDGE_IN_TOKEN_LIST.chainTokenList[
-      network.id as keyof typeof BRIDGE_IN_TOKEN_LIST.chainTokenList
-    ] as BridgeToken[];
+    const tokens =
+      BRIDGE_IN_TOKEN_LIST.chainTokenList[
+        network.id as keyof typeof BRIDGE_IN_TOKEN_LIST.chainTokenList
+      ];
     if (!tokens || tokens.length === 0) {
       throw new Error(
         "useBridgeIn::setNetwork: No tokens available for network: " +
           network.id
+      );
+    }
+    // check token type to make sure they are all bridgeInTokens
+    if (!isBridgeInTokenList(tokens)) {
+      throw new Error(
+        "useBridgeIn::setNetwork: Invalid token type for network: " + network.id
       );
     }
     setState((prevState) => ({
@@ -132,7 +147,7 @@ export default function useBridgeIn(
     setState((prevState) => ({
       ...prevState,
       selectedToken: token,
-      availableMethods: bridgeMethods as BridgingMethod[],
+      availableMethods: bridgeMethods,
       // reset method selection
       selectedMethod: null,
     }));

@@ -1,42 +1,18 @@
-import { ERC20Token } from "@/config/interfaces/tokens";
+import { ERC20Token, isERC20Token } from "@/config/interfaces/tokens";
+import { BridgingMethod } from "./bridgeMethods";
 
-export enum BridgingMethod {
-  GRAVITY_BRIDGE = "0",
-  IBC = "1",
-  LAYER_ZERO = "2",
-}
-
-/**
- *
- * @param {BridgingMethod} method for bridging
- * @returns string representation of bridging method
- */
-export function bridgeMethodToString(method: BridgingMethod): string {
-  switch (method) {
-    case BridgingMethod.GRAVITY_BRIDGE:
-      return "Gravity Bridge";
-    case BridgingMethod.IBC:
-      return "IBC";
-    case BridgingMethod.LAYER_ZERO:
-      return "Layer Zero";
-    default:
-      return "Unknown";
-  }
-}
-
-export type BridgeToken = (BridgeInToken | BridgeOutToken) &
-  (ERC20Token | IBCToken);
+export type BridgeToken = BridgeInToken | BridgeOutToken;
 
 // BridgeIn and BridgeOut are the same thing, but with different bridging methods object
-interface BridgeInToken {
+export type BridgeInToken = {
   bridgeMethods: BridgingMethod[];
-}
-interface BridgeOutToken {
+} & (ERC20Token | IBCToken);
+export type BridgeOutToken = {
   bridgeMethods: {
     chainId: string;
     methods: BridgingMethod[];
   }[];
-}
+} & (ERC20Token | IBCToken);
 
 // extends ERC20 since all IBC tokens supported on Canto will have
 // an ERC20 representation
@@ -48,4 +24,89 @@ export interface IBCToken extends ERC20Token {
 // for user balance data on bridge
 export interface UserTokenBalances {
   [key: string]: string; // token id => balance
+}
+
+///
+/// Functions to check token objects for type (type guarding)
+///
+
+/**
+ * Checks if object is IBCToken
+ * @param {object} object to check
+ * @returns {boolean} true if object is IBCToken
+ * @see IBCToken
+ */
+export function isIBCToken(object: any): object is IBCToken {
+  return isERC20Token(object) && "ibcDenom" in object && "nativeName" in object;
+}
+
+///
+/// ** Bridge In Token Typeguards **
+///
+
+/**
+ * Checks if object is BridgeInToken
+ * @param {object} object to check
+ * @returns {boolean} true if object is BridgeInToken
+ * @see BridgeInToken
+ */
+export function isBridgeInToken(
+  object: any
+): object is BridgeInToken & BridgeToken {
+  return (
+    (isERC20Token(object) || isIBCToken(object)) &&
+    "bridgeMethods" in object &&
+    Array.isArray(object.bridgeMethods)
+  );
+}
+
+/**
+ * Checks if array is BridgeInToken[]
+ * @param {object} array to check
+ * @returns {boolean} true if array is BridgeInToken[]
+ * @see BridgeInToken
+ */
+export function isBridgeInTokenList(
+  array: Array<object>
+): array is BridgeInToken[] & BridgeToken[] {
+  return array.every(isBridgeInToken);
+}
+
+///
+/// ** Bridge Out Token Typeguards **
+///
+
+/**
+ * Checks if object is BridgeOutToken
+ * @param {object} object to check
+ * @returns {boolean} true if object is BridgeOutToken
+ * @see BridgeOutToken
+ */
+export function isBridgeOutToken(
+  object: any
+): object is BridgeOutToken & BridgeToken {
+  return (
+    (isERC20Token(object) || isIBCToken(object)) &&
+    "bridgeMethods" in object &&
+    Array.isArray(object.bridgeMethods) &&
+    object.bridgeMethods.every((method: object) => {
+      return (
+        "chainId" in method &&
+        "methods" in method &&
+        Array.isArray(method.methods)
+      );
+    })
+  );
+}
+
+/**
+ * Checks if array is BridgeOutToken[]
+ * @param {object} array to check
+ * @returns {boolean} true if array is BridgeOutToken[]
+ * @see BridgeOutToken
+ */
+export function isBridgeOutTokenList(
+  array: Array<object>
+): array is BridgeOutToken[] & BridgeToken[] {
+  return array.every(isBridgeOutToken);
 }

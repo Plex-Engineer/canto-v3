@@ -11,9 +11,7 @@ import {
   waitForCosmosTx,
 } from "./cosmos/transactions/performCosmosTx";
 import { waitForTransaction as evmWait } from "wagmi/actions";
-import { tryFetchWithRetry } from "./async.utils";
 import { performKeplrTx } from "./keplr/performKeplrTx";
-import { getCosmosAPIEndpoint } from "./networks.utils";
 
 /**
  * @notice performs a single transaction

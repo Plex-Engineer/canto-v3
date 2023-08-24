@@ -2,6 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 import { IBCToken } from "../../interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
@@ -202,7 +203,7 @@ export async function getBlockTimestamp(
     const ms = Date.parse(ts);
     // return as nano-seconds
     return NO_ERROR(Number(ms * 1e7 + 600 * 1e9).toString());
-  } catch (error) {
-    return NEW_ERROR("getBlockTimestamp: " + (error as Error).message);
+  } catch (err) {
+    return NEW_ERROR("getBlockTimestamp: " + errMsg(err));
   }
 }

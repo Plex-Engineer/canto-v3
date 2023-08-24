@@ -7,6 +7,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 import {
   getProviderWithoutSigner,
@@ -90,6 +91,6 @@ export async function getUserLayerZeroHistory(
       receiveFromChain: formattedFromEvents,
     });
   } catch (err) {
-    return NEW_ERROR("getUserLayerZeroHistory::" + (err as Error).message);
+    return NEW_ERROR("getUserLayerZeroHistory::" + errMsg(err));
   }
 }

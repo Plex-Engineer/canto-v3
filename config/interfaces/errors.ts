@@ -13,3 +13,10 @@ export const NEW_ERROR = <T>(msg: string): ReturnWithError<T> => ({
   data: null as T,
   error: new Error(msg),
 });
+
+export const errMsg = (error: any): string => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return error;
+};

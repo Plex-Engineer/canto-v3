@@ -3,6 +3,7 @@ import {
   NO_ERROR,
   PromiseWithError,
   ReturnWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 import {
   CosmosTxContext,
@@ -139,10 +140,8 @@ export async function signAndBroadcastCosmosTransaction(
       );
     }
     return NO_ERROR(broadcastPost.data);
-  } catch (error) {
-    return NEW_ERROR(
-      "signAndBroadcastCosmosTransaction: " + (error as Error).message
-    );
+  } catch (err) {
+    return NEW_ERROR("signAndBroadcastCosmosTransaction: " + errMsg(err));
   }
 }
 

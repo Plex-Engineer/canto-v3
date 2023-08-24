@@ -3,7 +3,11 @@ import {
   NO_ERROR,
   ReturnWithError,
 } from "@/config/interfaces/errors";
-import { BaseNetwork } from "@/config/interfaces/networks";
+import {
+  BaseNetwork,
+  CosmosNetwork,
+  EVMNetwork,
+} from "@/config/interfaces/networks";
 import { Chain } from "@/config/interfaces/transactions";
 import * as NETWORKS from "@/config/networks";
 import * as COSMOS_NETWORKS from "@/config/networks/cosmos";
@@ -13,7 +17,7 @@ import * as COSMOS_NETWORKS from "@/config/networks/cosmos";
  * @param {BaseNetwork} network network to check if EVM
  * @returns {boolean} true if network is an EVM chain
  */
-export function isEVMNetwork(network: BaseNetwork): boolean {
+export function isEVMNetwork(network: BaseNetwork): network is EVMNetwork {
   return typeof network.chainId === "number";
 }
 
@@ -22,7 +26,9 @@ export function isEVMNetwork(network: BaseNetwork): boolean {
  * @param {BaseNetwork} network network to check if Cosmos
  * @returns {boolean} true if network is a Cosmos chain
  */
-export function isCosmosNetwork(network: BaseNetwork): boolean {
+export function isCosmosNetwork(
+  network: BaseNetwork
+): network is CosmosNetwork {
   return typeof network.chainId === "string";
 }
 

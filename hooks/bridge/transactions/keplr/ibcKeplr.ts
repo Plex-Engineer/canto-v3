@@ -2,6 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 import {
   coin,
@@ -197,7 +198,7 @@ async function signAndBroadcastIBCKeplr(
     );
     return NO_ERROR(ibcResponse);
   } catch (err) {
-    return NEW_ERROR("signAndBroadcastIBCKeplr::" + (err as Error).message);
+    return NEW_ERROR("signAndBroadcastIBCKeplr::" + errMsg(err));
   }
 }
 
@@ -309,7 +310,7 @@ async function injectiveIBCIn(
         )
       );
     } catch (err) {
-      return NEW_ERROR("injectiveIBCIn::" + (err as Error).message);
+      return NEW_ERROR("injectiveIBCIn::" + errMsg(err));
     }
   }
 
@@ -455,9 +456,7 @@ async function evmosIBCIn(
       }
       return NO_ERROR(broadcastPost.tx_response);
     } catch (err) {
-      return NEW_ERROR(
-        "evmosIBCIn::signAndBroadcast::" + (err as Error).message
-      );
+      return NEW_ERROR("evmosIBCIn::signAndBroadcast::" + errMsg(err));
     }
   }
   return NO_ERROR([

@@ -2,6 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 
 const DEFAULT_HEADER = {
@@ -28,8 +29,8 @@ export async function tryFetch<T>(
     }
     const data = await response.json();
     return NO_ERROR<T>(data);
-  } catch (error) {
-    return NEW_ERROR("tryFetch::" + (error as Error).message);
+  } catch (err) {
+    return NEW_ERROR("tryFetch::" + errMsg(err));
   }
 }
 

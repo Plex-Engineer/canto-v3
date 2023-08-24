@@ -21,12 +21,12 @@ export async function getAllUserBridgeTransactionHistory(
 ): PromiseWithError<AllUserBridgeTransactionHistory> {
   const [layerZero, gravityBridge, ibc] = await Promise.all([
     getUserLayerZeroHistory(
-      CANTO_MAINNET_EVM.chainId as number,
+      CANTO_MAINNET_EVM.chainId,
       "0x56C03B8C4FA80Ba37F5A7b60CAAAEF749bB5b220",
       ethAccount
     ),
     getUserGBridgeInHistory(ETH_MAINNET.chainId, ethAccount),
-    getAllIBCTransactions(CANTO_MAINNET_EVM.chainId as number, ethAccount),
+    getAllIBCTransactions(CANTO_MAINNET_EVM.chainId, ethAccount),
   ]);
   return NO_ERROR({
     layerZero: layerZero.data,

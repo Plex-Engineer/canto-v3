@@ -2,6 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 import BigNumber from "bignumber.js";
 import {
@@ -48,7 +49,7 @@ export async function getEVMTokenBalanceList(
     });
     return NO_ERROR(balances);
   } catch (err) {
-    return NEW_ERROR("getTokenBalanceList::" + (err as Error).message);
+    return NEW_ERROR("getTokenBalanceList::" + errMsg(err));
   }
 }
 
@@ -76,8 +77,8 @@ export async function getTokenBalance(
     );
     const balance = await tokenContract.methods.balanceOf(account).call();
     return NO_ERROR(new BigNumber(balance as string));
-  } catch (error) {
-    return NEW_ERROR("getTokenBalance::" + (error as Error).message);
+  } catch (err) {
+    return NEW_ERROR("getTokenBalance::" + errMsg(err));
   }
 }
 
@@ -113,8 +114,8 @@ export async function checkTokenAllowance(
     return NO_ERROR(
       new BigNumber(allowance as string).isGreaterThanOrEqualTo(amount)
     );
-  } catch (error) {
-    return NEW_ERROR("checkTokenAllowance::" + (error as Error).message);
+  } catch (err) {
+    return NEW_ERROR("checkTokenAllowance::" + errMsg(err));
   }
 }
 
