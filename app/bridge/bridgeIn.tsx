@@ -7,12 +7,14 @@ import Container from "@/components/container/container";
 import Spacer from "@/components/layout/spacer";
 import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
+import Selector from "../selector/selector";
+import { Item } from "../selector/selector";
 
 const BridgeIn = () => {
-  const mockNetworks = [
+  const mockNetworks: Item[] = [
     {
-      name: "Ethereum",
       iconUrl: "/networks/ethereum.svg",
+      name: "Ethereum",
       balance: 0.43,
     },
     {
@@ -26,6 +28,8 @@ const BridgeIn = () => {
       balance: 0.43,
     },
   ];
+
+  const [activeMockNetwork, setActiveMockNetwork] = useState(mockNetworks[0]);
 
   const [selectedNetwork, setSelectedNetwork] = useState(mockNetworks[0]);
 
@@ -148,6 +152,16 @@ const BridgeIn = () => {
                 />
               </Button>
             </Container>
+            {/* mock network selector */}
+            <Selector
+              title="SELECT NETWORK"
+              activeItem={activeMockNetwork}
+              items={mockNetworks}
+              onChange={(item) => {
+                console.log(item);
+                setActiveMockNetwork(item);
+              }}
+            />
           </div>
         </div>
         <Spacer height="100%" />

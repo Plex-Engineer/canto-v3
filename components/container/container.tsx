@@ -12,11 +12,15 @@ interface Props {
     vertical?: boolean;
   };
   layer?: number;
+  className?: string;
+  onClick?: () => void;
 }
 
 const Container = (props: Props) => {
   return (
     <div
+      className={props.className}
+      onClick={props.onClick}
       style={{
         margin: props.margin,
         padding: props.padding,
