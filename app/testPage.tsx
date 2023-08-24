@@ -14,19 +14,16 @@ import { createMsgsClaimStakingRewards } from "@/utils/cosmos/transactions/messa
 import { createMsgsDelegate } from "@/utils/cosmos/transactions/messages/staking/delegate";
 import { connectToKeplr } from "@/utils/keplr/connectKeplr";
 import { useEffect, useState } from "react";
-import { formatUnits } from "viem";
 import { useWalletClient } from "wagmi";
 import Text from "@/components/text";
 import styles from "./bridge/bridge.module.scss";
-import Image from "next/image";
 import Container from "@/components/container/container";
 import Spacer from "@/components/layout/spacer";
-import Icon from "@/components/icon/icon";
-import Modal from "@/components/modal/modal";
 import Button from "@/components/button/button";
 import { BridgeHookReturn } from "@/hooks/bridge/interfaces/hookParams";
 import AnimatedBackground from "@/components/animated_background/animatedBackground";
 import Tabs from "@/components/tabs/tabs";
+import Selector from "./selector/selector";
 
 export default function TestPage() {
   const [direction, setDirection] = useState<"in" | "out">("in");
@@ -181,10 +178,6 @@ interface BridgeProps {
   };
 }
 const Bridge = (props: BridgeProps) => {
-  const [choosingNetwork, setChoosingNetwork] = useState(false);
-  const [choosingToken, setChoosingToken] = useState(false);
-  const [choosingMethod, setChoosingMethod] = useState(false);
-
   function formatParamsBridgeIn(params: {
     ethAddress: string;
     userCosmosAddress: string;
@@ -213,7 +206,6 @@ const Bridge = (props: BridgeProps) => {
         };
     }
   }
-
   async function bridgeInTest() {
     props.bridge
       .bridge(
@@ -236,7 +228,6 @@ const Bridge = (props: BridgeProps) => {
         );
       });
   }
-
   function formatParamsBridgeOut(params: {
     ethAddress: string;
     userCosmosAddress: string;
@@ -259,7 +250,6 @@ const Bridge = (props: BridgeProps) => {
         };
     }
   }
-
   async function bridgeOutTest() {
     props.bridge
       .bridge(
@@ -284,236 +274,59 @@ const Bridge = (props: BridgeProps) => {
   }
   return (
     <>
-      <Modal
-        open={choosingNetwork}
-        onClose={() => {
-          setChoosingNetwork(false);
-        }}
-        width="30rem"
-        height="36rem"
-      >
-        <ul>
-          {props.bridge.allOptions.networks.map((network) => (
-            <li key={network.id}>
-              <Button
-                color={
-                  (
-                    props.bridge.direction === "in"
-                      ? network.id === props.bridge.selections?.fromNetwork?.id
-                      : network.id === props.bridge.selections?.toNetwork?.id
-                  )
-                    ? "accent"
-                    : "primary"
-                }
-                icon={{
-                  url: network.icon,
-                  position: "left",
-                }}
-                onClick={() => {
-                  props.bridge.setters.network(network.id);
-                  setChoosingNetwork(false);
-                }}
-              >
-                {network.name}
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </Modal>
-      <Modal
-        open={choosingToken}
-        onClose={() => setChoosingToken(false)}
-        width="30rem"
-        height="36rem"
-      >
-        <Text>Choose a Token</Text>
-        <ul>
-          {props.bridge.allOptions.tokens.map((token) => (
-            <li key={token.id}>
-              <Button
-                color={
-                  token.id === props.bridge.selections.token?.id
-                    ? "accent"
-                    : "primary"
-                }
-                icon={{
-                  url: token.icon,
-                  position: "left",
-                }}
-                onClick={() => {
-                  props.bridge.setters.token(token.id);
-                  setChoosingToken(false);
-                }}
-              >
-                {token.name}
-                {"  "}
-                {formatUnits(BigInt(token.balance ?? 0), token.decimals)}
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </Modal>
-      <Modal
-        open={choosingMethod}
-        onClose={() => setChoosingMethod(false)}
-        width="30rem"
-        height="36rem"
-      >
-        <Text>Choose a Method</Text>
-        <ul>
-          {props.bridge.allOptions.methods.map((method) => (
-            <li key={method}>
-              <Button
-                color={
-                  method === props.bridge.selections.method
-                    ? "accent"
-                    : "primary"
-                }
-                onClick={() => {
-                  props.bridge.setters.method(method);
-                  setChoosingMethod(false);
-                }}
-              >
-                {bridgeMethodToString(method)}
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </Modal>
-
       <section className={styles.container}>
         <div className={styles["network-selection"]}>
-          <Text size="sm">Select Network</Text>
-          <div className={styles["networks-box"]}>
-            <Button
-              color="secondary"
-              height={64}
-              width="fill"
-              onClick={() => {
-                setChoosingNetwork(true);
-              }}
-            >
-              <Container width="50px">
-                <Text size="x-sm" theme="secondary-dark">
-                  From
-                </Text>
-              </Container>
-              <div className={styles.token}>
-                <Image
-                  src={props.bridge.selections.fromNetwork?.icon ?? ""}
-                  alt={`${props.bridge.selections.fromNetwork?.name} icon`}
-                  width={30}
-                  height={30}
-                />
-                <Text size="md" font="proto_mono">
-                  {props.bridge.selections.fromNetwork?.name}
-                </Text>
-              </div>
-              <Icon
-                icon={{
-                  url: "dropdown.svg",
-                  size: 24,
-                }}
-              />
-            </Button>
-            <div className={styles["network-box"]}>
-              <Container width="50px">
-                <Text size="x-sm" theme="secondary-dark">
-                  To
-                </Text>
-              </Container>
-              <div className={styles.token}>
-                <Image
-                  src={props.bridge.selections.toNetwork?.icon ?? ""}
-                  alt={"canto icon"}
-                  width={30}
-                  height={30}
-                />
-                <Text size="md" font="proto_mono">
-                  {props.bridge.selections.toNetwork?.name}
-                </Text>
-              </div>
-            </div>
-          </div>
+          <label>From Network</label>
+          <Selector
+            title="SELECT FROM NETWORK"
+            activeItem={props.bridge.selections.fromNetwork}
+            items={
+              props.bridge.direction === "in"
+                ? props.bridge.allOptions.networks
+                : []
+            }
+            onChange={
+              props.bridge.direction === "in"
+                ? props.bridge.setters.network
+                : () => false
+            }
+          />
+          <label>To Network</label>
+          <Selector
+            title="SELECT TO NETWORK"
+            activeItem={props.bridge.selections.toNetwork}
+            items={
+              props.bridge.direction === "out"
+                ? props.bridge.allOptions.networks
+                : []
+            }
+            onChange={
+              props.bridge.direction === "out"
+                ? props.bridge.setters.network
+                : () => false
+            }
+          />
+          <Text size="sm">Select Token</Text>
+          <Selector
+            title="SELECT TOKEN"
+            activeItem={props.bridge.selections.token}
+            items={props.bridge.allOptions.tokens}
+            onChange={props.bridge.setters.token}
+          />
+          <Text size="sm">Select Method</Text>
+          <Selector
+            title="SELECT METHOD"
+            activeItem={{
+              name: bridgeMethodToString(props.bridge.selections.method),
+            }}
+            items={props.bridge.allOptions.methods.map((method) => ({
+              name: bridgeMethodToString(method),
+              id: method
+            }))}
+            onChange={props.bridge.setters.method}
+          />
         </div>
         <Spacer height="100px" />
-
-        <div className={styles["token-selection"]}>
-          <Text size="sm">Select Token</Text>
-          <div className={styles["token-box"]}>
-            <Container width="50%">
-              <Button
-                color="secondary"
-                width="fill"
-                height="large"
-                onClick={() => {
-                  setChoosingToken(true);
-                }}
-              >
-                <Container
-                  width="100%"
-                  direction="row"
-                  gap={20}
-                  center={{
-                    vertical: true,
-                  }}
-                >
-                  <Image
-                    src={props.bridge.selections.token?.icon ?? ""}
-                    alt={"graviton icon"}
-                    width={30}
-                    height={30}
-                  />
-                  <Text size="md" font="proto_mono">
-                    {props.bridge.selections.token?.name}
-                  </Text>
-                </Container>
-                <Icon
-                  icon={{
-                    url: "dropdown.svg",
-                    size: 24,
-                  }}
-                />
-              </Button>
-            </Container>
-          </div>
-        </div>
-        <Spacer height="100%" />
-        <div className={styles["token-selection"]}>
-          <Text size="sm">Select Method</Text>
-          <div className={styles["token-box"]}>
-            <Container width="50%">
-              <Button
-                color="secondary"
-                width="fill"
-                height="large"
-                onClick={() => {
-                  setChoosingMethod(true);
-                }}
-              >
-                <Container
-                  width="100%"
-                  direction="row"
-                  gap={20}
-                  center={{
-                    vertical: true,
-                  }}
-                >
-                  <Text size="md" font="proto_mono">
-                    {bridgeMethodToString(props.bridge.selections.method)}
-                  </Text>
-                </Container>
-                <Icon
-                  icon={{
-                    url: "dropdown.svg",
-                    size: 24,
-                  }}
-                />
-              </Button>
-            </Container>
-          </div>
-        </div>
-        <Spacer height="100%" />
         <Button
           width="fill"
           onClick={() => {

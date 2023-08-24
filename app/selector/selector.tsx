@@ -8,16 +8,17 @@ import React, { use, useMemo, useState } from "react";
 import styles from "./selector.module.scss";
 
 export interface Item {
-  iconUrl: string;
+  id: string;
+  icon: string;
   name: string;
   balance?: number;
 }
 
 interface Props {
   title: string;
-  activeItem: Item;
+  activeItem?: Item;
   items: Item[];
-  onChange: (item: Item) => void;
+  onChange: (itemId: string) => void;
 }
 const Selector = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -49,18 +50,18 @@ const Selector = (props: Props) => {
               }}
               className={styles.item}
               onClick={() => {
-                props.onChange(item);
+                props.onChange(item.id);
                 setIsOpen(false);
               }}
             >
               <Image
-                src={item.iconUrl}
+                src={item.icon}
                 alt={item.name}
                 width={30}
                 height={30}
               />
               <Text size="md" font="proto_mono">
-                {item.name}
+                {item.name}{" / "}{item.balance}
               </Text>
             </Container>
           ))}
@@ -83,13 +84,13 @@ const Selector = (props: Props) => {
           }}
         >
           <Image
-            src={props.activeItem.iconUrl}
-            alt={props.activeItem.name + " icon"}
+            src={props.activeItem?.icon ?? ""}
+            alt={props.activeItem?.name + " icon"}
             width={30}
             height={30}
           />
           <Text size="md" font="proto_mono">
-            {props.activeItem.name}
+            {props.activeItem?.name ?? "SELECT ITEM"}
           </Text>
         </Container>
         <Icon
