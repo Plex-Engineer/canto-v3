@@ -37,7 +37,7 @@ interface MessageIBCOutParams {
   denom: string;
   // Addresses
   cosmosReceiver: string;
-  cantoSender: string;
+  cosmosSender: string;
   // Timeout
   revisionNumber: number;
   revisionHeight: number;
@@ -51,11 +51,11 @@ interface MessageIBCOutParams {
  * @param {MessageIBCOutParams} params IBC out parameters
  * @returns {UnsignedCosmosMessages} eip and cosmos messages along with types object and fee
  */
-export function createMsgsIBCOut(
+export function createMsgsIBCTransfer(
   params: MessageIBCOutParams
 ): UnsignedCosmosMessages {
-  const eipMsg = eip712MsgIBCOut(params);
-  const cosmosMsg = protoMsgIBCOut(params);
+  const eipMsg = eip712MsgIBCTransfer(params);
+  const cosmosMsg = protoMsgIBCTransfer(params);
   return {
     eipMsg,
     cosmosMsg,
@@ -64,12 +64,12 @@ export function createMsgsIBCOut(
   };
 }
 
-function eip712MsgIBCOut(params: MessageIBCOutParams): EIP712Message {
+function eip712MsgIBCTransfer(params: MessageIBCOutParams): EIP712Message {
   return {
     type: "cosmos-sdk/MsgTransfer",
     value: {
       receiver: params.cosmosReceiver,
-      sender: params.cantoSender,
+      sender: params.cosmosSender,
       source_channel: params.sourceChannel,
       source_port: params.sourcePort,
       timeout_height: {
@@ -85,7 +85,7 @@ function eip712MsgIBCOut(params: MessageIBCOutParams): EIP712Message {
   };
 }
 
-function protoMsgIBCOut(params: MessageIBCOutParams): CosmosNativeMessage {
+function protoMsgIBCTransfer(params: MessageIBCOutParams): CosmosNativeMessage {
   const token = new Coin({
     denom: params.denom,
     amount: params.amount,
@@ -98,7 +98,7 @@ function protoMsgIBCOut(params: MessageIBCOutParams): CosmosNativeMessage {
     sourcePort: params.sourcePort,
     sourceChannel: params.sourceChannel,
     token,
-    sender: params.cantoSender,
+    sender: params.cosmosSender,
     receiver: params.cosmosReceiver,
     timeoutHeight: height,
     timeoutTimestamp: BigInt(parseInt(params.timeoutTimestamp, 10)),

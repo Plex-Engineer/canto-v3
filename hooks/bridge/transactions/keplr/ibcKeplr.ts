@@ -12,8 +12,8 @@ import { IBCToken } from "../../interfaces/tokens";
 import { CosmosNetwork } from "@/config/interfaces/networks";
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
 import { checkPubKeyETH, ethToCantoAddress } from "@/utils/address.utils";
-import { CANTO_MAINNET_COSMOS, INJECTIVE } from "@/config/networks";
-import { getBlockTimestamp } from "../methods/ibc";
+import { CANTO_MAINNET_COSMOS, EVMOS, INJECTIVE } from "@/config/networks";
+import { getBlockTimestamp, getIBCData } from "../methods/ibc";
 import { Transaction } from "@/config/interfaces/transactions";
 import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
 import { connectToKeplr } from "@/utils/keplr/connectKeplr";
@@ -32,6 +32,17 @@ import {
   DEFAULT_BLOCK_TIMEOUT_HEIGHT,
   BigNumberInBase,
 } from "@injectivelabs/utils";
+import {
+  createTransactionWithMultipleMessages,
+  createTxRaw,
+} from "@evmos/proto";
+import { createMsgsIBCTransfer } from "@/utils/cosmos/transactions/messages/ibc/ibc";
+import {
+  generatePostBodyBroadcast,
+  getSenderObj,
+} from "@/utils/cosmos/transactions/helpers.utils";
+import { tryFetch } from "@/utils/async.utils";
+import Long from "long";
 
 /**
  * @notice creates a list of transactions that need to be made for IBC in to canto using keplr
@@ -88,9 +99,19 @@ export async function ibcInKeplr(
     return NEW_ERROR("ibcInKeplr::" + ethToCantoError.message);
   }
 
-  /** Make check for specific chains (injective) */
+  /** Make check for specific chains (injective, evmos) */
   if (cosmosNetwork.chainId === INJECTIVE.chainId) {
     return await injectiveIBCIn(
+      cosmosNetwork,
+      cosmosSender,
+      cantoReceiver,
+      ibcToken.nativeName,
+      amount
+    );
+  }
+  /** call this after getting timestamp information */
+  if (cosmosNetwork.chainId === EVMOS.chainId) {
+    return await evmosIBCIn(
       cosmosNetwork,
       cosmosSender,
       cantoReceiver,
@@ -183,7 +204,7 @@ async function signAndBroadcastIBCKeplr(
 /**
  * @notice creates a list of transactions that need to be made for IBC in to canto using injective
  * @dev will only work for injective
- * @param {CosmosNetwork} cosmosNetwork network to ibc from
+ * @param {CosmosNetwork} injectiveNetwork network to ibc from
  * @param {string} injectiveAddress injective address to send from
  * @param {string} cantoAddress canto address to send to
  * @param {string} denom denom to send
@@ -191,27 +212,31 @@ async function signAndBroadcastIBCKeplr(
  * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
  */
 async function injectiveIBCIn(
-  cosmosNetwork: CosmosNetwork,
+  injectiveNetwork: CosmosNetwork,
   injectiveAddress: string,
   cantoAddress: string,
   denom: string,
   amount: string
 ): PromiseWithError<Transaction[]> {
-  if (cosmosNetwork.chainId !== INJECTIVE.chainId) {
+  // check injective chain
+  if (injectiveNetwork.chainId !== INJECTIVE.chainId) {
     return NEW_ERROR(
-      "injectiveIBCIn: invalid chain id for injective: " + cosmosNetwork.chainId
+      "injectiveIBCIn: invalid chain id for injective: " +
+        injectiveNetwork.chainId
     );
   }
   // get the channel number from the network
   const ibcChannel =
-    IBC_CHANNELS[cosmosNetwork.id as keyof typeof IBC_CHANNELS];
+    IBC_CHANNELS[injectiveNetwork.id as keyof typeof IBC_CHANNELS];
   // check if chennel was found
   if (!ibcChannel || !ibcChannel.toCanto) {
-    return NEW_ERROR("injectiveIBCIn: invalid channel id: " + cosmosNetwork.id);
+    return NEW_ERROR(
+      "injectiveIBCIn: invalid channel id: " + injectiveNetwork.id
+    );
   }
 
   /** Account Details **/
-  const chainRestAuthApi = new ChainRestAuthApi(cosmosNetwork.restEndpoint);
+  const chainRestAuthApi = new ChainRestAuthApi(injectiveNetwork.restEndpoint);
   const accountDetailsResponse = await chainRestAuthApi.fetchAccount(
     injectiveAddress
   );
@@ -220,7 +245,7 @@ async function injectiveIBCIn(
 
   /** Block Details */
   const chainRestTendermintApi = new ChainRestTendermintApi(
-    cosmosNetwork.restEndpoint
+    injectiveNetwork.restEndpoint
   );
   const latestBlock = await chainRestTendermintApi.fetchLatestBlock();
   const latestHeight = latestBlock.header.height;
@@ -249,7 +274,7 @@ async function injectiveIBCIn(
   /** Prepare the Transaction **/
   const { signDoc } = createTransaction({
     pubKey: accountDetails.pubKey.key,
-    chainId: cosmosNetwork.chainId,
+    chainId: injectiveNetwork.chainId,
     fee: DEFAULT_STD_FEE,
     message: [msg],
     sequence: accountDetails.sequence,
@@ -262,7 +287,7 @@ async function injectiveIBCIn(
     try {
       /** Sign the Transaction **/
       const offlineSigner = window.keplr?.getOfflineSigner(
-        cosmosNetwork.chainId
+        injectiveNetwork.chainId
       );
 
       const directSignResponse = await offlineSigner?.signDirect(
@@ -277,7 +302,7 @@ async function injectiveIBCIn(
       /** Broadcast the Transaction **/
       return NO_ERROR(
         await window.keplr?.sendTx(
-          cosmosNetwork.chainId,
+          injectiveNetwork.chainId,
           CosmosTxV1Beta1Tx.TxRaw.encode(txRaw).finish(),
           //@ts-ignore
           "sync"
@@ -290,12 +315,163 @@ async function injectiveIBCIn(
 
   return NO_ERROR([
     {
-      chainId: cosmosNetwork.chainId,
+      chainId: injectiveNetwork.chainId,
       description: "IBC In",
       type: "KEPLR",
       tx: signAndBroadcast,
       getHash: (txResponse: Uint8Array) =>
         NO_ERROR(Buffer.from(txResponse).toString("hex")),
+    },
+  ]);
+}
+
+/**
+ * @notice creates a list of transactions that need to be made for IBC in to canto using evmos
+ * @dev will only work for evmos
+ * @param {CosmosNetwork} evmosNetwork network to ibc from
+ * @param {string} evmosAddress evmos address to send from
+ * @param {string} cantoAddress canto address to send to
+ * @param {string} denom denom to send
+ * @param {string} amount amount to send
+ * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
+ */
+async function evmosIBCIn(
+  evmosNetwork: CosmosNetwork,
+  evmosAddress: string,
+  cantoAddress: string,
+  denom: string,
+  amount: string
+): PromiseWithError<Transaction[]> {
+  // check evmos chain
+  if (evmosNetwork.chainId !== EVMOS.chainId) {
+    return NEW_ERROR(
+      "evmosIBCIn: invalid chain id for evmos: " + evmosNetwork.chainId
+    );
+  }
+  // get canto chain ibc data and timestamp
+  const { data: ibcData, error: ibcError } = await getIBCData(
+    CANTO_MAINNET_COSMOS.restEndpoint
+  );
+  if (ibcError) {
+    return NEW_ERROR("txIBCOut::" + ibcError.message);
+  }
+
+  // get block timeout timestamp
+  const { data: blockTimestamp, error: timestampError } =
+    await getBlockTimestamp(
+      getCosmosAPIEndpoint(CANTO_MAINNET_COSMOS.chainId).data
+    );
+  if (timestampError) {
+    return NEW_ERROR("ibcInKeplr::" + timestampError.message);
+  }
+
+  // get ibc channel
+  const ibcChannel = IBC_CHANNELS[evmosNetwork.id as keyof typeof IBC_CHANNELS];
+  if (!ibcChannel || !ibcChannel.toCanto) {
+    return NEW_ERROR("evmosIBCIn: invalid channel id: " + evmosNetwork.id);
+  }
+
+  // create messges
+  const messages = createMsgsIBCTransfer({
+    sourcePort: "transfer",
+    sourceChannel: ibcChannel.toCanto,
+    denom,
+    amount,
+    cosmosSender: evmosAddress,
+    cosmosReceiver: cantoAddress,
+    timeoutTimestamp: blockTimestamp.slice(0, 9) + "00000000000",
+    revisionNumber: Number(ibcData.height.revision_number),
+    revisionHeight: Number(ibcData.height.revision_height) + 1000,
+    memo: "",
+  });
+
+  // get context
+  const { data: senderObj, error: senderObjError } = await getSenderObj(
+    evmosAddress,
+    evmosNetwork.chainId
+  );
+  if (senderObjError) {
+    return NEW_ERROR("performCosmosTxEIP::" + senderObjError);
+  }
+  // create payload for keplr
+  const keplrPayload = createTransactionWithMultipleMessages(
+    [messages.cosmosMsg],
+    "ibc evmos to canto",
+    "4000000000000000",
+    "aevmos",
+    parseInt("200000", 10),
+    "ethsecp256",
+    senderObj.pubkey,
+    senderObj.sequence,
+    senderObj.accountNumber,
+    evmosNetwork.chainId
+  );
+
+  // signature and broadcast transaction
+  async function signAndBroadcast(): PromiseWithError<unknown> {
+    try {
+      // sign with keplr
+      const signResponse = await window.keplr?.signDirect(
+        evmosNetwork.chainId,
+        evmosAddress,
+        {
+          bodyBytes: keplrPayload.signDirect.body.serializeBinary(),
+          authInfoBytes: keplrPayload.signDirect.authInfo.serializeBinary(),
+          chainId: evmosNetwork.chainId,
+          accountNumber: new Long(senderObj.accountNumber),
+        }
+      );
+      if (!signResponse) {
+        return NEW_ERROR("evmosIBCIn: no sign response");
+      }
+      const signatures = [
+        new Uint8Array(
+          Buffer.from(signResponse?.signature.signature, "base64")
+        ),
+      ];
+      const { signed } = signResponse;
+      const signedTx = createTxRaw(
+        signed.bodyBytes,
+        signed.authInfoBytes,
+        signatures
+      );
+      // post tx to rpc
+      const postOptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: generatePostBodyBroadcast(signedTx),
+      };
+      const { data: broadcastPost, error: broadcastError } = await tryFetch<{
+        tx_response: DeliverTxResponse;
+      }>(
+        getCosmosAPIEndpoint(evmosNetwork.chainId).data +
+          "/cosmos/tx/v1beta1/txs",
+        postOptions
+      );
+      if (broadcastError) {
+        return NEW_ERROR("evmosIBCIn: " + broadcastError.message);
+      }
+      return NO_ERROR(broadcastPost.tx_response);
+    } catch (err) {
+      return NEW_ERROR(
+        "evmosIBCIn::signAndBroadcast::" + (err as Error).message
+      );
+    }
+  }
+  return NO_ERROR([
+    {
+      chainId: evmosNetwork.chainId,
+      description: "IBC in",
+      type: "KEPLR",
+      tx: signAndBroadcast,
+      getHash: (txResponse: { txhash: string }) => {
+        if (!txResponse || !txResponse.txhash) {
+          return NEW_ERROR("ibcInKeplr: no transaction hash");
+        }
+        return NO_ERROR(txResponse.txhash);
+      },
     },
   ]);
 }
