@@ -2,6 +2,41 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  overflow-y: auto;
+}
+
+.scroll-view {
+  height: calc(100% - 26px);
+  overflow-y: auto;
+  position: relative;
+  &::before,
+  &::after {
+    top: 40px;
+    left: 0;
+    content: "";
+    position: fixed;
+    display: block;
+    height: 30px;
+    width: 100%;
+    z-index: 12;
+    background: linear-gradient(
+      180deg,
+      var(--card-sub-surface-color) 0%,
+      var(--card-sub-surface-color) 22.92%,
+      rgba(217, 217, 217, 0) 100%
+    );
+  }
+
+  &::after {
+    top: auto;
+    bottom: 10px;
+    background: linear-gradient(
+      0deg,
+      var(--card-sub-surface-color) 0%,
+      var(--card-sub-surface-color) 22.92%,
+      rgba(217, 217, 217, 0) 100%
+    );
+  }
 }
 
 .item {
