@@ -33,7 +33,7 @@
 }
 
 .fadeout {
-  animation: fade-out 0.5s forwards;
+  animation: fade-out 0.4s forwards;
 
   @keyframes fade-out {
     0% {
@@ -48,13 +48,13 @@
   }
 
   .modal {
-    animation: exit 0.4s ease-in forwards;
+    animation: exit 0.3s ease-in forwards;
     @keyframes exit {
       0% {
         scale: 1;
       }
       60% {
-        scale: 1.1 1.2;
+        scale: 1.04 1.08;
       }
       90% {
         scale: 0.3 0.4;

@@ -23,7 +23,7 @@ const Modal = ({ onClose, children, title, width, height, open }: Props) => {
     ref.current?.classList.add(styles.fadeout);
     setTimeout(() => {
       onClose();
-    }, 500);
+    }, 400);
   }
 
   useEffect(() => {
