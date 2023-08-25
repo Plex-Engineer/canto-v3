@@ -3,7 +3,9 @@ import { getAllUserBridgeTransactionHistory } from "@/hooks/bridge/txHistory";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
 import useStaking from "@/hooks/staking/useStaking";
-import useTransactionStore from "@/stores/transactionStore";
+import useTransactionStore, {
+  TransactionStore,
+} from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
 import { ethToCantoAddress } from "@/utils/address.utils";
 import { createMsgsClaimStakingRewards } from "@/utils/cosmos/transactions/messages/staking/claimRewards";
@@ -26,6 +28,7 @@ import {
   BridgingMethod,
 } from "@/hooks/bridge/interfaces/bridgeMethods";
 import { isCosmosNetwork } from "@/utils/networks.utils";
+import { TransactionFlowWithStatus } from "@/config/interfaces/transactions";
 
 export default function TestPage() {
   const [txIndex, setTxIndex] = useState<number>(0);
@@ -43,7 +46,7 @@ export default function TestPage() {
     userCosmosAddress: cosmosAddress,
   });
   const transactionStore = useStore(useTransactionStore, (state) => state);
-  console.log(transactionStore?.transactions);
+  console.log(transactionStore?.transactionFlows);
 
   useEffect(() => {
     async function getKeplrInfoForBridge() {
@@ -161,28 +164,7 @@ export default function TestPage() {
             RETRY TRANSACTION
           </Button>
         </h1>
-        <ul>
-          {transactionStore?.transactions[txIndex]?.map((tx, idx) => (
-            <div key={idx}>
-              <li>tx - {idx}</li>
-              <li>
-                {idx}- description: {tx.tx.description}
-              </li>
-              <li>
-                {idx}- status: {tx.status}
-              </li>
-              <li>
-                {idx}-{" "}
-                <a
-                  href={tx.txLink}
-                  style={{ cursor: "pointer", color: "blue" }}
-                >
-                  link
-                </a>
-              </li>
-            </div>
-          ))}
-        </ul>
+        <TxBox {...transactionStore?.transactionFlows[txIndex]} />
         <Spacer height="30px" />
         <div
           style={{
@@ -198,11 +180,14 @@ export default function TestPage() {
             Backward
           </Button>
           <Spacer width="20px" />
-          <Text>Current page: {txIndex + 1}</Text>
+          <Text>
+            Current page: {txIndex + 1}{" "}
+            {"  Title: " + transactionStore?.transactionFlows?.[txIndex]?.title}
+          </Text>
           <Spacer width="20px" />
           <Button
             onClick={() => {
-              if (txIndex !== transactionStore?.transactions.length - 1)
+              if (txIndex !== transactionStore?.transactionFlows.length - 1)
                 setTxIndex((prev) => prev + 1);
             }}
           >
@@ -213,6 +198,34 @@ export default function TestPage() {
     </div>
   );
 }
+const TxBox = (flow: TransactionFlowWithStatus) => {
+  if (!flow || !flow.title) return <></>;
+  return (
+    <div>
+      <h1>title: {flow.title}</h1>
+      <h3>status: {flow.status}</h3>
+      <ul>
+        {flow.transactions.map((tx, idx) => (
+          <div key={idx}>
+            <li>tx - {idx}</li>
+            <li>
+              {idx}- description: {tx.tx.description}
+            </li>
+            <li>
+              {idx}- status: {tx.status}
+            </li>
+            <li>
+              {idx}-{" "}
+              <a href={tx.txLink} style={{ cursor: "pointer", color: "blue" }}>
+                link
+              </a>
+            </li>
+          </div>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 interface BridgeProps {
   bridge: BridgeHookReturn;
@@ -220,11 +233,11 @@ interface BridgeProps {
     signer: any;
     cosmosAddress: string;
     cantoAddress: string;
-    transactionStore?: any;
+    transactionStore?: TransactionStore;
   };
 }
 const Bridge = (props: BridgeProps) => {
-  console.log(props.bridge.selections)
+  console.log(props.bridge.selections);
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
   const [inputCosmosAddress, setInputCosmosAddress] = useState<string>("");
@@ -272,10 +285,11 @@ const Bridge = (props: BridgeProps) => {
           console.log(val.error);
           return;
         }
-        props.params.transactionStore?.addTransactions(
-          val.data,
-          props.params.signer
-        );
+        props.params.transactionStore?.addTransactions({
+          title: "bridge",
+          txList: val.data,
+          signer: props.params.signer,
+        });
       });
   }
 
