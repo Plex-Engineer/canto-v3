@@ -61,7 +61,17 @@ const BridgeIn = () => {
         <div className={styles["network-selection"]}>
           <Text size="sm">Select Network</Text>
           <div className={styles["networks-box"]}>
-            <Button
+            {/* mock network selector */}
+            <Selector
+              title="SELECT NETWORK"
+              activeItem={activeMockNetwork}
+              items={mockNetworks}
+              onChange={(item) => {
+                console.log(item);
+                setActiveMockNetwork(item);
+              }}
+            />
+            {/* <Button
               color="secondary"
               height={64}
               width="fill"
@@ -91,7 +101,7 @@ const BridgeIn = () => {
                   size: 24,
                 }}
               />
-            </Button>
+            </Button> */}
             <div className={styles["network-box"]}>
               <Container width="50px">
                 <Text size="x-sm" theme="secondary-dark">
@@ -152,16 +162,6 @@ const BridgeIn = () => {
                 />
               </Button>
             </Container>
-            {/* mock network selector */}
-            <Selector
-              title="SELECT NETWORK"
-              activeItem={activeMockNetwork}
-              items={mockNetworks}
-              onChange={(item) => {
-                console.log(item);
-                setActiveMockNetwork(item);
-              }}
-            />
           </div>
         </div>
         <Spacer height="100%" />
