@@ -38,6 +38,9 @@ interface MsgConvertCoinParams {
 export function createMsgsConvertCoin(
   params: MsgConvertCoinParams
 ): UnsignedCosmosMessages {
+  if (!instanceOfMsgConcertCoinParams(params)) {
+    throw new Error("Expected type MsgConvertCoinParams");
+  }
   const eipMsg = eip712MsgConvertCoin(params);
   const cosmosMsg = protoMsgConvertCoin(params);
   return {
@@ -77,4 +80,23 @@ function protoMsgConvertCoin(
     message,
     path: MsgConvertCoin.typeName,
   };
+}
+
+///
+/// Typeguard
+///
+
+function instanceOfMsgConcertCoinParams(
+  params: object
+): params is MsgConvertCoinParams {
+  return (
+    "ethReceiver" in params &&
+    typeof params.ethReceiver === "string" &&
+    "cantoSender" in params &&
+    typeof params.cantoSender === "string" &&
+    "denom" in params &&
+    typeof params.denom === "string" &&
+    "amount" in params &&
+    typeof params.amount === "string"
+  );
 }

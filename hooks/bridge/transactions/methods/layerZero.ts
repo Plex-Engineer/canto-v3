@@ -6,7 +6,6 @@ import {
 } from "@/config/interfaces/errors";
 import { EVMNetwork } from "@/config/interfaces/networks";
 import { isValidEthAddress } from "@/utils/address.utils";
-import { BridgeToken } from "../../interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
 import { encodePacked } from "web3-utils";
@@ -16,6 +15,7 @@ import { OFT_ABI } from "@/config/abis";
 import { getProviderWithoutSigner } from "@/utils/evm/helpers.utils";
 import { getTokenBalance } from "@/utils/evm/erc20.utils";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
+import { ERC20Token } from "@/config/interfaces/tokens";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging through layer zero
@@ -23,7 +23,7 @@ import { ZERO_ADDRESS } from "@/config/consts/addresses";
  * @param {EVMNetwork} fromNetwork network to send from
  * @param {EVMNetwork} toNetwork network to send to
  * @param {string} ethSender eth sender address
- * @param {BridgeToken} token token to bridge
+ * @param {ERC20Token} token token to bridge
  * @param {string} amount amount to bridge
  * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
  */
@@ -31,7 +31,7 @@ export async function bridgeLayerZero(
   fromNetwork: EVMNetwork,
   toNetwork: EVMNetwork,
   ethSender: string,
-  token: BridgeToken,
+  token: ERC20Token,
   amount: string
 ): PromiseWithError<Transaction[]> {
   // check all params

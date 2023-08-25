@@ -9,7 +9,6 @@ import {
   DeliverTxResponse,
   SigningStargateClient,
 } from "@cosmjs/stargate";
-import { IBCToken } from "../../interfaces/tokens";
 import { CosmosNetwork } from "@/config/interfaces/networks";
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
 import { checkPubKeyETH, ethToCantoAddress } from "@/utils/address.utils";
@@ -44,6 +43,7 @@ import {
 } from "@/utils/cosmos/transactions/helpers.utils";
 import { tryFetch } from "@/utils/async.utils";
 import Long from "long";
+import { IBCToken } from "@/config/interfaces/tokens";
 
 /**
  * @notice creates a list of transactions that need to be made for IBC in to canto using keplr

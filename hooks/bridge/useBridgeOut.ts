@@ -15,13 +15,14 @@ import {
   ReturnWithError,
 } from "@/config/interfaces/errors";
 import { BaseNetwork } from "@/config/interfaces/networks";
-import { BridgeOutToken, isBridgeOutToken } from "./interfaces/tokens";
+import { BridgeOutToken } from "./interfaces/tokens";
 import { BridgingMethod } from "./interfaces/bridgeMethods";
 import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
 import { Transaction } from "@/config/interfaces/transactions";
 import useTokenBalances from "../helpers/useTokenBalances";
 import { bridgeOutTx } from "./transactions/bridge";
-import { isERC20TokenList } from "@/config/interfaces/tokens";
+import { isERC20TokenList } from "@/utils/tokens/tokens.utils";
+import { isBridgeOutToken } from "@/utils/tokens/bridgeTokens.utils";
 
 export default function useBridgeOut(
   props: BridgeHookInputParams
