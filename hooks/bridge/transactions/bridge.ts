@@ -11,7 +11,7 @@ import { bridgeInGravity } from "./methods/gravityBridge";
 import { bridgeLayerZero } from "./methods/layerZero";
 import { ibcInKeplr } from "./keplr/ibcKeplr";
 import { txIBCOut } from "./methods/ibc";
-import { isERC20Token, isIBCToken } from "@/config/interfaces/tokens";
+import { isERC20Token, isIBCToken } from "@/utils/tokens/tokens.utils";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging into canto

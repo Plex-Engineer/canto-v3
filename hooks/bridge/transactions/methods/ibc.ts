@@ -11,7 +11,8 @@ import { createMsgsIBCTransfer } from "@/utils/cosmos/transactions/messages/ibc/
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
 import { tryFetchMultipleEndpoints } from "@/utils/async.utils";
 import { _convertERC20Tx } from "./recovery";
-import { IBCToken, isERC20Token } from "@/config/interfaces/tokens";
+import { isERC20Token } from "@/utils/tokens/tokens.utils";
+import { IBCToken } from "@/config/interfaces/tokens";
 
 /**
  * @notice creates a list of transactions that need to be made for IBC out of canto

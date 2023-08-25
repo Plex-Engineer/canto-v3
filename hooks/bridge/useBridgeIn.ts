@@ -16,17 +16,16 @@ import {
 } from "./interfaces/hookParams";
 import useAutoSelect from "../helpers/useAutoSelect";
 import { BaseNetwork } from "@/config/interfaces/networks";
-import {
-  BridgeInToken,
-  isBridgeInToken,
-  isBridgeInTokenList,
-} from "./interfaces/tokens";
+import { BridgeInToken } from "./interfaces/tokens";
 import { BridgingMethod } from "./interfaces/bridgeMethods";
 import { Transaction } from "@/config/interfaces/transactions";
 import useTokenBalances from "../helpers/useTokenBalances";
-
 import { bridgeInTx } from "./transactions/bridge";
-import { isERC20TokenList } from "@/config/interfaces/tokens";
+import { isERC20TokenList } from "@/utils/tokens/tokens.utils";
+import {
+  isBridgeInToken,
+  isBridgeInTokenList,
+} from "@/utils/tokens/bridgeTokens.utils";
 
 export default function useBridgeIn(
   props: BridgeHookInputParams
