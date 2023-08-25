@@ -1,4 +1,9 @@
-import { ERC20Token, isERC20Token } from "@/config/interfaces/tokens";
+import {
+  ERC20Token,
+  IBCToken,
+  isERC20Token,
+  isIBCToken,
+} from "@/config/interfaces/tokens";
 import { BridgingMethod } from "./bridgeMethods";
 
 export type BridgeToken = BridgeInToken | BridgeOutToken;
@@ -14,14 +19,6 @@ export type BridgeOutToken = {
   }[];
 } & (ERC20Token | IBCToken);
 
-// extends ERC20 since all IBC tokens supported on Canto will have
-// an ERC20 representation
-export interface IBCToken extends Omit<ERC20Token, "address"> {
-  address?: string;
-  ibcDenom: string; // "ibc/..."
-  nativeName: string; // ex. uatom, ucre, acanto
-}
-
 // for user balance data on bridge
 export interface UserTokenBalances {
   [key: string]: string; // token id => balance
@@ -30,25 +27,6 @@ export interface UserTokenBalances {
 ///
 /// Functions to check token objects for type (type guarding)
 ///
-
-/**
- * Checks if object is IBCToken
- * @param {object} object to check
- * @returns {boolean} true if object is IBCToken
- * @see IBCToken
- */
-export function isIBCToken(object: any): object is IBCToken {
-  return (
-    "id" in object &&
-    "chainId" in object &&
-    "name" in object &&
-    "symbol" in object &&
-    "decimals" in object &&
-    "icon" in object &&
-    "ibcDenom" in object &&
-    "nativeName" in object
-  );
-}
 
 ///
 /// ** Bridge In Token Typeguards **

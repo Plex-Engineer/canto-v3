@@ -4,7 +4,6 @@ import {
   PromiseWithError,
   errMsg,
 } from "@/config/interfaces/errors";
-import { IBCToken } from "../../interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
 import { CosmosNetwork } from "@/config/interfaces/networks";
 import { ethToCantoAddress, isValidEthAddress } from "@/utils/address.utils";
@@ -12,6 +11,7 @@ import { createMsgsIBCTransfer } from "@/utils/cosmos/transactions/messages/ibc/
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
 import { tryFetchMultipleEndpoints } from "@/utils/async.utils";
 import { _convertERC20Tx } from "./recovery";
+import { IBCToken, isERC20Token } from "@/config/interfaces/tokens";
 
 /**
  * @notice creates a list of transactions that need to be made for IBC out of canto
@@ -79,6 +79,12 @@ export async function txIBCOut(
   // if recovery, return only the ibc msg
   const allTxs: Transaction[] = [];
   if (!recovery) {
+    // since convert ERC20 must be done, check to make sure the token is also an ERC20
+    if (!isERC20Token(token)) {
+      return NEW_ERROR(
+        "txIBCOut: token must be ERC20 to convert to IBC: " + token.id
+      );
+    }
     allTxs.push(
       _convertERC20Tx(
         chainId,
