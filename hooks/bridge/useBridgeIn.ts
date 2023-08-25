@@ -83,9 +83,12 @@ export default function useBridgeIn(
     if (!isBridgeInToken(token)) {
       return NEW_ERROR("useBridgeIn::getToken: invalid token type:" + id);
     }
-    return token
-      ? NO_ERROR(token)
-      : NEW_ERROR("useBridgeIn::getToken: token not found:" + id);
+    // check if we have a balance for the token
+    const balance = userTokenBalances[token.id];
+    if (balance !== undefined) {
+      return NO_ERROR({ ...token, balance });
+    }
+    return NO_ERROR(token);
   }
 
   ///
@@ -216,7 +219,7 @@ export default function useBridgeIn(
     selections: {
       toNetwork: state.toNetwork,
       fromNetwork: state.fromNetwork,
-      token: state.selectedToken,
+      token: state.selectedToken ? getToken(state.selectedToken.id).data : null,
       method: state.selectedMethod,
     },
     setters: {

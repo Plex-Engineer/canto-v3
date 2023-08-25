@@ -1,6 +1,6 @@
 import { ERC20Token } from "@/config/interfaces/tokens";
 import { UserTokenBalances } from "../bridge/interfaces/tokens";
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getEVMTokenBalanceList } from "@/utils/evm/erc20.utils";
 import { getCosmosTokenBalanceList } from "@/utils/cosmos/cosmosBalance.utils";
 
@@ -23,6 +23,7 @@ export default function useTokenBalances(
   const [userTokenBalances, setUserTokenBalances] = useState<UserTokenBalances>(
     {}
   );
+
   useEffect(() => {
     async function setTokenBalances(): Promise<void> {
       // only set balances if there is a user and the chain is an evm chain
@@ -54,8 +55,15 @@ export default function useTokenBalances(
       }
     }
     // timeout will act as debounce, if multiple deps are changed at the same time
-    const setAllBalances = setTimeout(() => setTokenBalances(), 1000);
-    return () => clearTimeout(setAllBalances);
+    // interval will call every 5 seconds to update balances
+    let timer: any;
+    const setAllBalances = setTimeout(async () => {
+      timer = setInterval(async () => await setTokenBalances(), 5000);
+    }, 1000);
+    return () => {
+      clearTimeout(setAllBalances);
+      clearInterval(timer);
+    };
   }, [chainId, tokens, userEthAddress, userCosmosAddress]);
 
   return userTokenBalances;

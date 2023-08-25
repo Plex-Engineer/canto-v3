@@ -12,6 +12,7 @@ import { ERC20Token, IBCToken } from "@/config/interfaces/tokens";
  */
 export function isERC20Token(object: any): object is ERC20Token {
   return (
+    typeof object === "object" &&
     "id" in object &&
     "chainId" in object &&
     "address" in object &&
@@ -40,6 +41,7 @@ export function isERC20TokenList(array: Array<object>): array is ERC20Token[] {
  */
 export function isIBCToken(object: any): object is IBCToken {
   return (
+    typeof object === "object" &&
     "id" in object &&
     "chainId" in object &&
     "name" in object &&

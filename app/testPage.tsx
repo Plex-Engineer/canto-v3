@@ -34,11 +34,11 @@ export default function TestPage() {
   const [cantoAddress, setCantoAddress] = useState<string>("");
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({
-    testnet: false,
+    testnet: true,
     userEthAddress: signer?.account.address,
   });
   const bridgeIn = useBridgeIn({
-    testnet: false,
+    testnet: true,
     userEthAddress: signer?.account.address,
     userCosmosAddress: cosmosAddress,
   });
@@ -224,6 +224,7 @@ interface BridgeProps {
   };
 }
 const Bridge = (props: BridgeProps) => {
+  console.log(props.bridge.selections)
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
   const [inputCosmosAddress, setInputCosmosAddress] = useState<string>("");
@@ -321,6 +322,8 @@ const Bridge = (props: BridgeProps) => {
         items={props.bridge.allOptions.tokens}
         onChange={props.bridge.setters.token}
       />
+      <Spacer height="10px" />
+      Balance: {props.bridge.selections.token?.balance}
     </>
   );
 
