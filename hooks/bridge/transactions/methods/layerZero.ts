@@ -16,6 +16,8 @@ import { getProviderWithoutSigner } from "@/utils/evm/helpers.utils";
 import { getTokenBalance } from "@/utils/evm/erc20.utils";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
 import { ERC20Token } from "@/config/interfaces/tokens";
+import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
+import { formatBalance } from "@/utils/tokenBalances.utils";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging through layer zero
@@ -76,7 +78,11 @@ export async function bridgeLayerZero(
           true,
           token.address,
           new BigNumber(amount).minus(oftBalance).toString(),
-          `Deposit ${amount} ${token.symbol} to OFT`
+          TX_DESCRIPTIONS.OFT_DEPOSIT_OR_WITHDRAW(
+            token.symbol,
+            formatBalance(amount, token.decimals),
+            true
+          )
         )
       );
     }
@@ -91,7 +97,12 @@ export async function bridgeLayerZero(
       token.address,
       amount,
       gas.toString(),
-      `Bridge ${amount} ${token.symbol} from ${fromNetwork.name} to ${toNetwork.name}`
+      TX_DESCRIPTIONS.BRIDGE(
+        token.symbol,
+        formatBalance(amount, token.decimals),
+        fromNetwork.name,
+        toNetwork.name
+      )
     )
   );
 

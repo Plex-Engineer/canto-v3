@@ -5,6 +5,7 @@ import {
   WETH_MAINNET_ADDRESS,
 } from "@/config/consts/addresses";
 import { CANTO_BOT_API_URL } from "@/config/consts/apiUrls";
+import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import {
   NEW_ERROR,
   NO_ERROR,
@@ -12,7 +13,11 @@ import {
 } from "@/config/interfaces/errors";
 import { ERC20Token } from "@/config/interfaces/tokens";
 import { Transaction } from "@/config/interfaces/transactions";
-import { CANTO_MAINNET_COSMOS } from "@/config/networks";
+import {
+  CANTO_MAINNET_COSMOS,
+  CANTO_MAINNET_EVM,
+  ETH_MAINNET,
+} from "@/config/networks";
 import {
   checkPubKeyCosmos,
   ethToCantoAddress,
@@ -27,6 +32,7 @@ import {
   checkTokenAllowance,
   getTokenBalance,
 } from "@/utils/evm/erc20.utils";
+import { formatBalance } from "@/utils/tokenBalances.utils";
 import BigNumber from "bignumber.js";
 
 /**
@@ -113,7 +119,11 @@ export async function bridgeInGravity(
 
     // must add this to the transaction list to set the public key
     txList.push(
-      _generatePubKeyTx(chainId, cantoAddress, "Generate Public Key")
+      _generatePubKeyTx(
+        chainId,
+        cantoAddress,
+        TX_DESCRIPTIONS.GENERATE_PUBLIC_KEY()
+      )
     );
   }
 
@@ -132,7 +142,12 @@ export async function bridgeInGravity(
     if (wethBalance.isLessThan(amount)) {
       // must wrap the right amount of ETH now
       txList.push(
-        _wrapTx(chainId, token.address, amount, `Wrap ${amount} ETH to WETH`)
+        _wrapTx(
+          chainId,
+          token.address,
+          amount,
+          TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amount, token.decimals))
+        )
       );
     }
   }
@@ -156,7 +171,7 @@ export async function bridgeInGravity(
         token.address,
         GRAVITY_BRIDGE_ETH_ADDRESS,
         amount,
-        `Approve ${token.symbol} for Gravity Bridge`
+        TX_DESCRIPTIONS.APPROVE_TOKEN(token.symbol, "Gravity Bridge")
       )
     );
   }
@@ -168,7 +183,12 @@ export async function bridgeInGravity(
       cantoReceiver,
       token.address,
       amount,
-      `Bridge ${amount} ${token.symbol} to Canto`
+      TX_DESCRIPTIONS.BRIDGE(
+        token.symbol,
+        formatBalance(amount, token.decimals),
+        ETH_MAINNET.name,
+        CANTO_MAINNET_EVM.name
+      )
     )
   );
 

@@ -11,7 +11,8 @@ export const _convertERC20Tx = (
   tokenAddress: string,
   amount: string,
   ethSender: string,
-  cantoReceiver: string
+  cantoReceiver: string,
+  description: string
 ): Transaction => {
   const convertERC20Tx = createMsgsConvertERC20({
     contract_address: tokenAddress,
@@ -21,7 +22,7 @@ export const _convertERC20Tx = (
   });
   return {
     chainId,
-    description: "Convert ERC20",
+    description,
     type: "COSMOS",
     msg: convertERC20Tx,
   };
@@ -32,7 +33,8 @@ const _convertCoinTx = (
   cantoSender: string,
   ethReceiver: string,
   tokenDenom: string,
-  amount: string
+  amount: string,
+  description: string
 ): Transaction => {
   const convertCoinTx = createMsgsConvertCoin({
     cantoSender,
@@ -42,7 +44,7 @@ const _convertCoinTx = (
   });
   return {
     chainId,
-    description: "Convert Coin",
+    description,
     type: "COSMOS",
     msg: convertCoinTx,
   };

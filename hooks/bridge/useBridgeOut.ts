@@ -23,6 +23,7 @@ import useTokenBalances from "../helpers/useTokenBalances";
 import { bridgeOutTx } from "./transactions/bridge";
 import { isERC20TokenList } from "@/utils/tokens/tokens.utils";
 import { isBridgeOutToken } from "@/utils/tokens/bridgeTokens.utils";
+import { convertToBigNumber } from "@/utils/tokenBalances.utils";
 
 export default function useBridgeOut(
   props: BridgeHookInputParams
@@ -184,6 +185,52 @@ export default function useBridgeOut(
   ///
   /// external functions
   ///
+  function canBridge(params: BridgeHookTxParams): ReturnWithError<boolean> {
+    // check to make sure all parameters are defined and valid
+    // check current state
+    if (!state.selectedToken) {
+      return NEW_ERROR("useBridgeOut::canBridge: no token selected");
+    }
+    if (!state.fromNetwork || !state.toNetwork) {
+      return NEW_ERROR("useBridgeOut::canBridge: network undefined");
+    }
+    if (!state.selectedMethod) {
+      return NEW_ERROR("useBridgeOut::canBridge: method undefined");
+    }
+    // check passed in parameters
+    if (!params.sender) {
+      return NEW_ERROR("useBridgeOut::canBridge: sender undefined");
+    }
+    if (!params.receiver) {
+      return NEW_ERROR("useBridgeOut::canBridge: receiver undefined");
+    }
+    // make sure balance exists for token
+    const balance = userTokenBalances[state.selectedToken.id];
+    if (balance === undefined) {
+      return NEW_ERROR(
+        "useBridgeOut::canBridge: balance undefined for token: " +
+          state.selectedToken.id
+      );
+    }
+    // make sure amount it less than or equal to the token balance
+    const { data: userAmount, error: bigNumberError } = convertToBigNumber(
+      params.amount,
+      state.selectedToken.decimals
+    );
+    if (bigNumberError) {
+      return NEW_ERROR("useBridgeOut::canBridge::" + bigNumberError.message);
+    }
+    // token balance is already formatted with decimals
+    const { data: tokenAmount, error: tokenBigNumberError } =
+      convertToBigNumber(balance, 0);
+    if (tokenBigNumberError) {
+      return NEW_ERROR(
+        "useBridgeOut::canBridge::" + tokenBigNumberError.message
+      );
+    }
+    return NO_ERROR(userAmount.lte(tokenAmount) && userAmount.gt(0));
+  }
+
   async function bridgeOut(
     params: BridgeHookTxParams
   ): PromiseWithError<Transaction[]> {
@@ -237,6 +284,9 @@ export default function useBridgeOut(
       network: setNetwork,
       method: setMethod,
     },
-    bridge: bridgeOut,
+    bridge: {
+      bridgeTx: bridgeOut,
+      canBridge,
+    },
   };
 }

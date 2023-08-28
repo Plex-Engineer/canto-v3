@@ -44,6 +44,8 @@ import {
 import { tryFetch } from "@/utils/async.utils";
 import Long from "long";
 import { IBCToken } from "@/config/interfaces/tokens";
+import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
+import { formatBalance } from "@/utils/tokenBalances.utils";
 
 /**
  * @notice creates a list of transactions that need to be made for IBC in to canto using keplr
@@ -106,7 +108,7 @@ export async function ibcInKeplr(
       cosmosNetwork,
       cosmosSender,
       cantoReceiver,
-      ibcToken.nativeName,
+      ibcToken,
       amount
     );
   }
@@ -116,7 +118,7 @@ export async function ibcInKeplr(
       cosmosNetwork,
       cosmosSender,
       cantoReceiver,
-      ibcToken.nativeName,
+      ibcToken,
       amount
     );
   }
@@ -142,7 +144,12 @@ export async function ibcInKeplr(
   return NO_ERROR([
     {
       chainId: cosmosNetwork.chainId,
-      description: "IBC In",
+      description: TX_DESCRIPTIONS.BRIDGE(
+        ibcToken.symbol,
+        formatBalance(amount, ibcToken.decimals),
+        cosmosNetwork.name,
+        CANTO_MAINNET_COSMOS.name
+      ),
       type: "KEPLR",
       tx: async () => {
         return await signAndBroadcastIBCKeplr(keplrClient.client, {
@@ -208,7 +215,7 @@ async function signAndBroadcastIBCKeplr(
  * @param {CosmosNetwork} injectiveNetwork network to ibc from
  * @param {string} injectiveAddress injective address to send from
  * @param {string} cantoAddress canto address to send to
- * @param {string} denom denom to send
+ * @param {IBCToken} token token to send
  * @param {string} amount amount to send
  * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
  */
@@ -216,7 +223,7 @@ async function injectiveIBCIn(
   injectiveNetwork: CosmosNetwork,
   injectiveAddress: string,
   cantoAddress: string,
-  denom: string,
+  token: IBCToken,
   amount: string
 ): PromiseWithError<Transaction[]> {
   // check injective chain
@@ -267,7 +274,7 @@ async function injectiveIBCIn(
       revisionNumber: parseInt(latestBlock.header.version.block, 10),
     },
     amount: {
-      denom,
+      denom: token.nativeName,
       amount: amount,
     },
   });
@@ -317,7 +324,12 @@ async function injectiveIBCIn(
   return NO_ERROR([
     {
       chainId: injectiveNetwork.chainId,
-      description: "IBC In",
+      description: TX_DESCRIPTIONS.BRIDGE(
+        token.symbol,
+        formatBalance(amount, token.decimals),
+        injectiveNetwork.name,
+        CANTO_MAINNET_COSMOS.name
+      ),
       type: "KEPLR",
       tx: signAndBroadcast,
       getHash: (txResponse: Uint8Array) =>
@@ -332,7 +344,7 @@ async function injectiveIBCIn(
  * @param {CosmosNetwork} evmosNetwork network to ibc from
  * @param {string} evmosAddress evmos address to send from
  * @param {string} cantoAddress canto address to send to
- * @param {string} denom denom to send
+ * @param {IBCToken} token token to send
  * @param {string} amount amount to send
  * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
  */
@@ -340,7 +352,7 @@ async function evmosIBCIn(
   evmosNetwork: CosmosNetwork,
   evmosAddress: string,
   cantoAddress: string,
-  denom: string,
+  token: IBCToken,
   amount: string
 ): PromiseWithError<Transaction[]> {
   // check evmos chain
@@ -376,7 +388,7 @@ async function evmosIBCIn(
   const messages = createMsgsIBCTransfer({
     sourcePort: "transfer",
     sourceChannel: ibcChannel.toCanto,
-    denom,
+    denom: token.nativeName,
     amount,
     cosmosSender: evmosAddress,
     cosmosReceiver: cantoAddress,
@@ -462,7 +474,12 @@ async function evmosIBCIn(
   return NO_ERROR([
     {
       chainId: evmosNetwork.chainId,
-      description: "IBC in",
+      description: TX_DESCRIPTIONS.BRIDGE(
+        token.symbol,
+        formatBalance(amount, token.decimals),
+        evmosNetwork.name,
+        CANTO_MAINNET_COSMOS.name
+      ),
       type: "KEPLR",
       tx: signAndBroadcast,
       getHash: (txResponse: { txhash: string }) => {

@@ -28,6 +28,7 @@ import {
 } from "@/hooks/bridge/interfaces/bridgeMethods";
 import { isCosmosNetwork } from "@/utils/networks.utils";
 import { TransactionFlowWithStatus } from "@/config/interfaces/transactions";
+import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 
 export default function TestPage() {
   const [txIndex, setTxIndex] = useState<number>(0);
@@ -40,7 +41,7 @@ export default function TestPage() {
     userEthAddress: signer?.account.address,
   });
   const bridgeIn = useBridgeIn({
-    testnet: true,
+    testnet: false,
     userEthAddress: signer?.account.address,
     userCosmosAddress: cosmosAddress,
   });
@@ -280,11 +281,14 @@ const Bridge = (props: BridgeProps) => {
   ]);
 
   async function bridgeTest() {
-    props.bridge
-      .bridge({
+    props.bridge.bridge
+      .bridgeTx({
         sender: fromAddress,
         receiver: toAddress,
-        amount,
+        amount: convertToBigNumber(
+          amount,
+          props.bridge.selections.token?.decimals ?? 18
+        ).data.toString(),
       })
       .then((val) => {
         if (val.error) {
@@ -351,18 +355,35 @@ const Bridge = (props: BridgeProps) => {
       <Selector
         title="SELECT TOKEN"
         activeItem={
-          props.bridge.selections.token ??
-          ({
-            name: "Select Token",
-            icon: "",
-            id: "",
-          } as Item)
+          props.bridge.selections.token
+            ? {
+                ...props.bridge.selections.token,
+              }
+            : ({
+                name: "Select Token",
+                icon: "",
+                id: "",
+              } as Item)
         }
-        items={props.bridge.allOptions.tokens ?? []}
+        items={
+          props.bridge.allOptions.tokens.map((token) => ({
+            ...token,
+            balance: formatBalance(token.balance ?? "0", token.decimals),
+          })) ?? []
+        }
         onChange={props.bridge.setters.token}
       />
       <Spacer height="10px" />
-      Balance: {props.bridge.selections.token?.balance}
+      Balance:{" "}
+      {formatBalance(
+        props.bridge.selections.token?.balance ?? "0",
+        props.bridge.selections.token?.decimals ?? 18,
+        {
+          precision: 0,
+          commify: true,
+          symbol: props.bridge.selections.token?.symbol,
+        }
+      )}
     </>
   );
 
@@ -378,6 +399,12 @@ const Bridge = (props: BridgeProps) => {
         {networkSelectors}
       </>
     );
+  const { data: canBridge } = props.bridge.bridge.canBridge({
+    sender: fromAddress,
+    receiver: toAddress,
+    amount,
+  });
+  console.log(canBridge);
   return (
     <>
       <section className={styles.container}>
@@ -415,6 +442,9 @@ const Bridge = (props: BridgeProps) => {
         <Spacer height="100px" />
         <Button width="fill" onClick={bridgeTest}>
           {props.bridge.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
+          {` ::can bridge: ${
+            canBridge !== null ? (canBridge ? "yes" : "no") : "no"
+          }`}
         </Button>
       </section>
     </>
