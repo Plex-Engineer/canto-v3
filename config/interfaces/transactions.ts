@@ -65,7 +65,7 @@ export interface Sender {
   accountAddress: string;
   sequence: number;
   accountNumber: number;
-  pubkey: string;
+  pubkey: string | null | undefined;
 }
 
 export interface Chain {

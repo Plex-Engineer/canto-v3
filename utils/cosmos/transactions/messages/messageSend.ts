@@ -70,7 +70,10 @@ function protoMsgSend(params: MessageSendParams): CosmosNativeMessage {
     amount: [value],
   });
   return {
-    message,
+    message: {
+      ...message,
+      serializeBinary: () => message.toBinary(),
+    },
     path: MsgSend.typeName,
   };
 }

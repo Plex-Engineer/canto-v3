@@ -85,14 +85,14 @@ export async function checkPubKeyCosmos(
     chainId
   );
   if (error) {
-    return NEW_ERROR("checkPubKey::" + error.message);
+    return NEW_ERROR("checkPubKeyCosmos::" + error.message);
   }
   try {
     return NO_ERROR(
       cosmosAccount["account"]["base_account"]["pub_key"] != null
     );
   } catch (err) {
-    return NEW_ERROR("checkPubKey::" + errMsg(err));
+    return NEW_ERROR("checkPubKeyCosmos::" + errMsg(err));
   }
 }
 

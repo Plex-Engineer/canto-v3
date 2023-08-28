@@ -70,10 +70,8 @@ export async function bridgeInGravity(
     cantoReceiver,
     CANTO_MAINNET_COSMOS.chainId
   );
-  if (checkPubKeyError) {
-    return NEW_ERROR("bridgeInGravity::" + checkPubKeyError.message);
-  }
-  if (!hasPubKey) {
+  // if no pub key found or error fetching account
+  if (!hasPubKey || checkPubKeyError) {
     const { data: cantoAddress, error: ethToCantoError } =
       await ethToCantoAddress(ethSender);
     if (ethToCantoError) {
@@ -120,7 +118,7 @@ export async function bridgeInGravity(
     // must add this to the transaction list to set the public key
     txList.push(
       _generatePubKeyTx(
-        chainId,
+        CANTO_MAINNET_EVM.chainId,
         cantoAddress,
         TX_DESCRIPTIONS.GENERATE_PUBLIC_KEY()
       )

@@ -62,7 +62,8 @@ export async function performCosmosTransactionEIP(
   }
   const { data: senderObj, error: senderObjError } = await getSenderObj(
     cantoAddress,
-    tx.chainId
+    tx.chainId,
+    true
   );
   if (senderObjError) {
     return NEW_ERROR("performCosmosTxEIP::" + senderObjError);
