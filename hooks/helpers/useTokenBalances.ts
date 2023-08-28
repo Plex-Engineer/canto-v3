@@ -1,6 +1,6 @@
 import { ERC20Token } from "@/config/interfaces/tokens";
 import { UserTokenBalances } from "../bridge/interfaces/tokens";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getEVMTokenBalanceList } from "@/utils/evm/erc20.utils";
 import { getCosmosTokenBalanceList } from "@/utils/cosmos/cosmosBalance.utils";
 
@@ -61,6 +61,8 @@ export default function useTokenBalances(
       timer = setInterval(async () => await setTokenBalances(), 5000);
     }, 1000);
     return () => {
+      // clean up timeout and interval and reset token balance object since something was changed
+      setUserTokenBalances({});
       clearTimeout(setAllBalances);
       clearInterval(timer);
     };
