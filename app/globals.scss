@@ -40,7 +40,7 @@
   --light-mode: 1;
 }
 
-.dark {
+.dark2 {
 --light-color: 17, 17, 17;
   --dark-color: 255, 255, 255
   --text-only-dark: #222222;
@@ -69,7 +69,7 @@
   --box-shadow: 0;
 }
 
-.dark2 {
+.dark {
   --text-only-dark: #222222;
   --text-only-light: #ffffff;
   --primary-90-color: #eeeeee;
@@ -86,7 +86,7 @@
   --border-optional-color: #ffffff00;
   --extra-shadow: #cdcdcd;
   --border-stroke-color: #3d3d3d;
-  --border-radius: 5;
+  --border-radius: 40px;
   --text-dark-color: #ececec;
   --card-sub-surface-color: #292929;
   --card-surface-color: #1e1e1e;
@@ -101,7 +101,7 @@
   scroll-behavior: smooth;
 
   &:focus {
-    outline: 2px solid var(--primary-90-color);
+    outline: 2px solid none;
   }
 }
 
