@@ -406,6 +406,10 @@ async function evmosIBCIn(
   if (senderObjError) {
     return NEW_ERROR("performCosmosTxEIP::" + senderObjError);
   }
+  // transaction would have already failed by now if no public key was present, but typeguard
+  if (!senderObj.pubkey) {
+    return NEW_ERROR("performCosmosTxEIP: no public key found");
+  }
   // create payload for keplr
   const keplrPayload = createTransactionWithMultipleMessages(
     [messages.cosmosMsg],
