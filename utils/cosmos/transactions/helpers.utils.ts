@@ -96,7 +96,7 @@ export async function signAndBroadcastCosmosTransaction(
       context.chain.chainId,
       eipPayload
     );
-      console.log("HERE")
+
     // check public key on sender object, if none, create one
     if (!context.sender.pubkey) {
       // create a public key for the user IFF EIP712 Canto is used (since through metamask)
@@ -203,6 +203,7 @@ export function generatePostBodyBroadcast(
  * @notice gets sender object from cosmos
  * @param {string} senderCosmosAddress sender of tx
  * @param {string | number} chainid chainId for tx
+ * @param {boolean} eip712 whether or not to use eip712 (will allow null public key)
  * @returns {PromiseWithError<Sender>} Sender object or error
  */
 export async function getSenderObj(
@@ -221,6 +222,7 @@ export async function getSenderObj(
  * @notice reformats cosmos account data into sender object
  * @dev will fail if no public key is present on the account (will not create one for the user)
  * @param {CosmosAccountReturn} accountData account data from cosmos
+ * @param {boolean} eip712 whether or not to use eip712 (will allow null public key)
  * @returns {ReturnWithError<Sender>} formatted sender object or error
  */
 function reformatSender(

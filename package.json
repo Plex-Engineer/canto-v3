@@ -34,6 +34,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-fast-marquee": "^1.6.0",
+    "react-query": "^3.39.3",
     "react-tabs": "^6.0.2",
     "sass": "^1.64.2",
     "styled-components": "^6.0.5",
