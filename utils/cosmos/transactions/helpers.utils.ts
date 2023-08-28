@@ -1,9 +1,9 @@
-import { getCosmosAPIEndpoint } from "@/config/consts/apiUrls";
 import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
   ReturnWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 import {
   CosmosTxContext,
@@ -12,18 +12,18 @@ import {
   Sender,
   UnsignedCosmosMessages,
 } from "@/config/interfaces/transactions";
-import { ethToCantoAddress } from "@/utils/address.utils";
 import { tryFetch } from "@/utils/async.utils";
+import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
 import {
-  createEIP712,
   generateMessageWithMultipleTransactions,
-} from "@tharsis/eip712";
+  createEIP712,
+} from "@evmos/eip712";
+import { createTransactionWithMultipleMessages } from "@evmos/proto";
 import {
   createTxRawEIP712,
   signatureToWeb3Extension,
-} from "@tharsis/transactions";
-import { createTransactionWithMultipleMessages } from "@tharsis/proto";
-import { signTypedData } from "wagmi/actions";
+} from "@evmos/transactions";
+
 interface CosmosAccountReturn {
   account: {
     base_account: {
@@ -36,15 +36,16 @@ interface CosmosAccountReturn {
     };
   };
 }
-
+/**
+ * @notice gets account data from cosmos
+ * @param {string} cosmosAddress cosmos address to get account for
+ * @param {string | number} chainId chainId of chain
+ * @returns {PromiseWithError<CosmosAccountReturn>} account data or error
+ */
 export async function getCosmosAccount(
-  ethAddress: string,
-  chainId: number
+  cosmosAddress: string,
+  chainId: string | number
 ): PromiseWithError<CosmosAccountReturn> {
-  const { data: cantoAddress, error } = await ethToCantoAddress(ethAddress);
-  if (error) {
-    return NEW_ERROR("getCosmosAccount::" + error.message);
-  }
   const { data: apiEndpoint, error: apiEndpointError } =
     getCosmosAPIEndpoint(chainId);
   if (apiEndpointError) {
@@ -52,7 +53,7 @@ export async function getCosmosAccount(
   }
   const { data: result, error: fetchError } =
     await tryFetch<CosmosAccountReturn>(
-      apiEndpoint + `/cosmos/auth/v1beta1/accounts/${cantoAddress}`
+      apiEndpoint + `/cosmos/auth/v1beta1/accounts/${cosmosAddress}`
     );
   if (fetchError) {
     return NEW_ERROR("getCosmosAccount::" + fetchError.message);
@@ -60,39 +61,43 @@ export async function getCosmosAccount(
   return NO_ERROR(result);
 }
 
+/**
+ * @notice signs and broadcasts a cosmos transaction
+ * @param {CosmosTxContext} context context for tx
+ * @param {UnsignedCosmosMessages} tx unsigned tx to sign and broadcast
+ * @returns {PromiseWithError<any>} return data of broadcast or error
+ */
 export async function signAndBroadcastCosmosTransaction(
   context: CosmosTxContext,
   tx: UnsignedCosmosMessages
 ): PromiseWithError<any> {
   try {
-    //create correct fee object for EIP712
+    // create correct fee object for EIP712
     const feeObj = generateFeeObj(tx.fee, context.sender.accountAddress);
-    const message = generateMessageWithMultipleTransactions(
+
+    // check if multiple messages are included in transactions
+    const eipMsgArray = Array.isArray(tx.eipMsg) ? tx.eipMsg : [tx.eipMsg];
+    const cosmosMsgArray = Array.isArray(tx.cosmosMsg)
+      ? tx.cosmosMsg
+      : [tx.cosmosMsg];
+
+    // create eip payload
+    const eipPayload = generateMessageWithMultipleTransactions(
       context.sender.accountNumber.toString(),
       context.sender.sequence.toString(),
       context.chain.cosmosChainId,
       context.memo,
       feeObj,
-      [tx.eipMsg]
+      eipMsgArray
     );
     const eipToSign = createEIP712(
       tx.typesObject,
       context.chain.chainId,
-      message
+      eipPayload
     );
-    // const signature = await signTypedData(eipToSign);
-    // @ts-ignore
-    const signature = await window.ethereum.request({
-      method: "eth_signTypedData_v4",
-      params: [context.ethAddress, JSON.stringify(eipToSign)],
-    });
-    const extension = signatureToWeb3Extension(
-      context.chain,
-      context.sender,
-      signature
-    );
-    const cosmosTxToBroadcast = createTransactionWithMultipleMessages(
-      [tx.cosmosMsg],
+    // create cosmos payload
+    const cosmosPayload = createTransactionWithMultipleMessages(
+      cosmosMsgArray,
       context.memo,
       tx.fee.amount,
       tx.fee.denom,
@@ -103,33 +108,40 @@ export async function signAndBroadcastCosmosTransaction(
       context.sender.accountNumber,
       context.chain.cosmosChainId
     );
-    const raw = createTxRawEIP712(
-      cosmosTxToBroadcast.legacyAmino.body,
-      cosmosTxToBroadcast.legacyAmino.authInfo,
-      extension
+
+    // get signature from metamask
+    const signature = await window.ethereum.request({
+      method: "eth_signTypedData_v4",
+      params: [context.ethAddress, JSON.stringify(eipToSign)],
+    });
+    const signedTx = createTxRawEIP712(
+      cosmosPayload.legacyAmino.body,
+      cosmosPayload.legacyAmino.authInfo,
+      signatureToWeb3Extension(context.chain, context.sender, signature)
     );
+
+    // post tx to rpc
     const postOptions = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: generatePostBodyBroadcast(raw),
+      body: generatePostBodyBroadcast(signedTx),
     };
     const broadcastPost = await tryFetch(
       getCosmosAPIEndpoint(context.chain.chainId).data +
         "/cosmos/tx/v1beta1/txs",
       postOptions
     );
+
     if (broadcastPost.error) {
       return NEW_ERROR(
         "signAndBroadcastCosmosTransaction: " + broadcastPost.error.message
       );
     }
     return NO_ERROR(broadcastPost.data);
-  } catch (error) {
-    return NEW_ERROR(
-      "signAndBroadcastCosmosTransaction: " + (error as Error).message
-    );
+  } catch (err) {
+    return NEW_ERROR("signAndBroadcastCosmosTransaction: " + errMsg(err));
   }
 }
 
@@ -146,7 +158,7 @@ enum BroadcastMode {
   Async = "BROADCAST_MODE_ASYNC",
 }
 
-function generatePostBodyBroadcast(
+export function generatePostBodyBroadcast(
   txRaw: TxToSend,
   broadcastMode: string = BroadcastMode.Sync
 ) {
@@ -155,17 +167,29 @@ function generatePostBodyBroadcast(
     .toString()}], "mode": "${broadcastMode}" }`;
 }
 
+/**
+ * @notice gets sender object from cosmos
+ * @param {string} senderCosmosAddress sender of tx
+ * @param {string | number} chainid chainId for tx
+ * @returns {PromiseWithError<Sender>} Sender object or error
+ */
 export async function getSenderObj(
-  senderEthAddress: string,
-  chainid: number
+  senderCosmosAddress: string,
+  chainid: string | number
 ): PromiseWithError<Sender> {
-  const cosmosAccount = await getCosmosAccount(senderEthAddress, chainid);
+  const cosmosAccount = await getCosmosAccount(senderCosmosAddress, chainid);
   if (cosmosAccount.error) {
     return NEW_ERROR("getSenderObj::" + cosmosAccount.error.message);
   }
   return reformatSender(cosmosAccount.data);
 }
 
+/**
+ * @notice reformats cosmos account data into sender object
+ * @dev will fail if no public key is present on the account (will not create one for the user)
+ * @param {CosmosAccountReturn} accountData account data from cosmos
+ * @returns {ReturnWithError<Sender>} formatted sender object or error
+ */
 function reformatSender(
   accountData: CosmosAccountReturn
 ): ReturnWithError<Sender> {
@@ -181,6 +205,12 @@ function reformatSender(
   });
 }
 
+/**
+ * @notice creates a fee object for EIP712
+ * @param {Fee} fee fee object
+ * @param {string} feePayer sender of tx
+ * @returns {EIP712FeeObject}EIP712Fee object
+ */
 function generateFeeObj(fee: Fee, feePayer: string): EIP712FeeObject {
   return {
     amount: [

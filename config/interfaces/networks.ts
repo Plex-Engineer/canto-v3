@@ -21,6 +21,7 @@ interface Network {
 }
 export interface EVMNetwork extends Network {
   chainId: number;
+  multicall3Address?: `0x${string}`;
 }
 
 export interface CosmosNetwork extends Network {

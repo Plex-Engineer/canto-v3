@@ -1,3 +1,6 @@
+/**
+ * WETH Contract ABI
+ */
 export const WETH_ABI = [
   {
     constant: true,

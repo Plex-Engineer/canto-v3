@@ -13,18 +13,18 @@ import { Item } from "../selector/selector";
 const BridgeIn = () => {
   const mockNetworks: Item[] = [
     {
-      iconUrl: "/networks/ethereum.svg",
+      icon: "/networks/ethereum.svg",
       name: "Ethereum",
       balance: 0.43,
     },
     {
       name: "Layer Zero",
-      iconUrl: "/networks/layer_zero.png",
+      icon: "/networks/layer_zero.png",
       balance: 0.43,
     },
     {
       name: "Gravity Bridge",
-      iconUrl: "/networks/graviton.svg",
+      icon: "/networks/graviton.svg",
       balance: 0.43,
     },
     {
@@ -134,7 +134,7 @@ const BridgeIn = () => {
               </Container>
               <div className={styles.token}>
                 <Image
-                  src={selectedNetwork.iconUrl}
+                  src={selectedNetwork.icon}
                   alt={`${selectedNetwork.name} icon`}
                   width={30}
                   height={30}

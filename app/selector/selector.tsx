@@ -9,16 +9,17 @@ import styles from "./selector.module.scss";
 import Spacer from "@/components/layout/spacer";
 
 export interface Item {
-  iconUrl: string;
+  id: string;
+  icon: string;
   name: string;
   balance?: number;
 }
 
 interface Props {
   title: string;
-  activeItem: Item;
+  activeItem?: Item;
   items: Item[];
-  onChange: (item: Item) => void;
+  onChange: (itemId: string) => void;
 }
 const Selector = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -84,13 +85,13 @@ const Selector = (props: Props) => {
           }}
         >
           <Image
-            src={props.activeItem.iconUrl}
-            alt={props.activeItem.name + " icon"}
+            src={props.activeItem?.icon ?? ""}
+            alt={props.activeItem?.name + " icon"}
             width={30}
             height={30}
           />
           <Text size="md" font="proto_mono">
-            {props.activeItem.name}
+            {props.activeItem?.name ?? "SELECT ITEM"}
           </Text>
         </Container>
         <Icon

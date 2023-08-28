@@ -1,8 +1,9 @@
-import { CANTO_MAINNET, CANTO_TESTNET } from "@/config/networks";
+import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
 import {
   BridgeHookInputParams,
   BridgeHookReturn,
   BridgeHookState,
+  BridgeHookTxParams,
 } from "./interfaces/hookParams";
 import BRIDGE_OUT_TOKENS from "@/config/jsons/bridgeOutTokens.json";
 import { useState } from "react";
@@ -13,12 +14,15 @@ import {
   PromiseWithError,
   ReturnWithError,
 } from "@/config/interfaces/errors";
-import { BaseNetwork, CosmosNetwork } from "@/config/interfaces/networks";
-import { BridgeToken, BridgingMethod, IBCToken } from "./interfaces/tokens";
+import { BaseNetwork } from "@/config/interfaces/networks";
+import { BridgeOutToken } from "./interfaces/tokens";
+import { BridgingMethod } from "./interfaces/bridgeMethods";
 import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
 import { Transaction } from "@/config/interfaces/transactions";
-import { bridgeLayerZero } from "./transactions/layerZero";
-import { txIBCOut } from "./transactions/ibc";
+import useTokenBalances from "../helpers/useTokenBalances";
+import { bridgeOutTx } from "./transactions/bridge";
+import { isERC20TokenList } from "@/utils/tokens/tokens.utils";
+import { isBridgeOutToken } from "@/utils/tokens/bridgeTokens.utils";
 
 export default function useBridgeOut(
   props: BridgeHookInputParams
@@ -28,11 +32,11 @@ export default function useBridgeOut(
     // all options
     availableTokens: BRIDGE_OUT_TOKENS.chainTokenList[
       props.testnet ? "canto-testnet" : "canto-mainnet"
-    ] as BridgeToken[],
+    ] as BridgeOutToken[],
     availableNetworks: [],
     availableMethods: [],
     // default selections
-    fromNetwork: props.testnet ? CANTO_TESTNET : CANTO_MAINNET,
+    fromNetwork: props.testnet ? CANTO_TESTNET_EVM : CANTO_MAINNET_EVM,
     toNetwork: null,
     selectedToken: null,
     selectedMethod: null,
@@ -44,6 +48,15 @@ export default function useBridgeOut(
   ///
   /// internal hooks
   ///
+
+  // contains object mapping of the token balances
+  const userTokenBalances = useTokenBalances(
+    state.fromNetwork?.chainId,
+    isERC20TokenList(state.availableTokens) ? state.availableTokens : [],
+    props.userEthAddress,
+    props.userCosmosAddress
+  );
+
   // will autoselect the first available token if there are any
   useAutoSelect(state.availableTokens, setToken);
   // will autoselect the first available network if there are any
@@ -63,11 +76,17 @@ export default function useBridgeOut(
       ? NO_ERROR(network)
       : NEW_ERROR("useBridgeOut::getNetwork: network not found:" + id);
   }
-  function getToken(id: string): ReturnWithError<BridgeToken> {
+  function getToken(id: string): ReturnWithError<BridgeOutToken> {
     const token = state.availableTokens.find((token) => token.id === id);
-    return token
-      ? NO_ERROR(token)
-      : NEW_ERROR("useBridgeOut::getToken: token not found:" + id);
+    if (!isBridgeOutToken(token)) {
+      throw new Error("useBridgeOut::getToken: invalid token type: " + id);
+    }
+    // check if we have a balance for the token
+    const balance = userTokenBalances[token.id];
+    if (balance !== undefined) {
+      return NO_ERROR({ ...token, balance });
+    }
+    return NO_ERROR(token);
   }
 
   ///
@@ -76,6 +95,9 @@ export default function useBridgeOut(
 
   // sets selected token and loads the available networks it can be bridge to
   function setToken(id: string): void {
+    //make sure new token was actually selected
+    if (state.selectedToken?.id === id) return;
+
     const { data: token, error: tokenError } = getToken(id);
     if (tokenError) {
       throw new Error("useBridgeOut::setToken::" + tokenError.message);
@@ -111,6 +133,9 @@ export default function useBridgeOut(
 
   // sets selected network and loads the available methods for bridging
   function setNetwork(id: string): void {
+    //make sure new network was actually selected
+    if (state.toNetwork?.id === id) return;
+
     const { data: network, error: networkError } = getNetwork(id);
     if (networkError) {
       throw new Error("useBridgeOut::setNetwork: invalid network id: " + id);
@@ -144,6 +169,9 @@ export default function useBridgeOut(
   // sets selected bridging method only it actually exists on the token
   function setMethod(selectMethod: string): void {
     const method = selectMethod as BridgingMethod;
+    //make sure new method was actually selected
+    if (method === state.selectedMethod) return;
+
     if (!state.availableMethods.includes(method)) {
       throw new Error("setMethod: Invalid method: " + method);
     }
@@ -157,8 +185,7 @@ export default function useBridgeOut(
   /// external functions
   ///
   async function bridgeOut(
-    ethAccount: string,
-    amount: string
+    params: BridgeHookTxParams
   ): PromiseWithError<Transaction[]> {
     // check basic parameters to make sure they exist
     if (!state.selectedToken) {
@@ -167,59 +194,42 @@ export default function useBridgeOut(
     if (!state.toNetwork || !state.fromNetwork) {
       return NEW_ERROR("useBridgeOut::bridgeOut: no network selected");
     }
-    let transactions: ReturnWithError<Transaction[]>;
-    // check the selected method to figure out how to create tx
-    switch (state.selectedMethod) {
-      case BridgingMethod.GRAVITY_BRIDGE:
-        transactions = NEW_ERROR(
-          "useBridgeOut::bridgeOut: GBRIDGE not implemented"
-        );
-        break;
-      case BridgingMethod.LAYER_ZERO:
-        transactions = await bridgeLayerZero(
-          state.fromNetwork,
-          state.toNetwork,
-          ethAccount,
-          state.selectedToken,
-          amount
-        );
-        break;
-      case BridgingMethod.IBC: {
-        transactions = await txIBCOut(
-          Number(state.fromNetwork.chainId),
-          ethAccount,
-          "cosmos address",
-          state.toNetwork as CosmosNetwork,
-          state.selectedToken as IBCToken,
-          amount
-        );
-        break;
-      }
-      default:
-        return NEW_ERROR(
-          "useBridgeOut::bridgeOut: invalid transaction method: " +
-            state.selectedMethod
-        );
+    const { data: transactions, error: transactionsError } = await bridgeOutTx({
+      from: {
+        network: state.fromNetwork,
+        account: params.sender,
+      },
+      to: {
+        network: state.toNetwork,
+        account: params.receiver,
+      },
+      token: {
+        data: state.selectedToken,
+        amount: params.amount,
+      },
+      method: state.selectedMethod,
+    });
+    if (transactionsError) {
+      return NEW_ERROR("useBridgeOut::bridgeOut::" + transactionsError.message);
     }
-    if (transactions.error) {
-      return NEW_ERROR(
-        "useBridgeOut::bridgeOut::" + transactions.error.message
-      );
-    }
-    return transactions;
+    return NO_ERROR(transactions);
   }
 
   return {
+    direction: "out",
     testnet: props.testnet ?? false,
     allOptions: {
-      tokens: state.availableTokens,
+      tokens: state.availableTokens.map((token) => {
+        const balance = userTokenBalances[token.id];
+        return balance !== undefined ? { ...token, balance } : token;
+      }),
       networks: state.availableNetworks,
       methods: state.availableMethods,
     },
     selections: {
       toNetwork: state.toNetwork,
       fromNetwork: state.fromNetwork,
-      token: state.selectedToken,
+      token: state.selectedToken ? getToken(state.selectedToken.id).data : null,
       method: state.selectedMethod,
     },
     setters: {

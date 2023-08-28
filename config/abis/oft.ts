@@ -1,3 +1,6 @@
+/**
+ * OFT Contract ABI
+ */
 export const OFT_ABI = [
   {
     inputs: [

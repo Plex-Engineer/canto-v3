@@ -2,16 +2,18 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 import { Transaction } from "@/config/interfaces/transactions";
-import {
-  GetWalletClientResult,
-  prepareWriteContract,
-  writeContract,
-} from "wagmi/actions";
+import { GetWalletClientResult, writeContract } from "wagmi/actions";
 import { checkOnRightChain } from "../baseTransaction.utils";
 
-// will return the txHash of the signed transaction
+/**
+ * @notice performs evm transaction
+ * @param {Transaction} tx transaction to perform
+ * @param {GetWalletClientResult} signer signer to sign transaction with
+ * @returns {PromiseWithError<string>} txHash of transaction or error
+ */
 export async function performEVMTransaction(
   tx: Transaction,
   signer?: GetWalletClientResult
@@ -21,6 +23,9 @@ export async function performEVMTransaction(
   }
   if (!signer) {
     return NEW_ERROR("performEVMTransaction: no signer");
+  }
+  if (typeof tx.chainId !== "number") {
+    return NEW_ERROR("performEVMTransaction: invalid chainId: " + tx.chainId);
   }
   const { data: onRightChain, error: chainError } = await checkOnRightChain(
     signer,
@@ -43,7 +48,7 @@ export async function performEVMTransaction(
     };
     const { hash } = await writeContract(contractCall);
     return NO_ERROR(hash);
-  } catch (error) {
-    return NEW_ERROR("performEVMTransaction: " + (error as Error).message);
+  } catch (err) {
+    return NEW_ERROR("performEVMTransaction: " + errMsg(err));
   }
 }

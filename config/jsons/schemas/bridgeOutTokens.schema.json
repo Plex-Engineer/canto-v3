@@ -1,0 +1,123 @@
+{
+    "title": "Bridge Out Token list schema",
+    "type": "object",
+    "properties": {
+        "title": {
+            "description": "title",
+            "type": "string"
+        },
+        "description": {
+            "description": "description",
+            "type": "string"
+        },
+        "chainTokenList": {
+            "description": "chain id with list of bridging tokens",
+            "type": "object",
+            "patternProperties": {
+                "^.*$": {
+                    "description": "bridge out tokens for specified chain",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/bridgeOutToken"
+                    }
+                }
+            }
+        }
+    },
+    "additionalProperties": true,
+    "definitions": {
+        "bridgeMethod": {
+            "description": "Types of bridge methods, (0 = gravity bridge, 1 = ibc, 2 = layer zero)",
+            "enum": [
+                "0",
+                "1",
+                "2"
+            ]
+        },
+        "bridgeMethodWithChain": {
+            "description": "Type of bridging method along with chain (for bridging out)",
+            "type": "object",
+            "properties": {
+                "chainId": {
+                    "description": "id of network (not the same as evm or cosmos chainId)",
+                    "type": "string"
+                },
+                "methods": {
+                    "description": "methods the token can be bridged with to this chain",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/bridgeMethod"
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "bridgeOutToken": {
+            "description": "will be an erc20 token since originating from canto evm",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "id",
+                    "type": "string"
+                },
+                "chainId": {
+                    "description": "chainId",
+                    "type": "number"
+                },
+                "address": {
+                    "description": "address",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "name",
+                    "type": "string"
+                },
+                "symbol": {
+                    "description": "symbol",
+                    "type": "string"
+                },
+                "decimals": {
+                    "description": "decimals",
+                    "type": "number"
+                },
+                "icon": {
+                    "description": "icon",
+                    "type": "string"
+                },
+                "bridgeMethods": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/bridgeMethodWithChain"
+                    }
+                },
+                "ibcDenom": {
+                    "description": "ibcDenom",
+                    "type": "string"
+                },
+                "nativeName": {
+                    "description": "nativeName",
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "id",
+                "chainId",
+                "address",
+                "name",
+                "symbol",
+                "decimals",
+                "icon",
+                "bridgeMethods"
+            ],
+            "dependencies": {
+                "ibcDenom": [
+                    "nativeName"
+                ],
+                "nativeName": [
+                    "ibcDenom"
+                ]
+            }
+        }
+    }
+}

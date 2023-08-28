@@ -6,4 +6,13 @@ export interface ERC20Token {
   symbol: string;
   decimals: number;
   icon: string;
+  balance?: string;
+}
+
+// extends ERC20 since all IBC tokens supported on Canto will have
+// an ERC20 representation
+export interface IBCToken extends Omit<ERC20Token, "address"> {
+  address?: string;
+  ibcDenom: string; // "ibc/..."
+  nativeName: string; // ex. uatom, ucre, acanto
 }

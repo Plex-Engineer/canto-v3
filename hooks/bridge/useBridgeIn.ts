@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
-import { CANTO_MAINNET, CANTO_TESTNET } from "@/config/networks";
+import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
 import BRIDGE_IN_TOKEN_LIST from "@/config/jsons/bridgeInTokens.json";
 import {
   NEW_ERROR,
@@ -12,13 +12,20 @@ import {
   BridgeHookInputParams,
   BridgeHookReturn,
   BridgeHookState,
+  BridgeHookTxParams,
 } from "./interfaces/hookParams";
 import useAutoSelect from "../helpers/useAutoSelect";
 import { BaseNetwork } from "@/config/interfaces/networks";
-import { BridgeToken, BridgingMethod } from "./interfaces/tokens";
+import { BridgeInToken } from "./interfaces/tokens";
+import { BridgingMethod } from "./interfaces/bridgeMethods";
 import { Transaction } from "@/config/interfaces/transactions";
-import { bridgeInGravity } from "./transactions/gravityBridge";
-import { bridgeLayerZero } from "./transactions/layerZero";
+import useTokenBalances from "../helpers/useTokenBalances";
+import { bridgeInTx } from "./transactions/bridge";
+import { isERC20TokenList } from "@/utils/tokens/tokens.utils";
+import {
+  isBridgeInToken,
+  isBridgeInTokenList,
+} from "@/utils/tokens/bridgeTokens.utils";
 
 export default function useBridgeIn(
   props: BridgeHookInputParams
@@ -32,7 +39,7 @@ export default function useBridgeIn(
     availableTokens: [],
     availableMethods: [],
     // default selections
-    toNetwork: props.testnet ? CANTO_TESTNET : CANTO_MAINNET,
+    toNetwork: props.testnet ? CANTO_TESTNET_EVM : CANTO_MAINNET_EVM,
     fromNetwork: null,
     selectedToken: null,
     selectedMethod: null,
@@ -45,6 +52,13 @@ export default function useBridgeIn(
   /// internal hooks
   ///
 
+  // contains object mapping of the token balances
+  const userTokenBalances = useTokenBalances(
+    state.fromNetwork?.chainId,
+    isERC20TokenList(state.availableTokens) ? state.availableTokens : [],
+    props.userEthAddress,
+    props.userCosmosAddress
+  );
   // will autoselect the first available network (only network can have default since loaded once)
   useAutoSelect(state.availableNetworks, setNetwork, props.defaults?.networkId);
   // will autoselect the first available token
@@ -64,11 +78,17 @@ export default function useBridgeIn(
       ? NO_ERROR(network)
       : NEW_ERROR("useBridgeIn::getNetwork: network not found:" + id);
   }
-  function getToken(id: string): ReturnWithError<BridgeToken> {
+  function getToken(id: string): ReturnWithError<BridgeInToken> {
     const token = state.availableTokens.find((token) => token.id === id);
-    return token
-      ? NO_ERROR(token)
-      : NEW_ERROR("useBridgeIn::getToken: token not found:" + id);
+    if (!isBridgeInToken(token)) {
+      return NEW_ERROR("useBridgeIn::getToken: invalid token type:" + id);
+    }
+    // check if we have a balance for the token
+    const balance = userTokenBalances[token.id];
+    if (balance !== undefined) {
+      return NO_ERROR({ ...token, balance });
+    }
+    return NO_ERROR(token);
   }
 
   ///
@@ -77,17 +97,27 @@ export default function useBridgeIn(
 
   // sets network and finds tokens for that network
   function setNetwork(id: string): void {
+    //make sure new network was actually selected
+    if (state.fromNetwork?.id === id) return;
+
     const { data: network, error: networkError } = getNetwork(id);
     if (networkError) {
       throw new Error("useBridgeIn::setNetwork::" + networkError.message);
     }
-    const tokens = BRIDGE_IN_TOKEN_LIST.chainTokenList[
-      network.id as keyof typeof BRIDGE_IN_TOKEN_LIST.chainTokenList
-    ] as BridgeToken[];
+    const tokens =
+      BRIDGE_IN_TOKEN_LIST.chainTokenList[
+        network.id as keyof typeof BRIDGE_IN_TOKEN_LIST.chainTokenList
+      ];
     if (!tokens || tokens.length === 0) {
       throw new Error(
         "useBridgeIn::setNetwork: No tokens available for network: " +
           network.id
+      );
+    }
+    // check token type to make sure they are all bridgeInTokens
+    if (!isBridgeInTokenList(tokens)) {
+      throw new Error(
+        "useBridgeIn::setNetwork: Invalid token type for network: " + network.id
       );
     }
     setState((prevState) => ({
@@ -103,6 +133,9 @@ export default function useBridgeIn(
 
   // sets selected token and loads bridging methods for that token
   function setToken(id: string): void {
+    //make sure new token was actually selected
+    if (state.selectedToken?.id === id) return;
+
     const { data: token, error: tokenError } = getToken(id);
     if (tokenError) {
       throw new Error("useBridgeIn::setToken::" + tokenError.message);
@@ -117,7 +150,7 @@ export default function useBridgeIn(
     setState((prevState) => ({
       ...prevState,
       selectedToken: token,
-      availableMethods: bridgeMethods as BridgingMethod[],
+      availableMethods: bridgeMethods,
       // reset method selection
       selectedMethod: null,
     }));
@@ -126,6 +159,8 @@ export default function useBridgeIn(
   // sets selected bridging method only it actually exists on the token
   function setMethod(selectMethod: string): void {
     const method = selectMethod as BridgingMethod;
+    //make sure new method was actually selected
+    if (method === state.selectedMethod) return;
 
     if (!state.availableMethods.includes(method)) {
       throw new Error("useBridgeIn::setMethod: Invalid method: " + method);
@@ -140,8 +175,7 @@ export default function useBridgeIn(
   /// external functions
   ///
   async function bridgeIn(
-    ethAccount: string,
-    amount: string
+    params: BridgeHookTxParams
   ): PromiseWithError<Transaction[]> {
     // check basic parameters to make sure they exist
     if (!state.selectedToken) {
@@ -150,54 +184,42 @@ export default function useBridgeIn(
     if (!state.fromNetwork || !state.toNetwork) {
       return NEW_ERROR("useBridgeIn::bridgeIn: network undefined");
     }
-
-    let transactions: ReturnWithError<Transaction[]>;
-    // check the selected method to figure out how to create tx
-    switch (state.selectedMethod) {
-      case BridgingMethod.GRAVITY_BRIDGE:
-        transactions = await bridgeInGravity(
-          Number(state.fromNetwork.chainId),
-          ethAccount,
-          state.selectedToken,
-          amount
-        );
-        break;
-      case BridgingMethod.LAYER_ZERO:
-        transactions = await bridgeLayerZero(
-          state.fromNetwork,
-          state.toNetwork,
-          ethAccount,
-          state.selectedToken,
-          amount
-        );
-        break;
-      case BridgingMethod.IBC: {
-        transactions = NEW_ERROR("useBridgeIn::bridgeIn: IBC not implemented");
-        break;
-      }
-      default:
-        transactions = NEW_ERROR(
-          "useBridgeIn::bridgeIn: invalid method: " + state.selectedMethod
-        );
-        break;
+    const { data: transactions, error: transactionsError } = await bridgeInTx({
+      from: {
+        network: state.fromNetwork,
+        account: params.sender,
+      },
+      to: {
+        network: state.toNetwork,
+        account: params.receiver,
+      },
+      token: {
+        data: state.selectedToken,
+        amount: params.amount,
+      },
+      method: state.selectedMethod,
+    });
+    if (transactionsError) {
+      return NEW_ERROR("useBridgeIn::bridgeIn::" + transactionsError.message);
     }
-    if (transactions.error) {
-      return NEW_ERROR("useBridgeIn::bridgeIn::" + transactions.error.message);
-    }
-    return transactions;
+    return NO_ERROR(transactions);
   }
 
   return {
+    direction: "in",
     testnet: props.testnet ?? false,
     allOptions: {
       networks: state.availableNetworks,
-      tokens: state.availableTokens,
+      tokens: state.availableTokens.map((token) => {
+        const balance = userTokenBalances[token.id];
+        return balance !== undefined ? { ...token, balance } : token;
+      }),
       methods: state.availableMethods,
     },
     selections: {
       toNetwork: state.toNetwork,
       fromNetwork: state.fromNetwork,
-      token: state.selectedToken,
+      token: state.selectedToken ? getToken(state.selectedToken.id).data : null,
       method: state.selectedMethod,
     },
     setters: {

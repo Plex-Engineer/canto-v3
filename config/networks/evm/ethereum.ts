@@ -23,6 +23,7 @@ export const ETH_MAINNET: EVMNetwork = {
     getAddressLink: getEthAddressLink(ethBlockExplorer),
     getTransactionLink: getEthTransactionLink(ethBlockExplorer),
   },
+  multicall3Address: "0xcA11bde05977b3631167028862bE2a173976CA11",
 };
 
 export const GOERLI_TESTNET: EVMNetwork = {
@@ -43,4 +44,5 @@ export const GOERLI_TESTNET: EVMNetwork = {
     getAddressLink: getEthAddressLink(goerliBlockExplorer),
     getTransactionLink: getEthTransactionLink(goerliBlockExplorer),
   },
+  multicall3Address: "0xcA11bde05977b3631167028862bE2a173976CA11",
 };

@@ -3,3 +3,4 @@ export const GRAVITY_BRIDGE_ETH_ADDRESS =
   "0xa4108aA1Ec4967F8b52220a4f7e94A8201F2D906";
 export const WETH_MAINNET_ADDRESS =
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+export const PUB_KEY_BOT_ADDRESS = "canto1efrhdukv096tmjs7r80m8pqkr3udp9g0uadjfv"

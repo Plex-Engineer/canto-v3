@@ -2,6 +2,7 @@
     "title": "Canto Bridge Out Token List",
     "description": "List of tokens supported to bridge out, possible chains to send to, and the bridge method to use",
     "bridgeMethodInfo": {
+        "comment": "enum for bridge method also noted in ../schemas/bridgeOutTokens.schema.json",
         "0": "gravity bridge",
         "1": "ibc transfer",
         "2": "layer zero"
@@ -15,7 +16,7 @@
                 "name": "Canto",
                 "symbol": "CANTO",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
                 "bridgeMethods": [
                     {
                         "chainId": "eth-mainnet",
@@ -32,12 +33,12 @@
                 "name": "USDC",
                 "symbol": "USDC",
                 "decimals": 6,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdc.svg",
                 "ibcDenom": "ibc/17CD484EE7D9723B847D95015FA3EBD1572FD13BC84FB838F55B18A57450F25B",
                 "nativeName": "gravity0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
                 "bridgeMethods": [
                     {
-                        "chainId": "gravity-bridge",
+                        "chainId": "gravity-bridge-3",
                         "methods": [
                             "1"
                         ]
@@ -51,12 +52,12 @@
                 "name": "USDT",
                 "symbol": "USDT",
                 "decimals": 6,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdt.svg",
                 "ibcDenom": "ibc/4F6A2DEFEA52CD8D90966ADCB2BD0593D3993AB0DF7F6AEB3EFD6167D79237B0",
                 "nativeName": "gravity0xd567B3d7B8FE3C79a1AD8dA978812cfC4Fa05e75",
                 "bridgeMethods": [
                     {
-                        "chainId": "gravity-bridge",
+                        "chainId": "gravity-bridge-3",
                         "methods": [
                             "1"
                         ]
@@ -70,12 +71,12 @@
                 "name": "ETH",
                 "symbol": "ETH",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/eth-white.svg",
                 "ibcDenom": "ibc/DC186CA7A8C009B43774EBDC825C935CABA9743504CE6037507E6E5CCE12858A",
                 "nativeName": "gravity0x5FD55A1B9FC24967C4dB09C513C3BA0DFa7FF687",
                 "bridgeMethods": [
                     {
-                        "chainId": "gravity-bridge",
+                        "chainId": "gravity-bridge-3",
                         "methods": [
                             "1"
                         ]
@@ -89,12 +90,12 @@
                 "name": "Wrapped Staked ETH",
                 "symbol": "WSTETH",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/wsteth.svg",
                 "ibcDenom": "ibc/35D050E2A1F7BEAFA783A4A4739DC802A6797E59041341D78D88F5B754948604",
                 "nativeName": "gravity0xc71aAf8e486e3F33841BB56Ca3FD2aC3fa8D29a8",
                 "bridgeMethods": [
                     {
-                        "chainId": "gravity-bridge",
+                        "chainId": "gravity-bridge-3",
                         "methods": [
                             "1"
                         ]
@@ -113,7 +114,7 @@
                 "nativeName": "ugraviton",
                 "bridgeMethods": [
                     {
-                        "chainId": "gravity-bridge",
+                        "chainId": "gravity-bridge-3",
                         "methods": [
                             "1"
                         ]
@@ -127,12 +128,411 @@
                 "name": "Atom",
                 "symbol": "ATOM",
                 "decimals": 6,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
                 "ibcDenom": "ibc/9117A26BA81E29FA4F78F57DC2BD90CD3D26848101BA880445F119B22A1E254E",
                 "nativeName": "uatom",
                 "bridgeMethods": [
                     {
-                        "chainId": "cosmos-hub",
+                        "chainId": "cosmoshub-4",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x0CE35b0D42608Ca54Eb7bcc8044f7087C18E7717",
+                "chainId": 7700,
+                "address": "0x0CE35b0D42608Ca54Eb7bcc8044f7087C18E7717",
+                "name": "Osmosis",
+                "symbol": "OSMO",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg",
+                "ibcDenom": "ibc/D24B4564BCD51D3D02D9987D92571EAC5915676A9BD6D9B0C1D0254CB8A5EA34",
+                "nativeName": "uosmo",
+                "bridgeMethods": [
+                    {
+                        "chainId": "osmosis-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x3452e23F9c4cC62c70B7ADAd699B264AF3549C19",
+                "chainId": 7700,
+                "address": "0x3452e23F9c4cC62c70B7ADAd699B264AF3549C19",
+                "name": "Comdex",
+                "symbol": "CMDX",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/comdex/images/cmdx.svg",
+                "ibcDenom": "ibc/B0ADAE6558A3E9B2B49FF2EA89A9AEA312431FEB51FCF73650C8C90589F5149B",
+                "nativeName": "ucmdx",
+                "bridgeMethods": [
+                    {
+                        "chainId": "comdex-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x1D54EcB8583Ca25895c512A8308389fFD581F9c9",
+                "chainId": 7700,
+                "address": "0x1D54EcB8583Ca25895c512A8308389fFD581F9c9",
+                "name": "Injective",
+                "symbol": "INJ",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/injective/images/inj.svg",
+                "ibcDenom": "ibc/4E790C04E6F00F971251E227AEA8E19A5AD274BFE18253EF0EDD7707D8AF1F7C",
+                "nativeName": "inj",
+                "bridgeMethods": [
+                    {
+                        "chainId": "injective-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x5db67696C3c088DfBf588d3dd849f44266ff0ffa",
+                "chainId": 7700,
+                "address": "0x5db67696C3c088DfBf588d3dd849f44266ff0ffa",
+                "name": "Crescent",
+                "symbol": "CRE",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/crescent/images/cre.svg",
+                "ibcDenom": "ibc/31DCE745EBDFBB19710DF9B1B2D2378183DDB9216EA42750AD1E246CF4A6040B",
+                "nativeName": "ucre",
+                "bridgeMethods": [
+                    {
+                        "chainId": "crescent-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0xFA3C22C069B9556A4B2f7EcE1Ee3B467909f4864",
+                "chainId": 7700,
+                "address": "0xFA3C22C069B9556A4B2f7EcE1Ee3B467909f4864",
+                "name": "Sommelier",
+                "symbol": "SOMM",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/sommelier/images/somm.svg",
+                "ibcDenom": "ibc/E341F178AB30AC89CF18B9559D90EF830419B5A4B50945EF800FD68DE840A91E",
+                "nativeName": "usomm",
+                "bridgeMethods": [
+                    {
+                        "chainId": "sommelier-3",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x5aD523d94Efb56C400941eb6F34393b84c75ba39",
+                "chainId": 7700,
+                "address": "0x5aD523d94Efb56C400941eb6F34393b84c75ba39",
+                "name": "Akash",
+                "symbol": "AKT",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/akash/images/akt.svg",
+                "ibcDenom": "ibc/C7B08BE4C7765726030DF899C78DE8FC8DFA6B580920B18AE04A3A70447BE299",
+                "nativeName": "uakt",
+                "bridgeMethods": [
+                    {
+                        "chainId": "akashnet-2",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0xC5e00D3b04563950941f7137B5AfA3a534F0D6d6",
+                "chainId": 7700,
+                "address": "0xC5e00D3b04563950941f7137B5AfA3a534F0D6d6",
+                "name": "Kava",
+                "symbol": "KAVA",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/kava/images/kava.svg",
+                "ibcDenom": "ibc/147B3FF1D005512CCE4089559AF5D0C951F4211A031F15E782E505B85022DF89",
+                "nativeName": "ukava",
+                "bridgeMethods": [
+                    {
+                        "chainId": "kava_2222-10",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x15C3Eb3B621d1Bff62CbA1c9536B7c1AE9149b57",
+                "chainId": 7700,
+                "address": "0x15C3Eb3B621d1Bff62CbA1c9536B7c1AE9149b57",
+                "name": "Sentinel",
+                "symbol": "DVPN",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/sentinel/images/dvpn.svg",
+                "ibcDenom": "ibc/57D140BD8A4232F69E6A9121106985BC07BAA69B15B45299C19507A7AF9D1D51",
+                "nativeName": "udvpn",
+                "bridgeMethods": [
+                    {
+                        "chainId": "sentinelhub-2",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0xF5b24c0093b65408ACE53df7ce86a02448d53b25",
+                "chainId": 7700,
+                "address": "0xF5b24c0093b65408ACE53df7ce86a02448d53b25",
+                "name": "Evmos",
+                "symbol": "EVMOS",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/evmos/images/evmos.svg",
+                "ibcDenom": "ibc/ADD4A1A9CCE546D83048328686F31E089BC1154552B96A50A2BD3377B0FE4C49",
+                "nativeName": "aevmos",
+                "bridgeMethods": [
+                    {
+                        "chainId": "evmos_9001-2",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0xc8B4d3e67238e38B20d38908646fF6F4F48De5EC",
+                "chainId": 7700,
+                "address": "0xc8B4d3e67238e38B20d38908646fF6F4F48De5EC",
+                "name": "Persistence",
+                "symbol": "XPRT",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/persistence/images/xprt.svg",
+                "ibcDenom": "ibc/B3CC9901DF8BA5F6154EDA69B3016EE16A795B6C422216AE08307FBBEAC22575",
+                "nativeName": "uxprt",
+                "bridgeMethods": [
+                    {
+                        "chainId": "core-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x50dE24B3f0B3136C50FA8A3B8ebc8BD80a269ce5",
+                "chainId": 7700,
+                "address": "0x50dE24B3f0B3136C50FA8A3B8ebc8BD80a269ce5",
+                "name": "PSTAKE staked ATOM",
+                "symbol": "stkATOM",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/persistence/images/stkatom.svg",
+                "ibcDenom": "ibc/F596D425ED062FF586E9F74EA67E663BEB602EAD18F3388FB6DF57E127552BFD",
+                "nativeName": "stk/uatom",
+                "bridgeMethods": [
+                    {
+                        "chainId": "core-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x13974cf36984216C90D1F4FC815C156092feA396",
+                "chainId": 7700,
+                "address": "0x13974cf36984216C90D1F4FC815C156092feA396",
+                "name": "Stride",
+                "symbol": "STRD",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/stride/images/strd.svg",
+                "ibcDenom": "ibc/68930779653E62D66440AE801EE3394E9A29C4222930CBB20EC3EE179DE69E34",
+                "nativeName": "ustrd",
+                "bridgeMethods": [
+                    {
+                        "chainId": "stride-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x205CF44075E77A3543abC690437F3b2819bc450a",
+                "chainId": 7700,
+                "address": "0x205CF44075E77A3543abC690437F3b2819bc450a",
+                "name": "stEVMOS",
+                "symbol": "stEVMOS",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/stride/images/stevmos.svg",
+                "ibcDenom": "ibc/F33F8D7220E055E2079040C9E2BC6EC77FE77BD0D3FEB0ED5E1A9E5302E36885",
+                "nativeName": "staevmos",
+                "bridgeMethods": [
+                    {
+                        "chainId": "stride-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x4A2a90D444DbB7163B5861b772f882BbA394Ca67",
+                "chainId": 7700,
+                "address": "0x4A2a90D444DbB7163B5861b772f882BbA394Ca67",
+                "name": "stATOM",
+                "symbol": "stATOM",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/stride/images/statom.svg",
+                "ibcDenom": "ibc/E37B0A409BFF1981B1CEE15E2D766F28BE0710AFFCB4DE546FADE29A290B92B4",
+                "nativeName": "stuatom",
+                "bridgeMethods": [
+                    {
+                        "chainId": "stride-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0xe01C6D4987Fc8dCE22988DADa92d56dA701d0Fe0",
+                "chainId": 7700,
+                "address": "0xe01C6D4987Fc8dCE22988DADa92d56dA701d0Fe0",
+                "name": "stJUNO",
+                "symbol": "stJUNO",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/stride/images/stjuno.svg",
+                "ibcDenom": "ibc/88C5B8AA229E9CCF38A70005A4DD50F758AF222244F7FF1506B57081C9E2A8BB",
+                "nativeName": "stujuno",
+                "bridgeMethods": [
+                    {
+                        "chainId": "stride-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x3515F25AB7637adcF1b69F4D384ed5936B83431F",
+                "chainId": 7700,
+                "address": "0x3515F25AB7637adcF1b69F4D384ed5936B83431F",
+                "name": "stOSMO",
+                "symbol": "stOSMO",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/stride/images/stosmo.svg",
+                "ibcDenom": "ibc/9EA05E1C36673DCFEF7AFB499B10673F0232B3AB5279EDA20E2E149969169931",
+                "nativeName": "stuosmo",
+                "bridgeMethods": [
+                    {
+                        "chainId": "stride-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x4AF57825b86Abf93D4F9D720bEF7c1C1b300A6F3",
+                "chainId": 7700,
+                "address": "0x4AF57825b86Abf93D4F9D720bEF7c1C1b300A6F3",
+                "name": "stSTARS",
+                "symbol": "stSTARS",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/stride/images/ststars.svg",
+                "ibcDenom": "ibc/3E5BCCFB6C591DD08FA67C5A4C9AA1EE372CF591AA6E0B819C530AE5F653316A",
+                "nativeName": "stustars",
+                "bridgeMethods": [
+                    {
+                        "chainId": "stride-1",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0xF0965c8f0755CF080a61C91EDd6707F0532c8fE7",
+                "chainId": 7700,
+                "address": "0xF0965c8f0755CF080a61C91EDd6707F0532c8fE7",
+                "name": "Quicksilver",
+                "symbol": "QCK",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/quicksilver/images/qck.svg",
+                "ibcDenom": "ibc/A4105A8226DEF5EE9AB52E7A745980D102E102C1C6A1E91DA186DB36216C3744",
+                "nativeName": "uqck",
+                "bridgeMethods": [
+                    {
+                        "chainId": "quicksilver-2",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x9d6F2a9fDB32708e1AC07788cc29D6125ac73027",
+                "chainId": 7700,
+                "address": "0x9d6F2a9fDB32708e1AC07788cc29D6125ac73027",
+                "name": "Quicksilver Liquid Staked ATOM",
+                "symbol": "qATOM",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/quicksilver/images/qatom.svg",
+                "ibcDenom": "ibc/218B1A13F78796F4B4764BD36D110F0D14B452E0119C125EA8E3482D2E1FF9DB",
+                "nativeName": "uqatom",
+                "bridgeMethods": [
+                    {
+                        "chainId": "quicksilver-2",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0xB5124FA2b2cF92B2D469b249433BA1c96BDF536D",
+                "chainId": 7700,
+                "address": "0xB5124FA2b2cF92B2D469b249433BA1c96BDF536D",
+                "name": "Quicksilver Liquid Staked Regen",
+                "symbol": "qREGEN",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/quicksilver/images/qregen.svg",
+                "ibcDenom": "ibc/A310237FFAEB069D06E03AD04F0D4356AF4E4647C662C4209F8E40D0CA2F14AD",
+                "nativeName": "uqregen",
+                "bridgeMethods": [
+                    {
+                        "chainId": "quicksilver-2",
+                        "methods": [
+                            "1"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0xD32eB974468ed767338533842D2D4Cc90B9BAb46",
+                "chainId": 7700,
+                "address": "0xD32eB974468ed767338533842D2D4Cc90B9BAb46",
+                "name": "Quicksilver Liquid Staked STARS",
+                "symbol": "qSTARS",
+                "decimals": 6,
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/quicksilver/images/qstars.svg",
+                "ibcDenom": "ibc/13B6057538B93225F6EBACCB64574C49B2C1568C5AE6CCFE0A039D7DAC02BF29",
+                "nativeName": "uqstars",
+                "bridgeMethods": [
+                    {
+                        "chainId": "quicksilver-2",
                         "methods": [
                             "1"
                         ]
@@ -148,7 +548,7 @@
                 "name": "Canto",
                 "symbol": "CANTO",
                 "decimals": 18,
-                "icon": "",
+                "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
                 "bridgeMethods": [
                     {
                         "chainId": "mumbai-testnet",

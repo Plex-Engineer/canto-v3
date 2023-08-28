@@ -6,13 +6,20 @@ import {
 import { GetWalletClientResult, switchNetwork } from "wagmi/actions";
 import { performEVMTransaction } from "./evm/performEVMTx";
 import { Transaction } from "@/config/interfaces/transactions";
-import { performCosmosTransaction } from "./cosmos/performCosmosTx";
+import {
+  performCosmosTransactionEIP,
+  waitForCosmosTx,
+} from "./cosmos/transactions/performCosmosTx";
 import { waitForTransaction as evmWait } from "wagmi/actions";
-import { tryFetchWithRetry } from "./async.utils";
-import { getCosmosAPIEndpoint } from "@/config/consts/apiUrls";
+import { performKeplrTx } from "./keplr/performKeplrTx";
 
-// function will know if EVM or COSMOS tx to perform
-// returns hash of tx
+/**
+ * @notice performs a single transaction
+ * @dev will know if EVM or COSMOS tx to perform
+ * @param {Transaction} tx transaction to perform
+ * @param {GetWalletClientResult} signer signer to perform tx with
+ * @returns {PromiseWithError<string>} txHash of transaction or error
+ */
 export async function performSingleTransaction(
   tx: Transaction,
   signer: GetWalletClientResult
@@ -23,7 +30,10 @@ export async function performSingleTransaction(
       return await performEVMTransaction(tx, signer);
     case "COSMOS":
       // perform cosmos tx
-      return await performCosmosTransaction(tx, signer);
+      return await performCosmosTransactionEIP(tx, signer);
+    case "KEPLR":
+      // perform keplr tx
+      return await performKeplrTx(tx);
     default:
       return NEW_ERROR(
         "useTransactionStore::performSingleTransaction: unknown tx type"
@@ -31,11 +41,17 @@ export async function performSingleTransaction(
   }
 }
 
-// function type spcecifies how to check on the transaction
-// will return if the transaction was successful/confirmed
+/**
+ * @notice checks if the transaction was successful/confirmed
+ * @dev will know if EVM or COSMOS tx to check
+ * @param {string} txType type of transaction
+ * @param {number} chainId chainId of transaction
+ * @param {string} hash hash of transaction
+ * @returns {PromiseWithError<{status: string, error: any}>} status of transaction or error
+ */
 export async function waitForTransaction(
-  txType: "EVM" | "COSMOS",
-  chainId: number,
+  txType: "EVM" | "COSMOS" | "KEPLR",
+  chainId: number | string,
   hash: string
 ): PromiseWithError<{
   status: string;
@@ -44,7 +60,7 @@ export async function waitForTransaction(
   switch (txType) {
     case "EVM":
       const receipt = await evmWait({
-        chainId,
+        chainId: chainId as number,
         hash: hash as `0x${string}`,
         confirmations: 1,
       });
@@ -53,29 +69,20 @@ export async function waitForTransaction(
         error: receipt.logs,
       });
     case "COSMOS":
-      const { data: endpoint, error: endpointError } =
-        getCosmosAPIEndpoint(chainId);
-      if (endpointError) {
-        return NEW_ERROR("waitForTransaction::" + endpointError.message);
-      }
-      const { data: response, error: fetchError } = await tryFetchWithRetry<{
-        tx_response: {
-          code: number;
-          raw_log: string;
-        };
-      }>(endpoint + "/cosmos/tx/v1beta1/txs/" + hash, 5);
-      if (fetchError) {
-        return NEW_ERROR("waitForTransaction::" + fetchError.message);
-      }
-      return NO_ERROR({
-        status: response.tx_response.code === 0 ? "success" : "fail",
-        error: response.tx_response.raw_log,
-      });
+    case "KEPLR":
+      return waitForCosmosTx(chainId, hash);
     default:
       return NEW_ERROR("waitForTransaction: unknown tx type: " + txType);
   }
 }
 
+/**
+ * @notice checks if the signer is on the right chain and tries to switch if not
+ * @dev for EVM wallets
+ * @param {GetWalletClientResult} signer EVM signing wallet client
+ * @param {number} chainId chainId signer should be on
+ * @returns {PromiseWithError<boolean>} if the signer is on the chain
+ */
 export async function checkOnRightChain(
   signer: GetWalletClientResult,
   chainId: number
@@ -85,6 +92,7 @@ export async function checkOnRightChain(
   }
   if (signer.chain.id !== chainId) {
     try {
+      // attempt to switch chains
       const network = await switchNetwork({ chainId });
       if (!network || network.id !== chainId) {
         return NEW_ERROR("checkOnRightChain: error switching chains");

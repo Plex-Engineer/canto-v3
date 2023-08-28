@@ -1,28 +1,21 @@
-import { ERC20Token } from "@/config/interfaces/tokens";
+import { ERC20Token, IBCToken } from "@/config/interfaces/tokens";
+import { BridgingMethod } from "./bridgeMethods";
 
-export enum BridgingMethod {
-  GRAVITY_BRIDGE = "0",
-  IBC = "1",
-  LAYER_ZERO = "2",
-}
-
-export type BridgeToken = (BridgeInToken | BridgeOutToken) &
-  (ERC20Token | IBCToken);
+export type BridgeToken = BridgeInToken | BridgeOutToken;
 
 // BridgeIn and BridgeOut are the same thing, but with different bridging methods object
-interface BridgeInToken {
+export type BridgeInToken = {
   bridgeMethods: BridgingMethod[];
-}
-interface BridgeOutToken {
+} & (ERC20Token | IBCToken);
+
+export type BridgeOutToken = {
   bridgeMethods: {
     chainId: string;
     methods: BridgingMethod[];
   }[];
-}
+} & (ERC20Token | IBCToken);
 
-// extends ERC20 since all IBC tokens supported on Canto will have
-// an ERC20 representation
-export interface IBCToken extends ERC20Token {
-  ibcDenom: string; // "ibc/..."
-  nativeName: string; // ex. uatom, ucre, acanto
+// for user balance data on bridge
+export interface UserTokenBalances {
+  [key: string]: string; // token id => balance
 }
