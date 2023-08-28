@@ -14,83 +14,98 @@ const BridgeIn = () => {
   const mockNetworks: Item[] = [
     {
       icon: "/networks/ethereum.svg",
+      id: "1",
       name: "Ethereum",
       balance: 0.43,
     },
     {
       name: "Layer Zero",
       icon: "/networks/layer_zero.png",
+      id: "1",
       balance: 0.43,
     },
     {
       name: "Gravity Bridge",
       icon: "/networks/graviton.svg",
+      id: "1",
       balance: 0.43,
     },
     {
-      iconUrl: "/networks/ethereum.svg",
+      icon: "/networks/ethereum.svg",
+      id: "1",
       name: "Ethereum",
       balance: 0.43,
     },
     {
       name: "Layer Zero",
-      iconUrl: "/networks/layer_zero.png",
+      icon: "/networks/layer_zero.png",
+      id: "1",
       balance: 0.43,
     },
     {
       name: "Gravity Bridge",
-      iconUrl: "/networks/graviton.svg",
+      icon: "/networks/graviton.svg",
+      id: "1",
       balance: 0.43,
     },
     {
-      iconUrl: "/networks/ethereum.svg",
+      icon: "/networks/ethereum.svg",
+      id: "1",
       name: "Ethereum",
       balance: 0.43,
     },
     {
       name: "Layer Zero",
-      iconUrl: "/networks/layer_zero.png",
+      icon: "/networks/layer_zero.png",
+      id: "1",
       balance: 0.43,
     },
     {
       name: "Gravity Bridge",
-      iconUrl: "/networks/graviton.svg",
+      icon: "/networks/graviton.svg",
+      id: "1",
       balance: 0.43,
     },
 
     {
-      iconUrl: "/networks/ethereum.svg",
+      icon: "/networks/ethereum.svg",
+      id: "1",
       name: "Ethereum",
       balance: 0.43,
     },
     {
       name: "Layer Zero",
-      iconUrl: "/networks/layer_zero.png",
+      icon: "/networks/layer_zero.png",
+      id: "1",
       balance: 0.43,
     },
     {
       name: "Gravity Bridge",
-      iconUrl: "/networks/graviton.svg",
+      icon: "/networks/graviton.svg",
+      id: "1",
       balance: 0.43,
     },
     {
-      iconUrl: "/networks/ethereum.svg",
+      icon: "/networks/ethereum.svg",
+      id: "1",
       name: "Ethereum",
       balance: 0.43,
     },
     {
       name: "Layer Zero",
-      iconUrl: "/networks/layer_zero.png",
+      icon: "/networks/layer_zero.png",
+      id: "1",
       balance: 0.43,
     },
     {
       name: "Gravity Bridge",
-      iconUrl: "/networks/graviton.svg",
+      icon: "/networks/graviton.svg",
+      id: "1",
       balance: 0.43,
     },
   ];
 
-  const [activeMockNetwork, setActiveMockNetwork] = useState(mockNetworks[0]);
+  const [activeMockNetwork, setActiveMockNetwork] = useState("1");
 
   const [choosingToken, setChoosingToken] = useState(false);
 
@@ -112,7 +127,7 @@ const BridgeIn = () => {
             {/* mock network selector */}
             <Selector
               title="SELECT NETWORK"
-              activeItem={activeMockNetwork}
+              activeItem={mockNetworks[Number(activeMockNetwork)]}
               items={mockNetworks}
               onChange={(item) => {
                 console.log(item);

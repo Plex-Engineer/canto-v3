@@ -12,7 +12,7 @@ export interface Item {
   id: string;
   icon: string;
   name: string;
-  balance?: number;
+  balance?: number | string;
 }
 
 interface Props {
@@ -50,18 +50,13 @@ const Selector = (props: Props) => {
                 }}
                 className={styles.item}
                 onClick={() => {
-                  props.onChange(item);
+                  props.onChange(item.id);
                   setIsOpen(false);
                 }}
               >
-                <Image
-                  src={item.iconUrl}
-                  alt={item.name}
-                  width={30}
-                  height={30}
-                />
+                <Image src={item.icon} alt={item.name} width={30} height={30} />
                 <Text size="md" font="proto_mono">
-                  {item.name}
+                  {item.name} {item.balance}
                 </Text>
               </Container>
             ))}

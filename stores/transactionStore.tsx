@@ -29,7 +29,7 @@ export interface TransactionStore {
   // will delete all transactions in list index, or the entire store if no index provided
   clearTransactions: (listIndex?: number) => void;
   performTransactions: (
-    signer: GetWalletClientResult,
+    signer: GetWalletClientResult | undefined,
     overrides?: {
       txListIndex?: number;
       txIndex?: number;
@@ -84,6 +84,12 @@ const useTransactionStore = create<TransactionStore>()(
           }
         },
         performTransactions: async (signer, overrides) => {
+          // make sure signer is here
+          if (!signer) {
+            return NEW_ERROR(
+              "useTransactionStore::performTransactions: no signer provided"
+            );
+          }
           // start with the most recent if none provided
           const listIndex =
             overrides?.txListIndex || get().transactionFlows.length - 1;

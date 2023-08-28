@@ -21,11 +21,10 @@ import Button from "@/components/button/button";
 import { BridgeHookReturn } from "@/hooks/bridge/interfaces/hookParams";
 import AnimatedBackground from "@/components/animated_background/animatedBackground";
 import Tabs from "@/components/tabs/tabs";
-import Selector from "./selector/selector";
+import Selector, { Item } from "./selector/selector";
 import {
-  bridgeMethodToIcon,
-  bridgeMethodToString,
   BridgingMethod,
+  getBridgeMethodInfo,
 } from "@/hooks/bridge/interfaces/bridgeMethods";
 import { isCosmosNetwork } from "@/utils/networks.utils";
 import { TransactionFlowWithStatus } from "@/config/interfaces/transactions";
@@ -37,7 +36,7 @@ export default function TestPage() {
   const [cantoAddress, setCantoAddress] = useState<string>("");
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({
-    testnet: true,
+    testnet: false,
     userEthAddress: signer?.account.address,
   });
   const bridgeIn = useBridgeIn({
@@ -60,6 +59,7 @@ export default function TestPage() {
 
   useEffect(() => {
     async function getCantoAddress() {
+      if (!signer?.account.address) return;
       const cantoAddress = await ethToCantoAddress(signer?.account.address);
       if (cantoAddress.error) {
         console.log(cantoAddress.error);
@@ -164,7 +164,7 @@ export default function TestPage() {
             RETRY TRANSACTION
           </Button>
         </h1>
-        <TxBox {...transactionStore?.transactionFlows[txIndex]} />
+        <TxBox flow={transactionStore?.transactionFlows[txIndex]} />
         <Spacer height="30px" />
         <div
           style={{
@@ -187,7 +187,10 @@ export default function TestPage() {
           <Spacer width="20px" />
           <Button
             onClick={() => {
-              if (txIndex !== transactionStore?.transactionFlows.length - 1)
+              if (
+                transactionStore &&
+                txIndex !== transactionStore.transactionFlows.length - 1
+              )
                 setTxIndex((prev) => prev + 1);
             }}
           >
@@ -198,7 +201,10 @@ export default function TestPage() {
     </div>
   );
 }
-const TxBox = (flow: TransactionFlowWithStatus) => {
+interface TxBoxProps {
+  flow?: TransactionFlowWithStatus;
+}
+const TxBox = ({ flow }: TxBoxProps) => {
   if (!flow || !flow.title) return <></>;
   return (
     <div>
@@ -298,7 +304,13 @@ const Bridge = (props: BridgeProps) => {
       <label>{`From network (${fromAddress})`}</label>
       <Selector
         title="SELECT FROM NETWORK"
-        activeItem={props.bridge.selections.fromNetwork}
+        activeItem={
+          props.bridge.selections.fromNetwork ?? {
+            name: "Select network",
+            icon: "",
+            id: "",
+          }
+        }
         items={
           props.bridge.direction === "in"
             ? props.bridge.allOptions.networks
@@ -313,7 +325,13 @@ const Bridge = (props: BridgeProps) => {
       <label>{`To network (${toAddress})`}</label>
       <Selector
         title="SELECT TO NETWORK"
-        activeItem={props.bridge.selections.toNetwork}
+        activeItem={
+          props.bridge.selections.toNetwork ?? {
+            name: "Select network",
+            icon: "",
+            id: "",
+          }
+        }
         items={
           props.bridge.direction === "out"
             ? props.bridge.allOptions.networks
@@ -332,8 +350,15 @@ const Bridge = (props: BridgeProps) => {
       <Text size="sm">Select Token</Text>
       <Selector
         title="SELECT TOKEN"
-        activeItem={props.bridge.selections.token}
-        items={props.bridge.allOptions.tokens}
+        activeItem={
+          props.bridge.selections.token ??
+          ({
+            name: "Select Token",
+            icon: "",
+            id: "",
+          } as Item)
+        }
+        items={props.bridge.allOptions.tokens ?? []}
         onChange={props.bridge.setters.token}
       />
       <Spacer height="10px" />
@@ -362,16 +387,18 @@ const Bridge = (props: BridgeProps) => {
           <Selector
             title="SELECT METHOD"
             activeItem={{
-              name: bridgeMethodToString(props.bridge.selections.method),
-              id: props.bridge.selections.method,
-              icon: bridgeMethodToIcon(props.bridge.selections.method),
+              name: getBridgeMethodInfo(props.bridge.selections.method).name,
+              id: props.bridge.selections.method ?? "0",
+              icon: getBridgeMethodInfo(props.bridge.selections.method).icon,
             }}
             items={props.bridge.allOptions.methods.map((method) => ({
-              name: bridgeMethodToString(method),
+              name: getBridgeMethodInfo(method).name,
               id: method,
-              icon: bridgeMethodToIcon(method),
+              icon: getBridgeMethodInfo(method).icon,
             }))}
-            onChange={props.bridge.setters.method}
+            onChange={(method) =>
+              props.bridge.setters.method(method as BridgingMethod)
+            }
           />
         </div>
         <Spacer height="100px" />
