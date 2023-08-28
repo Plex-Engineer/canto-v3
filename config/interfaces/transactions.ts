@@ -35,6 +35,18 @@ export interface TransactionWithStatus {
 }
 
 ///
+/// Transaction Flows will include multiple transactions
+/// Flow will have the title of the overal "transaction flow"
+/// Flow will have a status
+///
+type TransactionFlowStatus = "NONE" | "PENDING" | "SUCCESS" | "ERROR";
+export interface TransactionFlowWithStatus {
+  title: string;
+  status: TransactionFlowStatus;
+  transactions: TransactionWithStatus[];
+}
+
+///
 /// Cosmos Transaction Interfaces
 ///
 export interface CosmosTxContext {
@@ -53,7 +65,7 @@ export interface Sender {
   accountAddress: string;
   sequence: number;
   accountNumber: number;
-  pubkey: string;
+  pubkey: string | null | undefined;
 }
 
 export interface Chain {

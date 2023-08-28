@@ -26,6 +26,7 @@ import {
   isBridgeInToken,
   isBridgeInTokenList,
 } from "@/utils/tokens/bridgeTokens.utils";
+import { convertToBigNumber } from "@/utils/tokenBalances.utils";
 
 export default function useBridgeIn(
   props: BridgeHookInputParams
@@ -83,9 +84,12 @@ export default function useBridgeIn(
     if (!isBridgeInToken(token)) {
       return NEW_ERROR("useBridgeIn::getToken: invalid token type:" + id);
     }
-    return token
-      ? NO_ERROR(token)
-      : NEW_ERROR("useBridgeIn::getToken: token not found:" + id);
+    // check if we have a balance for the token
+    const balance = userTokenBalances[token.id];
+    if (balance !== undefined) {
+      return NO_ERROR({ ...token, balance });
+    }
+    return NO_ERROR(token);
   }
 
   ///
@@ -171,6 +175,52 @@ export default function useBridgeIn(
   ///
   /// external functions
   ///
+  function canBridge(params: BridgeHookTxParams): ReturnWithError<boolean> {
+    // check to make sure all parameters are defined and valid
+    // check current state
+    if (!state.selectedToken) {
+      return NEW_ERROR("useBridgeIn::canBridge: no token selected");
+    }
+    if (!state.fromNetwork || !state.toNetwork) {
+      return NEW_ERROR("useBridgeIn::canBridge: network undefined");
+    }
+    if (!state.selectedMethod) {
+      return NEW_ERROR("useBridgeIn::canBridge: method undefined");
+    }
+    // check passed in parameters
+    if (!params.sender) {
+      return NEW_ERROR("useBridgeIn::canBridge: sender undefined");
+    }
+    if (!params.receiver) {
+      return NEW_ERROR("useBridgeIn::canBridge: receiver undefined");
+    }
+    // make sure balance exists for token
+    const balance = userTokenBalances[state.selectedToken.id];
+    if (balance === undefined) {
+      return NEW_ERROR(
+        "useBridgeIn::canBridge: balance undefined for token: " +
+          state.selectedToken.id
+      );
+    }
+    // make sure amount it less than or equal to the token balance
+    const { data: userAmount, error: bigNumberError } = convertToBigNumber(
+      params.amount,
+      state.selectedToken.decimals
+    );
+    if (bigNumberError) {
+      return NEW_ERROR("useBridgeIn::canBridge::" + bigNumberError.message);
+    }
+    // token balance is already formatted with decimals
+    const { data: tokenAmount, error: tokenBigNumberError } =
+      convertToBigNumber(balance, 0);
+    if (tokenBigNumberError) {
+      return NEW_ERROR(
+        "useBridgeIn::canBridge::" + tokenBigNumberError.message
+      );
+    }
+    return NO_ERROR(userAmount.lte(tokenAmount) && userAmount.gt(0));
+  }
+
   async function bridgeIn(
     params: BridgeHookTxParams
   ): PromiseWithError<Transaction[]> {
@@ -216,7 +266,7 @@ export default function useBridgeIn(
     selections: {
       toNetwork: state.toNetwork,
       fromNetwork: state.fromNetwork,
-      token: state.selectedToken,
+      token: state.selectedToken ? getToken(state.selectedToken.id).data : null,
       method: state.selectedMethod,
     },
     setters: {
@@ -224,6 +274,9 @@ export default function useBridgeIn(
       token: setToken,
       method: setMethod,
     },
-    bridge: bridgeIn,
+    bridge: {
+      bridgeTx: bridgeIn,
+      canBridge,
+    },
   };
 }

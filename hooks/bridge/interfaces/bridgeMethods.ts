@@ -4,37 +4,47 @@ export enum BridgingMethod {
   LAYER_ZERO = "2",
 }
 
+type BridgeMethodInfo = {
+  [key in BridgingMethod]: {
+    name: string;
+    icon: string;
+    id: string;
+  };
+};
+
+const BRIDGE_METHOD_INFO: BridgeMethodInfo = {
+  [BridgingMethod.GRAVITY_BRIDGE]: {
+    name: "Gravity Bridge",
+    icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/gravitybridge/images/grav.svg",
+    id: "bridge-gravity",
+  },
+  [BridgingMethod.IBC]: {
+    name: "IBC",
+    icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
+    id: "bridge-ibc",
+  },
+  [BridgingMethod.LAYER_ZERO]: {
+    name: "Layer Zero",
+    icon: "/networks/layer_zero.png",
+    id: "bridge-layer-zero",
+  },
+} as const;
+
 /**
- * @notice Converts a BridgingMethod enum to a string representation of a bridging method to
+ * @notice Converts a BridgingMethod enum to a BridgeMethodInfo object
+ * @dev This is used to get the name, icon, and id for a bridging method
  * @param {BridgingMethod} method for bridging
- * @returns string representation of bridging method
+ * @returns BridgeMethodInfo object
  */
-export function bridgeMethodToString(method: BridgingMethod): string {
-  switch (method) {
-    case BridgingMethod.GRAVITY_BRIDGE:
-      return "Gravity Bridge";
-    case BridgingMethod.IBC:
-      return "IBC";
-    case BridgingMethod.LAYER_ZERO:
-      return "Layer Zero";
-    default:
-      return "Unknown";
+export function getBridgeMethodInfo(
+  method: BridgingMethod | null
+): BridgeMethodInfo[BridgingMethod] {
+  if (method === null) {
+    return {
+      name: "Unknown",
+      icon: "",
+      id: "",
+    };
   }
-}
-/**
- * @notice Converts a BridgingMethod enum to a string representation of a bridging method icon
- * @param {BridgingMethod} method for bridging
- * @returns string representation of bridging method icon
- */
-export function bridgeMethodToIcon(method: BridgingMethod): string {
-  switch (method) {
-    case BridgingMethod.GRAVITY_BRIDGE:
-      return "https://raw.githubusercontent.com/cosmos/chain-registry/master/gravitybridge/images/grav.svg";
-    case BridgingMethod.IBC:
-      return "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg";
-    case BridgingMethod.LAYER_ZERO:
-      return "/networks/layer_zero.png";
-    default:
-      return "";
-  }
+  return BRIDGE_METHOD_INFO[method];
 }

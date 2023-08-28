@@ -4,14 +4,15 @@ import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
 import Text from "@/components/text";
 import Image from "next/image";
-import React, { use, useMemo, useState } from "react";
+import React, { useState } from "react";
 import styles from "./selector.module.scss";
+import Spacer from "@/components/layout/spacer";
 
 export interface Item {
   id: string;
   icon: string;
   name: string;
-  balance?: number;
+  balance?: number | string;
 }
 
 interface Props {
@@ -22,10 +23,6 @@ interface Props {
 }
 const Selector = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false);
-
-  //   useMemo(() => {
-  //     props.onChange(props.activeItem);
-  //   }, [props]);
 
   return (
     <>
@@ -38,33 +35,32 @@ const Selector = (props: Props) => {
         <Text size="lg" font="proto_mono">
           {props.title}
         </Text>
-        <div className={styles["items-list"]}>
-          {props.items.map((item) => (
-            <Container
-              key={item.name}
-              width="100%"
-              direction="row"
-              gap={20}
-              center={{
-                vertical: true,
-              }}
-              className={styles.item}
-              onClick={() => {
-                props.onChange(item.id);
-                setIsOpen(false);
-              }}
-            >
-              <Image
-                src={item.icon}
-                alt={item.name}
-                width={30}
-                height={30}
-              />
-              <Text size="md" font="proto_mono">
-                {item.name}{" / "}{item.balance}
-              </Text>
-            </Container>
-          ))}
+        <div className={styles["scroll-view"]}>
+          <Spacer height="10px" />
+
+          <div className={styles["items-list"]}>
+            {props.items.map((item) => (
+              <Container
+                key={item.name}
+                width="100%"
+                direction="row"
+                gap={20}
+                center={{
+                  vertical: true,
+                }}
+                className={styles.item}
+                onClick={() => {
+                  props.onChange(item.id);
+                  setIsOpen(false);
+                }}
+              >
+                <Image src={item.icon} alt={item.name} width={30} height={30} />
+                <Text size="md" font="proto_mono">
+                  {item.name} {item.balance}
+                </Text>
+              </Container>
+            ))}
+          </div>
         </div>
       </Modal>
       <Button

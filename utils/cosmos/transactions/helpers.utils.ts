@@ -23,6 +23,7 @@ import {
   createTxRawEIP712,
   signatureToWeb3Extension,
 } from "@evmos/transactions";
+import { signatureToPubkey } from "@hanchon/signature-to-pubkey";
 
 interface CosmosAccountReturn {
   account: {
@@ -95,6 +96,28 @@ export async function signAndBroadcastCosmosTransaction(
       context.chain.chainId,
       eipPayload
     );
+      console.log("HERE")
+    // check public key on sender object, if none, create one
+    if (!context.sender.pubkey) {
+      // create a public key for the user IFF EIP712 Canto is used (since through metamask)
+      try {
+        const signature = await window.ethereum.request({
+          method: "personal_sign",
+          params: [context.ethAddress, "generate_pubkey"],
+        });
+        context.sender.pubkey = signatureToPubkey(
+          signature,
+          Buffer.from([
+            50, 215, 18, 245, 169, 63, 252, 16, 225, 169, 71, 95, 254, 165, 146,
+            216, 40, 162, 115, 78, 147, 125, 80, 182, 25, 69, 136, 250, 65, 200,
+            94, 178,
+          ])
+        );
+      } catch (err) {
+        return NEW_ERROR("signAndBroadcastCosmosTransaction: " + errMsg(err));
+      }
+    }
+
     // create cosmos payload
     const cosmosPayload = createTransactionWithMultipleMessages(
       cosmosMsgArray,
@@ -117,7 +140,16 @@ export async function signAndBroadcastCosmosTransaction(
     const signedTx = createTxRawEIP712(
       cosmosPayload.legacyAmino.body,
       cosmosPayload.legacyAmino.authInfo,
-      signatureToWeb3Extension(context.chain, context.sender, signature)
+      signatureToWeb3Extension(
+        context.chain,
+        {
+          accountAddress: context.sender.accountAddress,
+          sequence: context.sender.sequence,
+          accountNumber: context.sender.accountNumber,
+          pubkey: context.sender.pubkey,
+        },
+        signature
+      )
     );
 
     // post tx to rpc
@@ -175,13 +207,14 @@ export function generatePostBodyBroadcast(
  */
 export async function getSenderObj(
   senderCosmosAddress: string,
-  chainid: string | number
+  chainid: string | number,
+  eip712: boolean = false
 ): PromiseWithError<Sender> {
   const cosmosAccount = await getCosmosAccount(senderCosmosAddress, chainid);
   if (cosmosAccount.error) {
     return NEW_ERROR("getSenderObj::" + cosmosAccount.error.message);
   }
-  return reformatSender(cosmosAccount.data);
+  return reformatSender(cosmosAccount.data, eip712);
 }
 
 /**
@@ -191,17 +224,19 @@ export async function getSenderObj(
  * @returns {ReturnWithError<Sender>} formatted sender object or error
  */
 function reformatSender(
-  accountData: CosmosAccountReturn
+  accountData: CosmosAccountReturn,
+  eip712: boolean
 ): ReturnWithError<Sender> {
   const baseAccount = accountData.account.base_account;
-  if (baseAccount.pub_key == null) {
-    return NEW_ERROR("reformatSender: pubkey is null");
+  if (baseAccount.pub_key == null && !eip712) {
+    // if used for eip712, the pubk key can be null, since we will create one before the tx
+    return NEW_ERROR("reformatSender: no public key on account");
   }
   return NO_ERROR({
     accountAddress: baseAccount.address,
     sequence: baseAccount.sequence,
     accountNumber: baseAccount.account_number,
-    pubkey: baseAccount.pub_key.key,
+    pubkey: baseAccount.pub_key?.key,
   });
 }
 

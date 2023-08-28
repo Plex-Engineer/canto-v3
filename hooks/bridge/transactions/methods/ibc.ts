@@ -13,6 +13,9 @@ import { tryFetchMultipleEndpoints } from "@/utils/async.utils";
 import { _convertERC20Tx } from "./recovery";
 import { isERC20Token } from "@/utils/tokens/tokens.utils";
 import { IBCToken } from "@/config/interfaces/tokens";
+import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
+import { formatBalance } from "@/utils/tokenBalances.utils";
+import { CANTO_MAINNET_COSMOS } from "@/config/networks";
 
 /**
  * @notice creates a list of transactions that need to be made for IBC out of canto
@@ -92,7 +95,11 @@ export async function txIBCOut(
         token.address,
         amount,
         senderEthAddress,
-        cantoAddress
+        cantoAddress,
+        TX_DESCRIPTIONS.CONVERT_ERC20(
+          token.symbol,
+          formatBalance(amount, token.decimals)
+        )
       )
     );
   }
@@ -108,7 +115,13 @@ export async function txIBCOut(
       Number(ibcData.height.revision_number),
       Number(ibcData.height.revision_height) + 1000,
       blockTimestamp.slice(0, 9) + "00000000000",
-      "ibc from canto"
+      "ibc from canto",
+      TX_DESCRIPTIONS.BRIDGE(
+        token.symbol,
+        formatBalance(amount, token.decimals),
+        CANTO_MAINNET_COSMOS.name,
+        receivingChain.name
+      )
     )
   );
 
@@ -131,7 +144,8 @@ const _ibcOutTx = (
   revisionNumber: number,
   revisionHeight: number,
   timeoutTimestamp: string,
-  memo: string
+  memo: string,
+  description: string
 ): Transaction => {
   const ibcTx = createMsgsIBCTransfer({
     sourcePort,
@@ -148,7 +162,7 @@ const _ibcOutTx = (
   return {
     chainId,
     type: "COSMOS",
-    description: "IBC Out",
+    description,
     msg: ibcTx,
   };
 };

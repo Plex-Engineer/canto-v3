@@ -14,40 +14,103 @@ const BridgeIn = () => {
   const mockNetworks: Item[] = [
     {
       icon: "/networks/ethereum.svg",
+      id: "1",
       name: "Ethereum",
       balance: 0.43,
     },
     {
       name: "Layer Zero",
       icon: "/networks/layer_zero.png",
+      id: "1",
       balance: 0.43,
     },
     {
       name: "Gravity Bridge",
       icon: "/networks/graviton.svg",
+      id: "1",
+      balance: 0.43,
+    },
+    {
+      icon: "/networks/ethereum.svg",
+      id: "1",
+      name: "Ethereum",
+      balance: 0.43,
+    },
+    {
+      name: "Layer Zero",
+      icon: "/networks/layer_zero.png",
+      id: "1",
+      balance: 0.43,
+    },
+    {
+      name: "Gravity Bridge",
+      icon: "/networks/graviton.svg",
+      id: "1",
+      balance: 0.43,
+    },
+    {
+      icon: "/networks/ethereum.svg",
+      id: "1",
+      name: "Ethereum",
+      balance: 0.43,
+    },
+    {
+      name: "Layer Zero",
+      icon: "/networks/layer_zero.png",
+      id: "1",
+      balance: 0.43,
+    },
+    {
+      name: "Gravity Bridge",
+      icon: "/networks/graviton.svg",
+      id: "1",
+      balance: 0.43,
+    },
+
+    {
+      icon: "/networks/ethereum.svg",
+      id: "1",
+      name: "Ethereum",
+      balance: 0.43,
+    },
+    {
+      name: "Layer Zero",
+      icon: "/networks/layer_zero.png",
+      id: "1",
+      balance: 0.43,
+    },
+    {
+      name: "Gravity Bridge",
+      icon: "/networks/graviton.svg",
+      id: "1",
+      balance: 0.43,
+    },
+    {
+      icon: "/networks/ethereum.svg",
+      id: "1",
+      name: "Ethereum",
+      balance: 0.43,
+    },
+    {
+      name: "Layer Zero",
+      icon: "/networks/layer_zero.png",
+      id: "1",
+      balance: 0.43,
+    },
+    {
+      name: "Gravity Bridge",
+      icon: "/networks/graviton.svg",
+      id: "1",
       balance: 0.43,
     },
   ];
 
-  const [activeMockNetwork, setActiveMockNetwork] = useState(mockNetworks[0]);
+  const [activeMockNetwork, setActiveMockNetwork] = useState("1");
 
-  const [selectedNetwork, setSelectedNetwork] = useState(mockNetworks[0]);
-
-  const [choosingNetwork, setChoosingNetwork] = useState(false);
   const [choosingToken, setChoosingToken] = useState(false);
 
   return (
     <>
-      <Modal
-        open={choosingNetwork}
-        onClose={() => {
-          setChoosingNetwork(false);
-        }}
-        width="30rem"
-        height="36rem"
-      >
-        <Text>Choose a Network</Text>
-      </Modal>
       <Modal
         open={choosingToken}
         onClose={() => setChoosingToken(false)}
@@ -61,7 +124,17 @@ const BridgeIn = () => {
         <div className={styles["network-selection"]}>
           <Text size="sm">Select Network</Text>
           <div className={styles["networks-box"]}>
-            <Button
+            {/* mock network selector */}
+            <Selector
+              title="SELECT NETWORK"
+              activeItem={mockNetworks[Number(activeMockNetwork)]}
+              items={mockNetworks}
+              onChange={(item) => {
+                console.log(item);
+                setActiveMockNetwork(item);
+              }}
+            />
+            {/* <Button
               color="secondary"
               height={64}
               width="fill"
@@ -91,7 +164,7 @@ const BridgeIn = () => {
                   size: 24,
                 }}
               />
-            </Button>
+            </Button> */}
             <div className={styles["network-box"]}>
               <Container width="50px">
                 <Text size="x-sm" theme="secondary-dark">
@@ -152,16 +225,6 @@ const BridgeIn = () => {
                 />
               </Button>
             </Container>
-            {/* mock network selector */}
-            <Selector
-              title="SELECT NETWORK"
-              activeItem={activeMockNetwork}
-              items={mockNetworks}
-              onChange={(item) => {
-                console.log(item);
-                setActiveMockNetwork(item);
-              }}
-            />
           </div>
         </div>
         <Spacer height="100%" />
