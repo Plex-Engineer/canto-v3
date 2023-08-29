@@ -13,11 +13,13 @@
 }
 
 .light {
+  --canto-color: var(--extra-success-color, #06fc99);
   --dark-color: 17, 17, 17;
   --light-color: 255, 255, 255;
-  --text-only-dark: hsl(0, 0%, 13%);
+  --text-only-dark: #212121;
   --text-only-light: #ffffff;
   --primary-90-color: #222222;
+  --primary-10-color: #22222220;
   --text-light-color: #ffffff;
   --card-background-color: #c1c1c1;
   --text-light-30-color: #ffffff4c;
@@ -40,12 +42,14 @@
   --light-mode: 1;
 }
 
-.dark2 {
---light-color: 17, 17, 17;
-  --dark-color: 255, 255, 255
+.dark {
+  --canto-color: #06fc99;
+  --light-color: 17, 17, 17;
+  --dark-color: 255, 255, 255;
   --text-only-dark: #222222;
   --text-only-light: #ffffff;
   --primary-90-color: #eeeeee;
+  --primary-10-color: #eeeeee31;
   --text-light-color: #111111;
   --card-background-color: #303438;
   --text-light-30-color: #1111114c;
@@ -69,8 +73,9 @@
   --box-shadow: 0;
 }
 
-.dark {
-    --light-color: 17, 17, 17;
+.dark2 {
+  --canto-color: #06fc99;
+  --light-color: 17, 17, 17;
   --dark-color: 255, 255, 255;
   --text-only-dark: #222222;
   --text-only-light: #ffffff;
@@ -114,7 +119,13 @@ body {
   display: grid;
   grid-template-rows: auto auto 1fr auto;
 }
-
+.body {
+  background-color: var(--card-background-color);
+  color: var(--text-dark-color);
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+}
 .center {
   display: flex;
   justify-content: center;
