@@ -26,27 +26,30 @@ import {
   BridgingMethod,
   getBridgeMethodInfo,
 } from "@/hooks/bridge/interfaces/bridgeMethods";
-import { isCosmosNetwork } from "@/utils/networks.utils";
+import {
+  getNetworkInfoFromChainId,
+  isCosmosNetwork,
+} from "@/utils/networks.utils";
 import { TransactionFlowWithStatus } from "@/config/interfaces/transactions";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 
 export default function TestPage() {
+  const [onTestnet, setOnTestnet] = useState<boolean>(false);
   const [txIndex, setTxIndex] = useState<number>(0);
   const [direction, setDirection] = useState<"in" | "out">("in");
   const [cosmosAddress, setCosmosAddress] = useState<string>("");
   const [cantoAddress, setCantoAddress] = useState<string>("");
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({
-    testnet: false,
+    testnet: onTestnet,
     userEthAddress: signer?.account.address,
   });
   const bridgeIn = useBridgeIn({
-    testnet: false,
+    testnet: onTestnet,
     userEthAddress: signer?.account.address,
     userCosmosAddress: cosmosAddress,
   });
   const transactionStore = useStore(useTransactionStore, (state) => state);
-  console.log(transactionStore?.transactionFlows);
 
   useEffect(() => {
     async function getKeplrInfoForBridge() {
@@ -71,6 +74,17 @@ export default function TestPage() {
     }
     getCantoAddress();
   }, [signer?.account.address]);
+
+  useEffect(() => {
+    const { data: network, error } = getNetworkInfoFromChainId(
+      signer?.chain.id ?? 1
+    );
+    if (error) {
+      console.log(error);
+      return;
+    }
+    setOnTestnet(network.isTestChain);
+  }, [signer?.chain.id]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "5rem" }}>
@@ -244,7 +258,6 @@ interface BridgeProps {
   };
 }
 const Bridge = (props: BridgeProps) => {
-  console.log(props.bridge.selections);
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
   const [inputCosmosAddress, setInputCosmosAddress] = useState<string>("");

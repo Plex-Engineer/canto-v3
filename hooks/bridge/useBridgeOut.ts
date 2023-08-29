@@ -6,7 +6,7 @@ import {
   BridgeHookTxParams,
 } from "./interfaces/hookParams";
 import BRIDGE_OUT_TOKENS from "@/config/jsons/bridgeOutTokens.json";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAutoSelect from "../helpers/useAutoSelect";
 import {
   NEW_ERROR,
@@ -29,26 +29,33 @@ export default function useBridgeOut(
   props: BridgeHookInputParams
 ): BridgeHookReturn {
   // initial state with props
-  const initialState = {
+  const initialState = (testnet: boolean): BridgeHookState => ({
     // all options
     availableTokens: BRIDGE_OUT_TOKENS.chainTokenList[
-      props.testnet ? "canto-testnet" : "canto-mainnet"
+      testnet ? "canto-testnet" : "canto-mainnet"
     ] as BridgeOutToken[],
     availableNetworks: [],
     availableMethods: [],
     // default selections
-    fromNetwork: props.testnet ? CANTO_TESTNET_EVM : CANTO_MAINNET_EVM,
+    fromNetwork: testnet ? CANTO_TESTNET_EVM : CANTO_MAINNET_EVM,
     toNetwork: null,
     selectedToken: null,
     selectedMethod: null,
-  };
+  });
 
   // state of the entire hook that will be exposed
-  const [state, setState] = useState<BridgeHookState>(initialState);
+  const [state, setState] = useState<BridgeHookState>(
+    initialState(props.testnet ?? false)
+  );
 
   ///
   /// internal hooks
   ///
+  
+  // if the user switches to testnet, we need to reset the state
+  useEffect(() => {
+    setState(initialState(props.testnet ?? false));
+  }, [props.testnet]);
 
   // contains object mapping of the token balances
   const userTokenBalances = useTokenBalances(
