@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
 import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
 import BRIDGE_IN_TOKEN_LIST from "@/config/jsons/bridgeInTokens.json";
@@ -32,26 +32,31 @@ export default function useBridgeIn(
   props: BridgeHookInputParams
 ): BridgeHookReturn {
   // initial state with props
-  const initialState: BridgeHookState = {
+  const initialState = (testnet: boolean): BridgeHookState => ({
     // all options
-    availableNetworks: props.testnet
-      ? TEST_BRIDGE_NETWORKS
-      : MAIN_BRIDGE_NETWORKS,
+    availableNetworks: testnet ? TEST_BRIDGE_NETWORKS : MAIN_BRIDGE_NETWORKS,
     availableTokens: [],
     availableMethods: [],
     // default selections
-    toNetwork: props.testnet ? CANTO_TESTNET_EVM : CANTO_MAINNET_EVM,
+    toNetwork: testnet ? CANTO_TESTNET_EVM : CANTO_MAINNET_EVM,
     fromNetwork: null,
     selectedToken: null,
     selectedMethod: null,
-  };
+  });
 
   // state of the entire hook that will be exposed
-  const [state, setState] = useState<BridgeHookState>(initialState);
+  const [state, setState] = useState<BridgeHookState>(
+    initialState(props.testnet ?? false)
+  );
 
   ///
   /// internal hooks
   ///
+
+  // if the user switches to testnet, we need to reset the state
+  useEffect(() => {
+    setState(initialState(props.testnet ?? false));
+  }, [props.testnet]);
 
   // contains object mapping of the token balances
   const userTokenBalances = useTokenBalances(
