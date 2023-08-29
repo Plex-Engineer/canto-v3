@@ -7,8 +7,9 @@ import Container from "@/components/container/container";
 import Spacer from "@/components/layout/spacer";
 import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
-import Selector from "../selector/selector";
-import { Item } from "../selector/selector";
+import Selector from "../../components/selector/selector";
+import { Item } from "../../components/selector/selector";
+import Input from "@/components/input/input";
 
 const BridgeIn = () => {
   const mockNetworks: Item[] = [
@@ -109,6 +110,7 @@ const BridgeIn = () => {
 
   const [choosingToken, setChoosingToken] = useState(false);
 
+  const [amount, setAmount] = useState("");
   return (
     <>
       <Modal
@@ -190,7 +192,7 @@ const BridgeIn = () => {
         <div className={styles["token-selection"]}>
           <Text size="sm">Select Token</Text>
           <div className={styles["token-box"]}>
-            <Container width="50%">
+            <Container width="100%" direction="row" gap={20}>
               <Button
                 color="secondary"
                 width="fill"
@@ -224,6 +226,19 @@ const BridgeIn = () => {
                   }}
                 />
               </Button>
+
+              <Input
+                type="amount"
+                placeholder="0.0"
+                value={amount}
+                // disabled
+                onChange={(val) => {
+                  setAmount(val.target.value);
+                }}
+                className={styles["input"]}
+                error={Number(amount) > 53.4}
+                errorMessage="Amount must be less than 54"
+              />
             </Container>
           </div>
         </div>

@@ -1,0 +1,58 @@
+import { Theme } from "@rainbow-me/rainbowkit";
+
+export const candoTheme: Theme = {
+  blurs: {
+    modalOverlay: "blur(2px)",
+  },
+  colors: {
+    accentColor: "var(--card-surface-color)",
+    accentColorForeground: "var(--text-dark-color)",
+    actionButtonBorder: "var(--text-dark-30-color)",
+    actionButtonBorderMobile: "var(--text-dark-30-color)",
+    actionButtonSecondaryBackground: "var(--primary-90-color)",
+    closeButton: "...",
+    closeButtonBackground: "...",
+    connectButtonBackground: "var(--card-surface-color)",
+    connectButtonBackgroundError: "blue",
+    connectButtonInnerBackground: "...",
+    connectButtonText: "var(--primary-90-color)",
+    connectButtonTextError: "...",
+    connectionIndicator: "var(--canto-color)",
+    downloadBottomCardBackground: "blue",
+    downloadTopCardBackground: "blue",
+    error: "blue",
+    generalBorder: "var(--text-dark-30-color)",
+    generalBorderDim: "blue",
+    menuItemBackground: "var(--primary-10-color)",
+    modalBackdrop: "var(--text-dark-30-color)",
+    modalBackground: "var(--card-sub-surface-color)",
+    modalBorder: "var(--text-dark-30-color)",
+    modalText: "var(--text-dark-color)",
+    modalTextDim: "var(--primary-90-color)",
+    modalTextSecondary: "var(--primary-90-color)",
+    profileAction: "var(--card-surface-color)",
+    profileActionHover: "var(--text-light-color)",
+    profileForeground: "...",
+    selectedOptionBorder: "transparent",
+    standby: "var(--primary-90-color)",
+  },
+  fonts: {
+    body: "Proto Mono",
+  },
+  radii: {
+    actionButton: "var(--border-radius, 0)",
+    connectButton: "var(--border-radius, 0)",
+    menuButton: "var(--border-radius, 0)",
+    modal: "var(--border-radius, 0)",
+    modalMobile: "var(--border-radius, 0)",
+  },
+  shadows: {
+    connectButton: "var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15))",
+    dialog: "var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15))",
+    profileDetailsAction:
+      "var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15))",
+    selectedOption: "...",
+    selectedWallet: "...",
+    walletLogo: "...",
+  },
+};

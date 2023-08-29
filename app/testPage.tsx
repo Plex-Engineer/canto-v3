@@ -21,7 +21,7 @@ import Button from "@/components/button/button";
 import { BridgeHookReturn } from "@/hooks/bridge/interfaces/hookParams";
 import AnimatedBackground from "@/components/animated_background/animatedBackground";
 import Tabs from "@/components/tabs/tabs";
-import Selector, { Item } from "./selector/selector";
+import Selector, { Item } from "../components/selector/selector";
 import {
   BridgingMethod,
   getBridgeMethodInfo,

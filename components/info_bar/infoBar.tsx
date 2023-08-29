@@ -16,8 +16,14 @@ const InfoBar = ({ values }: Props) => {
     <div className={styles.container}>
       <Marquee delay={1} pauseOnHover speed={20} autoFill>
         <div className={styles.content}>
-          {values.map((value) => (
-            <>
+          {values.map((value, idx) => (
+            <div
+              key={value.name}
+              style={{
+                display: "flex",
+                gap: "5rem",
+              }}
+            >
               <div key={value.name} className={styles.item}>
                 <Text color="var(--text-only-light" opacity={90} size="x-sm">
                   {value.name}
@@ -37,10 +43,14 @@ const InfoBar = ({ values }: Props) => {
                 </Text>
               </div>
 
-              <Text color="var(--text-only-light" opacity={90}>
+              <Text
+                color="var(--text-only-light"
+                opacity={90}
+                key={value.name + " text"}
+              >
                 /
               </Text>
-            </>
+            </div>
           ))}
         </div>
       </Marquee>

@@ -50,13 +50,14 @@
 .wallet-connect {
   display: flex;
   align-items: center;
-  justify-content: end;
+  width: 100%;
+  justify-content: flex-end;
   padding: 12px 30px;
 }
 
 .container {
   display: grid;
-  grid-template-columns: 80px 1fr 400px;
+  grid-template-columns: 80px 1fr 1fr;
 
   animation: fadeIn 0.5s ease-in-out;
 

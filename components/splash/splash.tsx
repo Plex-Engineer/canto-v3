@@ -14,9 +14,9 @@ const Splash = () => {
       }}
     >
       <Rive
-        src="anims/hey-ho.riv"
-        // src="anims/loading.riv"
-        // stateMachines={["loop"]}
+        // src="anims/hey-ho.riv"
+        src="anims/loading.riv"
+        stateMachines={["loop"]}
         style={{
           height: "800px",
           width: "800px",

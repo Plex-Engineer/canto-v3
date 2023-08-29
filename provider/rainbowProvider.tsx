@@ -1,9 +1,14 @@
 import "@rainbow-me/rainbowkit/styles.css";
-
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import {
+  darkTheme,
+  getDefaultWallets,
+  lightTheme,
+  RainbowKitProvider,
+} from "@rainbow-me/rainbowkit";
 import { Chain, configureChains, createConfig, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import * as EVM_CHAINS from "@/config/networks/evm";
+import { candoTheme } from "./util";
 
 const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
   (network) => {
@@ -54,7 +59,12 @@ interface RainbowProviderProps {
 const CantoWalletProvider = ({ children }: RainbowProviderProps) => {
   return (
     <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider chains={chains} coolMode>
+      <RainbowKitProvider
+        showRecentTransactions
+        chains={chains}
+        modalSize="wide"
+        theme={candoTheme}
+      >
         {children}
       </RainbowKitProvider>
     </WagmiConfig>
