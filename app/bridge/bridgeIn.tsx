@@ -110,6 +110,7 @@ const BridgeIn = () => {
 
   const [choosingToken, setChoosingToken] = useState(false);
 
+  const [amount, setAmount] = useState("");
   return (
     <>
       <Modal
@@ -191,7 +192,7 @@ const BridgeIn = () => {
         <div className={styles["token-selection"]}>
           <Text size="sm">Select Token</Text>
           <div className={styles["token-box"]}>
-            <Container width="50%">
+            <Container width="100%" direction="row" gap={20}>
               <Button
                 color="secondary"
                 width="fill"
@@ -227,12 +228,16 @@ const BridgeIn = () => {
               </Button>
 
               <Input
-                label="Amount"
-                type="number"
+                type="amount"
                 placeholder="0.0"
-                value="0.0"
-                onChange={() => {}}
+                value={amount}
+                // disabled
+                onChange={(val) => {
+                  setAmount(val.target.value);
+                }}
                 className={styles["input"]}
+                error={Number(amount) > 53.4}
+                errorMessage="Amount must be less than 54"
               />
             </Container>
           </div>

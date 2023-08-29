@@ -49,7 +49,7 @@
   --text-light-color: #111111;
   --card-background-color: #303438;
   --text-light-30-color: #1111114c;
-  --extra-failure-color: #ef4444;
+  --extra-failure-color: #dd3434;
   --text-dark-30-color: #e1e1e14c;
   --extra-success-color: #06fc99;
   --text-light-40-color: #11111166;
@@ -70,6 +70,8 @@
 }
 
 .dark {
+    --light-color: 17, 17, 17;
+  --dark-color: 255, 255, 255;
   --text-only-dark: #222222;
   --text-only-light: #ffffff;
   --primary-90-color: #eeeeee;

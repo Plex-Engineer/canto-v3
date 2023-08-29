@@ -1,10 +1,12 @@
 import React from "react";
 import styles from "./input.module.scss";
+import Text from "../text";
 
 interface InputProps {
   type: "text" | "number" | "amount";
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  backgroundColor?: string;
   placeholder?: string;
   className?: string;
   disabled?: boolean;
@@ -36,12 +38,25 @@ const Input = (props: InputProps) => {
         className={props.labelClassName}
         style={props.labelStyle}
       >
-        {props.label}
+        <Text font="rm_mono" size="sm">
+          {props.label}
+        </Text>
       </label>
       <input
         type={props.type}
         value={props.value}
-        onChange={props.onChange}
+        onChange={
+          props.type === "amount"
+            ? (e) => {
+                if (
+                  e.target.value === "" ||
+                  e.target.value.match(/^\d*\.?\d*$/)
+                ) {
+                  props.onChange(e);
+                }
+              }
+            : props.onChange
+        }
         placeholder={props.placeholder}
         className={props.className}
         disabled={props.disabled}
@@ -58,10 +73,25 @@ const Input = (props: InputProps) => {
         readOnly={props.readOnly}
         onBlur={props.onBlur}
         onFocus={props.onFocus}
+        style={{
+          backgroundColor: props.error
+            ? " #ff000017"
+            : props.backgroundColor ?? "",
+          border: props.error
+            ? "1px solid var(--extra-failure-color, #ff0000)"
+            : "",
+          ...props.style,
+        }}
       />
-      {props.error && (
-        <span className={styles["error-message"]}>{props.errorMessage}</span>
-      )}
+
+      <span
+        className={styles["error-message"]}
+        style={{
+          opacity: props.error ? 1 : 0,
+        }}
+      >
+        {props.errorMessage}
+      </span>
     </div>
   );
 };
