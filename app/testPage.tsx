@@ -402,9 +402,11 @@ const Bridge = (props: BridgeProps) => {
   const { data: canBridge } = props.bridge.bridge.canBridge({
     sender: fromAddress,
     receiver: toAddress,
-    amount,
+    amount: convertToBigNumber(
+      amount,
+      props.bridge.selections.token?.decimals ?? 18
+    ).data.toString(),
   });
-  console.log(canBridge);
   return (
     <>
       <section className={styles.container}>

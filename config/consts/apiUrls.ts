@@ -34,6 +34,7 @@ export interface UserDataResponse {
           routerAllowanceUnderlying: string[];
         };
       };
+      liquidity: string[3];
     };
   };
 }

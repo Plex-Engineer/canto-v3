@@ -15,7 +15,7 @@ import BigNumber from "bignumber.js";
  */
 export function convertToBigNumber(
   amount: string,
-  decimals: number
+  decimals: number = 0
 ): ReturnWithError<BigNumber> {
   try {
     // truncate the amount to the number of decimals

@@ -204,15 +204,14 @@ export default function useBridgeIn(
     }
     // make sure amount it less than or equal to the token balance
     const { data: userAmount, error: bigNumberError } = convertToBigNumber(
-      params.amount,
-      state.selectedToken.decimals
+      params.amount
     );
     if (bigNumberError) {
       return NEW_ERROR("useBridgeIn::canBridge::" + bigNumberError.message);
     }
     // token balance is already formatted with decimals
     const { data: tokenAmount, error: tokenBigNumberError } =
-      convertToBigNumber(balance, 0);
+      convertToBigNumber(balance);
     if (tokenBigNumberError) {
       return NEW_ERROR(
         "useBridgeIn::canBridge::" + tokenBigNumberError.message
