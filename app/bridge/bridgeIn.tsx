@@ -9,6 +9,7 @@ import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
 import Selector from "../../components/selector/selector";
 import { Item } from "../../components/selector/selector";
+import Input from "@/components/input/input";
 
 const BridgeIn = () => {
   const mockNetworks: Item[] = [
@@ -224,6 +225,15 @@ const BridgeIn = () => {
                   }}
                 />
               </Button>
+
+              <Input
+                label="Amount"
+                type="number"
+                placeholder="0.0"
+                value="0.0"
+                onChange={() => {}}
+                className={styles["input"]}
+              />
             </Container>
           </div>
         </div>
