@@ -17,21 +17,21 @@ import { getBlockTimestamp, getIBCData } from "../methods/ibc";
 import { Transaction } from "@/config/interfaces/transactions";
 import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
 import { connectToKeplr } from "@/utils/keplr/connectKeplr";
-import {
-  ChainRestAuthApi,
-  ChainRestTendermintApi,
-  BaseAccount,
-  DEFAULT_STD_FEE,
-  createTransaction,
-  MsgTransfer,
-  makeTimeoutTimestampInNs,
-  getTxRawFromTxRawOrDirectSignResponse,
-  CosmosTxV1Beta1Tx,
-} from "@injectivelabs/sdk-ts";
-import {
-  DEFAULT_BLOCK_TIMEOUT_HEIGHT,
-  BigNumberInBase,
-} from "@injectivelabs/utils";
+// import {
+//   ChainRestAuthApi,
+//   ChainRestTendermintApi,
+//   BaseAccount,
+//   DEFAULT_STD_FEE,
+//   createTransaction,
+//   MsgTransfer,
+//   makeTimeoutTimestampInNs,
+//   getTxRawFromTxRawOrDirectSignResponse,
+//   CosmosTxV1Beta1Tx,
+// } from "@injectivelabs/sdk-ts";
+// import {
+//   DEFAULT_BLOCK_TIMEOUT_HEIGHT,
+//   BigNumberInBase,
+// } from "@injectivelabs/utils";
 import {
   createTransactionWithMultipleMessages,
   createTxRaw,
@@ -104,13 +104,14 @@ export async function ibcInKeplr(
 
   /** Make check for specific chains (injective, evmos) */
   if (cosmosNetwork.chainId === INJECTIVE.chainId) {
-    return await injectiveIBCIn(
-      cosmosNetwork,
-      cosmosSender,
-      cantoReceiver,
-      ibcToken,
-      amount
-    );
+    return NEW_ERROR("ibcInKeplr: injective not supported yet");
+    // return await injectiveIBCIn(
+    //   cosmosNetwork,
+    //   cosmosSender,
+    //   cantoReceiver,
+    //   ibcToken,
+    //   amount
+    // );
   }
   /** call this after getting timestamp information */
   if (cosmosNetwork.chainId === EVMOS.chainId) {
@@ -209,134 +210,134 @@ async function signAndBroadcastIBCKeplr(
   }
 }
 
-/**
- * @notice creates a list of transactions that need to be made for IBC in to canto using injective
- * @dev will only work for injective
- * @param {CosmosNetwork} injectiveNetwork network to ibc from
- * @param {string} injectiveAddress injective address to send from
- * @param {string} cantoAddress canto address to send to
- * @param {IBCToken} token token to send
- * @param {string} amount amount to send
- * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
- */
-async function injectiveIBCIn(
-  injectiveNetwork: CosmosNetwork,
-  injectiveAddress: string,
-  cantoAddress: string,
-  token: IBCToken,
-  amount: string
-): PromiseWithError<Transaction[]> {
-  // check injective chain
-  if (injectiveNetwork.chainId !== INJECTIVE.chainId) {
-    return NEW_ERROR(
-      "injectiveIBCIn: invalid chain id for injective: " +
-        injectiveNetwork.chainId
-    );
-  }
-  // get the channel number from the network
-  const ibcChannel =
-    IBC_CHANNELS[injectiveNetwork.id as keyof typeof IBC_CHANNELS];
-  // check if chennel was found
-  if (!ibcChannel || !ibcChannel.toCanto) {
-    return NEW_ERROR(
-      "injectiveIBCIn: invalid channel id: " + injectiveNetwork.id
-    );
-  }
+// /**
+//  * @notice creates a list of transactions that need to be made for IBC in to canto using injective
+//  * @dev will only work for injective
+//  * @param {CosmosNetwork} injectiveNetwork network to ibc from
+//  * @param {string} injectiveAddress injective address to send from
+//  * @param {string} cantoAddress canto address to send to
+//  * @param {IBCToken} token token to send
+//  * @param {string} amount amount to send
+//  * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
+//  */
+// async function injectiveIBCIn(
+//   injectiveNetwork: CosmosNetwork,
+//   injectiveAddress: string,
+//   cantoAddress: string,
+//   token: IBCToken,
+//   amount: string
+// ): PromiseWithError<Transaction[]> {
+//   // check injective chain
+//   if (injectiveNetwork.chainId !== INJECTIVE.chainId) {
+//     return NEW_ERROR(
+//       "injectiveIBCIn: invalid chain id for injective: " +
+//         injectiveNetwork.chainId
+//     );
+//   }
+//   // get the channel number from the network
+//   const ibcChannel =
+//     IBC_CHANNELS[injectiveNetwork.id as keyof typeof IBC_CHANNELS];
+//   // check if chennel was found
+//   if (!ibcChannel || !ibcChannel.toCanto) {
+//     return NEW_ERROR(
+//       "injectiveIBCIn: invalid channel id: " + injectiveNetwork.id
+//     );
+//   }
 
-  /** Account Details **/
-  const chainRestAuthApi = new ChainRestAuthApi(injectiveNetwork.restEndpoint);
-  const accountDetailsResponse = await chainRestAuthApi.fetchAccount(
-    injectiveAddress
-  );
-  const baseAccount = BaseAccount.fromRestApi(accountDetailsResponse);
-  const accountDetails = baseAccount.toAccountDetails();
+//   /** Account Details **/
+//   const chainRestAuthApi = new ChainRestAuthApi(injectiveNetwork.restEndpoint);
+//   const accountDetailsResponse = await chainRestAuthApi.fetchAccount(
+//     injectiveAddress
+//   );
+//   const baseAccount = BaseAccount.fromRestApi(accountDetailsResponse);
+//   const accountDetails = baseAccount.toAccountDetails();
 
-  /** Block Details */
-  const chainRestTendermintApi = new ChainRestTendermintApi(
-    injectiveNetwork.restEndpoint
-  );
-  const latestBlock = await chainRestTendermintApi.fetchLatestBlock();
-  const latestHeight = latestBlock.header.height;
-  const timeoutHeight = new BigNumberInBase(latestHeight).plus(
-    DEFAULT_BLOCK_TIMEOUT_HEIGHT
-  );
+//   /** Block Details */
+//   const chainRestTendermintApi = new ChainRestTendermintApi(
+//     injectiveNetwork.restEndpoint
+//   );
+//   const latestBlock = await chainRestTendermintApi.fetchLatestBlock();
+//   const latestHeight = latestBlock.header.height;
+//   const timeoutHeight = new BigNumberInBase(latestHeight).plus(
+//     DEFAULT_BLOCK_TIMEOUT_HEIGHT
+//   );
 
-  /** Message **/
-  const msg = MsgTransfer.fromJSON({
-    port: "transfer",
-    memo: "injectiveIBC",
-    sender: injectiveAddress,
-    receiver: cantoAddress,
-    channelId: ibcChannel.toCanto,
-    timeout: makeTimeoutTimestampInNs(),
-    height: {
-      revisionHeight: timeoutHeight.toNumber(),
-      revisionNumber: parseInt(latestBlock.header.version.block, 10),
-    },
-    amount: {
-      denom: token.nativeName,
-      amount: amount,
-    },
-  });
+//   /** Message **/
+//   const msg = MsgTransfer.fromJSON({
+//     port: "transfer",
+//     memo: "injectiveIBC",
+//     sender: injectiveAddress,
+//     receiver: cantoAddress,
+//     channelId: ibcChannel.toCanto,
+//     timeout: makeTimeoutTimestampInNs(),
+//     height: {
+//       revisionHeight: timeoutHeight.toNumber(),
+//       revisionNumber: parseInt(latestBlock.header.version.block, 10),
+//     },
+//     amount: {
+//       denom: token.nativeName,
+//       amount: amount,
+//     },
+//   });
 
-  /** Prepare the Transaction **/
-  const { signDoc } = createTransaction({
-    pubKey: accountDetails.pubKey.key,
-    chainId: injectiveNetwork.chainId,
-    fee: DEFAULT_STD_FEE,
-    message: [msg],
-    sequence: accountDetails.sequence,
-    timeoutHeight: timeoutHeight.toNumber(),
-    accountNumber: accountDetails.accountNumber,
-  });
+//   /** Prepare the Transaction **/
+//   const { signDoc } = createTransaction({
+//     pubKey: accountDetails.pubKey.key,
+//     chainId: injectiveNetwork.chainId,
+//     fee: DEFAULT_STD_FEE,
+//     message: [msg],
+//     sequence: accountDetails.sequence,
+//     timeoutHeight: timeoutHeight.toNumber(),
+//     accountNumber: accountDetails.accountNumber,
+//   });
 
-  /** Signature and Broadcast Tx */
-  async function signAndBroadcast(): PromiseWithError<unknown> {
-    try {
-      /** Sign the Transaction **/
-      const offlineSigner = window.keplr?.getOfflineSigner(
-        injectiveNetwork.chainId
-      );
+//   /** Signature and Broadcast Tx */
+//   async function signAndBroadcast(): PromiseWithError<unknown> {
+//     try {
+//       /** Sign the Transaction **/
+//       const offlineSigner = window.keplr?.getOfflineSigner(
+//         injectiveNetwork.chainId
+//       );
 
-      const directSignResponse = await offlineSigner?.signDirect(
-        injectiveAddress,
-        //@ts-ignore
-        signDoc
-      );
-      if (!directSignResponse) {
-        return NEW_ERROR("injectiveIBCIn: no direct sign response");
-      }
-      const txRaw = getTxRawFromTxRawOrDirectSignResponse(directSignResponse);
-      /** Broadcast the Transaction **/
-      return NO_ERROR(
-        await window.keplr?.sendTx(
-          injectiveNetwork.chainId,
-          CosmosTxV1Beta1Tx.TxRaw.encode(txRaw).finish(),
-          //@ts-ignore
-          "sync"
-        )
-      );
-    } catch (err) {
-      return NEW_ERROR("injectiveIBCIn::" + errMsg(err));
-    }
-  }
+//       const directSignResponse = await offlineSigner?.signDirect(
+//         injectiveAddress,
+//         //@ts-ignore
+//         signDoc
+//       );
+//       if (!directSignResponse) {
+//         return NEW_ERROR("injectiveIBCIn: no direct sign response");
+//       }
+//       const txRaw = getTxRawFromTxRawOrDirectSignResponse(directSignResponse);
+//       /** Broadcast the Transaction **/
+//       return NO_ERROR(
+//         await window.keplr?.sendTx(
+//           injectiveNetwork.chainId,
+//           CosmosTxV1Beta1Tx.TxRaw.encode(txRaw).finish(),
+//           //@ts-ignore
+//           "sync"
+//         )
+//       );
+//     } catch (err) {
+//       return NEW_ERROR("injectiveIBCIn::" + errMsg(err));
+//     }
+//   }
 
-  return NO_ERROR([
-    {
-      chainId: injectiveNetwork.chainId,
-      description: TX_DESCRIPTIONS.BRIDGE(
-        token.symbol,
-        formatBalance(amount, token.decimals),
-        injectiveNetwork.name,
-        CANTO_MAINNET_COSMOS.name
-      ),
-      type: "KEPLR",
-      tx: signAndBroadcast,
-      getHash: (txResponse: Uint8Array) =>
-        NO_ERROR(Buffer.from(txResponse).toString("hex")),
-    },
-  ]);
-}
+//   return NO_ERROR([
+//     {
+//       chainId: injectiveNetwork.chainId,
+//       description: TX_DESCRIPTIONS.BRIDGE(
+//         token.symbol,
+//         formatBalance(amount, token.decimals),
+//         injectiveNetwork.name,
+//         CANTO_MAINNET_COSMOS.name
+//       ),
+//       type: "KEPLR",
+//       tx: signAndBroadcast,
+//       getHash: (txResponse: Uint8Array) =>
+//         NO_ERROR(Buffer.from(txResponse).toString("hex")),
+//     },
+//   ]);
+// }
 
 /**
  * @notice creates a list of transactions that need to be made for IBC in to canto using evmos

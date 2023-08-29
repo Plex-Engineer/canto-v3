@@ -37,7 +37,7 @@ export default function TestPage() {
   const [cantoAddress, setCantoAddress] = useState<string>("");
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({
-    testnet: false,
+    testnet: true,
     userEthAddress: signer?.account.address,
   });
   const bridgeIn = useBridgeIn({
@@ -244,7 +244,6 @@ interface BridgeProps {
   };
 }
 const Bridge = (props: BridgeProps) => {
-  console.log(props.bridge.selections);
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
   const [inputCosmosAddress, setInputCosmosAddress] = useState<string>("");
