@@ -7,8 +7,8 @@ import Container from "@/components/container/container";
 import Spacer from "@/components/layout/spacer";
 import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
-import Selector from "../selector/selector";
-import { Item } from "../selector/selector";
+import Selector from "../../components/selector/selector";
+import { Item } from "../../components/selector/selector";
 
 const BridgeIn = () => {
   const mockNetworks: Item[] = [
