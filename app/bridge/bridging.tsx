@@ -84,8 +84,8 @@ const Bridging = (props: BridgeProps) => {
       });
   }
 
-  const networkSelectors = (
-    <>
+  const NetworkSelectors = () => (
+    <Container width="100%" gap={14}>
       <Text size="sm">{`From network (${fromAddress})`}</Text>
       <Selector
         title="SELECT FROM NETWORK"
@@ -125,13 +125,13 @@ const Bridging = (props: BridgeProps) => {
             : () => false
         }
       />
-    </>
+    </Container>
   );
 
-  const tokenSelector = (
+  const TokenSelector = () => (
     <Container width="100%" gap={10}>
       <Text size="sm">Select Token</Text>
-      <Container width="100%" direction="row" gap={10}>
+      <Container width="100%" direction="row" gap={20}>
         <Selector
           title="SELECT TOKEN"
           activeItem={
@@ -153,7 +153,6 @@ const Bridging = (props: BridgeProps) => {
           }
           onChange={props.hook.setters.token}
         />
-        <Spacer height="10px" />
         <Input
           type="amount"
           placeholder="0.0"
@@ -200,18 +199,6 @@ const Bridging = (props: BridgeProps) => {
     </Container>
   );
 
-  const orderedSelectors =
-    props.hook.direction === "in" ? (
-      <>
-        {networkSelectors}
-        {tokenSelector}
-      </>
-    ) : (
-      <>
-        {tokenSelector}
-        {networkSelectors}
-      </>
-    );
   const { data: canBridge } = props.hook.bridge.canBridge({
     sender: fromAddress,
     receiver: toAddress,
@@ -223,13 +210,13 @@ const Bridging = (props: BridgeProps) => {
       <section className={styles.container}>
         <div
           className={styles["network-selection"]}
-          //   style={{
-          //     flexDirection:
-          //       props.hook.direction === "in" ? "column" : "column-reverse",
-          //   }}
+          style={{
+            flexDirection:
+              props.hook.direction === "in" ? "column" : "column-reverse",
+          }}
         >
-          {orderedSelectors}
-
+          <NetworkSelectors />
+          <TokenSelector />
           {/* <Text size="sm">Select Method</Text>
           <Selector
             title="SELECT METHOD"
