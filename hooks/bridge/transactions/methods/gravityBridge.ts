@@ -39,7 +39,6 @@ import BigNumber from "bignumber.js";
  * @notice creates a list of transactions that need to be made for bridging into gravity bridge
  * @param {number} chainId chainId to begin bridging from
  * @param {string} ethSender eth sender address
- * @param {string} cantoReceiver canto receiver address
  * @param {ERC20Token} token token to bridge
  * @param {string} amount amount to bridge
  * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
@@ -47,7 +46,6 @@ import BigNumber from "bignumber.js";
 export async function bridgeInGravity(
   chainId: number,
   ethSender: string,
-  cantoReceiver: string,
   token: ERC20Token,
   amount: string
 ): PromiseWithError<Transaction[]> {
@@ -55,10 +53,12 @@ export async function bridgeInGravity(
   if (!isValidEthAddress(ethSender)) {
     return NEW_ERROR("bridgeInGravity: invalid eth address: " + ethSender);
   }
-  if (!isValidCantoAddress(cantoReceiver)) {
-    return NEW_ERROR(
-      "bridgeInGravity: invalid canto address: " + cantoReceiver
-    );
+
+  // gravity bridge is onlt used from ETH mainnet to canto, so convert the sender ethAddress to canto
+  const { data: cantoReceiver, error: ethToCantoError } =
+    await ethToCantoAddress(ethSender);
+  if (ethToCantoError) {
+    return NEW_ERROR("bridgeInGravity::" + ethToCantoError.message);
   }
 
   // parameters look good, so create the tx list
@@ -72,24 +72,10 @@ export async function bridgeInGravity(
   );
   // if no pub key found or error fetching account
   if (!hasPubKey || checkPubKeyError) {
-    const { data: cantoAddress, error: ethToCantoError } =
-      await ethToCantoAddress(ethSender);
-    if (ethToCantoError) {
-      return NEW_ERROR("bridgeInGravity::" + ethToCantoError.message);
-    }
-    // check that the receiver and sender is the same address since EIP will be created
-    if (cantoAddress !== cantoReceiver) {
-      return NEW_ERROR(
-        "bridgeInGravity: canto address and canto receiver are not the same: " +
-          cantoAddress +
-          " != " +
-          cantoReceiver
-      );
-    }
     // get canto balance to see if enough canto for generating public key
     const { data: cantoBalance, error: balanceError } = await getCantoBalance(
       CANTO_MAINNET_COSMOS.chainId,
-      cantoAddress
+      cantoReceiver
     );
     if (balanceError) {
       return NEW_ERROR("bridgeInGravity::" + balanceError.message);
@@ -106,7 +92,7 @@ export async function bridgeInGravity(
         },
         mode: "no-cors",
         body: JSON.stringify({
-          cantoAddress: cantoAddress,
+          cantoAddress: cantoReceiver,
           hexAddress: ethSender,
         }),
       });
@@ -119,7 +105,7 @@ export async function bridgeInGravity(
     txList.push(
       _generatePubKeyTx(
         CANTO_MAINNET_EVM.chainId,
-        cantoAddress,
+        cantoReceiver,
         TX_DESCRIPTIONS.GENERATE_PUBLIC_KEY()
       )
     );

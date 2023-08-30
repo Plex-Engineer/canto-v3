@@ -1,14 +1,11 @@
+"use client";
 import Spacer from "@/components/layout/spacer";
 import Selector, { Item } from "@/components/selector/selector";
 import Text from "@/components/text";
-import {
-  BridgingMethod,
-  getBridgeMethodInfo,
-} from "@/hooks/bridge/interfaces/bridgeMethods";
 import { BridgeHookReturn } from "@/hooks/bridge/interfaces/hookParams";
 import { TransactionStore } from "@/stores/transactionStore";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";
 import Input from "@/components/input/input";
@@ -18,54 +15,16 @@ interface BridgeProps {
   hook: BridgeHookReturn;
   params: {
     signer: any;
-    cosmosAddress: string;
-    cantoAddress: string;
     transactionStore?: TransactionStore;
   };
 }
 const Bridging = (props: BridgeProps) => {
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
-  const [inputCosmosAddress, setInputCosmosAddress] = useState<string>("");
-  const [fromAddress, setFromAddress] = useState<string>("");
-  const [toAddress, setToAddress] = useState<string>("");
-
-  // SET FROM AND TO ADDRESSES BASED ON BRIDGE METHOD
-  useEffect(() => {
-    switch (props.hook.selections.method) {
-      case BridgingMethod.GRAVITY_BRIDGE:
-        setFromAddress(props.params.signer?.account.address);
-        setToAddress(props.params.cantoAddress);
-        return;
-      case BridgingMethod.IBC:
-        if (props.hook.direction === "in") {
-          setFromAddress(props.params.cosmosAddress);
-          setToAddress(props.params.signer?.account.address);
-        } else {
-          setFromAddress(props.params.signer?.account.address);
-          setToAddress(inputCosmosAddress);
-        }
-        return;
-      case BridgingMethod.LAYER_ZERO:
-        setFromAddress(props.params.signer?.account.address);
-        setToAddress(props.params.signer?.account.address);
-        return;
-    }
-  }, [
-    props.hook.selections.method,
-    props.params.signer?.account.address,
-    inputCosmosAddress,
-    props.params.cosmosAddress,
-    props.params.cantoAddress,
-    props.hook.direction,
-  ]);
-
   //? BRIDGE TEST
-  async function bridgeTest() {
+  async function bridgeTx() {
     props.hook.bridge
       .bridgeTx({
-        sender: fromAddress,
-        receiver: toAddress,
         amount: convertToBigNumber(
           amount,
           props.hook.selections.token?.decimals ?? 18
@@ -84,124 +43,7 @@ const Bridging = (props: BridgeProps) => {
       });
   }
 
-  const NetworkSelectors = () => (
-    <Container width="100%" gap={14}>
-      <Text size="sm">{`From network (${fromAddress})`}</Text>
-      <Selector
-        title="SELECT FROM NETWORK"
-        activeItem={
-          props.hook.selections.fromNetwork ?? {
-            name: "Select network",
-            icon: "",
-            id: "",
-          }
-        }
-        items={
-          props.hook.direction === "in" ? props.hook.allOptions.networks : []
-        }
-        onChange={
-          props.hook.direction === "in"
-            ? props.hook.setters.network
-            : () => false
-        }
-      />
-
-      <Text size="sm">{`To network (${toAddress})`}</Text>
-      <Selector
-        title="SELECT TO NETWORK"
-        activeItem={
-          props.hook.selections.toNetwork ?? {
-            name: "Select network",
-            icon: "",
-            id: "",
-          }
-        }
-        items={
-          props.hook.direction === "out" ? props.hook.allOptions.networks : []
-        }
-        onChange={
-          props.hook.direction === "out"
-            ? props.hook.setters.network
-            : () => false
-        }
-      />
-    </Container>
-  );
-
-  const TokenSelector = () => (
-    <Container width="100%" gap={10}>
-      <Text size="sm">Select Token</Text>
-      <Container width="100%" direction="row" gap={20}>
-        <Selector
-          title="SELECT TOKEN"
-          activeItem={
-            props.hook.selections.token
-              ? {
-                  ...props.hook.selections.token,
-                }
-              : ({
-                  name: "Select Token",
-                  icon: "",
-                  id: "",
-                } as Item)
-          }
-          items={
-            props.hook.allOptions.tokens.map((token) => ({
-              ...token,
-              balance: formatBalance(token.balance ?? "0", token.decimals),
-            })) ?? []
-          }
-          onChange={props.hook.setters.token}
-        />
-        <Input
-          type="amount"
-          placeholder="0.0"
-          value={amount}
-          onChange={(val) => {
-            setAmount(val.target.value);
-          }}
-          className={styles["input"]}
-          error={
-            Number(amount) >
-            Number(
-              formatBalance(
-                props.hook.selections.token?.balance ?? "0",
-                props.hook.selections.token?.decimals ?? 18,
-                {
-                  precision: 0,
-                  commify: true,
-                  symbol: props.hook.selections.token?.symbol,
-                }
-              )
-            )
-          }
-          errorMessage={`"Amount must be less than " ${formatBalance(
-            props.hook.selections.token?.balance ?? "0",
-            props.hook.selections.token?.decimals ?? 18,
-            {
-              precision: 0,
-              commify: true,
-              symbol: props.hook.selections.token?.symbol,
-            }
-          )}`}
-        />
-      </Container>
-      {/* Balance:{" "}
-      {formatBalance(
-        props.bridge.selections.token?.balance ?? "0",
-        props.bridge.selections.token?.decimals ?? 18,
-        {
-          precision: 0,
-          commify: true,
-          symbol: props.bridge.selections.token?.symbol,
-        }
-      )} */}
-    </Container>
-  );
-
   const { data: canBridge } = props.hook.bridge.canBridge({
-    sender: fromAddress,
-    receiver: toAddress,
     amount,
   });
 
@@ -215,8 +57,112 @@ const Bridging = (props: BridgeProps) => {
               props.hook.direction === "in" ? "column" : "column-reverse",
           }}
         >
-          <NetworkSelectors />
-          <TokenSelector />
+          <Container width="100%" gap={14}>
+            <Text size="sm">{`From network (${props.hook.addresses.getSender()})`}</Text>
+            <Selector
+              title="SELECT FROM NETWORK"
+              activeItem={
+                props.hook.selections.fromNetwork ?? {
+                  name: "Select network",
+                  icon: "",
+                  id: "",
+                }
+              }
+              items={
+                props.hook.direction === "in"
+                  ? props.hook.allOptions.networks
+                  : []
+              }
+              onChange={
+                props.hook.direction === "in"
+                  ? (networkId) => props.hook.setState("network", networkId)
+                  : () => false
+              }
+            />
+
+            <Text size="sm">{`To network (${props.hook.addresses.getReceiver()})`}</Text>
+            <Selector
+              title="SELECT TO NETWORK"
+              activeItem={
+                props.hook.selections.toNetwork ?? {
+                  name: "Select network",
+                  icon: "",
+                  id: "",
+                }
+              }
+              items={
+                props.hook.direction === "out"
+                  ? props.hook.allOptions.networks
+                  : []
+              }
+              onChange={
+                props.hook.direction === "out"
+                  ? (networkId) => props.hook.setState("network", networkId)
+                  : () => false
+              }
+            />
+          </Container>
+          <Container width="100%" gap={10}>
+            <Text size="sm">Select Token</Text>
+            <Container width="100%" direction="row" gap={20}>
+              <Selector
+                title="SELECT TOKEN"
+                activeItem={
+                  props.hook.selections.token
+                    ? {
+                        ...props.hook.selections.token,
+                      }
+                    : ({
+                        name: "Select Token",
+                        icon: "",
+                        id: "",
+                      } as Item)
+                }
+                items={
+                  props.hook.allOptions.tokens.map((token) => ({
+                    ...token,
+                    balance: formatBalance(
+                      token.balance ?? "0",
+                      token.decimals
+                    ),
+                  })) ?? []
+                }
+                onChange={(tokenId) => props.hook.setState("token", tokenId)}
+              />
+              <Input
+                type="amount"
+                placeholder="0.0"
+                value={amount}
+                onChange={(val) => {
+                  setAmount(val.target.value);
+                }}
+                className={styles["input"]}
+                error={
+                  Number(amount) >
+                  Number(
+                    formatBalance(
+                      props.hook.selections.token?.balance ?? "0",
+                      props.hook.selections.token?.decimals ?? 18,
+                      {
+                        precision: 0,
+                        commify: true,
+                        symbol: props.hook.selections.token?.symbol,
+                      }
+                    )
+                  )
+                }
+                errorMessage={`"Amount must be less than " ${formatBalance(
+                  props.hook.selections.token?.balance ?? "0",
+                  props.hook.selections.token?.decimals ?? 18,
+                  {
+                    precision: 0,
+                    commify: true,
+                    symbol: props.hook.selections.token?.symbol,
+                  }
+                )}`}
+              />
+            </Container>
+          </Container>
           {/* <Text size="sm">Select Method</Text>
           <Selector
             title="SELECT METHOD"
@@ -275,7 +221,7 @@ const Bridging = (props: BridgeProps) => {
           onChange={(e) => setInputCosmosAddress(e.target.value)}
         /> */}
         <Spacer height="100px" />
-        <Button width="fill" onClick={bridgeTest}>
+        <Button width="fill" onClick={bridgeTx}>
           {props.hook.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
           {` ::can bridge: ${
             canBridge !== null ? (canBridge ? "yes" : "no") : "no"
