@@ -44,7 +44,10 @@ const Bridging = (props: BridgeProps) => {
   }
 
   const { data: canBridge } = props.hook.bridge.canBridge({
-    amount,
+    amount: convertToBigNumber(
+      amount,
+      props.hook.selections.token?.decimals ?? 18
+    ).data.toString(),
   });
 
   return (
