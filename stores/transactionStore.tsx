@@ -28,6 +28,7 @@ interface AddTransactionsParams {
 }
 export interface TransactionStore {
   transactionFlows: UserTransactionFlowMap;
+  getUserTransactionFlows: (ethAccount: string) => TransactionFlowWithStatus[];
   addTransactions: (params: AddTransactionsParams) => PromiseWithError<boolean>;
   // will delete all transactions in list index, or the entire store if no index provided
   clearTransactions: (ethAccount: string, listIndex?: number) => void;
@@ -56,7 +57,11 @@ const useTransactionStore = create<TransactionStore>()(
   devtools(
     persist(
       (set, get) => ({
-        transactionFlows: {},
+        transactionFlows: new Map<string, TransactionFlowWithStatus[]>(),
+        getUserTransactionFlows: (ethAccount) => {
+          const userTxFlows = get().transactionFlows.get(ethAccount);
+          return userTxFlows || [];
+        },
         addTransactions: async (params) => {
           const txListWithStatus: TransactionFlowWithStatus = {
             title: params.title,
@@ -67,19 +72,16 @@ const useTransactionStore = create<TransactionStore>()(
             })),
           };
           // add the flow to the user map
-          const allUserTxFlows = get().transactionFlows;
-          const currentUserTransactionFlows = allUserTxFlows[params.ethAccount];
-          if (!currentUserTransactionFlows) {
-            allUserTxFlows[params.ethAccount] = [txListWithStatus];
-          } else {
-            allUserTxFlows[params.ethAccount] = [
-              ...currentUserTransactionFlows,
-              txListWithStatus,
-            ];
-          }
-
+          const currentUserTransactionFlows = get().getUserTransactionFlows(
+            params.ethAccount
+          );
           set({
-            transactionFlows: allUserTxFlows,
+            transactionFlows: new Map(
+              get().transactionFlows.set(params.ethAccount, [
+                ...currentUserTransactionFlows,
+                txListWithStatus,
+              ])
+            ),
           });
           // if signer, we can perform the transactions right away
           if (params.signer) {
@@ -90,20 +92,21 @@ const useTransactionStore = create<TransactionStore>()(
         clearTransactions: (ethAccount, listIndex) => {
           const txFlows = get().transactionFlows;
           if (!listIndex) {
-            txFlows[ethAccount] = [];
+            txFlows.delete(ethAccount);
             set({ transactionFlows: txFlows });
           } else {
-            const userTxList = txFlows[ethAccount];
+            const userTxList = txFlows.get(ethAccount);
             if (!userTxList || !userTxList[listIndex]) {
               // nothing to delete
               return;
             }
-            txFlows[ethAccount] = [
+            // delete the list
+            const updatedUserFlows = [
               ...userTxList.slice(0, listIndex),
               ...userTxList.slice(listIndex + 1),
             ];
             set({
-              transactionFlows: txFlows,
+              transactionFlows: txFlows.set(ethAccount, updatedUserFlows),
             });
           }
         },
@@ -116,8 +119,8 @@ const useTransactionStore = create<TransactionStore>()(
           }
           const ethAddress = signer.account.address;
           // grab user flows
-          const userTxFlows = get().transactionFlows[ethAddress];
-          if (!userTxFlows) {
+          const userTxFlows = get().getUserTransactionFlows(ethAddress);
+          if (userTxFlows.length === 0) {
             return NEW_ERROR(
               "useTransactionStore::performTransactions: no transactions found"
             );
@@ -128,7 +131,8 @@ const useTransactionStore = create<TransactionStore>()(
           // check that we have a transaction flow object
           if (!transactionFlow) {
             return NEW_ERROR(
-              "useTransactionStore::performTransactions: no transactions found"
+              "useTransactionStore::performTransactions: no transactions found at index " +
+                listIndex
             );
           }
           // set the flow status to pending now that we will be performing the transactions
@@ -204,8 +208,7 @@ const useTransactionStore = create<TransactionStore>()(
         },
         setTxStatus: (ethAccount, listIndex, txIndex, details) => {
           // called internally, no need to check any of the params
-          const allTxFlows = get().transactionFlows;
-          const currentUserTxFlows = allTxFlows[ethAccount];
+          const currentUserTxFlows = get().getUserTransactionFlows(ethAccount);
           // save updates
           const updatedTx = {
             ...currentUserTxFlows[listIndex].transactions[txIndex],
@@ -220,35 +223,61 @@ const useTransactionStore = create<TransactionStore>()(
             ],
           };
           // set state
-          allTxFlows[ethAccount] = [
-            ...currentUserTxFlows.slice(0, listIndex),
-            updatedFlow,
-            ...currentUserTxFlows.slice(listIndex + 1),
-          ];
           set({
-            transactionFlows: allTxFlows,
+            transactionFlows: new Map(
+              get().transactionFlows.set(ethAccount, [
+                ...currentUserTxFlows.slice(0, listIndex),
+                updatedFlow,
+                ...currentUserTxFlows.slice(listIndex + 1),
+              ])
+            ),
           });
         },
         setTxFlowStatus: (ethAddress, listIndex, status) => {
           // called internally, no need to check any of the params
-          const allTxFlows = get().transactionFlows;
-          const currentUserTxFlows = allTxFlows[ethAddress];
+          const currentUserTxFlows = get().getUserTransactionFlows(ethAddress);
           const updatedFlow = { ...currentUserTxFlows[listIndex], status };
 
           // set new flows
-          allTxFlows[ethAddress] = [
-            ...currentUserTxFlows.slice(0, listIndex),
-            updatedFlow,
-            ...currentUserTxFlows.slice(listIndex + 1),
-          ];
           set({
-            transactionFlows: allTxFlows,
+            transactionFlows: new Map(
+              get().transactionFlows.set(ethAddress, [
+                ...currentUserTxFlows.slice(0, listIndex),
+                updatedFlow,
+                ...currentUserTxFlows.slice(listIndex + 1),
+              ])
+            ),
           });
         },
       }),
       {
         name: "transaction-store",
         version: 1,
+        storage: {
+          getItem: (key) => {
+            const jsonStr = localStorage.getItem(key);
+            if (!jsonStr) return null;
+            const { state } = JSON.parse(jsonStr);
+            return {
+              state: {
+                ...state,
+                transactionFlows: new Map(state.transactionFlows),
+              },
+            };
+          },
+          setItem: (key, value) => {
+            const jsonStr = JSON.stringify({
+              state: {
+                ...value.state,
+                transactionFlows: Array.from(
+                  value.state.transactionFlows.entries()
+                ),
+              },
+            });
+            localStorage.setItem(key, jsonStr);
+          },
+          removeItem: (key) => localStorage.removeItem(key),
+        },
       }
     )
   )

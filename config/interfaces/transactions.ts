@@ -47,9 +47,7 @@ export interface TransactionFlowWithStatus {
 }
 // user can be on different accounts to make transactions, so we need to map the transaction flows to the account
 // index by account address
-export interface UserTransactionFlowMap {
-  [account: string]: TransactionFlowWithStatus[];
-}
+export type UserTransactionFlowMap = Map<string, TransactionFlowWithStatus[]>;
 
 ///
 /// Cosmos Transaction Interfaces
