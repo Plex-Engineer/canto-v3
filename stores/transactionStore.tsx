@@ -22,11 +22,14 @@ import { persist, devtools } from "zustand/middleware";
 
 interface AddTransactionsParams {
   title: string;
-  txList: Transaction[];
+  txList: () => PromiseWithError<Transaction[]>;
   ethAccount: string;
   signer?: GetWalletClientResult;
 }
 export interface TransactionStore {
+  // will tell the tx store if a transaction flow is currently being prepared
+  isLoading: boolean;
+  setLoading: (loading: boolean) => void;
   transactionFlows: UserTransactionFlowMap;
   getUserTransactionFlows: (ethAccount: string) => TransactionFlowWithStatus[];
   addTransactions: (params: AddTransactionsParams) => PromiseWithError<boolean>;
@@ -57,16 +60,28 @@ const useTransactionStore = create<TransactionStore>()(
   devtools(
     persist(
       (set, get) => ({
+        isLoading: false,
+        // should never be called by any other component
+        setLoading: (loading) => set({ isLoading: loading }),
         transactionFlows: new Map<string, TransactionFlowWithStatus[]>(),
         getUserTransactionFlows: (ethAccount) => {
           const userTxFlows = get().transactionFlows.get(ethAccount);
           return userTxFlows || [];
         },
         addTransactions: async (params) => {
+          // set loading state to true
+          set({ isLoading: true });
+          // run the function to get all transactions
+          const { data: txList, error } = await params.txList();
+          if (error) {
+            return NEW_ERROR(
+              "useTransactionStore::addTransactions: " + errMsg(error)
+            );
+          }
           const txListWithStatus: TransactionFlowWithStatus = {
             title: params.title,
             status: "NONE",
-            transactions: params.txList.map((tx) => ({
+            transactions: txList.map((tx) => ({
               tx,
               status: "NONE",
             })),
@@ -82,6 +97,7 @@ const useTransactionStore = create<TransactionStore>()(
                 txListWithStatus,
               ])
             ),
+            isLoading: false,
           });
           // if signer, we can perform the transactions right away
           if (params.signer) {
@@ -251,7 +267,7 @@ const useTransactionStore = create<TransactionStore>()(
         },
       }),
       {
-        name: "transaction-store",
+        name: "canto-io-transaction-store",
         version: 1,
         storage: {
           getItem: (key) => {
@@ -277,6 +293,10 @@ const useTransactionStore = create<TransactionStore>()(
             localStorage.setItem(key, jsonStr);
           },
           removeItem: (key) => localStorage.removeItem(key),
+        },
+        onRehydrateStorage: () => (state) => {
+          // reset isLoading to false, since we just reloaded the page
+          state?.setLoading(false);
         },
       }
     )

@@ -165,13 +165,17 @@ export default function TestPage() {
             RETRY TRANSACTION
           </Button>
         </h1>
-        <TxBox
-          flow={
-            transactionStore?.getUserTransactionFlows(
-              signer?.account.address ?? ""
-            )[txIndex]
-          }
-        />
+        {transactionStore?.isLoading ? (
+          <>LOADING......</>
+        ) : (
+          <TxBox
+            flow={
+              transactionStore?.getUserTransactionFlows(
+                signer?.account.address ?? ""
+              )[txIndex]
+            }
+          />
+        )}
         <Spacer height="30px" />
         <div
           style={{
@@ -259,25 +263,18 @@ const Bridge = (props: BridgeProps) => {
   const [amount, setAmount] = useState<string>("");
 
   async function bridgeTest() {
-    props.bridge.bridge
-      .bridgeTx({
-        amount: convertToBigNumber(
-          amount,
-          props.bridge.selections.token?.decimals ?? 18
-        ).data.toString(),
-      })
-      .then((val) => {
-        if (val.error) {
-          console.log(val.error);
-          return;
-        }
-        props.params.transactionStore?.addTransactions({
-          title: "bridge",
-          txList: val.data,
-          ethAccount: props.params.signer.account.address,
-          signer: props.params.signer,
-        });
-      });
+    props.params.transactionStore?.addTransactions({
+      title: "bridge",
+      txList: () =>
+        props.bridge.bridge.bridgeTx({
+          amount: convertToBigNumber(
+            amount,
+            props.bridge.selections.token?.decimals ?? 18
+          ).data.toString(),
+        }),
+      ethAccount: props.params.signer.account.address,
+      signer: props.params.signer,
+    });
   }
 
   const networkSelectors = (
