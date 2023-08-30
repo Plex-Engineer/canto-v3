@@ -39,12 +39,15 @@ export interface TransactionWithStatus {
 /// Flow will have the title of the overal "transaction flow"
 /// Flow will have a status
 ///
-type TransactionFlowStatus = "NONE" | "PENDING" | "SUCCESS" | "ERROR";
+export type TransactionFlowStatus = "NONE" | "PENDING" | "SUCCESS" | "ERROR";
 export interface TransactionFlowWithStatus {
   title: string;
   status: TransactionFlowStatus;
   transactions: TransactionWithStatus[];
 }
+// user can be on different accounts to make transactions, so we need to map the transaction flows to the account
+// index by account address
+export type UserTransactionFlowMap = Map<string, TransactionFlowWithStatus[]>;
 
 ///
 /// Cosmos Transaction Interfaces
