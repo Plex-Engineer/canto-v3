@@ -96,7 +96,7 @@ export async function signAndBroadcastCosmosTransaction(
       context.chain.chainId,
       eipPayload
     );
-      console.log("HERE")
+
     // check public key on sender object, if none, create one
     if (!context.sender.pubkey) {
       // create a public key for the user IFF EIP712 Canto is used (since through metamask)
