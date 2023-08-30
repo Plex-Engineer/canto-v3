@@ -342,28 +342,22 @@ const Bridge = (props: BridgeProps) => {
     </>
   );
 
-  const orderedSelectors =
-    props.bridge.direction === "in" ? (
-      <>
-        {networkSelectors}
-        {tokenSelector}
-      </>
-    ) : (
-      <>
-        {tokenSelector}
-        {networkSelectors}
-      </>
-    );
   const { data: canBridge } = props.bridge.bridge.canBridge({
     amount,
   });
-  console.log(canBridge);
   return (
     <>
       <section className={styles.container}>
-        <div className={styles["network-selection"]}>
-          {orderedSelectors}
-          <Text size="sm">Select Method</Text>
+        <div
+          className={styles["network-selection"]}
+          style={{
+            flexDirection:
+              props.bridge.direction === "in" ? "column" : "column-reverse",
+          }}
+        >
+          {networkSelectors}
+          {tokenSelector}
+          {/* <Text size="sm">Select Method</Text>
           <Selector
             title="SELECT METHOD"
             activeItem={{
@@ -379,7 +373,7 @@ const Bridge = (props: BridgeProps) => {
             onChange={(method) =>
               props.bridge.setState("method", method as BridgingMethod)
             }
-          />
+          /> */}
         </div>
         <Spacer height="100px" />
         <input

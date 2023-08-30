@@ -43,125 +43,9 @@ const Bridging = (props: BridgeProps) => {
       });
   }
 
-  const NetworkSelectors = () => (
-    <Container width="100%" gap={14}>
-      <Text size="sm">{`From network (${props.hook.addresses.getSender()})`}</Text>
-      <Selector
-        title="SELECT FROM NETWORK"
-        activeItem={
-          props.hook.selections.fromNetwork ?? {
-            name: "Select network",
-            icon: "",
-            id: "",
-          }
-        }
-        items={
-          props.hook.direction === "in" ? props.hook.allOptions.networks : []
-        }
-        onChange={
-          props.hook.direction === "in"
-            ? (networkId) => props.hook.setState("network", networkId)
-            : () => false
-        }
-      />
-
-      <Text size="sm">{`To network (${props.hook.addresses.getReceiver()})`}</Text>
-      <Selector
-        title="SELECT TO NETWORK"
-        activeItem={
-          props.hook.selections.toNetwork ?? {
-            name: "Select network",
-            icon: "",
-            id: "",
-          }
-        }
-        items={
-          props.hook.direction === "out" ? props.hook.allOptions.networks : []
-        }
-        onChange={
-          props.hook.direction === "out"
-            ? (networkId) => props.hook.setState("network", networkId)
-            : () => false
-        }
-      />
-    </Container>
-  );
-
-  const TokenSelector = () => (
-    <Container width="100%" gap={10}>
-      <Text size="sm">Select Token</Text>
-      <Container width="100%" direction="row" gap={20}>
-        <Selector
-          title="SELECT TOKEN"
-          activeItem={
-            props.hook.selections.token
-              ? {
-                  ...props.hook.selections.token,
-                }
-              : ({
-                  name: "Select Token",
-                  icon: "",
-                  id: "",
-                } as Item)
-          }
-          items={
-            props.hook.allOptions.tokens.map((token) => ({
-              ...token,
-              balance: formatBalance(token.balance ?? "0", token.decimals),
-            })) ?? []
-          }
-          onChange={(tokenId) => props.hook.setState("token", tokenId)}
-        />
-        <Input
-          type="amount"
-          placeholder="0.0"
-          value={amount}
-          onChange={(val) => {
-            setAmount(val.target.value);
-          }}
-          className={styles["input"]}
-          error={
-            Number(amount) >
-            Number(
-              formatBalance(
-                props.hook.selections.token?.balance ?? "0",
-                props.hook.selections.token?.decimals ?? 18,
-                {
-                  precision: 0,
-                  commify: true,
-                  symbol: props.hook.selections.token?.symbol,
-                }
-              )
-            )
-          }
-          errorMessage={`"Amount must be less than " ${formatBalance(
-            props.hook.selections.token?.balance ?? "0",
-            props.hook.selections.token?.decimals ?? 18,
-            {
-              precision: 0,
-              commify: true,
-              symbol: props.hook.selections.token?.symbol,
-            }
-          )}`}
-        />
-      </Container>
-      {/* Balance:{" "}
-      {formatBalance(
-        props.bridge.selections.token?.balance ?? "0",
-        props.bridge.selections.token?.decimals ?? 18,
-        {
-          precision: 0,
-          commify: true,
-          symbol: props.bridge.selections.token?.symbol,
-        }
-      )} */}
-    </Container>
-  );
-
   const { data: canBridge } = props.hook.bridge.canBridge({
     amount,
   });
-  console.log("rerender");
 
   return (
     <>
@@ -173,8 +57,112 @@ const Bridging = (props: BridgeProps) => {
               props.hook.direction === "in" ? "column" : "column-reverse",
           }}
         >
-          <NetworkSelectors />
-          <TokenSelector />
+          <Container width="100%" gap={14}>
+            <Text size="sm">{`From network (${props.hook.addresses.getSender()})`}</Text>
+            <Selector
+              title="SELECT FROM NETWORK"
+              activeItem={
+                props.hook.selections.fromNetwork ?? {
+                  name: "Select network",
+                  icon: "",
+                  id: "",
+                }
+              }
+              items={
+                props.hook.direction === "in"
+                  ? props.hook.allOptions.networks
+                  : []
+              }
+              onChange={
+                props.hook.direction === "in"
+                  ? (networkId) => props.hook.setState("network", networkId)
+                  : () => false
+              }
+            />
+
+            <Text size="sm">{`To network (${props.hook.addresses.getReceiver()})`}</Text>
+            <Selector
+              title="SELECT TO NETWORK"
+              activeItem={
+                props.hook.selections.toNetwork ?? {
+                  name: "Select network",
+                  icon: "",
+                  id: "",
+                }
+              }
+              items={
+                props.hook.direction === "out"
+                  ? props.hook.allOptions.networks
+                  : []
+              }
+              onChange={
+                props.hook.direction === "out"
+                  ? (networkId) => props.hook.setState("network", networkId)
+                  : () => false
+              }
+            />
+          </Container>
+          <Container width="100%" gap={10}>
+            <Text size="sm">Select Token</Text>
+            <Container width="100%" direction="row" gap={20}>
+              <Selector
+                title="SELECT TOKEN"
+                activeItem={
+                  props.hook.selections.token
+                    ? {
+                        ...props.hook.selections.token,
+                      }
+                    : ({
+                        name: "Select Token",
+                        icon: "",
+                        id: "",
+                      } as Item)
+                }
+                items={
+                  props.hook.allOptions.tokens.map((token) => ({
+                    ...token,
+                    balance: formatBalance(
+                      token.balance ?? "0",
+                      token.decimals
+                    ),
+                  })) ?? []
+                }
+                onChange={(tokenId) => props.hook.setState("token", tokenId)}
+              />
+              <Input
+                type="amount"
+                placeholder="0.0"
+                value={amount}
+                onChange={(val) => {
+                  setAmount(val.target.value);
+                }}
+                className={styles["input"]}
+                error={
+                  Number(amount) >
+                  Number(
+                    formatBalance(
+                      props.hook.selections.token?.balance ?? "0",
+                      props.hook.selections.token?.decimals ?? 18,
+                      {
+                        precision: 0,
+                        commify: true,
+                        symbol: props.hook.selections.token?.symbol,
+                      }
+                    )
+                  )
+                }
+                errorMessage={`"Amount must be less than " ${formatBalance(
+                  props.hook.selections.token?.balance ?? "0",
+                  props.hook.selections.token?.decimals ?? 18,
+                  {
+                    precision: 0,
+                    commify: true,
+                    symbol: props.hook.selections.token?.symbol,
+                  }
+                )}`}
+              />
+            </Container>
+          </Container>
           {/* <Text size="sm">Select Method</Text>
           <Selector
             title="SELECT METHOD"
