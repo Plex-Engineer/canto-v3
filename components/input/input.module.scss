@@ -1,7 +1,6 @@
 .input-container {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1rem;
   position: relative;
 
   input {
@@ -28,6 +27,7 @@
 
     transition: all 0.1s ease-in-out;
     background-color: transparent;
+
     &::placeholder {
       color: var(--text-dark-40-color, #b3b3b3);
     }
