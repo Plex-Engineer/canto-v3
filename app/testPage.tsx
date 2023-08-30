@@ -1,15 +1,10 @@
 "use client";
-import { getAllUserBridgeTransactionHistory } from "@/hooks/bridge/txHistory";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
-import useStaking from "@/hooks/staking/useStaking";
 import useTransactionStore, {
   TransactionStore,
 } from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
-import { ethToCantoAddress } from "@/utils/address.utils";
-import { createMsgsClaimStakingRewards } from "@/utils/cosmos/transactions/messages/staking/claimRewards";
-import { createMsgsDelegate } from "@/utils/cosmos/transactions/messages/staking/delegate";
 import { connectToKeplr } from "@/utils/keplr/connectKeplr";
 import { useEffect, useState } from "react";
 import { useWalletClient } from "wagmi";
@@ -21,55 +16,56 @@ import Button from "@/components/button/button";
 import { BridgeHookReturn } from "@/hooks/bridge/interfaces/hookParams";
 import AnimatedBackground from "@/components/animated_background/animatedBackground";
 import Tabs from "@/components/tabs/tabs";
-import Selector, { Item } from "./selector/selector";
+import Selector, { Item } from "../components/selector/selector";
 import {
   BridgingMethod,
   getBridgeMethodInfo,
 } from "@/hooks/bridge/interfaces/bridgeMethods";
-import { isCosmosNetwork } from "@/utils/networks.utils";
+import {
+  getNetworkInfoFromChainId,
+  isCosmosNetwork,
+} from "@/utils/networks.utils";
 import { TransactionFlowWithStatus } from "@/config/interfaces/transactions";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 
 export default function TestPage() {
+  const [onTestnet, setOnTestnet] = useState<boolean>(false);
   const [txIndex, setTxIndex] = useState<number>(0);
   const [direction, setDirection] = useState<"in" | "out">("in");
-  const [cosmosAddress, setCosmosAddress] = useState<string>("");
-  const [cantoAddress, setCantoAddress] = useState<string>("");
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({
-    testnet: false,
-    userEthAddress: signer?.account.address,
+    testnet: onTestnet,
   });
   const bridgeIn = useBridgeIn({
-    testnet: false,
-    userEthAddress: signer?.account.address,
-    userCosmosAddress: cosmosAddress,
+    testnet: onTestnet,
   });
   const transactionStore = useStore(useTransactionStore, (state) => state);
-  console.log(transactionStore?.transactionFlows);
 
   useEffect(() => {
     async function getKeplrInfoForBridge() {
       const network = bridgeIn.selections.fromNetwork;
       if (!network || !isCosmosNetwork(network)) return;
       const keplrClient = await connectToKeplr(network);
-      setCosmosAddress(keplrClient.data?.address);
+      bridgeIn.setState("cosmosAddress", keplrClient.data?.address);
     }
     getKeplrInfoForBridge();
   }, [bridgeIn.selections.fromNetwork]);
 
   useEffect(() => {
-    async function getCantoAddress() {
-      if (!signer?.account.address) return;
-      const cantoAddress = await ethToCantoAddress(signer?.account.address);
-      if (cantoAddress.error) {
-        console.log(cantoAddress.error);
-        return;
-      } else {
-        setCantoAddress(cantoAddress.data);
-      }
+    const { data: network, error } = getNetworkInfoFromChainId(
+      signer?.chain.id ?? 1
+    );
+    if (error) {
+      console.log(error);
+      return;
     }
-    getCantoAddress();
+    setOnTestnet(network.isTestChain);
+  }, [signer?.chain.id]);
+
+  useEffect(() => {
+    // set the signer address
+    bridgeIn.setState("ethAddress", signer?.account.address);
+    bridgeOut.setState("ethAddress", signer?.account.address);
   }, [signer?.account.address]);
 
   return (
@@ -99,8 +95,6 @@ export default function TestPage() {
                       bridge={bridgeIn}
                       params={{
                         signer: signer,
-                        cosmosAddress: cosmosAddress,
-                        cantoAddress: cantoAddress,
                         transactionStore: transactionStore,
                       }}
                     />
@@ -114,8 +108,6 @@ export default function TestPage() {
                       bridge={bridgeOut}
                       params={{
                         signer: signer,
-                        cosmosAddress: cosmosAddress,
-                        cantoAddress: cantoAddress,
                         transactionStore: transactionStore,
                       }}
                     />
@@ -238,53 +230,16 @@ interface BridgeProps {
   bridge: BridgeHookReturn;
   params: {
     signer: any;
-    cosmosAddress: string;
-    cantoAddress: string;
     transactionStore?: TransactionStore;
   };
 }
 const Bridge = (props: BridgeProps) => {
-  console.log(props.bridge.selections);
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
-  const [inputCosmosAddress, setInputCosmosAddress] = useState<string>("");
-  const [fromAddress, setFromAddress] = useState<string>("");
-  const [toAddress, setToAddress] = useState<string>("");
-
-  useEffect(() => {
-    switch (props.bridge.selections.method) {
-      case BridgingMethod.GRAVITY_BRIDGE:
-        setFromAddress(props.params.signer?.account.address);
-        setToAddress(props.params.cantoAddress);
-        return;
-      case BridgingMethod.IBC:
-        if (props.bridge.direction === "in") {
-          setFromAddress(props.params.cosmosAddress);
-          setToAddress(props.params.signer?.account.address);
-        } else {
-          setFromAddress(props.params.signer?.account.address);
-          setToAddress(inputCosmosAddress);
-        }
-        return;
-      case BridgingMethod.LAYER_ZERO:
-        setFromAddress(props.params.signer?.account.address);
-        setToAddress(props.params.signer?.account.address);
-        return;
-    }
-  }, [
-    props.bridge.selections.method,
-    props.params.signer?.account.address,
-    inputCosmosAddress,
-    props.params.cosmosAddress,
-    props.params.cantoAddress,
-    props.bridge.direction,
-  ]);
 
   async function bridgeTest() {
     props.bridge.bridge
       .bridgeTx({
-        sender: fromAddress,
-        receiver: toAddress,
         amount: convertToBigNumber(
           amount,
           props.bridge.selections.token?.decimals ?? 18
@@ -305,7 +260,7 @@ const Bridge = (props: BridgeProps) => {
 
   const networkSelectors = (
     <>
-      <label>{`From network (${fromAddress})`}</label>
+      <label>{`From network (${props.bridge.addresses.getSender()})`}</label>
       <Selector
         title="SELECT FROM NETWORK"
         activeItem={
@@ -322,11 +277,11 @@ const Bridge = (props: BridgeProps) => {
         }
         onChange={
           props.bridge.direction === "in"
-            ? props.bridge.setters.network
+            ? (val) => props.bridge.setState("network", val)
             : () => false
         }
       />
-      <label>{`To network (${toAddress})`}</label>
+      <label>{`To network (${props.bridge.addresses.getReceiver()})`}</label>
       <Selector
         title="SELECT TO NETWORK"
         activeItem={
@@ -343,7 +298,7 @@ const Bridge = (props: BridgeProps) => {
         }
         onChange={
           props.bridge.direction === "out"
-            ? props.bridge.setters.network
+            ? (val) => props.bridge.setState("network", val)
             : () => false
         }
       />
@@ -371,7 +326,7 @@ const Bridge = (props: BridgeProps) => {
             balance: formatBalance(token.balance ?? "0", token.decimals),
           })) ?? []
         }
-        onChange={props.bridge.setters.token}
+        onChange={(val) => props.bridge.setState("token", val)}
       />
       <Spacer height="10px" />
       Balance:{" "}
@@ -387,21 +342,7 @@ const Bridge = (props: BridgeProps) => {
     </>
   );
 
-  const orderedSelectors =
-    props.bridge.direction === "in" ? (
-      <>
-        {networkSelectors}
-        {tokenSelector}
-      </>
-    ) : (
-      <>
-        {tokenSelector}
-        {networkSelectors}
-      </>
-    );
   const { data: canBridge } = props.bridge.bridge.canBridge({
-    sender: fromAddress,
-    receiver: toAddress,
     amount: convertToBigNumber(
       amount,
       props.bridge.selections.token?.decimals ?? 18
@@ -410,9 +351,16 @@ const Bridge = (props: BridgeProps) => {
   return (
     <>
       <section className={styles.container}>
-        <div className={styles["network-selection"]}>
-          {orderedSelectors}
-          <Text size="sm">Select Method</Text>
+        <div
+          className={styles["network-selection"]}
+          style={{
+            flexDirection:
+              props.bridge.direction === "in" ? "column" : "column-reverse",
+          }}
+        >
+          {networkSelectors}
+          {tokenSelector}
+          {/* <Text size="sm">Select Method</Text>
           <Selector
             title="SELECT METHOD"
             activeItem={{
@@ -426,9 +374,9 @@ const Bridge = (props: BridgeProps) => {
               icon: getBridgeMethodInfo(method).icon,
             }))}
             onChange={(method) =>
-              props.bridge.setters.method(method as BridgingMethod)
+              props.bridge.setState("method", method as BridgingMethod)
             }
-          />
+          /> */}
         </div>
         <Spacer height="100px" />
         <input
@@ -439,7 +387,9 @@ const Bridge = (props: BridgeProps) => {
         <Spacer height="100px" />
         <input
           placeholder="cosmos receiver address"
-          onChange={(e) => setInputCosmosAddress(e.target.value)}
+          onChange={(e) =>
+            props.bridge.setState("inputCosmosAddress", e.target.value)
+          }
         />
         <Spacer height="100px" />
         <Button width="fill" onClick={bridgeTest}>

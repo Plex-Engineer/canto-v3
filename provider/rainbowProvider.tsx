@@ -1,9 +1,14 @@
 import "@rainbow-me/rainbowkit/styles.css";
-
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import {
+  darkTheme,
+  getDefaultWallets,
+  lightTheme,
+  RainbowKitProvider,
+} from "@rainbow-me/rainbowkit";
 import { Chain, configureChains, createConfig, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import * as EVM_CHAINS from "@/config/networks/evm";
+import { cantoTheme } from "./util";
 
 const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
   (network) => {
@@ -29,7 +34,16 @@ const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
         },
       },
       testnet: network.isTestChain,
-      contracts: contractInfo,
+      // eth main must have ens resolver
+      contracts:
+        network.chainId === EVM_CHAINS.ETH_MAINNET.chainId
+          ? {
+              ...contractInfo,
+              ensUniversalResolver: {
+                address: "0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62",
+              },
+            }
+          : contractInfo,
     };
   }
 );
@@ -54,7 +68,12 @@ interface RainbowProviderProps {
 const CantoWalletProvider = ({ children }: RainbowProviderProps) => {
   return (
     <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider chains={chains} coolMode>
+      <RainbowKitProvider
+        chains={chains}
+        modalSize="wide"
+        theme={cantoTheme}
+        initialChain={EVM_CHAINS.CANTO_MAINNET_EVM.chainId}
+      >
         {children}
       </RainbowKitProvider>
     </WagmiConfig>

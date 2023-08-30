@@ -29,6 +29,7 @@ interface Props {
   weight?: "regular" | "bold";
   children: React.ReactNode;
   isLoading?: boolean;
+  disabled?: boolean;
 }
 
 const Button = (props: Props) => {
@@ -72,6 +73,9 @@ const Button = (props: Props) => {
   };
 
   const getBGColor = () => {
+    if (props.disabled) {
+      return "var(--primary-10-color)";
+    }
     switch (props.color) {
       case "primary":
         return "var(--text-dark-color)";
@@ -87,6 +91,9 @@ const Button = (props: Props) => {
   };
 
   const getTextColor = () => {
+    if (props.disabled) {
+      return "var(--text-dark-40-color)";
+    }
     switch (props.color) {
       case "primary":
         return "var(--text-light-color)";
@@ -120,8 +127,11 @@ const Button = (props: Props) => {
     <button
       className={styles.container}
       onClick={props.onClick}
+      disabled={props.disabled}
       style={{
         height: getHeight() + "px",
+        cursor: props.disabled ? "not-allowed" : "pointer",
+
         width: getWidth(),
         backgroundColor: getBGColor(),
         padding: getPadding() + "px",

@@ -40,7 +40,6 @@ export async function bridgeInTx(
       transactions = await bridgeInGravity(
         params.from.network.chainId,
         params.from.account,
-        params.to.account,
         params.token.data,
         params.token.amount
       );

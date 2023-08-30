@@ -5,8 +5,6 @@ import { PromiseWithError, ReturnWithError } from "@/config/interfaces/errors";
 import { Transaction } from "@/config/interfaces/transactions";
 
 export interface BridgeHookInputParams {
-  userEthAddress?: string;
-  userCosmosAddress?: string;
   testnet?: boolean;
   defaults?: {
     networkId?: string;
@@ -23,6 +21,11 @@ export interface BridgeHookState {
   fromNetwork: BaseNetwork | null;
   selectedToken: BridgeToken | null;
   selectedMethod: BridgingMethod | null;
+  // user addresses
+  connectedEthAddress: string | null;
+  connectedCosmosAddress: string | null;
+  // only when ibc out of canto does this need to be set
+  userInputCosmosAddress: string | null;
 }
 
 export interface BridgeTransactionParams {
@@ -42,8 +45,6 @@ export interface BridgeTransactionParams {
 }
 
 export interface BridgeHookTxParams {
-  sender: string;
-  receiver: string;
   amount: string;
 }
 
@@ -61,13 +62,21 @@ export interface BridgeHookReturn {
     token: BridgeToken | null;
     method: BridgingMethod | null;
   };
-  setters: {
-    network: (id: string) => void;
-    token: (id: string) => void;
-    method: (method: BridgingMethod) => void;
+  setState: (param: HookSetterParam, value: any) => void;
+  addresses: {
+    getSender: () => string | null;
+    getReceiver: () => string | null;
   };
   bridge: {
     bridgeTx: (params: BridgeHookTxParams) => PromiseWithError<Transaction[]>;
     canBridge: (params: BridgeHookTxParams) => ReturnWithError<boolean>;
   };
 }
+
+export type HookSetterParam =
+  | "network"
+  | "token"
+  | "method"
+  | "ethAddress"
+  | "cosmosAddress"
+  | "inputCosmosAddress";

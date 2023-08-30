@@ -29,7 +29,7 @@ export default function LendingPage() {
           backgroundColor: "var(--card-sub-surface-color",
         }}
       >
-        <Button
+        {/* <Button
           color="primary"
           height={"small"}
           onClick={() => {
@@ -37,7 +37,7 @@ export default function LendingPage() {
           }}
         >
           Show Modal
-        </Button>
+        </Button> */}
         <Button color="secondary" height={"small"}>
           Sample Text
         </Button>
@@ -45,6 +45,16 @@ export default function LendingPage() {
           Sample Text
         </Button>
         <Button color="primary" height={"medium"}>
+          Sample Text
+        </Button>
+
+        <Button color="secondary" height={"small"} disabled>
+          Sample Text
+        </Button>
+        <Button color="accent" height={"small"} disabled>
+          Sample Text
+        </Button>
+        <Button color="primary" height={"medium"} disabled>
           Sample Text
         </Button>
         <Button color="secondary" height={"medium"}>

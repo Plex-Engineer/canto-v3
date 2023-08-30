@@ -6,6 +6,7 @@ import Image from "next/image";
 import Button from "../button/button";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const NavBar = () => {
   const currentPath = usePathname();
@@ -73,7 +74,8 @@ const NavBar = () => {
       </div>
 
       <div className={styles["wallet-connect"]}>
-        <Button color="secondary">Connect Wallet</Button>
+        {/* <Button color="secondary">Connect Wallet</Button> */}
+        <ConnectButton />
       </div>
     </div>
   );
