@@ -6,14 +6,10 @@ import Container from "@/components/container/container";
 import Tabs from "@/components/tabs/tabs";
 import styles from "./bridge.module.scss";
 import BridgeIn from "./bridgeIn";
-
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
-import useTransactionStore, {
-  TransactionStore,
-} from "@/stores/transactionStore";
+import useTransactionStore from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
-import { ethToCantoAddress } from "@/utils/address.utils";
 import { connectToKeplr } from "@/utils/keplr/connectKeplr";
 import {
   getNetworkInfoFromChainId,
@@ -26,17 +22,12 @@ export default function BridgePage() {
   const [direction, setDirection] = useState<"in" | "out">("in");
   const [onTestnet, setOnTestnet] = useState<boolean>(false);
   const [txIndex, setTxIndex] = useState<number>(0);
-  const [cosmosAddress, setCosmosAddress] = useState<string>("");
-  const [cantoAddress, setCantoAddress] = useState<string>("");
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({
     testnet: onTestnet,
-    userEthAddress: signer?.account.address,
   });
   const bridgeIn = useBridgeIn({
     testnet: onTestnet,
-    userEthAddress: signer?.account.address,
-    userCosmosAddress: cosmosAddress,
   });
   const transactionStore = useStore(useTransactionStore, (state) => state);
 
@@ -45,24 +36,10 @@ export default function BridgePage() {
       const network = bridgeIn.selections.fromNetwork;
       if (!network || !isCosmosNetwork(network)) return;
       const keplrClient = await connectToKeplr(network);
-      setCosmosAddress(keplrClient.data?.address);
+      bridgeIn.setState("cosmosAddress", keplrClient.data?.address);
     }
     getKeplrInfoForBridge();
   }, [bridgeIn.selections.fromNetwork]);
-
-  useEffect(() => {
-    async function getCantoAddress() {
-      if (!signer?.account.address) return;
-      const cantoAddress = await ethToCantoAddress(signer?.account.address);
-      if (cantoAddress.error) {
-        console.log(cantoAddress.error);
-        return;
-      } else {
-        setCantoAddress(cantoAddress.data);
-      }
-    }
-    getCantoAddress();
-  }, [signer?.account.address]);
 
   useEffect(() => {
     const { data: network, error } = getNetworkInfoFromChainId(
@@ -74,6 +51,12 @@ export default function BridgePage() {
     }
     setOnTestnet(network.isTestChain);
   }, [signer?.chain.id]);
+
+  useEffect(() => {
+    // set the signer address
+    bridgeIn.setState("ethAddress", signer?.account.address);
+    bridgeOut.setState("ethAddress", signer?.account.address);
+  }, [signer?.account.address]);
 
   function BridgeOut() {
     return (
@@ -126,8 +109,6 @@ export default function BridgePage() {
                     hook={bridgeIn}
                     params={{
                       signer: signer,
-                      cosmosAddress: cosmosAddress,
-                      cantoAddress: cantoAddress,
                       transactionStore: transactionStore,
                     }}
                   />
@@ -141,8 +122,6 @@ export default function BridgePage() {
                     hook={bridgeOut}
                     params={{
                       signer: signer,
-                      cosmosAddress: cosmosAddress,
-                      cantoAddress: cantoAddress,
                       transactionStore: transactionStore,
                     }}
                   />

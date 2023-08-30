@@ -1,5 +1,4 @@
 "use client";
-import CantoWalletProvider from "@/provider/rainbowProvider";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TestPage from "./testPage";
 
