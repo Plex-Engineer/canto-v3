@@ -143,7 +143,11 @@ export default function TestPage() {
           }}
         >
           TRANSACTIONS{" "}
-          <Button onClick={() => transactionStore?.clearTransactions()}>
+          <Button
+            onClick={() =>
+              transactionStore?.clearTransactions(signer?.account.address ?? "")
+            }
+          >
             CLEAR ALL TRANSACTIONS
           </Button>
           <Button
@@ -157,7 +161,13 @@ export default function TestPage() {
             RETRY TRANSACTION
           </Button>
         </h1>
-        <TxBox flow={transactionStore?.transactionFlows[txIndex]} />
+        <TxBox
+          flow={
+            transactionStore?.transactionFlows[signer?.account.address ?? ""]?.[
+              txIndex
+            ]
+          }
+        />
         <Spacer height="30px" />
         <div
           style={{
@@ -175,14 +185,21 @@ export default function TestPage() {
           <Spacer width="20px" />
           <Text>
             Current page: {txIndex + 1}{" "}
-            {"  Title: " + transactionStore?.transactionFlows?.[txIndex]?.title}
+            {"  Title: " +
+              transactionStore?.transactionFlows[
+                signer?.account.address ?? ""
+              ]?.[txIndex]?.title}
           </Text>
           <Spacer width="20px" />
           <Button
             onClick={() => {
               if (
                 transactionStore &&
-                txIndex !== transactionStore.transactionFlows.length - 1
+                txIndex !==
+                  transactionStore.transactionFlows[
+                    signer?.account.address ?? ""
+                  ]?.length -
+                    1
               )
                 setTxIndex((prev) => prev + 1);
             }}
@@ -253,6 +270,7 @@ const Bridge = (props: BridgeProps) => {
         props.params.transactionStore?.addTransactions({
           title: "bridge",
           txList: val.data,
+          ethAccount: props.params.signer.account.address,
           signer: props.params.signer,
         });
       });
