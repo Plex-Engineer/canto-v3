@@ -74,6 +74,7 @@ const useTransactionStore = create<TransactionStore>()(
           // run the function to get all transactions
           const { data: txList, error } = await params.txList();
           if (error) {
+            set({ isLoading: false });
             return NEW_ERROR(
               "useTransactionStore::addTransactions: " + errMsg(error)
             );
