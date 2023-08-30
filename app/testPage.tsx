@@ -1,9 +1,6 @@
 "use client";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
-import useTransactionStore, {
-  TransactionStore,
-} from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
 import { connectToKeplr } from "@/utils/keplr/connectKeplr";
 import { useEffect, useState } from "react";
@@ -27,6 +24,9 @@ import {
 } from "@/utils/networks.utils";
 import { TransactionFlowWithStatus } from "@/config/interfaces/transactions";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
+import useTransactionStore, {
+  TransactionStore,
+} from "@/stores/transactionStore";
 
 export default function TestPage() {
   const [onTestnet, setOnTestnet] = useState<boolean>(false);
@@ -40,6 +40,10 @@ export default function TestPage() {
     testnet: onTestnet,
   });
   const transactionStore = useStore(useTransactionStore, (state) => state);
+  console.log(
+    "🚀 ~ file: testPage.tsx:43 ~ TestPage ~ transactionStore:",
+    transactionStore
+  );
 
   useEffect(() => {
     async function getKeplrInfoForBridge() {
@@ -143,7 +147,11 @@ export default function TestPage() {
           }}
         >
           TRANSACTIONS{" "}
-          <Button onClick={() => transactionStore?.clearTransactions()}>
+          <Button
+            onClick={() =>
+              transactionStore?.clearTransactions(signer?.account.address ?? "")
+            }
+          >
             CLEAR ALL TRANSACTIONS
           </Button>
           <Button
@@ -157,7 +165,13 @@ export default function TestPage() {
             RETRY TRANSACTION
           </Button>
         </h1>
-        <TxBox flow={transactionStore?.transactionFlows[txIndex]} />
+        <TxBox
+          flow={
+            transactionStore?.getUserTransactionFlows(
+              signer?.account.address ?? ""
+            )[txIndex]
+          }
+        />
         <Spacer height="30px" />
         <div
           style={{
@@ -175,14 +189,21 @@ export default function TestPage() {
           <Spacer width="20px" />
           <Text>
             Current page: {txIndex + 1}{" "}
-            {"  Title: " + transactionStore?.transactionFlows?.[txIndex]?.title}
+            {"  Title: " +
+              transactionStore?.getUserTransactionFlows(
+                signer?.account.address ?? ""
+              )[txIndex]?.title}
           </Text>
           <Spacer width="20px" />
           <Button
             onClick={() => {
               if (
                 transactionStore &&
-                txIndex !== transactionStore.transactionFlows.length - 1
+                txIndex !==
+                  transactionStore.getUserTransactionFlows(
+                    signer?.account.address ?? ""
+                  ).length -
+                    1
               )
                 setTxIndex((prev) => prev + 1);
             }}
@@ -253,6 +274,7 @@ const Bridge = (props: BridgeProps) => {
         props.params.transactionStore?.addTransactions({
           title: "bridge",
           txList: val.data,
+          ethAccount: props.params.signer.account.address,
           signer: props.params.signer,
         });
       });

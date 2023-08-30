@@ -38,6 +38,7 @@ const Bridging = (props: BridgeProps) => {
         props.params.transactionStore?.addTransactions({
           title: "bridge",
           txList: val.data,
+          ethAccount: props.params.signer.address,
           signer: props.params.signer,
         });
       });
