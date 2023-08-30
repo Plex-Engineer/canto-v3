@@ -1,6 +1,8 @@
 "use client";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TestPage from "./testPage";
+import { QueryClient, QueryClientProvider } from "react-query";
+import TestLending from "./testLending";
 
 export default function Home() {
   return (
