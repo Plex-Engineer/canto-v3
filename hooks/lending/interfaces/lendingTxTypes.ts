@@ -1,4 +1,4 @@
-import { FormattedCToken } from "./tokens";
+import { CTokenWithUserData } from "./tokens";
 
 export enum CTokenLendingTxTypes {
   SUPPLY = "supply",
@@ -13,6 +13,6 @@ export interface CTokenLendingTransactionParams {
   chainId: number;
   ethAccount: string;
   type: CTokenLendingTxTypes;
-  cToken: FormattedCToken;
+  cToken: CTokenWithUserData;
   amount: string;
 }

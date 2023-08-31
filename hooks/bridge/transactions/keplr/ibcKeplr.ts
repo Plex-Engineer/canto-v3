@@ -45,7 +45,7 @@ import { tryFetch } from "@/utils/async.utils";
 import Long from "long";
 import { IBCToken } from "@/config/interfaces/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { formatBalance } from "@/utils/formatBalances";
 
 /**
  * @notice creates a list of transactions that need to be made for IBC in to canto using keplr

@@ -1,15 +1,18 @@
 import Button from "@/components/button/button";
 import Modal from "@/components/modal/modal";
-import { FormattedCToken } from "@/hooks/lending/interfaces/tokens";
 import useLending from "@/hooks/lending/useLending";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export default function TestLending() {
-  const lending = useLending();
+  const { tokens, position, loading, error } = useLending({
+    testnet: false,
+    userEthAddress: "0x8915da99B69e84DE6C97928d378D9887482C671c",
+  });
+  const sortedTokens = useMemo(() => {
+    return tokens.sort((a, b) => a.underlying.symbol.localeCompare(b.underlying.symbol));
+  }, [tokens]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedToken, setSelectedToken] = useState<FormattedCToken | null>(
-    null
-  );
+  const [selectedToken, setSelectedToken] = useState<any | null>(null);
   return (
     <div>
       <h1>Test Lending</h1>
@@ -24,10 +27,11 @@ export default function TestLending() {
               <h3>BorrowCap: {selectedToken.borrowCap}</h3>
               <h3>Cash: {selectedToken.cash}</h3>
               <h3>CollateralFactor: {selectedToken.collateralFactor}</h3>
+              <h3>Comp Supply State: {selectedToken.compSupplyState}</h3>
               <h3>Decimals: {selectedToken.decimals}</h3>
               <h3>DistApy: {selectedToken.distApy}</h3>
               <h3>Exchange Rate: {selectedToken.exchangeRate}</h3>
-              <h3>IsListed: {selectedToken.isListed}</h3>
+              <h3>IsListed: {selectedToken.isListed ? "yes" : "no"}</h3>
               <h3>Liquidity: {selectedToken.liquidity}</h3>
               <h3>Underlying Price: {selectedToken.price}</h3>
               <h3>Supply Apy: {selectedToken.supplyApy}</h3>
@@ -58,23 +62,32 @@ export default function TestLending() {
                 {selectedToken.userDetails?.isCollateral ? "yes" : "no"}
               </h2>
               <h2>
-                Router Allowance CToken:{" "}
-                {selectedToken.userDetails?.routerAllowanceCToken}
+                Supply Balance In Underlying:{" "}
+                {selectedToken.userDetails?.suppyBalanceInUnderlying}
               </h2>
               <h2>
-                Router Allowance Underlying:{" "}
-                {selectedToken.userDetails?.routerAllowanceUnderlying}
+                Allowance Underlying:{" "}
+                {selectedToken.userDetails?.underlyingAllowance}
               </h2>
             </>
           )}
         </>
       </Modal>
+      <h1>USER POSITION</h1>
+      {position && (
+        <>
+          <h2>Total Borrow: {position.totalBorrow}</h2>
+          <h2>Total Supply: {position.totalSupply}</h2>
+          <h2>Total Liquidity: {position.liquidity}</h2>
+          <h2>Total Shortfall: {position.shortfall}</h2>
+        </>
+      )}
       <h1>CTOKENS: </h1>
-      {lending.formattedUserCTokens.map((cToken) => (
+      {sortedTokens.map((cToken) => (
         <div key={cToken.address}>
           <h1>-------------------</h1>
           <h2>
-            {cToken.symbol}{" "}
+            {cToken.underlying.symbol}{" "}
             <Button
               color="accent"
               onClick={() => {

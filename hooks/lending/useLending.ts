@@ -1,15 +1,5 @@
-import {
-  CANTO_DATA_API_ENDPOINTS,
-  CANTO_DATA_API_URL,
-  GeneralCTokenResponse,
-  USER_CANTO_DATA_API_ENDPOINTS,
-  USER_CANTO_DATA_API_URL,
-  UserDataResponse,
-} from "@/config/consts/apiUrls";
-import { tryFetch } from "@/utils/async.utils";
 import { useQuery } from "react-query";
-import { CToken, FormattedCToken } from "./interfaces/tokens";
-import { useState } from "react";
+import { CTokenWithUserData } from "./interfaces/tokens";
 import {
   CTokenLendingTransactionParams,
   CTokenLendingTxTypes,
@@ -20,98 +10,94 @@ import {
   ReturnWithError,
   errMsg,
 } from "@/config/interfaces/errors";
-import { convertToBigNumber } from "@/utils/tokenBalances.utils";
+import { convertToBigNumber } from "@/utils/formatBalances";
+import { LendingHookInputParams } from "./interfaces/hookParams";
+import { getGeneralCTokenData, getUserCLMLensData } from "./helpers/clmLens";
+import { getTotalBorrowAndSupplyFromCTokens } from "./helpers/cTokens";
+import { UserLMPosition } from "./interfaces/userPositions";
+import { useState } from "react";
 
-export default function useLending() {
-  const [allCtokens, setAllCtokens] = useState<CToken[]>([]);
-  const [allUserCTokens, setAllUserCTokens] = useState<{
-    [key: string]: object;
-  }>({});
-  const [userLiquidity, setUserLiquidity] = useState<{
-    error: string;
-    liquidity: string;
-    shortfall: string;
-  }>();
-  const { isLoading: generalLoading, error: generalError } = useQuery(
-    "lending",
-    async () => {
-      const { data: cTokens, error: cTokenError } =
-        await tryFetch<GeneralCTokenResponse>(
-          CANTO_DATA_API_URL + CANTO_DATA_API_ENDPOINTS.allCTokens
-        );
-      if (cTokenError) {
-        throw cTokenError;
+/**
+ * @name useLending
+ * @description Hook for Canto Lending Market Tokens and User Data
+ * @returns
+ */
+export default function useLending(params: LendingHookInputParams) {
+  // internal state for tokens and position (ONLY SET ON SUCCESS)
+  // stops failed queries from overwriting the data with empty arrays
+  const [tokens, setTokens] = useState<CTokenWithUserData[]>([]);
+  const [position, setPosition] = useState<UserLMPosition>({
+    liquidity: "0",
+    shortfall: "0",
+    totalSupply: "0",
+    totalBorrow: "0",
+  });
+  // use query to get all general and user cToken data
+  const { isLoading: loadingCTokens, error: errorCTokens } = useQuery(
+    ["lending", params.testnet, params.userEthAddress],
+    async (): Promise<{
+      cTokens: CTokenWithUserData[];
+      position?: UserLMPosition;
+    }> => {
+      const [generalCTokens, userCTokens] = await Promise.all([
+        getGeneralCTokenData(params.testnet),
+        getUserCLMLensData(params.userEthAddress ?? "", params.testnet),
+      ]);
+      // check errors and return what is available
+      // if general error, then throw error now
+      if (generalCTokens.error) {
+        throw generalCTokens.error;
       }
-      return cTokens.cTokens;
-    },
-    {
-      onError: (error) => {
-        console.log(error);
-      },
-      onSuccess(data) {
-        setAllCtokens(data);
-      },
-      refetchInterval: 5000,
-    }
-  );
-
-  const { isLoading: userLoading, error: userError } = useQuery(
-    "userLending",
-    async () => {
-      const { data: cTokens, error: cTokenError } =
-        await tryFetch<UserDataResponse>(
-          USER_CANTO_DATA_API_URL +
-            USER_CANTO_DATA_API_ENDPOINTS.userData(
-              "0x8915da99B69e84DE6C97928d378D9887482C671c"
-            )
-        );
-      if (cTokenError) {
-        throw cTokenError;
-      }
-      console.log(cTokens);
-      return {
-        ctokens: cTokens.user.lending.cToken,
-        accountLiquidity: cTokens.user.lending.liquidity,
-      };
-    },
-    {
-      onError: (error) => {
-        console.log(error);
-      },
-      onSuccess(data) {
-        setAllUserCTokens(data.ctokens);
-        setUserLiquidity({
-            error: data.accountLiquidity[0],
-            liquidity: data.accountLiquidity[1],
-            shortfall: data.accountLiquidity[2],
-        });
-      },
-      refetchInterval: 5000,
-    }
-  );
-
-  const formattedUserCTokens: FormattedCToken[] = allCtokens
-    .map((cToken) => {
-      const userCToken = allUserCTokens[cToken.address];
-      if (userCToken) {
+      // if user error, then just return the general data
+      if (userCTokens.error) {
         return {
-          ...cToken,
-          userDetails: Object.fromEntries(
-            Object.entries(userCToken).map(([key, value]) => [key, value[0]])
-          ),
+          cTokens: generalCTokens.data,
         };
       }
-      return cToken;
-    })
-    .sort((a, b) => {
-      if (a.symbol < b.symbol) {
-        return -1;
+      // since both are okay, combine the data
+      const combinedCTokenData = generalCTokens.data.map((cToken) => {
+        const userCTokenDetails = userCTokens.data.balances.find((balance) => {
+          return (
+            balance.cTokenAddress.toLowerCase() === cToken.address.toLowerCase()
+          );
+        });
+        if (userCTokenDetails) {
+          return {
+            ...cToken,
+            userDetails: userCTokenDetails,
+          };
+        }
+        return cToken;
+      });
+
+      // do some get total user positions
+      const { data: positionTotals, error: positionError } =
+        getTotalBorrowAndSupplyFromCTokens(combinedCTokenData);
+      if (positionError) {
+        return {
+          cTokens: combinedCTokenData,
+        };
       }
-      if (a.symbol > b.symbol) {
-        return 1;
-      }
-      return 0;
-    }) as FormattedCToken[];
+      const userTotalPosition = {
+        liquidity: userCTokens.data.limits.liquidity.toString(),
+        shortfall: userCTokens.data.limits.shortfall.toString(),
+        totalSupply: positionTotals.totalSupply,
+        totalBorrow: positionTotals.totalBorrow,
+      };
+
+      return { cTokens: combinedCTokenData, position: userTotalPosition };
+    },
+    {
+      onError: (error) => {
+        console.log(error);
+      },
+      onSuccess: (data) => {
+        setTokens(data.cTokens);
+        data.position && setPosition(data.position);
+      },
+      refetchInterval: 5000,
+    }
+  );
 
   ///
   /// external functions
@@ -163,11 +149,9 @@ export default function useLending() {
   }
 
   return {
-    formattedUserCTokens,
-    accountLiquidity: userLiquidity,
-    generalLoading,
-    generalError,
-    userLoading,
-    userError,
+    tokens,
+    position,
+    loading: loadingCTokens,
+    error: errorCTokens,
   };
 }

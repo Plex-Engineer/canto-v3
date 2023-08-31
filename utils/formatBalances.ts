@@ -18,6 +18,7 @@ export function convertToBigNumber(
   decimals: number = 0
 ): ReturnWithError<BigNumber> {
   try {
+    if (isNaN(Number(amount))) throw new Error("Invalid amount");
     // truncate the amount to the number of decimals
     const numberAmount = Number(amount).toFixed(decimals);
     const bigNumber = new BigNumber(numberAmount);

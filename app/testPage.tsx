@@ -23,7 +23,7 @@ import {
   isCosmosNetwork,
 } from "@/utils/networks.utils";
 import { TransactionFlowWithStatus } from "@/config/interfaces/transactions";
-import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
+import { convertToBigNumber, formatBalance } from "@/utils/formatBalances";
 import useTransactionStore, {
   TransactionStore,
 } from "@/stores/transactionStore";

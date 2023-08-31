@@ -11,7 +11,7 @@ import {
 } from "@/config/interfaces/errors";
 import { _approveTx, checkTokenAllowance } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { formatBalance } from "@/utils/formatBalances";
 import { CERC20_ABI, COMPTROLLER_ABI } from "@/config/abis";
 import { CANTO_MAINNET_EVM } from "@/config/networks";
 import { COMPTROLLER_ADDRESS_CANTO_MAINNET } from "@/config/consts/addresses";

@@ -17,7 +17,7 @@ import { getTokenBalance } from "@/utils/evm/erc20.utils";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
 import { ERC20Token } from "@/config/interfaces/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { formatBalance } from "@/utils/formatBalances";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging through layer zero

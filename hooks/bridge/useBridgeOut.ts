@@ -24,7 +24,7 @@ import useTokenBalances from "../helpers/useTokenBalances";
 import { bridgeOutTx } from "./transactions/bridge";
 import { isERC20TokenList } from "@/utils/tokens/tokens.utils";
 import { isBridgeOutToken } from "@/utils/tokens/bridgeTokens.utils";
-import { convertToBigNumber } from "@/utils/tokenBalances.utils";
+import { convertToBigNumber } from "@/utils/formatBalances";
 import { isValidEthAddress } from "@/utils/address.utils";
 import { isCosmosNetwork } from "@/utils/networks.utils";
 

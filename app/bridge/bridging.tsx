@@ -4,7 +4,7 @@ import Selector, { Item } from "@/components/selector/selector";
 import Text from "@/components/text";
 import { BridgeHookReturn } from "@/hooks/bridge/interfaces/hookParams";
 import { TransactionStore } from "@/stores/transactionStore";
-import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
+import { convertToBigNumber, formatBalance } from "@/utils/formatBalances";
 import { useState } from "react";
 import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";

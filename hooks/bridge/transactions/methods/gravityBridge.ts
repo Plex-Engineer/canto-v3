@@ -32,7 +32,7 @@ import {
   checkTokenAllowance,
   getTokenBalance,
 } from "@/utils/evm/erc20.utils";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { formatBalance } from "@/utils/formatBalances";
 import BigNumber from "bignumber.js";
 
 /**

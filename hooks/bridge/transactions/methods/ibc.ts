@@ -14,7 +14,7 @@ import { _convertERC20Tx } from "./recovery";
 import { isERC20Token } from "@/utils/tokens/tokens.utils";
 import { IBCToken } from "@/config/interfaces/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { formatBalance } from "@/utils/formatBalances";
 import { CANTO_MAINNET_COSMOS } from "@/config/networks";
 
 /**

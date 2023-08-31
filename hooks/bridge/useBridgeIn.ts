@@ -27,7 +27,7 @@ import {
   isBridgeInToken,
   isBridgeInTokenList,
 } from "@/utils/tokens/bridgeTokens.utils";
-import { convertToBigNumber } from "@/utils/tokenBalances.utils";
+import { convertToBigNumber } from "@/utils/formatBalances";
 import { isValidEthAddress } from "@/utils/address.utils";
 
 export default function useBridgeIn(
