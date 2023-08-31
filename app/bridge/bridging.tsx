@@ -10,6 +10,7 @@ import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";
 import Input from "@/components/input/input";
 import Container from "@/components/container/container";
+import Image from "next/image";
 
 interface BridgeProps {
   hook: BridgeHookReturn;
@@ -167,17 +168,17 @@ const Bridging = (props: BridgeProps) => {
           <Selector
             title="SELECT METHOD"
             activeItem={{
-              name: getBridgeMethodInfo(props.bridge.selections.method).name,
-              id: props.bridge.selections.method ?? "0",
-              icon: getBridgeMethodInfo(props.bridge.selections.method).icon,
+              name: getBridgeMethodInfo(props.hook.selections.method).name,
+              id: props.hook.selections.method ?? "0",
+              icon: getBridgeMethodInfo(props.hook.selections.method).icon,
             }}
-            items={props.bridge.allOptions.methods.map((method) => ({
+            items={props.hook.allOptions.methods.map((method) => ({
               name: getBridgeMethodInfo(method).name,
               id: method,
               icon: getBridgeMethodInfo(method).icon,
             }))}
             onChange={(method) =>
-              props.bridge.setters.method(method as BridgingMethod)
+              props.hook.setters.method(method as BridgingMethod)
             }
           /> */}
         </div>
@@ -195,23 +196,23 @@ const Bridging = (props: BridgeProps) => {
             Number(amount) >
             Number(
               formatBalance(
-                props.bridge.selections.token?.balance ?? "0",
-                props.bridge.selections.token?.decimals ?? 18,
+                props.hook.selections.token?.balance ?? "0",
+                props.hook.selections.token?.decimals ?? 18,
                 {
                   precision: 0,
                   commify: true,
-                  symbol: props.bridge.selections.token?.symbol,
+                  symbol: props.hook.selections.token?.symbol,
                 }
               )
             )
           }
           errorMessage={`"Amount must be less than " ${formatBalance(
-            props.bridge.selections.token?.balance ?? "0",
-            props.bridge.selections.token?.decimals ?? 18,
+            props.hook.selections.token?.balance ?? "0",
+            props.hook.selections.token?.decimals ?? 18,
             {
               precision: 0,
               commify: true,
-              symbol: props.bridge.selections.token?.symbol,
+              symbol: props.hook.selections.token?.symbol,
             }
           )}`}
         /> */}
