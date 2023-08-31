@@ -118,7 +118,13 @@ export default function BridgePage() {
               {
                 title: "BRIDGE OUT",
                 content: (
-                 <></>
+                  <Bridging
+                    hook={bridgeOut}
+                    params={{
+                      signer: signer,
+                      transactionStore: transactionStore,
+                    }}
+                  />
                 ),
                 onClick: () => setDirection("out"),
               },
