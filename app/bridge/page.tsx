@@ -128,11 +128,7 @@ export default function BridgePage() {
                 ),
                 onClick: () => setDirection("out"),
               },
-              {
-                title: "RECOVERY",
-                isDisabled: true,
-                content: TxRecovery(),
-              },
+
               {
                 title: "TX HISTORY",
                 content: TxHistory(),

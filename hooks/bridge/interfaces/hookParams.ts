@@ -17,15 +17,15 @@ export interface BridgeHookState {
   availableTokens: BridgeToken[];
   availableMethods: BridgingMethod[];
   // default selections
-  toNetwork: BaseNetwork | null;
-  fromNetwork: BaseNetwork | null;
-  selectedToken: BridgeToken | null;
-  selectedMethod: BridgingMethod | null;
+  toNetwork: BaseNetwork | undefined;
+  fromNetwork: BaseNetwork | undefined;
+  selectedToken: BridgeToken | undefined;
+  selectedMethod: BridgingMethod | undefined;
   // user addresses
-  connectedEthAddress: string | null;
-  connectedCosmosAddress: string | null;
+  connectedEthAddress: string | undefined;
+  connectedCosmosAddress: string | undefined;
   // only when ibc out of canto does this need to be set
-  userInputCosmosAddress: string | null;
+  userInputCosmosAddress: string | undefined;
 }
 
 export interface BridgeTransactionParams {
@@ -57,15 +57,15 @@ export interface BridgeHookReturn {
     methods: BridgingMethod[];
   };
   selections: {
-    toNetwork: BaseNetwork | null;
-    fromNetwork: BaseNetwork | null;
-    token: BridgeToken | null;
-    method: BridgingMethod | null;
+    toNetwork: BaseNetwork | undefined;
+    fromNetwork: BaseNetwork | undefined;
+    token: BridgeToken | undefined;
+    method: BridgingMethod | undefined;
   };
   setState: (param: HookSetterParam, value: any) => void;
   addresses: {
-    getSender: () => string | null;
-    getReceiver: () => string | null;
+    getSender: () => string | undefined;
+    getReceiver: () => string | undefined;
   };
   bridge: {
     bridgeTx: (params: BridgeHookTxParams) => PromiseWithError<Transaction[]>;

@@ -11,6 +11,9 @@ import Button from "@/components/button/button";
 import Input from "@/components/input/input";
 import Container from "@/components/container/container";
 import Image from "next/image";
+import TransactionModal from "./components/transactionModal";
+import Modal from "@/components/modal/modal";
+import ConfirmationModal from "./components/confirmationModal";
 
 interface BridgeProps {
   hook: BridgeHookReturn;
@@ -22,7 +25,6 @@ interface BridgeProps {
 const Bridging = (props: BridgeProps) => {
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
-  //? BRIDGE TEST
   async function bridgeTx() {
     props.hook.bridge
       .bridgeTx({
@@ -36,6 +38,8 @@ const Bridging = (props: BridgeProps) => {
           console.log(val.error);
           return;
         }
+        //launch modal
+        setIsConfirmationModalOpen(true);
         props.params.transactionStore?.addTransactions({
           title: "bridge",
           txList: val.data,
@@ -48,8 +52,40 @@ const Bridging = (props: BridgeProps) => {
     amount,
   });
 
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+
   return (
     <>
+      <Modal
+        open={isConfirmationModalOpen}
+        height="500px"
+        width="460px"
+        onClose={() => {
+          setIsConfirmationModalOpen(false);
+        }}
+      >
+        {/* <TransactionModal /> */}
+        <ConfirmationModal
+          imgUrl={
+            props.hook.direction === "in"
+              ? props.hook.selections.fromNetwork?.icon ?? ""
+              : props.hook.selections.toNetwork?.icon ?? ""
+          }
+          addresses={{
+            from: props.hook.addresses.getSender(),
+            to: props.hook.addresses.getReceiver(),
+            name:
+              props.hook.direction === "in"
+                ? props.hook.selections.toNetwork?.name
+                : props.hook.selections.fromNetwork?.name,
+          }}
+          fromNetwork={props.hook.selections.fromNetwork?.name ?? ""}
+          toNetwork={props.hook.selections.toNetwork?.name ?? ""}
+          type={props.hook.direction}
+          amount={amount}
+          onConfirm={bridgeTx}
+        />
+      </Modal>
       <section className={styles.container}>
         <div
           className={styles["network-selection"]}
@@ -60,8 +96,8 @@ const Bridging = (props: BridgeProps) => {
         >
           <Container width="100%" gap={14}>
             <Text size="sm">
-              {`From network `}
-              {
+              {`From `}
+              {/* {
                 <span
                   style={{
                     color: "var(--text-dark-40-color)",
@@ -69,7 +105,7 @@ const Bridging = (props: BridgeProps) => {
                 >
                   {props.hook.addresses.getSender()}
                 </span>
-              }
+              } */}
             </Text>
 
             {props.hook.direction === "in" ? (
@@ -110,8 +146,8 @@ const Bridging = (props: BridgeProps) => {
             )}
 
             <Text size="sm">
-              {`To network`}{" "}
-              {
+              {`To `}{" "}
+              {/* {
                 <span
                   style={{
                     color: "var(--text-dark-40-color)",
@@ -119,7 +155,7 @@ const Bridging = (props: BridgeProps) => {
                 >
                   {props.hook.addresses.getReceiver()}
                 </span>
-              }
+              } */}
             </Text>
             {props.hook.direction === "out" ? (
               <Selector
@@ -236,45 +272,18 @@ const Bridging = (props: BridgeProps) => {
         </div>
         <Spacer height="100px" />
 
-        {/* <Input
-          type="amount"
-          placeholder="0.0"
-          value={amount}
-          onChange={(val) => {
-            setAmount(val.target.value);
-          }}
-          className={styles["input"]}
-          error={
-            Number(amount) >
-            Number(
-              formatBalance(
-                props.hook.selections.token?.balance ?? "0",
-                props.hook.selections.token?.decimals ?? 18,
-                {
-                  precision: 0,
-                  commify: true,
-                  symbol: props.hook.selections.token?.symbol,
-                }
-              )
-            )
-          }
-          errorMessage={`"Amount must be less than " ${formatBalance(
-            props.hook.selections.token?.balance ?? "0",
-            props.hook.selections.token?.decimals ?? 18,
-            {
-              precision: 0,
-              commify: true,
-              symbol: props.hook.selections.token?.symbol,
-            }
-          )}`}
-        /> */}
         <Spacer height="100px" />
         {/* <input
           placeholder="cosmos receiver address"
           onChange={(e) => setInputCosmosAddress(e.target.value)}
         /> */}
         <Spacer height="100px" />
-        <Button width="fill" onClick={bridgeTx}>
+        <Button
+          width="fill"
+          onClick={() => {
+            setIsConfirmationModalOpen(true);
+          }}
+        >
           {props.hook.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
           {` ::can bridge: ${
             canBridge !== null ? (canBridge ? "yes" : "no") : "no"
