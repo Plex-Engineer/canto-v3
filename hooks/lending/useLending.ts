@@ -19,6 +19,10 @@ import { getGeneralCTokenData, getUserCLMLensData } from "./helpers/clmLens";
 import { UserLMPosition } from "./interfaces/userPositions";
 import { useState } from "react";
 import { getLMTotalsFromCTokens } from "./helpers/cTokens";
+import {
+  cTokenBorrowLimit,
+  cTokenWithdrawLimit,
+} from "@/utils/clm/positions.utils";
 
 /**
  * @name useLending
@@ -114,48 +118,88 @@ export default function useLending(
   /// external functions
   ///
   function canPerformLendingTx(
-    params: CTokenLendingTransactionParams
+    txParams: CTokenLendingTransactionParams
   ): ReturnWithError<boolean> {
+    // make sure all the info we have is from the eth account
+    if (
+      txParams.ethAccount.toLowerCase() !== params.userEthAddress?.toLowerCase()
+    ) {
+      return NEW_ERROR(
+        "canPerformLendingTx: txParams.ethAccount does not match params.userEthAddress"
+      );
+    }
     // check to make sure user details are available
-    if (!params.cToken.userDetails) {
+    if (!txParams.cToken.userDetails) {
       return NEW_ERROR(
         "canPerformLendingTx: cToken does not have user details"
       );
     }
     // check to make sure amount is okay
-    switch (params.type) {
+    const { data: userAmount, error: userAmountError } = convertToBigNumber(
+      txParams.amount
+    );
+    if (userAmountError) {
+      return NEW_ERROR("canPerformLendingTx::" + errMsg(userAmountError));
+    }
+    switch (txParams.type) {
       case CTokenLendingTxTypes.SUPPLY:
       // check user has enough balance
       case CTokenLendingTxTypes.REPAY: {
         // check user has enough balance and borrow balance to pay back
-        const { data: userAmount, error: userAmountError } = convertToBigNumber(
-          params.amount
-        );
-        if (userAmountError) {
-          return NEW_ERROR("canPerformLendingTx::" + errMsg(userAmountError));
-        }
         const { data: userBalance, error: userBalanceError } =
-          convertToBigNumber(params.cToken.userDetails.balanceOfUnderlying);
+          convertToBigNumber(txParams.cToken.userDetails.balanceOfUnderlying);
         if (userBalanceError) {
           return NEW_ERROR("canPerformLendingTx::" + errMsg(userBalanceError));
         }
-        if (userAmount.gt(userBalance)) {
-          return NEW_ERROR(
-            "canPerformLendingTx: user does not have enough balance"
+        if (txParams.type === CTokenLendingTxTypes.REPAY) {
+          return NO_ERROR(
+            userAmount.lte(userBalance) &&
+              userAmount.gt(0) &&
+              userAmount.lte(txParams.cToken.userDetails.borrowBalance)
           );
         }
+        return NO_ERROR(userAmount.lte(userBalance) && userAmount.gt(0));
       }
       case CTokenLendingTxTypes.BORROW:
-      // check borrow limit
+        // check borrow limit
+        const { data: borrowLimit, error: borrowLimitError } =
+          cTokenBorrowLimit(txParams.cToken, position.liquidity);
+        if (borrowLimitError) {
+          return NEW_ERROR("canPerformLendingTx::" + errMsg(borrowLimitError));
+        }
+        return NO_ERROR(borrowLimit.gte(userAmount) && userAmount.gt(0));
       case CTokenLendingTxTypes.WITHDRAW:
-      // check borrow limit
+      // check withdraw limit with amount and current supply
       case CTokenLendingTxTypes.DECOLLATERALIZE:
-      // check borrow limit
+        // check withdraw limit with total supply
+        const { data: withdrawLimit, error: withdrawLimitError } =
+          cTokenWithdrawLimit(txParams.cToken, position.liquidity);
+        if (withdrawLimitError) {
+          return NEW_ERROR(
+            "canPerformLendingTx::" + errMsg(withdrawLimitError)
+          );
+        }
+        if (txParams.type === CTokenLendingTxTypes.WITHDRAW) {
+          return NO_ERROR(
+            withdrawLimit.gte(userAmount) &&
+              userAmount.gt(0) &&
+              userAmount.lte(
+                txParams.cToken.userDetails.supplyBalanceInUnderlying
+              )
+          );
+        } else {
+          // must be decollateralizing (same as withdrawing all supply)
+          return NO_ERROR(
+            withdrawLimit.gte(
+              txParams.cToken.userDetails.supplyBalanceInUnderlying
+            )
+          );
+        }
       case CTokenLendingTxTypes.COLLATERALIZE:
         // no checks needed
         return NO_ERROR(true);
       default:
-        return NEW_ERROR("canPerformLendingTx: invalid type: " + params.type);
+        return NEW_ERROR("canPerformLendingTx: invalid type: " + txParams.type);
     }
   }
 
@@ -164,5 +208,6 @@ export default function useLending(
     position,
     loading: loadingCTokens,
     error: errorCTokens,
+    canPerformLendingTx,
   };
 }

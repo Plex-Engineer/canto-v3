@@ -28,7 +28,7 @@ export interface UserCTokenDetails {
   borrowBalance: string;
   rewards: string;
   isCollateral: boolean;
-  suppyBalanceInUnderlying: string;
+  supplyBalanceInUnderlying: string;
   underlyingAllowance: string;
 }
 

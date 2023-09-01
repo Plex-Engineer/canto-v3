@@ -1,15 +1,15 @@
 import Button from "@/components/button/button";
 import Modal from "@/components/modal/modal";
+import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import useLending from "@/hooks/lending/useLending";
 import { formatBalance } from "@/utils/formatBalances";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function TestLending() {
-  const { tokens, position, loading, error } = useLending({
+  const { tokens, position, loading, error, canPerformLendingTx } = useLending({
     testnet: false,
-    userEthAddress: "0x1E480827489E3eA19f82EF213b67200A76C0DF58",
+    userEthAddress: "",
   });
-  console.log(position);
   const sortedTokens = useMemo(() => {
     return tokens.sort((a, b) =>
       a.underlying.symbol.localeCompare(b.underlying.symbol)
@@ -18,6 +18,18 @@ export default function TestLending() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedToken, setSelectedToken] = useState<any | null>(null);
 
+  useEffect(() => {
+    if (selectedToken !== null)
+    console.log(
+      canPerformLendingTx({
+        chainId: 7700,
+        ethAccount: "",
+        cToken: selectedToken,
+        amount: "1",
+        type: CTokenLendingTxTypes.WITHDRAW,
+      })
+    );
+  }, [modalOpen]);
   return (
     <div>
       <h1>Test Lending</h1>
@@ -64,7 +76,7 @@ export default function TestLending() {
               </h2>
               <h2>
                 Supply Balance In Underlying:{" "}
-                {selectedToken.userDetails?.suppyBalanceInUnderlying}
+                {selectedToken.userDetails?.supplyBalanceInUnderlying}
               </h2>
               <h2>
                 Allowance Underlying:{" "}
@@ -80,7 +92,10 @@ export default function TestLending() {
           <h2>Total Borrow: {position.totalBorrow}</h2>
           <h2>
             Total Supply:{" "}
-            {formatBalance(position.totalSupply, 18, { commify: true, precision: 2 })}
+            {formatBalance(position.totalSupply, 18, {
+              commify: true,
+              precision: 2,
+            })}
           </h2>
           <h2>Total Liquidity: {position.liquidity}</h2>
           <h2>Total Shortfall: {position.shortfall}</h2>

@@ -7,6 +7,13 @@ import { CTokenWithUserData } from "../interfaces/tokens";
 import BigNumber from "bignumber.js";
 import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
 
+/**
+ * @notice Gets total supply, borrow, and rewards from user cTokens
+ * @dev total supply and borrow are in $NOTE, total rewards are in WCANTO
+ * @param {CTokenWithUserData[]} userCTokens cTokens with user balances
+ * @param {string} compAccrued in $WCANTO, how mich had already been accrued
+ * @returns {ReturnWithError<{totalSupply: string, totalBorrow: string, totalRewards: string}>} Totals
+ */
 export function getLMTotalsFromCTokens(
   userCTokens: CTokenWithUserData[],
   compAccrued: string = "0"
@@ -30,7 +37,7 @@ export function getLMTotalsFromCTokens(
       // get the values in $note
       const { data: supplyInNote, error: supplyError } =
         convertTokenAmountToNote(
-          cToken.userDetails.suppyBalanceInUnderlying,
+          cToken.userDetails.supplyBalanceInUnderlying,
           cToken.price
         );
       const { data: borrowInNote, error: borrowError } =

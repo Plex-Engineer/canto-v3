@@ -85,7 +85,7 @@ export async function getUserCLMLensData(
             borrowBalance: data.borrowBalance.toString(),
             rewards: data.rewards.toString(),
             isCollateral: data.isCollateral,
-            suppyBalanceInUnderlying: data.supplyBalanceInUnderlying.toString(),
+            supplyBalanceInUnderlying: data.supplyBalanceInUnderlying.toString(),
             underlyingAllowance: data.underlyingAllowance.toString(),
           };
         }) as UserCTokenDetails[],
