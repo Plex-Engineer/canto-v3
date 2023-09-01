@@ -1,14 +1,19 @@
 import Button from "@/components/button/button";
+import Input from "@/components/input/input";
 import Modal from "@/components/modal/modal";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import useLending from "@/hooks/lending/useLending";
-import { formatBalance } from "@/utils/formatBalances";
+import { convertToBigNumber, formatBalance } from "@/utils/formatBalances";
 import { useEffect, useMemo, useState } from "react";
+import { useWalletClient } from "wagmi";
 
 export default function TestLending() {
+  const { data: signer } = useWalletClient();
+
+  const [amount, setAmount] = useState("");
   const { tokens, position, loading, error, canPerformLendingTx } = useLending({
     testnet: false,
-    userEthAddress: "",
+    userEthAddress: signer?.account.address,
   });
   const sortedTokens = useMemo(() => {
     return tokens.sort((a, b) =>
@@ -18,18 +23,6 @@ export default function TestLending() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedToken, setSelectedToken] = useState<any | null>(null);
 
-  useEffect(() => {
-    if (selectedToken !== null)
-    console.log(
-      canPerformLendingTx({
-        chainId: 7700,
-        ethAccount: "",
-        cToken: selectedToken,
-        amount: "1",
-        type: CTokenLendingTxTypes.WITHDRAW,
-      })
-    );
-  }, [modalOpen]);
   return (
     <div>
       <h1>Test Lending</h1>
@@ -82,6 +75,83 @@ export default function TestLending() {
                 Allowance Underlying:{" "}
                 {selectedToken.userDetails?.underlyingAllowance}
               </h2>
+              <Input
+                type="amount"
+                value={amount}
+                onChange={(val) => {
+                  setAmount(val.target.value);
+                }}
+              />
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                <Button
+                  color="accent"
+                  disabled={
+                    !canPerformLendingTx({
+                      chainId: 7700,
+                      ethAccount: signer?.account.address ?? "",
+                      cToken: selectedToken,
+                      amount: convertToBigNumber(
+                        amount,
+                        selectedToken.underlying.decimals
+                      ).data.toString(),
+                      type: CTokenLendingTxTypes.SUPPLY,
+                    }).data
+                  }
+                >
+                  SUPPLY
+                </Button>
+                <Button
+                  color="accent"
+                  disabled={
+                    !canPerformLendingTx({
+                      chainId: 7700,
+                      ethAccount: signer?.account.address ?? "",
+                      cToken: selectedToken,
+                      amount: convertToBigNumber(
+                        amount,
+                        selectedToken.underlying.decimals
+                      ).data.toString(),
+                      type: CTokenLendingTxTypes.WITHDRAW,
+                    }).data
+                  }
+                >
+                  WITHDRAW
+                </Button>
+                <Button
+                  color="accent"
+                  disabled={
+                    !canPerformLendingTx({
+                      chainId: 7700,
+                      ethAccount: signer?.account.address ?? "",
+                      cToken: selectedToken,
+                      amount: convertToBigNumber(
+                        amount,
+                        selectedToken.underlying.decimals
+                      ).data.toString(),
+                      type: CTokenLendingTxTypes.BORROW,
+                    }).data
+                  }
+                >
+                  BORROW
+                </Button>
+                <Button
+                  color="accent"
+                  disabled={
+                    !canPerformLendingTx({
+                      chainId: 7700,
+                      ethAccount: signer?.account.address ?? "",
+                      cToken: selectedToken,
+                      amount: convertToBigNumber(
+                        amount,
+                        selectedToken.underlying.decimals
+                      ).data.toString(),
+                      type: CTokenLendingTxTypes.REPAY,
+                    }).data
+                  }
+                >
+                  REPAY
+                </Button>
+              </div>
             </>
           )}
         </>
