@@ -3,6 +3,8 @@ import styles from "./modal.module.scss";
 import React, { useEffect } from "react";
 import { useScrollLock } from "../utils/scrollLock";
 import Image from "next/image";
+import Icon from "../icon/icon";
+import Container from "../container/container";
 
 interface Props {
   open: boolean;
@@ -18,8 +20,8 @@ const Modal = ({ onClose, children, title, width, height, open }: Props) => {
 
   const { lockScroll, unlockScroll } = useScrollLock();
 
-  function handleClose(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    e.stopPropagation();
+  function handleClose(e?: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    e?.stopPropagation();
     ref.current?.classList.add(styles.fadeout);
     setTimeout(() => {
       onClose();
@@ -47,14 +49,15 @@ const Modal = ({ onClose, children, title, width, height, open }: Props) => {
         }}
       >
         <div className={styles.modal}>
-          <Image
-            className={styles.close}
-            onClick={handleClose}
-            src="/close.svg"
-            alt="close"
-            height={40}
-            width={40}
-          />
+          <Container className={styles.close} onClick={handleClose}>
+            <Icon
+              icon={{
+                url: "close.svg",
+                size: 40,
+              }}
+            />
+          </Container>
+
           {title && (
             <div className={styles.header}>
               <h3 className={styles.title}>{title}</h3>

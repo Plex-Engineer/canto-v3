@@ -81,6 +81,7 @@ const Input = (props: InputProps) => {
             ? "1px solid var(--extra-failure-color, #ff0000)"
             : "",
           ...props.style,
+          fontSize: props.type === "amount" ? "1.5rem" : "1rem",
         }}
       />
 

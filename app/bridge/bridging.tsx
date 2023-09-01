@@ -11,7 +11,6 @@ import Button from "@/components/button/button";
 import Input from "@/components/input/input";
 import Container from "@/components/container/container";
 import Image from "next/image";
-import TransactionModal from "./components/transactionModal";
 import Modal from "@/components/modal/modal";
 import ConfirmationModal from "./components/confirmationModal";
 
@@ -58,14 +57,18 @@ const Bridging = (props: BridgeProps) => {
     <>
       <Modal
         open={isConfirmationModalOpen}
-        height="500px"
-        width="460px"
+        width="30rem"
+        height="36rem"
         onClose={() => {
           setIsConfirmationModalOpen(false);
         }}
       >
         {/* <TransactionModal /> */}
         <ConfirmationModal
+          token={{
+            name: props.hook.selections.token?.symbol ?? "",
+            url: props.hook.selections.token?.icon ?? "",
+          }}
           imgUrl={
             props.hook.direction === "in"
               ? props.hook.selections.fromNetwork?.icon ?? ""
@@ -76,8 +79,8 @@ const Bridging = (props: BridgeProps) => {
             to: props.hook.addresses.getReceiver(),
             name:
               props.hook.direction === "in"
-                ? props.hook.selections.toNetwork?.name
-                : props.hook.selections.fromNetwork?.name,
+                ? props.hook.selections.fromNetwork?.name
+                : props.hook.selections.toNetwork?.name,
           }}
           fromNetwork={props.hook.selections.fromNetwork?.name ?? ""}
           toNetwork={props.hook.selections.toNetwork?.name ?? ""}
