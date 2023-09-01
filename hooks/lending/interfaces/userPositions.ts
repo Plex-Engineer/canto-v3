@@ -7,4 +7,5 @@ export interface UserLMPosition {
   shortfall: string;
   totalSupply: string;
   totalBorrow: string;
+  totalRewards: string;
 }

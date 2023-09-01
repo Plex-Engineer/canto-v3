@@ -7,9 +7,14 @@ import { CTokenWithUserData } from "../interfaces/tokens";
 import BigNumber from "bignumber.js";
 import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
 
-export function getTotalBorrowAndSupplyFromCTokens(
-  userCTokens: CTokenWithUserData[]
-): ReturnWithError<{ totalSupply: string; totalBorrow: string }> {
+export function getLMTotalsFromCTokens(
+  userCTokens: CTokenWithUserData[],
+  compAccrued: string = "0"
+): ReturnWithError<{
+  totalSupply: string;
+  totalBorrow: string;
+  totalRewards: string;
+}> {
   let errorInLoop = false;
   let errorReaons: string[] = [];
 
@@ -45,14 +50,20 @@ export function getTotalBorrowAndSupplyFromCTokens(
       return {
         totalSupply: acc.totalSupply.plus(supplyInNote),
         totalBorrow: acc.totalBorrow.plus(borrowInNote),
+        totalRewards: acc.totalRewards.plus(cToken.userDetails.rewards),
       };
     },
-    { totalSupply: new BigNumber(0), totalBorrow: new BigNumber(0) }
+    {
+      totalSupply: new BigNumber(0),
+      totalBorrow: new BigNumber(0),
+      totalRewards: new BigNumber(compAccrued),
+    }
   );
   return errorInLoop
-    ? NEW_ERROR("getTotalBorrowAndSupplyFromCTokens: " + errorReaons.join(", "))
+    ? NEW_ERROR("getLMTotalsFromCTokens: " + errorReaons.join(", "))
     : NO_ERROR({
         totalSupply: totals.totalSupply.toString(),
         totalBorrow: totals.totalBorrow.toString(),
+        totalRewards: totals.totalRewards.toString(),
       });
 }

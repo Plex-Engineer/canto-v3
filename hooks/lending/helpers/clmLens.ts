@@ -32,13 +32,13 @@ import {
  * @notice Gets user data from CLM Lens
  * @param {string} userEthAddress Ethereum address of user
  * @param {boolean} testnet Whether to use testnet or mainnet
- * @returns {PromiseWithError<{ balances: UserCTokenDetails[]; limits: {liquidity: number} }>}
+ * @returns {PromiseWithError<{ cTokens: UserCTokenDetails[]; limits: {liquidity: number}, compAccrued: number }>}
  */
 export async function getUserCLMLensData(
   userEthAddress: string,
   testnet: boolean = false
 ): PromiseWithError<{
-  balances: UserCTokenDetails[];
+  cTokens: UserCTokenDetails[];
   limits: { liquidity: number; shortfall: number };
   compAccrued: number;
 }> {
@@ -68,7 +68,7 @@ export async function getUserCLMLensData(
         getProviderWithoutSigner(rpcUrl)
       );
 
-      const [balances, limits, compAccrued] = await Promise.all([
+      const [cTokens, limits, compAccrued] = await Promise.all([
         (
           await lensContract.methods
             .cTokenBalancesAll(
@@ -83,7 +83,7 @@ export async function getUserCLMLensData(
             balanceOfCToken: data.balanceOfCToken.toString(),
             balanceOfUnderlying: data.balanceOfUnderlying.toString(),
             borrowBalance: data.borrowBalance.toString(),
-            compSupplierIndex: data.compSupplierIndex.toString(),
+            rewards: data.rewards.toString(),
             isCollateral: data.isCollateral,
             suppyBalanceInUnderlying: data.supplyBalanceInUnderlying.toString(),
             underlyingAllowance: data.underlyingAllowance.toString(),
@@ -97,7 +97,7 @@ export async function getUserCLMLensData(
           .call() as Promise<number>,
       ]);
 
-      return NO_ERROR({ balances, limits, compAccrued });
+      return NO_ERROR({ cTokens, limits, compAccrued });
     } catch (err) {
       return NEW_ERROR("getUserCLMLensData: " + errMsg(err));
     }

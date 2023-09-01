@@ -46,7 +46,7 @@ export const CLM_LENS_ABI = [
           },
           {
             internalType: "uint256",
-            name: "compSupplierIndex",
+            name: "rewards",
             type: "uint256",
           },
           {
@@ -117,7 +117,7 @@ export const CLM_LENS_ABI = [
           },
           {
             internalType: "uint256",
-            name: "compSupplierIndex",
+            name: "rewards",
             type: "uint256",
           },
           {

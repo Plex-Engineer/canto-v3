@@ -11,18 +11,23 @@ import {
   errMsg,
 } from "@/config/interfaces/errors";
 import { convertToBigNumber } from "@/utils/formatBalances";
-import { LendingHookInputParams } from "./interfaces/hookParams";
+import {
+  LendingHookInputParams,
+  LendingHookReturn,
+} from "./interfaces/hookParams";
 import { getGeneralCTokenData, getUserCLMLensData } from "./helpers/clmLens";
-import { getTotalBorrowAndSupplyFromCTokens } from "./helpers/cTokens";
 import { UserLMPosition } from "./interfaces/userPositions";
 import { useState } from "react";
+import { getLMTotalsFromCTokens } from "./helpers/cTokens";
 
 /**
  * @name useLending
  * @description Hook for Canto Lending Market Tokens and User Data
  * @returns
  */
-export default function useLending(params: LendingHookInputParams) {
+export default function useLending(
+  params: LendingHookInputParams
+): LendingHookReturn {
   // internal state for tokens and position (ONLY SET ON SUCCESS)
   // stops failed queries from overwriting the data with empty arrays
   const [tokens, setTokens] = useState<CTokenWithUserData[]>([]);
@@ -31,6 +36,7 @@ export default function useLending(params: LendingHookInputParams) {
     shortfall: "0",
     totalSupply: "0",
     totalBorrow: "0",
+    totalRewards: "0",
   });
   // use query to get all general and user cToken data
   const { isLoading: loadingCTokens, error: errorCTokens } = useQuery(
@@ -39,7 +45,7 @@ export default function useLending(params: LendingHookInputParams) {
       cTokens: CTokenWithUserData[];
       position?: UserLMPosition;
     }> => {
-      const [generalCTokens, userCTokens] = await Promise.all([
+      const [generalCTokens, userLMData] = await Promise.all([
         getGeneralCTokenData(params.testnet),
         getUserCLMLensData(params.userEthAddress ?? "", params.testnet),
       ]);
@@ -49,16 +55,17 @@ export default function useLending(params: LendingHookInputParams) {
         throw generalCTokens.error;
       }
       // if user error, then just return the general data
-      if (userCTokens.error) {
+      if (userLMData.error) {
         return {
           cTokens: generalCTokens.data,
         };
       }
       // since both are okay, combine the data
       const combinedCTokenData = generalCTokens.data.map((cToken) => {
-        const userCTokenDetails = userCTokens.data.balances.find((balance) => {
+        const userCTokenDetails = userLMData.data.cTokens.find((userCToken) => {
           return (
-            balance.cTokenAddress.toLowerCase() === cToken.address.toLowerCase()
+            userCToken.cTokenAddress.toLowerCase() ===
+            cToken.address.toLowerCase()
           );
         });
         if (userCTokenDetails) {
@@ -72,17 +79,21 @@ export default function useLending(params: LendingHookInputParams) {
 
       // do some get total user positions
       const { data: positionTotals, error: positionError } =
-        getTotalBorrowAndSupplyFromCTokens(combinedCTokenData);
+        getLMTotalsFromCTokens(
+          combinedCTokenData,
+          userLMData.data.compAccrued.toString()
+        );
       if (positionError) {
         return {
           cTokens: combinedCTokenData,
         };
       }
       const userTotalPosition = {
-        liquidity: userCTokens.data.limits.liquidity.toString(),
-        shortfall: userCTokens.data.limits.shortfall.toString(),
+        liquidity: userLMData.data.limits.liquidity.toString(),
+        shortfall: userLMData.data.limits.shortfall.toString(),
         totalSupply: positionTotals.totalSupply,
         totalBorrow: positionTotals.totalBorrow,
+        totalRewards: positionTotals.totalRewards,
       };
 
       return { cTokens: combinedCTokenData, position: userTotalPosition };

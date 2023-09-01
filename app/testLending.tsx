@@ -1,18 +1,23 @@
 import Button from "@/components/button/button";
 import Modal from "@/components/modal/modal";
 import useLending from "@/hooks/lending/useLending";
+import { formatBalance } from "@/utils/formatBalances";
 import { useMemo, useState } from "react";
 
 export default function TestLending() {
   const { tokens, position, loading, error } = useLending({
     testnet: false,
-    userEthAddress: "0x8915da99B69e84DE6C97928d378D9887482C671c",
+    userEthAddress: "0x1E480827489E3eA19f82EF213b67200A76C0DF58",
   });
+  console.log(position);
   const sortedTokens = useMemo(() => {
-    return tokens.sort((a, b) => a.underlying.symbol.localeCompare(b.underlying.symbol));
+    return tokens.sort((a, b) =>
+      a.underlying.symbol.localeCompare(b.underlying.symbol)
+    );
   }, [tokens]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedToken, setSelectedToken] = useState<any | null>(null);
+
   return (
     <div>
       <h1>Test Lending</h1>
@@ -27,7 +32,6 @@ export default function TestLending() {
               <h3>BorrowCap: {selectedToken.borrowCap}</h3>
               <h3>Cash: {selectedToken.cash}</h3>
               <h3>CollateralFactor: {selectedToken.collateralFactor}</h3>
-              <h3>Comp Supply State: {selectedToken.compSupplyState}</h3>
               <h3>Decimals: {selectedToken.decimals}</h3>
               <h3>DistApy: {selectedToken.distApy}</h3>
               <h3>Exchange Rate: {selectedToken.exchangeRate}</h3>
@@ -53,10 +57,7 @@ export default function TestLending() {
               <h2>
                 Borrow Balance: {selectedToken.userDetails?.borrowBalance}
               </h2>
-              <h2>
-                Comp Supplier Index:{" "}
-                {selectedToken.userDetails?.compSupplierIndex}
-              </h2>
+              <h2>Rewards: {selectedToken.userDetails?.rewards}</h2>
               <h2>
                 Is Collateral:{" "}
                 {selectedToken.userDetails?.isCollateral ? "yes" : "no"}
@@ -77,9 +78,13 @@ export default function TestLending() {
       {position && (
         <>
           <h2>Total Borrow: {position.totalBorrow}</h2>
-          <h2>Total Supply: {position.totalSupply}</h2>
+          <h2>
+            Total Supply:{" "}
+            {formatBalance(position.totalSupply, 18, { commify: true, precision: 2 })}
+          </h2>
           <h2>Total Liquidity: {position.liquidity}</h2>
           <h2>Total Shortfall: {position.shortfall}</h2>
+          <h2>Total Rewards: {position.totalRewards}</h2>
         </>
       )}
       <h1>CTOKENS: </h1>
