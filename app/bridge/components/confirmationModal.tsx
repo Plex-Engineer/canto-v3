@@ -72,7 +72,7 @@ const ConfirmationModal = (props: Props) => {
             <Text size="sm" theme="secondary-dark">
               amount
             </Text>
-            <Text size="sm">{props.amount}</Text>
+            <Text size="sm">{props.amount == "" ? "0.00" : props.amount}</Text>
           </Container>
         </Container>
       </Container>

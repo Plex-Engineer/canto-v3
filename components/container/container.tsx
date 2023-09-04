@@ -14,6 +14,7 @@ interface Props {
   layer?: number;
   className?: string;
   onClick?: () => void;
+  style?: React.CSSProperties;
 }
 
 const Container = (props: Props) => {
@@ -38,6 +39,7 @@ const Container = (props: Props) => {
             : "unset",
         alignItems: props.center?.vertical ? "center" : "unset",
         zIndex: props.layer,
+        ...props.style,
       }}
     >
       {props.children}

@@ -3,7 +3,7 @@ import { TransactionFlowWithStatus } from "@/config/interfaces/transactions";
 interface TxBoxProps {
   flow?: TransactionFlowWithStatus;
 }
-const TxBox = ({ flow }: TxBoxProps) => {
+const TxItems = ({ flow }: TxBoxProps) => {
   if (!flow || !flow.title) return <></>;
   return (
     <div>
@@ -32,4 +32,4 @@ const TxBox = ({ flow }: TxBoxProps) => {
   );
 };
 
-export default TxBox;
+export default TxItems;

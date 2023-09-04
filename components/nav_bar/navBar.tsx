@@ -3,10 +3,10 @@ import Link from "next/link";
 import styles from "./navbar.module.scss";
 import Text from "../text";
 import Image from "next/image";
-import Button from "../button/button";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import TransactionModal from "../transactions/TxModal";
 
 const NavBar = () => {
   const currentPath = usePathname();
@@ -72,10 +72,13 @@ const NavBar = () => {
           <Text>Governance</Text>
         </Link>
       </div>
-
-      <div className={styles["wallet-connect"]}>
-        {/* <Button color="secondary">Connect Wallet</Button> */}
-        <ConnectButton />
+      <div className={styles["btn-grp"]}>
+        <div className={styles.activity}>
+          <TransactionModal />
+        </div>
+        <div className={styles["wallet-connect"]}>
+          <ConnectButton />
+        </div>
       </div>
     </div>
   );

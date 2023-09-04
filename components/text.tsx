@@ -14,7 +14,7 @@ const proto_mono = localFont({
 
 interface Props {
   font?: "rm_mono" | "proto_mono";
-  weight?: "regular" | "bold";
+  weight?: "normal" | "bold";
   size?: "xx-sm" | "x-sm" | "sm" | "md" | "lg" | "x-lg";
   opacity?: number;
   theme?:
@@ -25,6 +25,7 @@ interface Props {
   color?: string;
   style?: React.CSSProperties;
   children: React.ReactNode;
+  className?: string;
 }
 
 const sizes = {
@@ -52,15 +53,17 @@ const Text = ({
   theme,
   style,
   opacity,
+  className,
 }: Props) => {
   return (
     <p
+      className={className}
       style={{
         fontFamily:
           font == "proto_mono"
             ? proto_mono.style.fontFamily
             : rm_mono.style.fontFamily,
-        opacity: (opacity ?? 100) / 100,
+        opacity: opacity ?? 1,
         fontWeight: weight,
         fontSize: sizes[size ?? "md"],
         lineHeight: "140%",

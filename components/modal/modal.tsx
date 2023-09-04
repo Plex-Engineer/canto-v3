@@ -2,7 +2,6 @@ import ReactDOM from "react-dom";
 import styles from "./modal.module.scss";
 import React, { useEffect } from "react";
 import { useScrollLock } from "../utils/scrollLock";
-import Image from "next/image";
 import Icon from "../icon/icon";
 import Container from "../container/container";
 

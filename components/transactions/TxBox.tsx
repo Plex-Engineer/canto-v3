@@ -1,13 +1,13 @@
 import Button from "@/components/button/button";
 import React, { useState } from "react";
-import TxItem from "../../../components/transactions/TxItems";
+import TxItem from "./TxItems";
 import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
 import useTransactionStore from "@/stores/transactionStore";
 import { useWalletClient } from "wagmi";
 import Container from "@/components/container/container";
 
-const TransactionModal = () => {
+const TransactionBox = () => {
   const [txIndex, setTxIndex] = useState<number>(0);
   const { data: signer } = useWalletClient();
 
@@ -92,4 +92,4 @@ const TransactionModal = () => {
   );
 };
 
-export default TransactionModal;
+export default TransactionBox;
