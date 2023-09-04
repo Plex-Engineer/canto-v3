@@ -79,8 +79,8 @@ const Bridging = (props: BridgeProps) => {
             to: props.hook.addresses.getReceiver(),
             name:
               props.hook.direction === "in"
-                ? props.hook.selections.fromNetwork?.name
-                : props.hook.selections.toNetwork?.name,
+                ? props.hook.selections.fromNetwork?.name ?? null
+                : props.hook.selections.toNetwork?.name ?? null,
           }}
           fromNetwork={props.hook.selections.fromNetwork?.name ?? ""}
           toNetwork={props.hook.selections.toNetwork?.name ?? ""}

@@ -5,14 +5,13 @@ import Text from "@/components/text";
 import Image from "next/image";
 import React from "react";
 import styles from "../bridge.module.scss";
-import Spacer from "@/components/layout/spacer";
 
 interface Props {
   imgUrl: string;
   addresses: {
-    from?: string;
-    to?: string;
-    name?: string;
+    from: string | null;
+    to: string | null;
+    name: string | null;
   };
   token?: {
     name: string;
