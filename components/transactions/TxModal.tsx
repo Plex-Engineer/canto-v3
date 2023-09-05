@@ -20,10 +20,10 @@ const TransactionModal = () => {
     signer?.account.address ?? ""
   );
   const mostRecentFlow = transactionFlows?.[transactionFlows.length - 1];
+  console.log(transactionFlows)
 
   // open if transaction is loading in
   useEffect(() => {
-    console.log(txStore?.isLoading);
     if (txStore?.isLoading) {
       setIsTransactionModalOpen(true);
     }
