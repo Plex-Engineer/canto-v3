@@ -62,7 +62,7 @@ export default function useLending() {
         await tryFetch<UserDataResponse>(
           USER_CANTO_DATA_API_URL +
             USER_CANTO_DATA_API_ENDPOINTS.userData(
-              "0x8915da99B69e84DE6C97928d378D9887482C671c"
+              ""
             )
         );
       if (cTokenError) {
