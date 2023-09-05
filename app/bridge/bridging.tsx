@@ -25,30 +25,25 @@ const Bridging = (props: BridgeProps) => {
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
   async function bridgeTx() {
-    props.hook.bridge
-      .bridgeTx({
-        amount: convertToBigNumber(
-          amount,
-          props.hook.selections.token?.decimals ?? 18
-        ).data.toString(),
-      })
-      .then((val) => {
-        if (val.error) {
-          console.log(val.error);
-          return;
-        }
-        //launch modal
-        setIsConfirmationModalOpen(true);
-        props.params.transactionStore?.addTransactions({
-          title: "bridge",
-          txList: val.data,
-          signer: props.params.signer,
-        });
-      });
+    props.params.transactionStore?.addTransactions({
+      title: "bridge",
+      txList: () =>
+        props.hook.bridge.bridgeTx({
+          amount: convertToBigNumber(
+            amount,
+            props.hook.selections.token?.decimals ?? 18
+          ).data.toString(),
+        }),
+      ethAccount: props.params.signer.account.address,
+      signer: props.params.signer,
+    });
   }
 
   const { data: canBridge } = props.hook.bridge.canBridge({
-    amount,
+    amount: convertToBigNumber(
+      amount,
+      props.hook.selections.token?.decimals ?? 18
+    ).data.toString(),
   });
 
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);

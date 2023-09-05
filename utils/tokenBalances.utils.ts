@@ -6,9 +6,16 @@ import {
 } from "@/config/interfaces/errors";
 import BigNumber from "bignumber.js";
 
+/**
+ * @notice converts a string amount to a big number
+ * @dev truncates the amount to the number of decimals
+ * @param {string} amount amount to convert
+ * @param {number} decimals number of decimals to convert to
+ * @returns {ReturnWithError<BigNumber>} converted amount or error
+ */
 export function convertToBigNumber(
   amount: string,
-  decimals: number
+  decimals: number = 0
 ): ReturnWithError<BigNumber> {
   try {
     // truncate the amount to the number of decimals
@@ -22,6 +29,12 @@ export function convertToBigNumber(
   }
 }
 
+/**
+ * @notice formats a balance to a string
+ * @param {string | BigNumber} amount amount to format
+ * @param {number} decimals number of decimals to format to
+ * @param {object} options options to format with
+ */
 export function formatBalance(
   amount: string | BigNumber,
   decimals: number,
