@@ -6,11 +6,22 @@ import Footer from "@/components/footer/footer";
 import NavBar from "@/components/nav_bar/navBar";
 import CantoWalletProvider from "@/provider/rainbowProvider";
 import { QueryClient, QueryClientProvider } from "react-query";
+import localFont from "next/font/local";
+import clsx from "clsx";
 
-// export const metadata: Metadata = {
-//   title: "Canto v3",
-//   description: "canto v3 is gonna be cool",
-// };
+const rm_mono = localFont({
+  src: "../fonts/rm-mono-regular.ttf",
+  weight: "300",
+  style: "normal",
+  variable: "--rm-mono",
+});
+
+const proto_mono = localFont({
+  src: "../fonts/proto-mono-regular.ttf",
+  weight: "300",
+  style: "normal",
+  variable: "--proto-mono",
+});
 
 export default function RootLayout({
   children,
@@ -19,7 +30,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="light">
+      <body
+        className={clsx("light")}
+        style={
+          {
+            "--rm-mono": rm_mono.style.fontFamily,
+            "--proto-mono": proto_mono.style.fontFamily,
+          } as React.CSSProperties
+        }
+      >
         <CantoWalletProvider>
           <QueryClientProvider client={new QueryClient()}>
             <div className="body">

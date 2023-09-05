@@ -17,7 +17,6 @@
     // text
     color: var(--primary-90-color, #222);
     text-align: right;
-    font-family: RM Mono;
     font-size: 24px;
     font-style: normal;
     font-weight: 400;
@@ -58,7 +57,7 @@
   color: var(--extra-failure-color, #ff0000);
   font-size: 12px;
   font-style: normal;
-  font-family: Proto Mono;
+  font-family: var(--rm-mono);
   font-weight: 600;
   line-height: 140%; /* 16.8px */
   letter-spacing: -0.48px;

@@ -79,7 +79,7 @@
   box-shadow: 5px 5px 0 0px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-
+  border-radius: var(--border-radius, 0px);
   animation: enter 0.25s linear forwards;
 
   @keyframes enter {

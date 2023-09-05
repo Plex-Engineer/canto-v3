@@ -39,7 +39,6 @@
   padding: 20px;
   border-radius: var(--border-radius, 0px);
   border: 1px solid var(--border-stroke-color, #b3b3b3);
-  margin-top: 1rem;
 }
 
 .token {
@@ -49,4 +48,14 @@
   gap: 1rem;
   width: 100%;
   padding-left: 1rem;
+}
+
+.confirmation-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: stretch;
+  height: 100%;
+  gap: 1rem;
+  width: 100%;
 }

@@ -1,0 +1,54 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.txBox {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid var(--border-stroke-color, #3d3d3d);
+  border-radius: var(--border-radius, 0px);
+  padding: 12px;
+  align-items: center;
+  //   justify-content: center;
+  width: 100%;
+  cursor: pointer;
+
+  user-select: none;
+}
+
+.collapsable {
+  transition: all 0.2s ease-in-out;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.4s ease-in;
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    display: block;
+    height: 4px;
+    width: 100%;
+    background: linear-gradient(
+      180deg,
+      rgba(211, 211, 211, 0) 0%,
+      var(--card-sub-surface-color) 100%
+    );
+    margin-top: 12px;
+  }
+}
+
+.txImg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  width: 40px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-color: rgba(var(--dark-color), 0.1);
+}

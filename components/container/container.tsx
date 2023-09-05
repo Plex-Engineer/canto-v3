@@ -1,12 +1,12 @@
 interface Props {
   children: React.ReactNode;
-  margin?: "xx-sm" | "x-sm" | "sm" | "reg" | "lg" | "x-lg";
-  padding?: "xx-sm" | "x-sm" | "sm" | "reg" | "lg" | "x-lg";
+  margin?: "xx-sm" | "x-sm" | "sm" | "md" | "lg" | "x-lg";
+  padding?: "xx-sm" | "x-sm" | "sm" | "md" | "lg" | "x-lg";
   width?: string;
   height?: string;
   backgroundColor?: string;
   direction?: "row" | "column";
-  gap?: number;
+  gap?: number | "auto";
   center?: {
     horizontal?: boolean;
     vertical?: boolean;
@@ -14,6 +14,7 @@ interface Props {
   layer?: number;
   className?: string;
   onClick?: () => void;
+  style?: React.CSSProperties;
 }
 
 const Container = (props: Props) => {
@@ -30,9 +31,15 @@ const Container = (props: Props) => {
         display: "flex",
         flexDirection: props.direction ?? "column",
         gap: props.gap,
-        justifyContent: props.center?.horizontal ? "center" : "unset",
+        justifyContent:
+          props.gap == "auto"
+            ? "space-between"
+            : props.center?.horizontal
+            ? "center"
+            : "unset",
         alignItems: props.center?.vertical ? "center" : "unset",
         zIndex: props.layer,
+        ...props.style,
       }}
     >
       {props.children}
