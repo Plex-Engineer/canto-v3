@@ -11,6 +11,7 @@ import {
   TransactionWithStatus,
   UserTransactionFlowMap,
 } from "@/config/interfaces/transactions";
+import { CANTO_MAINNET_COSMOS } from "@/config/networks";
 import {
   performSingleTransaction,
   waitForTransaction,
@@ -22,6 +23,7 @@ import { persist, devtools } from "zustand/middleware";
 
 interface AddTransactionsParams {
   title: string;
+  icon: string;
   txList: () => PromiseWithError<Transaction[]>;
   ethAccount: string;
   signer?: GetWalletClientResult;
@@ -81,6 +83,7 @@ const useTransactionStore = create<TransactionStore>()(
           }
           const txListWithStatus: TransactionFlowWithStatus = {
             title: params.title,
+            icon: params.icon,
             status: "NONE",
             transactions: txList.map((tx) => ({
               tx,
@@ -169,6 +172,7 @@ const useTransactionStore = create<TransactionStore>()(
                 error: undefined,
                 hash: undefined,
                 txLink: undefined,
+                timestamp: undefined,
               });
               // request signature and receive txHash once signed
               const { data: txHash, error: txError } =
@@ -179,18 +183,24 @@ const useTransactionStore = create<TransactionStore>()(
                 get().setTxStatus(ethAddress, listIndex, i, {
                   status: "ERROR",
                   error: txError,
+                  timestamp: new Date().getTime(),
                 });
                 throw Error(
                   "transactionStore::performTransaction::" + txError.message
                 );
               }
               // we have a txHash so we can set status to pending
+              // to get the txLink, we can grab it from the chainId, unless its a cosmos EIP712 tx
+              const txLink =
+                transactions[i].tx.type === "COSMOS"
+                  ? CANTO_MAINNET_COSMOS.blockExplorer?.getTransactionLink
+                  : getNetworkInfoFromChainId(transactions[i].tx.chainId).data
+                      .blockExplorer?.getTransactionLink;
               get().setTxStatus(ethAddress, listIndex, i, {
                 status: "PENDING",
                 hash: txHash,
-                txLink: getNetworkInfoFromChainId(
-                  transactions[i].tx.chainId
-                ).data.blockExplorer?.getTransactionLink(txHash),
+                txLink: txLink ? txLink(txHash) : "",
+                timestamp: new Date().getTime(),
               });
               // wait for the result before moving on
               const { data: receipt, error: txReceiptError } =

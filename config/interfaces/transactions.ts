@@ -32,6 +32,7 @@ export interface TransactionWithStatus {
   hash?: string;
   error?: Error;
   txLink?: string;
+  timestamp?: number;
 }
 
 ///
@@ -43,6 +44,7 @@ export type TransactionFlowStatus = "NONE" | "PENDING" | "SUCCESS" | "ERROR";
 export interface TransactionFlowWithStatus {
   title: string;
   status: TransactionFlowStatus;
+  icon: string;
   transactions: TransactionWithStatus[];
 }
 // user can be on different accounts to make transactions, so we need to map the transaction flows to the account

@@ -30,6 +30,7 @@ const Bridging = (props: BridgeProps) => {
   async function bridgeTx() {
     props.params.transactionStore?.addTransactions({
       title: "bridge",
+      icon: props.hook.selections.token?.icon ?? "",
       txList: () =>
         props.hook.bridge.bridgeTx({
           amount: convertToBigNumber(
