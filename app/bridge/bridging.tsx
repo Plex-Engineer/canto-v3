@@ -123,9 +123,25 @@ const Bridging = (props: BridgeProps) => {
                 }
                 items={
                   props.hook.direction === "in"
-                    ? props.hook.allOptions.networks
+                    ? [
+                        props.hook.allOptions.networks.find(
+                          (network) => network.name.toLowerCase() === "ethereum"
+                        )!,
+                      ]
                     : []
                 }
+                groupedItems={[
+                  {
+                    main: {
+                      name: "Other Networks",
+                      icon: "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/32%402x/color/atom%402x.png",
+                      id: "",
+                    },
+                    items: props.hook.allOptions.networks.filter(
+                      (network) => network.name.toLowerCase() !== "ethereum"
+                    ),
+                  },
+                ]}
                 onChange={
                   props.hook.direction === "in"
                     ? (networkId) => props.hook.setState("network", networkId)
