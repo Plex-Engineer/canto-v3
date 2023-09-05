@@ -7,6 +7,7 @@ export interface ERC20Token {
   decimals: number;
   icon: string;
   balance?: string;
+  nativeWrappedToken?: boolean; // if this is a wrapper around the network native token (chainId)
 }
 
 // extends ERC20 since all IBC tokens supported on Canto will have

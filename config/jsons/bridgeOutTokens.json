@@ -11,6 +11,7 @@
         "canto-mainnet": [
             {
                 "id": "0x56C03B8C4FA80Ba37F5A7b60CAAAEF749bB5b220",
+                "nativeWrappedToken": true,
                 "chainId": 7700,
                 "address": "0x56C03B8C4FA80Ba37F5A7b60CAAAEF749bB5b220",
                 "name": "Canto",
@@ -543,6 +544,7 @@
         "canto-testnet": [
             {
                 "id": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
+                "nativeWrappedToken": true,
                 "chainId": 7701,
                 "address": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
                 "name": "Canto",

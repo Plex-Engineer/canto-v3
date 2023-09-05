@@ -31,14 +31,21 @@ export function formatBalance(
     commify?: boolean;
   }
 ): string {
-  const { symbol = "", precision = 2, commify = false } = options || {};
-  const bigNumber = new BigNumber(amount);
-  const multiplier = new BigNumber(10).pow(decimals);
-  const formattedAmount = bigNumber.dividedBy(multiplier).toFixed(precision);
+  const { symbol = "", precision = undefined, commify = false } = options || {};
+  const bnAmount = new BigNumber(amount);
+  const formattedAmount = bnAmount.dividedBy(new BigNumber(10).pow(decimals));
+  // if precision is undefined, ret2 places after the first non-zero decimal
+  const truncateAt =
+    precision ??
+    2 - Math.floor(Math.log(formattedAmount.toNumber()) / Math.log(10));
+  // make sure truncateAt is a positive number
+  const truncatedAmount = formattedAmount.toFixed(
+    Math.max(0, isFinite(truncateAt) ? truncateAt : 0)
+  );
   return (
     (commify
-      ? formattedAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-      : formattedAmount) +
+      ? truncatedAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      : truncatedAmount) +
     " " +
     symbol
   );

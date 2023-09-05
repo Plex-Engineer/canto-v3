@@ -13,7 +13,7 @@ import { Contract } from "web3";
 import { ERC20_ABI } from "@/config/abis";
 import { Transaction } from "@/config/interfaces/transactions";
 import { ERC20Token } from "@/config/interfaces/tokens";
-import { multicall } from "wagmi/actions";
+import { fetchBalance, multicall } from "wagmi/actions";
 import { UserTokenBalances } from "@/hooks/bridge/interfaces/tokens";
 
 /**
@@ -40,13 +40,22 @@ export async function getEVMTokenBalanceList(
       contracts: multicallConfig,
     });
     const balances: UserTokenBalances = {};
-    data.forEach((result, index) => {
+    await Promise.all(data.map(async (result, index) => {
       if (result.error) {
         balances[tokens[index].id] = "0";
       } else {
-        balances[tokens[index].id] = (result.result as number).toString();
+        // check to see if we want to add the native balance to the token balance
+        if (tokens[index].nativeWrappedToken) {
+          const nativeBalance = await fetchBalance({
+            address: userEthAddress as `0x${string}`,
+            chainId,
+          });
+          balances[tokens[index].id] = (nativeBalance.value + (result.result as bigint)).toString();
+        } else {
+          balances[tokens[index].id] = (result.result as number).toString();
+        }
       }
-    });
+    }));
     return NO_ERROR(balances);
   } catch (err) {
     return NEW_ERROR("getTokenBalanceList::" + errMsg(err));

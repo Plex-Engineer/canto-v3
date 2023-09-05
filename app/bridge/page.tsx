@@ -5,7 +5,6 @@ import AnimatedBackground from "@/components/animated_background/animatedBackgro
 import Container from "@/components/container/container";
 import Tabs from "@/components/tabs/tabs";
 import styles from "./bridge.module.scss";
-import BridgeIn from "./bridgeIn";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
 import useTransactionStore from "@/stores/transactionStore";
@@ -21,7 +20,6 @@ import Bridging from "./bridging";
 export default function BridgePage() {
   const [direction, setDirection] = useState<"in" | "out">("in");
   const [onTestnet, setOnTestnet] = useState<boolean>(false);
-  const [txIndex, setTxIndex] = useState<number>(0);
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({
     testnet: onTestnet,
