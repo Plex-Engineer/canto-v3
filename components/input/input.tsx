@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./input.module.scss";
 import Text from "../text";
+import clsx from "clsx";
 
 interface InputProps {
   type: "text" | "number" | "amount";
@@ -30,6 +31,7 @@ interface InputProps {
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
+
 const Input = (props: InputProps) => {
   return (
     <div className={styles["input-container"]}>
@@ -58,7 +60,7 @@ const Input = (props: InputProps) => {
             : props.onChange
         }
         placeholder={props.placeholder}
-        className={props.className}
+        className={clsx(props.className)}
         disabled={props.disabled}
         name={props.name}
         id={props.id}
@@ -81,6 +83,7 @@ const Input = (props: InputProps) => {
             ? "1px solid var(--extra-failure-color, #ff0000)"
             : "",
           ...props.style,
+          fontFamily: "var(--rm-mono)",
           fontSize: props.type === "amount" ? "1.5rem" : "1rem",
         }}
       />

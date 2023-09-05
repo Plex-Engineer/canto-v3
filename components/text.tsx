@@ -1,17 +1,3 @@
-import localFont from "next/font/local";
-
-const rm_mono = localFont({
-  src: "../fonts/rm-mono-regular.ttf",
-  weight: "300",
-  style: "normal",
-});
-
-const proto_mono = localFont({
-  src: "../fonts/proto-mono-regular.ttf",
-  weight: "300",
-  style: "normal",
-});
-
 interface Props {
   font?: "rm_mono" | "proto_mono";
   weight?: "normal" | "bold";
@@ -60,9 +46,7 @@ const Text = ({
       className={className}
       style={{
         fontFamily:
-          font == "proto_mono"
-            ? proto_mono.style.fontFamily
-            : rm_mono.style.fontFamily,
+          font == "proto_mono" ? "var(--proto-mono)" : "var(--rm-mono)",
         opacity: opacity ?? 1,
         fontWeight: weight,
         fontSize: sizes[size ?? "md"],
