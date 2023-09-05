@@ -13,6 +13,7 @@ import Container from "@/components/container/container";
 import Image from "next/image";
 import Modal from "@/components/modal/modal";
 import ConfirmationModal from "./components/confirmationModal";
+import { BridgingMethod } from "@/hooks/bridge/interfaces/bridgeMethods";
 
 interface BridgeProps {
   hook: BridgeHookReturn;
@@ -24,6 +25,8 @@ interface BridgeProps {
 const Bridging = (props: BridgeProps) => {
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
+
+  // transaction that will do the bridging
   async function bridgeTx() {
     props.params.transactionStore?.addTransactions({
       title: "bridge",
@@ -39,6 +42,7 @@ const Bridging = (props: BridgeProps) => {
     });
   }
 
+  // check to see if bridging will be possible with the current parameters
   const { data: canBridge } = props.hook.bridge.canBridge({
     amount: convertToBigNumber(
       amount,
@@ -46,8 +50,35 @@ const Bridging = (props: BridgeProps) => {
     ).data.toString(),
   });
 
+  // check the amount to see if we can get to confirmation
+  /** Will not tell us if the other parameters are okay */
+  const checkAmount = (amount: string) =>
+    Number(amount) <=
+    Number(
+      formatBalance(
+        props.hook.selections.token?.balance ?? "0",
+        props.hook.selections.token?.decimals ?? 18,
+        {
+          precision: props.hook.selections.token?.decimals ?? 18,
+        }
+      )
+    );
+
+  // if confirmation is open
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 
+  // cosmos address props
+  const cosmosProps =
+    props.hook.selections.method === BridgingMethod.IBC &&
+    props.hook.direction === "out"
+      ? {
+          cosmosAddress: {
+            currentAddress: props.hook.addresses.getReceiver() ?? "",
+            setAddress: (address: string) =>
+              props.hook.setState("inputCosmosAddress", address),
+          },
+        }
+      : {};
   return (
     <>
       <Modal
@@ -60,6 +91,7 @@ const Bridging = (props: BridgeProps) => {
       >
         {/* <TransactionModal /> */}
         <ConfirmationModal
+          {...cosmosProps}
           token={{
             name: props.hook.selections.token?.symbol ?? "",
             url: props.hook.selections.token?.icon ?? "",
@@ -81,7 +113,13 @@ const Bridging = (props: BridgeProps) => {
           toNetwork={props.hook.selections.toNetwork?.name ?? ""}
           type={props.hook.direction}
           amount={amount}
-          onConfirm={bridgeTx}
+          confirmation={{
+            onConfirm: () => {
+              setIsConfirmationModalOpen(false);
+              bridgeTx();
+            },
+            canConfirm: canBridge ?? false,
+          }}
         />
       </Modal>
       <section className={styles.container}>
@@ -131,13 +169,13 @@ const Bridging = (props: BridgeProps) => {
               <div className={styles["network-box"]}>
                 <div className={styles.token}>
                   <Image
-                    src={"/networks/canto.svg"}
-                    alt={"canto icon"}
+                    src={props.hook.selections.fromNetwork?.icon ?? ""}
+                    alt={props.hook.selections.fromNetwork?.name ?? ""}
                     width={30}
                     height={30}
                   />
                   <Text size="md" font="proto_mono">
-                    Canto
+                    {props.hook.selections.fromNetwork?.name}
                   </Text>
                 </div>
               </div>
@@ -180,13 +218,13 @@ const Bridging = (props: BridgeProps) => {
               <div className={styles["network-box"]}>
                 <div className={styles.token}>
                   <Image
-                    src={"/networks/canto.svg"}
-                    alt={"canto icon"}
+                    src={props.hook.selections.toNetwork?.icon ?? ""}
+                    alt={props.hook.selections.toNetwork?.name ?? ""}
                     width={30}
                     height={30}
                   />
                   <Text size="md" font="proto_mono">
-                    Canto
+                    {props.hook.selections.toNetwork?.name}
                   </Text>
                 </div>
               </div>
@@ -228,20 +266,11 @@ const Bridging = (props: BridgeProps) => {
                     setAmount(val.target.value);
                   }}
                   className={styles["input"]}
-                  error={
-                    Number(amount) >
-                    Number(
-                      formatBalance(
-                        props.hook.selections.token?.balance ?? "0",
-                        props.hook.selections.token?.decimals ?? 18
-                      )
-                    )
-                  }
+                  error={!checkAmount(amount)}
                   errorMessage={`"Amount must be less than ${formatBalance(
                     props.hook.selections.token?.balance ?? "0",
                     props.hook.selections.token?.decimals ?? 18,
                     {
-                      precision: 0,
                       commify: true,
                       symbol: props.hook.selections.token?.symbol,
                     }
@@ -271,21 +300,14 @@ const Bridging = (props: BridgeProps) => {
         <Spacer height="100px" />
 
         <Spacer height="100px" />
-        {/* <input
-          placeholder="cosmos receiver address"
-          onChange={(e) => setInputCosmosAddress(e.target.value)}
-        /> */}
-        <Spacer height="100px" />
         <Button
           width="fill"
           onClick={() => {
             setIsConfirmationModalOpen(true);
           }}
+          disabled={!checkAmount(amount) || Number(amount) <= 0}
         >
           {props.hook.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
-          {` ::can bridge: ${
-            canBridge !== null ? (canBridge ? "yes" : "no") : "no"
-          }`}
         </Button>
       </section>
     </>

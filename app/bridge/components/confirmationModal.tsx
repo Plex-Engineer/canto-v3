@@ -21,10 +21,16 @@ interface Props {
   toNetwork: string;
   amount: string;
   type: "in" | "out";
-  onConfirm: () => void;
+  confirmation: {
+    canConfirm: boolean;
+    onConfirm: () => void;
+  };
+  cosmosAddress?: {
+    currentAddress: string;
+    setAddress: (address: string) => void;
+  };
 }
 const ConfirmationModal = (props: Props) => {
-  const [cosmosAddress, setCosmosAddress] = React.useState<string>("");
   return (
     <div className={styles["confirmation-container"]}>
       <Text size="lg" font="proto_mono">
@@ -71,18 +77,21 @@ const ConfirmationModal = (props: Props) => {
             <Text size="sm" theme="secondary-dark">
               amount
             </Text>
-            <Text size="sm">{props.amount == "" ? "0.00" : props.amount}</Text>
+            <Text size="sm">
+              {props.amount == "" ? "0.00" : props.amount}
+              {` ${props.token?.name}`}
+            </Text>
           </Container>
         </Container>
       </Container>
-      {props.type === "out" && (
+      {props.cosmosAddress && (
         <Container width="100%">
           <Input
             type={"text"}
             placeholder={props.addresses.name + " address"}
-            value={cosmosAddress}
+            value={props.cosmosAddress.currentAddress}
             onChange={function (e: React.ChangeEvent<HTMLInputElement>): void {
-              setCosmosAddress(e.target.value);
+              props.cosmosAddress?.setAddress(e.target.value);
             }}
           />
         </Container>
@@ -90,12 +99,13 @@ const ConfirmationModal = (props: Props) => {
       <Button
         width={"fill"}
         onClick={() => {
-          props.onConfirm;
+          props.confirmation.onConfirm();
         }}
+        disabled={!props.confirmation.canConfirm}
       >
         Confirm Bridge {props.type}
       </Button>
-      <Text size="x-sm" font="rm_mono" theme="secondary-dark">
+      {/* <Text size="x-sm" font="rm_mono" theme="secondary-dark">
         By completing bridge in, you are transferring your assets from Ethereum
         (
         {props.addresses.from?.slice(0, 6) +
@@ -106,7 +116,7 @@ const ConfirmationModal = (props: Props) => {
           "..." +
           props.addresses.to?.slice(-4)}
         )
-      </Text>
+      </Text> */}
     </div>
   );
 };
