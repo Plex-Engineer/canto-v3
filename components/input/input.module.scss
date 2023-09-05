@@ -57,7 +57,7 @@
   color: var(--extra-failure-color, #ff0000);
   font-size: 12px;
   font-style: normal;
-  font-family: var("--rm-mono") !important;
+  font-family: var(--rm-mono);
   font-weight: 600;
   line-height: 140%; /* 16.8px */
   letter-spacing: -0.48px;
