@@ -13,7 +13,7 @@ export interface Item {
   id: string;
   icon: string;
   name: string;
-  balance?: number | string;
+  secondary?: number | string;
 }
 
 interface Props {
@@ -29,7 +29,6 @@ interface Props {
 const Selector = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [group, setGroup] = useState(props.groupedItems?.[0] ?? undefined);
   useEffect(() => {
     setIsExpanded(false);
   }, [isOpen]);
@@ -48,7 +47,10 @@ const Selector = (props: Props) => {
         <div
           className={styles["scroll-view"]}
           style={{
-            overflowY: isExpanded ? "scroll" : "hidden",
+            overflowY:
+              isExpanded || props.groupedItems == undefined
+                ? "scroll"
+                : "hidden",
           }}
         >
           <Spacer height="10px" />
@@ -70,9 +72,14 @@ const Selector = (props: Props) => {
                 }}
               >
                 <Image src={item.icon} alt={item.name} width={30} height={30} />
-                <Text size="md" font="proto_mono">
-                  {item.name} {item.balance}
-                </Text>
+                <Container direction="row" gap={"auto"} width="100%">
+                  <Text size="md" font="proto_mono">
+                    {item.name}
+                  </Text>
+                  <Text size="md" font="proto_mono">
+                    {item.secondary}
+                  </Text>
+                </Container>
               </Container>
             ))}
             {props.groupedItems?.map((group) => (
@@ -96,7 +103,7 @@ const Selector = (props: Props) => {
                   height={30}
                 />
                 <Text size="md" font="proto_mono">
-                  {group.main.name} {group.main.balance}
+                  {group.main.name} {group.main.secondary}
                 </Text>
                 <div
                   style={{
@@ -118,7 +125,6 @@ const Selector = (props: Props) => {
             className={clsx(styles["grp-items"])}
             style={{
               transform: isExpanded ? "translateX(0)" : "translateX(100%)",
-              // height: isExpanded ? "" : "0px",
             }}
           >
             <Container
@@ -149,27 +155,35 @@ const Selector = (props: Props) => {
                 Back
               </Text>
             </Container>
-            {group?.items.map((item) => (
-              <Container
-                key={item.name}
-                width="100%"
-                direction="row"
-                gap={20}
-                center={{
-                  vertical: true,
-                }}
-                className={styles.item}
-                onClick={() => {
-                  props.onChange(item.id);
-                  setIsOpen(false);
-                }}
-              >
-                <Image src={item.icon} alt={item.name} width={30} height={30} />
-                <Text size="md" font="proto_mono">
-                  {item.name} {item.balance}
-                </Text>
-              </Container>
-            ))}
+            {props.groupedItems != undefined &&
+              props.groupedItems.map((group) =>
+                group.items.map((item) => (
+                  <Container
+                    key={item.name}
+                    width="100%"
+                    direction="row"
+                    gap={20}
+                    center={{
+                      vertical: true,
+                    }}
+                    className={styles.item}
+                    onClick={() => {
+                      props.onChange(item.id);
+                      setIsOpen(false);
+                    }}
+                  >
+                    <Image
+                      src={item.icon}
+                      alt={item.name}
+                      width={30}
+                      height={30}
+                    />
+                    <Text size="md" font="proto_mono">
+                      {item.name} {item.secondary}
+                    </Text>
+                  </Container>
+                ))
+              )}
           </Container>
         </div>
       </Modal>

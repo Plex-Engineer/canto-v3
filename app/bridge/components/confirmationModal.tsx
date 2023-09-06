@@ -44,7 +44,7 @@ const ConfirmationModal = (props: Props) => {
         Bridge {props.token?.name} {props.type}{" "}
         {props.type == "in" ? "from" : "to"} {props.addresses?.name}
       </Text>
-      {props.extraDetails}
+      <div className={styles.info}>{props.extraDetails}</div>
       <Container
         width="100%"
         height="100%"

@@ -23,6 +23,10 @@
   align-self: stretch;
 }
 
+.info {
+  //   position: absolute;
+  background-color: var(--card-sub-surface-color);
+}
 .networks-box {
   width: 100%;
 }

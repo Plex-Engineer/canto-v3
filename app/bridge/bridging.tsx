@@ -85,7 +85,7 @@ const Bridging = (props: BridgeProps) => {
       <Modal
         open={isConfirmationModalOpen}
         width="30rem"
-        height="36rem"
+        height="min-content"
         onClose={() => {
           setIsConfirmationModalOpen(false);
         }}
@@ -124,7 +124,7 @@ const Bridging = (props: BridgeProps) => {
           extraDetails={
             props.hook.selections.toNetwork?.id ===
             "ethereum-via-gravity-bridge" ? (
-              <Text>
+              <Text theme="secondary-dark" size="x-sm">
                 To bridge your tokens to Ethereum through Gravity Bridge, first
                 ensure that you have an IBC wallet like Keplr. Next, enter your
                 Gravity Bridge address (from Keplr) below and confirm. Once
@@ -274,6 +274,10 @@ const Bridging = (props: BridgeProps) => {
                   props.hook.selections.token
                     ? {
                         ...props.hook.selections.token,
+                        name:
+                          props.hook.selections.token.name.length > 24
+                            ? props.hook.selections.token.symbol
+                            : props.hook.selections.token.name,
                       }
                     : ({
                         name: "Select Token",
@@ -284,7 +288,8 @@ const Bridging = (props: BridgeProps) => {
                 items={
                   props.hook.allOptions.tokens.map((token) => ({
                     ...token,
-                    balance: formatBalance(
+                    name: token.name.length > 24 ? token.symbol : token.name,
+                    secondary: formatBalance(
                       token.balance ?? "0",
                       token.decimals
                     ),
@@ -302,14 +307,23 @@ const Bridging = (props: BridgeProps) => {
                   }}
                   className={styles["input"]}
                   error={!checkAmount(amount)}
-                  errorMessage={`"Amount must be less than ${formatBalance(
-                    props.hook.selections.token?.balance ?? "0",
-                    props.hook.selections.token?.decimals ?? 18,
-                    {
-                      commify: true,
-                      symbol: props.hook.selections.token?.symbol,
-                    }
-                  )}"`}
+                  errorMessage={
+                    Number(
+                      formatBalance(
+                        props.hook.selections.token?.balance ?? "0",
+                        props.hook.selections.token?.decimals ?? 18
+                      )
+                    ) === 0
+                      ? "You have 0 balance"
+                      : `"Amount must be less than ${formatBalance(
+                          props.hook.selections.token?.balance ?? "0",
+                          props.hook.selections.token?.decimals ?? 18,
+                          {
+                            commify: true,
+                            symbol: props.hook.selections.token?.symbol,
+                          }
+                        )}"`
+                  }
                 />
               </Container>
             </Container>
