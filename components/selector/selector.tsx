@@ -45,15 +45,15 @@ const Selector = (props: Props) => {
         <Text size="lg" font="proto_mono">
           {props.title}
         </Text>
-        <div className={styles["scroll-view"]}>
+        <div
+          className={styles["scroll-view"]}
+          style={{
+            overflowY: isExpanded ? "scroll" : "hidden",
+          }}
+        >
           <Spacer height="10px" />
 
-          <div
-            className={clsx(styles["items-list"])}
-            style={{
-              transform: isExpanded ? "translateX(-100%)" : "translateX(0)",
-            }}
-          >
+          <div className={clsx(styles["items-list"])}>
             {props.items.map((item) => (
               <Container
                 key={item.name}
@@ -113,10 +113,12 @@ const Selector = (props: Props) => {
               </Container>
             ))}
           </div>
+
           <Container
             className={clsx(styles["grp-items"])}
             style={{
               transform: isExpanded ? "translateX(0)" : "translateX(100%)",
+              // height: isExpanded ? "" : "0px",
             }}
           >
             <Container

@@ -4,6 +4,8 @@
   gap: 2px;
   overflow-y: auto;
   transition: transform 0.5s ease-out;
+  background-color: var(--card-sub-surface-color);
+  height: 100%;
 }
 
 .scroll-view {
@@ -82,6 +84,8 @@
   top: 20px;
   transform: translateX(100%);
   width: 100%;
+  z-index: 2;
+  background-color: var(--card-sub-surface-color);
   transition: transform 0.5s ease-out;
 }
 
