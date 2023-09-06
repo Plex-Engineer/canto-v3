@@ -4,9 +4,10 @@ import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
 import Text from "@/components/text";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./selector.module.scss";
 import Spacer from "@/components/layout/spacer";
+import clsx from "clsx";
 
 export interface Item {
   id: string;
@@ -20,9 +21,18 @@ interface Props {
   activeItem?: Item;
   items: Item[];
   onChange: (itemId: string) => void;
+  groupedItems?: {
+    main: Item;
+    items: Item[];
+  }[];
 }
 const Selector = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [group, setGroup] = useState(props.groupedItems?.[0] ?? undefined);
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [isOpen]);
 
   return (
     <>
@@ -38,7 +48,12 @@ const Selector = (props: Props) => {
         <div className={styles["scroll-view"]}>
           <Spacer height="10px" />
 
-          <div className={styles["items-list"]}>
+          <div
+            className={clsx(styles["items-list"])}
+            style={{
+              transform: isExpanded ? "translateX(-100%)" : "translateX(0)",
+            }}
+          >
             {props.items.map((item) => (
               <Container
                 key={item.name}
@@ -60,7 +75,100 @@ const Selector = (props: Props) => {
                 </Text>
               </Container>
             ))}
+            {props.groupedItems?.map((group) => (
+              <Container
+                key={group.main.name}
+                width="100%"
+                direction="row"
+                gap={20}
+                center={{
+                  vertical: true,
+                }}
+                className={styles.item}
+                onClick={() => {
+                  setIsExpanded(!isExpanded);
+                }}
+              >
+                <Image
+                  src={group.main.icon}
+                  alt={group.main.name}
+                  width={30}
+                  height={30}
+                />
+                <Text size="md" font="proto_mono">
+                  {group.main.name} {group.main.balance}
+                </Text>
+                <div
+                  style={{
+                    transform: !isExpanded ? "rotate(-90deg)" : "rotate(0deg)",
+                  }}
+                >
+                  <Icon
+                    icon={{
+                      url: "dropdown.svg",
+                      size: 24,
+                    }}
+                  />
+                </div>
+              </Container>
+            ))}
           </div>
+          <Container
+            className={clsx(styles["grp-items"])}
+            style={{
+              transform: isExpanded ? "translateX(0)" : "translateX(100%)",
+            }}
+          >
+            <Container
+              direction="row"
+              gap={20}
+              className={styles.item}
+              width="100%"
+              center={{
+                vertical: true,
+              }}
+              onClick={() => {
+                setIsExpanded(false);
+              }}
+            >
+              <div
+                style={{
+                  transform: "rotate(90deg)",
+                }}
+              >
+                <Icon
+                  icon={{
+                    url: "dropdown.svg",
+                    size: 24,
+                  }}
+                />
+              </div>
+              <Text size="md" font="proto_mono">
+                Back
+              </Text>
+            </Container>
+            {group?.items.map((item) => (
+              <Container
+                key={item.name}
+                width="100%"
+                direction="row"
+                gap={20}
+                center={{
+                  vertical: true,
+                }}
+                className={styles.item}
+                onClick={() => {
+                  props.onChange(item.id);
+                  setIsOpen(false);
+                }}
+              >
+                <Image src={item.icon} alt={item.name} width={30} height={30} />
+                <Text size="md" font="proto_mono">
+                  {item.name} {item.balance}
+                </Text>
+              </Container>
+            ))}
+          </Container>
         </div>
       </Modal>
       <Button
