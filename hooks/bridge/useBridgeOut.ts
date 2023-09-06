@@ -18,7 +18,7 @@ import {
 import { BaseNetwork } from "@/config/interfaces/networks";
 import { BridgeOutToken } from "./interfaces/tokens";
 import { BridgingMethod } from "./interfaces/bridgeMethods";
-import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
+import { MAIN_BRIDGE_OUT_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
 import { Transaction } from "@/config/interfaces/transactions";
 import useTokenBalances from "../helpers/useTokenBalances";
 import { bridgeOutTx } from "./transactions/bridge";
@@ -136,7 +136,7 @@ export default function useBridgeOut(
     }
     // get the networks from the ids
     const supportedNetworks = (
-      props.testnet ? TEST_BRIDGE_NETWORKS : MAIN_BRIDGE_NETWORKS
+      props.testnet ? TEST_BRIDGE_NETWORKS : MAIN_BRIDGE_OUT_NETWORKS
     ).filter((network) => supportedNetworkIds.includes(network.id));
     if (supportedNetworks.length === 0) {
       throw new Error(
