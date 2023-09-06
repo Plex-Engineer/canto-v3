@@ -29,7 +29,7 @@ const Bridging = (props: BridgeProps) => {
   // transaction that will do the bridging
   async function bridgeTx() {
     props.params.transactionStore?.addTransactions({
-      title: "bridge",
+      title: `Bridge ${props.hook.selections.token?.symbol} From ${props.hook.selections.fromNetwork?.name} To ${props.hook.selections.toNetwork?.name}`,
       icon: props.hook.selections.token?.icon ?? "",
       txList: () =>
         props.hook.bridge.bridgeTx({
