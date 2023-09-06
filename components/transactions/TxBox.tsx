@@ -1,6 +1,5 @@
 import Button from "@/components/button/button";
 import React, { useState } from "react";
-import TxItem from "./TxItems";
 import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
 import useTransactionStore from "@/stores/transactionStore";
