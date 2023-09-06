@@ -5,6 +5,8 @@ import Text from "@/components/text";
 import Image from "next/image";
 import React, { ReactNode } from "react";
 import styles from "../bridge.module.scss";
+import PopUp from "@/components/popup/popup";
+import Icon from "@/components/icon/icon";
 
 interface Props {
   imgUrl: string;
@@ -44,7 +46,34 @@ const ConfirmationModal = (props: Props) => {
         Bridge {props.token?.name} {props.type}{" "}
         {props.type == "in" ? "from" : "to"} {props.addresses?.name}
       </Text>
-      <div className={styles.info}>{props.extraDetails}</div>
+      {props.extraDetails && (
+        <Container
+          width="100%"
+          style={{
+            alignItems: "flex-end",
+          }}
+        >
+          <PopUp content={props.extraDetails} width="300px">
+            {/* <Icon
+          icon={{
+            url: "/check.svg",
+            size: 24,
+          }}
+        /> */}
+            <span className={styles.infoPop}>
+              <Text
+                theme="secondary-dark"
+                size="sm"
+                style={{
+                  textAlign: "right",
+                }}
+              >
+                ?
+              </Text>
+            </span>
+          </PopUp>
+        </Container>
+      )}
       <Container
         width="100%"
         height="100%"

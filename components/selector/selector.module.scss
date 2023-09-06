@@ -25,7 +25,7 @@
       180deg,
       var(--card-sub-surface-color) 0%,
       var(--card-sub-surface-color) 22.92%,
-      rgba(217, 217, 217, 0) 100%
+      rgba(var(--light-color), 0) 100%
     );
   }
 
@@ -36,7 +36,7 @@
       0deg,
       var(--card-sub-surface-color) 0%,
       var(--card-sub-surface-color) 22.92%,
-      rgba(217, 217, 217, 0) 100%
+      rgba(var(--light-color), 0) 100%
     );
   }
 }

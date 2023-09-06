@@ -124,7 +124,7 @@ const Bridging = (props: BridgeProps) => {
           extraDetails={
             props.hook.selections.toNetwork?.id ===
             "ethereum-via-gravity-bridge" ? (
-              <Text theme="secondary-dark" size="x-sm">
+              <Text size="x-sm">
                 To bridge your tokens to Ethereum through Gravity Bridge, first
                 ensure that you have an IBC wallet like Keplr. Next, enter your
                 Gravity Bridge address (from Keplr) below and confirm. Once
