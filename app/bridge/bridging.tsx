@@ -185,7 +185,7 @@ const Bridging = (props: BridgeProps) => {
                 groupedItems={[
                   {
                     main: {
-                      name: "Other Networks",
+                      name: "Cosmos Networks",
                       icon: "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/32%402x/color/atom%402x.png",
                       id: "",
                     },

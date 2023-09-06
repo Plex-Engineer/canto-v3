@@ -126,11 +126,6 @@ export default function BridgePage() {
                 ),
                 onClick: () => setDirection("out"),
               },
-
-              {
-                title: "TX HISTORY",
-                content: TxHistory(),
-              },
             ]}
           />
         </Container>
