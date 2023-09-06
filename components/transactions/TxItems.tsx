@@ -14,7 +14,7 @@ const TxItems = ({ flow }: TxBoxProps) => {
           <div key={idx}>
             <li>tx - {idx}</li>
             <li>
-              {idx}- description: {tx.tx.description}
+              {idx}- description: {tx.tx.description.description}
             </li>
             <li>
               {idx}- status: {tx.status}

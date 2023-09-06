@@ -3,7 +3,7 @@ import Container from "@/components/container/container";
 import Input from "@/components/input/input";
 import Text from "@/components/text";
 import Image from "next/image";
-import React from "react";
+import React, { ReactNode } from "react";
 import styles from "../bridge.module.scss";
 
 interface Props {
@@ -29,6 +29,7 @@ interface Props {
     currentAddress: string;
     setAddress: (address: string) => void;
   };
+  extraDetails?: ReactNode;
 }
 const ConfirmationModal = (props: Props) => {
   return (
@@ -43,6 +44,7 @@ const ConfirmationModal = (props: Props) => {
         Bridge {props.token?.name} {props.type}{" "}
         {props.type == "in" ? "from" : "to"} {props.addresses?.name}
       </Text>
+      {props.extraDetails}
       <Container
         width="100%"
         height="100%"

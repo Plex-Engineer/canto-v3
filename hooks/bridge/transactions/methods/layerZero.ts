@@ -6,7 +6,10 @@ import {
 } from "@/config/interfaces/errors";
 import { EVMNetwork } from "@/config/interfaces/networks";
 import { isValidEthAddress } from "@/utils/address.utils";
-import { Transaction } from "@/config/interfaces/transactions";
+import {
+  Transaction,
+  TransactionDescription,
+} from "@/config/interfaces/transactions";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
 import { encodePacked } from "web3-utils";
 import BigNumber from "bignumber.js";
@@ -18,6 +21,10 @@ import { ZERO_ADDRESS } from "@/config/consts/addresses";
 import { ERC20Token } from "@/config/interfaces/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { formatBalance } from "@/utils/tokenBalances.utils";
+import {
+  BridgingMethod,
+  getBridgeMethodInfo,
+} from "../../interfaces/bridgeMethods";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging through layer zero
@@ -101,7 +108,8 @@ export async function bridgeLayerZero(
         token.symbol,
         formatBalance(amount, token.decimals),
         fromNetwork.name,
-        toNetwork.name
+        toNetwork.name,
+        getBridgeMethodInfo(BridgingMethod.LAYER_ZERO).name
       )
     )
   );
@@ -121,7 +129,7 @@ const _oftTransferTx = (
   tokenAddress: string,
   amount: string,
   gas: string,
-  description: string
+  description: TransactionDescription
 ): Transaction => ({
   description,
   chainId: chainId,
@@ -144,7 +152,7 @@ const _oftDepositOrWithdrawTx = (
   deposit: boolean,
   oftAddress: string,
   amount: string,
-  description: string
+  description: TransactionDescription
 ): Transaction => ({
   description,
   chainId: chainId,

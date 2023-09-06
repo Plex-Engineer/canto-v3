@@ -1,4 +1,7 @@
-import { Transaction } from "@/config/interfaces/transactions";
+import {
+  Transaction,
+  TransactionDescription,
+} from "@/config/interfaces/transactions";
 import { createMsgsConvertCoin } from "@/utils/cosmos/transactions/messages/convertCoin/convertCoin";
 import { createMsgsConvertERC20 } from "@/utils/cosmos/transactions/messages/convertCoin/convertERC20";
 
@@ -12,7 +15,7 @@ export const _convertERC20Tx = (
   amount: string,
   ethSender: string,
   cantoReceiver: string,
-  description: string
+  description: TransactionDescription
 ): Transaction => {
   const convertERC20Tx = createMsgsConvertERC20({
     contract_address: tokenAddress,
@@ -34,7 +37,7 @@ const _convertCoinTx = (
   ethReceiver: string,
   tokenDenom: string,
   amount: string,
-  description: string
+  description: TransactionDescription
 ): Transaction => {
   const convertCoinTx = createMsgsConvertCoin({
     cantoSender,

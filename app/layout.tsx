@@ -43,32 +43,33 @@ export default function RootLayout({
           <QueryClientProvider client={new QueryClient()}>
             <div className="body">
               <InfoBar
-                values={[
-                  {
-                    name: "contracts w/ CSR enabled:",
-                    value: "$1,210.56",
-                    change: "+2% $23.4",
-                    isPositive: true,
-                  },
-                  {
-                    name: "CANTO price:",
-                    value: "$1,210.56",
-                    change: "+22%",
-                    isPositive: true,
-                  },
-                  {
-                    name: "TVL:",
-                    value: "$1,210.56",
-                    change: "-1.2%",
-                    isPositive: false,
-                  },
-                  {
-                    name: "Market Cap:",
-                    value: "$1,435,438.56",
-                    change: "-34.2%",
-                    isPositive: false,
-                  },
-                ]}
+                values={[]}
+                // {[
+                //   {
+                //     name: "contracts w/ CSR enabled:",
+                //     value: "$1,210.56",
+                //     change: "+2% $23.4",
+                //     isPositive: true,
+                //   },
+                //   {
+                //     name: "CANTO price:",
+                //     value: "$1,210.56",
+                //     change: "+22%",
+                //     isPositive: true,
+                //   },
+                //   {
+                //     name: "TVL:",
+                //     value: "$1,210.56",
+                //     change: "-1.2%",
+                //     isPositive: false,
+                //   },
+                //   {
+                //     name: "Market Cap:",
+                //     value: "$1,435,438.56",
+                //     change: "-34.2%",
+                //     isPositive: false,
+                //   },
+                // ]}
               />
               <NavBar />
               {children}

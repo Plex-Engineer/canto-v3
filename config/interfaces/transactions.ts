@@ -1,10 +1,14 @@
 import { ContractAbi } from "web3-types";
 import { PromiseWithError, ReturnWithError } from "./errors";
+export interface TransactionDescription {
+  title: string;
+  description: string;
+}
 
 export type Transaction = {
   // chainId the wallet must be on to perform the transaction
   chainId: number | string;
-  description: string;
+  description: TransactionDescription;
 } & (
   | {
       type: "EVM";

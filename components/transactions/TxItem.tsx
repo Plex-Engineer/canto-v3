@@ -51,7 +51,7 @@ const TxItem = (props: TxItemProps) => {
             vertical: false,
           }}
         >
-          <Text size="sm">{props.tx.tx.description}</Text>
+          <Text size="sm">{props.tx.tx.description.title}</Text>
         </Container>
         <div
           className={styles.collapsable}
@@ -61,7 +61,7 @@ const TxItem = (props: TxItemProps) => {
           }}
         >
           <Text size="sm" theme="secondary-dark">
-            {props.tx.tx.description}
+            {props.tx.tx.description.description}
           </Text>
           {props.tx.txLink && (
             <Container direction="row" gap={"auto"}>
