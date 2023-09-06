@@ -4,6 +4,7 @@ import styles from "./footer.module.scss";
 import FooterButton from "./components/footerButton";
 import { useEffect, useState } from "react";
 import { getTokenPriceInUSDC } from "@/utils/tokens/prices.utils";
+import { useAccount, useBlockNumber } from "wagmi";
 
 const Footer = () => {
   const [cantoPrice, setCantoPrice] = useState("0");
@@ -93,17 +94,18 @@ const FooterLink = ({ href, text }: PropLink) => {
 };
 
 const StatusText = () => {
+  const blockNumber = useBlockNumber();
   return (
     <Text
       size="x-sm"
       font="proto_mono"
       style={{
-        width: "200px",
+        width: "160px",
         justifyContent: "center",
       }}
     >
       <span className={styles.status}></span>
-      live data feed
+      {blockNumber.isFetched ? `#${blockNumber.data}` : "Loading..."}
     </Text>
   );
 };
