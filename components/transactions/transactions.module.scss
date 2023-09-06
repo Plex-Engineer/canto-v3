@@ -18,6 +18,10 @@
   cursor: pointer;
 
   user-select: none;
+
+  &:hover {
+    background-color: rgba(var(--dark-color), 0.1);
+  }
 }
 
 .collapsable {
@@ -26,20 +30,20 @@
   max-height: 0;
   transition: max-height 0.4s ease-in;
   position: relative;
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    display: block;
-    height: 4px;
-    width: 100%;
-    background: linear-gradient(
-      180deg,
-      rgba(211, 211, 211, 0) 0%,
-      var(--card-sub-surface-color) 100%
-    );
-    margin-top: 12px;
-  }
+  //   &::after {
+  //     content: "";
+  //     position: absolute;
+  //     bottom: 0;
+  //     display: block;
+  //     height: 4px;
+  //     width: 100%;
+  //     background: linear-gradient(
+  //       180deg,
+  //       rgba(211, 211, 211, 0) 0%,
+  //       var(--card-sub-surface-color) 100%
+  //     );
+  //     margin-top: 12px;
+  //   }
 }
 
 .txImg {
