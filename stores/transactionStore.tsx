@@ -190,16 +190,13 @@ const useTransactionStore = create<TransactionStore>()(
                 );
               }
               // we have a txHash so we can set status to pending
-              // to get the txLink, we can grab it from the chainId, unless its a cosmos EIP712 tx
-              const txLink =
-                transactions[i].tx.type === "COSMOS"
-                  ? CANTO_MAINNET_COSMOS.blockExplorer?.getTransactionLink
-                  : getNetworkInfoFromChainId(transactions[i].tx.chainId).data
-                      .blockExplorer?.getTransactionLink;
+              // to get the txLink, we can grab it from the chainId,
               get().setTxStatus(ethAddress, listIndex, i, {
                 status: "PENDING",
                 hash: txHash,
-                txLink: txLink ? txLink(txHash) : "",
+                txLink: getNetworkInfoFromChainId(
+                  transactions[i].tx.chainId
+                ).data.blockExplorer?.getTransactionLink(txHash),
                 timestamp: new Date().getTime(),
               });
               // wait for the result before moving on

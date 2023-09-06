@@ -75,14 +75,18 @@ const TxItem = (props: TxItemProps) => {
                   <Text size="sm">view link</Text>
                 </a>
               )}
-              {props.tx.hash && <Text size="sm">#{props.tx.hash.slice(0,6) + "..."}</Text>}
+              {props.tx.hash && (
+                <Text size="sm">#{props.tx.hash.slice(0, 6) + "..."}</Text>
+              )}
             </Container>
           )}
         </div>
         {props.tx.status === "ERROR" && (
           <Button onClick={props.onRetry}>RETRY</Button>
         )}
-        timestamp: {props.tx.timestamp}
+        {props.tx.timestamp && (
+          <>timestamp: {new Date(props.tx.timestamp).toLocaleString()}</>
+        )}
       </Container>
     </div>
   );
