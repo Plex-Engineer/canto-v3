@@ -14,6 +14,32 @@ interface TxItemProps {
 }
 const TxItem = (props: TxItemProps) => {
   const [isRevealing, setIsRevealing] = React.useState(false);
+
+  function DateToMomentsAgo(date: Date) {
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) {
+      return Math.floor(interval) + " years ago";
+    }
+    interval = seconds / 2592000;
+    if (interval > 1) {
+      return Math.floor(interval) + " months ago";
+    }
+    interval = seconds / 86400;
+    if (interval > 1) {
+      return Math.floor(interval) + " days ago";
+    }
+    interval = seconds / 3600;
+    if (interval > 1) {
+      return Math.floor(interval) + " hours ago";
+    }
+    interval = seconds / 60;
+    if (interval > 1) {
+      return Math.floor(interval) + " minutes ago";
+    }
+    return Math.floor(seconds) + " seconds ago";
+  }
+
   return (
     <div
       className={styles.txBox}
@@ -28,6 +54,7 @@ const TxItem = (props: TxItemProps) => {
           </Text>
         ) : (
           <Icon
+            className={props.tx.status === "SIGNING" ? styles.loader : ""}
             icon={{
               url:
                 props.tx.status === "SUCCESS"
@@ -72,22 +99,28 @@ const TxItem = (props: TxItemProps) => {
                     textDecoration: "underline",
                   }}
                 >
-                  <Text size="sm">view link</Text>
+                  {props.tx.hash ? (
+                    <Text size="sm">#{props.tx.hash.slice(0, 6) + "..."}</Text>
+                  ) : (
+                    <Text size="sm">view link</Text>
+                  )}
                 </a>
-              )}
-              {props.tx.hash && (
-                <Text size="sm">#{props.tx.hash.slice(0, 6) + "..."}</Text>
               )}
             </Container>
           )}
         </div>
-        {props.tx.status === "ERROR" && (
-          <Button onClick={props.onRetry}>RETRY</Button>
-        )}
+
         {props.tx.timestamp && (
-          <>timestamp: {new Date(props.tx.timestamp).toLocaleString()}</>
+          <Text size="sm" theme="secondary-dark">
+            {DateToMomentsAgo(new Date(props.tx.timestamp))}
+          </Text>
         )}
       </Container>
+      {props.tx.status === "ERROR" && (
+        <Button onClick={props.onRetry} color="primary">
+          retry
+        </Button>
+      )}
     </div>
   );
 };

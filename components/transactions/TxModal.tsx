@@ -46,14 +46,14 @@ const TransactionModal = () => {
             });
           }}
         />
-        <Button
+        {/* <Button
           color="accent"
           onClick={() =>
             txStore?.clearTransactions(signer?.account.address ?? "")
           }
         >
           CLEAR ALL TXS
-        </Button>
+        </Button> */}
       </Modal>
       <Button
         color="secondary"
