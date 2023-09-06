@@ -4,7 +4,8 @@ import styles from "./footer.module.scss";
 import FooterButton from "./components/footerButton";
 import { useEffect, useState } from "react";
 import { getTokenPriceInUSDC } from "@/utils/tokens/prices.utils";
-import { useAccount, useBlockNumber } from "wagmi";
+import { useBlockNumber } from "wagmi";
+import { CANTO_MAINNET_EVM } from "@/config/networks";
 
 const Footer = () => {
   const [cantoPrice, setCantoPrice] = useState("0");
@@ -94,7 +95,10 @@ const FooterLink = ({ href, text }: PropLink) => {
 };
 
 const StatusText = () => {
-  const blockNumber = useBlockNumber();
+  const { data: blockNumber } = useBlockNumber({
+    chainId: CANTO_MAINNET_EVM.chainId,
+    watch: true,
+  });
   return (
     <Text
       size="x-sm"
@@ -105,7 +109,7 @@ const StatusText = () => {
       }}
     >
       <span className={styles.status}></span>
-      {blockNumber.isFetched ? `#${blockNumber.data}` : "Loading..."}
+      {blockNumber ? `#${blockNumber}` : "Loading..."}
     </Text>
   );
 };
