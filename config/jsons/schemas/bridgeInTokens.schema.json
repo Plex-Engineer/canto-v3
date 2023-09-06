@@ -82,6 +82,10 @@
                 "nativeName": {
                     "description": "nativeName",
                     "type": "string"
+                },
+                "nativeWrappedToken": {
+                    "description": "if the token is a wapped representation of a native token",
+                    "type": "boolean"
                 }
             },
             "additionalProperties": false,
