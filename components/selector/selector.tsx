@@ -82,43 +82,48 @@ const Selector = (props: Props) => {
                 </Container>
               </Container>
             ))}
-            {props.groupedItems?.map((group) => (
-              <Container
-                key={group.main.name}
-                width="100%"
-                direction="row"
-                gap={20}
-                center={{
-                  vertical: true,
-                }}
-                className={styles.item}
-                onClick={() => {
-                  setIsExpanded(!isExpanded);
-                }}
-              >
-                <Image
-                  src={group.main.icon}
-                  alt={group.main.name}
-                  width={30}
-                  height={30}
-                />
-                <Text size="md" font="proto_mono">
-                  {group.main.name} {group.main.secondary}
-                </Text>
-                <div
-                  style={{
-                    transform: !isExpanded ? "rotate(-90deg)" : "rotate(0deg)",
-                  }}
-                >
-                  <Icon
-                    icon={{
-                      url: "dropdown.svg",
-                      size: 24,
+            {props.groupedItems?.map(
+              (group) =>
+                group.items.length !== 0 && (
+                  <Container
+                    key={group.main.name}
+                    width="100%"
+                    direction="row"
+                    gap={20}
+                    center={{
+                      vertical: true,
                     }}
-                  />
-                </div>
-              </Container>
-            ))}
+                    className={styles.item}
+                    onClick={() => {
+                      setIsExpanded(!isExpanded);
+                    }}
+                  >
+                    <Image
+                      src={group.main.icon}
+                      alt={group.main.name}
+                      width={30}
+                      height={30}
+                    />
+                    <Text size="md" font="proto_mono">
+                      {group.main.name} {group.main.secondary}
+                    </Text>
+                    <div
+                      style={{
+                        transform: !isExpanded
+                          ? "rotate(-90deg)"
+                          : "rotate(0deg)",
+                      }}
+                    >
+                      <Icon
+                        icon={{
+                          url: "dropdown.svg",
+                          size: 24,
+                        }}
+                      />
+                    </div>
+                  </Container>
+                )
+            )}
           </div>
 
           <Container

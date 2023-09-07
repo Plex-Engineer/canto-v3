@@ -11,7 +11,7 @@ interface Props {
   onRetry: (txIdx: number) => void;
 }
 
-const TxUnused = (props: Props) => {
+const TxFlow = (props: Props) => {
   return (
     <div className={styles.container}>
       {props.txFlow && (
@@ -42,4 +42,4 @@ const TxUnused = (props: Props) => {
   );
 };
 
-export default TxUnused;
+export default TxFlow;
