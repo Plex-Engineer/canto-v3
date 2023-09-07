@@ -170,7 +170,7 @@ const Bridging = (props: BridgeProps) => {
                 activeItem={
                   props.hook.selections.fromNetwork ?? {
                     name: "Select network",
-                    icon: "",
+                    icon: "loader.svg",
                     id: "",
                   }
                 }
@@ -203,8 +203,8 @@ const Bridging = (props: BridgeProps) => {
               <div className={styles["network-box"]}>
                 <div className={styles.token}>
                   <Image
-                    src={props.hook.selections.fromNetwork?.icon ?? ""}
-                    alt={props.hook.selections.fromNetwork?.name ?? ""}
+                    src={props.hook.selections.fromNetwork?.icon ?? "loader.svg"}
+                    alt={props.hook.selections.fromNetwork?.name ?? "loading"}
                     width={30}
                     height={30}
                   />
@@ -233,7 +233,7 @@ const Bridging = (props: BridgeProps) => {
                 activeItem={
                   props.hook.selections.toNetwork ?? {
                     name: "Select network",
-                    icon: "",
+                    icon: "loader.svg",
                     id: "",
                   }
                 }
@@ -252,8 +252,8 @@ const Bridging = (props: BridgeProps) => {
               <div className={styles["network-box"]}>
                 <div className={styles.token}>
                   <Image
-                    src={props.hook.selections.toNetwork?.icon ?? ""}
-                    alt={props.hook.selections.toNetwork?.name ?? ""}
+                    src={props.hook.selections.toNetwork?.icon ?? "loader.svg"}
+                    alt={props.hook.selections.toNetwork?.name ?? "loading"}
                     width={30}
                     height={30}
                   />
@@ -280,7 +280,7 @@ const Bridging = (props: BridgeProps) => {
                       }
                     : ({
                         name: "Select Token",
-                        icon: "",
+                        icon: "loader.svg",
                         id: "",
                       } as Item)
                 }
