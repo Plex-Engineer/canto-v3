@@ -77,7 +77,7 @@ const NavBar = () => {
           <TransactionModal />
         </div>
         <div className={styles["wallet-connect"]}>
-          <ConnectButton />
+          <ConnectButton chainStatus={"none"} />
         </div>
       </div>
     </div>
