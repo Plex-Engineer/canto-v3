@@ -36,7 +36,7 @@ const NavBar = () => {
           <Text>Home</Text>
         </Link> */}
         <Link
-          href="/"
+          href="/bridge"
           className={clsx(
             styles["nav-link"],
             currentPath == "/bridge" && styles.active

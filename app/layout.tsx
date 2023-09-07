@@ -11,14 +11,14 @@ import clsx from "clsx";
 
 const rm_mono = localFont({
   src: "../fonts/rm-mono-regular.ttf",
-  weight: "300",
+  weight: "400",
   style: "normal",
   variable: "--rm-mono",
 });
 
 const proto_mono = localFont({
   src: "../fonts/proto-mono-regular.ttf",
-  weight: "300",
+  weight: "400",
   style: "normal",
   variable: "--proto-mono",
 });
@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={clsx("light")}
+        className={clsx("dark")}
         style={
           {
             "--rm-mono": rm_mono.style.fontFamily,

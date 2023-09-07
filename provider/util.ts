@@ -37,7 +37,7 @@ export const cantoTheme: Theme = {
     standby: "var(--primary-90-color)",
   },
   fonts: {
-    body: "var(--rm-mono)",
+    body: "var(--rm-mono) ",
   },
   radii: {
     actionButton: "var(--border-radius, 0)",
