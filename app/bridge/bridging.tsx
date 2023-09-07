@@ -14,6 +14,7 @@ import Image from "next/image";
 import Modal from "@/components/modal/modal";
 import ConfirmationModal from "./components/confirmationModal";
 import { BridgingMethod } from "@/hooks/bridge/interfaces/bridgeMethods";
+import { isEVMNetwork } from "@/utils/networks.utils";
 
 interface BridgeProps {
   hook: BridgeHookReturn;
@@ -175,11 +176,9 @@ const Bridging = (props: BridgeProps) => {
                 }
                 items={
                   props.hook.direction === "in"
-                    ? [
-                        props.hook.allOptions.networks.find(
-                          (network) => network.name.toLowerCase() === "ethereum"
-                        )!,
-                      ]
+                    ? props.hook.allOptions.networks.filter((network) =>
+                        isEVMNetwork(network)
+                      )!
                     : []
                 }
                 groupedItems={[
@@ -190,7 +189,7 @@ const Bridging = (props: BridgeProps) => {
                       id: "",
                     },
                     items: props.hook.allOptions.networks.filter(
-                      (network) => network.name.toLowerCase() !== "ethereum"
+                      (network) => !isEVMNetwork(network)
                     ),
                   },
                 ]}

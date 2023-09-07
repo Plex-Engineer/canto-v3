@@ -1,11 +1,12 @@
 import React from "react";
 import Text from "../text";
 import styles from "./transactions.module.scss";
-import Icon from "../icon/icon";
 import Container from "../container/container";
 import Spacer from "../layout/spacer";
 import { TransactionWithStatus } from "@/config/interfaces/transactions";
 import Button from "../button/button";
+import { dateToMomentsAgo } from "@/utils/formatting.utils";
+import StatusIcon from "../icon/statusIcon";
 
 interface TxItemProps {
   tx: TransactionWithStatus;
@@ -14,31 +15,6 @@ interface TxItemProps {
 }
 const TxItem = (props: TxItemProps) => {
   const [isRevealing, setIsRevealing] = React.useState(false);
-
-  function DateToMomentsAgo(date: Date) {
-    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-    let interval = seconds / 31536000;
-    if (interval > 1) {
-      return Math.floor(interval) + " years ago";
-    }
-    interval = seconds / 2592000;
-    if (interval > 1) {
-      return Math.floor(interval) + " months ago";
-    }
-    interval = seconds / 86400;
-    if (interval > 1) {
-      return Math.floor(interval) + " days ago";
-    }
-    interval = seconds / 3600;
-    if (interval > 1) {
-      return Math.floor(interval) + " hours ago";
-    }
-    interval = seconds / 60;
-    if (interval > 1) {
-      return Math.floor(interval) + " minutes ago";
-    }
-    return Math.floor(seconds) + " seconds ago";
-  }
 
   return (
     <div
@@ -53,20 +29,7 @@ const TxItem = (props: TxItemProps) => {
             {props.idx}
           </Text>
         ) : (
-          <Icon
-            className={props.tx.status === "SIGNING" ? styles.loader : ""}
-            icon={{
-              url:
-                props.tx.status === "SUCCESS"
-                  ? "check.svg"
-                  : props.tx.status === "ERROR"
-                  ? "close.svg"
-                  : props.tx.status === "SIGNING"
-                  ? "loader.svg"
-                  : "canto.svg",
-              size: 24,
-            }}
-          />
+          <StatusIcon status={props.tx.status} size={24} />
         )}
       </div>
       <Spacer width="14px" />
@@ -112,7 +75,7 @@ const TxItem = (props: TxItemProps) => {
 
         {props.tx.timestamp && (
           <Text size="sm" theme="secondary-dark">
-            {DateToMomentsAgo(new Date(props.tx.timestamp))}
+            {dateToMomentsAgo(props.tx.timestamp)}
           </Text>
         )}
       </Container>

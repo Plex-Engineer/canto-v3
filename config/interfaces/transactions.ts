@@ -46,6 +46,7 @@ export interface TransactionWithStatus {
 ///
 export type TransactionFlowStatus = "NONE" | "PENDING" | "SUCCESS" | "ERROR";
 export interface TransactionFlowWithStatus {
+  id: string;
   title: string;
   status: TransactionFlowStatus;
   icon: string;

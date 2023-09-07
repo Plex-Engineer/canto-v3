@@ -6,7 +6,6 @@ import Image from "next/image";
 import React, { ReactNode } from "react";
 import styles from "../bridge.module.scss";
 import PopUp from "@/components/popup/popup";
-import Icon from "@/components/icon/icon";
 
 interface Props {
   imgUrl: string;
