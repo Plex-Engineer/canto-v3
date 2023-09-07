@@ -11,6 +11,7 @@ import Text from "../text";
 import styles from "./transactions.module.scss";
 import Spacer from "../layout/spacer";
 import clsx from "clsx";
+import StatusIcon from "../icon/statusIcon";
 
 const TransactionModal = () => {
   // set modal open state
@@ -56,42 +57,54 @@ const TransactionModal = () => {
           <Spacer height="10px" />
           <div className={clsx(styles["items-list"])}>
             {transactionFlows &&
-              transactionFlows.map((flow, idx) => (
-                <Container
-                  key={idx}
-                  width="100%"
-                  direction="row"
-                  gap={20}
-                  center={{
-                    vertical: true,
-                  }}
-                  className={styles.item}
-                  onClick={() => {
-                    setCurrentFlowId(flow.id);
-                  }}
-                >
-                  <Text>{flow.title}</Text>
-                  <div
-                    style={{
-                      transform: !(flow.id === currentFlowId)
-                        ? "rotate(-90deg)"
-                        : "rotate(0deg)",
+              transactionFlows
+                .sort((a, b) => Number(b.id) - Number(a.id))
+                .map((flow, idx) => (
+                  <Container
+                    key={idx}
+                    width="100%"
+                    direction="row"
+                    gap={20}
+                    center={{
+                      vertical: true,
+                    }}
+                    className={styles.item}
+                    onClick={() => {
+                      setCurrentFlowId(flow.id);
                     }}
                   >
-                    <Icon
-                      icon={{
-                        url: "dropdown.svg",
-                        size: 24,
+                    <StatusIcon status={flow.status} size={24} />
+                    <Text>{flow.title}</Text>
+                    <div
+                      style={{
+                        transform: !(flow.id === currentFlowId)
+                          ? "rotate(-90deg)"
+                          : "rotate(0deg)",
                       }}
-                    />
-                  </div>
-                </Container>
-              ))}
+                    >
+                      <Icon
+                        icon={{
+                          url: "dropdown.svg",
+                          size: 24,
+                        }}
+                      />
+                    </div>
+                  </Container>
+                ))}
+            <Button
+              color="accent"
+              onClick={() =>
+                txStore?.clearTransactions(signer?.account.address ?? "")
+              }
+            >
+              CLEAR ALL TXS
+            </Button>
           </div>
           <Container
             className={clsx(styles["grp-items"])}
             style={{
               transform: currentFlowId ? "translateX(0)" : "translateX(100%)",
+              height: "100%",
             }}
           >
             <Container
@@ -135,24 +148,6 @@ const TransactionModal = () => {
               />
             )}
           </Container>
-
-          {/* <TxFlow
-            txFlow={mostRecentFlow}
-            onRetry={(txIdx) => {
-              txStore?.performTransactions(signer, {
-                txListIndex: (transactionFlows?.length ?? 0) - 1,
-                txIndex: txIdx,
-              });
-            }}
-          /> */}
-          <Button
-            color="accent"
-            onClick={() =>
-              txStore?.clearTransactions(signer?.account.address ?? "")
-            }
-          >
-            CLEAR ALL TXS
-          </Button>
         </div>
       </Modal>
       <Button

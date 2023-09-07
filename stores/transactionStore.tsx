@@ -70,8 +70,8 @@ const useTransactionStore = create<TransactionStore>()(
           return userTxFlows || [];
         },
         addTransactions: async (params) => {
-          // random id for the flow
-          const flowId = Date.now().toString() + Math.random().toString();
+          // random id uses timestamp
+          const flowId = Date.now().toString();
           // set loading state to true
           set({ isLoading: flowId });
           // run the function to get all transactions

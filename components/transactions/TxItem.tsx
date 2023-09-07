@@ -1,12 +1,12 @@
 import React from "react";
 import Text from "../text";
 import styles from "./transactions.module.scss";
-import Icon from "../icon/icon";
 import Container from "../container/container";
 import Spacer from "../layout/spacer";
 import { TransactionWithStatus } from "@/config/interfaces/transactions";
 import Button from "../button/button";
 import { dateToMomentsAgo } from "@/utils/formatting.utils";
+import StatusIcon from "../icon/statusIcon";
 
 interface TxItemProps {
   tx: TransactionWithStatus;
@@ -29,20 +29,7 @@ const TxItem = (props: TxItemProps) => {
             {props.idx}
           </Text>
         ) : (
-          <Icon
-            className={props.tx.status === "SIGNING" ? styles.loader : ""}
-            icon={{
-              url:
-                props.tx.status === "SUCCESS"
-                  ? "check.svg"
-                  : props.tx.status === "ERROR"
-                  ? "close.svg"
-                  : props.tx.status === "SIGNING"
-                  ? "loader.svg"
-                  : "canto.svg",
-              size: 24,
-            }}
-          />
+          <StatusIcon status={props.tx.status} size={24} />
         )}
       </div>
       <Spacer width="14px" />
