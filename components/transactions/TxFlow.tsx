@@ -4,11 +4,15 @@ import Image from "next/image";
 import Text from "../text";
 import TxItem from "./TxItem";
 import Spacer from "../layout/spacer";
-import { TransactionFlowWithStatus } from "@/config/interfaces/transactions";
+import {
+  BridgeStatus,
+  TransactionFlowWithStatus,
+} from "@/config/interfaces/transactions";
 
 interface Props {
   txFlow?: TransactionFlowWithStatus;
   onRetry: (txIdx: number) => void;
+  setBridgeStatus: (txIndex: number, status: BridgeStatus) => void;
 }
 
 const TxFlow = (props: Props) => {
@@ -34,6 +38,7 @@ const TxFlow = (props: Props) => {
               tx={tx}
               idx={idx + 1}
               onRetry={() => props.onRetry(idx)}
+              setBridgeStatus={(status) => props.setBridgeStatus(idx, status)}
             />
           ))}
         </>

@@ -9,6 +9,7 @@ import { isValidEthAddress } from "@/utils/address.utils";
 import {
   Transaction,
   TransactionDescription,
+  TransactionFlowStatus,
 } from "@/config/interfaces/transactions";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
 import { encodePacked } from "web3-utils";
@@ -25,6 +26,8 @@ import {
   BridgingMethod,
   getBridgeMethodInfo,
 } from "../../interfaces/bridgeMethods";
+import { getMessagesBySrcTxHash } from "@layerzerolabs/scan-client";
+import { getNetworkInfoFromChainId } from "@/utils/networks.utils";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging through layer zero
@@ -131,6 +134,10 @@ const _oftTransferTx = (
   gas: string,
   description: TransactionDescription
 ): Transaction => ({
+  bridge: {
+    lastStatus: "NONE",
+    type: BridgingMethod.LAYER_ZERO,
+  },
   description,
   chainId: chainId,
   type: "EVM",
@@ -210,5 +217,38 @@ export async function estimateOFTSendGasFee(
     return NO_ERROR(new BigNumber(gas[0] as string));
   } catch (err) {
     return NEW_ERROR("estimateOFTSendGasFee::" + errMsg(err));
+  }
+}
+
+/**
+ * Will check status of ongoing LZ bridge
+ */
+export async function checkLZBridgeStatus(
+  fromChainId: number,
+  txHash: string
+): PromiseWithError<{ status: TransactionFlowStatus }> {
+  try {
+    // get network
+    const {data: fromNetwork, error: fromNetworkError} = getNetworkInfoFromChainId(fromChainId);
+    if (fromNetworkError) throw new Error(fromNetworkError.message);
+
+    const fromLZId = LZ_CHAIN_IDS[fromNetwork.id as keyof typeof LZ_CHAIN_IDS];
+    if (!fromLZId) {
+      return NEW_ERROR("checkLZBridgeStatus: invalid lz chainId: " + fromNetwork.id);
+    }
+    const { messages } = await getMessagesBySrcTxHash(fromLZId, txHash);
+    if (messages.length === 0) return NO_ERROR({ status: "PENDING" });
+    switch (messages[0].status) {
+      case "INFLIGHT":
+        return NO_ERROR({ status: "PENDING" });
+      case "DELIVERED":
+        return NO_ERROR({ status: "SUCCESS" });
+      case "FAILED":
+        return NO_ERROR({ status: "ERROR" });
+      default:
+        return NO_ERROR({ status: "NONE" });
+    }
+  } catch (err) {
+    return NEW_ERROR("checkLZBridgeStatus::" + errMsg(err));
   }
 }
