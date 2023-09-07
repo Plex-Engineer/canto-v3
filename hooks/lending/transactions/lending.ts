@@ -1,4 +1,7 @@
-import { Transaction } from "@/config/interfaces/transactions";
+import {
+  Transaction,
+  TransactionDescription,
+} from "@/config/interfaces/transactions";
 import {
   CTokenLendingTransactionParams,
   CTokenLendingTxTypes,
@@ -116,7 +119,7 @@ const _lendingCTokenTx = (
   cTokenAddress: string,
   isCanto: boolean,
   amount: string,
-  description: string
+  description: TransactionDescription
 ): Transaction => {
   const txDetails = methodAndParamsFromLendingTxType(
     lendingTx,
@@ -140,7 +143,7 @@ const _collateralizeTx = (
   comptrollerAddress: string,
   cTokenAddress: string,
   collateralize: boolean,
-  description: string
+  description: TransactionDescription
 ): Transaction => ({
   description,
   chainId: chainId,

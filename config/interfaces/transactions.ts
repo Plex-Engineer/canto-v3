@@ -1,10 +1,14 @@
 import { ContractAbi } from "web3-types";
 import { PromiseWithError, ReturnWithError } from "./errors";
+export interface TransactionDescription {
+  title: string;
+  description: string;
+}
 
 export type Transaction = {
   // chainId the wallet must be on to perform the transaction
   chainId: number | string;
-  description: string;
+  description: TransactionDescription;
 } & (
   | {
       type: "EVM";
@@ -32,6 +36,7 @@ export interface TransactionWithStatus {
   hash?: string;
   error?: Error;
   txLink?: string;
+  timestamp?: number;
 }
 
 ///
@@ -41,8 +46,10 @@ export interface TransactionWithStatus {
 ///
 export type TransactionFlowStatus = "NONE" | "PENDING" | "SUCCESS" | "ERROR";
 export interface TransactionFlowWithStatus {
+  id: string;
   title: string;
   status: TransactionFlowStatus;
+  icon: string;
   transactions: TransactionWithStatus[];
 }
 // user can be on different accounts to make transactions, so we need to map the transaction flows to the account

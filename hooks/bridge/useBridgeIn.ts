@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MAIN_BRIDGE_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
+import { MAIN_BRIDGE_IN_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
 import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
 import BRIDGE_IN_TOKEN_LIST from "@/config/jsons/bridgeInTokens.json";
 import {
@@ -36,7 +36,7 @@ export default function useBridgeIn(
   // initial state with props
   const initialState = (testnet: boolean): BridgeHookState => ({
     // all options
-    availableNetworks: testnet ? TEST_BRIDGE_NETWORKS : MAIN_BRIDGE_NETWORKS,
+    availableNetworks: testnet ? TEST_BRIDGE_NETWORKS : MAIN_BRIDGE_IN_NETWORKS,
     availableTokens: [],
     availableMethods: [],
     // default selections

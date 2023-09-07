@@ -4,7 +4,10 @@ import {
   PromiseWithError,
   errMsg,
 } from "@/config/interfaces/errors";
-import { Transaction } from "@/config/interfaces/transactions";
+import {
+  Transaction,
+  TransactionDescription,
+} from "@/config/interfaces/transactions";
 import { CosmosNetwork } from "@/config/interfaces/networks";
 import { ethToCantoAddress, isValidEthAddress } from "@/utils/address.utils";
 import { createMsgsIBCTransfer } from "@/utils/cosmos/transactions/messages/ibc/ibc";
@@ -16,6 +19,7 @@ import { IBCToken } from "@/config/interfaces/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { formatBalance } from "@/utils/tokenBalances.utils";
 import { CANTO_MAINNET_COSMOS } from "@/config/networks";
+import { BridgingMethod, getBridgeMethodInfo } from "../../interfaces/bridgeMethods";
 
 /**
  * @notice creates a list of transactions that need to be made for IBC out of canto
@@ -120,7 +124,8 @@ export async function txIBCOut(
         token.symbol,
         formatBalance(amount, token.decimals),
         CANTO_MAINNET_COSMOS.name,
-        receivingChain.name
+        receivingChain.name,
+        getBridgeMethodInfo(BridgingMethod.IBC).name
       )
     )
   );
@@ -145,7 +150,7 @@ const _ibcOutTx = (
   revisionHeight: number,
   timeoutTimestamp: string,
   memo: string,
-  description: string
+  description: TransactionDescription
 ): Transaction => {
   const ibcTx = createMsgsIBCTransfer({
     sourcePort,

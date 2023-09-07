@@ -57,7 +57,7 @@ export function formatBalance(
   );
   return (
     (commify
-      ? truncatedAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      ? truncatedAmount.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
       : truncatedAmount) +
     " " +
     symbol

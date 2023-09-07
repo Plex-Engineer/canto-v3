@@ -27,6 +27,10 @@
         "toCanto": "channel-88",
         "fromCanto": "channel-0"
     },
+    "ethereum-via-gravity-bridge": {
+        "toCanto": "channel-88",
+        "fromCanto": "channel-0"
+    },
     "injective-1": {
         "toCanto": "channel-99",
         "fromCanto": "channel-8"

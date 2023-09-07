@@ -29,7 +29,7 @@ const Modal = ({ onClose, children, title, width, height, open }: Props) => {
 
   useEffect(() => {
     if (open) {
-      lockScroll(8);
+      lockScroll(0);
     } else {
       unlockScroll();
     }

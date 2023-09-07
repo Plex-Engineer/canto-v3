@@ -22,36 +22,37 @@ import { persist, devtools } from "zustand/middleware";
 
 interface AddTransactionsParams {
   title: string;
+  icon: string;
   txList: () => PromiseWithError<Transaction[]>;
   ethAccount: string;
   signer?: GetWalletClientResult;
 }
 export interface TransactionStore {
-  // will tell the tx store if a transaction flow is currently being prepared
-  isLoading: boolean;
-  setLoading: (loading: boolean) => void;
+  // will tell the tx store which current flow id is loading
+  isLoading: string | null;
+  setLoading: (loading: string | null) => void;
   transactionFlows: UserTransactionFlowMap;
   getUserTransactionFlows: (ethAccount: string) => TransactionFlowWithStatus[];
   addTransactions: (params: AddTransactionsParams) => PromiseWithError<boolean>;
-  // will delete all transactions in list index, or the entire store if no index provided
-  clearTransactions: (ethAccount: string, listIndex?: number) => void;
+  // will delete the flow with the id provided, or the entire store if no index provided
+  clearTransactions: (ethAccount: string, flowId?: string) => void;
   performTransactions: (
     signer: GetWalletClientResult | undefined,
     overrides?: {
-      txListIndex?: number;
+      flowId?: string;
       txIndex?: number;
     }
   ) => PromiseWithError<boolean>;
   // this should only be called internally
   setTxStatus: (
     ethAccount: string,
-    listIndex: number,
+    flowId: string,
     txIndex: number,
     details: Partial<TransactionWithStatus>
   ) => void;
   setTxFlowStatus: (
     ethAddress: string,
-    listIndex: number,
+    flowId: string,
     status: TransactionFlowStatus
   ) => void;
 }
@@ -60,7 +61,7 @@ const useTransactionStore = create<TransactionStore>()(
   devtools(
     persist(
       (set, get) => ({
-        isLoading: false,
+        isLoading: null,
         // should never be called by any other component
         setLoading: (loading) => set({ isLoading: loading }),
         transactionFlows: new Map<string, TransactionFlowWithStatus[]>(),
@@ -69,18 +70,23 @@ const useTransactionStore = create<TransactionStore>()(
           return userTxFlows || [];
         },
         addTransactions: async (params) => {
+          // random id uses timestamp
+          const flowId = Date.now().toString();
           // set loading state to true
-          set({ isLoading: true });
+          set({ isLoading: flowId });
           // run the function to get all transactions
           const { data: txList, error } = await params.txList();
           if (error) {
-            set({ isLoading: false });
+            set({ isLoading: null });
             return NEW_ERROR(
               "useTransactionStore::addTransactions: " + errMsg(error)
             );
           }
+          // create flow object with random id
           const txListWithStatus: TransactionFlowWithStatus = {
+            id: flowId,
             title: params.title,
+            icon: params.icon,
             status: "NONE",
             transactions: txList.map((tx) => ({
               tx,
@@ -98,7 +104,7 @@ const useTransactionStore = create<TransactionStore>()(
                 txListWithStatus,
               ])
             ),
-            isLoading: false,
+            isLoading: null,
           });
           // if signer, we can perform the transactions right away
           if (params.signer) {
@@ -106,22 +112,21 @@ const useTransactionStore = create<TransactionStore>()(
           }
           return NO_ERROR(true);
         },
-        clearTransactions: (ethAccount, listIndex) => {
+        clearTransactions: (ethAccount, flowId) => {
           const txFlows = get().transactionFlows;
-          if (!listIndex) {
+          if (!flowId) {
             txFlows.delete(ethAccount);
             set({ transactionFlows: txFlows });
           } else {
-            const userTxList = txFlows.get(ethAccount);
-            if (!userTxList || !userTxList[listIndex]) {
+            const userTxFlows = txFlows.get(ethAccount);
+            if (!userTxFlows) {
               // nothing to delete
               return;
             }
-            // delete the list
-            const updatedUserFlows = [
-              ...userTxList.slice(0, listIndex),
-              ...userTxList.slice(listIndex + 1),
-            ];
+            // delete the flow
+            const updatedUserFlows = userTxFlows?.filter(
+              (flow) => flow.id !== flowId
+            );
             set({
               transactionFlows: txFlows.set(ethAccount, updatedUserFlows),
             });
@@ -143,20 +148,20 @@ const useTransactionStore = create<TransactionStore>()(
             );
           }
           // start with the most recent if none provided
-          const listIndex = overrides?.txListIndex || userTxFlows.length - 1;
-          const transactionFlow = userTxFlows[listIndex];
+          const flowToPerform = overrides?.flowId
+            ? userTxFlows.find((flow) => flow.id === overrides.flowId)
+            : userTxFlows[userTxFlows.length - 1];
           // check that we have a transaction flow object
-          if (!transactionFlow) {
+          if (!flowToPerform) {
             return NEW_ERROR(
-              "useTransactionStore::performTransactions: no transactions found at index " +
-                listIndex
+              "useTransactionStore::performTransactions: no transactions found"
             );
           }
           // set the flow status to pending now that we will be performing the transactions
-          get().setTxFlowStatus(ethAddress, listIndex, "PENDING");
+          get().setTxFlowStatus(ethAddress, flowToPerform.id, "PENDING");
 
           // get the transactions
-          const transactions = transactionFlow.transactions;
+          const transactions = flowToPerform.transactions;
           const txIndex = overrides?.txIndex || 0;
 
           // go through each transaction and perform it
@@ -164,11 +169,12 @@ const useTransactionStore = create<TransactionStore>()(
             try {
               // set pending since about to be signed
               // reset error, hash, and txLink since new tx
-              get().setTxStatus(ethAddress, listIndex, i, {
+              get().setTxStatus(ethAddress, flowToPerform.id, i, {
                 status: "SIGNING",
                 error: undefined,
                 hash: undefined,
                 txLink: undefined,
+                timestamp: undefined,
               });
               // request signature and receive txHash once signed
               const { data: txHash, error: txError } =
@@ -176,21 +182,24 @@ const useTransactionStore = create<TransactionStore>()(
               // if error with signature, set status and throw error
               if (txError) {
                 // set tx status to error
-                get().setTxStatus(ethAddress, listIndex, i, {
+                get().setTxStatus(ethAddress, flowToPerform.id, i, {
                   status: "ERROR",
                   error: txError,
+                  timestamp: new Date().getTime(),
                 });
                 throw Error(
                   "transactionStore::performTransaction::" + txError.message
                 );
               }
               // we have a txHash so we can set status to pending
-              get().setTxStatus(ethAddress, listIndex, i, {
+              // to get the txLink, we can grab it from the chainId,
+              get().setTxStatus(ethAddress, flowToPerform.id, i, {
                 status: "PENDING",
                 hash: txHash,
                 txLink: getNetworkInfoFromChainId(
                   transactions[i].tx.chainId
                 ).data.blockExplorer?.getTransactionLink(txHash),
+                timestamp: new Date().getTime(),
               });
               // wait for the result before moving on
               const { data: receipt, error: txReceiptError } =
@@ -201,68 +210,81 @@ const useTransactionStore = create<TransactionStore>()(
                 );
               // check receipt for error
               if (txReceiptError || receipt.status !== "success") {
-                get().setTxStatus(ethAddress, listIndex, i, {
+                get().setTxStatus(ethAddress, flowToPerform.id, i, {
                   status: "ERROR",
                   error: new Error(receipt.error),
                 });
                 throw Error(receipt.error);
               }
               // transaction was a success so we can set status and
-              get().setTxStatus(ethAddress, listIndex, i, {
+              get().setTxStatus(ethAddress, flowToPerform.id, i, {
                 status: "SUCCESS",
               });
             } catch (err) {
               // something failed, so set the flow to failure
-              get().setTxFlowStatus(ethAddress, listIndex, "ERROR");
+              get().setTxFlowStatus(ethAddress, flowToPerform.id, "ERROR");
               return NEW_ERROR(
                 "useTransactionStore::performTransactions: " + errMsg(err)
               );
             }
           }
           // made it through the whole list, so the flow was a success
-          get().setTxFlowStatus(ethAddress, listIndex, "SUCCESS");
+          get().setTxFlowStatus(ethAddress, flowToPerform.id, "SUCCESS");
           return NO_ERROR(true);
         },
-        setTxStatus: (ethAccount, listIndex, txIndex, details) => {
-          // called internally, no need to check any of the params
+        setTxStatus: (ethAccount, flowId, txIndex, details) => {
+          // find the flow we need to update the tx in
           const currentUserTxFlows = get().getUserTransactionFlows(ethAccount);
-          // save updates
+          const flowToUpdate = currentUserTxFlows.find(
+            (flow) => flow.id === flowId
+          );
+          if (!flowToUpdate) {
+            return;
+          }
+          // create new tx with details
           const updatedTx = {
-            ...currentUserTxFlows[listIndex].transactions[txIndex],
+            ...flowToUpdate.transactions[txIndex],
             ...details,
           };
-          const updatedFlow = {
-            ...currentUserTxFlows[listIndex],
-            transactions: [
-              ...currentUserTxFlows[listIndex].transactions.slice(0, txIndex),
-              updatedTx,
-              ...currentUserTxFlows[listIndex].transactions.slice(txIndex + 1),
-            ],
-          };
+          // create new tx List
+          const updatedTxList = flowToUpdate.transactions.map((tx, idx) =>
+            idx === txIndex ? updatedTx : tx
+          );
+          // create new flow with updated tx list
+          const updatedFlowList = currentUserTxFlows.map((flow) =>
+            flow.id === flowId
+              ? {
+                  ...flow,
+                  transactions: updatedTxList,
+                }
+              : flow
+          );
           // set state
           set({
             transactionFlows: new Map(
-              get().transactionFlows.set(ethAccount, [
-                ...currentUserTxFlows.slice(0, listIndex),
-                updatedFlow,
-                ...currentUserTxFlows.slice(listIndex + 1),
-              ])
+              get().transactionFlows.set(ethAccount, updatedFlowList)
             ),
           });
         },
-        setTxFlowStatus: (ethAddress, listIndex, status) => {
-          // called internally, no need to check any of the params
+        setTxFlowStatus: (ethAddress, flowId, status) => {
+          // update single flow status
           const currentUserTxFlows = get().getUserTransactionFlows(ethAddress);
-          const updatedFlow = { ...currentUserTxFlows[listIndex], status };
+          const flowToUpdate = currentUserTxFlows.find(
+            (flow) => flow.id === flowId
+          );
+          if (!flowToUpdate) {
+            return;
+          }
+          const updatedFlow = { ...flowToUpdate, status };
 
+          // put update flow back into list
+          const updatedUserFlows = currentUserTxFlows.map((flow) =>
+            flow.id === flowId ? updatedFlow : flow
+          );
           // set new flows
           set({
             transactionFlows: new Map(
-              get().transactionFlows.set(ethAddress, [
-                ...currentUserTxFlows.slice(0, listIndex),
-                updatedFlow,
-                ...currentUserTxFlows.slice(listIndex + 1),
-              ])
+              get().transactionFlows.set(ethAddress, updatedUserFlows)
             ),
           });
         },
@@ -297,7 +319,7 @@ const useTransactionStore = create<TransactionStore>()(
         },
         onRehydrateStorage: () => (state) => {
           // reset isLoading to false, since we just reloaded the page
-          state?.setLoading(false);
+          state?.setLoading(null);
         },
       }
     )

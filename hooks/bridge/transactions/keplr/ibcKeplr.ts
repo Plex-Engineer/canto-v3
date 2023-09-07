@@ -46,6 +46,10 @@ import Long from "long";
 import { IBCToken } from "@/config/interfaces/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { formatBalance } from "@/utils/tokenBalances.utils";
+import {
+  BridgingMethod,
+  getBridgeMethodInfo,
+} from "../../interfaces/bridgeMethods";
 
 /**
  * @notice creates a list of transactions that need to be made for IBC in to canto using keplr
@@ -149,7 +153,8 @@ export async function ibcInKeplr(
         ibcToken.symbol,
         formatBalance(amount, ibcToken.decimals),
         cosmosNetwork.name,
-        CANTO_MAINNET_COSMOS.name
+        CANTO_MAINNET_COSMOS.name,
+        getBridgeMethodInfo(BridgingMethod.IBC).name
       ),
       type: "KEPLR",
       tx: async () => {
@@ -483,7 +488,8 @@ async function evmosIBCIn(
         token.symbol,
         formatBalance(amount, token.decimals),
         evmosNetwork.name,
-        CANTO_MAINNET_COSMOS.name
+        CANTO_MAINNET_COSMOS.name,
+        getBridgeMethodInfo(BridgingMethod.IBC).name
       ),
       type: "KEPLR",
       tx: signAndBroadcast,

@@ -1,13 +1,21 @@
 import React from "react";
-import { ITransaction } from "./TxUnused";
 import Text from "../text";
 import styles from "./transactions.module.scss";
-import Icon from "../icon/icon";
 import Container from "../container/container";
 import Spacer from "../layout/spacer";
+import { TransactionWithStatus } from "@/config/interfaces/transactions";
+import Button from "../button/button";
+import { dateToMomentsAgo } from "@/utils/formatting.utils";
+import StatusIcon from "../icon/statusIcon";
 
-const TxItem = (props: ITransaction) => {
+interface TxItemProps {
+  tx: TransactionWithStatus;
+  idx: number;
+  onRetry: () => void;
+}
+const TxItem = (props: TxItemProps) => {
   const [isRevealing, setIsRevealing] = React.useState(false);
+
   return (
     <div
       className={styles.txBox}
@@ -16,24 +24,12 @@ const TxItem = (props: ITransaction) => {
       }}
     >
       <div className={styles.txImg}>
-        {props.status === "pending" ? (
+        {props.tx.status === "NONE" ? (
           <Text font="proto_mono" opacity={0.5}>
             {props.idx}
           </Text>
         ) : (
-          <Icon
-            icon={{
-              url:
-                props.status === "success"
-                  ? "check.svg"
-                  : props.status === "failed"
-                  ? "close.svg"
-                  : props.status === "loading"
-                  ? "loader.svg"
-                  : "canto.svg",
-              size: 24,
-            }}
-          />
+          <StatusIcon status={props.tx.status} size={24} />
         )}
       </div>
       <Spacer width="14px" />
@@ -45,9 +41,8 @@ const TxItem = (props: ITransaction) => {
             vertical: false,
           }}
         >
-          <Text size="sm">{props.title}</Text>
+          <Text size="sm">{props.tx.tx.description.title}</Text>
         </Container>
-
         <div
           className={styles.collapsable}
           style={{
@@ -56,25 +51,39 @@ const TxItem = (props: ITransaction) => {
           }}
         >
           <Text size="sm" theme="secondary-dark">
-            {props.description}
+            {props.tx.tx.description.description}
           </Text>
-          {props.status === "success" && (
+          {props.tx.txLink && (
             <Container direction="row" gap={"auto"}>
-              {props.link && (
+              {props.tx.txLink && (
                 <a
-                  href={props.link}
+                  href={props.tx.txLink}
                   style={{
                     textDecoration: "underline",
                   }}
                 >
-                  <Text size="sm">view link</Text>
+                  {props.tx.hash ? (
+                    <Text size="sm">#{props.tx.hash.slice(0, 6) + "..."}</Text>
+                  ) : (
+                    <Text size="sm">view link</Text>
+                  )}
                 </a>
               )}
-              {props.hash && <Text size="sm">#{props.hash}</Text>}
             </Container>
           )}
         </div>
+
+        {props.tx.timestamp && (
+          <Text size="sm" theme="secondary-dark">
+            {dateToMomentsAgo(props.tx.timestamp)}
+          </Text>
+        )}
       </Container>
+      {props.tx.status === "ERROR" && (
+        <Button onClick={props.onRetry} color="primary">
+          retry
+        </Button>
+      )}
     </div>
   );
 };

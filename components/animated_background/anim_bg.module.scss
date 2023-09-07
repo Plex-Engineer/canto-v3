@@ -10,12 +10,13 @@
   background: url("/wires.svg") no-repeat center center;
   background-size: 100%;
   position: absolute;
-  z-index: -5;
+  fill: red;
+  z-index: -1;
 }
 
 .moving {
   width: 10px;
-  border: 2px solid white;
+  border: 2px solid var(--anim-bg-color, #dfdfdf);
   opacity: 0.5;
   aspect-ratio: 1.23433242507;
   position: absolute;
@@ -57,11 +58,11 @@
       width: var(--init-size, 10px);
     }
     70% {
-      border-color: #dfdfdf;
+      border-color: var(--anim-bg-color, #1d1d1d);
     }
     100% {
       width: 100vw;
-      border-color: #c1c1c1;
+      border-color: var(--card-sub-surface-color);
     }
   }
 }

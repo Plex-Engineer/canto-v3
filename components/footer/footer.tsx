@@ -2,8 +2,31 @@ import Image from "next/image";
 import Text from "../text";
 import styles from "./footer.module.scss";
 import FooterButton from "./components/footerButton";
+import { useEffect, useState } from "react";
+import { getTokenPriceInUSDC } from "@/utils/tokens/prices.utils";
+import { useBlockNumber } from "wagmi";
+import { CANTO_MAINNET_EVM } from "@/config/networks";
 
 const Footer = () => {
+  const [cantoPrice, setCantoPrice] = useState("0");
+  const [notePrice, setNotePrice] = useState("0");
+
+  async function getTokenPrices() {
+    // canto will use WCANTO address
+    const [priceCanto, priceNote] = await Promise.all([
+      getTokenPriceInUSDC("0x826551890Dc65655a0Aceca109aB11AbDbD7a07B", 18),
+      getTokenPriceInUSDC("0x4e71A2E537B7f9D9413D3991D37958c0b5e1e503", 18),
+    ]);
+    if (!priceCanto.error) {
+      setCantoPrice(priceCanto.data);
+    }
+    if (!priceNote.error) {
+      setNotePrice(priceNote.data);
+    }
+  }
+  useEffect(() => {
+    getTokenPrices();
+  }, []);
   return (
     <div className={styles.container}>
       <div className={styles.links}>
@@ -33,7 +56,7 @@ const Footer = () => {
               filter: "invert(var(--dark-mode))",
             }}
           />{" "}
-          $0.1101
+          ${cantoPrice}
         </Text>
         <Text
           size="sm"
@@ -52,7 +75,7 @@ const Footer = () => {
               filter: "invert(var(--dark-mode))",
             }}
           />
-          $1.0094
+          ${notePrice}
         </Text>
       </div>
     </div>
@@ -72,17 +95,21 @@ const FooterLink = ({ href, text }: PropLink) => {
 };
 
 const StatusText = () => {
+  const { data: blockNumber } = useBlockNumber({
+    chainId: CANTO_MAINNET_EVM.chainId,
+    watch: true,
+  });
   return (
     <Text
       size="x-sm"
       font="proto_mono"
       style={{
-        width: "200px",
+        width: "160px",
         justifyContent: "center",
       }}
     >
       <span className={styles.status}></span>
-      live data feed
+      {blockNumber ? `#${blockNumber}` : "Loading..."}
     </Text>
   );
 };

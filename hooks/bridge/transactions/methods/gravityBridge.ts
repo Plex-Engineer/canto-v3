@@ -12,7 +12,10 @@ import {
   PromiseWithError,
 } from "@/config/interfaces/errors";
 import { ERC20Token } from "@/config/interfaces/tokens";
-import { Transaction } from "@/config/interfaces/transactions";
+import {
+  Transaction,
+  TransactionDescription,
+} from "@/config/interfaces/transactions";
 import {
   CANTO_MAINNET_COSMOS,
   CANTO_MAINNET_EVM,
@@ -34,6 +37,7 @@ import {
 } from "@/utils/evm/erc20.utils";
 import { formatBalance } from "@/utils/tokenBalances.utils";
 import BigNumber from "bignumber.js";
+import { BridgingMethod, getBridgeMethodInfo } from "../../interfaces/bridgeMethods";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging into gravity bridge
@@ -171,7 +175,8 @@ export async function bridgeInGravity(
         token.symbol,
         formatBalance(amount, token.decimals),
         ETH_MAINNET.name,
-        CANTO_MAINNET_EVM.name
+        CANTO_MAINNET_EVM.name,
+        getBridgeMethodInfo(BridgingMethod.GRAVITY_BRIDGE).name
       )
     )
   );
@@ -199,7 +204,7 @@ const _sendToCosmosTx = (
   cantoReceiverAddress: string,
   tokenAddress: string,
   amount: string,
-  description: string
+  description: TransactionDescription
 ): Transaction => ({
   description,
   chainId: chainId,
@@ -215,7 +220,7 @@ const _wrapTx = (
   chainId: number,
   wethAddress: string,
   amount: string,
-  description: string
+  description: TransactionDescription
 ): Transaction => ({
   description,
   chainId: chainId,
@@ -230,7 +235,7 @@ const _wrapTx = (
 const _generatePubKeyTx = (
   chainId: number,
   cantoSender: string,
-  description: string
+  description: TransactionDescription
 ): Transaction => {
   const pubKeyTx = createMsgsSend({
     fromAddress: cantoSender,
