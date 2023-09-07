@@ -30,7 +30,7 @@ const Bridging = (props: BridgeProps) => {
   // transaction that will do the bridging
   async function bridgeTx() {
     props.params.transactionStore?.addTransactions({
-      title: `Bridge ${props.hook.selections.token?.symbol} From ${props.hook.selections.fromNetwork?.name} To ${props.hook.selections.toNetwork?.name}`,
+      title: `Bridge ${props.hook.direction} ${amount} ${props.hook.selections.token?.symbol}`,
       icon: props.hook.selections.token?.icon ?? "",
       txList: () =>
         props.hook.bridge.bridgeTx({
@@ -203,7 +203,9 @@ const Bridging = (props: BridgeProps) => {
               <div className={styles["network-box"]}>
                 <div className={styles.token}>
                   <Image
-                    src={props.hook.selections.fromNetwork?.icon ?? "loader.svg"}
+                    src={
+                      props.hook.selections.fromNetwork?.icon ?? "loader.svg"
+                    }
                     alt={props.hook.selections.fromNetwork?.name ?? "loading"}
                     width={30}
                     height={30}
