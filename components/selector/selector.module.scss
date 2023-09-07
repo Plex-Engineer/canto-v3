@@ -9,8 +9,15 @@
 
 .scroll-view {
   height: calc(100% - 26px);
+  overflow-x: hidden;
   overflow-y: auto;
   position: relative;
+  scroll-behavior: smooth;
+  &::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+  }
+
   &::before,
   &::after {
     top: 40px;
@@ -60,6 +67,7 @@
     transform: scaleY(0.6) translateX(-16px);
     opacity: 0;
     transition: all 0.2s ease-out;
+    border-radius: var(--border-radius);
   }
 
   &:hover::after {
