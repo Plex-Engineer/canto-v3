@@ -39,7 +39,7 @@ const TxItem = (props: TxItemProps) => {
       }
     },
     {
-      enabled: props.tx.tx.bridge !== undefined,
+      enabled: props.tx.tx.bridge !== undefined && props.tx.tx.bridge.lastStatus !== "SUCCESS",
       refetchInterval: 10000,
     }
   );
