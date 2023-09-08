@@ -1,3 +1,4 @@
+import LoadingIcon from "../loader/loading";
 import Icon from "./icon";
 
 interface Props {
@@ -8,6 +9,8 @@ interface Props {
 }
 
 const StatusIcon = (props: Props) => {
+  if (props.status === "PENDING" || props.status === "SIGNING")
+    return <LoadingIcon size={props.size} />;
   return (
     <Icon
       icon={{
@@ -16,8 +19,6 @@ const StatusIcon = (props: Props) => {
             ? "check.svg"
             : props.status === "ERROR"
             ? "close.svg"
-            : props.status === "PENDING" || props.status === "SIGNING"
-            ? "loader.svg"
             : "",
         size: props.size,
       }}

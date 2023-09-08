@@ -26,7 +26,7 @@ const TxFlow = (props: Props) => {
             height={50}
             alt={"Transaction"}
           />
-          <Spacer height="20px" />
+          <Spacer height="30px" />
 
           <Text font="proto_mono" size="lg">
             {props.txFlow.title}

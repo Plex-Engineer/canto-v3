@@ -2,10 +2,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   height: 100%;
 }
 
+.transactions {
+  flex-grow: 1;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+}
 .txBox {
   display: flex;
   flex-direction: row;
@@ -13,7 +19,6 @@
   border-radius: var(--border-radius, 0px);
   padding: 12px;
   align-items: center;
-  //   justify-content: center;
   width: 100%;
   cursor: pointer;
 
@@ -30,20 +35,6 @@
   max-height: 0;
   transition: max-height 0.4s ease-in;
   position: relative;
-  //   &::after {
-  //     content: "";
-  //     position: absolute;
-  //     bottom: 0;
-  //     display: block;
-  //     height: 4px;
-  //     width: 100%;
-  //     background: linear-gradient(
-  //       180deg,
-  //       rgba(211, 211, 211, 0) 0%,
-  //       var(--card-sub-surface-color) 100%
-  //     );
-  //     margin-top: 12px;
-  //   }
 }
 
 .txImg {
@@ -54,90 +45,9 @@
   width: 40px;
   aspect-ratio: 1;
   border-radius: 50%;
+  border: 1px solid var(--border-stroke-color, #3d3d3d);
+
   background-color: rgba(var(--dark-color), 0.1);
-}
-
-.loader {
-  animation: spin 1.6s linear infinite;
-  //12 steps with 30deg snaps
-  @keyframes spin {
-    0% {
-      transform: -rotate(0deg);
-    }
-    8.332% {
-      transform: rotate(-0deg);
-    }
-    8.333% {
-      transform: rotate(-30deg);
-    }
-    16.665% {
-      transform: rotate(-30deg);
-    }
-
-    16.666% {
-      transform: rotate(-60deg);
-    }
-    24.99% {
-      transform: rotate(-60deg);
-    }
-    25% {
-      transform: rotate(-90deg);
-    }
-    33.332% {
-      transform: rotate(-90deg);
-    }
-    33.333% {
-      transform: rotate(-120deg);
-    }
-    41.665% {
-      transform: rotate(-120deg);
-    }
-    41.666% {
-      transform: rotate(-150deg);
-    }
-    49.99% {
-      transform: rotate(-150deg);
-    }
-    50% {
-      transform: rotate(-180deg);
-    }
-    58.332% {
-      transform: rotate(-180deg);
-    }
-    58.333% {
-      transform: rotate(-210deg);
-    }
-    66.665% {
-      transform: rotate(-210deg);
-    }
-    66.666% {
-      transform: rotate(-240deg);
-    }
-    74.99% {
-      transform: rotate(-240deg);
-    }
-    75% {
-      transform: rotate(-270deg);
-    }
-    83.332% {
-      transform: rotate(-270deg);
-    }
-    83.333% {
-      transform: rotate(-300deg);
-    }
-    91.665% {
-      transform: rotate(-300deg);
-    }
-    91.666% {
-      transform: rotate(-330deg);
-    }
-    99.9% {
-      transform: rotate(-330deg);
-    }
-    100% {
-      transform: rotate(-359deg);
-    }
-  }
 }
 
 .item {
@@ -145,26 +55,14 @@
   flex-direction: row;
   align-items: center;
   cursor: pointer;
-  height: 60px;
-  padding: 0 16px;
+  height: min-content;
+  padding: 16px;
   transition: all 0.2s ease-out;
   position: relative;
-  &::after {
-    position: absolute;
-    content: "";
-    display: block;
-    width: 100%;
-    height: 100%;
+  border: 1px solid var(--border-stroke-color);
+  border-radius: var(--border-radius, 0px);
+  &:hover {
     background-color: rgba(var(--dark-color), 0.1);
-    transform: scaleY(0.6) translateX(-16px);
-    opacity: 0;
-    transition: all 0.2s ease-out;
-    border-radius: var(--border-radius);
-  }
-
-  &:hover::after {
-    transform: scaleY(1) translateX(-16px);
-    opacity: 1;
   }
 
   &:active::after {
@@ -181,10 +79,12 @@
   overflow-y: auto;
   position: relative;
   scroll-behavior: smooth;
-  &::-webkit-scrollbar {
-    width: 0px;
-    background: transparent;
-  }
+  padding: 16px 0;
+
+  //   &::-webkit-scrollbar {
+  //     width: 0px;
+  //     background: transparent;
+  //   }
 
   &::before,
   &::after {
@@ -219,16 +119,18 @@
 .items-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  overflow-y: auto;
+  height: 100%;
+  gap: 8px;
   transition: transform 0.5s ease-out;
   background-color: var(--card-sub-surface-color);
 }
 .grp-items {
   position: absolute;
-  top: 20px;
+  top: 0px;
   transform: translateX(100%);
   width: 100%;
+  height: 100%;
+  padding-top: 20px;
   z-index: 2;
   background-color: var(--card-sub-surface-color);
   transition: transform 0.5s ease-out;

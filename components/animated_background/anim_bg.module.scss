@@ -7,11 +7,17 @@
   position: relative;
   overflow: hidden;
   z-index: 0;
-  background: url("/wires.svg") no-repeat center center;
+  //   background: url("/wires.svg") no-repeat center center;
   background-size: 100%;
   position: absolute;
   fill: red;
   z-index: -1;
+
+  svg {
+    & * {
+      stroke: var(--anim-bg-color);
+    }
+  }
 }
 
 .moving {
