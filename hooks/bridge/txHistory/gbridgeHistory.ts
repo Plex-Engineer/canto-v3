@@ -40,7 +40,7 @@ export async function getUserGBridgeInHistory(
   const queuedTxs: GBridgeQueueReturn[] = [];
 
   allTransactions.forEach((event) => {
-    const matchingQueueTx = queue.find(
+    const matchingQueueTx = queue.transactions.find(
       (qTx) => qTx.block_height === event.blockNumber
     );
     matchingQueueTx
@@ -120,20 +120,24 @@ interface GBridgeQueueReturn {
 }
 
 // this data comes from the gravity bridge api
-async function getGBridgeQueueForUser(
+export async function getGBridgeQueueForUser(
   ethAccount: string
-): PromiseWithError<GBridgeQueueReturn[]> {
+): PromiseWithError<{
+  latestBlock: string;
+  transactions: GBridgeQueueReturn[];
+}> {
   // query gbridge deposit events for queue
   const { data: latestTransactions, error: fetchError } = await tryFetch<{
+    latest_eth_block: string;
     deposit_events: GBridgeQueueReturn[];
   }>(GRAVITY_BRIDGE_API_URL + "/eth_bridge_info");
   if (fetchError) {
     return NEW_ERROR("getGBridgeQueueForUser::" + fetchError.message);
   }
-  console.log(latestTransactions.deposit_events);
-  return NO_ERROR(
-    latestTransactions.deposit_events.filter(
+  return NO_ERROR({
+    latestBlock: latestTransactions.latest_eth_block,
+    transactions: latestTransactions.deposit_events.filter(
       (event) => event.sender.toLowerCase() === ethAccount.toLowerCase()
-    )
-  );
+    ),
+  });
 }

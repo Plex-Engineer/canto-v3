@@ -5,6 +5,7 @@ import {
   errMsg,
 } from "@/config/interfaces/errors";
 import {
+  BridgeStatus,
   Transaction,
   TransactionFlowStatus,
   TransactionFlowWithStatus,
@@ -51,9 +52,16 @@ export interface TransactionStore {
     details: Partial<TransactionWithStatus>
   ) => void;
   setTxFlowStatus: (
-    ethAddress: string,
+    ethAccount: string,
     flowId: string,
     status: TransactionFlowStatus
+  ) => void;
+  // special function for setting bridge status on a transaction
+  setTxBridgeStatus: (
+    ethAccount: string,
+    flowId: string,
+    txIndex: number,
+    status: BridgeStatus
   ) => void;
 }
 
@@ -266,9 +274,9 @@ const useTransactionStore = create<TransactionStore>()(
             ),
           });
         },
-        setTxFlowStatus: (ethAddress, flowId, status) => {
+        setTxFlowStatus: (ethAccount, flowId, status) => {
           // update single flow status
-          const currentUserTxFlows = get().getUserTransactionFlows(ethAddress);
+          const currentUserTxFlows = get().getUserTransactionFlows(ethAccount);
           const flowToUpdate = currentUserTxFlows.find(
             (flow) => flow.id === flowId
           );
@@ -284,7 +292,54 @@ const useTransactionStore = create<TransactionStore>()(
           // set new flows
           set({
             transactionFlows: new Map(
-              get().transactionFlows.set(ethAddress, updatedUserFlows)
+              get().transactionFlows.set(ethAccount, updatedUserFlows)
+            ),
+          });
+        },
+        setTxBridgeStatus: (ethAccount, flowId, txIndex, status) => {
+          // find the flow we need to update the tx in
+          const currentUserTxFlows = get().getUserTransactionFlows(ethAccount);
+          const flowToUpdate = currentUserTxFlows.find(
+            (flow) => flow.id === flowId
+          );
+          if (!flowToUpdate) {
+            return;
+          }
+          // create new tx with details
+          const txToUpdate = flowToUpdate.transactions[txIndex];
+
+          //make sure this is actually a bridge
+          if (!txToUpdate.tx.bridge) {
+            return;
+          }
+          const updatedTx = {
+            ...txToUpdate,
+            tx: {
+              ...txToUpdate.tx,
+              bridge: {
+                ...txToUpdate.tx.bridge,
+                lastStatus: status.status,
+                timeLeft: status.completedIn,
+              },
+            },
+          };
+          // create new tx List
+          const updatedTxList = flowToUpdate.transactions.map((tx, idx) =>
+            idx === txIndex ? updatedTx : tx
+          );
+          // create new flow with updated tx list
+          const updatedFlowList = currentUserTxFlows.map((flow) =>
+            flow.id === flowId
+              ? {
+                  ...flow,
+                  transactions: updatedTxList,
+                }
+              : flow
+          );
+          // set state
+          set({
+            transactionFlows: new Map(
+              get().transactionFlows.set(ethAccount, updatedFlowList)
             ),
           });
         },

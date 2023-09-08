@@ -5,7 +5,7 @@
  */
 export function dateToMomentsAgo(timestamp: number): string {
   const seconds = Math.floor(
-    (new Date().getTime() - new Date(timestamp).getTime()) / 1000
+    (new Date().getTime() - timestamp) / 1000
   );
   let interval = seconds / 31536000;
   if (interval > 1) {
