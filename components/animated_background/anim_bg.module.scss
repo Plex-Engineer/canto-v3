@@ -7,13 +7,25 @@
   position: relative;
   overflow: hidden;
   z-index: 0;
-  //   background: url("/wires.svg") no-repeat center center;
+  // background: url("/wires.svg") no-repeat center center;
+  //   mask-image: radial-gradient(
+  //     circle at 50% 50%,
+  //     black 0%,
+  //     black 50%,
+  //     transparent 100%
+  //   );
+
+  mask-image: radial-gradient(
+    50% 50% at 50% 50%,
+    #d9d9d9 0%,
+    #fff 71.15%,
+    rgba(255, 255, 255, 0) 100%
+  );
   background-size: 100%;
   position: absolute;
-  fill: red;
   z-index: -1;
-
   svg {
+    scale: 1.2;
     & * {
       stroke: var(--anim-bg-color);
     }
@@ -66,9 +78,10 @@
     70% {
       border-color: var(--anim-bg-color, #1d1d1d);
     }
+
     100% {
       width: 100vw;
-      border-color: var(--card-sub-surface-color);
+      border-color: var(--card-background-color);
     }
   }
 }
