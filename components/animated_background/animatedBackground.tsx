@@ -13,7 +13,7 @@ const AnimatedBackground = (props: Props) => {
       className={styles.container}
       style={
         {
-          "--direction": props.direction == "in" ? "reverse" : "normal",
+          "--direction": props.direction == "in" ? "normal" : "reverse",
           "--anim-time": props.time + "s",
           "--init-size": props.initSize,
         } as React.CSSProperties
