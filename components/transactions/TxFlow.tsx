@@ -22,20 +22,22 @@ const TxFlow = (props: Props) => {
             height={50}
             alt={"Transaction"}
           />
-          <Spacer height="20px" />
+          <Spacer height="30px" />
 
           <Text font="proto_mono" size="lg">
             {props.txFlow.title}
           </Text>
           <Spacer height="40px" />
-          {props.txFlow.transactions.map((tx, idx) => (
-            <TxItem
-              key={idx}
-              tx={tx}
-              idx={idx + 1}
-              onRetry={() => props.onRetry(idx)}
-            />
-          ))}
+          <div className={styles.transactions}>
+            {props.txFlow.transactions.map((tx, idx) => (
+              <TxItem
+                key={idx}
+                tx={tx}
+                idx={idx + 1}
+                onRetry={() => props.onRetry(idx)}
+              />
+            ))}
+          </div>
         </>
       )}
     </div>

@@ -54,7 +54,7 @@ const TransactionModal = () => {
           Activity
         </Text>
         <div className={styles["scroll-view"]}>
-          <Spacer height="10px" />
+          {/* <Spacer height="10px" /> */}
           <div className={clsx(styles["items-list"])}>
             {transactionFlows &&
               transactionFlows
@@ -73,7 +73,9 @@ const TransactionModal = () => {
                       setCurrentFlowId(flow.id);
                     }}
                   >
-                    <StatusIcon status={flow.status} size={24} />
+                    <div className={styles.txImg}>
+                      <StatusIcon status={flow.status} size={24} />
+                    </div>
                     <Text>{flow.title}</Text>
                     <div
                       style={{
@@ -91,8 +93,11 @@ const TransactionModal = () => {
                     </div>
                   </Container>
                 ))}
+            <Spacer height="100%" />
+
             <Button
-              color="accent"
+              color="secondary"
+              height={"small"}
               onClick={() =>
                 txStore?.clearTransactions(signer?.account.address ?? "")
               }
@@ -104,38 +109,43 @@ const TransactionModal = () => {
             className={clsx(styles["grp-items"])}
             style={{
               transform: currentFlowId ? "translateX(0)" : "translateX(100%)",
-              height: "100%",
             }}
           >
-            <Container
-              direction="row"
-              gap={20}
-              className={styles.item}
-              width="100%"
-              center={{
-                vertical: true,
-              }}
-              onClick={() => {
-                setCurrentFlowId(null);
+            <div
+              style={{
+                position: "absolute",
               }}
             >
-              {" "}
-              <div
-                style={{
-                  transform: "rotate(90deg)",
+              <Container
+                direction="row"
+                gap={20}
+                className={styles.item}
+                width="120px"
+                height="50px"
+                center={{
+                  vertical: true,
+                }}
+                onClick={() => {
+                  setCurrentFlowId(null);
                 }}
               >
-                <Icon
-                  icon={{
-                    url: "dropdown.svg",
-                    size: 24,
+                <div
+                  style={{
+                    transform: "rotate(90deg)",
                   }}
-                />
-              </div>
-              <Text size="md" font="proto_mono">
-                Back
-              </Text>
-            </Container>
+                >
+                  <Icon
+                    icon={{
+                      url: "dropdown.svg",
+                      size: 24,
+                    }}
+                  />
+                </div>
+                <Text size="sm" font="proto_mono">
+                  Back
+                </Text>
+              </Container>
+            </div>
             {currentFlowId && getFlowFromId(currentFlowId) && (
               <TxFlow
                 txFlow={getFlowFromId(currentFlowId)}
