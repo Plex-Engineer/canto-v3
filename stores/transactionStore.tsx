@@ -375,6 +375,21 @@ const useTransactionStore = create<TransactionStore>()(
         onRehydrateStorage: () => (state) => {
           // reset isLoading to false, since we just reloaded the page
           state?.setLoading(null);
+          // reset pending transactions to error
+          state?.transactionFlows.forEach((userFlowList, userAddress) => {
+            userFlowList.forEach((txFlow) => {
+              if (txFlow.status === "PENDING") {
+                txFlow.transactions.forEach((tx, idx) => {
+                  if (tx.status === "PENDING" || tx.status === "SIGNING") {
+                    state?.setTxStatus(userAddress, txFlow.id, idx, {
+                      status: "ERROR",
+                    });
+                    state?.setTxFlowStatus(userAddress, txFlow.id, "ERROR");
+                  }
+                });
+              }
+            });
+          });
         },
       }
     )

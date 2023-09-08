@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import AnimatedBackground from "@/components/animated_background/animatedBackground";
 import Container from "@/components/container/container";
@@ -16,7 +15,6 @@ import {
 } from "@/utils/networks.utils";
 import { useWalletClient } from "wagmi";
 import Bridging from "./bridging";
-import { checkLZBridgeStatus } from "@/hooks/bridge/transactions/methods/layerZero";
 
 export default function BridgePage() {
   const [direction, setDirection] = useState<"in" | "out">("in");
