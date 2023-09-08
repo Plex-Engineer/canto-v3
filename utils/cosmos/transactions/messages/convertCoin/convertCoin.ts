@@ -77,8 +77,8 @@ function protoMsgConvertCoin(
     }),
   });
   return {
-    message,
-    path: MsgConvertCoin.typeName,
+    message: { ...message, serializeBinary: () => message.toBinary() },
+    path: "canto.erc20.v1.MsgConvertCoin",
   };
 }
 

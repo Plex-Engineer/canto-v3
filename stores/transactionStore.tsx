@@ -86,6 +86,7 @@ const useTransactionStore = create<TransactionStore>()(
           const { data: txList, error } = await params.txList();
           if (error) {
             set({ isLoading: null });
+            console.log(error);
             return NEW_ERROR(
               "useTransactionStore::addTransactions: " + errMsg(error)
             );
@@ -231,6 +232,7 @@ const useTransactionStore = create<TransactionStore>()(
             } catch (err) {
               // something failed, so set the flow to failure
               get().setTxFlowStatus(ethAddress, flowToPerform.id, "ERROR");
+              console.log(err);
               return NEW_ERROR(
                 "useTransactionStore::performTransactions: " + errMsg(err)
               );
