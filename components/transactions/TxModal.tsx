@@ -155,6 +155,14 @@ const TransactionModal = () => {
                     txIndex: txIdx,
                   });
                 }}
+                setBridgeStatus={(txIndex, status) =>
+                  txStore?.setTxBridgeStatus(
+                    signer?.account.address ?? "",
+                    currentFlowId,
+                    txIndex,
+                    status
+                  )
+                }
               />
             )}
           </Container>

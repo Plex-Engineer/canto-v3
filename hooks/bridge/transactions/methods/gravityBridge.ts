@@ -10,11 +10,13 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  errMsg,
 } from "@/config/interfaces/errors";
 import { ERC20Token } from "@/config/interfaces/tokens";
 import {
   Transaction,
   TransactionDescription,
+  TransactionFlowStatus,
 } from "@/config/interfaces/transactions";
 import {
   CANTO_MAINNET_COSMOS,
@@ -24,7 +26,6 @@ import {
 import {
   checkPubKeyCosmos,
   ethToCantoAddress,
-  isValidCantoAddress,
   isValidEthAddress,
 } from "@/utils/address.utils";
 import { tryFetch } from "@/utils/async.utils";
@@ -37,7 +38,12 @@ import {
 } from "@/utils/evm/erc20.utils";
 import { formatBalance } from "@/utils/tokenBalances.utils";
 import BigNumber from "bignumber.js";
-import { BridgingMethod, getBridgeMethodInfo } from "../../interfaces/bridgeMethods";
+import {
+  BridgingMethod,
+  getBridgeMethodInfo,
+} from "../../interfaces/bridgeMethods";
+import { getGBridgeQueueForUser } from "../../txHistory/gbridgeHistory";
+import { fetchBlockNumber, fetchTransaction } from "wagmi/actions";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging into gravity bridge
@@ -62,7 +68,7 @@ export async function bridgeInGravity(
   const { data: cantoReceiver, error: ethToCantoError } =
     await ethToCantoAddress(ethSender);
   if (ethToCantoError) {
-    return NEW_ERROR("bridgeInGravity::" + ethToCantoError.message);
+    return NEW_ERROR("bridgeInGravity::" + errMsg(ethToCantoError));
   }
 
   // parameters look good, so create the tx list
@@ -82,7 +88,7 @@ export async function bridgeInGravity(
       cantoReceiver
     );
     if (balanceError) {
-      return NEW_ERROR("bridgeInGravity::" + balanceError.message);
+      return NEW_ERROR("bridgeInGravity::" + errMsg(balanceError));
     }
     const enoughCanto = new BigNumber(cantoBalance).gte("300000000000000000");
     // call api to send canto if not enough canto
@@ -101,7 +107,7 @@ export async function bridgeInGravity(
         }),
       });
       if (botError) {
-        return NEW_ERROR("bridgeInGravity::" + botError.message);
+        return NEW_ERROR("bridgeInGravity::" + errMsg(botError));
       }
     }
 
@@ -124,7 +130,7 @@ export async function bridgeInGravity(
       ethSender
     );
     if (balanceError) {
-      return NEW_ERROR("bridgeInGravity::" + balanceError.message);
+      return NEW_ERROR("bridgeInGravity::" + errMsg(balanceError));
     }
     // check if we need to wrap ETH
     if (wethBalance.isLessThan(amount)) {
@@ -149,7 +155,7 @@ export async function bridgeInGravity(
       amount
     );
   if (allowanceError) {
-    return NEW_ERROR("bridgeInGravity::" + allowanceError.message);
+    return NEW_ERROR("bridgeInGravity::" + errMsg(allowanceError));
   }
 
   if (needAllowance) {
@@ -206,6 +212,10 @@ const _sendToCosmosTx = (
   amount: string,
   description: TransactionDescription
 ): Transaction => ({
+  bridge: {
+    type: BridgingMethod.GRAVITY_BRIDGE,
+    lastStatus: "NONE",
+  },
   description,
   chainId: chainId,
   type: "EVM",
@@ -250,3 +260,60 @@ const _generatePubKeyTx = (
     msg: pubKeyTx,
   };
 };
+
+/**
+ * Will check to see if gbridge has completed the transaction
+ */
+export async function checkGbridgeTxStatus(
+  chainId: number,
+  txHash: string
+): PromiseWithError<{ status: TransactionFlowStatus; completedIn: number }> {
+  try {
+    // get tx and block number
+    const [transaction, currentBlock] = await Promise.all([
+      fetchTransaction({ chainId, hash: txHash as `0x${string}` }),
+      fetchBlockNumber({ chainId }),
+    ]);
+
+    // make sure transaction has actually succeeded
+    if (!transaction.blockNumber)
+      throw new Error("checkGbridgeTxStatus: transaction not complete");
+
+    // can make an immediate check if it has been 96 blocks
+    if (currentBlock - transaction.blockNumber >= 96) {
+      return NO_ERROR({
+        status: "SUCCESS",
+        completedIn: 0,
+      });
+    }
+    // check gbridge queue to see if transaction is confirmed there quicker than 96 blocks
+    // // get the current gbridge queue for the user
+    const { data: gbridgeQueue, error: gbridgeQueueError } =
+      await getGBridgeQueueForUser(transaction.from);
+
+    if (gbridgeQueueError)
+      throw new Error("checkGbridgeTxStatus::" + errMsg(gbridgeQueueError));
+
+    for (const event of gbridgeQueue.transactions) {
+      if (
+        Number(event.block_height) === Number(transaction.blockNumber) &&
+        event.sender.toLowerCase() === transaction.from.toLowerCase()
+      ) {
+        // grab data from event
+        if (event.confirmed === true) {
+          return NO_ERROR({ status: "SUCCESS", completedIn: 0 });
+        } else {
+          return NO_ERROR({
+            status: "PENDING",
+            completedIn: Number(event.seconds_until_confirmed),
+          });
+        }
+      }
+    }
+    // we made it through the whole gbridge queue and didn't find the transaction
+    // this means gbridge hasn't picked it up yet
+    return NO_ERROR({ status: "PENDING", completedIn: 0 });
+  } catch (err) {
+    return NEW_ERROR("checkGbridgeTxStatus::" + errMsg(err));
+  }
+}

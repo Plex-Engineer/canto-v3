@@ -16,6 +16,7 @@ import {
 } from "@/utils/networks.utils";
 import { useWalletClient } from "wagmi";
 import Bridging from "./bridging";
+import { checkLZBridgeStatus } from "@/hooks/bridge/transactions/methods/layerZero";
 
 export default function BridgePage() {
   const [direction, setDirection] = useState<"in" | "out">("in");

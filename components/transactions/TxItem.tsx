@@ -3,18 +3,46 @@ import Text from "../text";
 import styles from "./transactions.module.scss";
 import Container from "../container/container";
 import Spacer from "../layout/spacer";
-import { TransactionWithStatus } from "@/config/interfaces/transactions";
+import {
+  BridgeStatus,
+  TransactionWithStatus,
+} from "@/config/interfaces/transactions";
 import Button from "../button/button";
 import { dateToMomentsAgo } from "@/utils/formatting.utils";
 import StatusIcon from "../icon/statusIcon";
+import { useQuery } from "react-query";
+import { getBridgeStatus } from "@/hooks/bridge/transactions/bridgeTxStatus";
 
 interface TxItemProps {
   tx: TransactionWithStatus;
   idx: number;
   onRetry: () => void;
+  setBridgeStatus: (status: BridgeStatus) => void;
 }
 const TxItem = (props: TxItemProps) => {
   const [isRevealing, setIsRevealing] = React.useState(false);
+  useQuery(
+    "bridge status",
+    async () => {
+      const bridge = props.tx.tx.bridge;
+      if (bridge && props.tx.hash && bridge.lastStatus !== "SUCCESS") {
+        const { data, error } = await getBridgeStatus(
+          bridge.type,
+          props.tx.tx.chainId as number,
+          props.tx.hash
+        );
+        if (error) {
+          console.log(error);
+          return;
+        }
+        props.setBridgeStatus(data);
+      }
+    },
+    {
+      enabled: props.tx.tx.bridge !== undefined && props.tx.tx.bridge.lastStatus !== "SUCCESS",
+      refetchInterval: 10000,
+    }
+  );
 
   return (
     <div
@@ -76,6 +104,12 @@ const TxItem = (props: TxItemProps) => {
         {props.tx.timestamp && (
           <Text size="sm" theme="secondary-dark">
             {dateToMomentsAgo(props.tx.timestamp)}
+          </Text>
+        )}
+        {props.tx.tx.bridge && props.tx.tx.bridge.lastStatus !== "NONE" && (
+          <Text size="sm" theme="secondary-dark">
+            BRIDGE STATUS - {props.tx.tx.bridge.lastStatus} Time left:
+            {props.tx.tx.bridge.timeLeft}
           </Text>
         )}
       </Container>

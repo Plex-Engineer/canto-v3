@@ -1,5 +1,6 @@
 import { ContractAbi } from "web3-types";
 import { PromiseWithError, ReturnWithError } from "./errors";
+import { BridgingMethod } from "@/hooks/bridge/interfaces/bridgeMethods";
 export interface TransactionDescription {
   title: string;
   description: string;
@@ -9,6 +10,11 @@ export type Transaction = {
   // chainId the wallet must be on to perform the transaction
   chainId: number | string;
   description: TransactionDescription;
+  bridge?: {
+    type: BridgingMethod;
+    lastStatus: TransactionFlowStatus;
+    timeLeft?: number;
+  };
 } & (
   | {
       type: "EVM";
@@ -109,4 +115,9 @@ export interface EIP712Message {
 export interface CosmosNativeMessage {
   message: object;
   path: string;
+}
+
+export interface BridgeStatus {
+  status: TransactionFlowStatus;
+  completedIn?: number;
 }

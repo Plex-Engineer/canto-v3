@@ -9,11 +9,12 @@ import { isValidEthAddress } from "@/utils/address.utils";
 import {
   Transaction,
   TransactionDescription,
+  TransactionFlowStatus,
 } from "@/config/interfaces/transactions";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
 import { encodePacked } from "web3-utils";
 import BigNumber from "bignumber.js";
-import { Contract } from "web3";
+import Web3, { Contract } from "web3";
 import { OFT_ABI } from "@/config/abis";
 import { getProviderWithoutSigner } from "@/utils/evm/helpers.utils";
 import { getTokenBalance } from "@/utils/evm/erc20.utils";
@@ -25,6 +26,8 @@ import {
   BridgingMethod,
   getBridgeMethodInfo,
 } from "../../interfaces/bridgeMethods";
+import { getMessagesBySrcTxHash } from "@layerzerolabs/scan-client";
+import { getNetworkInfoFromChainId } from "@/utils/networks.utils";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging through layer zero
@@ -51,7 +54,11 @@ export async function bridgeLayerZero(
   if (!toLZChainId) {
     return NEW_ERROR("bridgeLayerZero: invalid lz chainId: " + toNetwork.id);
   }
-  const toAddressBytes = encodePacked({ type: "bytes32", value: ethSender });
+
+  const toAddressBytes = new Web3().eth.abi.encodeParameter(
+    "address",
+    ethSender
+  );
   const { data: gas, error: oftError } = await estimateOFTSendGasFee(
     fromNetwork.rpcUrl,
     toLZChainId,
@@ -131,6 +138,10 @@ const _oftTransferTx = (
   gas: string,
   description: TransactionDescription
 ): Transaction => ({
+  bridge: {
+    lastStatus: "NONE",
+    type: BridgingMethod.LAYER_ZERO,
+  },
   description,
   chainId: chainId,
   type: "EVM",
@@ -142,7 +153,7 @@ const _oftTransferTx = (
     toLZChainId,
     toAddressBytes,
     amount,
-    [ethAddress, ZERO_ADDRESS, []],
+    [ethAddress, ZERO_ADDRESS, "0x"],
   ],
   value: gas,
 });
@@ -196,7 +207,7 @@ export async function estimateOFTSendGasFee(
     oftAddress,
     getProviderWithoutSigner(fromRpc)
   );
-  const toAddressBytes = encodePacked({ type: "bytes32", value: account });
+  const toAddressBytes = new Web3().eth.abi.encodeParameter("address", account);
   try {
     const gas = await oftContract.methods
       .estimateSendFee(
@@ -210,5 +221,41 @@ export async function estimateOFTSendGasFee(
     return NO_ERROR(new BigNumber(gas[0] as string));
   } catch (err) {
     return NEW_ERROR("estimateOFTSendGasFee::" + errMsg(err));
+  }
+}
+
+/**
+ * Will check status of ongoing LZ bridge
+ */
+export async function checkLZBridgeStatus(
+  fromChainId: number,
+  txHash: string
+): PromiseWithError<{ status: TransactionFlowStatus }> {
+  try {
+    // get network
+    const { data: fromNetwork, error: fromNetworkError } =
+      getNetworkInfoFromChainId(fromChainId);
+    if (fromNetworkError) throw new Error(fromNetworkError.message);
+
+    const fromLZId = LZ_CHAIN_IDS[fromNetwork.id as keyof typeof LZ_CHAIN_IDS];
+    if (!fromLZId) {
+      return NEW_ERROR(
+        "checkLZBridgeStatus: invalid lz chainId: " + fromNetwork.id
+      );
+    }
+    const { messages } = await getMessagesBySrcTxHash(fromLZId, txHash);
+    if (messages.length === 0) return NO_ERROR({ status: "PENDING" });
+    switch (messages[0].status) {
+      case "INFLIGHT":
+        return NO_ERROR({ status: "PENDING" });
+      case "DELIVERED":
+        return NO_ERROR({ status: "SUCCESS" });
+      case "FAILED":
+        return NO_ERROR({ status: "ERROR" });
+      default:
+        return NO_ERROR({ status: "NONE" });
+    }
+  } catch (err) {
+    return NEW_ERROR("checkLZBridgeStatus::" + errMsg(err));
   }
 }
