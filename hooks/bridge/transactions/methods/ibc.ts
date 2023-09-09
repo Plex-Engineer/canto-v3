@@ -19,11 +19,13 @@ import { IBCToken } from "@/config/interfaces/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { formatBalance } from "@/utils/tokenBalances.utils";
 import { CANTO_MAINNET_COSMOS } from "@/config/networks";
-import { BridgingMethod, getBridgeMethodInfo } from "../../interfaces/bridgeMethods";
+import {
+  BridgingMethod,
+  getBridgeMethodInfo,
+} from "../../interfaces/bridgeMethods";
 
 /**
  * @notice creates a list of transactions that need to be made for IBC out of canto
- * @param {number} chainId chainId to send tx on
  * @param {string} senderEthAddress eth address to send tx from
  * @param {string} receiverCosmosAddress cosmos address to send tx to
  * @param {CosmosNetwork} receivingChain chain to send tx to
@@ -33,7 +35,6 @@ import { BridgingMethod, getBridgeMethodInfo } from "../../interfaces/bridgeMeth
  * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
  */
 export async function txIBCOut(
-  chainId: number,
   senderEthAddress: string,
   receiverCosmosAddress: string,
   receivingChain: CosmosNetwork,
@@ -95,7 +96,7 @@ export async function txIBCOut(
     }
     allTxs.push(
       _convertERC20Tx(
-        chainId,
+        token.chainId,
         token.address,
         amount,
         senderEthAddress,
@@ -109,7 +110,7 @@ export async function txIBCOut(
   }
   allTxs.push(
     _ibcOutTx(
-      chainId,
+      token.chainId,
       "transfer",
       channelId.fromCanto,
       amount,

@@ -68,6 +68,12 @@ export async function ibcInKeplr(
   ibcToken: IBCToken,
   amount: string
 ): PromiseWithError<Transaction[]> {
+  // make sure token chainId is correct
+  if (ibcToken.chainId.toString() !== cosmosNetwork.chainId) {
+    return NEW_ERROR(
+      "ibcInKeplr: token chain id does not match from network chain id"
+    );
+  }
   // check if we can obtain the keplr client
   const { data: keplrClient, error: clientError } = await connectToKeplr(
     cosmosNetwork

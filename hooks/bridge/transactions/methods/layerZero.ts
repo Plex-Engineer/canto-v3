@@ -54,6 +54,12 @@ export async function bridgeLayerZero(
   if (!isValidEthAddress(ethSender)) {
     return NEW_ERROR("bridgeLayerZero: invalid eth address: " + ethSender);
   }
+  // make sure token chain id is the same as the from network chain id
+  if (token.chainId !== fromNetwork.chainId) {
+    return NEW_ERROR(
+      "bridgeLayerZero: token chain id does not match from network chain id"
+    );
+  }
   const toLZChainId = LZ_CHAIN_IDS[toNetwork.id as keyof typeof LZ_CHAIN_IDS];
   if (!toLZChainId) {
     return NEW_ERROR("bridgeLayerZero: invalid lz chainId: " + toNetwork.id);
@@ -64,7 +70,7 @@ export async function bridgeLayerZero(
     ethSender
   );
   const { data: gas, error: oftError } = await estimateOFTSendGasFee(
-    fromNetwork.rpcUrl,
+    token.chainId,
     toLZChainId,
     token.address,
     ethSender,
@@ -84,7 +90,7 @@ export async function bridgeLayerZero(
       // check if proxy has allowance for amount
       const { data: needAllowance, error: allowanceError } =
         await checkTokenAllowance(
-          fromNetwork.chainId,
+          token.chainId,
           token.oftUnderlyingAddress,
           ethSender,
           token.address,
@@ -97,7 +103,7 @@ export async function bridgeLayerZero(
       if (!needAllowance) {
         txList.push(
           _approveTx(
-            fromNetwork.chainId,
+            token.chainId,
             token.oftUnderlyingAddress,
             token.address,
             amount,
@@ -108,7 +114,7 @@ export async function bridgeLayerZero(
     } else {
       // must be a native OFT (check if we already have OFT balance)
       const { data: oftBalance, error: balanceError } = await getTokenBalance(
-        fromNetwork.chainId,
+        token.chainId,
         token.address,
         ethSender
       );
@@ -119,7 +125,7 @@ export async function bridgeLayerZero(
       if (oftBalance.lt(amount)) {
         txList.push(
           _oftDepositOrWithdrawTx(
-            fromNetwork.chainId,
+            token.chainId,
             true,
             token.address,
             new BigNumber(amount).minus(oftBalance).toString(),
@@ -137,7 +143,7 @@ export async function bridgeLayerZero(
   // will need to call transfer from after depositing
   txList.push(
     _oftTransferTx(
-      fromNetwork.chainId,
+      token.chainId,
       toLZChainId,
       ethSender,
       toAddressBytes,
@@ -223,8 +229,8 @@ const _oftDepositOrWithdrawTx = (
  * @param {number[]} adapterParams adapter params for OFT
  * @returns {PromiseWithError<BigNumber>} gas fee for sending OFT or error
  */
-export async function estimateOFTSendGasFee(
-  fromRpc: string,
+async function estimateOFTSendGasFee(
+  fromChainId: number,
   toLZChainId: number,
   oftAddress: string,
   account: string,
@@ -235,10 +241,19 @@ export async function estimateOFTSendGasFee(
     { type: "uint16", value: adapterParams[0] },
     { type: "uint256", value: adapterParams[1] }
   );
+  // get network
+  const { data: fromNetwork, error: fromNetworkError } =
+    getNetworkInfoFromChainId(fromChainId);
+
+  if (fromNetworkError) {
+    return NEW_ERROR(
+      "estimateOFTSendGasFee::" + errMsg(fromNetworkError.message)
+    );
+  }
   const oftContract = new Contract(
     OFT_ABI,
     oftAddress,
-    getProviderWithoutSigner(fromRpc)
+    getProviderWithoutSigner(fromNetwork.rpcUrl)
   );
   const toAddressBytes = new Web3().eth.abi.encodeParameter("address", account);
   try {
