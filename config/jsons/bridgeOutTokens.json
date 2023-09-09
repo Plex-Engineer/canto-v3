@@ -595,7 +595,7 @@
                 "name": "cNote",
                 "symbol": "cNOTE",
                 "decimals": 18,
-                "icon": "",
+                "icon": "/tokens/note.svg",
                 "isOFT": true,
                 "isOFTProxy": true,
                 "oftUnderlyingAddress": "0x04E52476d318CdF739C38BD41A922787D441900c",

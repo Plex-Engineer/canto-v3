@@ -474,7 +474,7 @@
                 "name": "cNote",
                 "symbol": "cNOTE",
                 "decimals": 18,
-                "icon": "",
+                "icon": "/tokens/note.svg",
                 "isOFT": true,
                 "isOFTProxy": false,
                 "bridgeMethods": [
@@ -504,7 +504,7 @@
                 "name": "cNote",
                 "symbol": "cNOTE",
                 "decimals": 18,
-                "icon": "",
+                "icon": "/tokens/note.svg",
                 "isOFT": true,
                 "isOFTProxy": false,
                 "bridgeMethods": [
@@ -534,7 +534,7 @@
                 "name": "cNote",
                 "symbol": "cNOTE",
                 "decimals": 18,
-                "icon": "",
+                "icon": "/tokens/note.svg",
                 "isOFT": true,
                 "isOFTProxy": false,
                 "bridgeMethods": [
@@ -564,7 +564,7 @@
                 "name": "cNote",
                 "symbol": "cNOTE",
                 "decimals": 18,
-                "icon": "",
+                "icon": "/tokens/note.svg",
                 "isOFT": true,
                 "isOFTProxy": false,
                 "bridgeMethods": [
@@ -594,7 +594,7 @@
                 "name": "cNote",
                 "symbol": "cNOTE",
                 "decimals": 18,
-                "icon": "",
+                "icon": "/tokens/note.svg",
                 "isOFT": true,
                 "isOFTProxy": false,
                 "bridgeMethods": [
