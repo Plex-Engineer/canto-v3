@@ -86,6 +86,18 @@
                 "nativeWrappedToken": {
                     "description": "if the token is a wapped representation of a native token",
                     "type": "boolean"
+                },
+                "isOFT": {
+                    "description": "if the token is an OFT",
+                    "type": "boolean"
+                },
+                "isOFTProxy": {
+                    "description": "if the token is an OFT proxy",
+                    "type": "boolean"
+                },
+                "oftUnderlyingAddress": {
+                    "description": "address of the underlying token for an OFT",
+                    "type": "string"
                 }
             },
             "additionalProperties": false,
@@ -98,6 +110,11 @@
                 "icon",
                 "bridgeMethods"
             ],
+            "dependencies": {
+                "isOFT": [
+                    "isOFTProxy"
+                ]
+            },
             "if": {
                 "properties": {
                     "chainId": {

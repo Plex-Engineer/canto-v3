@@ -11,7 +11,7 @@ import { bridgeInGravity } from "./methods/gravityBridge";
 import { bridgeLayerZero } from "./methods/layerZero";
 import { ibcInKeplr } from "./keplr/ibcKeplr";
 import { txIBCOut } from "./methods/ibc";
-import { isERC20Token, isIBCToken } from "@/utils/tokens/tokens.utils";
+import { isERC20Token, isIBCToken, isOFTToken } from "@/utils/tokens/tokens.utils";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging into canto
@@ -51,8 +51,8 @@ export async function bridgeInTx(
       ) {
         return NEW_ERROR("bridgeInTx: layer zero only works for EVM networks");
       }
-      // check to make sure token is an ERC20 token
-      if (!isERC20Token(params.token.data)) {
+      // check to make sure token is an OFT token
+      if (!isOFTToken(params.token.data)) {
         return NEW_ERROR("bridgeInTx: layer zero only works for ERC20");
       }
       transactions = await bridgeLayerZero(
@@ -113,7 +113,7 @@ export async function bridgeOutTx(
         return NEW_ERROR("bridgeOutTx: layer zero only works for EVM networks");
       }
       // check to make sure token is an ERC20 token
-      if (!isERC20Token(params.token.data)) {
+      if (!isOFTToken(params.token.data)) {
         return NEW_ERROR("bridgeOutTx: layer zero only works for ERC20");
       }
       transactions = await bridgeLayerZero(

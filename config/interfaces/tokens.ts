@@ -17,3 +17,10 @@ export interface IBCToken extends Omit<ERC20Token, "address"> {
   ibcDenom: string; // "ibc/..."
   nativeName: string; // ex. uatom, ucre, acanto
 }
+
+// OFT is an ERC20 but it may be a proxy to another token (native, or another ERC20)
+export interface OFTToken extends ERC20Token {
+  isOFT: true;
+  isOFTProxy: boolean;
+  oftUnderlyingAddress?: string; // if proxy is true and this is undefined, then it is a proxy to the native token
+}

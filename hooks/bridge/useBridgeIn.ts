@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { MAIN_BRIDGE_IN_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
+import {
+  MAIN_BRIDGE_IN_NETWORKS,
+  TEST_BRIDGE_NETWORKS,
+} from "./config/networks";
 import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
 import BRIDGE_IN_TOKEN_LIST from "@/config/jsons/bridgeInTokens.json";
 import {
@@ -22,13 +25,14 @@ import { BridgingMethod } from "./interfaces/bridgeMethods";
 import { Transaction } from "@/config/interfaces/transactions";
 import useTokenBalances from "../helpers/useTokenBalances";
 import { bridgeInTx } from "./transactions/bridge";
-import { isERC20TokenList } from "@/utils/tokens/tokens.utils";
+import { isERC20TokenList, isOFTToken } from "@/utils/tokens/tokens.utils";
 import {
   isBridgeInToken,
   isBridgeInTokenList,
 } from "@/utils/tokens/bridgeTokens.utils";
 import { convertToBigNumber } from "@/utils/tokenBalances.utils";
 import { isValidEthAddress } from "@/utils/address.utils";
+import { ERC20Token } from "@/config/interfaces/tokens";
 
 export default function useBridgeIn(
   props: BridgeHookInputParams
@@ -75,7 +79,22 @@ export default function useBridgeIn(
   // contains object mapping of the token balances
   const userTokenBalances = useTokenBalances(
     state.fromNetwork?.chainId,
-    isERC20TokenList(state.availableTokens) ? state.availableTokens : [],
+    isERC20TokenList(state.availableTokens)
+      ? (state.availableTokens.map((token) => {
+          if (
+            isOFTToken(token) &&
+            token.isOFTProxy &&
+            token.oftUnderlyingAddress
+          ) {
+            return {
+              ...token,
+              address: token.oftUnderlyingAddress,
+            };
+          } else {
+            return token;
+          }
+        }) as ERC20Token[])
+      : [],
     state.connectedEthAddress,
     state.connectedCosmosAddress
   );
