@@ -39,7 +39,9 @@ const TxItem = (props: TxItemProps) => {
       }
     },
     {
-      enabled: props.tx.tx.bridge !== undefined && props.tx.tx.bridge.lastStatus !== "SUCCESS",
+      enabled:
+        props.tx.tx.bridge !== undefined &&
+        props.tx.tx.bridge.lastStatus !== "SUCCESS",
       refetchInterval: 10000,
     }
   );
@@ -107,10 +109,16 @@ const TxItem = (props: TxItemProps) => {
           </Text>
         )}
         {props.tx.tx.bridge && props.tx.tx.bridge.lastStatus !== "NONE" && (
-          <Text size="sm" theme="secondary-dark">
-            BRIDGE STATUS - {props.tx.tx.bridge.lastStatus} Time left:
-            {props.tx.tx.bridge.timeLeft}
-          </Text>
+          <>
+            <Text size="sm" theme="secondary-dark">
+              BRIDGE STATUS - {props.tx.tx.bridge.lastStatus}
+            </Text>
+            {props.tx.tx.bridge.timeLeft && (
+              <Text size="sm" theme="secondary-dark">
+                TIME LEFT: {props.tx.tx.bridge.timeLeft} seconds
+              </Text>
+            )}
+          </>
         )}
       </Container>
       {props.tx.status === "ERROR" && (

@@ -26,7 +26,7 @@ interface AddTransactionsParams {
   icon: string;
   txList: () => PromiseWithError<Transaction[]>;
   ethAccount: string;
-  signer?: GetWalletClientResult;
+  signer: GetWalletClientResult | undefined;
 }
 export interface TransactionStore {
   // will tell the tx store which current flow id is loading
@@ -78,30 +78,32 @@ const useTransactionStore = create<TransactionStore>()(
           return userTxFlows || [];
         },
         addTransactions: async (params) => {
-          // random id uses timestamp
-          const flowId = Date.now().toString();
-          // set loading state to true
-          set({ isLoading: flowId });
-          // run the function to get all transactions
-          const { data: txList, error } = await params.txList();
-          if (error) {
-            set({ isLoading: null });
-            return NEW_ERROR(
-              "useTransactionStore::addTransactions: " + errMsg(error)
-            );
-          }
-          // create flow object with random id
-          const txListWithStatus: TransactionFlowWithStatus = {
-            id: flowId,
+          // create new flow before getting transactions
+          let newFlow: TransactionFlowWithStatus = {
+            id: Date.now().toString(),
             title: params.title,
             icon: params.icon,
             status: "NONE",
-            transactions: txList.map((tx) => ({
-              tx,
-              status: "NONE",
-            })),
+            transactions: [],
           };
-          // add the flow to the user map
+          // set loading state to true
+          set({ isLoading: newFlow.id });
+          // run the function to get all transactions
+          const { data: txList, error } = await params.txList();
+          if (error) {
+            // set error and status in flow
+            newFlow = { ...newFlow, status: "ERROR", error: error };
+          } else {
+            // set transactions in flow
+            newFlow = {
+              ...newFlow,
+              transactions: txList.map((tx) => ({
+                tx,
+                status: "NONE",
+              })),
+            };
+          }
+          // add the flow to the user map and set loading to null
           const currentUserTransactionFlows = get().getUserTransactionFlows(
             params.ethAccount
           );
@@ -109,16 +111,13 @@ const useTransactionStore = create<TransactionStore>()(
             transactionFlows: new Map(
               get().transactionFlows.set(params.ethAccount, [
                 ...currentUserTransactionFlows,
-                txListWithStatus,
+                newFlow,
               ])
             ),
             isLoading: null,
           });
-          // if signer, we can perform the transactions right away
-          if (params.signer) {
-            return await get().performTransactions(params.signer);
-          }
-          return NO_ERROR(true);
+          // we are expecting a signer so call performTransactions
+          return await get().performTransactions(params.signer);
         },
         clearTransactions: (ethAccount, flowId) => {
           const txFlows = get().transactionFlows;

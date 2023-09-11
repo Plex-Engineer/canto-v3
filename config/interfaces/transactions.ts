@@ -57,6 +57,7 @@ export interface TransactionFlowWithStatus {
   status: TransactionFlowStatus;
   icon: string;
   transactions: TransactionWithStatus[];
+  error?: Error;
 }
 // user can be on different accounts to make transactions, so we need to map the transaction flows to the account
 // index by account address

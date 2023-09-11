@@ -32,15 +32,17 @@ const TxFlow = (props: Props) => {
             {props.txFlow.title}
           </Text>
           <Spacer height="40px" />
-          {props.txFlow.transactions.map((tx, idx) => (
-            <TxItem
-              key={idx}
-              tx={tx}
-              idx={idx + 1}
-              onRetry={() => props.onRetry(idx)}
-              setBridgeStatus={(status) => props.setBridgeStatus(idx, status)}
-            />
-          ))}
+          {props.txFlow?.error && <Text>{props.txFlow.error.message}</Text>}
+          {!props.txFlow.error &&
+            props.txFlow.transactions.map((tx, idx) => (
+              <TxItem
+                key={idx}
+                tx={tx}
+                idx={idx + 1}
+                onRetry={() => props.onRetry(idx)}
+                setBridgeStatus={(status) => props.setBridgeStatus(idx, status)}
+              />
+            ))}
         </>
       )}
     </div>
