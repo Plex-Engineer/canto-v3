@@ -135,12 +135,13 @@ export async function bridgeInGravity(
     // check if we need to wrap ETH
     if (wethBalance.isLessThan(amount)) {
       // must wrap the right amount of ETH now
+      const amountToWrap = new BigNumber(amount).minus(wethBalance).toString();
       txList.push(
         _wrapTx(
           chainId,
           token.address,
-          amount,
-          TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amount, token.decimals))
+          amountToWrap,
+          TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amountToWrap, token.decimals))
         )
       );
     }
