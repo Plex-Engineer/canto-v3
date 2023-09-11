@@ -65,7 +65,7 @@ export async function cTokenLendingTx(
       params.type === CTokenLendingTxTypes.REPAY)
   ) {
     // check if we need to approve token
-    const { data: needAllowance, error: allowanceError } =
+    const { data: hasAllowance, error: allowanceError } =
       await checkTokenAllowance(
         params.chainId,
         params.cToken.underlying.address,
@@ -76,7 +76,7 @@ export async function cTokenLendingTx(
     if (allowanceError) {
       return NEW_ERROR("cTokenLendingTx::" + errMsg(allowanceError));
     }
-    if (needAllowance) {
+    if (!hasAllowance) {
       txList.push(
         _approveTx(
           params.chainId,

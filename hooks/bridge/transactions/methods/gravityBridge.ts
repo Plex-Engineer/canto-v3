@@ -121,33 +121,34 @@ export async function bridgeInGravity(
     );
   }
 
-  // check if dealing with WETH, since we might need to wrap ETH
-  if (isWETH(token.address)) {
-    // get WETH balance first, since we might not need to wrap yet
-    const { data: wethBalance, error: balanceError } = await getTokenBalance(
-      chainId,
-      token.address,
-      ethSender
-    );
-    if (balanceError) {
-      return NEW_ERROR("bridgeInGravity::" + errMsg(balanceError));
-    }
-    // check if we need to wrap ETH
-    if (wethBalance.isLessThan(amount)) {
-      // must wrap the right amount of ETH now
-      const amountToWrap = new BigNumber(amount).minus(wethBalance).toString();
-      txList.push(
-        _wrapTx(
-          chainId,
-          token.address,
-          amountToWrap,
-          TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amountToWrap, token.decimals))
-        )
-      );
-    }
-  }
+  // // check if dealing with WETH, since we might need to wrap ETH
+  // if (isWETH(token.address)) {
+  //   // get WETH balance first, since we might not need to wrap yet
+  //   const { data: wethBalance, error: balanceError } = await getTokenBalance(
+  //     chainId,
+  //     token.address,
+  //     ethSender
+  //   );
+  //   if (balanceError) {
+  //     return NEW_ERROR("bridgeInGravity::" + errMsg(balanceError));
+  //   }
+  //   // check if we need to wrap ETH
+  //   if (wethBalance.isLessThan(amount)) {
+  //     // must wrap the right amount of ETH now
+  //     const amountToWrap = new BigNumber(amount).minus(wethBalance).toString();
+  //     txList.push(
+  //       _wrapTx(
+  //         chainId,
+  //         token.address,
+  //         amountToWrap,
+  //         TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amountToWrap, token.decimals))
+  //       )
+  //     );
+  //   }
+  // }
+  console.log(amount);
   // check token allowance
-  const { data: needAllowance, error: allowanceError } =
+  const { data: hasAllowance, error: allowanceError } =
     await checkTokenAllowance(
       chainId,
       token.address,
@@ -158,8 +159,8 @@ export async function bridgeInGravity(
   if (allowanceError) {
     return NEW_ERROR("bridgeInGravity::" + errMsg(allowanceError));
   }
-
-  if (needAllowance) {
+  // if no allowance, must approve
+  if (!hasAllowance) {
     txList.push(
       _approveTx(
         chainId,
