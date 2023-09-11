@@ -85,25 +85,46 @@ const ConfirmationModal = (props: Props) => {
             <Text size="sm" theme="secondary-dark">
               from
             </Text>
-            <Text size="sm">
-              {props.fromNetwork + " : "}
-              {props.addresses.from?.slice(0, 6) +
-                "..." +
-                props.addresses.from?.slice(-4)}
-            </Text>
+            <PopUp
+              width="min-content"
+              content={<Text size="sm">{props.addresses.from}</Text>}
+            >
+              <Text size="sm">
+                {props.fromNetwork + " : "}
+                {props.addresses.from?.slice(0, 6) +
+                  "..." +
+                  props.addresses.from?.slice(-4)}
+              </Text>
+            </PopUp>
           </Container>
           <Container width="100%" direction="row" gap={"auto"}>
             <Text size="sm" theme="secondary-dark">
               to
             </Text>
-            <Text size="sm">
-              {props.toNetwork + " : "}
-              {props.addresses.to
-                ? props.addresses.to?.slice(0, 6) +
-                  "..." +
-                  props.addresses.to?.slice(-4)
-                : "..."}
-            </Text>
+            {props.addresses.to ? (
+              <PopUp
+                width="min-content"
+                content={<Text size="sm">{props.addresses.to}</Text>}
+              >
+                <Text size="sm">
+                  {props.toNetwork + " : "}
+                  {props.addresses.to
+                    ? props.addresses.to?.slice(0, 6) +
+                      "..." +
+                      props.addresses.to?.slice(-4)
+                    : "..."}
+                </Text>
+              </PopUp>
+            ) : (
+              <Text size="sm">
+                {props.toNetwork + " : "}
+                {props.addresses.to
+                  ? props.addresses.to?.slice(0, 6) +
+                    "..." +
+                    props.addresses.to?.slice(-4)
+                  : "..."}
+              </Text>
+            )}
           </Container>
           <Container width="100%" direction="row" gap={"auto"}>
             <Text size="sm" theme="secondary-dark">
