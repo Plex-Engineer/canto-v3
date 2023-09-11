@@ -40,7 +40,7 @@ export interface TransactionWithStatus {
   tx: Transaction;
   status: TransactionStatus;
   hash?: string;
-  error?: Error;
+  error?: string;
   txLink?: string;
   timestamp?: number;
 }
@@ -57,7 +57,7 @@ export interface TransactionFlowWithStatus {
   status: TransactionFlowStatus;
   icon: string;
   transactions: TransactionWithStatus[];
-  error?: Error;
+  error?: string;
 }
 // user can be on different accounts to make transactions, so we need to map the transaction flows to the account
 // index by account address

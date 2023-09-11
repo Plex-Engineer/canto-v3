@@ -92,7 +92,7 @@ const useTransactionStore = create<TransactionStore>()(
           const { data: txList, error } = await params.txList();
           if (error) {
             // set error and status in flow
-            newFlow = { ...newFlow, status: "ERROR", error: error };
+            newFlow = { ...newFlow, status: "ERROR", error: error.message };
           } else {
             // set transactions in flow
             newFlow = {
@@ -191,7 +191,7 @@ const useTransactionStore = create<TransactionStore>()(
                 // set tx status to error
                 get().setTxStatus(ethAddress, flowToPerform.id, i, {
                   status: "ERROR",
-                  error: txError,
+                  error: txError.message,
                   timestamp: new Date().getTime(),
                 });
                 throw Error(
@@ -219,7 +219,7 @@ const useTransactionStore = create<TransactionStore>()(
               if (txReceiptError || receipt.status !== "success") {
                 get().setTxStatus(ethAddress, flowToPerform.id, i, {
                   status: "ERROR",
-                  error: new Error(receipt.error),
+                  error: receipt.error.message,
                 });
                 throw Error(receipt.error);
               }

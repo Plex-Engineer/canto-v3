@@ -103,7 +103,7 @@ const TxItem = (props: TxItemProps) => {
           )}
           {props.tx.error && (
             <Text size="sm" theme="secondary-dark" style={{ color: "red" }}>
-              Error: {props.tx.error.message.split(":").slice(-1)}
+              Error: {props.tx.error.split(":").slice(-1)}
             </Text>
           )}
         </div>
