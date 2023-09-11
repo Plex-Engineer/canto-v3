@@ -127,15 +127,20 @@ const Bridging = (props: BridgeProps) => {
             "ethereum-via-gravity-bridge" ? (
               <Text size="x-sm">
                 To bridge your tokens to Ethereum through Gravity Bridge, first
-                ensure that you have an IBC wallet like Keplr. Next, enter your
-                Gravity Bridge address (from Keplr) below and confirm. Once
-                completed, you can transfer your tokens from Gravity Bridge to
-                Ethereum using the Gravity Bridge Portal{" "}
+                ensure that you have an IBC wallet like Keplr.
+                <br />
+                <br />
+                Next, enter your Gravity Bridge address (from Keplr) below and
+                confirm.
+                <br />
+                <br />
+                Once completed, you can transfer your tokens from Gravity Bridge
+                to Ethereum using the{" "}
                 <a
                   style={{ textDecoration: "underline" }}
                   href="https://bridge.blockscape.network/"
                 >
-                  here
+                  Gravity Bridge Portal
                 </a>
               </Text>
             ) : undefined
