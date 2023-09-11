@@ -98,9 +98,11 @@ const ConfirmationModal = (props: Props) => {
             </Text>
             <Text size="sm">
               {props.toNetwork + " : "}
-              {props.addresses.to?.slice(0, 6) +
-                "..." +
-                props.addresses.to?.slice(-4)}
+              {props.addresses.to
+                ? props.addresses.to?.slice(0, 6) +
+                  "..." +
+                  props.addresses.to?.slice(-4)
+                : "..."}
             </Text>
           </Container>
           <Container width="100%" direction="row" gap={"auto"}>
