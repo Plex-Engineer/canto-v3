@@ -21,6 +21,7 @@ const FooterButton = ({ text }: PropLinkButton) => {
   return (
     <button
       style={{
+        paddingLeft: "1rem",
         height: "100%",
       }}
       onClick={() => {

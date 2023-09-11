@@ -12,7 +12,8 @@
     align-items: center;
     height: 100%;
   }
-  p {
+
+  .link {
     height: 100%;
     display: flex;
     align-items: center;
@@ -34,6 +35,14 @@
     }
   }
 
+  .item {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    border-right: #999 1px solid;
+    text-transform: uppercase;
+    transition: background 0.1s ease-out;
+  }
   a {
     padding: 0 2rem;
     display: flex;
