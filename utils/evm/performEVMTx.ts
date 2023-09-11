@@ -49,6 +49,7 @@ export async function performEVMTransaction(
     const { hash } = await writeContract(contractCall);
     return NO_ERROR(hash);
   } catch (err) {
+    console.log(err);
     return NEW_ERROR("performEVMTransaction: " + errMsg(err));
   }
 }
