@@ -43,7 +43,12 @@ import {
   getBridgeMethodInfo,
 } from "../../interfaces/bridgeMethods";
 import { getGBridgeQueueForUser } from "../../txHistory/gbridgeHistory";
-import { fetchBlockNumber, fetchTransaction } from "wagmi/actions";
+import {
+  fetchBalance,
+  fetchBlockNumber,
+  fetchTransaction,
+} from "wagmi/actions";
+import { BridgeTransactionParams } from "../../interfaces/hookParams";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging into gravity bridge
@@ -322,4 +327,44 @@ export async function checkGbridgeTxStatus(
   } catch (err) {
     return NEW_ERROR("checkGbridgeTxStatus::" + errMsg(err));
   }
+}
+
+/**
+ * @notice validates the parameters for bridging in through gravity bridge
+ * @param {BridgeTransactionParams} params parameters for bridging in
+ * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
+ */
+export async function validateGBridgeInTxParams(
+  params: BridgeTransactionParams
+): PromiseWithError<{
+  valid: boolean;
+  error?: string;
+}> {
+  // get token balance for user
+  const { data: userTokenBalance, error: userTokenBalanceError } =
+    await getTokenBalance(
+      params.token.data.chainId,
+      params.token.data.address ?? "",
+      params.from.account
+    );
+  if (userTokenBalanceError) {
+    return NEW_ERROR("validateGBridgeParams::" + userTokenBalanceError);
+  }
+  // add to the total balance if there is not enough && it is a native wrapped token
+  let totalBalance = userTokenBalance;
+  if (
+    params.token.data.nativeWrappedToken &&
+    userTokenBalance.lt(params.token.amount)
+  ) {
+    // get native balance as well
+    const nativeBalance = await fetchBalance({
+      address: params.from.account as `0x${string}`,
+      chainId: params.token.data.chainId,
+    });
+    totalBalance = totalBalance.plus(nativeBalance.value.toString());
+  }
+  if (totalBalance.lt(params.token.amount)) {
+    return NO_ERROR({ valid: false, error: "insufficient funds" });
+  }
+  return NO_ERROR({ valid: true });
 }

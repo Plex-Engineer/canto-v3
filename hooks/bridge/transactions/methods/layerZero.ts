@@ -9,7 +9,7 @@ import { isValidEthAddress } from "@/utils/address.utils";
 import {
   Transaction,
   TransactionDescription,
-  TransactionFlowStatus,
+  TransactionStatus,
 } from "@/config/interfaces/transactions";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
 import { encodePacked } from "web3-utils";
@@ -32,6 +32,9 @@ import {
 } from "../../interfaces/bridgeMethods";
 import { getMessagesBySrcTxHash } from "@layerzerolabs/scan-client";
 import { getNetworkInfoFromChainId } from "@/utils/networks.utils";
+import { BridgeTransactionParams } from "../../interfaces/hookParams";
+import { isOFTToken } from "@/utils/tokens/tokens.utils";
+import { fetchBalance } from "wagmi/actions";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging through layer zero
@@ -278,7 +281,7 @@ async function estimateOFTSendGasFee(
 export async function checkLZBridgeStatus(
   fromChainId: number,
   txHash: string
-): PromiseWithError<{ status: TransactionFlowStatus }> {
+): PromiseWithError<{ status: TransactionStatus }> {
   try {
     // get network
     const { data: fromNetwork, error: fromNetworkError } =
@@ -306,4 +309,51 @@ export async function checkLZBridgeStatus(
   } catch (err) {
     return NEW_ERROR("checkLZBridgeStatus::" + errMsg(err));
   }
+}
+
+/**
+ * @notice validates the parameters for bridging through layer zero
+ * @param {BridgeTransactionParams} params parameters for bridging
+ * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
+ */
+export async function validateLayerZeroTxParams(
+  params: BridgeTransactionParams
+): PromiseWithError<{
+  valid: boolean;
+  error?: string;
+}> {
+  if (!isOFTToken(params.token.data)) {
+    return NEW_ERROR("validateLayerZeroParams: layer zero only works for OFT");
+  }
+  // check if the user has enough tokens to make the bridge tx
+  let tokenAddress = params.token.data.address;
+  if (params.token.data.isOFTProxy && params.token.data.oftUnderlyingAddress) {
+    tokenAddress = params.token.data.oftUnderlyingAddress;
+  }
+  const { data: userTokenBalance, error: userTokenBalanceError } =
+    await getTokenBalance(
+      params.token.data.chainId,
+      tokenAddress,
+      params.from.account
+    );
+  if (userTokenBalanceError) {
+    return NEW_ERROR("validateLayerZeroParams::" + userTokenBalanceError);
+  }
+  // might still need to grab native token balance if also a wrapper around native token (native OFT)
+  let totalBalance = userTokenBalance;
+  if (
+    totalBalance.lt(params.token.amount) &&
+    params.token.data.nativeWrappedToken
+  ) {
+    // get native balance as well
+    const nativeBalance = await fetchBalance({
+      address: params.from.account as `0x${string}`,
+      chainId: params.token.data.chainId,
+    });
+    totalBalance = totalBalance.plus(nativeBalance.value.toString());
+  }
+  if (totalBalance.lt(params.token.amount)) {
+    return NO_ERROR({ valid: false, error: "insufficient funds" });
+  }
+  return NO_ERROR({ valid: true });
 }

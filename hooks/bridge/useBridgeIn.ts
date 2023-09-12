@@ -25,7 +25,6 @@ import { BridgeInToken } from "./interfaces/tokens";
 import { BridgingMethod } from "./interfaces/bridgeMethods";
 import { NewTransactionFlow } from "@/config/interfaces/transactions";
 import useTokenBalances from "../helpers/useTokenBalances";
-import { bridgeInTx } from "./transactions/bridge";
 import { isERC20TokenList, isOFTToken } from "@/utils/tokens/tokens.utils";
 import {
   isBridgeInToken,
@@ -373,11 +372,11 @@ export default function useBridgeIn(
     }
     return NO_ERROR({
       from: {
-        network: state.fromNetwork,
+        chainId: state.fromNetwork.chainId,
         account: sender,
       },
       to: {
-        network: state.toNetwork,
+        chainId: state.toNetwork.chainId,
         account: receiver,
       },
       token: {

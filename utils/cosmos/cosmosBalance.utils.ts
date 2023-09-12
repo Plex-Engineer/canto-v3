@@ -27,13 +27,13 @@ export async function getCantoBalance(
 
 /**
  * @notice gets token balance from cosmos chain
- * @param {string} chainId chainId to get balances from
+ * @param {string | number} chainId chainId to get balances from
  * @param {string} cosmosAddress cosmos address to get balance for
  * @param {string} tokenDenom token denom to get balance for
  * @returns {PromiseWithError<string>} balance of token as a string or error
  */
 export async function getCosmosTokenBalance(
-  chainId: string,
+  chainId: string | number,
   cosmosAddress: string,
   tokenDenom: string
 ): PromiseWithError<string> {

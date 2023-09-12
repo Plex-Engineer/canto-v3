@@ -19,16 +19,11 @@ export interface NewTransactionFlow {
 ///
 export interface TransactionFlow extends NewTransactionFlow {
   id: string;
-  status: TransactionFlowStatus;
+  status: TransactionStatus;
   transactions: TransactionWithStatus[];
   error?: string;
 }
-export type TransactionFlowStatus =
-  | "NONE"
-  | "POPULATING"
-  | "SIGNING"
-  | "SUCCESS"
-  | "ERROR";
+
 // user can be on different accounts to make transactions, so we need to map the transaction flows to the account
 // index by account address
 export type UserTransactionFlowMap = Map<string, TransactionFlow[]>;
@@ -46,7 +41,7 @@ export type Transaction = {
   description: TransactionDescription;
   bridge?: {
     type: BridgingMethod;
-    lastStatus: TransactionFlowStatus;
+    lastStatus: TransactionStatus;
     timeLeft?: number;
   };
 } & (
@@ -70,6 +65,7 @@ export type Transaction = {
 );
 export type TransactionStatus =
   | "NONE"
+  | "POPULATING"
   | "SIGNING"
   | "PENDING"
   | "SUCCESS"
@@ -85,7 +81,7 @@ export interface TransactionWithStatus {
 }
 
 export interface BridgeStatus {
-  status: TransactionFlowStatus;
+  status: TransactionStatus;
   completedIn?: number;
 }
 

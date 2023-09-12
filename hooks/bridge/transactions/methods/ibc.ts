@@ -17,12 +17,15 @@ import { _convertERC20Tx } from "./recovery";
 import { isERC20Token } from "@/utils/tokens/tokens.utils";
 import { IBCToken } from "@/config/interfaces/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 import { CANTO_MAINNET_COSMOS } from "@/config/networks";
 import {
   BridgingMethod,
   getBridgeMethodInfo,
 } from "../../interfaces/bridgeMethods";
+import { BridgeTransactionParams } from "../../interfaces/hookParams";
+import { getCosmosTokenBalance } from "@/utils/cosmos/cosmosBalance.utils";
+import { getTokenBalance } from "@/utils/evm/erc20.utils";
 
 /**
  * @notice creates a list of transactions that need to be made for IBC out of canto
@@ -94,19 +97,29 @@ export async function txIBCOut(
         "txIBCOut: token must be ERC20 to convert to IBC: " + token.id
       );
     }
-    allTxs.push(
-      _convertERC20Tx(
-        token.chainId,
-        token.address,
-        amount,
-        senderEthAddress,
-        cantoAddress,
-        TX_DESCRIPTIONS.CONVERT_ERC20(
-          token.symbol,
-          formatBalance(amount, token.decimals)
+    // we also need to check if there is already native balance on the chain
+    const { data: nativeBalance, error: nativeBalanceError } =
+      await getCosmosTokenBalance(token.chainId, cantoAddress, token.ibcDenom);
+    if (nativeBalanceError) {
+      return NEW_ERROR("txIBCOut::" + nativeBalanceError.message);
+    }
+    const amountToConvert =
+      convertToBigNumber(amount).data.minus(nativeBalance);
+    if (amountToConvert.gt(0)) {
+      allTxs.push(
+        _convertERC20Tx(
+          token.chainId,
+          token.address,
+          amountToConvert.toString(),
+          senderEthAddress,
+          cantoAddress,
+          TX_DESCRIPTIONS.CONVERT_ERC20(
+            token.symbol,
+            formatBalance(amount, token.decimals)
+          )
         )
-      )
-    );
+      );
+    }
   }
   allTxs.push(
     _ibcOutTx(
@@ -233,4 +246,31 @@ export async function getBlockTimestamp(
   } catch (err) {
     return NEW_ERROR("getBlockTimestamp: " + errMsg(err));
   }
+}
+
+/**
+ * @notice validates the parameters for bridging out through IBC
+ * @param {BridgeTransactionParams} params parameters for bridging out
+ * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
+ */
+export async function validateIBCOutTxParams(
+  params: BridgeTransactionParams
+): PromiseWithError<{
+  valid: boolean;
+  error?: string;
+}> {
+  // get token balance for user
+  const { data: userTokenBalance, error: userTokenBalanceError } =
+    await getTokenBalance(
+      params.token.data.chainId,
+      params.token.data.address ?? "",
+      params.from.account
+    );
+  if (userTokenBalanceError) {
+    return NEW_ERROR("validateGBridgeParams::" + userTokenBalanceError);
+  }
+  if (userTokenBalance.lt(params.token.amount)) {
+    return NO_ERROR({ valid: false, error: "insufficient funds" });
+  }
+  return NO_ERROR({ valid: true });
 }

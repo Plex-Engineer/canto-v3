@@ -23,12 +23,8 @@ import {
   MAIN_BRIDGE_OUT_NETWORKS,
   TEST_BRIDGE_NETWORKS,
 } from "./config/networks";
-import {
-  NewTransactionFlow,
-  Transaction,
-} from "@/config/interfaces/transactions";
+import { NewTransactionFlow } from "@/config/interfaces/transactions";
 import useTokenBalances from "../helpers/useTokenBalances";
-import { bridgeOutTx } from "./transactions/bridge";
 import { isERC20TokenList, isOFTToken } from "@/utils/tokens/tokens.utils";
 import { isBridgeOutToken } from "@/utils/tokens/bridgeTokens.utils";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
@@ -36,7 +32,6 @@ import { isValidEthAddress } from "@/utils/address.utils";
 import { isCosmosNetwork } from "@/utils/networks.utils";
 import { ERC20Token } from "@/config/interfaces/tokens";
 import { TransactionFlowType } from "@/config/transactions/txMap";
-
 
 export default function useBridgeOut(
   props: BridgeHookInputParams
@@ -408,11 +403,11 @@ export default function useBridgeOut(
     }
     return NO_ERROR({
       from: {
-        network: state.fromNetwork,
+        chainId: state.fromNetwork.chainId,
         account: sender,
       },
       to: {
-        network: state.toNetwork,
+        chainId: state.toNetwork.chainId,
         account: receiver,
       },
       token: {

@@ -116,7 +116,7 @@ const TxItem = (props: TxItemProps) => {
             <Text size="sm" theme="secondary-dark">
               BRIDGE STATUS - {props.tx.tx.bridge.lastStatus}
             </Text>
-            {props.tx.tx.bridge.timeLeft && (
+            {props.tx.tx.bridge.timeLeft !== undefined && (
               <Text size="sm" theme="secondary-dark">
                 TIME LEFT: {props.tx.tx.bridge.timeLeft} seconds
               </Text>
