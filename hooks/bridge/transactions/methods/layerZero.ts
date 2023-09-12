@@ -126,15 +126,18 @@ export async function bridgeLayerZero(
       }
       // if OFT balance is less than the amount, user must deposit
       if (oftBalance.lt(amount)) {
+        const amountToDeposit = new BigNumber(amount)
+          .minus(oftBalance)
+          .toString();
         txList.push(
           _oftDepositOrWithdrawTx(
             token.chainId,
             true,
             token.address,
-            new BigNumber(amount).minus(oftBalance).toString(),
+            amountToDeposit,
             TX_DESCRIPTIONS.OFT_DEPOSIT_OR_WITHDRAW(
               token.symbol,
-              formatBalance(amount, token.decimals),
+              formatBalance(amountToDeposit, token.decimals),
               true
             )
           )

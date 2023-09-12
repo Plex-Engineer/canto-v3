@@ -62,8 +62,9 @@ export async function waitForTransaction(
       const receipt = await evmWait({
         chainId: chainId as number,
         hash: hash as `0x${string}`,
-        confirmations: 1,
+        confirmations: 2,
       });
+      console.log(receipt)
       return NO_ERROR({
         status: receipt.status,
         error: receipt.logs,
