@@ -14,7 +14,7 @@ import Image from "next/image";
 import Modal from "@/components/modal/modal";
 import ConfirmationModal from "./components/confirmationModal";
 import { BridgingMethod } from "@/hooks/bridge/interfaces/bridgeMethods";
-import { isEVMNetwork } from "@/utils/networks.utils";
+import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks.utils";
 import { GetWalletClientResult } from "wagmi/actions";
 
 interface BridgeProps {
@@ -76,9 +76,12 @@ const Bridging = (props: BridgeProps) => {
   // cosmos address props
   const cosmosProps =
     props.hook.selections.method === BridgingMethod.IBC &&
-    props.hook.direction === "out"
+    props.hook.direction === "out" &&
+    props.hook.selections.toNetwork &&
+    isCosmosNetwork(props.hook.selections.toNetwork)
       ? {
           cosmosAddress: {
+            addressPrefix: props.hook.selections.toNetwork.addressPrefix,
             currentAddress: props.hook.addresses.getReceiver() ?? "",
             setAddress: (address: string) =>
               props.hook.setState("inputCosmosAddress", address),
