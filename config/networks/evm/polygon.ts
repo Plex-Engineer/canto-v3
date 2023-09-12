@@ -1,7 +1,7 @@
 import { EVMNetwork } from "@/config/interfaces/networks";
 import { getEthAddressLink, getEthTransactionLink } from "../helpers";
 
-const polygonScanUrl = "https://polygonscan.com";
+const polygonScanUrl = "https://mumbai.polygonscan.com";
 
 export const MUMBAI_TESTNET: EVMNetwork = {
   id: "mumbai-testnet",

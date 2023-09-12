@@ -14,13 +14,12 @@ export default function useAutoSelect(
 ) {
   useEffect(() => {
     if (items && items.length > 0) {
-      if (override) {
-        return setter(override);
-      } else if (typeof items[0] === "string") {
-        return setter(items[0]);
-      } else {
-        return setter(items[0].id);
-      }
+      return override &&
+        items.some((item) =>
+          typeof item === "string" ? item === override : item.id === override
+        )
+        ? setter(override)
+        : setter(typeof items[0] === "string" ? items[0] : items[0].id);
     }
   }, [items]);
 }

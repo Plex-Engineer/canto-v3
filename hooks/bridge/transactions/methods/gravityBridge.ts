@@ -16,7 +16,7 @@ import { ERC20Token } from "@/config/interfaces/tokens";
 import {
   Transaction,
   TransactionDescription,
-  TransactionFlowStatus,
+  TransactionStatus,
 } from "@/config/interfaces/transactions";
 import {
   CANTO_MAINNET_COSMOS,
@@ -43,18 +43,21 @@ import {
   getBridgeMethodInfo,
 } from "../../interfaces/bridgeMethods";
 import { getGBridgeQueueForUser } from "../../txHistory/gbridgeHistory";
-import { fetchBlockNumber, fetchTransaction } from "wagmi/actions";
+import {
+  fetchBalance,
+  fetchBlockNumber,
+  fetchTransaction,
+} from "wagmi/actions";
+import { BridgeTransactionParams } from "../../interfaces/hookParams";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging into gravity bridge
- * @param {number} chainId chainId to begin bridging from
  * @param {string} ethSender eth sender address
  * @param {ERC20Token} token token to bridge
  * @param {string} amount amount to bridge
  * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
  */
 export async function bridgeInGravity(
-  chainId: number,
   ethSender: string,
   token: ERC20Token,
   amount: string
@@ -62,6 +65,12 @@ export async function bridgeInGravity(
   // check addresses
   if (!isValidEthAddress(ethSender)) {
     return NEW_ERROR("bridgeInGravity: invalid eth address: " + ethSender);
+  }
+  // check token chain
+  if (token.chainId !== ETH_MAINNET.chainId) {
+    return NEW_ERROR(
+      "bridgeInGravity: token chain id does not match from network chain id"
+    );
   }
 
   // gravity bridge is onlt used from ETH mainnet to canto, so convert the sender ethAddress to canto
@@ -107,7 +116,7 @@ export async function bridgeInGravity(
         }),
       });
       if (botError) {
-        return NEW_ERROR("bridgeInGravity::" + errMsg(botError));
+        return NEW_ERROR("bridgeInGravity::" + "pubKey: pub key error");
       }
     }
 
@@ -125,7 +134,7 @@ export async function bridgeInGravity(
   if (isWETH(token.address)) {
     // get WETH balance first, since we might not need to wrap yet
     const { data: wethBalance, error: balanceError } = await getTokenBalance(
-      chainId,
+      token.chainId,
       token.address,
       ethSender
     );
@@ -135,20 +144,22 @@ export async function bridgeInGravity(
     // check if we need to wrap ETH
     if (wethBalance.isLessThan(amount)) {
       // must wrap the right amount of ETH now
+      const amountToWrap = new BigNumber(amount).minus(wethBalance).toString();
       txList.push(
         _wrapTx(
-          chainId,
+          token.chainId,
           token.address,
-          amount,
-          TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amount, token.decimals))
+          amountToWrap,
+          TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amountToWrap, token.decimals))
         )
       );
     }
   }
+
   // check token allowance
-  const { data: needAllowance, error: allowanceError } =
+  const { data: hasAllowance, error: allowanceError } =
     await checkTokenAllowance(
-      chainId,
+      token.chainId,
       token.address,
       ethSender,
       GRAVITY_BRIDGE_ETH_ADDRESS,
@@ -157,11 +168,11 @@ export async function bridgeInGravity(
   if (allowanceError) {
     return NEW_ERROR("bridgeInGravity::" + errMsg(allowanceError));
   }
-
-  if (needAllowance) {
+  // if no allowance, must approve
+  if (!hasAllowance) {
     txList.push(
       _approveTx(
-        chainId,
+        token.chainId,
         token.address,
         GRAVITY_BRIDGE_ETH_ADDRESS,
         amount,
@@ -173,7 +184,7 @@ export async function bridgeInGravity(
   // send to cosmos
   txList.push(
     _sendToCosmosTx(
-      chainId,
+      token.chainId,
       cantoReceiver,
       token.address,
       amount,
@@ -267,7 +278,7 @@ const _generatePubKeyTx = (
 export async function checkGbridgeTxStatus(
   chainId: number,
   txHash: string
-): PromiseWithError<{ status: TransactionFlowStatus; completedIn: number }> {
+): PromiseWithError<{ status: TransactionStatus; completedIn: number }> {
   try {
     // get tx and block number
     const [transaction, currentBlock] = await Promise.all([
@@ -316,4 +327,44 @@ export async function checkGbridgeTxStatus(
   } catch (err) {
     return NEW_ERROR("checkGbridgeTxStatus::" + errMsg(err));
   }
+}
+
+/**
+ * @notice validates the parameters for bridging in through gravity bridge
+ * @param {BridgeTransactionParams} params parameters for bridging in
+ * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
+ */
+export async function validateGBridgeInTxParams(
+  params: BridgeTransactionParams
+): PromiseWithError<{
+  valid: boolean;
+  error?: string;
+}> {
+  // get token balance for user
+  const { data: userTokenBalance, error: userTokenBalanceError } =
+    await getTokenBalance(
+      params.token.data.chainId,
+      params.token.data.address ?? "",
+      params.from.account
+    );
+  if (userTokenBalanceError) {
+    return NEW_ERROR("validateGBridgeParams::" + userTokenBalanceError);
+  }
+  // add to the total balance if there is not enough && it is a native wrapped token
+  let totalBalance = userTokenBalance;
+  if (
+    params.token.data.nativeWrappedToken &&
+    userTokenBalance.lt(params.token.amount)
+  ) {
+    // get native balance as well
+    const nativeBalance = await fetchBalance({
+      address: params.from.account as `0x${string}`,
+      chainId: params.token.data.chainId,
+    });
+    totalBalance = totalBalance.plus(nativeBalance.value.toString());
+  }
+  if (totalBalance.lt(params.token.amount)) {
+    return NO_ERROR({ valid: false, error: "insufficient funds" });
+  }
+  return NO_ERROR({ valid: true });
 }

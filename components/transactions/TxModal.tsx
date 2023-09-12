@@ -35,11 +35,16 @@ const TransactionModal = () => {
 
   // open if transaction is loading in
   useEffect(() => {
-    if (txStore?.isLoading) {
-      setIsOpen(true);
-      setCurrentFlowId(txStore.isLoading);
+    if (transactionFlows) {
+      transactionFlows.forEach((flow) => {
+        if (flow.status === "POPULATING") {
+          setIsOpen(true);
+          setCurrentFlowId(flow.id);
+          return;
+        }
+      });
     }
-  }, [txStore?.isLoading]);
+  }, [transactionFlows]);
   return (
     <>
       <Modal
@@ -149,11 +154,8 @@ const TransactionModal = () => {
               {currentFlowId && getFlowFromId(currentFlowId) && (
                 <TxFlow
                   txFlow={getFlowFromId(currentFlowId)}
-                  onRetry={(txIdx) => {
-                    txStore?.performTransactions(signer, {
-                      flowId: currentFlowId,
-                      txIndex: txIdx,
-                    });
+                  onRetry={() => {
+                    txStore?.performFlow(signer, currentFlowId);
                   }}
                   setBridgeStatus={(txIndex, status) =>
                     txStore?.setTxBridgeStatus(

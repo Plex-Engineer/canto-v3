@@ -27,6 +27,7 @@ interface Props {
     onConfirm: () => void;
   };
   cosmosAddress?: {
+    addressPrefix: string;
     currentAddress: string;
     setAddress: (address: string) => void;
   };
@@ -141,7 +142,7 @@ const ConfirmationModal = (props: Props) => {
         <Container width="100%">
           <Input
             type={"text"}
-            placeholder={props.addresses.name + " address"}
+            placeholder={`address: (${props.cosmosAddress.addressPrefix}...)`}
             value={props.cosmosAddress.currentAddress}
             onChange={function (e: React.ChangeEvent<HTMLInputElement>): void {
               props.cosmosAddress?.setAddress(e.target.value);
