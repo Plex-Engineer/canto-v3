@@ -7,7 +7,6 @@ import {
   BridgeStatus,
   TransactionWithStatus,
 } from "@/config/interfaces/transactions";
-import Button from "../button/button";
 import { dateToMomentsAgo } from "@/utils/formatting.utils";
 import StatusIcon from "../icon/statusIcon";
 import { useQuery } from "react-query";
@@ -16,7 +15,6 @@ import { getBridgeStatus } from "@/hooks/bridge/transactions/bridgeTxStatus";
 interface TxItemProps {
   tx: TransactionWithStatus;
   idx: number;
-  onRetry: () => void;
   setBridgeStatus: (status: BridgeStatus) => void;
 }
 const TxItem = (props: TxItemProps) => {
@@ -126,11 +124,6 @@ const TxItem = (props: TxItemProps) => {
           </>
         )}
       </Container>
-      {props.tx.status === "ERROR" && (
-        <Button onClick={props.onRetry} color="primary">
-          retry
-        </Button>
-      )}
     </div>
   );
 };

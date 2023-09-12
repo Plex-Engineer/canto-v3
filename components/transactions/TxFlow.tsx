@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styles from "./transactions.module.scss";
 import Image from "next/image";
 import Text from "../text";
@@ -6,16 +6,36 @@ import TxItem from "./TxItem";
 import Spacer from "../layout/spacer";
 import {
   BridgeStatus,
-  TransactionFlowWithStatus,
+  TransactionFlow,
 } from "@/config/interfaces/transactions";
+import Button from "../button/button";
+import { TRANSACTION_FLOW_MAP } from "@/config/transactions/txMap";
 
 interface Props {
-  txFlow?: TransactionFlowWithStatus;
-  onRetry: (txIdx: number) => void;
+  txFlow?: TransactionFlow;
+  onRetry: () => void;
   setBridgeStatus: (txIndex: number, status: BridgeStatus) => void;
 }
 
 const TxFlow = (props: Props) => {
+  const [canRetry, setCanRetry] = React.useState<{
+    valid: boolean;
+    error: string | undefined;
+  }>({ valid: false, error: undefined });
+  useEffect(() => {
+    async function checkRetryParams() {
+      if (props.txFlow?.status === "ERROR") {
+        // check if we can retry
+        const { data } = await TRANSACTION_FLOW_MAP[
+          props.txFlow.txType
+        ].validParams(props.txFlow.params);
+        if (data) {
+          setCanRetry({ valid: data.valid, error: data.error });
+        }
+      }
+    }
+    checkRetryParams();
+  }, [props.txFlow?.status]);
   return (
     <div className={styles.container}>
       {props.txFlow && (
@@ -39,10 +59,14 @@ const TxFlow = (props: Props) => {
                 key={idx}
                 tx={tx}
                 idx={idx + 1}
-                onRetry={() => props.onRetry(idx)}
                 setBridgeStatus={(status) => props.setBridgeStatus(idx, status)}
               />
             ))}
+          {props.txFlow.status === "ERROR" && (
+            <Button disabled={!canRetry.valid} onClick={props.onRetry}>
+              RETRY
+            </Button>
+          )}
         </>
       )}
     </div>

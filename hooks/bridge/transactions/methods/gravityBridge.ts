@@ -16,7 +16,7 @@ import { ERC20Token } from "@/config/interfaces/tokens";
 import {
   Transaction,
   TransactionDescription,
-  TransactionFlowStatus,
+  TransactionStatus,
 } from "@/config/interfaces/transactions";
 import {
   CANTO_MAINNET_COSMOS,
@@ -121,32 +121,32 @@ export async function bridgeInGravity(
     );
   }
 
-  // // check if dealing with WETH, since we might need to wrap ETH
-  // if (isWETH(token.address)) {
-  //   // get WETH balance first, since we might not need to wrap yet
-  //   const { data: wethBalance, error: balanceError } = await getTokenBalance(
-  //     chainId,
-  //     token.address,
-  //     ethSender
-  //   );
-  //   if (balanceError) {
-  //     return NEW_ERROR("bridgeInGravity::" + errMsg(balanceError));
-  //   }
-  //   // check if we need to wrap ETH
-  //   if (wethBalance.isLessThan(amount)) {
-  //     // must wrap the right amount of ETH now
-  //     const amountToWrap = new BigNumber(amount).minus(wethBalance).toString();
-  //     txList.push(
-  //       _wrapTx(
-  //         chainId,
-  //         token.address,
-  //         amountToWrap,
-  //         TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amountToWrap, token.decimals))
-  //       )
-  //     );
-  //   }
-  // }
-  console.log(amount);
+  // check if dealing with WETH, since we might need to wrap ETH
+  if (isWETH(token.address)) {
+    // get WETH balance first, since we might not need to wrap yet
+    const { data: wethBalance, error: balanceError } = await getTokenBalance(
+      chainId,
+      token.address,
+      ethSender
+    );
+    if (balanceError) {
+      return NEW_ERROR("bridgeInGravity::" + errMsg(balanceError));
+    }
+    // check if we need to wrap ETH
+    if (wethBalance.isLessThan(amount)) {
+      // must wrap the right amount of ETH now
+      const amountToWrap = new BigNumber(amount).minus(wethBalance).toString();
+      txList.push(
+        _wrapTx(
+          chainId,
+          token.address,
+          amountToWrap,
+          TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amountToWrap, token.decimals))
+        )
+      );
+    }
+  }
+
   // check token allowance
   const { data: hasAllowance, error: allowanceError } =
     await checkTokenAllowance(
@@ -269,7 +269,7 @@ const _generatePubKeyTx = (
 export async function checkGbridgeTxStatus(
   chainId: number,
   txHash: string
-): PromiseWithError<{ status: TransactionFlowStatus; completedIn: number }> {
+): PromiseWithError<{ status: TransactionStatus; completedIn: number }> {
   try {
     // get tx and block number
     const [transaction, currentBlock] = await Promise.all([

@@ -2,7 +2,10 @@ import { BaseNetwork } from "@/config/interfaces/networks";
 import { BridgeToken } from "./tokens";
 import { BridgingMethod } from "../interfaces/bridgeMethods";
 import { PromiseWithError, ReturnWithError } from "@/config/interfaces/errors";
-import { Transaction } from "@/config/interfaces/transactions";
+import {
+  NewTransactionFlow,
+  Transaction,
+} from "@/config/interfaces/transactions";
 
 export interface BridgeHookInputParams {
   testnet?: boolean;
@@ -68,7 +71,9 @@ export interface BridgeHookReturn {
     getReceiver: () => string | null;
   };
   bridge: {
-    bridgeTx: (params: BridgeHookTxParams) => PromiseWithError<Transaction[]>;
+    createNewBridgeFlow: (
+      params: BridgeHookTxParams
+    ) => ReturnWithError<NewTransactionFlow>;
     canBridge: (params: BridgeHookTxParams) => ReturnWithError<boolean>;
   };
 }

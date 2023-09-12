@@ -1,5 +1,6 @@
 import {
   NEW_ERROR,
+  NO_ERROR,
   PromiseWithError,
   ReturnWithError,
 } from "@/config/interfaces/errors";
@@ -12,6 +13,11 @@ import { bridgeLayerZero } from "./methods/layerZero";
 import { ibcInKeplr } from "./keplr/ibcKeplr";
 import { txIBCOut } from "./methods/ibc";
 import { isERC20Token, isIBCToken } from "@/utils/tokens/tokens.utils";
+import { getTokenBalance } from "@/utils/evm/erc20.utils";
+import { fetchBalance } from "wagmi/actions";
+import { getCosmosTokenBalance } from "@/utils/cosmos/cosmosBalance.utils";
+import { IBCToken } from "@/config/interfaces/tokens";
+import { convertToBigNumber } from "@/utils/tokenBalances.utils";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging into canto
@@ -157,4 +163,125 @@ export async function bridgeOutTx(
     return NEW_ERROR("bridgeOutTx::" + transactions.error);
   }
   return transactions;
+}
+
+export async function validateBridgeInTxParams(
+  params: BridgeTransactionParams
+): PromiseWithError<{
+  valid: boolean;
+  error?: string;
+}> {
+  // balance will depend on the method used
+  switch (params.method) {
+    case BridgingMethod.GRAVITY_BRIDGE: {
+      // get token balance for user
+      const { data: userTokenBalance, error: userTokenBalanceError } =
+        await getTokenBalance(
+          params.token.data.chainId,
+          params.token.data.address ?? "",
+          params.from.account
+        );
+      if (userTokenBalanceError) {
+        return NEW_ERROR("validateBridgeTxParams::" + userTokenBalanceError);
+      }
+      // add to the total balance if there is not enough && it is a native wrapped token
+      let totalBalance = userTokenBalance;
+      if (
+        params.token.data.nativeWrappedToken &&
+        userTokenBalance.lt(params.token.amount)
+      ) {
+        // get native balance as well
+        const nativeBalance = await fetchBalance({
+          address: params.from.account as `0x${string}`,
+          chainId: params.token.data.chainId,
+        });
+        totalBalance = totalBalance.plus(nativeBalance.value.toString());
+      }
+      if (totalBalance.lt(params.token.amount)) {
+        return NO_ERROR({ valid: false, error: "insufficient funds" });
+      }
+      return NO_ERROR({ valid: true });
+    }
+    case BridgingMethod.IBC: {
+      // if ibc in then we need to check native balance of the token on the cosmos chain
+      const { data: cosmosBalance, error: cosmosBalanceError } =
+        await getCosmosTokenBalance(
+          params.token.data.chainId.toString(),
+          params.from.account,
+          (params.token.data as IBCToken).nativeName
+        );
+      if (cosmosBalanceError) {
+        return NEW_ERROR("validateBridgeTxParams::" + cosmosBalanceError);
+      }
+      if (convertToBigNumber(cosmosBalance).data.lt(params.token.amount)) {
+        return NO_ERROR({ valid: false, error: "insufficient funds" });
+      }
+      return NO_ERROR({ valid: true });
+    }
+    case BridgingMethod.LAYER_ZERO:
+      // we need to check if the user has enough tokens to make the bridge tx
+      let tokenAddress = params.token.data.address;
+      if (
+        params.token.data.isOFT &&
+        params.token.data.isOFTProxy &&
+        params.token.data.oftUnderlyingAddress
+      ) {
+        tokenAddress = params.token.data.oftUnderlyingAddress;
+      }
+      const { data: userTokenBalance, error: userTokenBalanceError } =
+        await getTokenBalance(
+          params.token.data.chainId,
+          tokenAddress ?? "",
+          params.from.account
+        );
+      if (userTokenBalanceError) {
+        return NEW_ERROR("validateBridgeTxParams::" + userTokenBalanceError);
+      }
+      // might still need to grab native token balance if also a wrapper around native token (native OFT)
+      let totalBalance = userTokenBalance;
+      if (
+        totalBalance.lt(params.token.amount) &&
+        params.token.data.nativeWrappedToken
+      ) {
+        // get native balance as well
+        const nativeBalance = await fetchBalance({
+          address: params.from.account as `0x${string}`,
+          chainId: params.token.data.chainId,
+        });
+        totalBalance = totalBalance.plus(nativeBalance.value.toString());
+      }
+      if (totalBalance.lt(params.token.amount)) {
+        return NO_ERROR({ valid: false, error: "insufficient funds" });
+      }
+      return NO_ERROR({ valid: true });
+
+    default: {
+      return NO_ERROR({ valid: false, error: "invalid method" });
+    }
+  }
+}
+
+//TODO: implement
+/**
+ * @notice validates the parameters for bridging out
+ * @param {BridgeTransactionParams} params parameters for bridging out
+ * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
+ */
+export async function validateBridgeOutTxParams(
+  params: BridgeTransactionParams
+): PromiseWithError<{
+  valid: boolean;
+  error?: string;
+}> {
+  // balance will depend on the method used
+  switch (params.method) {
+    case BridgingMethod.GRAVITY_BRIDGE:
+      return NEW_ERROR("validateBridgeOutTxParams: GBRIDGE not implemented");
+    case BridgingMethod.IBC:
+      return NEW_ERROR("validateBridgeOutTxParams: GBRIDGE not implemented");
+    case BridgingMethod.LAYER_ZERO:
+      return NEW_ERROR("validateBridgeOutTxParams: GBRIDGE not implemented");
+    default:
+      return NO_ERROR({ valid: false, error: "invalid method" });
+  }
 }
