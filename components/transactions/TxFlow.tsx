@@ -10,6 +10,7 @@ import {
 } from "@/config/interfaces/transactions";
 import Button from "../button/button";
 import { TRANSACTION_FLOW_MAP } from "@/config/transactions/txMap";
+import { formatError } from "@/utils/formatting.utils";
 
 interface Props {
   txFlow?: TransactionFlow;
@@ -52,7 +53,7 @@ const TxFlow = (props: Props) => {
             {props.txFlow.title}
           </Text>
           <Spacer height="40px" />
-          {props.txFlow?.error && <Text>{props.txFlow.error}</Text>}
+          {props.txFlow?.error && <Text>{formatError(props.txFlow.error)}</Text>}
           {!props.txFlow.error &&
             props.txFlow.transactions.map((tx, idx) => (
               <TxItem

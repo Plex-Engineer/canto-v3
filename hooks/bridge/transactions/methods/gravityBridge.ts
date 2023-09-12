@@ -116,7 +116,7 @@ export async function bridgeInGravity(
         }),
       });
       if (botError) {
-        return NEW_ERROR("bridgeInGravity::" + errMsg(botError));
+        return NEW_ERROR("bridgeInGravity::" + "pubKey: pub key error");
       }
     }
 

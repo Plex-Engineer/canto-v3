@@ -7,7 +7,7 @@ import {
   BridgeStatus,
   TransactionWithStatus,
 } from "@/config/interfaces/transactions";
-import { dateToMomentsAgo } from "@/utils/formatting.utils";
+import { dateToMomentsAgo, formatError } from "@/utils/formatting.utils";
 import StatusIcon from "../icon/statusIcon";
 import { useQuery } from "react-query";
 import { getBridgeStatus } from "@/hooks/bridge/transactions/bridgeTxStatus";
@@ -101,7 +101,7 @@ const TxItem = (props: TxItemProps) => {
           )}
           {props.tx.error && (
             <Text size="sm" theme="secondary-dark" style={{ color: "red" }}>
-              Error: {props.tx.error.split(":").slice(-1)}
+              {formatError(props.tx.error)}
             </Text>
           )}
         </div>
