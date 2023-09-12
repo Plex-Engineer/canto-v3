@@ -4,7 +4,7 @@ import { CTokenWithUserData } from "./tokens";
 import { UserLMPosition } from "./userPositions";
 
 export interface LendingHookInputParams {
-  testnet: boolean;
+  chainId: number;
   userEthAddress?: string;
 }
 
@@ -12,8 +12,8 @@ export interface LendingHookReturn {
   tokens: CTokenWithUserData[];
   position: UserLMPosition;
   loading: boolean;
-  error: unknown;
   canPerformLendingTx: (
     txParams: CTokenLendingTransactionParams
   ) => ReturnWithError<boolean>;
+  error: unknown;
 }

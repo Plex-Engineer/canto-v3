@@ -23,7 +23,7 @@ export function convertTokenAmountToNote(
     convertToBigNumber(tokenAmount),
     convertToBigNumber(price),
   ];
-  if (amountBN.error || priceBN.error)
+  if (amountBN.error || priceBN.error || priceBN.data.isZero())
     return NEW_ERROR("convertTokenAmountToNote: Invalid amount or price");
 
   // calculate note amount
@@ -49,7 +49,7 @@ export function convertNoteAmountToToken(
     convertToBigNumber(noteAmount),
     convertToBigNumber(price),
   ];
-  if (amountBN.error || priceBN.error)
+  if (amountBN.error || priceBN.error || priceBN.data.isZero())
     return NEW_ERROR("convertNoteAmountToToken: Invalid amount or price");
 
   // calculate note amount

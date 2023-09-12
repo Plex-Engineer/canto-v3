@@ -1,4 +1,7 @@
-import { convertNoteAmountToToken, convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
+import {
+  convertNoteAmountToToken,
+  convertTokenAmountToNote,
+} from "@/utils/tokens/tokenMath.utils";
 import BigNumber from "bignumber.js";
 
 describe("test tokenMath", () => {
@@ -24,6 +27,14 @@ describe("test tokenMath", () => {
         token: {
           amount: "some error",
           price: "1000000000000000000000000000000",
+        },
+        expectedNoteValue: "doesn't matter",
+        error: true,
+      },
+      {
+        token: {
+          amount: "10000000000",
+          price: "0",
         },
         expectedNoteValue: "doesn't matter",
         error: true,

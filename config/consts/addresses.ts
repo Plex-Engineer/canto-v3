@@ -20,7 +20,7 @@ const CLM_LENS_ADDRESS = {
 
 type ContractName = "comptroller" | "clmLens";
 type ChainType = "mainnet" | "testnet";
-export function getCLMAddress(chainId: number, contractName: ContractName) {
+export function getCLMAddress(chainId: number, contractName: ContractName): string | null {
   // make sure on canto chain id
   let chainType: ChainType;
   if (chainId === CANTO_MAINNET_EVM.chainId) chainType = "mainnet";

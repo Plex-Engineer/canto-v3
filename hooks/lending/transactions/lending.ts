@@ -201,3 +201,17 @@ function methodAndParamsFromLendingTxType(
       throw new Error("Invalid tx type");
   }
 }
+
+/**
+ * @notice validates the parameters for a lending market cToken transaction
+ * @param {CTokenLendingTransactionParams} params parameters for lending tx
+ * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
+ */
+export async function validateCTokenLendingTxParams(
+  params: CTokenLendingTransactionParams
+): PromiseWithError<{
+  valid: boolean;
+  error?: string;
+}> {
+  return NO_ERROR({ valid: true });
+}

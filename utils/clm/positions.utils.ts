@@ -58,7 +58,7 @@ export function cTokenWithdrawLimit(
   }
   // liquidity change = (tokenAmount * price) * CF
   // if this is greater than the current liquidity, then the user cannot withdraw
-  // maxWithdraw = (currentLiquidity * percent) / (CF * price) == amountInToken / CF
+  // maxWithdraw = (currentLiquidity * (percent/100)) / (CF * price) == amountInToken / CF
   const { data: bnLiquidity, error: bnLiquidityError } =
     convertToBigNumber(currentLiquidity);
   if (bnLiquidityError) {

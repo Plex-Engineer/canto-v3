@@ -12,6 +12,13 @@ import { Chain } from "@/config/interfaces/transactions";
 import * as NETWORKS from "@/config/networks";
 import * as COSMOS_NETWORKS from "@/config/networks/cosmos";
 
+export function isCantoChainId(chainId: number): boolean {
+  return (
+    chainId === NETWORKS.CANTO_MAINNET_EVM.chainId ||
+    chainId === NETWORKS.CANTO_TESTNET_EVM.chainId
+  );
+}
+
 /**
  * @notice checks if network is an EVM chain
  * @param {BaseNetwork} network network to check if EVM

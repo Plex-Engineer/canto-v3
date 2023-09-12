@@ -5,16 +5,8 @@ import {
   errMsg,
 } from "@/config/interfaces/errors";
 import { CToken, UserCTokenDetails } from "@/hooks/lending/interfaces/tokens";
-import {
-  MAINNET_CTOKEN_ADDRESSES,
-  TESTNET_CTOKEN_ADDRESSES,
-} from "@/hooks/lending/config/cTokenAddresses";
-import {
-  CLM_LENS_ADDRESS,
-  COMPTROLLER_ADDRESS,
-} from "@/config/consts/addresses";
+import { getCTokenAddressesFromChainId } from "@/hooks/lending/config/cTokenAddresses";
 import { isValidEthAddress } from "@/utils/address.utils";
-import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
 import {
   getProviderWithoutSigner,
   getRpcUrlFromChainId,
@@ -27,30 +19,35 @@ import {
   CANTO_DATA_API_URL,
   GeneralCTokenResponse,
 } from "@/config/consts/apiUrls";
+import { isCantoChainId } from "@/utils/networks.utils";
+import { getCLMAddress } from "@/config/consts/addresses";
 
 /**
  * @notice Gets user data from CLM Lens
  * @param {string} userEthAddress Ethereum address of user
- * @param {boolean} testnet Whether to use testnet or mainnet
+ * @param {number} chainId Whether to use testnet or mainnet
  * @returns {PromiseWithError<{ cTokens: UserCTokenDetails[]; limits: {liquidity: number}, compAccrued: number }>}
  */
 export async function getUserCLMLensData(
   userEthAddress: string,
-  testnet: boolean = false
+  chainId: number
 ): PromiseWithError<{
   cTokens: UserCTokenDetails[];
   limits: { liquidity: number; shortfall: number };
   compAccrued: number;
 }> {
-  if (isValidEthAddress(userEthAddress)) {
+  if (isValidEthAddress(userEthAddress) || !isCantoChainId(chainId)) {
     try {
       // get all addresses depending on testnet
-      const [cTokenAddresses, lensAddress, comptrollerAddress, chainId] = [
-        testnet ? TESTNET_CTOKEN_ADDRESSES : MAINNET_CTOKEN_ADDRESSES,
-        CLM_LENS_ADDRESS[testnet ? "testnet" : "mainnet"],
-        COMPTROLLER_ADDRESS[testnet ? "testnet" : "mainnet"],
-        testnet ? CANTO_TESTNET_EVM.chainId : CANTO_MAINNET_EVM.chainId,
+      const [cTokenAddresses, lensAddress, comptrollerAddress] = [
+        getCTokenAddressesFromChainId(chainId),
+        getCLMAddress(chainId, "clmLens"),
+        getCLMAddress(chainId, "comptroller"),
       ];
+      // make sure addresses exist
+      if (!cTokenAddresses || !lensAddress || !comptrollerAddress) {
+        throw Error("getUserCLMLensData: chainId not supported");
+      }
       const { data: rpcUrl, error } = getRpcUrlFromChainId(chainId);
       if (error) {
         throw error;
@@ -85,7 +82,8 @@ export async function getUserCLMLensData(
             borrowBalance: data.borrowBalance.toString(),
             rewards: data.rewards.toString(),
             isCollateral: data.isCollateral,
-            supplyBalanceInUnderlying: data.supplyBalanceInUnderlying.toString(),
+            supplyBalanceInUnderlying:
+              data.supplyBalanceInUnderlying.toString(),
             underlyingAllowance: data.underlyingAllowance.toString(),
           };
         }) as UserCTokenDetails[],
@@ -103,24 +101,28 @@ export async function getUserCLMLensData(
     }
   }
   return NEW_ERROR(
-    "getUserCLMLensData: Invalid Ethereum Address: " + userEthAddress
+    "getUserCLMLensData: Invalid Params: " + userEthAddress + " " + chainId
   );
 }
 
 /**
  * @notice Gets general cToken data from Canto Data API
  * @dev Currently only supports mainnet
- * @param {boolean} testnet Whether to use testnet or mainnet
+ * @param {number} chainId Whether to use testnet or mainnet
  * @returns {PromiseWithError<CToken[]>} List of cTokens
  */
 export async function getGeneralCTokenData(
-  testnet: boolean = false
+  chainId: number
 ): PromiseWithError<CToken[]> {
+  if (!isCantoChainId(chainId)) {
+    return NEW_ERROR("getGeneralCTokenData: Invalid chainId: " + chainId);
+  }
   //no api for testnet yet
-  if (testnet) return NEW_ERROR("getGeneralCTokenData: Testnet not supported");
+  if (chainId === 7701)
+    return NEW_ERROR("getGeneralCTokenData: Testnet not supported");
   // get full response
   const { data, error } = await tryFetch<GeneralCTokenResponse>(
-    testnet ? "" : CANTO_DATA_API_URL + CANTO_DATA_API_ENDPOINTS.allCTokens
+    CANTO_DATA_API_URL + CANTO_DATA_API_ENDPOINTS.allCTokens
   );
   if (error) {
     return NEW_ERROR("getGeneralCTokenData: " + errMsg(error));

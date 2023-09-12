@@ -1,4 +1,6 @@
-export const MAINNET_CTOKEN_ADDRESSES = [
+import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
+
+const MAINNET_CTOKEN_ADDRESSES = [
   "0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
   "0xdE59F060D7ee2b612E7360E6C1B97c4d8289Ca2e",
   "0x6b46ba92d7e94FfA658698764f5b8dfD537315A9",
@@ -12,7 +14,7 @@ export const MAINNET_CTOKEN_ADDRESSES = [
   "0xb49A395B39A0b410675406bEE7bD06330CB503E3",
 ];
 
-export const TESTNET_CTOKEN_ADDRESSES = [
+const TESTNET_CTOKEN_ADDRESSES = [
   "0x04E52476d318CdF739C38BD41A922787D441900c",
   "0x9160c5760a540cAfA24F90102cAA14C50497d5b7",
   "0x3BEe0A8209e6F8c5c743F21e0cA99F2cb780D0D8",
@@ -25,3 +27,21 @@ export const TESTNET_CTOKEN_ADDRESSES = [
   "0xBeD263484AEDFD449eE1ed8f0b4799192026E190",
   "0xf301c9d5804Fab3dd207ef75f78509db6393f37F",
 ];
+
+/**
+ * @notice gets cToken addresses from chainId
+ * @param {number} chainId chainId to get cToken addresses for
+ * @returns {string[] | null} cToken addresses or null if not canto chainId
+ */
+export function getCTokenAddressesFromChainId(
+  chainId: number
+): string[] | null {
+  switch (chainId) {
+    case CANTO_MAINNET_EVM.chainId:
+      return MAINNET_CTOKEN_ADDRESSES;
+    case CANTO_TESTNET_EVM.chainId:
+      return TESTNET_CTOKEN_ADDRESSES;
+    default:
+      return null;
+  }
+}

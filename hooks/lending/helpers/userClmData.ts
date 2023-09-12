@@ -12,20 +12,20 @@ import { getLMTotalsFromCTokens } from "./cTokens";
 /**
  * @notice Gets all user data from clmLens and general api
  * @param {string} userEthAddress address to get data for
- * @param {boolean} testnet if this is for testnet
+ * @param {number} chainId chainId to get data for
  * @returns {PromiseWithError<{cTokens: CTokenWithUserData[], position?: UserLMPosition}>}
  */
 export async function getAllUserCLMData(
   userEthAddress: string,
-  testnet: boolean = false
+  chainId: number
 ): PromiseWithError<{
   cTokens: CTokenWithUserData[];
   position?: UserLMPosition;
 }> {
   // get data from clmLens and general api
   const [generalCTokens, userLMData] = await Promise.all([
-    getGeneralCTokenData(testnet),
-    getUserCLMLensData(userEthAddress, testnet),
+    getGeneralCTokenData(chainId),
+    getUserCLMLensData(userEthAddress, chainId),
   ]);
   // check errors and return what is available
   // if general error, then return error now
@@ -34,6 +34,7 @@ export async function getAllUserCLMData(
   }
   // if user error, then just return the general data
   if (userLMData.error) {
+    console.log(userLMData.error);
     return NO_ERROR({ cTokens: generalCTokens.data });
   }
   // since both are okay, combine the data

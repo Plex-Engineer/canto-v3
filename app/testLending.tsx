@@ -12,7 +12,7 @@ export default function TestLending() {
 
   const [amount, setAmount] = useState("");
   const { tokens, position, loading, error, canPerformLendingTx } = useLending({
-    testnet: false,
+    chainId: signer?.chain.id === 7701 ? 7701 : 7700,
     userEthAddress: signer?.account.address,
   });
   const sortedTokens = useMemo(() => {

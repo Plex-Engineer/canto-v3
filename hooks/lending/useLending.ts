@@ -43,11 +43,11 @@ export default function useLending(
   });
   // use query to get all general and user cToken data
   const { isLoading: loadingCTokens, error: errorCTokens } = useQuery(
-    ["lending", params.testnet, params.userEthAddress],
+    ["lending", params.chainId, params.userEthAddress],
     async () => {
       return await getAllUserCLMData(
         params.userEthAddress ?? "",
-        params.testnet
+        params.chainId
       );
     },
     {
@@ -57,6 +57,7 @@ export default function useLending(
       onSuccess(response) {
         if (response.error) {
           console.log(response.error);
+          return;
         }
         setTokens(response.data.cTokens);
         response.data.position && setPosition(response.data.position);
@@ -92,6 +93,10 @@ export default function useLending(
     if (userAmountError) {
       return NEW_ERROR("canPerformLendingTx::" + errMsg(userAmountError));
     }
+    // make sure amount is greater than zero as well
+    if (!userAmount.gt(0)) {
+      return NEW_ERROR("canPerformLendingTx: amount must be greater than 0");
+    }
     switch (txParams.txType) {
       case CTokenLendingTxTypes.SUPPLY:
       // check user has enough balance
@@ -105,11 +110,10 @@ export default function useLending(
         if (txParams.txType === CTokenLendingTxTypes.REPAY) {
           return NO_ERROR(
             userAmount.lte(userBalance) &&
-              userAmount.gt(0) &&
               userAmount.lte(txParams.cToken.userDetails.borrowBalance)
           );
         }
-        return NO_ERROR(userAmount.lte(userBalance) && userAmount.gt(0));
+        return NO_ERROR(userAmount.lte(userBalance));
       }
       case CTokenLendingTxTypes.BORROW:
         // check borrow limit
@@ -118,7 +122,7 @@ export default function useLending(
         if (borrowLimitError) {
           return NEW_ERROR("canPerformLendingTx::" + errMsg(borrowLimitError));
         }
-        return NO_ERROR(borrowLimit.gte(userAmount) && userAmount.gt(0));
+        return NO_ERROR(borrowLimit.gte(userAmount));
       case CTokenLendingTxTypes.WITHDRAW:
       // check withdraw limit with amount and current supply
       case CTokenLendingTxTypes.DECOLLATERALIZE:
@@ -133,7 +137,6 @@ export default function useLending(
         if (txParams.txType === CTokenLendingTxTypes.WITHDRAW) {
           return NO_ERROR(
             withdrawLimit.gte(userAmount) &&
-              userAmount.gt(0) &&
               userAmount.lte(
                 txParams.cToken.userDetails.supplyBalanceInUnderlying
               )
@@ -150,7 +153,9 @@ export default function useLending(
         // no checks needed
         return NO_ERROR(true);
       default:
-        return NEW_ERROR("canPerformLendingTx: invalid type: " + txParams.txType);
+        return NEW_ERROR(
+          "canPerformLendingTx: invalid type: " + txParams.txType
+        );
     }
   }
 

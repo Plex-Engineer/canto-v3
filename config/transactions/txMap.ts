@@ -7,10 +7,16 @@ import {
 } from "@/hooks/bridge/transactions/bridge";
 import { Transaction } from "../interfaces/transactions";
 import { PromiseWithError } from "../interfaces/errors";
+import { CTokenLendingTransactionParams } from "@/hooks/lending/interfaces/lendingTxTypes";
+import {
+  cTokenLendingTx,
+  validateCTokenLendingTxParams,
+} from "@/hooks/lending/transactions/lending";
 
 export enum TransactionFlowType {
   BRIDGE_IN = "BRIDGE_IN",
   BRIDGE_OUT = "BRIDGE_OUT",
+  CLM_CTOKEN_TX = "CLM_CTOKEN_TX",
 }
 
 export const TRANSACTION_FLOW_MAP: {
@@ -31,5 +37,11 @@ export const TRANSACTION_FLOW_MAP: {
     validParams: async (params: BridgeTransactionParams) =>
       validateBridgeOutTxParams(params),
     tx: async (params: BridgeTransactionParams) => bridgeOutTx(params),
+  },
+  [TransactionFlowType.CLM_CTOKEN_TX]: {
+    validParams: async (params: CTokenLendingTransactionParams) =>
+      validateCTokenLendingTxParams(params),
+    tx: async (params: CTokenLendingTransactionParams) =>
+      cTokenLendingTx(params),
   },
 };
