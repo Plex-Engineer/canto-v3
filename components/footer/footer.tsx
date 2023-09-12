@@ -40,6 +40,7 @@ const Footer = () => {
       <div className={styles.links}>
         <StatusText />
         <Text
+          className={styles.item}
           size="sm"
           font="proto_mono"
           style={{
@@ -59,6 +60,7 @@ const Footer = () => {
           ${cantoPrice}
         </Text>
         <Text
+          className={styles.item}
           size="sm"
           font="proto_mono"
           style={{
@@ -88,7 +90,7 @@ interface PropLink {
 }
 const FooterLink = ({ href, text }: PropLink) => {
   return (
-    <Text size="x-sm" font="proto_mono">
+    <Text size="x-sm" font="proto_mono" className={styles.link}>
       <a href={href}>{text}</a>
     </Text>
   );
@@ -103,6 +105,7 @@ const StatusText = () => {
     <Text
       size="x-sm"
       font="proto_mono"
+      className={styles.item}
       style={{
         width: "160px",
         justifyContent: "center",

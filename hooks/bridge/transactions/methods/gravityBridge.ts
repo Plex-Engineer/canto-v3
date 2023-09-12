@@ -16,7 +16,7 @@ import { ERC20Token } from "@/config/interfaces/tokens";
 import {
   Transaction,
   TransactionDescription,
-  TransactionFlowStatus,
+  TransactionStatus,
 } from "@/config/interfaces/transactions";
 import {
   CANTO_MAINNET_COSMOS,
@@ -139,18 +139,20 @@ export async function bridgeInGravity(
     // check if we need to wrap ETH
     if (wethBalance.isLessThan(amount)) {
       // must wrap the right amount of ETH now
+      const amountToWrap = new BigNumber(amount).minus(wethBalance).toString();
       txList.push(
         _wrapTx(
           token.chainId,
           token.address,
-          amount,
-          TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amount, token.decimals))
+          amountToWrap,
+          TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amountToWrap, token.decimals))
         )
       );
     }
   }
+
   // check token allowance
-  const { data: needAllowance, error: allowanceError } =
+  const { data: hasAllowance, error: allowanceError } =
     await checkTokenAllowance(
       token.chainId,
       token.address,
@@ -161,8 +163,8 @@ export async function bridgeInGravity(
   if (allowanceError) {
     return NEW_ERROR("bridgeInGravity::" + errMsg(allowanceError));
   }
-
-  if (needAllowance) {
+  // if no allowance, must approve
+  if (!hasAllowance) {
     txList.push(
       _approveTx(
         token.chainId,
@@ -271,7 +273,7 @@ const _generatePubKeyTx = (
 export async function checkGbridgeTxStatus(
   chainId: number,
   txHash: string
-): PromiseWithError<{ status: TransactionFlowStatus; completedIn: number }> {
+): PromiseWithError<{ status: TransactionStatus; completedIn: number }> {
   try {
     // get tx and block number
     const [transaction, currentBlock] = await Promise.all([

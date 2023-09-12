@@ -15,11 +15,12 @@ import Modal from "@/components/modal/modal";
 import ConfirmationModal from "./components/confirmationModal";
 import { BridgingMethod } from "@/hooks/bridge/interfaces/bridgeMethods";
 import { isEVMNetwork } from "@/utils/networks.utils";
+import { GetWalletClientResult } from "wagmi/actions";
 
 interface BridgeProps {
   hook: BridgeHookReturn;
   params: {
-    signer: any;
+    signer: GetWalletClientResult | undefined;
     transactionStore?: TransactionStore;
   };
 }
@@ -29,17 +30,20 @@ const Bridging = (props: BridgeProps) => {
 
   // transaction that will do the bridging
   async function bridgeTx() {
-    props.params.transactionStore?.addTransactions({
-      title: `Bridge ${props.hook.direction} ${amount} ${props.hook.selections.token?.symbol}`,
-      icon: props.hook.selections.token?.icon ?? "",
-      txList: () =>
-        props.hook.bridge.bridgeTx({
-          amount: convertToBigNumber(
-            amount,
-            props.hook.selections.token?.decimals ?? 18
-          ).data.toString(),
-        }),
-      ethAccount: props.params.signer.account.address,
+    // get flow
+    const { data, error } = props.hook.bridge.createNewBridgeFlow({
+      amount: convertToBigNumber(
+        amount,
+        props.hook.selections.token?.decimals ?? 18
+      ).data.toString(),
+    });
+    if (error) {
+      console.log(error);
+      return;
+    }
+    // add flow to store
+    props.params.transactionStore?.addNewFlow({
+      txFlow: data,
       signer: props.params.signer,
     });
   }
@@ -127,15 +131,20 @@ const Bridging = (props: BridgeProps) => {
             "ethereum-via-gravity-bridge" ? (
               <Text size="x-sm">
                 To bridge your tokens to Ethereum through Gravity Bridge, first
-                ensure that you have an IBC wallet like Keplr. Next, enter your
-                Gravity Bridge address (from Keplr) below and confirm. Once
-                completed, you can transfer your tokens from Gravity Bridge to
-                Ethereum using the Gravity Bridge Portal{" "}
+                ensure that you have an IBC wallet like Keplr.
+                <br />
+                <br />
+                Next, enter your Gravity Bridge address (from Keplr) below and
+                confirm.
+                <br />
+                <br />
+                Once completed, you can transfer your tokens from Gravity Bridge
+                to Ethereum using the{" "}
                 <a
                   style={{ textDecoration: "underline" }}
                   href="https://bridge.blockscape.network/"
                 >
-                  here
+                  Gravity Bridge Portal
                 </a>
               </Text>
             ) : undefined

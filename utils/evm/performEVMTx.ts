@@ -7,6 +7,7 @@ import {
 import { Transaction } from "@/config/interfaces/transactions";
 import { GetWalletClientResult, writeContract } from "wagmi/actions";
 import { checkOnRightChain } from "../baseTransaction.utils";
+import { BaseError } from "viem";
 
 /**
  * @notice performs evm transaction
@@ -49,6 +50,10 @@ export async function performEVMTransaction(
     const { hash } = await writeContract(contractCall);
     return NO_ERROR(hash);
   } catch (err) {
+    if (err instanceof BaseError) {
+      console.log(err.shortMessage);
+      return NEW_ERROR("performEVMTransaction: " + err.shortMessage);
+    }
     return NEW_ERROR("performEVMTransaction: " + errMsg(err));
   }
 }

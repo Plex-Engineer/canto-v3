@@ -35,11 +35,16 @@ const TransactionModal = () => {
 
   // open if transaction is loading in
   useEffect(() => {
-    if (txStore?.isLoading) {
-      setIsOpen(true);
-      setCurrentFlowId(txStore.isLoading);
+    if (transactionFlows) {
+      transactionFlows.forEach((flow) => {
+        if (flow.status === "POPULATING") {
+          setIsOpen(true);
+          setCurrentFlowId(flow.id);
+          return;
+        }
+      });
     }
-  }, [txStore?.isLoading]);
+  }, [transactionFlows]);
   return (
     <>
       <Modal
@@ -53,11 +58,11 @@ const TransactionModal = () => {
         <Text size="lg" font="proto_mono">
           Activity
         </Text>
-        <div className={styles["scroll-view"]}>
-          {/* <Spacer height="10px" /> */}
-          <div className={clsx(styles["items-list"])}>
-            {transactionFlows &&
-              transactionFlows
+        {transactionFlows && transactionFlows?.length > 0 ? (
+          <div className={styles["scroll-view"]}>
+            {/* <Spacer height="10px" /> */}
+            <div className={clsx(styles["items-list"])}>
+              {transactionFlows
                 .sort((a, b) => Number(b.id) - Number(a.id))
                 .map((flow, idx) => (
                   <Container
@@ -93,80 +98,90 @@ const TransactionModal = () => {
                     </div>
                   </Container>
                 ))}
-            <Spacer height="100%" />
+              <Spacer height="100%" />
 
-            <Button
-              color="secondary"
-              height={"small"}
-              onClick={() =>
-                txStore?.clearTransactions(signer?.account.address ?? "")
-              }
-            >
-              CLEAR ALL TXS
-            </Button>
-          </div>
-          <Container
-            className={clsx(styles["grp-items"])}
-            style={{
-              transform: currentFlowId ? "translateX(0)" : "translateX(100%)",
-            }}
-          >
-            <div
+              <Button
+                color="secondary"
+                height={"small"}
+                onClick={() =>
+                  txStore?.clearTransactions(signer?.account.address ?? "")
+                }
+              >
+                CLEAR ALL TXS
+              </Button>
+            </div>
+            <Container
+              className={clsx(styles["grp-items"])}
               style={{
-                position: "absolute",
+                transform: currentFlowId ? "translateX(0)" : "translateX(100%)",
               }}
             >
-              <Container
-                direction="row"
-                gap={20}
-                className={styles.item}
-                width="120px"
-                height="50px"
-                center={{
-                  vertical: true,
-                }}
-                onClick={() => {
-                  setCurrentFlowId(null);
+              <div
+                style={{
+                  position: "absolute",
                 }}
               >
-                <div
-                  style={{
-                    transform: "rotate(90deg)",
+                <Container
+                  direction="row"
+                  gap={20}
+                  className={styles.item}
+                  width="120px"
+                  height="50px"
+                  center={{
+                    vertical: true,
+                  }}
+                  onClick={() => {
+                    setCurrentFlowId(null);
                   }}
                 >
-                  <Icon
-                    icon={{
-                      url: "dropdown.svg",
-                      size: 24,
+                  <div
+                    style={{
+                      transform: "rotate(90deg)",
                     }}
-                  />
-                </div>
-                <Text size="sm" font="proto_mono">
-                  Back
-                </Text>
-              </Container>
-            </div>
-            {currentFlowId && getFlowFromId(currentFlowId) && (
-              <TxFlow
-                txFlow={getFlowFromId(currentFlowId)}
-                onRetry={(txIdx) => {
-                  txStore?.performTransactions(signer, {
-                    flowId: currentFlowId,
-                    txIndex: txIdx,
-                  });
-                }}
-                setBridgeStatus={(txIndex, status) =>
-                  txStore?.setTxBridgeStatus(
-                    signer?.account.address ?? "",
-                    currentFlowId,
-                    txIndex,
-                    status
-                  )
-                }
-              />
-            )}
+                  >
+                    <Icon
+                      icon={{
+                        url: "dropdown.svg",
+                        size: 24,
+                      }}
+                    />
+                  </div>
+                  <Text size="sm" font="proto_mono">
+                    Back
+                  </Text>
+                </Container>
+              </div>
+              {currentFlowId && getFlowFromId(currentFlowId) && (
+                <TxFlow
+                  txFlow={getFlowFromId(currentFlowId)}
+                  onRetry={() => {
+                    txStore?.performFlow(signer, currentFlowId);
+                  }}
+                  setBridgeStatus={(txIndex, status) =>
+                    txStore?.setTxBridgeStatus(
+                      signer?.account.address ?? "",
+                      currentFlowId,
+                      txIndex,
+                      status
+                    )
+                  }
+                />
+              )}
+            </Container>
+          </div>
+        ) : (
+          <Container
+            height="calc(100% - 30px)"
+            center={{
+              vertical: true,
+              horizontal: true,
+            }}
+          >
+            <Text size="lg" font="proto_mono">
+              no recent transactions
+            </Text>
           </Container>
-        </div>
+        )}
       </Modal>
       <Button
         color="secondary"

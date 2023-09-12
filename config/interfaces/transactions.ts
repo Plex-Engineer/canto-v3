@@ -1,6 +1,40 @@
 import { ContractAbi } from "web3-types";
 import { PromiseWithError, ReturnWithError } from "./errors";
 import { BridgingMethod } from "@/hooks/bridge/interfaces/bridgeMethods";
+import { TransactionFlowType } from "../transactions/txMap";
+
+// how transactions are stored for the user (will allow retrying creating transactions)
+// txType is the key for the txMap that will create the Transaction[] list
+export interface NewTransactionFlow {
+  title: string;
+  icon: string;
+  txType: TransactionFlowType;
+  params: object;
+}
+
+///
+/// Transaction Flows will include multiple transactions
+/// Flow will have the title of the overal "transaction flow"
+/// Flow will have a status
+///
+export interface TransactionFlow extends NewTransactionFlow {
+  id: string;
+  status: TransactionFlowStatus;
+  transactions: TransactionWithStatus[];
+  error?: string;
+}
+export type TransactionFlowStatus =
+  | "NONE"
+  | "POPULATING"
+  | "SIGNING"
+  | "SUCCESS"
+  | "ERROR";
+// user can be on different accounts to make transactions, so we need to map the transaction flows to the account
+// index by account address
+export type UserTransactionFlowMap = Map<string, TransactionFlow[]>;
+
+///
+
 export interface TransactionDescription {
   title: string;
   description: string;
@@ -34,33 +68,26 @@ export type Transaction = {
       getHash: (...args: any[]) => ReturnWithError<string>;
     }
 );
-type TransactionStatus = "NONE" | "SIGNING" | "PENDING" | "SUCCESS" | "ERROR";
+export type TransactionStatus =
+  | "NONE"
+  | "SIGNING"
+  | "PENDING"
+  | "SUCCESS"
+  | "ERROR";
 
 export interface TransactionWithStatus {
   tx: Transaction;
   status: TransactionStatus;
   hash?: string;
-  error?: Error;
+  error?: string;
   txLink?: string;
   timestamp?: number;
 }
 
-///
-/// Transaction Flows will include multiple transactions
-/// Flow will have the title of the overal "transaction flow"
-/// Flow will have a status
-///
-export type TransactionFlowStatus = "NONE" | "PENDING" | "SUCCESS" | "ERROR";
-export interface TransactionFlowWithStatus {
-  id: string;
-  title: string;
+export interface BridgeStatus {
   status: TransactionFlowStatus;
-  icon: string;
-  transactions: TransactionWithStatus[];
+  completedIn?: number;
 }
-// user can be on different accounts to make transactions, so we need to map the transaction flows to the account
-// index by account address
-export type UserTransactionFlowMap = Map<string, TransactionFlowWithStatus[]>;
 
 ///
 /// Cosmos Transaction Interfaces
@@ -115,9 +142,4 @@ export interface EIP712Message {
 export interface CosmosNativeMessage {
   message: object;
   path: string;
-}
-
-export interface BridgeStatus {
-  status: TransactionFlowStatus;
-  completedIn?: number;
 }
