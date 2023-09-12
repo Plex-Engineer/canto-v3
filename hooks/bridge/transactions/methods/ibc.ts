@@ -210,7 +210,7 @@ export async function getIBCData(
   );
   const ibcData = await tryFetchMultipleEndpoints<IBCData>(allEndpoints);
   if (ibcData.error) {
-    return NEW_ERROR("getIBCData::" + ibcData.error.message);
+    return NEW_ERROR("getIBCData::" + errMsg(ibcData.error));
   }
   return ibcData;
 }

@@ -168,7 +168,7 @@ export async function signAndBroadcastCosmosTransaction(
 
     if (broadcastPost.error) {
       return NEW_ERROR(
-        "signAndBroadcastCosmosTransaction: " + broadcastPost.error.message
+        "signAndBroadcastCosmosTransaction: " + errMsg(broadcastPost.error)
       );
     }
     return NO_ERROR(broadcastPost.data);
@@ -213,7 +213,7 @@ export async function getSenderObj(
 ): PromiseWithError<Sender> {
   const cosmosAccount = await getCosmosAccount(senderCosmosAddress, chainid);
   if (cosmosAccount.error) {
-    return NEW_ERROR("getSenderObj::" + cosmosAccount.error.message);
+    return NEW_ERROR("getSenderObj::" + errMsg(cosmosAccount.error));
   }
   return reformatSender(cosmosAccount.data, eip712);
 }

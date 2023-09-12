@@ -15,14 +15,13 @@ import {
   LendingHookInputParams,
   LendingHookReturn,
 } from "./interfaces/hookParams";
-import { getGeneralCTokenData, getUserCLMLensData } from "./helpers/clmLens";
 import { UserLMPosition } from "./interfaces/userPositions";
 import { useState } from "react";
-import { getLMTotalsFromCTokens } from "./helpers/cTokens";
 import {
   cTokenBorrowLimit,
   cTokenWithdrawLimit,
 } from "@/utils/clm/positions.utils";
+import { getAllUserCLMData } from "./helpers/userClmData";
 
 /**
  * @name useLending
@@ -45,67 +44,22 @@ export default function useLending(
   // use query to get all general and user cToken data
   const { isLoading: loadingCTokens, error: errorCTokens } = useQuery(
     ["lending", params.testnet, params.userEthAddress],
-    async (): Promise<{
-      cTokens: CTokenWithUserData[];
-      position?: UserLMPosition;
-    }> => {
-      const [generalCTokens, userLMData] = await Promise.all([
-        getGeneralCTokenData(params.testnet),
-        getUserCLMLensData(params.userEthAddress ?? "", params.testnet),
-      ]);
-      // check errors and return what is available
-      // if general error, then throw error now
-      if (generalCTokens.error) {
-        throw generalCTokens.error;
-      }
-      // if user error, then just return the general data
-      if (userLMData.error) {
-        return { cTokens: generalCTokens.data };
-      }
-      // since both are okay, combine the data
-      const combinedCTokenData = generalCTokens.data.map((cToken) => {
-        const userCTokenDetails = userLMData.data.cTokens.find((userCToken) => {
-          return (
-            userCToken.cTokenAddress.toLowerCase() ===
-            cToken.address.toLowerCase()
-          );
-        });
-        if (userCTokenDetails) {
-          return {
-            ...cToken,
-            userDetails: userCTokenDetails,
-          };
-        }
-        return cToken;
-      });
-      // get total user positions
-      const { data: positionTotals, error: positionError } =
-        getLMTotalsFromCTokens(
-          combinedCTokenData,
-          userLMData.data.compAccrued.toString()
-        );
-      if (positionError) {
-        return {
-          cTokens: combinedCTokenData,
-        };
-      }
-      const userTotalPosition = {
-        liquidity: userLMData.data.limits.liquidity.toString(),
-        shortfall: userLMData.data.limits.shortfall.toString(),
-        totalSupply: positionTotals.totalSupply,
-        totalBorrow: positionTotals.totalBorrow,
-        totalRewards: positionTotals.totalRewards,
-      };
-
-      return { cTokens: combinedCTokenData, position: userTotalPosition };
+    async () => {
+      return await getAllUserCLMData(
+        params.userEthAddress ?? "",
+        params.testnet
+      );
     },
     {
       onError: (error) => {
         console.log(error);
       },
-      onSuccess(data) {
-        setTokens(data.cTokens);
-        data.position && setPosition(data.position);
+      onSuccess(response) {
+        if (response.error) {
+          console.log(response.error);
+        }
+        setTokens(response.data.cTokens);
+        response.data.position && setPosition(response.data.position);
       },
       refetchInterval: 5000,
     }
@@ -138,7 +92,7 @@ export default function useLending(
     if (userAmountError) {
       return NEW_ERROR("canPerformLendingTx::" + errMsg(userAmountError));
     }
-    switch (txParams.type) {
+    switch (txParams.txType) {
       case CTokenLendingTxTypes.SUPPLY:
       // check user has enough balance
       case CTokenLendingTxTypes.REPAY: {
@@ -148,7 +102,7 @@ export default function useLending(
         if (userBalanceError) {
           return NEW_ERROR("canPerformLendingTx::" + errMsg(userBalanceError));
         }
-        if (txParams.type === CTokenLendingTxTypes.REPAY) {
+        if (txParams.txType === CTokenLendingTxTypes.REPAY) {
           return NO_ERROR(
             userAmount.lte(userBalance) &&
               userAmount.gt(0) &&
@@ -176,7 +130,7 @@ export default function useLending(
             "canPerformLendingTx::" + errMsg(withdrawLimitError)
           );
         }
-        if (txParams.type === CTokenLendingTxTypes.WITHDRAW) {
+        if (txParams.txType === CTokenLendingTxTypes.WITHDRAW) {
           return NO_ERROR(
             withdrawLimit.gte(userAmount) &&
               userAmount.gt(0) &&
@@ -196,7 +150,7 @@ export default function useLending(
         // no checks needed
         return NO_ERROR(true);
       default:
-        return NEW_ERROR("canPerformLendingTx: invalid type: " + txParams.type);
+        return NEW_ERROR("canPerformLendingTx: invalid type: " + txParams.txType);
     }
   }
 

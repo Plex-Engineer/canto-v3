@@ -12,7 +12,7 @@ export enum CTokenLendingTxTypes {
 export interface CTokenLendingTransactionParams {
   chainId: number;
   ethAccount: string;
-  type: CTokenLendingTxTypes;
+  txType: CTokenLendingTxTypes;
   cToken: CTokenWithUserData;
   amount: string;
 }

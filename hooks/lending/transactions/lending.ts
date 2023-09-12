@@ -16,8 +16,7 @@ import { _approveTx, checkTokenAllowance } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { formatBalance } from "@/utils/tokenBalances.utils";
 import { CERC20_ABI, COMPTROLLER_ABI } from "@/config/abis";
-import { CANTO_MAINNET_EVM } from "@/config/networks";
-import { COMPTROLLER_ADDRESS_CANTO_MAINNET } from "@/config/consts/addresses";
+import { getCLMAddress } from "@/config/consts/addresses";
 
 export async function cTokenLendingTx(
   params: CTokenLendingTransactionParams
@@ -28,17 +27,16 @@ export async function cTokenLendingTx(
   }
   // check if collateralizing tx
   if (
-    params.type === CTokenLendingTxTypes.COLLATERALIZE ||
-    params.type === CTokenLendingTxTypes.DECOLLATERALIZE
+    params.txType === CTokenLendingTxTypes.COLLATERALIZE ||
+    params.txType === CTokenLendingTxTypes.DECOLLATERALIZE
   ) {
     // get comptroller address
-    let comptrollerAddress;
-    if (params.chainId === CANTO_MAINNET_EVM.chainId) {
-      comptrollerAddress = COMPTROLLER_ADDRESS_CANTO_MAINNET;
-    } else {
+    const comptrollerAddress = getCLMAddress(params.chainId, "comptroller");
+    if (!comptrollerAddress) {
       return NEW_ERROR("cTokenLendingTx: chainId not supported");
     }
-    const isCollateralize = params.type === CTokenLendingTxTypes.COLLATERALIZE;
+    const isCollateralize =
+      params.txType === CTokenLendingTxTypes.COLLATERALIZE;
     return NO_ERROR([
       _collateralizeTx(
         params.chainId,
@@ -61,8 +59,8 @@ export async function cTokenLendingTx(
   // check to see if we need to enable token (only for supplying and repaying)
   if (
     !isCanto &&
-    (params.type === CTokenLendingTxTypes.SUPPLY ||
-      params.type === CTokenLendingTxTypes.REPAY)
+    (params.txType === CTokenLendingTxTypes.SUPPLY ||
+      params.txType === CTokenLendingTxTypes.REPAY)
   ) {
     // check if we need to approve token
     const { data: hasAllowance, error: allowanceError } =
@@ -94,13 +92,13 @@ export async function cTokenLendingTx(
   // create tx for lending
   txList.push(
     _lendingCTokenTx(
-      params.type,
+      params.txType,
       params.chainId,
       params.cToken.address,
       isCanto,
       params.amount,
       TX_DESCRIPTIONS.CTOKEN_LENDING(
-        params.type,
+        params.txType,
         params.cToken.underlying.symbol,
         formatBalance(params.amount, params.cToken.underlying.decimals)
       )

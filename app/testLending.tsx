@@ -94,7 +94,7 @@ export default function TestLending() {
                         amount,
                         selectedToken.underlying.decimals
                       ).data.toString(),
-                      type: CTokenLendingTxTypes.SUPPLY,
+                      txType: CTokenLendingTxTypes.SUPPLY,
                     }).data
                   }
                 >
@@ -111,7 +111,7 @@ export default function TestLending() {
                         amount,
                         selectedToken.underlying.decimals
                       ).data.toString(),
-                      type: CTokenLendingTxTypes.WITHDRAW,
+                      txType: CTokenLendingTxTypes.WITHDRAW,
                     }).data
                   }
                 >
@@ -128,7 +128,7 @@ export default function TestLending() {
                         amount,
                         selectedToken.underlying.decimals
                       ).data.toString(),
-                      type: CTokenLendingTxTypes.BORROW,
+                      txType: CTokenLendingTxTypes.BORROW,
                     }).data
                   }
                 >
@@ -145,7 +145,7 @@ export default function TestLending() {
                         amount,
                         selectedToken.underlying.decimals
                       ).data.toString(),
-                      type: CTokenLendingTxTypes.REPAY,
+                      txType: CTokenLendingTxTypes.REPAY,
                     }).data
                   }
                 >
@@ -159,7 +159,13 @@ export default function TestLending() {
       <h1>USER POSITION</h1>
       {position && (
         <>
-          <h2>Total Borrow: {position.totalBorrow}</h2>
+          <h2>
+            Total Borrow:{" "}
+            {formatBalance(position.totalBorrow, 18, {
+              commify: true,
+              precision: 2,
+            })}
+          </h2>
           <h2>
             Total Supply:{" "}
             {formatBalance(position.totalSupply, 18, {
@@ -167,9 +173,9 @@ export default function TestLending() {
               precision: 2,
             })}
           </h2>
-          <h2>Total Liquidity: {position.liquidity}</h2>
-          <h2>Total Shortfall: {position.shortfall}</h2>
-          <h2>Total Rewards: {position.totalRewards}</h2>
+          <h2>Total Liquidity: {formatBalance(position.liquidity, 18)}</h2>
+          <h2>Total Shortfall: {formatBalance(position.shortfall, 18)}</h2>
+          <h2>Total Rewards: {formatBalance(position.totalRewards, 18)}</h2>
         </>
       )}
       <h1>CTOKENS: </h1>
