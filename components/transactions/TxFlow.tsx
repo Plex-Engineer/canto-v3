@@ -53,7 +53,9 @@ const TxFlow = (props: Props) => {
             {props.txFlow.title}
           </Text>
           <Spacer height="40px" />
-          {props.txFlow?.error && <Text>{formatError(props.txFlow.error)}</Text>}
+          {props.txFlow?.error && (
+            <Text>{formatError(props.txFlow.error)}</Text>
+          )}
           {!props.txFlow.error &&
             props.txFlow.transactions.map((tx, idx) => (
               <TxItem
