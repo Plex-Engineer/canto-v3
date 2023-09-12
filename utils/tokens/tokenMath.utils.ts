@@ -3,7 +3,7 @@ import {
   NO_ERROR,
   ReturnWithError,
 } from "@/config/interfaces/errors";
-import { convertToBigNumber } from "../formatBalances";
+import { convertToBigNumber } from "../tokenBalances.utils";
 import BigNumber from "bignumber.js";
 
 /**

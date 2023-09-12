@@ -6,11 +6,13 @@ interface Props {
     size?: number;
   };
   color?: "primary" | "accent" | "dark";
+  className?: string;
 }
 
 const Icon = (props: Props) => {
   return (
     <Image
+      className={props.className}
       src={props.icon.url}
       style={{
         filter:

@@ -11,10 +11,9 @@ import {
   getEthTransactionLink,
 } from "../helpers";
 
-const cantoBlockExplorerEVM = "https://tuber.build";
 const cantoTestnetBlockExplorerEVM = "https://testnet.tuber.build";
 
-const cantoBlockExplorerCosmos = "https://www.mintscan.io/canto";
+const cantoMainBlockExplorer = "https://www.mintscan.io/canto";
 
 // canto will have an EVM and COSMOS chain data
 const cantoMainnetBaseInfo = {
@@ -35,9 +34,9 @@ export const CANTO_MAINNET_EVM: EVMNetwork = {
   id: "canto-mainnet",
   chainId: 7700,
   blockExplorer: {
-    url: cantoBlockExplorerEVM,
-    getAddressLink: getEthAddressLink(cantoBlockExplorerEVM),
-    getTransactionLink: getEthTransactionLink(cantoBlockExplorerEVM),
+    url: cantoMainBlockExplorer,
+    getAddressLink: getCosmosAddressLink(cantoMainBlockExplorer),
+    getTransactionLink: getCosmosTransactionLink(cantoMainBlockExplorer),
   },
   multicall3Address: "0xcA11bde05977b3631167028862bE2a173976CA11",
 };
@@ -52,9 +51,9 @@ export const CANTO_MAINNET_COSMOS: CosmosNetwork = {
     return checkCosmosAddress(this.addressPrefix)(address);
   },
   blockExplorer: {
-    url: cantoBlockExplorerCosmos,
-    getAddressLink: getCosmosAddressLink(cantoBlockExplorerCosmos),
-    getTransactionLink: getCosmosTransactionLink(cantoBlockExplorerCosmos),
+    url: cantoMainBlockExplorer,
+    getAddressLink: getCosmosAddressLink(cantoMainBlockExplorer),
+    getTransactionLink: getCosmosTransactionLink(cantoMainBlockExplorer),
   },
 };
 
@@ -93,8 +92,8 @@ export const CANTO_TESTNET_COSMOS: CosmosNetwork = {
     return checkCosmosAddress(this.addressPrefix)(address);
   },
   blockExplorer: {
-    url: cantoBlockExplorerCosmos,
-    getAddressLink: getCosmosAddressLink(cantoBlockExplorerCosmos),
-    getTransactionLink: getCosmosTransactionLink(cantoBlockExplorerCosmos),
+    url: cantoMainBlockExplorer,
+    getAddressLink: getCosmosAddressLink(cantoMainBlockExplorer),
+    getTransactionLink: getCosmosTransactionLink(cantoMainBlockExplorer),
   },
 };

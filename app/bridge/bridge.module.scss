@@ -7,6 +7,18 @@
   width: 100%;
 }
 
+.infoPop {
+  border-radius: 50px;
+  border: 1px solid var(--border-stroke-color);
+  background-color: rgba(var(--dark-color), 0.04);
+
+  min-width: 24px;
+  padding: 0 6px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .container {
   display: flex;
   flex-direction: column;
@@ -23,6 +35,10 @@
   align-self: stretch;
 }
 
+.info {
+  //   position: absolute;
+  background-color: var(--card-sub-surface-color);
+}
 .networks-box {
   width: 100%;
 }
@@ -39,7 +55,6 @@
   padding: 20px;
   border-radius: var(--border-radius, 0px);
   border: 1px solid var(--border-stroke-color, #b3b3b3);
-  margin-top: 1rem;
 }
 
 .token {
@@ -49,4 +64,14 @@
   gap: 1rem;
   width: 100%;
   padding-left: 1rem;
+}
+
+.confirmation-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: stretch;
+  height: 100%;
+  gap: 1rem;
+  width: 100%;
 }

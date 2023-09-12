@@ -13,6 +13,7 @@
 }
 
 .light {
+  --anim-bg-color: #dddddd;
   --canto-color: var(--extra-success-color, #06fc99);
   --dark-color: 17, 17, 17;
   --light-color: 255, 255, 255;
@@ -42,7 +43,8 @@
   --light-mode: 1;
 }
 
-.dark {
+.dim {
+  --anim-bg-color: #06fc99;
   --canto-color: #06fc99;
   --light-color: 17, 17, 17;
   --dark-color: 255, 255, 255;
@@ -74,6 +76,8 @@
 }
 
 .dark2 {
+  --anim-bg-color: #06fc99;
+
   --canto-color: #06fc99;
   --light-color: 17, 17, 17;
   --dark-color: 255, 255, 255;
@@ -102,6 +106,38 @@
   --box-shadow: 0;
 }
 
+.dark {
+  --anim-bg-color: #1b4633;
+  --canto-color: #06fc99;
+  --light-color: 17, 17, 17;
+  --dark-color: 255, 255, 255;
+  --text-only-dark: #222222;
+  --text-only-light: #ffffff;
+  --primary-90-color: #eeeeee;
+  --primary-10-color: #eeeeee31; // new
+
+  --text-light-color: #111111;
+  --card-background-color: #0b0b0b;
+  --text-light-30-color: #1111114c;
+  --extra-failure-color: #ef4444;
+  --text-dark-30-color: #ededed4c;
+  --extra-success-color: #06fc99;
+  --text-light-40-color: #11111166;
+  --card-subtle-color: #ffffff;
+  --text-dark-40-color: #ececec66;
+  --card-primary-color: #0ee489;
+  --border-optional-color: #ffffff00;
+  --extra-shadow: #cdcdcd;
+  --border-stroke-color: #3d3d3d;
+  --border-radius: 5;
+  --text-dark-color: #ececec;
+  --card-sub-surface-color: #292929;
+  --card-surface-color: #1e1e1e;
+  --dark-mode: 1;
+  --light-mode: 0;
+  --box-shadow: 0;
+}
+
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -120,7 +156,6 @@ body {
   grid-template-rows: auto auto 1fr auto;
 }
 .body {
-  background-color: var(--card-background-color);
   color: var(--text-dark-color);
   min-height: 100vh;
   display: grid;

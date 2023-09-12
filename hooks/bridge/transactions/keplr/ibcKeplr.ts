@@ -45,7 +45,17 @@ import { tryFetch } from "@/utils/async.utils";
 import Long from "long";
 import { IBCToken } from "@/config/interfaces/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { formatBalance } from "@/utils/formatBalances";
+
+import { formatBalance } from "@/utils/tokenBalances.utils";
+import {
+  BridgingMethod,
+  getBridgeMethodInfo,
+} from "../../interfaces/bridgeMethods";
+import { BridgeTransactionParams } from "../../interfaces/hookParams";
+import { getCosmosTokenBalance } from "@/utils/cosmos/cosmosBalance.utils";
+import { isIBCToken } from "@/utils/tokens/tokens.utils";
+import BigNumber from "bignumber.js";
+
 
 /**
  * @notice creates a list of transactions that need to be made for IBC in to canto using keplr
@@ -64,6 +74,12 @@ export async function ibcInKeplr(
   ibcToken: IBCToken,
   amount: string
 ): PromiseWithError<Transaction[]> {
+  // make sure token chainId is correct
+  if (ibcToken.chainId.toString() !== cosmosNetwork.chainId) {
+    return NEW_ERROR(
+      "ibcInKeplr: token chain id does not match from network chain id"
+    );
+  }
   // check if we can obtain the keplr client
   const { data: keplrClient, error: clientError } = await connectToKeplr(
     cosmosNetwork
@@ -149,7 +165,8 @@ export async function ibcInKeplr(
         ibcToken.symbol,
         formatBalance(amount, ibcToken.decimals),
         cosmosNetwork.name,
-        CANTO_MAINNET_COSMOS.name
+        CANTO_MAINNET_COSMOS.name,
+        getBridgeMethodInfo(BridgingMethod.IBC).name
       ),
       type: "KEPLR",
       tx: async () => {
@@ -483,7 +500,8 @@ async function evmosIBCIn(
         token.symbol,
         formatBalance(amount, token.decimals),
         evmosNetwork.name,
-        CANTO_MAINNET_COSMOS.name
+        CANTO_MAINNET_COSMOS.name,
+        getBridgeMethodInfo(BridgingMethod.IBC).name
       ),
       type: "KEPLR",
       tx: signAndBroadcast,
@@ -495,4 +513,34 @@ async function evmosIBCIn(
       },
     },
   ]);
+}
+
+/**
+ * @notice validates the parameters for bridging in through IBC keplr
+ * @param {BridgeTransactionParams} params parameters for bridging in
+ * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
+ */
+export async function validateKeplrIBCTxParams(
+  params: BridgeTransactionParams
+): PromiseWithError<{
+  valid: boolean;
+  error?: string;
+}> {
+  if (!isIBCToken(params.token.data)) {
+    return NEW_ERROR("validateKeplrIBCTxParams: IBC only works for IBC tokens");
+  }
+  // get token balance for user
+  const { data: userTokenBalance, error: userTokenBalanceError } =
+    await getCosmosTokenBalance(
+      params.from.chainId,
+      params.from.account,
+      params.token.data.nativeName
+    );
+  if (userTokenBalanceError) {
+    return NEW_ERROR("validateKeplrIBCTxParams::" + userTokenBalanceError);
+  }
+  if (BigNumber(userTokenBalance).lt(params.token.amount)) {
+    return NO_ERROR({ valid: false, error: "insufficient funds" });
+  }
+  return NO_ERROR({ valid: true });
 }

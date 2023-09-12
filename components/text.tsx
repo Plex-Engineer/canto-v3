@@ -1,20 +1,6 @@
-import localFont from "next/font/local";
-
-const rm_mono = localFont({
-  src: "../fonts/rm-mono-regular.ttf",
-  weight: "300",
-  style: "normal",
-});
-
-const proto_mono = localFont({
-  src: "../fonts/proto-mono-regular.ttf",
-  weight: "300",
-  style: "normal",
-});
-
 interface Props {
   font?: "rm_mono" | "proto_mono";
-  weight?: "regular" | "bold";
+  weight?: "normal" | "bold";
   size?: "xx-sm" | "x-sm" | "sm" | "md" | "lg" | "x-lg";
   opacity?: number;
   theme?:
@@ -25,6 +11,7 @@ interface Props {
   color?: string;
   style?: React.CSSProperties;
   children: React.ReactNode;
+  className?: string;
 }
 
 const sizes = {
@@ -52,15 +39,15 @@ const Text = ({
   theme,
   style,
   opacity,
+  className,
 }: Props) => {
   return (
     <p
+      className={className}
       style={{
         fontFamily:
-          font == "proto_mono"
-            ? proto_mono.style.fontFamily
-            : rm_mono.style.fontFamily,
-        opacity: (opacity ?? 100) / 100,
+          font == "proto_mono" ? "var(--proto-mono)" : "var(--rm-mono)",
+        opacity: opacity ?? 1,
         fontWeight: weight,
         fontSize: sizes[size ?? "md"],
         lineHeight: "140%",

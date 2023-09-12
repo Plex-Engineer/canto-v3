@@ -7,7 +7,7 @@ import {
   errMsg,
 } from "@/config/interfaces/errors";
 import { convertNoteAmountToToken } from "../tokens/tokenMath.utils";
-import { convertToBigNumber } from "../formatBalances";
+import { convertToBigNumber } from "../tokenBalances.utils";
 
 /**
  * @notice Calculates the maximum amount of tokens that can be borrowed

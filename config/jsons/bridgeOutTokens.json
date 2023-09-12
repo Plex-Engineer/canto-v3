@@ -11,12 +11,15 @@
         "canto-mainnet": [
             {
                 "id": "0x56C03B8C4FA80Ba37F5A7b60CAAAEF749bB5b220",
+                "nativeWrappedToken": true,
                 "chainId": 7700,
                 "address": "0x56C03B8C4FA80Ba37F5A7b60CAAAEF749bB5b220",
                 "name": "Canto",
                 "symbol": "CANTO",
                 "decimals": 18,
                 "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+                "isOFT": true,
+                "isOFTProxy": true,
                 "bridgeMethods": [
                     {
                         "chainId": "eth-mainnet",
@@ -38,7 +41,7 @@
                 "nativeName": "gravity0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
                 "bridgeMethods": [
                     {
-                        "chainId": "gravity-bridge-3",
+                        "chainId": "ethereum-via-gravity-bridge",
                         "methods": [
                             "1"
                         ]
@@ -57,7 +60,7 @@
                 "nativeName": "gravity0xd567B3d7B8FE3C79a1AD8dA978812cfC4Fa05e75",
                 "bridgeMethods": [
                     {
-                        "chainId": "gravity-bridge-3",
+                        "chainId": "ethereum-via-gravity-bridge",
                         "methods": [
                             "1"
                         ]
@@ -76,7 +79,7 @@
                 "nativeName": "gravity0x5FD55A1B9FC24967C4dB09C513C3BA0DFa7FF687",
                 "bridgeMethods": [
                     {
-                        "chainId": "gravity-bridge-3",
+                        "chainId": "ethereum-via-gravity-bridge",
                         "methods": [
                             "1"
                         ]
@@ -95,7 +98,7 @@
                 "nativeName": "gravity0xc71aAf8e486e3F33841BB56Ca3FD2aC3fa8D29a8",
                 "bridgeMethods": [
                     {
-                        "chainId": "gravity-bridge-3",
+                        "chainId": "ethereum-via-gravity-bridge",
                         "methods": [
                             "1"
                         ]
@@ -543,12 +546,59 @@
         "canto-testnet": [
             {
                 "id": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
+                "nativeWrappedToken": true,
                 "chainId": 7701,
                 "address": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
                 "name": "Canto",
                 "symbol": "CANTO",
                 "decimals": 18,
                 "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+                "isOFT": true,
+                "isOFTProxy": true,
+                "bridgeMethods": [
+                    {
+                        "chainId": "mumbai-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    },
+                    {
+                        "chainId": "fantom-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    },
+                    {
+                        "chainId": "goerli-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    },
+                    {
+                        "chainId": "avalanche-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    },
+                    {
+                        "chainId": "optimism-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x428383C265a423304D929adaC92a9ac8d8a2F113",
+                "chainId": 7701,
+                "address": "0x428383C265a423304D929adaC92a9ac8d8a2F113",
+                "name": "cNote",
+                "symbol": "cNOTE",
+                "decimals": 18,
+                "icon": "/tokens/note.svg",
+                "isOFT": true,
+                "isOFTProxy": true,
+                "oftUnderlyingAddress": "0x04E52476d318CdF739C38BD41A922787D441900c",
                 "bridgeMethods": [
                     {
                         "chainId": "mumbai-testnet",

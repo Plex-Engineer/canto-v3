@@ -1,4 +1,7 @@
-import { Transaction } from "@/config/interfaces/transactions";
+import {
+  Transaction,
+  TransactionDescription,
+} from "@/config/interfaces/transactions";
 import {
   CTokenLendingTransactionParams,
   CTokenLendingTxTypes,
@@ -11,7 +14,7 @@ import {
 } from "@/config/interfaces/errors";
 import { _approveTx, checkTokenAllowance } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { formatBalance } from "@/utils/formatBalances";
+import { formatBalance } from "@/utils/tokenBalances.utils";
 import { CERC20_ABI, COMPTROLLER_ABI } from "@/config/abis";
 import { CANTO_MAINNET_EVM } from "@/config/networks";
 import { COMPTROLLER_ADDRESS_CANTO_MAINNET } from "@/config/consts/addresses";
@@ -62,7 +65,7 @@ export async function cTokenLendingTx(
       params.type === CTokenLendingTxTypes.REPAY)
   ) {
     // check if we need to approve token
-    const { data: needAllowance, error: allowanceError } =
+    const { data: hasAllowance, error: allowanceError } =
       await checkTokenAllowance(
         params.chainId,
         params.cToken.underlying.address,
@@ -73,7 +76,7 @@ export async function cTokenLendingTx(
     if (allowanceError) {
       return NEW_ERROR("cTokenLendingTx::" + errMsg(allowanceError));
     }
-    if (needAllowance) {
+    if (!hasAllowance) {
       txList.push(
         _approveTx(
           params.chainId,
@@ -116,7 +119,7 @@ const _lendingCTokenTx = (
   cTokenAddress: string,
   isCanto: boolean,
   amount: string,
-  description: string
+  description: TransactionDescription
 ): Transaction => {
   const txDetails = methodAndParamsFromLendingTxType(
     lendingTx,
@@ -140,7 +143,7 @@ const _collateralizeTx = (
   comptrollerAddress: string,
   cTokenAddress: string,
   collateralize: boolean,
-  description: string
+  description: TransactionDescription
 ): Transaction => ({
   description,
   chainId: chainId,

@@ -3,10 +3,10 @@ import Link from "next/link";
 import styles from "./navbar.module.scss";
 import Text from "../text";
 import Image from "next/image";
-import Button from "../button/button";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import TransactionModal from "../transactions/TxModal";
 
 const NavBar = () => {
   const currentPath = usePathname();
@@ -26,7 +26,7 @@ const NavBar = () => {
       </div>
 
       <div className={styles["nav-links"]}>
-        <Link
+        {/* <Link
           href="/"
           className={clsx(
             styles["nav-link"],
@@ -34,7 +34,7 @@ const NavBar = () => {
           )}
         >
           <Text>Home</Text>
-        </Link>
+        </Link> */}
         <Link
           href="/bridge"
           className={clsx(
@@ -44,7 +44,7 @@ const NavBar = () => {
         >
           <Text>Bridge</Text>
         </Link>
-        <Link
+        {/* <Link
           href="/staking"
           className={clsx(
             styles["nav-link"],
@@ -70,12 +70,15 @@ const NavBar = () => {
           )}
         >
           <Text>Governance</Text>
-        </Link>
+        </Link> */}
       </div>
-
-      <div className={styles["wallet-connect"]}>
-        {/* <Button color="secondary">Connect Wallet</Button> */}
-        <ConnectButton />
+      <div className={styles["btn-grp"]}>
+        <div className={styles.activity}>
+          <TransactionModal />
+        </div>
+        <div className={styles["wallet-connect"]}>
+          <ConnectButton chainStatus={"none"} />
+        </div>
       </div>
     </div>
   );

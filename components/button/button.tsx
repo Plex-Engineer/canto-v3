@@ -1,18 +1,5 @@
-import localFont from "next/font/local";
 import styles from "./button.module.scss";
 import Image from "next/image";
-
-const rm_mono = localFont({
-  src: "../../fonts/rm-mono-regular.ttf",
-  weight: "300",
-  style: "normal",
-});
-
-const proto_mono = localFont({
-  src: "../../fonts/proto-mono-regular.ttf",
-  weight: "300",
-  style: "normal",
-});
 
 interface Props {
   onClick?: () => void;
@@ -50,12 +37,10 @@ const Button = (props: Props) => {
 
   const getFontFamily = () => {
     switch (props.fontFamily) {
-      case "rm_mono":
-        return rm_mono.style.fontFamily;
       case "proto_mono":
-        return proto_mono.style.fontFamily;
+        return "var(--proto-mono)";
       default:
-        return rm_mono.style.fontFamily;
+        return "var(--rm-mono)";
     }
   };
 

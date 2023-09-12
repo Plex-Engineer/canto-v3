@@ -3,7 +3,7 @@ import Input from "@/components/input/input";
 import Modal from "@/components/modal/modal";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import useLending from "@/hooks/lending/useLending";
-import { convertToBigNumber, formatBalance } from "@/utils/formatBalances";
+import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 import { useEffect, useMemo, useState } from "react";
 import { useWalletClient } from "wagmi";
 

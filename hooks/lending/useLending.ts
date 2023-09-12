@@ -10,7 +10,7 @@ import {
   ReturnWithError,
   errMsg,
 } from "@/config/interfaces/errors";
-import { convertToBigNumber } from "@/utils/formatBalances";
+import { convertToBigNumber } from "@/utils/tokenBalances.utils";
 import {
   LendingHookInputParams,
   LendingHookReturn,
@@ -60,9 +60,7 @@ export default function useLending(
       }
       // if user error, then just return the general data
       if (userLMData.error) {
-        return {
-          cTokens: generalCTokens.data,
-        };
+        return { cTokens: generalCTokens.data };
       }
       // since both are okay, combine the data
       const combinedCTokenData = generalCTokens.data.map((cToken) => {
@@ -80,8 +78,7 @@ export default function useLending(
         }
         return cToken;
       });
-
-      // do some get total user positions
+      // get total user positions
       const { data: positionTotals, error: positionError } =
         getLMTotalsFromCTokens(
           combinedCTokenData,
@@ -106,7 +103,7 @@ export default function useLending(
       onError: (error) => {
         console.log(error);
       },
-      onSuccess: (data) => {
+      onSuccess(data) {
         setTokens(data.cTokens);
         data.position && setPosition(data.position);
       },
