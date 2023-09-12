@@ -29,12 +29,14 @@ import {
 } from "@/config/interfaces/transactions";
 import useTokenBalances from "../helpers/useTokenBalances";
 import { bridgeOutTx } from "./transactions/bridge";
-import { isERC20TokenList } from "@/utils/tokens/tokens.utils";
+import { isERC20TokenList, isOFTToken } from "@/utils/tokens/tokens.utils";
 import { isBridgeOutToken } from "@/utils/tokens/bridgeTokens.utils";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 import { isValidEthAddress } from "@/utils/address.utils";
 import { isCosmosNetwork } from "@/utils/networks.utils";
+import { ERC20Token } from "@/config/interfaces/tokens";
 import { TransactionFlowType } from "@/config/transactions/txMap";
+
 
 export default function useBridgeOut(
   props: BridgeHookInputParams
@@ -83,7 +85,19 @@ export default function useBridgeOut(
   // contains object mapping of the token balances
   const userTokenBalances = useTokenBalances(
     state.fromNetwork?.chainId,
-    isERC20TokenList(state.availableTokens) ? state.availableTokens : [],
+    isERC20TokenList(state.availableTokens)
+      ? (state.availableTokens.map((token) => {
+          if (
+            isOFTToken(token) &&
+            token.isOFTProxy &&
+            token.oftUnderlyingAddress
+          ) {
+            return { ...token, address: token.oftUnderlyingAddress };
+          } else {
+            return token;
+          }
+        }) as ERC20Token[])
+      : [],
     state.connectedEthAddress,
     null
   );

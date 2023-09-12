@@ -47,14 +47,12 @@ import { fetchBlockNumber, fetchTransaction } from "wagmi/actions";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging into gravity bridge
- * @param {number} chainId chainId to begin bridging from
  * @param {string} ethSender eth sender address
  * @param {ERC20Token} token token to bridge
  * @param {string} amount amount to bridge
  * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
  */
 export async function bridgeInGravity(
-  chainId: number,
   ethSender: string,
   token: ERC20Token,
   amount: string
@@ -62,6 +60,12 @@ export async function bridgeInGravity(
   // check addresses
   if (!isValidEthAddress(ethSender)) {
     return NEW_ERROR("bridgeInGravity: invalid eth address: " + ethSender);
+  }
+  // check token chain
+  if (token.chainId !== ETH_MAINNET.chainId) {
+    return NEW_ERROR(
+      "bridgeInGravity: token chain id does not match from network chain id"
+    );
   }
 
   // gravity bridge is onlt used from ETH mainnet to canto, so convert the sender ethAddress to canto
@@ -125,7 +129,7 @@ export async function bridgeInGravity(
   if (isWETH(token.address)) {
     // get WETH balance first, since we might not need to wrap yet
     const { data: wethBalance, error: balanceError } = await getTokenBalance(
-      chainId,
+      token.chainId,
       token.address,
       ethSender
     );
@@ -138,7 +142,7 @@ export async function bridgeInGravity(
       const amountToWrap = new BigNumber(amount).minus(wethBalance).toString();
       txList.push(
         _wrapTx(
-          chainId,
+          token.chainId,
           token.address,
           amountToWrap,
           TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amountToWrap, token.decimals))
@@ -150,7 +154,7 @@ export async function bridgeInGravity(
   // check token allowance
   const { data: hasAllowance, error: allowanceError } =
     await checkTokenAllowance(
-      chainId,
+      token.chainId,
       token.address,
       ethSender,
       GRAVITY_BRIDGE_ETH_ADDRESS,
@@ -163,7 +167,7 @@ export async function bridgeInGravity(
   if (!hasAllowance) {
     txList.push(
       _approveTx(
-        chainId,
+        token.chainId,
         token.address,
         GRAVITY_BRIDGE_ETH_ADDRESS,
         amount,
@@ -175,7 +179,7 @@ export async function bridgeInGravity(
   // send to cosmos
   txList.push(
     _sendToCosmosTx(
-      chainId,
+      token.chainId,
       cantoReceiver,
       token.address,
       amount,
