@@ -64,7 +64,6 @@ export async function waitForTransaction(
         hash: hash as `0x${string}`,
         confirmations: 2,
       });
-      console.log(receipt)
       return NO_ERROR({
         status: receipt.status,
         error: receipt.logs,

@@ -47,7 +47,6 @@ export async function performEVMTransaction(
       chainId: tx.chainId,
       account: signer.account.address,
     };
-    console.log(contractCall)
     const { hash } = await writeContract(contractCall);
     return NO_ERROR(hash);
   } catch (err) {
