@@ -26,7 +26,7 @@ const AnimatedBackground = (props: Props) => {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <g clip-path="url(#clip0_277_2357)">
+        <g clipPath="url(#clip0_277_2357)">
           <circle cx="948" cy="948" r="3" fill="white" />
           <mask
             id="mask0_277_2357"

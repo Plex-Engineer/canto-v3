@@ -297,7 +297,10 @@ const Bridging = (props: BridgeProps) => {
                     name: token.name.length > 24 ? token.symbol : token.name,
                     secondary: formatBalance(
                       token.balance ?? "0",
-                      token.decimals
+                      token.decimals,
+                      {
+                        commify: true,
+                      }
                     ),
                   })) ?? []
                 }
