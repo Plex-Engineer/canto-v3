@@ -7,7 +7,7 @@ import {
   BridgeStatus,
   TransactionWithStatus,
 } from "@/config/interfaces/transactions";
-import { dateToMomentsAgo, formatError } from "@/utils/formatting.utils";
+import { dateToMomentsAgo, formatError, formatSecondsToMinutes } from "@/utils/formatting.utils";
 import StatusIcon from "../icon/statusIcon";
 import { useQuery } from "react-query";
 import { getBridgeStatus } from "@/hooks/bridge/transactions/bridgeTxStatus";
@@ -118,7 +118,7 @@ const TxItem = (props: TxItemProps) => {
             </Text>
             {props.tx.tx.bridge.timeLeft !== undefined && (
               <Text size="sm" theme="secondary-dark">
-                TIME LEFT: {props.tx.tx.bridge.timeLeft} seconds
+                TIME LEFT: {formatSecondsToMinutes(props.tx.tx.bridge.timeLeft)}
               </Text>
             )}
           </>
