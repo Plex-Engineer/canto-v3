@@ -12,6 +12,7 @@ import styles from "./transactions.module.scss";
 import Spacer from "../layout/spacer";
 import clsx from "clsx";
 import StatusIcon from "../icon/statusIcon";
+import Splash from "../splash/splash";
 
 const TransactionModal = () => {
   // set modal open state
@@ -58,7 +59,22 @@ const TransactionModal = () => {
         <Text size="lg" font="proto_mono">
           Activity
         </Text>
-        {transactionFlows && transactionFlows?.length > 0 ? (
+        {txStore?.isLoading ? (
+          <Container
+            height="calc(100% - 30px)"
+            center={{
+              vertical: true,
+              horizontal: true,
+            }}
+          >
+            <Container height="300px">
+              <Splash height="300px" width="300px" />
+            </Container>
+            <Text size="lg" font="proto_mono">
+              loading...
+            </Text>
+          </Container>
+        ) : transactionFlows && transactionFlows?.length > 0 ? (
           <div className={styles["scroll-view"]}>
             {/* <Spacer height="10px" /> */}
             <div className={clsx(styles["items-list"])}>
