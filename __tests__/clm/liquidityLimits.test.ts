@@ -1,4 +1,7 @@
-import { cTokenBorrowLimit } from "@/utils/clm/positions.utils";
+import {
+  cTokenBorrowLimit,
+  cTokenWithdrawLimit,
+} from "@/utils/clm/positions.utils";
 
 describe("liquidity limits tests", () => {
   it("calculate max borrow limit in underlying", async () => {
@@ -42,7 +45,14 @@ describe("liquidity limits tests", () => {
         cToken: { price: "1000000000000000000000000000000" }, // 1:1 but 6 decimal token
         currentLiquidity: "100000000000000000000", // 100 NOTE
         percent: 50, // only 50 percent
-        expected: "50000000", // 100 TOKEN
+        expected: "50000000", // 50 TOKEN
+        error: false,
+      },
+      {
+        cToken: { price: "1000000000000000000000000000000" }, // 1:1 but 6 decimal token
+        currentLiquidity: "100000000000000000000", // 100 NOTE
+        percent: 80, // only 80 percent
+        expected: "80000000", // 80 TOKEN
         error: false,
       },
       {
@@ -73,6 +83,179 @@ describe("liquidity limits tests", () => {
       } else {
         expect(maxBorrowError).toBeNull();
         expect(maxBorrow?.toString()).toBe(p.expected);
+      }
+    });
+  });
+
+  it("calculate max withdraw limit in underlying", async () => {
+    const params = [
+      {
+        description: "not collateral, 100% withdraw",
+        cToken: {
+          userDetails: {
+            isCollateral: false,
+            supplyBalanceInUnderlying: "1000000000000000000",
+          },
+          collateralFactor: "800000000000000000",
+          price: "1000000000000000000",
+        },
+        currentLiquidity: "0", // shouldn't matter
+        percent: 100,
+        expected: "1000000000000000000", // supply balance
+        error: false,
+      },
+      {
+        description:
+          "not collateral, 100% withdraw, with different percent and price (shouldn't matter)",
+        cToken: {
+          userDetails: {
+            isCollateral: false,
+            supplyBalanceInUnderlying: "1000000000000000000",
+          },
+          collateralFactor: "800000000000000000",
+          price: "1",
+        },
+        currentLiquidity: "0", // shouldn't matter
+        percent: 2,
+        expected: "1000000000000000000", // supply balance
+        error: false,
+      },
+      {
+        description: "no collateral factor, 100% withdraw",
+        cToken: {
+          userDetails: {
+            isCollateral: true,
+            supplyBalanceInUnderlying: "1000000000000000000",
+          },
+          collateralFactor: "0",
+          price: "1",
+        },
+        currentLiquidity: "0", // shouldn't matter
+        percent: 2,
+        expected: "1000000000000000000", // supply balance
+        error: false,
+      },
+      {
+        description:
+          "all liquidity comes from token, no borrows, 100% withdraw, price 1:1",
+        cToken: {
+          userDetails: {
+            isCollateral: true,
+            supplyBalanceInUnderlying: "1000000000000000000",
+          },
+          collateralFactor: "500000000000000000",
+          price: "1000000000000000000",
+        },
+        currentLiquidity: "500000000000000000", // should be half of the supply balance
+        percent: 100,
+        expected: "1000000000000000000", // supply balance
+        error: false,
+      },
+      {
+        description:
+          "all liquidity comes from token, no borrows, 80% withdraw, price 1:1",
+        cToken: {
+          userDetails: {
+            isCollateral: true,
+            supplyBalanceInUnderlying: "1000000000000000000",
+          },
+          collateralFactor: "500000000000000000",
+          price: "1000000000000000000",
+        },
+        currentLiquidity: "500000000000000000", // should be half of the supply balance
+        percent: 80,
+        expected: "800000000000000000",
+        error: false,
+      },
+      {
+        description: "no liquidity left, price 1:1, no withdraw allowed",
+        cToken: {
+          userDetails: {
+            isCollateral: true,
+            supplyBalanceInUnderlying: "1000000000000000000",
+          },
+          collateralFactor: "500000000000000000",
+          price: "1000000000000000000",
+        },
+        currentLiquidity: "0",
+        percent: 100,
+        expected: "0",
+        error: false,
+      },
+      {
+        description: "some liquidity left, price 1:1",
+        cToken: {
+          userDetails: {
+            isCollateral: true,
+            supplyBalanceInUnderlying: "1000000000000000000",
+          },
+          collateralFactor: "500000000000000000",
+          price: "1000000000000000000",
+        },
+        currentLiquidity: "250000000000000000",
+        percent: 100,
+        expected: "500000000000000000",
+        error: false,
+      },
+      {
+        description:
+          "all liquidity comes from token, no borrows, 100% withdraw, price 2:1, token has 6 decimals",
+        cToken: {
+          userDetails: {
+            isCollateral: true,
+            supplyBalanceInUnderlying: "1000000",
+          },
+          collateralFactor: "500000000000000000",
+          price: "1000000000000000000000000000000",
+        },
+        currentLiquidity: "500000000000000000",
+        percent: 100,
+        expected: "1000000", // supply balance
+        error: false,
+      },
+      {
+        description:
+          "price error",
+        cToken: {
+          userDetails: {
+            isCollateral: true,
+            supplyBalanceInUnderlying: "1000000",
+          },
+          collateralFactor: "500000000000000000",
+          price: "0",
+        },
+        currentLiquidity: "500000000000000000",
+        percent: 100,
+        expected: "1000000", // supply balance
+        error: true,
+      },
+      {
+        description:
+          "no user details",
+        cToken: {
+          collateralFactor: "500000000000000000",
+          price: "1000000000000000000",
+        },
+        currentLiquidity: "500000000000000000",
+        percent: 100,
+        expected: "1000000", // supply balance
+        error: true,
+      },
+    ];
+    params.forEach((p) => {
+      const { data: maxWithdraw, error: maxWithdrawError } =
+        cTokenWithdrawLimit(
+          //@ts-ignore
+          p.cToken,
+          p.currentLiquidity,
+          p.percent
+        );
+      if (p.error) {
+        expect(maxWithdrawError).not.toBeNull();
+        expect(maxWithdraw).toBeNull();
+      } else {
+        expect(maxWithdrawError).toBeNull();
+        expect(maxWithdraw?.toString()).toBe(p.expected);
       }
     });
   });
