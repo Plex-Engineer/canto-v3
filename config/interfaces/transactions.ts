@@ -56,6 +56,7 @@ export interface TransactionFlowWithStatus {
   title: string;
   status: TransactionFlowStatus;
   icon: string;
+  createdAt: number;
   transactions: TransactionWithStatus[];
 }
 // user can be on different accounts to make transactions, so we need to map the transaction flows to the account

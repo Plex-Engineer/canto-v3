@@ -13,6 +13,7 @@ import Spacer from "../layout/spacer";
 import clsx from "clsx";
 import StatusIcon from "../icon/statusIcon";
 import Splash from "../splash/splash";
+import { dateToMomentsAgo } from "@/utils/formatting.utils";
 
 const TransactionModal = () => {
   // set modal open state
@@ -92,7 +93,12 @@ const TransactionModal = () => {
                     <div className={styles.txImg}>
                       <StatusIcon status={flow.status} size={24} />
                     </div>
-                    <Text>{flow.title}</Text>
+                    <Container>
+                      <Text size="sm">{flow.title}</Text>
+                      <Text theme="secondary-dark" size="x-sm">
+                        {dateToMomentsAgo(flow.createdAt)}
+                      </Text>
+                    </Container>
                     <div
                       style={{
                         transform: !(flow.id === currentFlowId)
@@ -111,15 +117,25 @@ const TransactionModal = () => {
                 ))}
               <Spacer height="100%" />
 
-              <Button
-                color="secondary"
-                height={"small"}
-                onClick={() =>
-                  txStore?.clearTransactions(signer?.account.address ?? "")
-                }
+              <Container
+                width="100%"
+                center={{
+                  vertical: true,
+                }}
               >
-                CLEAR ALL TXS
-              </Button>
+                <Button
+                  width={"fill"}
+                  color="secondary"
+                  height={"small"}
+                  fontFamily="proto_mono"
+                  onClick={() =>
+                    txStore?.clearTransactions(signer?.account.address ?? "")
+                  }
+                >
+                  CLEAR ALL TXS
+                </Button>
+                <Spacer height="10px" />
+              </Container>
             </div>
             <Container
               className={clsx(styles["grp-items"])}

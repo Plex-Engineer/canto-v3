@@ -96,6 +96,7 @@ const useTransactionStore = create<TransactionStore>()(
             title: params.title,
             icon: params.icon,
             status: "NONE",
+            createdAt: new Date().getTime(),
             transactions: txList.map((tx) => ({
               tx,
               status: "NONE",
