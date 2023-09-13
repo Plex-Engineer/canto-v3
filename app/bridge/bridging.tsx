@@ -271,7 +271,7 @@ const Bridging = (props: BridgeProps) => {
               </div>
             )}
           </Container>
-          <Container width="100%" gap={10}>
+          <Container width="100%" gap={14}>
             <Text size="sm">Select Token</Text>
             <Container width="100%" direction="row" gap={20}>
               <Selector
