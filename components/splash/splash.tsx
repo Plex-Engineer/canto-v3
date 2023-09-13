@@ -2,7 +2,11 @@
 
 import Rive from "@rive-app/react-canvas";
 
-const Splash = () => {
+interface Props {
+  height?: string;
+  width?: string;
+}
+const Splash = (props: Props) => {
   return (
     <div
       style={{
@@ -18,8 +22,8 @@ const Splash = () => {
         src="anims/loading.riv"
         stateMachines={["loop"]}
         style={{
-          height: "800px",
-          width: "800px",
+          height: props.height || "800px",
+          width: props.width || "800px",
         }}
       />
     </div>
