@@ -16,6 +16,7 @@ import ConfirmationModal from "./components/confirmationModal";
 import { BridgingMethod } from "@/hooks/bridge/interfaces/bridgeMethods";
 import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks.utils";
 import { GetWalletClientResult } from "wagmi/actions";
+import { maxBridgeAmountInUnderlying } from "@/hooks/bridge/helpers/amounts";
 
 interface BridgeProps {
   hook: BridgeHookReturn;
@@ -343,11 +344,21 @@ const Bridging = (props: BridgeProps) => {
                 />
                 <Button
                   onClick={() => {
-                    const token = props.hook.selections.token;
-                    if (!token) return;
-                    const maxAmount = token.balance ?? "0";
-                    console.log(maxAmount)
-                    setAmount(formatBalance(maxAmount, token.decimals));
+                    maxBridgeAmountInUnderlying(
+                      props.hook.selections.token,
+                      props.hook.selections.toNetwork?.id ?? ""
+                    ).then((maxAmount) => {
+                      setAmount(
+                        formatBalance(
+                          maxAmount,
+                          props.hook.selections.token?.decimals ?? 0,
+                          {
+                            precision:
+                              props.hook.selections.token?.decimals ?? 0,
+                          }
+                        )
+                      );
+                    });
                   }}
                 >
                   MAX:{" "}
