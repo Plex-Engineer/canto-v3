@@ -341,6 +341,24 @@ const Bridging = (props: BridgeProps) => {
                         )}"`
                   }
                 />
+                <Button
+                  onClick={() => {
+                    const token = props.hook.selections.token;
+                    if (!token) return;
+                    const maxAmount = token.balance ?? "0";
+                    console.log(maxAmount)
+                    setAmount(formatBalance(maxAmount, token.decimals));
+                  }}
+                >
+                  MAX:{" "}
+                </Button>
+                <div>
+                  token balance:{" "}
+                  {formatBalance(
+                    props.hook.selections.token?.balance ?? "0",
+                    props.hook.selections.token?.decimals ?? 0
+                  )}
+                </div>
               </Container>
             </Container>
           </Container>
