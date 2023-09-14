@@ -48,6 +48,18 @@ export default function TestLending() {
     txStore?.addNewFlow({ txFlow: data, signer });
   }
 
+  const canPerformTx = (txType: CTokenLendingTxTypes) =>
+    transaction.canPerformLendingTx({
+      chainId: signer?.chain.id ?? 7700,
+      ethAccount: signer?.account.address ?? "",
+      cToken: selectedToken,
+      amount: convertToBigNumber(
+        amount,
+        selectedToken.underlying.decimals
+      ).data.toString(),
+      txType,
+    }).data;
+
   function onMax(txType: CTokenLendingTxTypes) {
     let maxAmount: string;
     switch (txType) {
@@ -148,18 +160,7 @@ export default function TestLending() {
                   {" "}
                   <Button
                     color="accent"
-                    disabled={
-                      !transaction.canPerformLendingTx({
-                        chainId: 7700,
-                        ethAccount: signer?.account.address ?? "",
-                        cToken: selectedToken,
-                        amount: convertToBigNumber(
-                          amount,
-                          selectedToken.underlying.decimals
-                        ).data.toString(),
-                        txType: CTokenLendingTxTypes.SUPPLY,
-                      }).data
-                    }
+                    disabled={!canPerformTx(CTokenLendingTxTypes.SUPPLY)}
                     onClick={() => lendingTx(CTokenLendingTxTypes.SUPPLY)}
                   >
                     SUPPLY
@@ -171,18 +172,7 @@ export default function TestLending() {
                 <div>
                   <Button
                     color="accent"
-                    disabled={
-                      !transaction.canPerformLendingTx({
-                        chainId: 7700,
-                        ethAccount: signer?.account.address ?? "",
-                        cToken: selectedToken,
-                        amount: convertToBigNumber(
-                          amount,
-                          selectedToken.underlying.decimals
-                        ).data.toString(),
-                        txType: CTokenLendingTxTypes.WITHDRAW,
-                      }).data
-                    }
+                    disabled={!canPerformTx(CTokenLendingTxTypes.WITHDRAW)}
                     onClick={() => lendingTx(CTokenLendingTxTypes.WITHDRAW)}
                   >
                     WITHDRAW
@@ -194,18 +184,7 @@ export default function TestLending() {
                 <div>
                   <Button
                     color="accent"
-                    disabled={
-                      !transaction.canPerformLendingTx({
-                        chainId: 7700,
-                        ethAccount: signer?.account.address ?? "",
-                        cToken: selectedToken,
-                        amount: convertToBigNumber(
-                          amount,
-                          selectedToken.underlying.decimals
-                        ).data.toString(),
-                        txType: CTokenLendingTxTypes.BORROW,
-                      }).data
-                    }
+                    disabled={!canPerformTx(CTokenLendingTxTypes.BORROW)}
                     onClick={() => lendingTx(CTokenLendingTxTypes.BORROW)}
                   >
                     BORROW
@@ -217,18 +196,7 @@ export default function TestLending() {
                 <div>
                   <Button
                     color="accent"
-                    disabled={
-                      !transaction.canPerformLendingTx({
-                        chainId: 7700,
-                        ethAccount: signer?.account.address ?? "",
-                        cToken: selectedToken,
-                        amount: convertToBigNumber(
-                          amount,
-                          selectedToken.underlying.decimals
-                        ).data.toString(),
-                        txType: CTokenLendingTxTypes.REPAY,
-                      }).data
-                    }
+                    disabled={!canPerformTx(CTokenLendingTxTypes.REPAY)}
                     onClick={() => lendingTx(CTokenLendingTxTypes.REPAY)}
                   >
                     REPAY
@@ -237,6 +205,26 @@ export default function TestLending() {
                     MAX
                   </Button>
                 </div>
+                <Button
+                  onClick={() => {
+                    lendingTx(
+                      selectedToken.userDetails.isCollateral
+                        ? CTokenLendingTxTypes.DECOLLATERALIZE
+                        : CTokenLendingTxTypes.COLLATERALIZE
+                    );
+                  }}
+                  disabled={
+                    !canPerformTx(
+                      selectedToken.userDetails.isCollateral
+                        ? CTokenLendingTxTypes.DECOLLATERALIZE
+                        : CTokenLendingTxTypes.COLLATERALIZE
+                    )
+                  }
+                >{`${
+                  selectedToken.userDetails.isCollateral
+                    ? "DECOLLATERALIZE"
+                    : "COLLATERLIAZE"
+                }`}</Button>
               </div>
             </>
           )}
