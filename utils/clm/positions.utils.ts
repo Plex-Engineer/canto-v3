@@ -71,10 +71,17 @@ export function cTokenWithdrawLimit(
   if (liquidityInTokenError) {
     return NEW_ERROR(`cTokenWithdrawLimit: ${errMsg(liquidityInTokenError)}`);
   }
-  // CF is scaled to 10 ^ 18
-  return NO_ERROR(
-    liquidityInToken.times(10 ** 18).div(cToken.collateralFactor)
+  // get total limit
+  const totalLimit = liquidityInToken
+    .times(10 ** 18)
+    .div(cToken.collateralFactor);
+  // minumum between supplyBalance and totalLimit
+  const userLimit = BigNumber.min(
+    totalLimit,
+    cToken.userDetails.supplyBalanceInUnderlying
   );
+  // CF is scaled to 10 ^ 18
+  return NO_ERROR(userLimit);
 }
 
 /**

@@ -5,6 +5,10 @@ import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes"
 import useLending from "@/hooks/lending/useLending";
 import useTransactionStore from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
+import {
+  cTokenBorrowLimit,
+  cTokenWithdrawLimit,
+} from "@/utils/clm/positions.utils";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 import { useEffect, useMemo, useState } from "react";
 import { useWalletClient } from "wagmi";
@@ -42,6 +46,42 @@ export default function TestLending() {
       return;
     }
     txStore?.addNewFlow({ txFlow: data, signer });
+  }
+
+  function onMax(txType: CTokenLendingTxTypes) {
+    let maxAmount: string;
+    switch (txType) {
+      case CTokenLendingTxTypes.SUPPLY:
+        maxAmount = selectedToken.userDetails?.balanceOfUnderlying;
+        break;
+      case CTokenLendingTxTypes.WITHDRAW:
+        maxAmount = cTokenWithdrawLimit(
+          selectedToken,
+          position.liquidity,
+          100
+        ).data.toString();
+        break;
+      case CTokenLendingTxTypes.BORROW:
+        maxAmount = cTokenBorrowLimit(
+          selectedToken,
+          position.liquidity,
+          80
+        ).data.toString();
+        break;
+      case CTokenLendingTxTypes.REPAY:
+        maxAmount = Math.min(
+          Number(selectedToken.userDetails?.borrowBalance),
+          Number(selectedToken.userDetails?.balanceOfUnderlying)
+        ).toString();
+        break;
+      default:
+        maxAmount = "0";
+    }
+    setAmount(
+      formatBalance(maxAmount, selectedToken.underlying.decimals, {
+        precision: selectedToken.underlying.decimals,
+      })
+    );
   }
 
   return (
@@ -104,78 +144,99 @@ export default function TestLending() {
                 }}
               />
               <div style={{ display: "flex", flexDirection: "row" }}>
-                <Button
-                  color="accent"
-                  disabled={
-                    !transaction.canPerformLendingTx({
-                      chainId: 7700,
-                      ethAccount: signer?.account.address ?? "",
-                      cToken: selectedToken,
-                      amount: convertToBigNumber(
-                        amount,
-                        selectedToken.underlying.decimals
-                      ).data.toString(),
-                      txType: CTokenLendingTxTypes.SUPPLY,
-                    }).data
-                  }
-                  onClick={() => lendingTx(CTokenLendingTxTypes.SUPPLY)}
-                >
-                  SUPPLY
-                </Button>
-                <Button
-                  color="accent"
-                  disabled={
-                    !transaction.canPerformLendingTx({
-                      chainId: 7700,
-                      ethAccount: signer?.account.address ?? "",
-                      cToken: selectedToken,
-                      amount: convertToBigNumber(
-                        amount,
-                        selectedToken.underlying.decimals
-                      ).data.toString(),
-                      txType: CTokenLendingTxTypes.WITHDRAW,
-                    }).data
-                  }
-                  onClick={() => lendingTx(CTokenLendingTxTypes.WITHDRAW)}
-                >
-                  WITHDRAW
-                </Button>
-                <Button
-                  color="accent"
-                  disabled={
-                    !transaction.canPerformLendingTx({
-                      chainId: 7700,
-                      ethAccount: signer?.account.address ?? "",
-                      cToken: selectedToken,
-                      amount: convertToBigNumber(
-                        amount,
-                        selectedToken.underlying.decimals
-                      ).data.toString(),
-                      txType: CTokenLendingTxTypes.BORROW,
-                    }).data
-                  }
-                  onClick={() => lendingTx(CTokenLendingTxTypes.BORROW)}
-                >
-                  BORROW
-                </Button>
-                <Button
-                  color="accent"
-                  disabled={
-                    !transaction.canPerformLendingTx({
-                      chainId: 7700,
-                      ethAccount: signer?.account.address ?? "",
-                      cToken: selectedToken,
-                      amount: convertToBigNumber(
-                        amount,
-                        selectedToken.underlying.decimals
-                      ).data.toString(),
-                      txType: CTokenLendingTxTypes.REPAY,
-                    }).data
-                  }
-                  onClick={() => lendingTx(CTokenLendingTxTypes.REPAY)}
-                >
-                  REPAY
-                </Button>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  {" "}
+                  <Button
+                    color="accent"
+                    disabled={
+                      !transaction.canPerformLendingTx({
+                        chainId: 7700,
+                        ethAccount: signer?.account.address ?? "",
+                        cToken: selectedToken,
+                        amount: convertToBigNumber(
+                          amount,
+                          selectedToken.underlying.decimals
+                        ).data.toString(),
+                        txType: CTokenLendingTxTypes.SUPPLY,
+                      }).data
+                    }
+                    onClick={() => lendingTx(CTokenLendingTxTypes.SUPPLY)}
+                  >
+                    SUPPLY
+                  </Button>
+                  <Button onClick={() => onMax(CTokenLendingTxTypes.SUPPLY)}>
+                    MAX
+                  </Button>
+                </div>
+                <div>
+                  <Button
+                    color="accent"
+                    disabled={
+                      !transaction.canPerformLendingTx({
+                        chainId: 7700,
+                        ethAccount: signer?.account.address ?? "",
+                        cToken: selectedToken,
+                        amount: convertToBigNumber(
+                          amount,
+                          selectedToken.underlying.decimals
+                        ).data.toString(),
+                        txType: CTokenLendingTxTypes.WITHDRAW,
+                      }).data
+                    }
+                    onClick={() => lendingTx(CTokenLendingTxTypes.WITHDRAW)}
+                  >
+                    WITHDRAW
+                  </Button>
+                  <Button onClick={() => onMax(CTokenLendingTxTypes.WITHDRAW)}>
+                    MAX
+                  </Button>
+                </div>
+                <div>
+                  <Button
+                    color="accent"
+                    disabled={
+                      !transaction.canPerformLendingTx({
+                        chainId: 7700,
+                        ethAccount: signer?.account.address ?? "",
+                        cToken: selectedToken,
+                        amount: convertToBigNumber(
+                          amount,
+                          selectedToken.underlying.decimals
+                        ).data.toString(),
+                        txType: CTokenLendingTxTypes.BORROW,
+                      }).data
+                    }
+                    onClick={() => lendingTx(CTokenLendingTxTypes.BORROW)}
+                  >
+                    BORROW
+                  </Button>
+                  <Button onClick={() => onMax(CTokenLendingTxTypes.BORROW)}>
+                    MAX
+                  </Button>
+                </div>
+                <div>
+                  <Button
+                    color="accent"
+                    disabled={
+                      !transaction.canPerformLendingTx({
+                        chainId: 7700,
+                        ethAccount: signer?.account.address ?? "",
+                        cToken: selectedToken,
+                        amount: convertToBigNumber(
+                          amount,
+                          selectedToken.underlying.decimals
+                        ).data.toString(),
+                        txType: CTokenLendingTxTypes.REPAY,
+                      }).data
+                    }
+                    onClick={() => lendingTx(CTokenLendingTxTypes.REPAY)}
+                  >
+                    REPAY
+                  </Button>
+                  <Button onClick={() => onMax(CTokenLendingTxTypes.REPAY)}>
+                    MAX
+                  </Button>
+                </div>
               </div>
             </>
           )}
