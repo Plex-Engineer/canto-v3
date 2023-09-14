@@ -59,7 +59,8 @@ const TransactionModal = () => {
         <Text size="lg" font="proto_mono">
           Activity
         </Text>
-        {txStore?.isLoading ? (
+        {/* {txStore?.isLoading ? ( */}
+        {false ? (
           <Container
             height="calc(100% - 30px)"
             center={{
