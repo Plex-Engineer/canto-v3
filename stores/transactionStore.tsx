@@ -78,6 +78,7 @@ const useTransactionStore = create<TransactionStore>()(
           let newFlow: TransactionFlow = {
             ...params.txFlow,
             id: Date.now().toString(),
+            createdAt: new Date().getTime(),
             status: "POPULATING",
             transactions: [],
           };
