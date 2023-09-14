@@ -207,7 +207,7 @@ function methodAndParamsFromLendingTxType(
  * @param {CTokenLendingTransactionParams} params parameters for lending tx
  * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
  */
-export async function validateCTokenLendingTxParams(
+export async function validateCTokenLendingRetryParams(
   params: CTokenLendingTransactionParams
 ): PromiseWithError<{
   valid: boolean;

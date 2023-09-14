@@ -29,7 +29,7 @@ const TxFlow = (props: Props) => {
         // check if we can retry
         const { data } = await TRANSACTION_FLOW_MAP[
           props.txFlow.txType
-        ].validParams(props.txFlow.params);
+        ].validRetry(props.txFlow.params);
         if (data) {
           setCanRetry({ valid: data.valid, error: data.error });
         }

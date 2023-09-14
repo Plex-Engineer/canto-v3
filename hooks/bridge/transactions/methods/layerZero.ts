@@ -315,18 +315,20 @@ export async function checkLZBridgeStatus(
 }
 
 /**
- * @notice validates the parameters for bridging through layer zero
+ * @notice validates the parameters for retrying bridging through layer zero
  * @param {BridgeTransactionParams} params parameters for bridging
  * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
  */
-export async function validateLayerZeroTxParams(
+export async function validateLayerZeroRetryParams(
   params: BridgeTransactionParams
 ): PromiseWithError<{
   valid: boolean;
   error?: string;
 }> {
   if (!isOFTToken(params.token.data)) {
-    return NEW_ERROR("validateLayerZeroParams: layer zero only works for OFT");
+    return NEW_ERROR(
+      "validateLayerZeroRetryParams: layer zero only works for OFT"
+    );
   }
   // check if the user has enough tokens to make the bridge tx
   let tokenAddress = params.token.data.address;
@@ -340,7 +342,7 @@ export async function validateLayerZeroTxParams(
       params.from.account
     );
   if (userTokenBalanceError) {
-    return NEW_ERROR("validateLayerZeroParams::" + userTokenBalanceError);
+    return NEW_ERROR("validateLayerZeroRetryParams::" + userTokenBalanceError);
   }
   // might still need to grab native token balance if also a wrapper around native token (native OFT)
   let totalBalance = userTokenBalance;

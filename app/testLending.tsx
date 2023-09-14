@@ -3,15 +3,18 @@ import Input from "@/components/input/input";
 import Modal from "@/components/modal/modal";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import useLending from "@/hooks/lending/useLending";
+import useTransactionStore from "@/stores/transactionStore";
+import useStore from "@/stores/useStore";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 import { useEffect, useMemo, useState } from "react";
 import { useWalletClient } from "wagmi";
 
 export default function TestLending() {
   const { data: signer } = useWalletClient();
+  const txStore = useStore(useTransactionStore, (state) => state);
 
   const [amount, setAmount] = useState("");
-  const { tokens, position, loading, error, canPerformLendingTx } = useLending({
+  const { tokens, position, loading, transaction } = useLending({
     chainId: signer?.chain.id === 7701 ? 7701 : 7700,
     userEthAddress: signer?.account.address,
   });
@@ -22,6 +25,24 @@ export default function TestLending() {
   }, [tokens]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedToken, setSelectedToken] = useState<any | null>(null);
+
+  function lendingTx(txType: CTokenLendingTxTypes) {
+    const { data, error } = transaction.createNewLendingFlow({
+      chainId: signer.chain.id,
+      ethAccount: signer.account.address,
+      cToken: selectedToken,
+      amount: convertToBigNumber(
+        amount,
+        selectedToken.underlying.decimals
+      ).data.toString(),
+      txType,
+    });
+    if (error) {
+      console.log(error);
+      return;
+    }
+    txStore?.addNewFlow({ txFlow: data, signer });
+  }
 
   return (
     <div>
@@ -86,7 +107,7 @@ export default function TestLending() {
                 <Button
                   color="accent"
                   disabled={
-                    !canPerformLendingTx({
+                    !transaction.canPerformLendingTx({
                       chainId: 7700,
                       ethAccount: signer?.account.address ?? "",
                       cToken: selectedToken,
@@ -97,13 +118,14 @@ export default function TestLending() {
                       txType: CTokenLendingTxTypes.SUPPLY,
                     }).data
                   }
+                  onClick={() => lendingTx(CTokenLendingTxTypes.SUPPLY)}
                 >
                   SUPPLY
                 </Button>
                 <Button
                   color="accent"
                   disabled={
-                    !canPerformLendingTx({
+                    !transaction.canPerformLendingTx({
                       chainId: 7700,
                       ethAccount: signer?.account.address ?? "",
                       cToken: selectedToken,
@@ -114,13 +136,14 @@ export default function TestLending() {
                       txType: CTokenLendingTxTypes.WITHDRAW,
                     }).data
                   }
+                  onClick={() => lendingTx(CTokenLendingTxTypes.WITHDRAW)}
                 >
                   WITHDRAW
                 </Button>
                 <Button
                   color="accent"
                   disabled={
-                    !canPerformLendingTx({
+                    !transaction.canPerformLendingTx({
                       chainId: 7700,
                       ethAccount: signer?.account.address ?? "",
                       cToken: selectedToken,
@@ -131,13 +154,14 @@ export default function TestLending() {
                       txType: CTokenLendingTxTypes.BORROW,
                     }).data
                   }
+                  onClick={() => lendingTx(CTokenLendingTxTypes.BORROW)}
                 >
                   BORROW
                 </Button>
                 <Button
                   color="accent"
                   disabled={
-                    !canPerformLendingTx({
+                    !transaction.canPerformLendingTx({
                       chainId: 7700,
                       ethAccount: signer?.account.address ?? "",
                       cToken: selectedToken,
@@ -148,6 +172,7 @@ export default function TestLending() {
                       txType: CTokenLendingTxTypes.REPAY,
                     }).data
                   }
+                  onClick={() => lendingTx(CTokenLendingTxTypes.REPAY)}
                 >
                   REPAY
                 </Button>

@@ -330,11 +330,11 @@ export async function checkGbridgeTxStatus(
 }
 
 /**
- * @notice validates the parameters for bridging in through gravity bridge
+ * @notice validates the parameters for retrying bridging in through gravity bridge
  * @param {BridgeTransactionParams} params parameters for bridging in
  * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
  */
-export async function validateGBridgeInTxParams(
+export async function validateGBridgeInRetryParams(
   params: BridgeTransactionParams
 ): PromiseWithError<{
   valid: boolean;
@@ -348,7 +348,7 @@ export async function validateGBridgeInTxParams(
       params.from.account
     );
   if (userTokenBalanceError) {
-    return NEW_ERROR("validateGBridgeParams::" + userTokenBalanceError);
+    return NEW_ERROR("validateGBridgeInRetryParams::" + userTokenBalanceError);
   }
   // add to the total balance if there is not enough && it is a native wrapped token
   let totalBalance = userTokenBalance;

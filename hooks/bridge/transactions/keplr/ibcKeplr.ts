@@ -516,18 +516,18 @@ async function evmosIBCIn(
 }
 
 /**
- * @notice validates the parameters for bridging in through IBC keplr
+ * @notice validates the parameters for retrying bridging in through IBC keplr
  * @param {BridgeTransactionParams} params parameters for bridging in
  * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
  */
-export async function validateKeplrIBCTxParams(
+export async function validateKeplrIBCRetryParams(
   params: BridgeTransactionParams
 ): PromiseWithError<{
   valid: boolean;
   error?: string;
 }> {
   if (!isIBCToken(params.token.data)) {
-    return NEW_ERROR("validateKeplrIBCTxParams: IBC only works for IBC tokens");
+    return NEW_ERROR("validateKeplrIBCRetryParams: IBC only works for IBC tokens");
   }
   // get token balance for user
   const { data: userTokenBalance, error: userTokenBalanceError } =
@@ -537,7 +537,7 @@ export async function validateKeplrIBCTxParams(
       params.token.data.nativeName
     );
   if (userTokenBalanceError) {
-    return NEW_ERROR("validateKeplrIBCTxParams::" + userTokenBalanceError);
+    return NEW_ERROR("validateKeplrIBCRetryParams::" + userTokenBalanceError);
   }
   if (BigNumber(userTokenBalance).lt(params.token.amount)) {
     return NO_ERROR({ valid: false, error: "insufficient funds" });

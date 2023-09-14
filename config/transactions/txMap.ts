@@ -2,15 +2,15 @@ import { BridgeTransactionParams } from "@/hooks/bridge/interfaces/hookParams";
 import {
   bridgeInTx,
   bridgeOutTx,
-  validateBridgeInTxParams,
-  validateBridgeOutTxParams,
+  validateBridgeInRetryParams,
+  validateBridgeOutRetryParams,
 } from "@/hooks/bridge/transactions/bridge";
 import { Transaction } from "../interfaces/transactions";
 import { PromiseWithError } from "../interfaces/errors";
 import { CTokenLendingTransactionParams } from "@/hooks/lending/interfaces/lendingTxTypes";
 import {
   cTokenLendingTx,
-  validateCTokenLendingTxParams,
+  validateCTokenLendingRetryParams,
 } from "@/hooks/lending/transactions/lending";
 
 export enum TransactionFlowType {
@@ -21,7 +21,7 @@ export enum TransactionFlowType {
 
 export const TRANSACTION_FLOW_MAP: {
   [key in TransactionFlowType]: {
-    validParams: (...params: any[]) => PromiseWithError<{
+    validRetry: (...params: any[]) => PromiseWithError<{
       valid: boolean;
       error?: string;
     }>;
@@ -29,18 +29,18 @@ export const TRANSACTION_FLOW_MAP: {
   };
 } = {
   [TransactionFlowType.BRIDGE_IN]: {
-    validParams: async (params: BridgeTransactionParams) =>
-      validateBridgeInTxParams(params),
+    validRetry: async (params: BridgeTransactionParams) =>
+      validateBridgeInRetryParams(params),
     tx: async (params: BridgeTransactionParams) => bridgeInTx(params),
   },
   [TransactionFlowType.BRIDGE_OUT]: {
-    validParams: async (params: BridgeTransactionParams) =>
-      validateBridgeOutTxParams(params),
+    validRetry: async (params: BridgeTransactionParams) =>
+      validateBridgeOutRetryParams(params),
     tx: async (params: BridgeTransactionParams) => bridgeOutTx(params),
   },
   [TransactionFlowType.CLM_CTOKEN_TX]: {
-    validParams: async (params: CTokenLendingTransactionParams) =>
-      validateCTokenLendingTxParams(params),
+    validRetry: async (params: CTokenLendingTransactionParams) =>
+      validateCTokenLendingRetryParams(params),
     tx: async (params: CTokenLendingTransactionParams) =>
       cTokenLendingTx(params),
   },

@@ -7,7 +7,7 @@ import {
 import { CTokenWithUserData } from "../interfaces/tokens";
 import { UserLMPosition } from "../interfaces/userPositions";
 import { getGeneralCTokenData, getUserCLMLensData } from "./clmLens";
-import { getLMTotalsFromCTokens } from "./cTokens";
+import { getLMTotalsFromCTokens } from "./cTokenTotals";
 
 /**
  * @notice Gets all user data from clmLens and general api
