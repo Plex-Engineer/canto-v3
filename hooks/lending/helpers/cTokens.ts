@@ -12,7 +12,7 @@ import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
  * @dev total supply and borrow are in $NOTE, total rewards are in WCANTO
  * @param {CTokenWithUserData[]} userCTokens cTokens with user balances
  * @param {string} compAccrued in $WCANTO, how mich had already been accrued
- * @returns {ReturnWithError<{totalSupply: string, totalBorrow: string, totalRewards: string}>} Totals
+ * @returns {ReturnWithError<{totalSupply: string, totalBorrow: string, totalRewards: string, avgApr: string}>} Totals
  */
 export function getLMTotalsFromCTokens(
   userCTokens: CTokenWithUserData[],
@@ -21,6 +21,7 @@ export function getLMTotalsFromCTokens(
   totalSupply: string;
   totalBorrow: string;
   totalRewards: string;
+  avgApr: string;
 }> {
   let errorInLoop = false;
   let errorReaons: string[] = [];
@@ -52,19 +53,34 @@ export function getLMTotalsFromCTokens(
         errorInLoop = true;
         return acc;
       }
-
+      // get the apr in $note
+      const supplyAprInNote = new BigNumber(
+        Number(cToken.supplyApy) + Number(cToken.distApy)
+      ).multipliedBy(supplyInNote);
+      const borrowAprInNote = new BigNumber(cToken.borrowApy).multipliedBy(
+        borrowInNote
+      );
       // add to totals
       return {
         totalSupply: acc.totalSupply.plus(supplyInNote),
         totalBorrow: acc.totalBorrow.plus(borrowInNote),
         totalRewards: acc.totalRewards.plus(cToken.userDetails.rewards),
+        cummulativeApr: acc.cummulativeApr
+          .plus(supplyAprInNote)
+          .minus(borrowAprInNote),
       };
     },
     {
       totalSupply: new BigNumber(0),
       totalBorrow: new BigNumber(0),
       totalRewards: new BigNumber(compAccrued),
+      cummulativeApr: new BigNumber(0),
     }
+  );
+  // to get average apr, we want sum(supplyApr * supplyBalance - borrowApr * borrowBalance) / (supplyBalance + borrowBalance)
+  // cummulative apr = supplyApr * supply - borrowApr * borrow (All in $NOTE)
+  const avgApr = totals.cummulativeApr.div(
+    totals.totalSupply.plus(totals.totalBorrow)
   );
   return errorInLoop
     ? NEW_ERROR("getLMTotalsFromCTokens: " + errorReaons.join(", "))
@@ -72,5 +88,6 @@ export function getLMTotalsFromCTokens(
         totalSupply: totals.totalSupply.toString(),
         totalBorrow: totals.totalBorrow.toString(),
         totalRewards: totals.totalRewards.toString(),
+        avgApr: avgApr.toString(),
       });
 }

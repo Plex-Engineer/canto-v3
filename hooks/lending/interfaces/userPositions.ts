@@ -8,4 +8,5 @@ export interface UserLMPosition {
   totalSupply: string;
   totalBorrow: string;
   totalRewards: string;
+  avgApr: string;
 }

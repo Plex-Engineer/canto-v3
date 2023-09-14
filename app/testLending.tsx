@@ -176,6 +176,7 @@ export default function TestLending() {
           <h2>Total Liquidity: {formatBalance(position.liquidity, 18)}</h2>
           <h2>Total Shortfall: {formatBalance(position.shortfall, 18)}</h2>
           <h2>Total Rewards: {formatBalance(position.totalRewards, 18)}</h2>
+          <h2>Average Apr: {position.avgApr}</h2>
         </>
       )}
       <h1>CTOKENS: </h1>

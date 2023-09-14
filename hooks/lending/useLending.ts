@@ -40,6 +40,7 @@ export default function useLending(
     totalSupply: "0",
     totalBorrow: "0",
     totalRewards: "0",
+    avgApr: "0",
   });
   // use query to get all general and user cToken data
   const { isLoading: loadingCTokens, error: errorCTokens } = useQuery(
@@ -62,7 +63,7 @@ export default function useLending(
         setTokens(response.data.cTokens);
         response.data.position && setPosition(response.data.position);
       },
-      refetchInterval: 5000,
+      refetchInterval: 10000,
     }
   );
 

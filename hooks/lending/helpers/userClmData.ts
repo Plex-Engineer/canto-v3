@@ -68,6 +68,7 @@ export async function getAllUserCLMData(
     totalSupply: positionTotals.totalSupply,
     totalBorrow: positionTotals.totalBorrow,
     totalRewards: positionTotals.totalRewards,
+    avgApr: positionTotals.avgApr,
   };
 
   return NO_ERROR({ cTokens: combinedCTokenData, position: userTotalPosition });
