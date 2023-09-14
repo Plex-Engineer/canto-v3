@@ -5,7 +5,7 @@ import Text from "@/components/text";
 import { BridgeHookReturn } from "@/hooks/bridge/interfaces/hookParams";
 import { TransactionStore } from "@/stores/transactionStore";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";
 import Input from "@/components/input/input";
@@ -28,6 +28,23 @@ interface BridgeProps {
 const Bridging = (props: BridgeProps) => {
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
+  const [maxBridgeAmount, setMaxBridgeAmount] = useState<string>("0");
+  const amountAsBigNumberString = convertToBigNumber(
+    amount,
+    props.hook.selections.token?.decimals ?? 18
+  ).data.toString();
+
+  useEffect(() => {
+    async function getMaxAmount() {
+      setMaxBridgeAmount(
+        await maxBridgeAmountInUnderlying(
+          props.hook.selections.token,
+          props.hook.selections.toNetwork?.id ?? ""
+        )
+      );
+    }
+    getMaxAmount();
+  }, [props.hook.selections.token, props.hook.selections.toNetwork?.id]);
 
   // transaction that will do the bridging
   async function bridgeTx() {
@@ -51,25 +68,13 @@ const Bridging = (props: BridgeProps) => {
 
   // check to see if bridging will be possible with the current parameters
   const { data: canBridge } = props.hook.bridge.canBridge({
-    amount: convertToBigNumber(
-      amount,
-      props.hook.selections.token?.decimals ?? 18
-    ).data.toString(),
+    amount: amountAsBigNumberString,
   });
 
   // check the amount to see if we can get to confirmation
   /** Will not tell us if the other parameters are okay */
-  const checkAmount = (amount: string) =>
-    Number(amount) <=
-    Number(
-      formatBalance(
-        props.hook.selections.token?.balance ?? "0",
-        props.hook.selections.token?.decimals ?? 18,
-        {
-          precision: props.hook.selections.token?.decimals ?? 18,
-        }
-      )
-    );
+  const checkAmount = () =>
+    convertToBigNumber(amountAsBigNumberString).data.lte(maxBridgeAmount);
 
   // if confirmation is open
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -122,7 +127,14 @@ const Bridging = (props: BridgeProps) => {
           fromNetwork={props.hook.selections.fromNetwork?.name ?? ""}
           toNetwork={props.hook.selections.toNetwork?.name ?? ""}
           type={props.hook.direction}
-          amount={amount}
+          amount={formatBalance(
+            amountAsBigNumberString,
+            props.hook.selections.token?.decimals ?? 18,
+            {
+              commify: true,
+              precision: props.hook.selections.token?.decimals ?? 18,
+            }
+          )}
           confirmation={{
             onConfirm: () => {
               setIsConfirmationModalOpen(false);
@@ -323,7 +335,7 @@ const Bridging = (props: BridgeProps) => {
                     setAmount(val.target.value);
                   }}
                   className={styles["input"]}
-                  error={!checkAmount(amount)}
+                  error={!checkAmount() && Number(amount) !== 0}
                   errorMessage={
                     Number(
                       formatBalance(
@@ -333,7 +345,7 @@ const Bridging = (props: BridgeProps) => {
                     ) === 0
                       ? "You have 0 balance"
                       : `"Amount must be less than ${formatBalance(
-                          props.hook.selections.token?.balance ?? "0",
+                          maxBridgeAmount,
                           props.hook.selections.token?.decimals ?? 18,
                           {
                             commify: true,
@@ -344,24 +356,19 @@ const Bridging = (props: BridgeProps) => {
                 />
                 <Button
                   onClick={() => {
-                    maxBridgeAmountInUnderlying(
-                      props.hook.selections.token,
-                      props.hook.selections.toNetwork?.id ?? ""
-                    ).then((maxAmount) => {
-                      setAmount(
-                        formatBalance(
-                          maxAmount,
-                          props.hook.selections.token?.decimals ?? 0,
-                          {
-                            precision:
-                              props.hook.selections.token?.decimals ?? 0,
-                          }
-                        )
-                      );
-                    });
+                    const token = props.hook.selections.token;
+                    if (!token) {
+                      setAmount("0");
+                      return;
+                    }
+                    setAmount(
+                      formatBalance(maxBridgeAmount, token.decimals, {
+                        precision: token.decimals,
+                      })
+                    );
                   }}
                 >
-                  MAX:{" "}
+                  MAX:
                 </Button>
                 <div>
                   token balance:{" "}
@@ -399,7 +406,7 @@ const Bridging = (props: BridgeProps) => {
           onClick={() => {
             setIsConfirmationModalOpen(true);
           }}
-          disabled={!checkAmount(amount) || Number(amount) <= 0}
+          disabled={!checkAmount() || Number(amount) <= 0}
         >
           {props.hook.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
         </Button>
