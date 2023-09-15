@@ -58,6 +58,16 @@ describe("formatBalance tests", () => {
         decimals: 6,
         expected: "0",
       },
+      {
+        amount: "10000000000",
+        decimals: 0,
+        expected: "10000000000",
+      },
+      {
+        amount: "-10000000000",
+        decimals: 0,
+        expected: "0",
+      }
     ];
     params.forEach((p) => {
       expect(formatBalance(p.amount, p.decimals)).toBe(p.expected);

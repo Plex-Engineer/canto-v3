@@ -333,13 +333,8 @@ const Bridging = (props: BridgeProps) => {
               <Container width="100%">
                 <Input
                   type="amount"
-                  balance={formatBalance(
-                    maxBridgeAmount,
-                    props.hook.selections.token?.decimals ?? 18,
-                    {
-                      precision: props.hook.selections.token?.decimals ?? 18,
-                    }
-                  )}
+                  balance={maxBridgeAmount}
+                  decimals={props.hook.selections.token?.decimals ?? 0}
                   placeholder="0.0"
                   value={amount}
                   onChange={(val) => {
@@ -350,8 +345,8 @@ const Bridging = (props: BridgeProps) => {
                   errorMessage={
                     Number(
                       formatBalance(
-                        props.hook.selections.token?.balance ?? "0",
-                        props.hook.selections.token?.decimals ?? 18
+                        maxBridgeAmount,
+                        props.hook.selections.token?.decimals ?? 0
                       )
                     ) === 0
                       ? "You have 0 balance"

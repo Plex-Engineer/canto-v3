@@ -30,6 +30,7 @@ type InputProps = {
   | {
       type: "amount";
       balance: string;
+      decimals: number;
     }
   | {
       type: "text";
@@ -52,7 +53,7 @@ const Input = (props: InputProps) => {
           {props.type === "amount" && (
             <span className={styles["balance"]}>
               Balance:{" "}
-              {formatBalance(props.balance, 0, {
+              {formatBalance(props.balance, props.decimals, {
                 commify: true,
               })}
             </span>
@@ -103,13 +104,15 @@ const Input = (props: InputProps) => {
             onClick={() => {
               props.onChange({
                 target: {
-                  value: props.balance,
+                  value: formatBalance(props.balance, props.decimals, {
+                    precision: props.decimals,
+                  }),
                 },
               } as any);
             }}
             height={58}
           >
-            MAX:
+            MAX
           </Button>
         )}
       </section>
