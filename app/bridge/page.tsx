@@ -25,6 +25,7 @@ export default function BridgePage() {
   // query params
   const bridgeDirection = () => {
     const direction = searchParams.get("direction");
+
     if (direction === "in") return "in";
     if (direction === "out") return "out";
     return "in";

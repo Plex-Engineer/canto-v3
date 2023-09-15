@@ -329,6 +329,10 @@ const Bridging = (props: BridgeProps) => {
               <Container width="100%">
                 <Input
                   type="amount"
+                  balance={formatBalance(
+                    maxBridgeAmount,
+                    props.hook.selections.token?.decimals ?? 18
+                  )}
                   placeholder="0.0"
                   value={amount}
                   onChange={(val) => {
@@ -344,39 +348,16 @@ const Bridging = (props: BridgeProps) => {
                       )
                     ) === 0
                       ? "You have 0 balance"
-                      : `"Amount must be less than ${formatBalance(
+                      : `Amount must be less than ${formatBalance(
                           maxBridgeAmount,
                           props.hook.selections.token?.decimals ?? 18,
                           {
                             commify: true,
                             symbol: props.hook.selections.token?.symbol,
                           }
-                        )}"`
+                        )}`
                   }
                 />
-                <Button
-                  onClick={() => {
-                    const token = props.hook.selections.token;
-                    if (!token) {
-                      setAmount("0");
-                      return;
-                    }
-                    setAmount(
-                      formatBalance(maxBridgeAmount, token.decimals, {
-                        precision: token.decimals,
-                      })
-                    );
-                  }}
-                >
-                  MAX:
-                </Button>
-                <div>
-                  token balance:{" "}
-                  {formatBalance(
-                    props.hook.selections.token?.balance ?? "0",
-                    props.hook.selections.token?.decimals ?? 0
-                  )}
-                </div>
               </Container>
             </Container>
           </Container>

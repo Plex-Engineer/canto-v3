@@ -47,6 +47,7 @@ const TransactionModal = () => {
       });
     }
   }, [transactionFlows]);
+
   return (
     <>
       <Modal
@@ -60,8 +61,10 @@ const TransactionModal = () => {
         <Text size="lg" font="proto_mono">
           Activity
         </Text>
-        {/* {txStore?.isLoading ? ( */}
-        {false ? (
+        {transactionFlows == undefined ||
+        (transactionFlows.length > 0 &&
+          transactionFlows[transactionFlows.length - 1].status ==
+            "POPULATING") ? (
           <Container
             height="calc(100% - 30px)"
             center={{
