@@ -33,7 +33,7 @@ const Bridging = (props: BridgeProps) => {
     amount,
     props.hook.selections.token?.decimals ?? 18
   ).data.toString();
-
+console.log(maxBridgeAmount)
   useEffect(() => {
     async function getMaxAmount() {
       setMaxBridgeAmount(
@@ -44,7 +44,7 @@ const Bridging = (props: BridgeProps) => {
       );
     }
     getMaxAmount();
-  }, [props.hook.selections.token, props.hook.selections.toNetwork?.id]);
+  }, [props.hook.selections.token?.id, props.hook.selections.toNetwork?.id]);
 
   // transaction that will do the bridging
   async function bridgeTx() {

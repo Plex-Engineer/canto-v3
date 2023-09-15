@@ -118,7 +118,7 @@ export default function useBridgeOut(
   function getToken(id: string): ReturnWithError<BridgeOutToken> {
     const token = state.availableTokens.find((token) => token.id === id);
     if (!isBridgeOutToken(token)) {
-      throw new Error("useBridgeOut::getToken: invalid token type: " + id);
+      return NEW_ERROR("useBridgeOut::getToken: invalid token type: " + id);
     }
     // check if we have a balance for the token
     const balance = userTokenBalances[token.id];
