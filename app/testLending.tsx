@@ -2,6 +2,7 @@ import Button from "@/components/button/button";
 import Input from "@/components/input/input";
 import Modal from "@/components/modal/modal";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
+import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import useLending from "@/hooks/lending/useLending";
 import useTransactionStore from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
@@ -61,7 +62,7 @@ export default function TestLending() {
       amount: convertToBigNumber(
         amount,
         selectedToken.underlying.decimals
-      ).data.toString(),
+      ).data?.toString(),
       txType,
     }).data;
 
@@ -107,6 +108,76 @@ export default function TestLending() {
     >
       {action}
     </Button>
+  );
+
+  const columns = [
+    "symbol",
+    "borrowApy",
+    "distApy",
+    "supplyApy",
+    "price",
+    "wallet balance",
+    "borrow balance",
+    "rewards",
+    "isCollateral",
+    "supply balance",
+  ];
+  const CTokenTable = ({ cTokens }: { cTokens: CTokenWithUserData[] }) => (
+    <table>
+      <thead>
+        <tr>
+          {columns.map((column) => (
+            <td key={column} style={{ display: "table-cell" }}>
+              {column}
+            </td>
+          ))}
+        </tr>
+      </thead>
+      {cTokens.map((cToken) => (
+        <CTokenRow key={cToken.address} cToken={cToken} />
+      ))}
+    </table>
+  );
+
+  const CTokenRow = ({ cToken }: { cToken: CTokenWithUserData }) => (
+    <tr
+      style={{
+        fontWeight: "400",
+        lineHeight: "4rem",
+        backgroundColor: "blue",
+        cursor: "pointer",
+      }}
+      onClick={() => {
+        setSelectedToken(cToken);
+        setModalOpen(true);
+      }}
+    >
+      <td>{cToken.underlying.symbol}</td>
+      <td>{cToken.borrowApy}</td>
+      <td>{cToken.distApy}</td>
+      <td>{cToken.supplyApy}</td>
+      <td>{formatBalance(cToken.price, 36 - cToken.underlying.decimals)}</td>
+      <td>
+        {formatBalance(
+          cToken.userDetails?.balanceOfUnderlying ?? "0",
+          cToken.underlying.decimals
+        )}
+      </td>
+      <td>
+        {formatBalance(
+          cToken.userDetails?.borrowBalance ?? "0",
+          cToken.underlying.decimals
+        )}
+      </td>
+      <td>{formatBalance(cToken.userDetails?.rewards ?? "0", 18)}</td>
+      <td>{cToken.userDetails?.isCollateral ? "yes" : "no"}</td>
+      <td>
+        {formatBalance(
+          cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
+          cToken.underlying.decimals
+        )}
+      </td>
+    </tr>
   );
 
   return (
@@ -187,47 +258,26 @@ export default function TestLending() {
         </>
       </Modal>
       <h1>USER POSITION</h1>
-      {position && (
-        <>
-          <h2>
-            Total Borrow:{" "}
-            {formatBalance(position.totalBorrow, 18, {
-              commify: true,
-              precision: 2,
-            })}
-          </h2>
-          <h2>
-            Total Supply:{" "}
-            {formatBalance(position.totalSupply, 18, {
-              commify: true,
-              precision: 2,
-            })}
-          </h2>
-          <h2>Total Liquidity: {formatBalance(position.liquidity, 18)}</h2>
-          <h2>Total Shortfall: {formatBalance(position.shortfall, 18)}</h2>
-          <h2>Total Rewards: {formatBalance(position.totalRewards, 18)}</h2>
-          <h2>Average Apr: {position.avgApr}</h2>
-        </>
-      )}
-      <h1>CTOKENS: </h1>
-      {sortedTokens.map((cToken) => (
-        <div key={cToken.address}>
-          <h1>-------------------</h1>
-          <h2>
-            {cToken.underlying.symbol}{" "}
-            <Button
-              color="accent"
-              onClick={() => {
-                setSelectedToken(cToken);
-                setModalOpen(true);
-              }}
-            >
-              SELECT TOKEN
-            </Button>
-          </h2>
-          <h1>-------------------</h1>
-        </div>
-      ))}
+      <h2>
+        Total Borrow:{" "}
+        {formatBalance(position.totalBorrow, 18, {
+          commify: true,
+          precision: 2,
+        })}
+      </h2>
+      <h2>
+        Total Supply:{" "}
+        {formatBalance(position.totalSupply, 18, {
+          commify: true,
+          precision: 2,
+        })}
+      </h2>
+      <h2>Total Liquidity: {formatBalance(position.liquidity, 18)}</h2>
+      <h2>Total Shortfall: {formatBalance(position.shortfall, 18)}</h2>
+      <h2>Total Rewards: {formatBalance(position.totalRewards, 18)}</h2>
+      <h2>Average Apr: {position.avgApr}</h2>
+
+      <CTokenTable cTokens={sortedTokens} />
     </div>
   );
 }
