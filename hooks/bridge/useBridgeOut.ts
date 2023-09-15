@@ -4,7 +4,6 @@ import {
   BridgeHookReturn,
   BridgeHookState,
   BridgeHookTxParams,
-  BridgeTransactionParams,
   HookSetterParam,
 } from "./interfaces/hookParams";
 import BRIDGE_OUT_TOKENS from "@/config/jsons/bridgeOutTokens.json";
@@ -27,11 +26,11 @@ import { NewTransactionFlow } from "@/config/interfaces/transactions";
 import useTokenBalances from "../helpers/useTokenBalances";
 import { isERC20TokenList, isOFTToken } from "@/utils/tokens/tokens.utils";
 import { isBridgeOutToken } from "@/utils/tokens/bridgeTokens.utils";
-import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
+import { convertToBigNumber } from "@/utils/tokenBalances.utils";
 import { isValidEthAddress } from "@/utils/address.utils";
 import { isCosmosNetwork } from "@/utils/networks.utils";
 import { ERC20Token } from "@/config/interfaces/tokens";
-import { TransactionFlowType } from "@/config/transactions/txMap";
+import { createNewBridgeFlow } from "./helpers/createBridgeFlow";
 
 export default function useBridgeOut(
   props: BridgeHookInputParams
@@ -119,7 +118,7 @@ export default function useBridgeOut(
   function getToken(id: string): ReturnWithError<BridgeOutToken> {
     const token = state.availableTokens.find((token) => token.id === id);
     if (!isBridgeOutToken(token)) {
-      throw new Error("useBridgeOut::getToken: invalid token type: " + id);
+      return NEW_ERROR("useBridgeOut::getToken: invalid token type: " + id);
     }
     // check if we have a balance for the token
     const balance = userTokenBalances[token.id];
@@ -304,35 +303,21 @@ export default function useBridgeOut(
   // will tell the parent if bridging params look good to bridge
   function canBridge(params: BridgeHookTxParams): ReturnWithError<boolean> {
     // check if we can create valid params
-    const { data: txParams, error: txParamsError } =
-      createBridgeTxParams(params);
-    if (txParamsError) {
-      return NEW_ERROR("useBridgeOut::canBridge::" + errMsg(txParamsError));
+    const { error: bridgeParamsError } = createBridgeOutTxFlow(params);
+    if (bridgeParamsError) {
+      return NEW_ERROR("useBridgeOut::canBridge::" + errMsg(bridgeParamsError));
     }
-    // make sure balance exists for token
-    const balance = userTokenBalances[txParams.token.data.id];
-    if (balance === undefined) {
-      return NEW_ERROR(
-        "useBridgeOut::canBridge: balance undefined for token: " +
-          txParams.token.data.id
-      );
-    }
-    // make sure amount it less than or equal to the token balance
+    // simple amount check, does not account for gas
     const { data: userAmount, error: bigNumberError } = convertToBigNumber(
       params.amount
     );
     if (bigNumberError) {
       return NEW_ERROR("useBridgeOut::canBridge::" + bigNumberError.message);
     }
-    // token balance is already formatted with decimals
-    const { data: tokenAmount, error: tokenBigNumberError } =
-      convertToBigNumber(balance);
-    if (tokenBigNumberError) {
-      return NEW_ERROR(
-        "useBridgeOut::canBridge::" + tokenBigNumberError.message
-      );
+    const tokenBalance = getToken(state.selectedToken?.id ?? "").data.balance;
+    if (!tokenBalance) {
+      return NEW_ERROR("useBridgeOut::canBridge: no token balance");
     }
-
     // final check if ibc transfer (check input address)
     if (state.selectedMethod === BridgingMethod.IBC) {
       if (
@@ -349,74 +334,25 @@ export default function useBridgeOut(
         );
       }
     }
-
-    return NO_ERROR(userAmount.lte(tokenAmount) && userAmount.gt(0));
+    return NO_ERROR(userAmount.lte(tokenBalance) && userAmount.gt(0));
   }
 
-  function createNewBridgeFlow(
+  // will return a new transaction flow object that we can pass into the transaction store
+  function createBridgeOutTxFlow(
     params: BridgeHookTxParams
   ): ReturnWithError<NewTransactionFlow> {
-    // see if we can create valid params
-    const { data: txParams, error: txParamsError } =
-      createBridgeTxParams(params);
-    if (txParamsError) {
-      return NEW_ERROR(
-        "useBridgeOut::createNewBridgeFlow::" + errMsg(txParamsError)
-      );
-    }
-    return NO_ERROR({
-      title: `Bridge out ${formatBalance(
-        params.amount,
-        txParams.token.data.decimals
-      )} ${txParams.token.data.symbol} `,
-      icon: txParams.token.data.icon,
-      txType: TransactionFlowType.BRIDGE_OUT,
-      params: txParams,
+    return createNewBridgeFlow({
+      bridgeIn: false,
+      token: getToken(state.selectedToken?.id ?? "").data,
+      fromNetwork: state.fromNetwork,
+      toNetwork: state.toNetwork,
+      method: state.selectedMethod,
+      sender: getSender(),
+      receiver: getReceiver(),
+      amount: params.amount,
     });
   }
 
-  function createBridgeTxParams(
-    params: BridgeHookTxParams
-  ): ReturnWithError<BridgeTransactionParams> {
-    // check basic parameters to make sure they exist
-    if (!state.selectedToken) {
-      return NEW_ERROR("useBridgeOut::createBridgeTxParams: no token selected");
-    }
-    if (!state.toNetwork || !state.fromNetwork) {
-      return NEW_ERROR(
-        "useBridgeOut::createBridgeTxParams: no network selected"
-      );
-    }
-    if (!state.selectedMethod) {
-      return NEW_ERROR("useBridgeOut::createBridgeTxParams: method undefined");
-    }
-    // check sender and receiver
-    const sender = getSender();
-    if (!sender) {
-      return NEW_ERROR("useBridgeOut::createBridgeTxParams: sender undefined");
-    }
-    const receiver = getReceiver();
-    if (!receiver) {
-      return NEW_ERROR(
-        "useBridgeOut::createBridgeTxParams: receiver undefined"
-      );
-    }
-    return NO_ERROR({
-      from: {
-        chainId: state.fromNetwork.chainId,
-        account: sender,
-      },
-      to: {
-        chainId: state.toNetwork.chainId,
-        account: receiver,
-      },
-      token: {
-        data: state.selectedToken,
-        amount: params.amount,
-      },
-      method: state.selectedMethod,
-    });
-  }
   return {
     direction: "out",
     testnet: props.testnet ?? false,
@@ -440,7 +376,7 @@ export default function useBridgeOut(
     },
     setState: generalSetter,
     bridge: {
-      createNewBridgeFlow,
+      createNewBridgeFlow: createBridgeOutTxFlow,
       canBridge,
     },
   };

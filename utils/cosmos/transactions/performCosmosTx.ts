@@ -37,20 +37,20 @@ export async function performCosmosTransactionEIP(
   if (typeof tx.chainId !== "number") {
     return NEW_ERROR("performCosmosTxEIP: invalid chainId: " + tx.chainId);
   }
-
-  // need to obtain the eth signer canto address
-  const { data: cantoAddress, error: ethToCantoError } =
-    await ethToCantoAddress(signer.account.address);
-  if (ethToCantoError) {
-    return NEW_ERROR("performCosmosTxEIP::" + ethToCantoError.message);
-  }
-
-  const { data: onRightChain, error: chainError } = await checkOnRightChain(
+  // switch chains if neccessary and get correct signer
+  const { data: newSigner, error: chainError } = await checkOnRightChain(
     signer,
     tx.chainId
   );
-  if (chainError || !onRightChain) {
+  if (chainError || !newSigner) {
     return NEW_ERROR("performCosmosTxEIP::" + chainError);
+  }
+
+  // need to obtain the eth signer canto address
+  const { data: cantoAddress, error: ethToCantoError } =
+    await ethToCantoAddress(newSigner.account.address);
+  if (ethToCantoError) {
+    return NEW_ERROR("performCosmosTxEIP::" + ethToCantoError.message);
   }
 
   // create transaction context
@@ -75,7 +75,7 @@ export async function performCosmosTransactionEIP(
         sender: senderObj,
         fee: tx.msg.fee,
         memo: "signed with metamask",
-        ethAddress: signer.account.address,
+        ethAddress: newSigner.account.address,
       },
       tx.msg
     );
