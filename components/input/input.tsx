@@ -3,6 +3,7 @@ import styles from "./input.module.scss";
 import Text from "../text";
 import clsx from "clsx";
 import Button from "../button/button";
+import { formatBalance } from "@/utils/tokenBalances.utils";
 
 // if amount is true then add more required props
 type InputProps = {
@@ -49,7 +50,12 @@ const Input = (props: InputProps) => {
         <Text font="rm_mono" size="sm">
           {props.label}
           {props.type === "amount" && (
-            <span className={styles["balance"]}>Balance: {props.balance}</span>
+            <span className={styles["balance"]}>
+              Balance:{" "}
+              {formatBalance(props.balance, 0, {
+                commify: true,
+              })}
+            </span>
           )}
         </Text>
       </label>
