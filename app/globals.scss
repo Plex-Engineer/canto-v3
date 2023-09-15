@@ -3,6 +3,23 @@
   --light-mode: 1;
 }
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
 ::selection {
   background: var(--border-stoke-dark-color);
   color: var(--text-light-color);
