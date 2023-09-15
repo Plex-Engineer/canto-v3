@@ -1,15 +1,101 @@
 import Button from "@/components/button/button";
+import Input from "@/components/input/input";
 import Modal from "@/components/modal/modal";
-import { FormattedCToken } from "@/hooks/lending/interfaces/tokens";
+import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import useLending from "@/hooks/lending/useLending";
-import { useState } from "react";
+import useTransactionStore from "@/stores/transactionStore";
+import useStore from "@/stores/useStore";
+import {
+  cTokenBorrowLimit,
+  cTokenWithdrawLimit,
+} from "@/utils/clm/positions.utils";
+import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
+import { useEffect, useMemo, useState } from "react";
+import { useWalletClient } from "wagmi";
 
 export default function TestLending() {
-  const lending = useLending();
+  const { data: signer } = useWalletClient();
+  const txStore = useStore(useTransactionStore, (state) => state);
+
+  const [amount, setAmount] = useState("");
+  const { tokens, position, loading, transaction } = useLending({
+    chainId: signer?.chain.id === 7701 ? 7701 : 7700,
+    userEthAddress: signer?.account.address,
+  });
+  const sortedTokens = useMemo(() => {
+    return tokens.sort((a, b) =>
+      a.underlying.symbol.localeCompare(b.underlying.symbol)
+    );
+  }, [tokens]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedToken, setSelectedToken] = useState<FormattedCToken | null>(
-    null
-  );
+  const [selectedToken, setSelectedToken] = useState<any | null>(null);
+
+  function lendingTx(txType: CTokenLendingTxTypes) {
+    const { data, error } = transaction.createNewLendingFlow({
+      chainId: signer.chain.id,
+      ethAccount: signer.account.address,
+      cToken: selectedToken,
+      amount: convertToBigNumber(
+        amount,
+        selectedToken.underlying.decimals
+      ).data.toString(),
+      txType,
+    });
+    if (error) {
+      console.log(error);
+      return;
+    }
+    txStore?.addNewFlow({ txFlow: data, signer });
+  }
+
+  const canPerformTx = (txType: CTokenLendingTxTypes) =>
+    transaction.canPerformLendingTx({
+      chainId: signer?.chain.id ?? 7700,
+      ethAccount: signer?.account.address ?? "",
+      cToken: selectedToken,
+      amount: convertToBigNumber(
+        amount,
+        selectedToken.underlying.decimals
+      ).data.toString(),
+      txType,
+    }).data;
+
+  function onMax(txType: CTokenLendingTxTypes) {
+    let maxAmount: string;
+    switch (txType) {
+      case CTokenLendingTxTypes.SUPPLY:
+        maxAmount = selectedToken.userDetails?.balanceOfUnderlying;
+        break;
+      case CTokenLendingTxTypes.WITHDRAW:
+        maxAmount = cTokenWithdrawLimit(
+          selectedToken,
+          position.liquidity,
+          100
+        ).data.toString();
+        break;
+      case CTokenLendingTxTypes.BORROW:
+        maxAmount = cTokenBorrowLimit(
+          selectedToken,
+          position.liquidity,
+          80
+        ).data.toString();
+        break;
+      case CTokenLendingTxTypes.REPAY:
+        maxAmount = Math.min(
+          Number(selectedToken.userDetails?.borrowBalance),
+          Number(selectedToken.userDetails?.balanceOfUnderlying)
+        ).toString();
+        break;
+      default:
+        maxAmount = "0";
+    }
+    setAmount(
+      formatBalance(maxAmount, selectedToken.underlying.decimals, {
+        precision: selectedToken.underlying.decimals,
+      })
+    );
+  }
+
   return (
     <div>
       <h1>Test Lending</h1>
@@ -27,7 +113,7 @@ export default function TestLending() {
               <h3>Decimals: {selectedToken.decimals}</h3>
               <h3>DistApy: {selectedToken.distApy}</h3>
               <h3>Exchange Rate: {selectedToken.exchangeRate}</h3>
-              <h3>IsListed: {selectedToken.isListed}</h3>
+              <h3>IsListed: {selectedToken.isListed ? "yes" : "no"}</h3>
               <h3>Liquidity: {selectedToken.liquidity}</h3>
               <h3>Underlying Price: {selectedToken.price}</h3>
               <h3>Supply Apy: {selectedToken.supplyApy}</h3>
@@ -49,32 +135,130 @@ export default function TestLending() {
               <h2>
                 Borrow Balance: {selectedToken.userDetails?.borrowBalance}
               </h2>
-              <h2>
-                Comp Supplier Index:{" "}
-                {selectedToken.userDetails?.compSupplierIndex}
-              </h2>
+              <h2>Rewards: {selectedToken.userDetails?.rewards}</h2>
               <h2>
                 Is Collateral:{" "}
                 {selectedToken.userDetails?.isCollateral ? "yes" : "no"}
               </h2>
               <h2>
-                Router Allowance CToken:{" "}
-                {selectedToken.userDetails?.routerAllowanceCToken}
+                Supply Balance In Underlying:{" "}
+                {selectedToken.userDetails?.supplyBalanceInUnderlying}
               </h2>
               <h2>
-                Router Allowance Underlying:{" "}
-                {selectedToken.userDetails?.routerAllowanceUnderlying}
+                Allowance Underlying:{" "}
+                {selectedToken.userDetails?.underlyingAllowance}
               </h2>
+              <Input
+                type="amount"
+                value={amount}
+                onChange={(val) => {
+                  setAmount(val.target.value);
+                }}
+              />
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  {" "}
+                  <Button
+                    color="accent"
+                    disabled={!canPerformTx(CTokenLendingTxTypes.SUPPLY)}
+                    onClick={() => lendingTx(CTokenLendingTxTypes.SUPPLY)}
+                  >
+                    SUPPLY
+                  </Button>
+                  <Button onClick={() => onMax(CTokenLendingTxTypes.SUPPLY)}>
+                    MAX
+                  </Button>
+                </div>
+                <div>
+                  <Button
+                    color="accent"
+                    disabled={!canPerformTx(CTokenLendingTxTypes.WITHDRAW)}
+                    onClick={() => lendingTx(CTokenLendingTxTypes.WITHDRAW)}
+                  >
+                    WITHDRAW
+                  </Button>
+                  <Button onClick={() => onMax(CTokenLendingTxTypes.WITHDRAW)}>
+                    MAX
+                  </Button>
+                </div>
+                <div>
+                  <Button
+                    color="accent"
+                    disabled={!canPerformTx(CTokenLendingTxTypes.BORROW)}
+                    onClick={() => lendingTx(CTokenLendingTxTypes.BORROW)}
+                  >
+                    BORROW
+                  </Button>
+                  <Button onClick={() => onMax(CTokenLendingTxTypes.BORROW)}>
+                    MAX
+                  </Button>
+                </div>
+                <div>
+                  <Button
+                    color="accent"
+                    disabled={!canPerformTx(CTokenLendingTxTypes.REPAY)}
+                    onClick={() => lendingTx(CTokenLendingTxTypes.REPAY)}
+                  >
+                    REPAY
+                  </Button>
+                  <Button onClick={() => onMax(CTokenLendingTxTypes.REPAY)}>
+                    MAX
+                  </Button>
+                </div>
+                <Button
+                  onClick={() => {
+                    lendingTx(
+                      selectedToken.userDetails.isCollateral
+                        ? CTokenLendingTxTypes.DECOLLATERALIZE
+                        : CTokenLendingTxTypes.COLLATERALIZE
+                    );
+                  }}
+                  disabled={
+                    !canPerformTx(
+                      selectedToken.userDetails.isCollateral
+                        ? CTokenLendingTxTypes.DECOLLATERALIZE
+                        : CTokenLendingTxTypes.COLLATERALIZE
+                    )
+                  }
+                >{`${
+                  selectedToken.userDetails.isCollateral
+                    ? "DECOLLATERALIZE"
+                    : "COLLATERLIAZE"
+                }`}</Button>
+              </div>
             </>
           )}
         </>
       </Modal>
+      <h1>USER POSITION</h1>
+      {position && (
+        <>
+          <h2>
+            Total Borrow:{" "}
+            {formatBalance(position.totalBorrow, 18, {
+              commify: true,
+              precision: 2,
+            })}
+          </h2>
+          <h2>
+            Total Supply:{" "}
+            {formatBalance(position.totalSupply, 18, {
+              commify: true,
+              precision: 2,
+            })}
+          </h2>
+          <h2>Total Liquidity: {formatBalance(position.liquidity, 18)}</h2>
+          <h2>Total Shortfall: {formatBalance(position.shortfall, 18)}</h2>
+          <h2>Total Rewards: {formatBalance(position.totalRewards, 18)}</h2>
+          <h2>Average Apr: {position.avgApr}</h2>
+        </>
+      )}
       <h1>CTOKENS: </h1>
-      {lending.formattedUserCTokens.map((cToken) => (
+      {sortedTokens.map((cToken) => (
         <div key={cToken.address}>
           <h1>-------------------</h1>
           <h2>
-            {cToken.symbol}{" "}
+            {cToken.underlying.symbol}{" "}
             <Button
               color="accent"
               onClick={() => {

@@ -29,7 +29,12 @@ export const TX_DESCRIPTIONS = {
     amount: string
   ) => ({
     title: `${txType} ${tokenSymbol}`,
-    description: `${txType} ${amount} ${tokenSymbol} in the lending market`,
+    description: `${txType} ${amount} ${tokenSymbol} ${
+      txType === CTokenLendingTxTypes.SUPPLY ||
+      txType === CTokenLendingTxTypes.REPAY
+        ? "to"
+        : "from"
+    } the lending market`,
   }),
   CTOKEN_COLLATERALIZE: (tokenSymbol: string, collateralize: boolean) => ({
     title: `${

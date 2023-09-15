@@ -4,6 +4,7 @@ export interface CToken {
   borrowCap: string;
   cash: string;
   collateralFactor: string;
+  compSupplyState: string;
   decimals: number;
   distApy: string;
   exchangeRate: string;
@@ -20,14 +21,17 @@ export interface CToken {
     symbol: string;
   };
 }
-export interface FormattedCToken extends CToken {
-  userDetails?: {
-    balanceOfCToken: string;
-    balanceOfUnderlying: string;
-    borrowBalance: string;
-    compSupplierIndex: string;
-    isCollateral: boolean;
-    routerAllowanceCToken: string;
-    routerAllowanceUnderlying: string;
-  };
+export interface UserCTokenDetails {
+  cTokenAddress: string;
+  balanceOfCToken: string;
+  balanceOfUnderlying: string;
+  borrowBalance: string;
+  rewards: string;
+  isCollateral: boolean;
+  supplyBalanceInUnderlying: string;
+  underlyingAllowance: string;
+}
+
+export interface CTokenWithUserData extends CToken {
+  userDetails?: UserCTokenDetails;
 }

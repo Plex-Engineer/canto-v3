@@ -14,14 +14,14 @@ import {
 } from "@/utils/networks.utils";
 import {
   bridgeInGravity,
-  validateGBridgeInTxParams,
+  validateGBridgeInRetryParams,
 } from "./methods/gravityBridge";
 import {
   bridgeLayerZero,
-  validateLayerZeroTxParams,
+  validateLayerZeroRetryParams,
 } from "./methods/layerZero";
-import { ibcInKeplr, validateKeplrIBCTxParams } from "./keplr/ibcKeplr";
-import { txIBCOut, validateIBCOutTxParams } from "./methods/ibc";
+import { ibcInKeplr, validateKeplrIBCRetryParams } from "./keplr/ibcKeplr";
+import { txIBCOut, validateIBCOutRetryParams } from "./methods/ibc";
 import {
   isERC20Token,
   isIBCToken,
@@ -171,7 +171,7 @@ export async function bridgeOutTx(
   return transactions;
 }
 
-export async function validateBridgeInTxParams(
+export async function validateBridgeInRetryParams(
   params: BridgeTransactionParams
 ): PromiseWithError<{
   valid: boolean;
@@ -180,11 +180,11 @@ export async function validateBridgeInTxParams(
   // balance will depend on the method used
   switch (params.method) {
     case BridgingMethod.GRAVITY_BRIDGE:
-      return validateGBridgeInTxParams(params);
+      return validateGBridgeInRetryParams(params);
     case BridgingMethod.IBC:
-      return validateKeplrIBCTxParams(params);
+      return validateKeplrIBCRetryParams(params);
     case BridgingMethod.LAYER_ZERO:
-      return validateLayerZeroTxParams(params);
+      return validateLayerZeroRetryParams(params);
     default: {
       return NO_ERROR({ valid: false, error: "invalid method" });
     }
@@ -196,7 +196,7 @@ export async function validateBridgeInTxParams(
  * @param {BridgeTransactionParams} params parameters for bridging out
  * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
  */
-export async function validateBridgeOutTxParams(
+export async function validateBridgeOutRetryParams(
   params: BridgeTransactionParams
 ): PromiseWithError<{
   valid: boolean;
@@ -205,11 +205,11 @@ export async function validateBridgeOutTxParams(
   // balance will depend on the method used
   switch (params.method) {
     case BridgingMethod.GRAVITY_BRIDGE:
-      return NEW_ERROR("validateBridgeOutTxParams: GBRIDGE not implemented");
+      return NEW_ERROR("validateBridgeOutRetryParams: GBRIDGE not implemented");
     case BridgingMethod.IBC:
-      return validateIBCOutTxParams(params);
+      return validateIBCOutRetryParams(params);
     case BridgingMethod.LAYER_ZERO:
-      return validateLayerZeroTxParams(params);
+      return validateLayerZeroRetryParams(params);
     default:
       return NO_ERROR({ valid: false, error: "invalid method" });
   }

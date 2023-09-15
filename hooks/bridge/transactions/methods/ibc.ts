@@ -210,7 +210,7 @@ export async function getIBCData(
   );
   const ibcData = await tryFetchMultipleEndpoints<IBCData>(allEndpoints);
   if (ibcData.error) {
-    return NEW_ERROR("getIBCData::" + ibcData.error.message);
+    return NEW_ERROR("getIBCData::" + errMsg(ibcData.error));
   }
   return ibcData;
 }
@@ -249,11 +249,11 @@ export async function getBlockTimestamp(
 }
 
 /**
- * @notice validates the parameters for bridging out through IBC
+ * @notice validates the parameters for retrying bridging out through IBC
  * @param {BridgeTransactionParams} params parameters for bridging out
  * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
  */
-export async function validateIBCOutTxParams(
+export async function validateIBCOutRetryParams(
   params: BridgeTransactionParams
 ): PromiseWithError<{
   valid: boolean;

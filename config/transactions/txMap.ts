@@ -2,20 +2,26 @@ import { BridgeTransactionParams } from "@/hooks/bridge/interfaces/hookParams";
 import {
   bridgeInTx,
   bridgeOutTx,
-  validateBridgeInTxParams,
-  validateBridgeOutTxParams,
+  validateBridgeInRetryParams,
+  validateBridgeOutRetryParams,
 } from "@/hooks/bridge/transactions/bridge";
 import { Transaction } from "../interfaces/transactions";
 import { PromiseWithError } from "../interfaces/errors";
+import { CTokenLendingTransactionParams } from "@/hooks/lending/interfaces/lendingTxTypes";
+import {
+  cTokenLendingTx,
+  validateCTokenLendingRetryParams,
+} from "@/hooks/lending/transactions/lending";
 
 export enum TransactionFlowType {
   BRIDGE_IN = "BRIDGE_IN",
   BRIDGE_OUT = "BRIDGE_OUT",
+  CLM_CTOKEN_TX = "CLM_CTOKEN_TX",
 }
 
 export const TRANSACTION_FLOW_MAP: {
   [key in TransactionFlowType]: {
-    validParams: (...params: any[]) => PromiseWithError<{
+    validRetry: (...params: any[]) => PromiseWithError<{
       valid: boolean;
       error?: string;
     }>;
@@ -23,13 +29,19 @@ export const TRANSACTION_FLOW_MAP: {
   };
 } = {
   [TransactionFlowType.BRIDGE_IN]: {
-    validParams: async (params: BridgeTransactionParams) =>
-      validateBridgeInTxParams(params),
+    validRetry: async (params: BridgeTransactionParams) =>
+      validateBridgeInRetryParams(params),
     tx: async (params: BridgeTransactionParams) => bridgeInTx(params),
   },
   [TransactionFlowType.BRIDGE_OUT]: {
-    validParams: async (params: BridgeTransactionParams) =>
-      validateBridgeOutTxParams(params),
+    validRetry: async (params: BridgeTransactionParams) =>
+      validateBridgeOutRetryParams(params),
     tx: async (params: BridgeTransactionParams) => bridgeOutTx(params),
+  },
+  [TransactionFlowType.CLM_CTOKEN_TX]: {
+    validRetry: async (params: CTokenLendingTransactionParams) =>
+      validateCTokenLendingRetryParams(params),
+    tx: async (params: CTokenLendingTransactionParams) =>
+      cTokenLendingTx(params),
   },
 };
