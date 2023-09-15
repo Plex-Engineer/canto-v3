@@ -1,12 +1,12 @@
 import { CTokenWithUserData } from "./tokens";
 
 export enum CTokenLendingTxTypes {
-  SUPPLY = "supply",
-  BORROW = "borrow",
-  REPAY = "repay",
-  WITHDRAW = "withdraw",
-  COLLATERALIZE = "collateralize",
-  DECOLLATERALIZE = "decollateralize",
+  SUPPLY = "Supply",
+  BORROW = "Borrow",
+  REPAY = "Repay",
+  WITHDRAW = "Withdraw",
+  COLLATERALIZE = "Collateralize",
+  DECOLLATERALIZE = "Decollateralize",
 }
 
 export interface CTokenLendingTransactionParams {

@@ -10,7 +10,7 @@ import {
   cTokenWithdrawLimit,
 } from "@/utils/clm/positions.utils";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useWalletClient } from "wagmi";
 
 export default function TestLending() {
@@ -30,10 +30,14 @@ export default function TestLending() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedToken, setSelectedToken] = useState<any | null>(null);
 
-  function lendingTx(txType: CTokenLendingTxTypes) {
+  const [currentAction, setCurrentAction] = useState<CTokenLendingTxTypes>(
+    CTokenLendingTxTypes.SUPPLY
+  );
+
+  function lendingTx(amount: string, txType: CTokenLendingTxTypes) {
     const { data, error } = transaction.createNewLendingFlow({
-      chainId: signer.chain.id,
-      ethAccount: signer.account.address,
+      chainId: signer?.chain.id ?? 0,
+      ethAccount: signer?.account.address ?? "",
       cToken: selectedToken,
       amount: convertToBigNumber(
         amount,
@@ -48,7 +52,8 @@ export default function TestLending() {
     txStore?.addNewFlow({ txFlow: data, signer });
   }
 
-  const canPerformTx = (txType: CTokenLendingTxTypes) =>
+  const canPerformTx = (amount: string, txType: CTokenLendingTxTypes) =>
+    !isNaN(Number(amount)) &&
     transaction.canPerformLendingTx({
       chainId: signer?.chain.id ?? 7700,
       ethAccount: signer?.account.address ?? "",
@@ -60,9 +65,9 @@ export default function TestLending() {
       txType,
     }).data;
 
-  function onMax(txType: CTokenLendingTxTypes) {
+  const maxAmount = () => {
     let maxAmount: string;
-    switch (txType) {
+    switch (currentAction) {
       case CTokenLendingTxTypes.SUPPLY:
         maxAmount = selectedToken.userDetails?.balanceOfUnderlying;
         break;
@@ -77,7 +82,7 @@ export default function TestLending() {
         maxAmount = cTokenBorrowLimit(
           selectedToken,
           position.liquidity,
-          80
+          100
         ).data.toString();
         break;
       case CTokenLendingTxTypes.REPAY:
@@ -89,12 +94,20 @@ export default function TestLending() {
       default:
         maxAmount = "0";
     }
-    setAmount(
-      formatBalance(maxAmount, selectedToken.underlying.decimals, {
-        precision: selectedToken.underlying.decimals,
-      })
-    );
+    return maxAmount;
+  };
+
+  interface LSProps {
+    action: CTokenLendingTxTypes;
   }
+  const LendingActionSwitch = ({ action }: LSProps) => (
+    <Button
+      color={action === currentAction ? "accent" : "primary"}
+      onClick={() => setCurrentAction(action)}
+    >
+      {action}
+    </Button>
+  );
 
   return (
     <div>
@@ -150,82 +163,25 @@ export default function TestLending() {
               </h2>
               <Input
                 type="amount"
+                balance={maxAmount()}
+                decimals={selectedToken.underlying.decimals}
                 value={amount}
                 onChange={(val) => {
                   setAmount(val.target.value);
                 }}
               />
               <div style={{ display: "flex", flexDirection: "row" }}>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  {" "}
-                  <Button
-                    color="accent"
-                    disabled={!canPerformTx(CTokenLendingTxTypes.SUPPLY)}
-                    onClick={() => lendingTx(CTokenLendingTxTypes.SUPPLY)}
-                  >
-                    SUPPLY
-                  </Button>
-                  <Button onClick={() => onMax(CTokenLendingTxTypes.SUPPLY)}>
-                    MAX
-                  </Button>
-                </div>
-                <div>
-                  <Button
-                    color="accent"
-                    disabled={!canPerformTx(CTokenLendingTxTypes.WITHDRAW)}
-                    onClick={() => lendingTx(CTokenLendingTxTypes.WITHDRAW)}
-                  >
-                    WITHDRAW
-                  </Button>
-                  <Button onClick={() => onMax(CTokenLendingTxTypes.WITHDRAW)}>
-                    MAX
-                  </Button>
-                </div>
-                <div>
-                  <Button
-                    color="accent"
-                    disabled={!canPerformTx(CTokenLendingTxTypes.BORROW)}
-                    onClick={() => lendingTx(CTokenLendingTxTypes.BORROW)}
-                  >
-                    BORROW
-                  </Button>
-                  <Button onClick={() => onMax(CTokenLendingTxTypes.BORROW)}>
-                    MAX
-                  </Button>
-                </div>
-                <div>
-                  <Button
-                    color="accent"
-                    disabled={!canPerformTx(CTokenLendingTxTypes.REPAY)}
-                    onClick={() => lendingTx(CTokenLendingTxTypes.REPAY)}
-                  >
-                    REPAY
-                  </Button>
-                  <Button onClick={() => onMax(CTokenLendingTxTypes.REPAY)}>
-                    MAX
-                  </Button>
-                </div>
-                <Button
-                  onClick={() => {
-                    lendingTx(
-                      selectedToken.userDetails.isCollateral
-                        ? CTokenLendingTxTypes.DECOLLATERALIZE
-                        : CTokenLendingTxTypes.COLLATERALIZE
-                    );
-                  }}
-                  disabled={
-                    !canPerformTx(
-                      selectedToken.userDetails.isCollateral
-                        ? CTokenLendingTxTypes.DECOLLATERALIZE
-                        : CTokenLendingTxTypes.COLLATERALIZE
-                    )
-                  }
-                >{`${
-                  selectedToken.userDetails.isCollateral
-                    ? "DECOLLATERALIZE"
-                    : "COLLATERLIAZE"
-                }`}</Button>
+                <LendingActionSwitch action={CTokenLendingTxTypes.SUPPLY} />
+                <LendingActionSwitch action={CTokenLendingTxTypes.WITHDRAW} />
+                <LendingActionSwitch action={CTokenLendingTxTypes.BORROW} />
+                <LendingActionSwitch action={CTokenLendingTxTypes.REPAY} />
               </div>
+              <Button
+                disabled={!canPerformTx(amount, currentAction)}
+                onClick={() => lendingTx(amount, currentAction)}
+              >
+                CONFIRM
+              </Button>
             </>
           )}
         </>

@@ -104,6 +104,31 @@ export async function cTokenLendingTx(
       )
     )
   );
+
+  // user should enable token as collateral if supplying and token has collateral factor
+  if (
+    params.txType === CTokenLendingTxTypes.SUPPLY &&
+    !params.cToken.userDetails.isCollateral &&
+    Number(params.cToken.collateralFactor) !== 0
+  ) {
+    // get comptroller address
+    const comptrollerAddress = getCLMAddress(params.chainId, "comptroller");
+    if (!comptrollerAddress) {
+      return NEW_ERROR("cTokenLendingTx: chainId not supported");
+    }
+    txList.push(
+      _collateralizeTx(
+        params.chainId,
+        comptrollerAddress,
+        params.cToken.address,
+        true,
+        TX_DESCRIPTIONS.CTOKEN_COLLATERALIZE(
+          params.cToken.underlying.symbol,
+          true
+        )
+      )
+    );
+  }
   return NO_ERROR(txList);
 }
 
