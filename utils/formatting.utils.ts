@@ -1,5 +1,5 @@
 /**
- * Formats a timestamp into "moments ago" format
+ * @notice Formats a timestamp into "moments ago" format
  * @param {number} timestamp Timestamp to format
  * @returns {string} Formatted timestamp
  */
@@ -29,7 +29,23 @@ export function dateToMomentsAgo(timestamp: number): string {
 }
 
 /**
- * Formats an error message to be more readable
+ * @notice Formats a number into a percentage
+ * @param {number} seconds seconds to format
+ * @returns {string} Formatted percentage
+ */
+export function formatSecondsToMinutes(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  if (minutes > 1) {
+    return minutes.toString() + " minutes";
+  } else if (minutes === 1) {
+    return "1 minute";
+  } else {
+    return seconds.toString() + " seconds";
+  }
+}
+
+/**
+ * @notice Formats an error message to be more readable
  * @param {string} errorMsg Error message to format
  * @returns {string} Formatted error message
  */

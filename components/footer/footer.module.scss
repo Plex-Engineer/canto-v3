@@ -1,12 +1,11 @@
 .container {
   display: flex;
   height: 40px;
-  margin-bottom: 1px;
 
   align-items: center;
   justify-content: space-between;
   border: 1px solid var(--border-stoke-dark-color, #222);
-
+  border-radius: var(--border-radius, 0px);
   .links {
     display: flex;
     align-items: center;

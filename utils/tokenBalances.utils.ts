@@ -20,8 +20,9 @@ export function convertToBigNumber(
   try {
     if (isNaN(Number(amount))) throw new Error("Invalid amount");
     // truncate the amount to the number of decimals
-    const numberAmount = Number(amount).toFixed(decimals);
-    const bigNumber = new BigNumber(numberAmount);
+    const decimalIndex = amount.indexOf(".");
+    const truncatedAmount = decimalIndex === -1 ? amount : amount.slice(0, decimalIndex + decimals + 1);
+    const bigNumber = new BigNumber(truncatedAmount);
     const multiplier = new BigNumber(10).pow(decimals);
     const convertedAmount = bigNumber.multipliedBy(multiplier);
     return NO_ERROR(convertedAmount);

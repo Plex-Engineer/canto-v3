@@ -18,6 +18,7 @@ export interface NewTransactionFlow {
 export interface TransactionFlow extends NewTransactionFlow {
   id: string;
   status: TransactionStatus;
+  createdAt: number;
   transactions: TransactionWithStatus[];
   error?: string;
 }

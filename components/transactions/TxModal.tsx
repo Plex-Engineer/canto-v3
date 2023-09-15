@@ -12,6 +12,8 @@ import styles from "./transactions.module.scss";
 import Spacer from "../layout/spacer";
 import clsx from "clsx";
 import StatusIcon from "../icon/statusIcon";
+import Splash from "../splash/splash";
+import { dateToMomentsAgo } from "@/utils/formatting.utils";
 
 const TransactionModal = () => {
   // set modal open state
@@ -45,6 +47,7 @@ const TransactionModal = () => {
       });
     }
   }, [transactionFlows]);
+
   return (
     <>
       <Modal
@@ -58,7 +61,25 @@ const TransactionModal = () => {
         <Text size="lg" font="proto_mono">
           Activity
         </Text>
-        {transactionFlows && transactionFlows?.length > 0 ? (
+        {transactionFlows == undefined ||
+        (transactionFlows.length > 0 &&
+          transactionFlows[transactionFlows.length - 1].status ==
+            "POPULATING") ? (
+          <Container
+            height="calc(100% - 30px)"
+            center={{
+              vertical: true,
+              horizontal: true,
+            }}
+          >
+            <Container height="300px">
+              <Splash height="300px" width="300px" />
+            </Container>
+            <Text size="lg" font="proto_mono">
+              loading...
+            </Text>
+          </Container>
+        ) : transactionFlows && transactionFlows?.length > 0 ? (
           <div className={styles["scroll-view"]}>
             {/* <Spacer height="10px" /> */}
             <div className={clsx(styles["items-list"])}>
@@ -81,7 +102,12 @@ const TransactionModal = () => {
                     <div className={styles.txImg}>
                       <StatusIcon status={flow.status} size={24} />
                     </div>
-                    <Text>{flow.title}</Text>
+                    <Container>
+                      <Text size="sm">{flow.title}</Text>
+                      <Text theme="secondary-dark" size="x-sm">
+                        {dateToMomentsAgo(flow.createdAt)}
+                      </Text>
+                    </Container>
                     <div
                       style={{
                         transform: !(flow.id === currentFlowId)
@@ -100,15 +126,25 @@ const TransactionModal = () => {
                 ))}
               <Spacer height="100%" />
 
-              <Button
-                color="secondary"
-                height={"small"}
-                onClick={() =>
-                  txStore?.clearTransactions(signer?.account.address ?? "")
-                }
+              <Container
+                width="100%"
+                center={{
+                  vertical: true,
+                }}
               >
-                CLEAR ALL TXS
-              </Button>
+                <Button
+                  width={"fill"}
+                  color="secondary"
+                  height={"small"}
+                  fontFamily="proto_mono"
+                  onClick={() =>
+                    txStore?.clearTransactions(signer?.account.address ?? "")
+                  }
+                >
+                  CLEAR ALL TXS
+                </Button>
+                <Spacer height="10px" />
+              </Container>
             </div>
             <Container
               className={clsx(styles["grp-items"])}

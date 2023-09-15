@@ -235,7 +235,7 @@ const _oftDepositOrWithdrawTx = (
  * @param {number[]} adapterParams adapter params for OFT
  * @returns {PromiseWithError<BigNumber>} gas fee for sending OFT or error
  */
-async function estimateOFTSendGasFee(
+export async function estimateOFTSendGasFee(
   fromChainId: number,
   toLZChainId: number,
   oftAddress: string,

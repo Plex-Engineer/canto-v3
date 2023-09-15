@@ -14,6 +14,7 @@ import {
 } from "@/config/interfaces/errors";
 import { ERC20Token } from "@/config/interfaces/tokens";
 import {
+  BridgeStatus,
   Transaction,
   TransactionDescription,
   TransactionStatus,
@@ -278,7 +279,7 @@ const _generatePubKeyTx = (
 export async function checkGbridgeTxStatus(
   chainId: number,
   txHash: string
-): PromiseWithError<{ status: TransactionStatus; completedIn: number }> {
+): PromiseWithError<BridgeStatus> {
   try {
     // get tx and block number
     const [transaction, currentBlock] = await Promise.all([
@@ -294,7 +295,7 @@ export async function checkGbridgeTxStatus(
     if (currentBlock - transaction.blockNumber >= 96) {
       return NO_ERROR({
         status: "SUCCESS",
-        completedIn: 0,
+        completedIn: undefined,
       });
     }
     // check gbridge queue to see if transaction is confirmed there quicker than 96 blocks
@@ -312,7 +313,7 @@ export async function checkGbridgeTxStatus(
       ) {
         // grab data from event
         if (event.confirmed === true) {
-          return NO_ERROR({ status: "SUCCESS", completedIn: 0 });
+          return NO_ERROR({ status: "SUCCESS", completedIn: undefined });
         } else {
           return NO_ERROR({
             status: "PENDING",
@@ -323,7 +324,7 @@ export async function checkGbridgeTxStatus(
     }
     // we made it through the whole gbridge queue and didn't find the transaction
     // this means gbridge hasn't picked it up yet
-    return NO_ERROR({ status: "PENDING", completedIn: 0 });
+    return NO_ERROR({ status: "PENDING", completedIn: undefined });
   } catch (err) {
     return NEW_ERROR("checkGbridgeTxStatus::" + errMsg(err));
   }
