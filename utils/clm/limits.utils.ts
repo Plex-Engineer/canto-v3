@@ -8,6 +8,8 @@ import {
 } from "@/config/interfaces/errors";
 import { convertNoteAmountToToken } from "../tokens/tokenMath.utils";
 import { convertToBigNumber } from "../tokenBalances.utils";
+import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
+import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 
 /**
  * @notice Calculates the maximum amount of tokens that can be borrowed
@@ -85,91 +87,41 @@ export function cTokenWithdrawLimit(
 }
 
 /**
- * @notice Checks if amount is good enough to supply for token
- * @dev Amount must be greater than 0 and less than or equal to balanceOfUnderlying
- * @param {string} amount Amount to supply
- * @param {string} balanceOfUnderlying Balance of underlying token
- * @returns {boolean} True if amount is good enough to supply
+ * @notice Calculates the maximum amount of tokens that can be used for a tx
+ * @param {CTokenLendingTxTypes} txType Type of tx to calculate for
+ * @param {CTokenWithUserData} cToken CToken to transact to
+ * @param {UserLMPosition} position User position to use for calculations
+ * @param {number} percent Percent of the maximum amount to use (optional parameter)
+ * @returns {string} Maximum amount of tokens that can be used for tx
  */
-export function canSupply(
-  amount: string,
-  balanceOfUnderlying: string
-): boolean {
-  const { data: bnAmount, error: bnAmountError } = convertToBigNumber(amount);
-  if (bnAmountError) return false;
-  return bnAmount.lte(balanceOfUnderlying) && bnAmount.gt(0);
-}
-
-/**
- * @notice Checks if amount is good enough to repay for token
- * @dev Amount must be greater than 0, less than or equal to balanceOfUnderlying, and less than or equal to borrowBalance
- * @param {string} amount Amount to repay
- * @param {string} balanceOfUnderlying Balance of underlying token
- * @param {string} borrowBalance Borrow balance of token
- * @returns {boolean} True if amount is good enough to repay
- */
-export function canRepay(
-  amount: string,
-  balanceOfUnderlying: string,
-  borrowBalance: string
-): boolean {
-  const { data: bnAmount, error: bnAmountError } = convertToBigNumber(amount);
-  if (bnAmountError) return false;
-  return (
-    bnAmount.lte(balanceOfUnderlying) &&
-    bnAmount.lte(borrowBalance) &&
-    bnAmount.gt(0)
-  );
-}
-
-/**
- * @notice Checks if amount is good enough to borrow for token
- * @dev Amount must be greater than 0 and less than or equal to borrowLimit
- * @param {string} amount Amount to borrow
- * @param {CTokenWithUserData} cToken CToken to borrow from
- * @param {string} currentLiquidity Current liquidity of the user
- * @param {number} percent Percent of the maximum amount to borrow (optional parameter)
- * @returns {boolean} True if amount is good enough to borrow
- */
-export function canBorrow(
-  amount: string,
+export function maxAmountForLendingTx(
+  txType: CTokenLendingTxTypes,
   cToken: CTokenWithUserData,
-  currentLiquidity: string,
+  position: UserLMPosition,
   percent: number = 100
-): boolean {
-  const { data: borrowLimit, error: borrowLimitError } = cTokenBorrowLimit(
-    cToken,
-    currentLiquidity,
-    percent
-  );
-  if (borrowLimitError) return false;
-  return borrowLimit.gte(amount) && Number(amount) > 0;
-}
-
-/**
- * @notice Checks if amount is good enough to withdraw for token
- * @dev Amount must be greater than 0, less than or equal to supplyBalanceInUnderlying, and less than or equal to withdrawLimit
- * @param {string} amount Amount to withdraw
- * @param {CTokenWithUserData} cToken CToken to withdraw from
- * @param {string} currentLiquidity Current liquidity of the user
- * @param {number} percent Percent of the maximum amount to withdraw (optional parameter)
- * @returns {boolean} True if amount is good enough to withdraw
- */
-export function canWithdraw(
-  amount: string,
-  cToken: CTokenWithUserData,
-  currentLiquidity: string,
-  percent: number = 100
-): boolean {
-  if (!cToken.userDetails) return false;
-  const { data: withdrawLimit, error: withdrawLimitError } =
-    cTokenWithdrawLimit(cToken, currentLiquidity, percent);
-  if (withdrawLimitError) return false;
-  const { data: bnAmount, error: bnAmountError } = convertToBigNumber(amount);
-  if (bnAmountError) return false;
-  return (
-    withdrawLimit.gte(amount) &&
-    bnAmount.lte(cToken.userDetails.supplyBalanceInUnderlying) &&
-    bnAmount.gt(0)
-  );
+): string {
+  if (!cToken.userDetails) return "0";
+  switch (txType) {
+    case CTokenLendingTxTypes.SUPPLY:
+      return cToken.userDetails.balanceOfUnderlying ?? "0";
+    case CTokenLendingTxTypes.WITHDRAW:
+      const maxAmount = cTokenWithdrawLimit(
+        cToken,
+        position.liquidity,
+        percent
+      );
+      if (maxAmount.error) return "0";
+      return maxAmount.data.toString();
+    case CTokenLendingTxTypes.BORROW:
+      const maxBorrow = cTokenBorrowLimit(cToken, position.liquidity, percent);
+      if (maxBorrow.error) return "0";
+      return maxBorrow.data.toString();
+    case CTokenLendingTxTypes.REPAY:
+      return Math.min(
+        Number(cToken.userDetails.borrowBalance),
+        Number(cToken.userDetails.balanceOfUnderlying)
+      ).toString();
+    default:
+      return "0";
+  }
 }

@@ -6,10 +6,7 @@ import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import useLending from "@/hooks/lending/useLending";
 import useTransactionStore from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
-import {
-  cTokenBorrowLimit,
-  cTokenWithdrawLimit,
-} from "@/utils/clm/positions.utils";
+import { maxAmountForLendingTx } from "@/utils/clm/limits.utils";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 import { useMemo, useState } from "react";
 import { useWalletClient } from "wagmi";
@@ -65,38 +62,6 @@ export default function TestLending() {
       ).data?.toString(),
       txType,
     }).data;
-
-  const maxAmount = () => {
-    let maxAmount: string;
-    switch (currentAction) {
-      case CTokenLendingTxTypes.SUPPLY:
-        maxAmount = selectedToken.userDetails?.balanceOfUnderlying;
-        break;
-      case CTokenLendingTxTypes.WITHDRAW:
-        maxAmount = cTokenWithdrawLimit(
-          selectedToken,
-          position.liquidity,
-          100
-        ).data.toString();
-        break;
-      case CTokenLendingTxTypes.BORROW:
-        maxAmount = cTokenBorrowLimit(
-          selectedToken,
-          position.liquidity,
-          100
-        ).data.toString();
-        break;
-      case CTokenLendingTxTypes.REPAY:
-        maxAmount = Math.min(
-          Number(selectedToken.userDetails?.borrowBalance),
-          Number(selectedToken.userDetails?.balanceOfUnderlying)
-        ).toString();
-        break;
-      default:
-        maxAmount = "0";
-    }
-    return maxAmount;
-  };
 
   interface LSProps {
     action: CTokenLendingTxTypes;
@@ -234,7 +199,11 @@ export default function TestLending() {
               </h2>
               <Input
                 type="amount"
-                balance={maxAmount()}
+                balance={maxAmountForLendingTx(
+                  currentAction,
+                  selectedToken,
+                  position
+                )}
                 decimals={selectedToken.underlying.decimals}
                 value={amount}
                 onChange={(val) => {
