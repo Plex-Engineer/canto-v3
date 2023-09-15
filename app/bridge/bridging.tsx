@@ -29,10 +29,10 @@ const Bridging = (props: BridgeProps) => {
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
   const [maxBridgeAmount, setMaxBridgeAmount] = useState<string>("0");
-  const amountAsBigNumberString = convertToBigNumber(
-    amount,
-    props.hook.selections.token?.decimals ?? 18
-  ).data.toString();
+  const amountAsBigNumberString = (
+    convertToBigNumber(amount, props.hook.selections.token?.decimals ?? 18)
+      .data ?? "0"
+  ).toString();
 
   useEffect(() => {
     async function getMaxAmount() {
