@@ -32,8 +32,8 @@ export default function TestLending() {
 
   function lendingTx(txType: CTokenLendingTxTypes) {
     const { data, error } = transaction.createNewLendingFlow({
-      chainId: signer.chain.id,
-      ethAccount: signer.account.address,
+      chainId: signer?.chain.id === 7701 ? 7701 : 7700,
+      ethAccount: signer!.account.address,
       cToken: selectedToken,
       amount: convertToBigNumber(
         amount,
@@ -150,6 +150,16 @@ export default function TestLending() {
               </h2>
               <Input
                 type="amount"
+                balance={
+                  selectedToken.userDetails.balanceOfUnderlying
+                    ? selectedToken.userDetails.balanceOfUnderlying
+                    : "0"
+                }
+                decimals={
+                  selectedToken.underlying.decimals
+                    ? selectedToken.underlying.decimals
+                    : 0
+                }
                 value={amount}
                 onChange={(val) => {
                   setAmount(val.target.value);
