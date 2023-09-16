@@ -91,7 +91,9 @@ interface PropLink {
 const FooterLink = ({ href, text }: PropLink) => {
   return (
     <Text size="x-sm" font="proto_mono" className={styles.link}>
-      <a href={href}>{text}</a>
+      <a href={href} target="_blank">
+        {text}
+      </a>
     </Text>
   );
 };
