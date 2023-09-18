@@ -17,8 +17,8 @@ import { useQuery } from "react-query";
 export default function useTokenBalances(
   chainId: number | string | undefined,
   tokens: ERC20Token[],
-  userEthAddress: string | null,
-  userCosmosAddress: string | null
+  userEthAddress: string | null = null,
+  userCosmosAddress: string | null = null
 ): UserTokenBalances {
   // state for balances of tokens
   const [userTokenBalances, setUserTokenBalances] = useState<UserTokenBalances>(
