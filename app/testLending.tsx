@@ -16,10 +16,11 @@ export default function TestLending() {
   const txStore = useStore(useTransactionStore, (state) => state);
 
   const [amount, setAmount] = useState("");
-  const { tokens, position, loading, transaction } = useLending({
+  const { tokens, position, loading, transaction, cNote } = useLending({
     chainId: signer?.chain.id === 7701 ? 7701 : 7700,
     userEthAddress: signer?.account.address,
   });
+  console.log(cNote)
   const sortedTokens = useMemo(() => {
     return tokens.sort((a, b) =>
       a.underlying.symbol.localeCompare(b.underlying.symbol)

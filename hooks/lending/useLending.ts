@@ -76,6 +76,7 @@ export default function useLending(
   return {
     tokens,
     position,
+    cNote: tokens.find((token) => token.symbol === "cNOTE")!,
     loading: loadingCTokens,
     transaction: {
       canPerformLendingTx,
