@@ -20,7 +20,8 @@
     text-transform: uppercase;
     transition: background 0.1s ease-out;
     &:hover {
-      background: #cecece;
+      background-color: var(--light-20-color, #222);
+
       cursor: pointer;
       color: var(--primary-color, #111);
     }
