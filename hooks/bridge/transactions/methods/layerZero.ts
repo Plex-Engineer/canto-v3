@@ -3,14 +3,13 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
-import { EVMNetwork } from "@/config/interfaces/networks";
-import { isValidEthAddress } from "@/utils/address.utils";
-import {
+  EVMNetwork,
   Transaction,
   TransactionDescription,
   TransactionStatus,
-} from "@/config/interfaces/transactions";
+  OFTToken,
+} from "@/config/interfaces";
+import { isValidEthAddress } from "@/utils/address.utils";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
 import { encodePacked } from "web3-utils";
 import BigNumber from "bignumber.js";
@@ -23,7 +22,6 @@ import {
   getTokenBalance,
 } from "@/utils/evm/erc20.utils";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
-import { OFTToken } from "@/config/interfaces/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { formatBalance } from "@/utils/tokenBalances.utils";
 import {

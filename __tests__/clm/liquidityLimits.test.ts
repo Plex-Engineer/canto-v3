@@ -1,7 +1,10 @@
+//@ts-nocheck
+import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import {
   cTokenBorrowLimit,
   cTokenWithdrawLimit,
-} from "@/utils/clm/positions.utils";
+  maxAmountForLendingTx,
+} from "@/utils/clm/limits.utils";
 
 describe("liquidity limits tests", () => {
   it("calculate max borrow limit in underlying", async () => {
@@ -72,7 +75,6 @@ describe("liquidity limits tests", () => {
     ];
     params.forEach((p) => {
       const { data: maxBorrow, error: maxBorrowError } = cTokenBorrowLimit(
-        //@ts-ignore
         p.cToken,
         p.currentLiquidity,
         p.percent
@@ -214,8 +216,7 @@ describe("liquidity limits tests", () => {
         error: false,
       },
       {
-        description:
-          "price error",
+        description: "price error",
         cToken: {
           userDetails: {
             isCollateral: true,
@@ -230,8 +231,7 @@ describe("liquidity limits tests", () => {
         error: true,
       },
       {
-        description:
-          "no user details",
+        description: "no user details",
         cToken: {
           collateralFactor: "500000000000000000",
           price: "1000000000000000000",
@@ -244,12 +244,7 @@ describe("liquidity limits tests", () => {
     ];
     params.forEach((p) => {
       const { data: maxWithdraw, error: maxWithdrawError } =
-        cTokenWithdrawLimit(
-          //@ts-ignore
-          p.cToken,
-          p.currentLiquidity,
-          p.percent
-        );
+        cTokenWithdrawLimit(p.cToken, p.currentLiquidity, p.percent);
       if (p.error) {
         expect(maxWithdrawError).not.toBeNull();
         expect(maxWithdraw).toBeNull();
@@ -257,6 +252,224 @@ describe("liquidity limits tests", () => {
         expect(maxWithdrawError).toBeNull();
         expect(maxWithdraw?.toString()).toBe(p.expected);
       }
+    });
+  });
+  // maximum calculations
+  it("calculate max amount for lending supply transaction", () => {
+    // all should just return user balance of underlying
+    const params = [
+      {
+        description: "no user details, return 0",
+        cToken: {},
+        position: {},
+        expected: "0",
+      },
+      {
+        cToken: {
+          userDetails: {
+            balanceOfUnderlying: "1000000000000000000",
+          },
+        },
+        position: {}, // position shouldn't matter
+        expected: "1000000000000000000",
+      },
+      {
+        cToken: {
+          userDetails: {
+            balanceOfUnderlying: "6767676767",
+          },
+        },
+        position: {}, // position shouldn't matter
+        expected: "6767676767",
+      },
+    ];
+    params.forEach((p) => {
+      expect(
+        maxAmountForLendingTx(CTokenLendingTxTypes.SUPPLY, p.cToken, p.position)
+      ).toBe(p.expected);
+    });
+  });
+  it("calculate max amount for lending repay transaction", () => {
+    // all should just return minimum of borrow balance and user balance of underlying
+    const params = [
+      {
+        description: "no user details, return 0",
+        cToken: {},
+        position: {},
+        expected: "0",
+      },
+      {
+        cToken: {
+          userDetails: {
+            balanceOfUnderlying: "1000000000000000000",
+            borrowBalance: "0",
+          },
+        },
+        position: {}, // position shouldn't matter
+        expected: "0",
+      },
+      {
+        cToken: {
+          userDetails: {
+            balanceOfUnderlying: "1000000000000000000",
+            borrowBalance: "10000",
+          },
+        },
+        position: {}, // position shouldn't matter
+        expected: "10000",
+      },
+      {
+        cToken: {
+          userDetails: {
+            balanceOfUnderlying: "6767676767",
+            borrowBalance: "1000000000000000000",
+          },
+        },
+        position: {}, // position shouldn't matter
+        expected: "6767676767",
+      },
+    ];
+    params.forEach((p) => {
+      expect(
+        maxAmountForLendingTx(CTokenLendingTxTypes.REPAY, p.cToken, p.position)
+      ).toBe(p.expected);
+    });
+  });
+  it("calculate max amount for lending borrow transaction", () => {
+    // all should just return borrow limit
+    const params = [
+      {
+        description: "no user details, return 0",
+        cToken: {},
+        position: {},
+        expected: "0",
+      },
+      {
+        cToken: {
+          price: "1000000000000000000",
+          userDetails: {}, // shouldn't matter
+        },
+        position: { liquidity: "1000000000000000000" },
+        expected: "1000000000000000000",
+      },
+      {
+        cToken: {
+          price: "1000000000000000000",
+          userDetails: {}, // shouldn't matter
+        },
+        position: { liquidity: "0" },
+        expected: "0",
+      },
+      {
+        cToken: {
+          price: "1000000000000000000000000000000",
+          userDetails: {}, // shouldn't matter
+        },
+        position: { liquidity: "100000000000000000000" },
+        expected: "100000000",
+      },
+      {
+        cToken: {
+          price: "2000000000000000000000000000000",
+          userDetails: {}, // shouldn't matter
+        },
+        position: { liquidity: "100000000000000000000" },
+        expected: "50000000",
+      },
+      {
+        cToken: {
+          price: "0",
+          userDetails: {}, // shouldn't matter
+        },
+        position: { liquidity: "100000000000000000000" },
+        expected: "0",
+      },
+    ];
+    params.forEach((p) => {
+      expect(
+        maxAmountForLendingTx(CTokenLendingTxTypes.BORROW, p.cToken, p.position)
+      ).toBe(p.expected);
+    });
+  });
+  it("calculate max amount for lending withdraw transaction", () => {
+    // all should just return withdraw limit
+    const params = [
+      {
+        description: "no user details, return 0",
+        cToken: {},
+        position: {},
+        expected: "0",
+      },
+      {
+        description: "not collateral, 100% withdraw",
+        cToken: {
+          userDetails: {
+            isCollateral: false,
+            supplyBalanceInUnderlying: "1000000000000000000",
+          },
+          collateralFactor: "800000000000000000",
+          price: "1000000000000000000",
+        },
+        position: {
+          liquidity: "0",
+        },
+        expected: "1000000000000000000", // supply balance
+      },
+      {
+        description:
+          "not collateral, 100% withdraw, with different price (shouldn't matter)",
+        cToken: {
+          userDetails: {
+            isCollateral: false,
+            supplyBalanceInUnderlying: "1000000000000000000",
+          },
+          collateralFactor: "800000000000000000",
+          price: "1",
+        },
+        position: {
+          liquidity: "0",
+        },
+        expected: "1000000000000000000", // supply balance
+      },
+      {
+        description: "no collateral factor, 100% withdraw",
+        cToken: {
+          userDetails: {
+            isCollateral: true,
+            supplyBalanceInUnderlying: "1000000000000000000",
+          },
+          collateralFactor: "0",
+          price: "1",
+        },
+        position: {
+          liquidity: "0",
+        },
+        expected: "1000000000000000000", // supply balance
+      },
+      {
+        description: "more liquidity than supply balance",
+        cToken: {
+          userDetails: {
+            isCollateral: true,
+            supplyBalanceInUnderlying: "1000000000000000000",
+          },
+          collateralFactor: "600000000000000000",
+          price: "1000000000000000000",
+        },
+        position: {
+          liquidity: "50000000000000000000000000000", // exceeds supply balance
+        },
+        expected: "1000000000000000000", // supply balance
+      },
+    ];
+    params.forEach((p) => {
+      expect(
+        maxAmountForLendingTx(
+          CTokenLendingTxTypes.WITHDRAW,
+          p.cToken,
+          p.position
+        )
+      ).toBe(p.expected);
     });
   });
 });

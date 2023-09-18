@@ -1,4 +1,4 @@
-import { SLINGSHOT_API_URL } from "@/config/consts/apiUrls";
+import { SLINGSHOT_API_URL } from "@/config/api";
 import { tryFetch } from "../async.utils";
 import BigNumber from "bignumber.js";
 import {
@@ -6,7 +6,7 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 
 /**
  * @notice gets the price of a token in USDC

@@ -2,15 +2,13 @@ import Button from "@/components/button/button";
 import Input from "@/components/input/input";
 import Modal from "@/components/modal/modal";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
+import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import useLending from "@/hooks/lending/useLending";
 import useTransactionStore from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
-import {
-  cTokenBorrowLimit,
-  cTokenWithdrawLimit,
-} from "@/utils/clm/positions.utils";
+import { maxAmountForLendingTx } from "@/utils/clm/limits.utils";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useWalletClient } from "wagmi";
 
 export default function TestLending() {
@@ -30,10 +28,14 @@ export default function TestLending() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedToken, setSelectedToken] = useState<any | null>(null);
 
-  function lendingTx(txType: CTokenLendingTxTypes) {
+  const [currentAction, setCurrentAction] = useState<CTokenLendingTxTypes>(
+    CTokenLendingTxTypes.SUPPLY
+  );
+
+  function lendingTx(amount: string, txType: CTokenLendingTxTypes) {
     const { data, error } = transaction.createNewLendingFlow({
-      chainId: signer?.chain.id === 7701 ? 7701 : 7700,
-      ethAccount: signer!.account.address,
+      chainId: signer?.chain.id ?? 0,
+      ethAccount: signer?.account.address ?? "",
       cToken: selectedToken,
       amount: convertToBigNumber(
         amount,
@@ -48,7 +50,8 @@ export default function TestLending() {
     txStore?.addNewFlow({ txFlow: data, signer });
   }
 
-  const canPerformTx = (txType: CTokenLendingTxTypes) =>
+  const canPerformTx = (amount: string, txType: CTokenLendingTxTypes) =>
+    !isNaN(Number(amount)) &&
     transaction.canPerformLendingTx({
       chainId: signer?.chain.id ?? 7700,
       ethAccount: signer?.account.address ?? "",
@@ -56,45 +59,91 @@ export default function TestLending() {
       amount: convertToBigNumber(
         amount,
         selectedToken.underlying.decimals
-      ).data.toString(),
+      ).data?.toString(),
       txType,
     }).data;
 
-  function onMax(txType: CTokenLendingTxTypes) {
-    let maxAmount: string;
-    switch (txType) {
-      case CTokenLendingTxTypes.SUPPLY:
-        maxAmount = selectedToken.userDetails?.balanceOfUnderlying;
-        break;
-      case CTokenLendingTxTypes.WITHDRAW:
-        maxAmount = cTokenWithdrawLimit(
-          selectedToken,
-          position.liquidity,
-          100
-        ).data.toString();
-        break;
-      case CTokenLendingTxTypes.BORROW:
-        maxAmount = cTokenBorrowLimit(
-          selectedToken,
-          position.liquidity,
-          80
-        ).data.toString();
-        break;
-      case CTokenLendingTxTypes.REPAY:
-        maxAmount = Math.min(
-          Number(selectedToken.userDetails?.borrowBalance),
-          Number(selectedToken.userDetails?.balanceOfUnderlying)
-        ).toString();
-        break;
-      default:
-        maxAmount = "0";
-    }
-    setAmount(
-      formatBalance(maxAmount, selectedToken.underlying.decimals, {
-        precision: selectedToken.underlying.decimals,
-      })
-    );
+  interface LSProps {
+    action: CTokenLendingTxTypes;
   }
+  const LendingActionSwitch = ({ action }: LSProps) => (
+    <Button
+      color={action === currentAction ? "accent" : "primary"}
+      onClick={() => setCurrentAction(action)}
+    >
+      {action}
+    </Button>
+  );
+
+  const columns = [
+    "symbol",
+    "borrowApy",
+    "distApy",
+    "supplyApy",
+    "price",
+    "wallet balance",
+    "borrow balance",
+    "rewards",
+    "isCollateral",
+    "supply balance",
+  ];
+  const CTokenTable = ({ cTokens }: { cTokens: CTokenWithUserData[] }) => (
+    <table>
+      <thead>
+        <tr>
+          {columns.map((column) => (
+            <td key={column} style={{ display: "table-cell" }}>
+              {column}
+            </td>
+          ))}
+        </tr>
+      </thead>
+      {cTokens.map((cToken) => (
+        <CTokenRow key={cToken.address} cToken={cToken} />
+      ))}
+    </table>
+  );
+
+  const CTokenRow = ({ cToken }: { cToken: CTokenWithUserData }) => (
+    <tr
+      style={{
+        fontWeight: "400",
+        lineHeight: "4rem",
+        backgroundColor: "blue",
+        cursor: "pointer",
+      }}
+      onClick={() => {
+        setSelectedToken(cToken);
+        setModalOpen(true);
+      }}
+    >
+      <td>{cToken.underlying.symbol}</td>
+      <td>{cToken.borrowApy}</td>
+      <td>{cToken.distApy}</td>
+      <td>{cToken.supplyApy}</td>
+      <td>{formatBalance(cToken.price, 36 - cToken.underlying.decimals)}</td>
+      <td>
+        {formatBalance(
+          cToken.userDetails?.balanceOfUnderlying ?? "0",
+          cToken.underlying.decimals
+        )}
+      </td>
+      <td>
+        {formatBalance(
+          cToken.userDetails?.borrowBalance ?? "0",
+          cToken.underlying.decimals
+        )}
+      </td>
+      <td>{formatBalance(cToken.userDetails?.rewards ?? "0", 18)}</td>
+      <td>{cToken.userDetails?.isCollateral ? "yes" : "no"}</td>
+      <td>
+        {formatBalance(
+          cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
+          cToken.underlying.decimals
+        )}
+      </td>
+    </tr>
+  );
 
   return (
     <div>
@@ -150,138 +199,54 @@ export default function TestLending() {
               </h2>
               <Input
                 type="amount"
-                balance={
-                  selectedToken.userDetails.balanceOfUnderlying
-                    ? selectedToken.userDetails.balanceOfUnderlying
-                    : "0"
-                }
-                decimals={
-                  selectedToken.underlying.decimals
-                    ? selectedToken.underlying.decimals
-                    : 0
-                }
+                balance={maxAmountForLendingTx(
+                  currentAction,
+                  selectedToken,
+                  position
+                )}
+                decimals={selectedToken.underlying.decimals}
                 value={amount}
                 onChange={(val) => {
                   setAmount(val.target.value);
                 }}
               />
               <div style={{ display: "flex", flexDirection: "row" }}>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  {" "}
-                  <Button
-                    color="accent"
-                    disabled={!canPerformTx(CTokenLendingTxTypes.SUPPLY)}
-                    onClick={() => lendingTx(CTokenLendingTxTypes.SUPPLY)}
-                  >
-                    SUPPLY
-                  </Button>
-                  <Button onClick={() => onMax(CTokenLendingTxTypes.SUPPLY)}>
-                    MAX
-                  </Button>
-                </div>
-                <div>
-                  <Button
-                    color="accent"
-                    disabled={!canPerformTx(CTokenLendingTxTypes.WITHDRAW)}
-                    onClick={() => lendingTx(CTokenLendingTxTypes.WITHDRAW)}
-                  >
-                    WITHDRAW
-                  </Button>
-                  <Button onClick={() => onMax(CTokenLendingTxTypes.WITHDRAW)}>
-                    MAX
-                  </Button>
-                </div>
-                <div>
-                  <Button
-                    color="accent"
-                    disabled={!canPerformTx(CTokenLendingTxTypes.BORROW)}
-                    onClick={() => lendingTx(CTokenLendingTxTypes.BORROW)}
-                  >
-                    BORROW
-                  </Button>
-                  <Button onClick={() => onMax(CTokenLendingTxTypes.BORROW)}>
-                    MAX
-                  </Button>
-                </div>
-                <div>
-                  <Button
-                    color="accent"
-                    disabled={!canPerformTx(CTokenLendingTxTypes.REPAY)}
-                    onClick={() => lendingTx(CTokenLendingTxTypes.REPAY)}
-                  >
-                    REPAY
-                  </Button>
-                  <Button onClick={() => onMax(CTokenLendingTxTypes.REPAY)}>
-                    MAX
-                  </Button>
-                </div>
-                <Button
-                  onClick={() => {
-                    lendingTx(
-                      selectedToken.userDetails.isCollateral
-                        ? CTokenLendingTxTypes.DECOLLATERALIZE
-                        : CTokenLendingTxTypes.COLLATERALIZE
-                    );
-                  }}
-                  disabled={
-                    !canPerformTx(
-                      selectedToken.userDetails.isCollateral
-                        ? CTokenLendingTxTypes.DECOLLATERALIZE
-                        : CTokenLendingTxTypes.COLLATERALIZE
-                    )
-                  }
-                >{`${
-                  selectedToken.userDetails.isCollateral
-                    ? "DECOLLATERALIZE"
-                    : "COLLATERLIAZE"
-                }`}</Button>
+                <LendingActionSwitch action={CTokenLendingTxTypes.SUPPLY} />
+                <LendingActionSwitch action={CTokenLendingTxTypes.WITHDRAW} />
+                <LendingActionSwitch action={CTokenLendingTxTypes.BORROW} />
+                <LendingActionSwitch action={CTokenLendingTxTypes.REPAY} />
               </div>
+              <Button
+                disabled={!canPerformTx(amount, currentAction)}
+                onClick={() => lendingTx(amount, currentAction)}
+              >
+                CONFIRM
+              </Button>
             </>
           )}
         </>
       </Modal>
       <h1>USER POSITION</h1>
-      {position && (
-        <>
-          <h2>
-            Total Borrow:{" "}
-            {formatBalance(position.totalBorrow, 18, {
-              commify: true,
-              precision: 2,
-            })}
-          </h2>
-          <h2>
-            Total Supply:{" "}
-            {formatBalance(position.totalSupply, 18, {
-              commify: true,
-              precision: 2,
-            })}
-          </h2>
-          <h2>Total Liquidity: {formatBalance(position.liquidity, 18)}</h2>
-          <h2>Total Shortfall: {formatBalance(position.shortfall, 18)}</h2>
-          <h2>Total Rewards: {formatBalance(position.totalRewards, 18)}</h2>
-          <h2>Average Apr: {position.avgApr}</h2>
-        </>
-      )}
-      <h1>CTOKENS: </h1>
-      {sortedTokens.map((cToken) => (
-        <div key={cToken.address}>
-          <h1>-------------------</h1>
-          <h2>
-            {cToken.underlying.symbol}{" "}
-            <Button
-              color="accent"
-              onClick={() => {
-                setSelectedToken(cToken);
-                setModalOpen(true);
-              }}
-            >
-              SELECT TOKEN
-            </Button>
-          </h2>
-          <h1>-------------------</h1>
-        </div>
-      ))}
+      <h2>
+        Total Borrow:{" "}
+        {formatBalance(position.totalBorrow, 18, {
+          commify: true,
+          precision: 2,
+        })}
+      </h2>
+      <h2>
+        Total Supply:{" "}
+        {formatBalance(position.totalSupply, 18, {
+          commify: true,
+          precision: 2,
+        })}
+      </h2>
+      <h2>Total Liquidity: {formatBalance(position.liquidity, 18)}</h2>
+      <h2>Total Shortfall: {formatBalance(position.shortfall, 18)}</h2>
+      <h2>Total Rewards: {formatBalance(position.totalRewards, 18)}</h2>
+      <h2>Average Apr: {position.avgApr}</h2>
+
+      <CTokenTable cTokens={sortedTokens} />
     </div>
   );
 }

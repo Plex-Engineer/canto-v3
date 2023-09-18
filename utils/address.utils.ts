@@ -3,7 +3,7 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import { tryFetch } from "./async.utils";
 import { CANTO_MAINNET_COSMOS } from "@/config/networks";
 import { isAddress as checkHex } from "web3-validator";

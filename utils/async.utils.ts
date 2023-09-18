@@ -3,7 +3,7 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 
 const DEFAULT_HEADER = {
   method: "GET",

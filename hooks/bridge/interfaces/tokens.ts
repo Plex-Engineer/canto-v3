@@ -1,4 +1,4 @@
-import { ERC20Token, IBCToken, OFTToken } from "@/config/interfaces/tokens";
+import { ERC20Token, IBCToken, OFTToken } from "@/config/interfaces";
 import { BridgingMethod } from "./bridgeMethods";
 
 export type BridgeToken = BridgeInToken | BridgeOutToken;
@@ -14,8 +14,3 @@ export type BridgeOutToken = {
     methods: BridgingMethod[];
   }[];
 } & (ERC20Token | IBCToken | OFTToken);
-
-// for user balance data on bridge
-export interface UserTokenBalances {
-  [key: string]: string; // token id => balance
-}

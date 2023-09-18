@@ -1,8 +1,7 @@
-import { ReturnWithError } from "@/config/interfaces/errors";
+import { ReturnWithError, NewTransactionFlow } from "@/config/interfaces";
 import { CTokenLendingTransactionParams } from "./lendingTxTypes";
 import { CTokenWithUserData } from "./tokens";
 import { UserLMPosition } from "./userPositions";
-import { NewTransactionFlow } from "@/config/interfaces/transactions";
 
 export interface LendingHookInputParams {
   chainId: number;

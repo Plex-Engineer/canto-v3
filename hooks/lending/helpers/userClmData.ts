@@ -3,7 +3,7 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import { CTokenWithUserData } from "../interfaces/tokens";
 import { UserLMPosition } from "../interfaces/userPositions";
 import { getGeneralCTokenData, getUserCLMLensData } from "./clmLens";

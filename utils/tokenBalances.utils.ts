@@ -3,7 +3,7 @@ import {
   NO_ERROR,
   ReturnWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import BigNumber from "bignumber.js";
 
 /**

@@ -3,7 +3,11 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+  UserTokenBalances,
+  Transaction,
+  TransactionDescription,
+  ERC20Token,
+} from "@/config/interfaces";
 import BigNumber from "bignumber.js";
 import {
   getProviderWithoutSigner,
@@ -11,13 +15,7 @@ import {
 } from "./helpers.utils";
 import { Contract } from "web3";
 import { ERC20_ABI } from "@/config/abis";
-import {
-  Transaction,
-  TransactionDescription,
-} from "@/config/interfaces/transactions";
-import { ERC20Token } from "@/config/interfaces/tokens";
 import { fetchBalance, multicall } from "wagmi/actions";
-import { UserTokenBalances } from "@/hooks/bridge/interfaces/tokens";
 
 /**
  * @notice gets all token balances from ethereum chain

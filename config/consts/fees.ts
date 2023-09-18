@@ -1,4 +1,4 @@
-import { Fee } from "../interfaces/transactions";
+import { Fee } from "../interfaces";
 
 export const CONVERT_FEE: Fee = {
   amount: "2300000000000000000",

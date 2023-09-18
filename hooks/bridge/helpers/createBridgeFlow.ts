@@ -3,11 +3,11 @@ import {
   NO_ERROR,
   ReturnWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+  NewTransactionFlow,
+  BaseNetwork,
+} from "@/config/interfaces";
 import { BridgeTransactionParams } from "../interfaces/hookParams";
-import { NewTransactionFlow } from "@/config/interfaces/transactions";
 import { BridgeToken } from "../interfaces/tokens";
-import { BaseNetwork } from "@/config/interfaces/networks";
 import { BridgingMethod } from "../interfaces/bridgeMethods";
 import { formatBalance } from "@/utils/tokenBalances.utils";
 import { TransactionFlowType } from "@/config/transactions/txMap";

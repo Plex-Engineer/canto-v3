@@ -4,10 +4,7 @@ import Image from "next/image";
 import Text from "../text";
 import TxItem from "./TxItem";
 import Spacer from "../layout/spacer";
-import {
-  BridgeStatus,
-  TransactionFlow,
-} from "@/config/interfaces/transactions";
+import { BridgeStatus, TransactionFlow } from "@/config/interfaces";
 import Button from "../button/button";
 import { TRANSACTION_FLOW_MAP } from "@/config/transactions/txMap";
 import { formatError } from "@/utils/formatting.utils";

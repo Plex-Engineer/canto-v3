@@ -1,26 +1,14 @@
 import { useQuery } from "react-query";
 import { CTokenWithUserData } from "./interfaces/tokens";
-import {
-  CTokenLendingTransactionParams,
-  CTokenLendingTxTypes,
-} from "./interfaces/lendingTxTypes";
-import {
-  NEW_ERROR,
-  NO_ERROR,
-  ReturnWithError,
-} from "@/config/interfaces/errors";
+import { CTokenLendingTransactionParams } from "./interfaces/lendingTxTypes";
+import { NEW_ERROR, ReturnWithError } from "@/config/interfaces";
 import {
   LendingHookInputParams,
   LendingHookReturn,
 } from "./interfaces/hookParams";
 import { UserLMPosition } from "./interfaces/userPositions";
 import { useState } from "react";
-import {
-  canBorrow,
-  canRepay,
-  canSupply,
-  canWithdraw,
-} from "@/utils/clm/positions.utils";
+import { lendingTxParamCheck } from "@/utils/clm/txParamCheck.utils";
 import { getAllUserCLMData } from "./helpers/userClmData";
 import { createNewCTokenLendingFlow } from "./helpers/createLendingFlow";
 
@@ -82,53 +70,7 @@ export default function useLending(
         "canPerformLendingTx: txParams.ethAccount does not match params.userEthAddress"
       );
     }
-    // check to make sure user details are available
-    if (!txParams.cToken.userDetails) {
-      return NEW_ERROR(
-        "canPerformLendingTx: cToken does not have user details"
-      );
-    }
-    switch (txParams.txType) {
-      case CTokenLendingTxTypes.SUPPLY:
-        return NO_ERROR(
-          canSupply(
-            txParams.amount,
-            txParams.cToken.userDetails.balanceOfUnderlying
-          )
-        );
-      case CTokenLendingTxTypes.REPAY:
-        return NO_ERROR(
-          canRepay(
-            txParams.amount,
-            txParams.cToken.userDetails.balanceOfUnderlying,
-            txParams.cToken.userDetails.borrowBalance
-          )
-        );
-      case CTokenLendingTxTypes.BORROW:
-        return NO_ERROR(
-          canBorrow(txParams.amount, txParams.cToken, position.liquidity)
-        );
-      case CTokenLendingTxTypes.WITHDRAW:
-        return NO_ERROR(
-          canWithdraw(txParams.amount, txParams.cToken, position.liquidity)
-        );
-      case CTokenLendingTxTypes.DECOLLATERALIZE:
-        // assume user is withdrawing everything from the cToken
-        return NO_ERROR(
-          canWithdraw(
-            txParams.cToken.userDetails.supplyBalanceInUnderlying,
-            txParams.cToken,
-            position.liquidity
-          )
-        );
-      case CTokenLendingTxTypes.COLLATERALIZE:
-        // no checks needed
-        return NO_ERROR(true);
-      default:
-        return NEW_ERROR(
-          "canPerformLendingTx: invalid type: " + txParams.txType
-        );
-    }
+    return lendingTxParamCheck(txParams, position);
   }
 
   return {
