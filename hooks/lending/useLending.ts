@@ -1,7 +1,7 @@
 import { useQuery } from "react-query";
 import { CTokenWithUserData } from "./interfaces/tokens";
 import { CTokenLendingTransactionParams } from "./interfaces/lendingTxTypes";
-import { NEW_ERROR, ReturnWithError } from "@/config/interfaces/errors";
+import { NEW_ERROR, ReturnWithError } from "@/config/interfaces";
 import {
   LendingHookInputParams,
   LendingHookReturn,

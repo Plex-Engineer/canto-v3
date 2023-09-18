@@ -8,7 +8,7 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import {
   getProviderWithoutSigner,
   getRpcUrlFromChainId,

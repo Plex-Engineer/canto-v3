@@ -1,8 +1,4 @@
-import {
-  BaseNetwork,
-  CosmosNetwork,
-  EVMNetwork,
-} from "@/config/interfaces/networks";
+import { CosmosNetwork, EVMNetwork } from "@/config/interfaces";
 import {
   checkCosmosAddress,
   getCosmosAddressLink,

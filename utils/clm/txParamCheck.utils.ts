@@ -5,7 +5,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   ReturnWithError,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 
 /**

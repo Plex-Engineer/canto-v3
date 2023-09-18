@@ -3,8 +3,8 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
-import { Transaction } from "@/config/interfaces/transactions";
+  Transaction,
+} from "@/config/interfaces";
 import { GetWalletClientResult, writeContract } from "wagmi/actions";
 import { checkOnRightChain } from "../baseTransaction.utils";
 import { BaseError } from "viem";

@@ -1,17 +1,15 @@
 import {
   Transaction,
   TransactionDescription,
-} from "@/config/interfaces/transactions";
-import {
-  CTokenLendingTransactionParams,
-  CTokenLendingTxTypes,
-} from "../interfaces/lendingTxTypes";
-import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
+import {
+  CTokenLendingTransactionParams,
+  CTokenLendingTxTypes,
+} from "../interfaces/lendingTxTypes";
 import { _approveTx, checkTokenAllowance } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { formatBalance } from "@/utils/tokenBalances.utils";

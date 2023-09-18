@@ -2,7 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   ReturnWithError,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import { CTokenWithUserData } from "../interfaces/tokens";
 import BigNumber from "bignumber.js";
 import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";

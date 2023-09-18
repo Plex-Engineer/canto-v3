@@ -3,9 +3,9 @@ import {
   NO_ERROR,
   PromiseWithError,
   ReturnWithError,
-} from "@/config/interfaces/errors";
+  Transaction,
+} from "@/config/interfaces";
 import { BridgeTransactionParams } from "../interfaces/hookParams";
-import { Transaction } from "@/config/interfaces/transactions";
 import { BridgingMethod } from "../interfaces/bridgeMethods";
 import {
   getNetworkInfoFromChainId,

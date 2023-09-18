@@ -6,7 +6,7 @@ import Spacer from "../layout/spacer";
 import {
   BridgeStatus,
   TransactionWithStatus,
-} from "@/config/interfaces/transactions";
+} from "@/config/interfaces";
 import { dateToMomentsAgo, formatError, formatSecondsToMinutes } from "@/utils/formatting.utils";
 import StatusIcon from "../icon/statusIcon";
 import { useQuery } from "react-query";

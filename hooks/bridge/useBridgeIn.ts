@@ -10,7 +10,10 @@ import {
   NO_ERROR,
   ReturnWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+  BaseNetwork,
+  NewTransactionFlow,
+  ERC20Token,
+} from "@/config/interfaces";
 import {
   BridgeHookInputParams,
   BridgeHookReturn,
@@ -19,10 +22,8 @@ import {
   HookSetterParam,
 } from "./interfaces/hookParams";
 import useAutoSelect from "../helpers/useAutoSelect";
-import { BaseNetwork } from "@/config/interfaces/networks";
 import { BridgeInToken } from "./interfaces/tokens";
 import { BridgingMethod } from "./interfaces/bridgeMethods";
-import { NewTransactionFlow } from "@/config/interfaces/transactions";
 import useTokenBalances from "../helpers/useTokenBalances";
 import { isERC20TokenList, isOFTToken } from "@/utils/tokens/tokens.utils";
 import {
@@ -31,7 +32,6 @@ import {
 } from "@/utils/tokens/bridgeTokens.utils";
 import { convertToBigNumber } from "@/utils/tokenBalances.utils";
 import { isValidEthAddress } from "@/utils/address.utils";
-import { ERC20Token } from "@/config/interfaces/tokens";
 import { createNewBridgeFlow } from "./helpers/createBridgeFlow";
 
 export default function useBridgeIn(

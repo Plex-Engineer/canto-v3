@@ -1,10 +1,7 @@
-import {
-  CANTO_DATA_API_ENDPOINTS,
-  CANTO_DATA_API_URL,
-} from "@/config/consts/apiUrls";
 import { tryFetch } from "@/utils/async.utils";
 import { useEffect, useState } from "react";
 import { Validator } from "./interfaces.ts/validators";
+import { CANTO_DATA_API } from "@/config/api";
 
 interface StakingReturn {
   validators: Validator[];
@@ -21,7 +18,7 @@ export default function useStaking() {
   async function getAllValidators() {
     const { data: validators, error: validatorError } = await tryFetch<
       Validator[]
-    >(CANTO_DATA_API_URL + CANTO_DATA_API_ENDPOINTS.allValidators);
+    >(CANTO_DATA_API.allValidators);
     if (validatorError) {
       console.error(validatorError);
       return;
@@ -30,7 +27,7 @@ export default function useStaking() {
   }
   async function getStakingApy() {
     const { data: apy, error: apyError } = await tryFetch<string>(
-      CANTO_DATA_API_URL + CANTO_DATA_API_ENDPOINTS.stakingApr
+      CANTO_DATA_API.stakingApr
     );
     if (apyError) {
       console.error(apyError);

@@ -1,5 +1,5 @@
 import { GRAVITY_BRIDGE } from "./gravitybridge";
-import { CosmosNetwork } from "../../interfaces/networks";
+import { CosmosNetwork } from "../../interfaces";
 import { ETH_MAINNET } from "..";
 
 export const ETHEREUM_VIA_GRAVITY_BRIDGE: CosmosNetwork = {

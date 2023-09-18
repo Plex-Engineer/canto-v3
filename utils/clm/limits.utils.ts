@@ -5,7 +5,7 @@ import {
   NO_ERROR,
   ReturnWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import { convertNoteAmountToToken } from "../tokens/tokenMath.utils";
 import { convertToBigNumber } from "../tokenBalances.utils";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";

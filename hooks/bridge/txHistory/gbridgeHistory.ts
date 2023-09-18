@@ -1,12 +1,12 @@
 import { GRAVITY_BRIDGE_ABI } from "@/config/abis";
 import { GRAVITY_BRIDGE_ETH_ADDRESS } from "@/config/consts/addresses";
-import { GRAVITY_BRIDGE_API_URL } from "@/config/consts/apiUrls";
+import { GRAVITY_BRIDGE_API_URL } from "@/config/api";
 import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import { tryFetch } from "@/utils/async.utils";
 import {
   getProviderWithoutSigner,

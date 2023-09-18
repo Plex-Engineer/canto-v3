@@ -2,8 +2,8 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
-} from "@/config/interfaces/errors";
-import { Transaction } from "@/config/interfaces/transactions";
+  Transaction,
+} from "@/config/interfaces";
 
 /**
  * @notice performs keplr transaction

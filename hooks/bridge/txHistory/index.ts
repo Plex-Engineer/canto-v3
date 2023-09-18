@@ -1,4 +1,4 @@
-import { NO_ERROR, PromiseWithError } from "@/config/interfaces/errors";
+import { NO_ERROR, PromiseWithError } from "@/config/interfaces";
 import {
   UserGBridgeInHistory,
   getUserGBridgeInHistory,

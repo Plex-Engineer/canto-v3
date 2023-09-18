@@ -3,7 +3,7 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import { CToken, UserCTokenDetails } from "@/hooks/lending/interfaces/tokens";
 import { getCTokenAddressesFromChainId } from "@/hooks/lending/config/cTokenAddresses";
 import { isValidEthAddress } from "@/utils/address.utils";
@@ -14,13 +14,9 @@ import {
 import { Contract } from "web3";
 import { CLM_LENS_ABI, COMPTROLLER_ABI } from "@/config/abis";
 import { tryFetch } from "@/utils/async.utils";
-import {
-  CANTO_DATA_API_ENDPOINTS,
-  CANTO_DATA_API_URL,
-  GeneralCTokenResponse,
-} from "@/config/consts/apiUrls";
 import { isCantoChainId } from "@/utils/networks.utils";
 import { getCLMAddress } from "@/config/consts/addresses";
+import { CANTO_DATA_API } from "@/config/api";
 
 /**
  * @notice Gets user data from CLM Lens
@@ -115,15 +111,16 @@ export async function getGeneralCTokenData(
   chainId: number
 ): PromiseWithError<CToken[]> {
   if (!isCantoChainId(chainId)) {
-    return NEW_ERROR("getGeneralCTokenData: Invalid chainId: " + chainId);
+    return NEW_ERROR("getGeneralCTokenData: Invalid chainId " + chainId);
   }
   //no api for testnet yet
   if (chainId === 7701)
     return NEW_ERROR("getGeneralCTokenData: Testnet not supported");
   // get full response
-  const { data, error } = await tryFetch<GeneralCTokenResponse>(
-    CANTO_DATA_API_URL + CANTO_DATA_API_ENDPOINTS.allCTokens
-  );
+  const { data, error } = await tryFetch<{
+    blockNumber: string;
+    cTokens: CToken[];
+  }>(CANTO_DATA_API.allCTokens);
   if (error) {
     return NEW_ERROR("getGeneralCTokenData: " + errMsg(error));
   }
