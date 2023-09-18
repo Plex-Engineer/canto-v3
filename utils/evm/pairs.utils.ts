@@ -11,6 +11,19 @@ import {
 import { Contract } from "web3";
 import { DEX_REOUTER_ABI } from "@/config/abis";
 
+/**
+ * @notice gets quote for adding liquidity to a pair
+ * @param {number} chainId chainId to get quote for
+ * @param {string} routerAddress address of router contract
+ * @param {string} tokenAAddress address of token A
+ * @param {string} tokenBAddress address of token B
+ * @param {boolean} stable whether or not the pair is stable
+ * @param {string} amountA amount of token A to add
+ * @returns {PromiseWithError<{
+ * amountBOptimal: string;
+ * expectedLiquidity: string;
+ * }>} quote for adding liquidity to a pair
+ */
 export async function quoteAddLiquidity(
   chainId: number,
   routerAddress: string,
