@@ -13,6 +13,7 @@ interface Props {
   };
   padding?: "sm" | "md" | "lg" | number;
   fontFamily?: "rm_mono" | "proto_mono";
+  fontSize?: "sm" | "md" | "lg" | number;
   weight?: "regular" | "bold";
   children: React.ReactNode;
   isLoading?: boolean;
@@ -108,6 +109,21 @@ const Button = (props: Props) => {
     }
   };
 
+  function getFontSize() {
+    switch (props.fontSize) {
+      case "sm":
+        return 14;
+      case "md":
+        return 16;
+      case "lg":
+        return 18;
+      case undefined:
+        return 16;
+      default:
+        return props.fontSize;
+    }
+  }
+
   return (
     <button
       className={styles.container}
@@ -116,7 +132,7 @@ const Button = (props: Props) => {
       style={{
         height: getHeight() + "px",
         cursor: props.disabled ? "not-allowed" : "pointer",
-
+        fontSize: getFontSize() + "px",
         width: getWidth(),
         backgroundColor: getBGColor(),
         padding: getPadding() + "px",

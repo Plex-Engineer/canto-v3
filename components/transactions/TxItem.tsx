@@ -3,14 +3,16 @@ import Text from "../text";
 import styles from "./transactions.module.scss";
 import Container from "../container/container";
 import Spacer from "../layout/spacer";
+import { BridgeStatus, TransactionWithStatus } from "@/config/interfaces";
 import {
-  BridgeStatus,
-  TransactionWithStatus,
-} from "@/config/interfaces";
-import { dateToMomentsAgo, formatError, formatSecondsToMinutes } from "@/utils/formatting.utils";
+  dateToMomentsAgo,
+  formatError,
+  formatSecondsToMinutes,
+} from "@/utils/formatting.utils";
 import StatusIcon from "../icon/statusIcon";
 import { useQuery } from "react-query";
 import { getBridgeStatus } from "@/hooks/bridge/transactions/bridgeTxStatus";
+import PopUp from "../popup/popup";
 
 interface TxItemProps {
   tx: TransactionWithStatus;
@@ -74,15 +76,26 @@ const TxItem = (props: TxItemProps) => {
         <div
           className={styles.collapsable}
           style={{
-            maxHeight: isRevealing ? "120px" : "0px",
+            maxHeight: isRevealing ? "500px" : "0px",
             width: "100%",
           }}
         >
           <Text size="sm" theme="secondary-dark">
             {props.tx.tx.description.description}
           </Text>
+          <Spacer height="8px" />
           {props.tx.txLink && (
-            <Container direction="row" gap={"auto"}>
+            <Container direction="row" gap="auto">
+              {props.tx.hash && (
+                // <PopUp width="600px" content={<Text>{props.tx.hash}</Text>}>
+                <Text size="sm">
+                  #
+                  {props.tx.hash.slice(0, 4) +
+                    "..." +
+                    props.tx.hash.slice(-5, -1)}
+                </Text>
+                // </PopUp>
+              )}
               {props.tx.txLink && (
                 <a
                   href={props.tx.txLink}
@@ -90,39 +103,37 @@ const TxItem = (props: TxItemProps) => {
                     textDecoration: "underline",
                   }}
                 >
-                  {props.tx.hash ? (
-                    <Text size="sm">#{props.tx.hash.slice(0, 6) + "..."}</Text>
-                  ) : (
-                    <Text size="sm">view link</Text>
-                  )}
+                  <Text size="sm">view explorer</Text>
                 </a>
               )}
             </Container>
           )}
           {props.tx.error && (
-            <Text size="sm" theme="secondary-dark" style={{ color: "red" }}>
+            <Text size="sm" style={{ color: "var(--extra-failure-color,red)" }}>
               {formatError(props.tx.error)}
             </Text>
           )}
         </div>
-
-        {props.tx.timestamp && (
-          <Text size="sm" theme="secondary-dark">
-            {dateToMomentsAgo(props.tx.timestamp)}
-          </Text>
-        )}
-        {props.tx.tx.bridge && props.tx.tx.bridge.lastStatus !== "NONE" && (
-          <>
+        <Container direction="row" gap={"auto"}>
+          {props.tx.timestamp && (
             <Text size="sm" theme="secondary-dark">
-              BRIDGE STATUS - {props.tx.tx.bridge.lastStatus}
+              {dateToMomentsAgo(props.tx.timestamp)}
             </Text>
-            {props.tx.tx.bridge.timeLeft !== undefined && (
+          )}
+          {props.tx.tx.bridge && props.tx.tx.bridge.lastStatus !== "NONE" && (
+            <>
               <Text size="sm" theme="secondary-dark">
-                TIME LEFT: {formatSecondsToMinutes(props.tx.tx.bridge.timeLeft)}
+                Bridge Status - {props.tx.tx.bridge.lastStatus.toLowerCase()}
               </Text>
-            )}
-          </>
-        )}
+              {props.tx.tx.bridge.timeLeft !== undefined && (
+                <Text size="sm" theme="secondary-dark">
+                  TIME LEFT:{" "}
+                  {formatSecondsToMinutes(props.tx.tx.bridge.timeLeft)}
+                </Text>
+              )}
+            </>
+          )}
+        </Container>
       </Container>
     </div>
   );
