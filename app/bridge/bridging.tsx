@@ -180,71 +180,80 @@ const Bridging = (props: BridgeProps) => {
           }}
         >
           {/* select network group */}
+
           <Container width="100%" gap={14}>
             {props.hook.direction === "in" ? (
-              <Selector
-                label={{
-                  text: "From",
-                  width: "50px",
-                }}
-                title="SELECT FROM NETWORK"
-                activeItem={
-                  props.hook.selections.fromNetwork ?? {
-                    name: "Select network",
-                    icon: "loader.svg",
-                    id: "",
-                  }
-                }
-                items={
-                  props.hook.direction === "in"
-                    ? props.hook.allOptions.networks.filter((network) =>
-                        isEVMNetwork(network)
-                      )!
-                    : []
-                }
-                groupedItems={[
-                  {
-                    main: {
-                      name: "Cosmos Networks",
-                      icon: "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/32%402x/color/atom%402x.png",
-                      id: "",
-                    },
-                    items: props.hook.allOptions.networks.filter(
-                      (network) => !isEVMNetwork(network)
-                    ),
-                  },
-                ]}
-                onChange={
-                  props.hook.direction === "in"
-                    ? (networkId) => props.hook.setState("network", networkId)
-                    : () => false
-                }
-              />
-            ) : (
-              <div className={styles["network-box"]}>
-                <Text
-                  theme="secondary-dark"
-                  size="sm"
-                  style={{
-                    width: "60px",
+              <>
+                <Text size="sm">Select Network</Text>
+
+                <Selector
+                  label={{
+                    text: "From",
+                    width: "50px",
                   }}
-                >
-                  From
-                </Text>
-                <div className={styles.token}>
-                  <Image
-                    src={
-                      props.hook.selections.fromNetwork?.icon ?? "loader.svg"
+                  title="SELECT FROM NETWORK"
+                  activeItem={
+                    props.hook.selections.fromNetwork ?? {
+                      name: "Select network",
+                      icon: "loader.svg",
+                      id: "",
                     }
-                    alt={props.hook.selections.fromNetwork?.name ?? "loading"}
-                    width={30}
-                    height={30}
-                  />
-                  <Text size="md" font="proto_mono">
-                    {props.hook.selections.fromNetwork?.name}
+                  }
+                  items={
+                    props.hook.direction === "in"
+                      ? props.hook.allOptions.networks.filter((network) =>
+                          isEVMNetwork(network)
+                        )!
+                      : []
+                  }
+                  groupedItems={[
+                    {
+                      main: {
+                        name: "Cosmos Networks",
+                        icon: "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/32%402x/color/atom%402x.png",
+                        id: "",
+                      },
+                      items: props.hook.allOptions.networks.filter(
+                        (network) => !isEVMNetwork(network)
+                      ),
+                    },
+                  ]}
+                  onChange={
+                    props.hook.direction === "in"
+                      ? (networkId) => props.hook.setState("network", networkId)
+                      : () => false
+                  }
+                />
+              </>
+            ) : (
+              <>
+                <Text size="sm">Select Network</Text>
+
+                <div className={styles["network-box"]}>
+                  <Text
+                    theme="secondary-dark"
+                    size="sm"
+                    style={{
+                      width: "60px",
+                    }}
+                  >
+                    From
                   </Text>
+                  <div className={styles.token}>
+                    <Image
+                      src={
+                        props.hook.selections.fromNetwork?.icon ?? "loader.svg"
+                      }
+                      alt={props.hook.selections.fromNetwork?.name ?? "loading"}
+                      width={30}
+                      height={30}
+                    />
+                    <Text size="md" font="proto_mono">
+                      {props.hook.selections.fromNetwork?.name}
+                    </Text>
+                  </div>
                 </div>
-              </div>
+              </>
             )}
 
             {props.hook.direction === "out" ? (
@@ -302,7 +311,7 @@ const Bridging = (props: BridgeProps) => {
           {/* select token group */}
 
           <Container width="100%" gap={14}>
-            <Text size="sm">Select Token</Text>
+            <Text size="sm">Select Token and enter amount</Text>
             <Container width="100%" direction="row" gap={20}>
               <Selector
                 title="SELECT TOKEN"
