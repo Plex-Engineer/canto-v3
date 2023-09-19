@@ -76,7 +76,7 @@ const TxItem = (props: TxItemProps) => {
         <div
           className={styles.collapsable}
           style={{
-            maxHeight: isRevealing ? "120px" : "0px",
+            maxHeight: isRevealing ? "500px" : "0px",
             width: "100%",
           }}
         >
