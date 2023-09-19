@@ -179,22 +179,14 @@ const Bridging = (props: BridgeProps) => {
               props.hook.direction === "in" ? "column" : "column-reverse",
           }}
         >
+          {/* select network group */}
           <Container width="100%" gap={14}>
-            <Text size="sm">
-              {`From `}
-              {/* {
-                <span
-                  style={{
-                    color: "var(--text-dark-40-color)",
-                  }}
-                >
-                  {props.hook.addresses.getSender()}
-                </span>
-              } */}
-            </Text>
-
             {props.hook.direction === "in" ? (
               <Selector
+                label={{
+                  text: "From",
+                  width: "50px",
+                }}
                 title="SELECT FROM NETWORK"
                 activeItem={
                   props.hook.selections.fromNetwork ?? {
@@ -230,6 +222,15 @@ const Bridging = (props: BridgeProps) => {
               />
             ) : (
               <div className={styles["network-box"]}>
+                <Text
+                  theme="secondary-dark"
+                  size="sm"
+                  style={{
+                    width: "60px",
+                  }}
+                >
+                  From
+                </Text>
                 <div className={styles.token}>
                   <Image
                     src={
@@ -246,20 +247,12 @@ const Bridging = (props: BridgeProps) => {
               </div>
             )}
 
-            <Text size="sm">
-              {`To `}{" "}
-              {/* {
-                <span
-                  style={{
-                    color: "var(--text-dark-40-color)",
-                  }}
-                >
-                  {props.hook.addresses.getReceiver()}
-                </span>
-              } */}
-            </Text>
             {props.hook.direction === "out" ? (
               <Selector
+                label={{
+                  text: "To",
+                  width: "50px",
+                }}
                 title="SELECT TO NETWORK"
                 activeItem={
                   props.hook.selections.toNetwork ?? {
@@ -281,6 +274,16 @@ const Bridging = (props: BridgeProps) => {
               />
             ) : (
               <div className={styles["network-box"]}>
+                <Text
+                  theme="secondary-dark"
+                  size="sm"
+                  style={{
+                    width: "60px",
+                  }}
+                >
+                  To
+                </Text>
+
                 <div className={styles.token}>
                   <Image
                     src={props.hook.selections.toNetwork?.icon ?? "loader.svg"}
@@ -295,6 +298,9 @@ const Bridging = (props: BridgeProps) => {
               </div>
             )}
           </Container>
+          <Spacer height="20px" />
+          {/* select token group */}
+
           <Container width="100%" gap={14}>
             <Text size="sm">Select Token</Text>
             <Container width="100%" direction="row" gap={20}>
@@ -333,6 +339,7 @@ const Bridging = (props: BridgeProps) => {
               <Container width="100%">
                 <Input
                   type="amount"
+                  height={64}
                   balance={maxBridgeAmount}
                   decimals={props.hook.selections.token?.decimals ?? 0}
                   placeholder="0.0"
@@ -381,9 +388,8 @@ const Bridging = (props: BridgeProps) => {
             }
           /> */}
         </div>
-        <Spacer height="100px" />
 
-        <Spacer height="100px" />
+        <Spacer height="200px" />
         <Button
           width="fill"
           onClick={() => {

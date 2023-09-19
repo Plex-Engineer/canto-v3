@@ -10,6 +10,7 @@ type InputProps = {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   backgroundColor?: string;
+  height?: "sm" | "md" | "lg" | number;
   placeholder?: string;
   className?: string;
   disabled?: boolean;
@@ -41,8 +42,27 @@ type InputProps = {
 );
 
 const Input = (props: InputProps) => {
+  function getHeight(height: InputProps["height"]) {
+    switch (height) {
+      //   in px
+      case "sm":
+        return "40px";
+      case "md":
+        return "50px";
+      case "lg":
+        return "60px";
+      default:
+        return `${height}px`;
+    }
+  }
+
   return (
-    <div className={styles["input-container"]}>
+    <div
+      className={styles["input-container"]}
+      style={{
+        height: getHeight(props.height),
+      }}
+    >
       <label
         htmlFor={props.id}
         className={props.labelClassName}
@@ -88,6 +108,8 @@ const Input = (props: InputProps) => {
           required={props.required}
           autoComplete="off"
           style={{
+            height: getHeight(props.height),
+
             backgroundColor: props.error
               ? " #ff000017"
               : props.backgroundColor ?? "",
@@ -110,7 +132,7 @@ const Input = (props: InputProps) => {
                 },
               } as any);
             }}
-            height={58}
+            height={Number(getHeight(props.height).slice(0, -2))}
           >
             MAX
           </Button>
