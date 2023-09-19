@@ -7,7 +7,6 @@ import NavBar from "@/components/nav_bar/navBar";
 import CantoWalletProvider from "@/provider/rainbowProvider";
 import { QueryClient, QueryClientProvider } from "react-query";
 import localFont from "next/font/local";
-import clsx from "clsx";
 
 const rm_mono = localFont({
   src: "../fonts/rm-mono-regular.ttf",
@@ -28,16 +27,10 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const getTheme = () => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("theme");
-    }
-  };
-
   return (
     <html lang="en">
       <body
-        className={getTheme() ?? "dark"}
+        className={"dark"}
         style={
           {
             "--rm-mono": rm_mono.style.fontFamily,
