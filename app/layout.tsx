@@ -30,14 +30,14 @@ export default function RootLayout({
 }) {
   const getTheme = () => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("theme") ?? "dark";
+      return localStorage.getItem("theme");
     }
   };
 
   return (
     <html lang="en">
       <body
-        className={getTheme()}
+        className={getTheme() ?? "dark"}
         style={
           {
             "--rm-mono": rm_mono.style.fontFamily,

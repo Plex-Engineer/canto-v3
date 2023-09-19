@@ -311,7 +311,7 @@ const Bridging = (props: BridgeProps) => {
           {/* select token group */}
 
           <Container width="100%" gap={14}>
-            <Text size="sm">Select Token and enter amount</Text>
+            <Text size="sm">Select Token and Enter Amount</Text>
             <Container width="100%" direction="row" gap={20}>
               <Selector
                 title="SELECT TOKEN"

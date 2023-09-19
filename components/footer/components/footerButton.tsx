@@ -12,12 +12,13 @@ const FooterButton = ({ text }: PropLinkButton) => {
     themeName =
       themeName === "dark" || themeName === "light" ? themeName : "dark";
     document.body.classList.add(themeName);
+
     document.body.classList.remove(themeName == "dark" ? "light" : "dark");
     localStorage.setItem("theme", themeName);
   }
-  useEffect(() => {
-    setTheme(localStorage.getItem("theme") as string);
-  }, []);
+  //   useEffect(() => {
+  //     setTheme(localStorage.getItem("theme") as string);
+  //   }, []);
 
   return (
     <button
