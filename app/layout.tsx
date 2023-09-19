@@ -28,10 +28,16 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const getTheme = () => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme") ?? "dark";
+    }
+  };
+
   return (
     <html lang="en">
       <body
-        className={localStorage.getItem("theme") ?? "dark"}
+        className={getTheme()}
         style={
           {
             "--rm-mono": rm_mono.style.fontFamily,
