@@ -1,8 +1,4 @@
-import {
-  NEW_ERROR,
-  NO_ERROR,
-  ReturnWithError,
-} from "@/config/interfaces";
+import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
 import { CTokenWithUserData } from "../interfaces/tokens";
 import BigNumber from "bignumber.js";
 import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
@@ -79,9 +75,13 @@ export function getLMTotalsFromCTokens(
   );
   // to get average apr, we want sum(supplyApr * supplyBalance - borrowApr * borrowBalance) / (supplyBalance + borrowBalance)
   // cummulative apr = supplyApr * supply - borrowApr * borrow (All in $NOTE)
-  const avgApr = totals.cummulativeApr.div(
-    totals.totalSupply.plus(totals.totalBorrow)
-  );
+  let avgApr = new BigNumber(0);
+  // check if division by zero will happen
+  if (totals.totalSupply.plus(totals.totalBorrow).isGreaterThan(0)) {
+    avgApr = totals.cummulativeApr.div(
+      totals.totalSupply.plus(totals.totalBorrow)
+    );
+  }
   return errorInLoop
     ? NEW_ERROR("getLMTotalsFromCTokens: " + errorReaons.join(", "))
     : NO_ERROR({

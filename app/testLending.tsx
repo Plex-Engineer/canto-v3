@@ -16,16 +16,16 @@ export default function TestLending() {
   const txStore = useStore(useTransactionStore, (state) => state);
 
   const [amount, setAmount] = useState("");
-  const { tokens, position, loading, transaction, cNote } = useLending({
+  const { cTokens, position, loading, transaction, cNote } = useLending({
     chainId: signer?.chain.id === 7701 ? 7701 : 7700,
+    cTokenType: "lending",
     userEthAddress: signer?.account.address,
   });
-  console.log(cNote)
   const sortedTokens = useMemo(() => {
-    return tokens.sort((a, b) =>
+    return cTokens.sort((a, b) =>
       a.underlying.symbol.localeCompare(b.underlying.symbol)
     );
-  }, [tokens]);
+  }, [cTokens]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedToken, setSelectedToken] = useState<any | null>(null);
 

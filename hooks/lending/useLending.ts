@@ -11,6 +11,8 @@ import { useState } from "react";
 import { lendingTxParamCheck } from "@/utils/clm/txParamCheck.utils";
 import { getAllUserCLMData } from "./helpers/userClmData";
 import { createNewCTokenLendingFlow } from "./helpers/createLendingFlow";
+import { areEqualAddresses } from "@/utils/address.utils";
+import { getCTokenAddressesFromChainId } from "./config/cTokenAddresses";
 
 /**
  * @name useLending
@@ -22,7 +24,7 @@ export default function useLending(
 ): LendingHookReturn {
   // internal state for tokens and position (ONLY SET ON SUCCESS)
   // stops failed queries from overwriting the data with empty arrays
-  const [tokens, setTokens] = useState<CTokenWithUserData[]>([]);
+  const [cTokens, setCTokens] = useState<CTokenWithUserData[]>([]);
   const [position, setPosition] = useState<UserLMPosition>({
     liquidity: "0",
     shortfall: "0",
@@ -35,9 +37,16 @@ export default function useLending(
   const { isLoading: loadingCTokens } = useQuery(
     ["lending", params.chainId, params.userEthAddress],
     async () => {
+      // get tokens
+      const cTokenAddresses = getCTokenAddressesFromChainId(
+        params.chainId,
+        params.cTokenType
+      );
+      if (!cTokenAddresses) throw Error("useLending: chainId not supported");
       return await getAllUserCLMData(
         params.userEthAddress ?? "",
-        params.chainId
+        params.chainId,
+        cTokenAddresses
       );
     },
     {
@@ -49,7 +58,7 @@ export default function useLending(
           console.log(response.error);
           return;
         }
-        setTokens(response.data.cTokens);
+        setCTokens(response.data.cTokens);
         response.data.position && setPosition(response.data.position);
       },
       refetchInterval: 10000,
@@ -63,9 +72,7 @@ export default function useLending(
     txParams: CTokenLendingTransactionParams
   ): ReturnWithError<boolean> {
     // make sure all the info we have is from the eth account
-    if (
-      txParams.ethAccount.toLowerCase() !== params.userEthAddress?.toLowerCase()
-    ) {
+    if (!areEqualAddresses(txParams.ethAccount, params.userEthAddress ?? "")) {
       return NEW_ERROR(
         "canPerformLendingTx: txParams.ethAccount does not match params.userEthAddress"
       );
@@ -74,9 +81,9 @@ export default function useLending(
   }
 
   return {
-    tokens,
+    cTokens,
     position,
-    cNote: tokens.find((token) => token.symbol === "cNOTE")!,
+    cNote: cTokens.find((token) => token.symbol === "cNOTE")!,
     loading: loadingCTokens,
     transaction: {
       canPerformLendingTx,

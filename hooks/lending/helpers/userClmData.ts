@@ -8,6 +8,7 @@ import { CTokenWithUserData } from "../interfaces/tokens";
 import { UserLMPosition } from "../interfaces/userPositions";
 import { getGeneralCTokenData, getUserCLMLensData } from "./clmLens";
 import { getLMTotalsFromCTokens } from "./cTokenTotals";
+import { areEqualAddresses, listIncludesAddress } from "@/utils/address.utils";
 
 /**
  * @notice Gets all user data from clmLens and general api
@@ -17,7 +18,8 @@ import { getLMTotalsFromCTokens } from "./cTokenTotals";
  */
 export async function getAllUserCLMData(
   userEthAddress: string,
-  chainId: number
+  chainId: number,
+  cTokenAddresses: string[]
 ): PromiseWithError<{
   cTokens: CTokenWithUserData[];
   position?: UserLMPosition;
@@ -25,25 +27,26 @@ export async function getAllUserCLMData(
   // get data from clmLens and general api
   const [generalCTokens, userLMData] = await Promise.all([
     getGeneralCTokenData(chainId),
-    getUserCLMLensData(userEthAddress, chainId),
+    getUserCLMLensData(userEthAddress, chainId, cTokenAddresses),
   ]);
   // check errors and return what is available
   // if general error, then return error now
   if (generalCTokens.error) {
     return NEW_ERROR("getAllUserCLMData::" + errMsg(generalCTokens.error));
   }
+  // remove cTokens from general data that are not in the cTokenAddresses list
+  const filteredCTokens = generalCTokens.data.filter((cToken) =>
+    listIncludesAddress(cTokenAddresses, cToken.address)
+  );
   // if user error, then just return the general data
   if (userLMData.error) {
-    console.log(userLMData.error);
-    return NO_ERROR({ cTokens: generalCTokens.data });
+    return NO_ERROR({ cTokens: filteredCTokens });
   }
   // since both are okay, combine the data
-  const combinedCTokenData = generalCTokens.data.map((cToken) => {
-    const userCTokenDetails = userLMData.data.cTokens.find((userCToken) => {
-      return (
-        userCToken.cTokenAddress.toLowerCase() === cToken.address.toLowerCase()
-      );
-    });
+  const combinedCTokenData = filteredCTokens.map((cToken) => {
+    const userCTokenDetails = userLMData.data.cTokens.find((userCToken) =>
+      areEqualAddresses(userCToken.cTokenAddress, cToken.address)
+    );
     if (userCTokenDetails) {
       return {
         ...cToken,

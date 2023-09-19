@@ -13,6 +13,7 @@ import {
   getRpcUrlFromChainId,
 } from "@/utils/evm/helpers.utils";
 import { Contract } from "web3";
+import { areEqualAddresses } from "@/utils/address.utils";
 
 export interface UserGBridgeInHistory {
   completed: SendToCosmosEvent[];
@@ -136,8 +137,8 @@ export async function getGBridgeQueueForUser(
   }
   return NO_ERROR({
     latestBlock: latestTransactions.latest_eth_block,
-    transactions: latestTransactions.deposit_events.filter(
-      (event) => event.sender.toLowerCase() === ethAccount.toLowerCase()
+    transactions: latestTransactions.deposit_events.filter((event) =>
+      areEqualAddresses(event.sender, ethAccount)
     ),
   });
 }

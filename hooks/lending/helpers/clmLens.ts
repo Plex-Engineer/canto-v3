@@ -5,7 +5,6 @@ import {
   errMsg,
 } from "@/config/interfaces";
 import { CToken, UserCTokenDetails } from "@/hooks/lending/interfaces/tokens";
-import { getCTokenAddressesFromChainId } from "@/hooks/lending/config/cTokenAddresses";
 import { isValidEthAddress } from "@/utils/address.utils";
 import {
   getProviderWithoutSigner,
@@ -22,11 +21,13 @@ import { CANTO_DATA_API } from "@/config/api";
  * @notice Gets user data from CLM Lens
  * @param {string} userEthAddress Ethereum address of user
  * @param {number} chainId Whether to use testnet or mainnet
+ * @param {string[]} cTokenAddresses List of cToken addresses to get data for
  * @returns {PromiseWithError<{ cTokens: UserCTokenDetails[]; limits: {liquidity: number}, compAccrued: number }>}
  */
 export async function getUserCLMLensData(
   userEthAddress: string,
-  chainId: number
+  chainId: number,
+  cTokenAddresses: string[]
 ): PromiseWithError<{
   cTokens: UserCTokenDetails[];
   limits: { liquidity: number; shortfall: number };
@@ -34,9 +35,8 @@ export async function getUserCLMLensData(
 }> {
   if (isValidEthAddress(userEthAddress) || !isCantoChainId(chainId)) {
     try {
-      // get all addresses depending on testnet
-      const [cTokenAddresses, lensAddress, comptrollerAddress] = [
-        getCTokenAddressesFromChainId(chainId),
+      // get all addresses depending on chainId
+      const [lensAddress, comptrollerAddress] = [
         getCLMAddress(chainId, "clmLens"),
         getCLMAddress(chainId, "comptroller"),
       ];
