@@ -18,6 +18,7 @@ const FooterButton = ({ text }: PropLinkButton) => {
   useEffect(() => {
     setTheme(localStorage.getItem("theme") as string);
   }, []);
+
   return (
     <button
       style={{

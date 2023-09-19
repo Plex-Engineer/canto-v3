@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={clsx("dark")}
+        className={localStorage.getItem("theme") ?? "dark"}
         style={
           {
             "--rm-mono": rm_mono.style.fontFamily,
