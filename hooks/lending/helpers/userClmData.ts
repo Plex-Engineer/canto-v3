@@ -4,11 +4,13 @@ import {
   PromiseWithError,
   errMsg,
 } from "@/config/interfaces";
-import { CTokenWithUserData } from "../interfaces/tokens";
+import { CToken, CTokenWithUserData } from "../interfaces/tokens";
 import { UserLMPosition } from "../interfaces/userPositions";
-import { getGeneralCTokenData, getUserCLMLensData } from "./clmLens";
+import { getUserCLMLensData } from "./clmLens";
 import { getLMTotalsFromCTokens } from "./cTokenTotals";
 import { areEqualAddresses, listIncludesAddress } from "@/utils/address.utils";
+import { getCantoApiData } from "@/config/api/canto-api";
+import { CANTO_DATA_API_ENDPOINTS } from "@/config/api";
 
 /**
  * @notice Gets all user data from clmLens and general api
@@ -26,7 +28,7 @@ export async function getAllUserCLMData(
 }> {
   // get data from clmLens and general api
   const [generalCTokens, userLMData] = await Promise.all([
-    getGeneralCTokenData(chainId),
+    getCantoApiData<CToken[]>(chainId, CANTO_DATA_API_ENDPOINTS.allCTokens),
     getUserCLMLensData(userEthAddress, chainId, cTokenAddresses),
   ]);
   // check errors and return what is available
