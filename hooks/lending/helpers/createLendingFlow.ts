@@ -11,7 +11,7 @@ export function createNewCTokenLendingFlow(
 ): ReturnWithError<NewTransactionFlow> {
   return NO_ERROR({
     title: params.txType + " " + params.cToken.underlying.symbol,
-    icon: "",
+    icon: params.cToken.underlying.logoURI,
     txType: TransactionFlowType.CLM_CTOKEN_TX,
     params: params,
   });

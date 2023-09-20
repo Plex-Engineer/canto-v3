@@ -1,8 +1,22 @@
 import { isCantoChainId } from "@/utils/networks.utils";
 import { NEW_ERROR, NO_ERROR, PromiseWithError, errMsg } from "../interfaces";
 import { tryFetch } from "@/utils/async.utils";
-import { CANTO_DATA_BASE_URL } from ".";
 
+// canto api
+const cantoMainnetDataBaseUrl = "http://localhost:8010/proxy";
+const cantoTestnetDataBaseUrl = "http://localhost:3001";
+
+// get url from chainId
+const CANTO_DATA_BASE_URL = (chainId: number) => {
+  return chainId === 7701 ? cantoTestnetDataBaseUrl : cantoMainnetDataBaseUrl;
+};
+
+// exported endpoints
+export const CANTO_DATA_API_ENDPOINTS = {
+  allValidators: "/v1/staking/validators",
+  stakingApr: "/v1/staking/apr",
+  allCTokens: "/v1/lending/cTokens",
+};
 /**
  * @notice Gets data from Canto API
  * @param {number} chainId chainId to get data for
