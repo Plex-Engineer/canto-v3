@@ -4,7 +4,7 @@ import {
   PromiseWithError,
   errMsg,
 } from "@/config/interfaces";
-import { CToken, UserCTokenDetails } from "@/hooks/lending/interfaces/tokens";
+import { UserCTokenDetails } from "@/hooks/lending/interfaces/tokens";
 import { isValidEthAddress } from "@/utils/address.utils";
 import {
   getProviderWithoutSigner,
@@ -12,10 +12,8 @@ import {
 } from "@/utils/evm/helpers.utils";
 import { Contract } from "web3";
 import { CLM_LENS_ABI, COMPTROLLER_ABI } from "@/config/abis";
-import { tryFetch } from "@/utils/async.utils";
 import { isCantoChainId } from "@/utils/networks.utils";
 import { getCLMAddress } from "@/config/consts/addresses";
-import { CANTO_DATA_API_ENDPOINTS, CANTO_DATA_BASE_URL } from "@/config/api";
 
 /**
  * @notice Gets user data from CLM Lens
@@ -99,29 +97,4 @@ export async function getUserCLMLensData(
   return NEW_ERROR(
     "getUserCLMLensData: Invalid Params: " + userEthAddress + " " + chainId
   );
-}
-
-/**
- * @notice Gets general cToken data from Canto Data API
- * @dev Currently only supports mainnet
- * @param {number} chainId Whether to use testnet or mainnet
- * @returns {PromiseWithError<CToken[]>} List of cTokens
- */
-export async function getGeneralCTokenData(
-  chainId: number
-): PromiseWithError<CToken[]> {
-  if (!isCantoChainId(chainId)) {
-    return NEW_ERROR("getGeneralCTokenData: Invalid chainId " + chainId);
-  }
-  // get full response
-  const { data, error } = await tryFetch<{
-    block: string;
-    results: string; // json string of CToken[]
-  }>(CANTO_DATA_BASE_URL(chainId) + CANTO_DATA_API_ENDPOINTS.allCTokens);
-  if (error) {
-    return NEW_ERROR("getGeneralCTokenData: " + errMsg(error));
-  }
-  // results will be a json string, so parse it
-  const jsonTokens = JSON.parse(data.results);
-  return NO_ERROR(jsonTokens);
 }
