@@ -1,9 +1,7 @@
 import { tryFetch } from "@/utils/async.utils";
 import { useQuery } from "react-query";
-import useTokenBalances from "../helpers/useTokenBalances";
 import { PairsHookInputParams } from "./interfaces/hookParams";
 import { Pair } from "./interfaces/pairs";
-import { useState } from "react";
 import { ERC20Token } from "@/config/interfaces/tokens";
 import { CANTO_DATA_API_ENDPOINTS, CANTO_DATA_BASE_URL } from "@/config/api";
 
@@ -12,7 +10,7 @@ export default function usePairs(params: PairsHookInputParams) {
     "lp pairs",
     async (): Promise<Pair[]> => {
       const { data, error } = await tryFetch<{ pairs: GeneralPairResponse[] }>(
-        CANTO_DATA_BASE_URL(7701) + CANTO_DATA_API_ENDPOINTS
+        CANTO_DATA_BASE_URL(params.chainId) + CANTO_DATA_API_ENDPOINTS.allPairs
       );
       if (error) throw error;
       const formattedPairs = data.pairs.map((pair) => {
@@ -42,9 +40,6 @@ export default function usePairs(params: PairsHookInputParams) {
           erc20Tokens.set(pair.token2.id, pair.token2);
         }
       });
-      setUnderlyingTokens(Array.from(erc20Tokens.values()));
-
-
       return formattedPairs;
     },
     {
@@ -56,13 +51,6 @@ export default function usePairs(params: PairsHookInputParams) {
       },
       refetchInterval: 10000,
     }
-  );
-  // save set of ERC20 tokens to use for balances, some pairs will have the same underlying tokens
-  const [underlyingTokens, setUnderlyingTokens] = useState<ERC20Token[]>([]);
-  const tokenBalances = useTokenBalances(
-    params.chainId,
-    underlyingTokens,
-    params.userEthAddress
   );
   return { pairs };
 }

@@ -12,4 +12,5 @@ export const CANTO_DATA_API_ENDPOINTS = {
   allValidators: "/v1/staking/validators",
   stakingApr: "/v1/staking/apr",
   allCTokens: "/v1/lending/cTokens",
+  allPairs: "/v1/dex/pairs",
 };
