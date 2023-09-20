@@ -13,7 +13,7 @@ import { useWalletClient } from "wagmi";
 export default function TestLP() {
   const signer = useWalletClient();
   const pairs = usePairs({
-    chainId: 7700,
+    chainId: 7701,
     userEthAddress: signer.data?.account.address ?? "",
   });
   const sortedPairs = pairs.pairs?.sort((a, b) =>
@@ -24,15 +24,16 @@ export default function TestLP() {
   const [valueToken2, setValueToken2] = useState("");
 
   function setBothValues(value: string, token1: boolean) {
+    if (!selectedPair) return;
     if (token1) {
       setValueToken1(value);
       quoteAddLiquidity(
         7700,
         "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
-        selectedPair?.token1.address,
-        selectedPair?.token2.address,
-        selectedPair?.stable,
-        convertToBigNumber(value, selectedPair?.token1.decimals).data.toString()
+        selectedPair.token1.address,
+        selectedPair.token2.address,
+        selectedPair.stable,
+        convertToBigNumber(value, selectedPair.token1.decimals).data.toString()
       ).then((data) => {
         if (data.error) {
           console.log(data.error);
@@ -40,7 +41,7 @@ export default function TestLP() {
           setValueToken2(
             formatBalance(
               data.data.amountBOptimal,
-              selectedPair?.token2.decimals
+              selectedPair.token2.decimals
             )
           );
         }
@@ -50,10 +51,10 @@ export default function TestLP() {
       quoteAddLiquidity(
         7700,
         "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
-        selectedPair?.token2.address,
-        selectedPair?.token1.address,
-        selectedPair?.stable,
-        convertToBigNumber(value, selectedPair?.token2.decimals).data.toString()
+        selectedPair.token2.address,
+        selectedPair.token1.address,
+        selectedPair.stable,
+        convertToBigNumber(value, selectedPair.token2.decimals).data.toString()
       ).then((data) => {
         if (data.error) {
           console.log(data.error);
@@ -61,7 +62,7 @@ export default function TestLP() {
           setValueToken1(
             formatBalance(
               data.data.amountBOptimal,
-              selectedPair?.token1.decimals
+              selectedPair.token1.decimals
             )
           );
         }
@@ -99,10 +100,7 @@ export default function TestLP() {
         <td>
           <Icon
             icon={{
-              url:
-                "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/LP/" +
-                pair.symbol +
-                ".svg",
+              url: pair.logoURI,
               size: 54,
             }}
           ></Icon>
@@ -139,38 +137,39 @@ export default function TestLP() {
           setValueToken2("");
         }}
       >
-        <div>
-          <h1>{selectedPair?.symbol}</h1>
-          <h3>
-            Reserve Ratio:{" "}
-            {formatBalance(
-              selectedPair?.ratio ?? "0",
-              18 +
-                Math.abs(
-                  selectedPair?.token1.decimals -
-                    selectedPair?.token2.decimals ?? 0
-                )
-            )}
-          </h3>
-          <Spacer height="50px" />
-          <Input
-            value={valueToken1}
-            onChange={(e) => {
-              setBothValues(e.target.value, true);
-            }}
-            label={selectedPair?.token1.symbol}
-            type="number"
-          />
-          <Spacer height="50px" />
-          <Input
-            value={valueToken2}
-            onChange={(e) => {
-              setBothValues(e.target.value, false);
-            }}
-            label={selectedPair?.token2.symbol}
-            type="number"
-          />
-        </div>
+        {selectedPair && (
+          <div>
+            <h1>{selectedPair.symbol}</h1>
+            <h3>
+              Reserve Ratio:{" "}
+              {formatBalance(
+                selectedPair.ratio,
+                18 +
+                  Math.abs(
+                    selectedPair.token1.decimals - selectedPair.token2.decimals
+                  )
+              )}
+            </h3>
+            <Spacer height="50px" />
+            <Input
+              value={valueToken1}
+              onChange={(e) => {
+                setBothValues(e.target.value, true);
+              }}
+              label={selectedPair.token1.symbol}
+              type="number"
+            />
+            <Spacer height="50px" />
+            <Input
+              value={valueToken2}
+              onChange={(e) => {
+                setBothValues(e.target.value, false);
+              }}
+              label={selectedPair.token2.symbol}
+              type="number"
+            />
+          </div>
+        )}
       </Modal>
       <PairTable pairs={sortedPairs ?? []} />
     </div>
