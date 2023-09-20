@@ -7,7 +7,7 @@ import {
   LendingHookReturn,
 } from "./interfaces/hookParams";
 import { UserLMPosition } from "./interfaces/userPositions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { lendingTxParamCheck } from "@/utils/clm/txParamCheck.utils";
 import { getAllUserCLMData } from "./helpers/userClmData";
 import { createNewCTokenLendingFlow } from "./helpers/createLendingFlow";
@@ -64,6 +64,21 @@ export default function useLending(
       refetchInterval: 10000,
     }
   );
+  ///
+  /// Internal Hooks
+  ///
+  // reset cTokens and position on chainId change
+  useEffect(() => {
+    setCTokens([]);
+    setPosition({
+      liquidity: "0",
+      shortfall: "0",
+      totalSupply: "0",
+      totalBorrow: "0",
+      totalRewards: "0",
+      avgApr: "0",
+    });
+  }, [params.chainId]);
 
   ///
   /// external functions

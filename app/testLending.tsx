@@ -1,4 +1,5 @@
 import Button from "@/components/button/button";
+import Icon from "@/components/icon/icon";
 import Input from "@/components/input/input";
 import Modal from "@/components/modal/modal";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
@@ -77,7 +78,7 @@ export default function TestLending() {
   );
 
   const columns = [
-    "symbol",
+    "token",
     "borrowApy",
     "distApy",
     "supplyApy",
@@ -118,7 +119,15 @@ export default function TestLending() {
         setModalOpen(true);
       }}
     >
-      <td>{cToken.underlying.symbol}</td>
+      <td>
+        <Icon
+          icon={{
+            url: cToken.underlying.logoURI,
+            size: 25,
+          }}
+        />
+        {cToken.underlying.symbol}
+      </td>
       <td>{cToken.borrowApy}</td>
       <td>{cToken.distApy}</td>
       <td>{cToken.supplyApy}</td>

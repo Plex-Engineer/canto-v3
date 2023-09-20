@@ -15,7 +15,7 @@ import { CLM_LENS_ABI, COMPTROLLER_ABI } from "@/config/abis";
 import { tryFetch } from "@/utils/async.utils";
 import { isCantoChainId } from "@/utils/networks.utils";
 import { getCLMAddress } from "@/config/consts/addresses";
-import { CANTO_DATA_API } from "@/config/api";
+import { CANTO_DATA_API_ENDPOINTS, CANTO_DATA_BASE_URL } from "@/config/api";
 
 /**
  * @notice Gets user data from CLM Lens
@@ -113,16 +113,15 @@ export async function getGeneralCTokenData(
   if (!isCantoChainId(chainId)) {
     return NEW_ERROR("getGeneralCTokenData: Invalid chainId " + chainId);
   }
-  //no api for testnet yet
-  if (chainId === 7701)
-    return NEW_ERROR("getGeneralCTokenData: Testnet not supported");
   // get full response
   const { data, error } = await tryFetch<{
-    blockNumber: string;
-    cTokens: CToken[];
-  }>(CANTO_DATA_API.allCTokens);
+    block: string;
+    results: string; // json string of CToken[]
+  }>(CANTO_DATA_BASE_URL(chainId) + CANTO_DATA_API_ENDPOINTS.allCTokens);
   if (error) {
     return NEW_ERROR("getGeneralCTokenData: " + errMsg(error));
   }
-  return NO_ERROR(data.cTokens);
+  // results will be a json string, so parse it
+  const jsonTokens = JSON.parse(data.results);
+  return NO_ERROR(jsonTokens);
 }
