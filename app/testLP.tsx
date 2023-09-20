@@ -3,7 +3,7 @@ import Icon from "@/components/icon/icon";
 import Input from "@/components/input/input";
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
-import { Pair } from "@/hooks/pairs/interfaces/pairs";
+import { PairWithUserCTokenData } from "@/hooks/pairs/interfaces/pairs";
 import usePairs from "@/hooks/pairs/usePairs";
 import { quoteAddLiquidity } from "@/utils/evm/pairs.utils";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
@@ -12,14 +12,14 @@ import { useWalletClient } from "wagmi";
 
 export default function TestLP() {
   const signer = useWalletClient();
-  const pairs = usePairs({
+  const { pairsWithUserCTokens: pairs } = usePairs({
     chainId: 7701,
     userEthAddress: signer.data?.account.address ?? "",
   });
-  const sortedPairs = pairs.pairs?.sort((a, b) =>
-    a.symbol.localeCompare(b.symbol)
-  );
-  const [selectedPair, setSelectedPair] = useState<Pair | null>(null);
+  const sortedPairs = pairs?.sort((a, b) => a.symbol.localeCompare(b.symbol));
+  console.log(sortedPairs);
+  const [selectedPair, setSelectedPair] =
+    useState<PairWithUserCTokenData | null>(null);
   const [valueToken1, setValueToken1] = useState("");
   const [valueToken2, setValueToken2] = useState("");
 
@@ -70,7 +70,7 @@ export default function TestLP() {
     }
   }
 
-  const PairTable = ({ pairs }: { pairs: Pair[] }) => {
+  const PairTable = ({ pairs }: { pairs: PairWithUserCTokenData[] }) => {
     return (
       <table>
         <thead>
@@ -84,6 +84,9 @@ export default function TestLP() {
             <th>Token 2</th>
             <th>TVL</th>
             <th>edit</th>
+            <th>user tokens</th>
+            <th>user stake</th>
+            <th>rewards</th>
           </tr>
         </thead>
         <tbody>
@@ -94,7 +97,7 @@ export default function TestLP() {
       </table>
     );
   };
-  const PairRow = ({ pair }: { pair: Pair }) => {
+  const PairRow = ({ pair }: { pair: PairWithUserCTokenData }) => {
     return (
       <tr>
         <td>
@@ -123,6 +126,19 @@ export default function TestLP() {
         <td>
           <Button onClick={() => setSelectedPair(pair)}>Manage</Button>
         </td>
+        <td>
+          {formatBalance(
+            pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+            pair.decimals
+          )}
+        </td>
+        <td>
+          {formatBalance(
+            pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0",
+            pair.decimals
+          )}
+        </td>
+        <td>{formatBalance(pair.clmData?.userDetails?.rewards ?? "0", 18)}</td>
       </tr>
     );
   };

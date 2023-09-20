@@ -3,10 +3,19 @@ import { PairsHookInputParams } from "./interfaces/hookParams";
 import { Pair } from "./interfaces/pairs";
 import { CANTO_DATA_API_ENDPOINTS } from "@/config/api";
 import { getCantoApiData } from "@/config/api/canto-api";
+import useLending from "../lending/useLending";
 
 export default function usePairs(params: PairsHookInputParams) {
+  // since LP tokens are part of the clm, we need to query the cLP tokens in useLending
+  // need the cLP tokens, user position, and transaction functions
+  const {
+    cTokens: cLPTokens,
+    position,
+    transaction: clmTxs,
+  } = useLending({ ...params, cTokenType: "lp" });
+
   const { data: pairs } = useQuery(
-    "lp pairs",
+    ["lp pairs", params.chainId],
     async (): Promise<Pair[]> => {
       const { data, error } = await getCantoApiData<Pair[]>(
         params.chainId,
@@ -53,5 +62,15 @@ export default function usePairs(params: PairsHookInputParams) {
       refetchInterval: 10000,
     }
   );
-  return { pairs };
+  const pairsWithUserCTokens = pairs?.map((pair) => {
+    const cLPToken = cLPTokens?.find(
+      (cToken) => cToken.address === pair.cLpAddress
+    );
+    if (!cLPToken) return pair;
+    return {
+      ...pair,
+      clmData: cLPToken,
+    };
+  });
+  return { pairsWithUserCTokens };
 }

@@ -1,3 +1,5 @@
+import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
+
 export interface Pair {
   aTob: boolean;
   address: string;
@@ -26,4 +28,9 @@ interface PairToken {
   logoURI: string;
   name: string;
   symbol: string;
+}
+
+// will include balances, staked, and allowances
+export interface PairWithUserCTokenData extends Pair {
+  clmData?: CTokenWithUserData;
 }
