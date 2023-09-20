@@ -1,6 +1,7 @@
 import Button from "@/components/button/button";
 import Icon from "@/components/icon/icon";
 import Input from "@/components/input/input";
+import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
@@ -255,7 +256,10 @@ export default function TestLending() {
       <h2>Total Shortfall: {formatBalance(position.shortfall, 18)}</h2>
       <h2>Total Rewards: {formatBalance(position.totalRewards, 18)}</h2>
       <h2>Average Apr: {position.avgApr}</h2>
-
+      <Spacer height="30px" />
+      <h1>CNOTE BY ITSELF</h1>
+      <CTokenTable cTokens={cNote ? [cNote] : []} />
+      <Spacer height="30px" />
       <CTokenTable cTokens={sortedTokens} />
     </div>
   );

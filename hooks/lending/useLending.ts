@@ -20,7 +20,10 @@ import { getCTokenAddressesFromChainId } from "./config/cTokenAddresses";
  * @returns
  */
 export default function useLending(
-  params: LendingHookInputParams
+  params: LendingHookInputParams,
+  options?: {
+    refetchInterval?: number;
+  }
 ): LendingHookReturn {
   // internal state for tokens and position (ONLY SET ON SUCCESS)
   // stops failed queries from overwriting the data with empty arrays
@@ -54,6 +57,7 @@ export default function useLending(
         console.log(error);
       },
       onSuccess(response) {
+        console.log("refetched")
         if (response.error) {
           console.log(response.error);
           return;
@@ -61,7 +65,7 @@ export default function useLending(
         setCTokens(response.data.cTokens);
         response.data.position && setPosition(response.data.position);
       },
-      refetchInterval: 10000,
+      refetchInterval: options?.refetchInterval || 5000,
     }
   );
   ///
