@@ -2,7 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   ReturnWithError,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import { convertToBigNumber } from "../tokenBalances.utils";
 import BigNumber from "bignumber.js";
 

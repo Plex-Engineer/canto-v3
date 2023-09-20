@@ -24,3 +24,8 @@ export interface OFTToken extends ERC20Token {
   isOFTProxy: boolean;
   oftUnderlyingAddress?: string; // if proxy is true and this is undefined, then it is a proxy to the native token
 }
+
+// for user token balances on certain pages
+export interface UserTokenBalances {
+  [key: string]: string; // token id => balance
+}

@@ -1,3 +1,4 @@
+import { Transaction, PromiseWithError } from "../interfaces";
 import { BridgeTransactionParams } from "@/hooks/bridge/interfaces/hookParams";
 import {
   bridgeInTx,
@@ -5,8 +6,6 @@ import {
   validateBridgeInRetryParams,
   validateBridgeOutRetryParams,
 } from "@/hooks/bridge/transactions/bridge";
-import { Transaction } from "../interfaces/transactions";
-import { PromiseWithError } from "../interfaces/errors";
 import { CTokenLendingTransactionParams } from "@/hooks/lending/interfaces/lendingTxTypes";
 import {
   cTokenLendingTx,

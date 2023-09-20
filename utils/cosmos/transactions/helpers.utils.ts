@@ -4,14 +4,12 @@ import {
   PromiseWithError,
   ReturnWithError,
   errMsg,
-} from "@/config/interfaces/errors";
-import {
   CosmosTxContext,
   EIP712FeeObject,
   Fee,
   Sender,
   UnsignedCosmosMessages,
-} from "@/config/interfaces/transactions";
+} from "@/config/interfaces";
 import { tryFetch } from "@/utils/async.utils";
 import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
 import {

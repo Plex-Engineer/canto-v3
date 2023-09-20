@@ -3,9 +3,8 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import { CToken, UserCTokenDetails } from "@/hooks/lending/interfaces/tokens";
-import { getCTokenAddressesFromChainId } from "@/hooks/lending/config/cTokenAddresses";
 import { isValidEthAddress } from "@/utils/address.utils";
 import {
   getProviderWithoutSigner,
@@ -14,23 +13,21 @@ import {
 import { Contract } from "web3";
 import { CLM_LENS_ABI, COMPTROLLER_ABI } from "@/config/abis";
 import { tryFetch } from "@/utils/async.utils";
-import {
-  CANTO_DATA_API_ENDPOINTS,
-  CANTO_DATA_API_URL,
-  GeneralCTokenResponse,
-} from "@/config/consts/apiUrls";
 import { isCantoChainId } from "@/utils/networks.utils";
 import { getCLMAddress } from "@/config/consts/addresses";
+import { CANTO_DATA_API_ENDPOINTS, CANTO_DATA_BASE_URL } from "@/config/api";
 
 /**
  * @notice Gets user data from CLM Lens
  * @param {string} userEthAddress Ethereum address of user
  * @param {number} chainId Whether to use testnet or mainnet
+ * @param {string[]} cTokenAddresses List of cToken addresses to get data for
  * @returns {PromiseWithError<{ cTokens: UserCTokenDetails[]; limits: {liquidity: number}, compAccrued: number }>}
  */
 export async function getUserCLMLensData(
   userEthAddress: string,
-  chainId: number
+  chainId: number,
+  cTokenAddresses: string[]
 ): PromiseWithError<{
   cTokens: UserCTokenDetails[];
   limits: { liquidity: number; shortfall: number };
@@ -38,9 +35,8 @@ export async function getUserCLMLensData(
 }> {
   if (isValidEthAddress(userEthAddress) || !isCantoChainId(chainId)) {
     try {
-      // get all addresses depending on testnet
-      const [cTokenAddresses, lensAddress, comptrollerAddress] = [
-        getCTokenAddressesFromChainId(chainId),
+      // get all addresses depending on chainId
+      const [lensAddress, comptrollerAddress] = [
         getCLMAddress(chainId, "clmLens"),
         getCLMAddress(chainId, "comptroller"),
       ];
@@ -115,17 +111,17 @@ export async function getGeneralCTokenData(
   chainId: number
 ): PromiseWithError<CToken[]> {
   if (!isCantoChainId(chainId)) {
-    return NEW_ERROR("getGeneralCTokenData: Invalid chainId: " + chainId);
+    return NEW_ERROR("getGeneralCTokenData: Invalid chainId " + chainId);
   }
-  //no api for testnet yet
-  if (chainId === 7701)
-    return NEW_ERROR("getGeneralCTokenData: Testnet not supported");
   // get full response
-  const { data, error } = await tryFetch<GeneralCTokenResponse>(
-    CANTO_DATA_API_URL + CANTO_DATA_API_ENDPOINTS.allCTokens
-  );
+  const { data, error } = await tryFetch<{
+    block: string;
+    results: string; // json string of CToken[]
+  }>(CANTO_DATA_BASE_URL(chainId) + CANTO_DATA_API_ENDPOINTS.allCTokens);
   if (error) {
     return NEW_ERROR("getGeneralCTokenData: " + errMsg(error));
   }
-  return NO_ERROR(data.cTokens);
+  // results will be a json string, so parse it
+  const jsonTokens = JSON.parse(data.results);
+  return NO_ERROR(jsonTokens);
 }

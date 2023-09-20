@@ -1,7 +1,4 @@
-import {
-  Transaction,
-  TransactionDescription,
-} from "@/config/interfaces/transactions";
+import { Transaction, TransactionDescription } from "@/config/interfaces";
 import { createMsgsConvertCoin } from "@/utils/cosmos/transactions/messages/convertCoin/convertCoin";
 import { createMsgsConvertERC20 } from "@/utils/cosmos/transactions/messages/convertCoin/convertERC20";
 

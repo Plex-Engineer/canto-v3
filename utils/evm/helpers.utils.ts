@@ -2,7 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   ReturnWithError,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import * as NETWORKS from "@/config/networks";
 import Web3 from "web3";
 

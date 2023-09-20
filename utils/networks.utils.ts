@@ -2,13 +2,11 @@ import {
   NEW_ERROR,
   NO_ERROR,
   ReturnWithError,
-} from "@/config/interfaces/errors";
-import {
   BaseNetwork,
   CosmosNetwork,
   EVMNetwork,
-} from "@/config/interfaces/networks";
-import { Chain } from "@/config/interfaces/transactions";
+  Chain,
+} from "@/config/interfaces";
 import * as NETWORKS from "@/config/networks";
 import * as COSMOS_NETWORKS from "@/config/networks/cosmos";
 

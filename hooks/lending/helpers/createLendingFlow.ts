@@ -1,6 +1,9 @@
-import { NO_ERROR, ReturnWithError } from "@/config/interfaces/errors";
+import {
+  NO_ERROR,
+  ReturnWithError,
+  NewTransactionFlow,
+} from "@/config/interfaces";
 import { CTokenLendingTransactionParams } from "../interfaces/lendingTxTypes";
-import { NewTransactionFlow } from "@/config/interfaces/transactions";
 import { TransactionFlowType } from "@/config/transactions/txMap";
 
 export function createNewCTokenLendingFlow(

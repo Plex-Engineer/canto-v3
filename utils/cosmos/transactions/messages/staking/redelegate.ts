@@ -3,7 +3,7 @@ import {
   CosmosNativeMessage,
   EIP712Message,
   UnsignedCosmosMessages,
-} from "@/config/interfaces/transactions";
+} from "@/config/interfaces";
 import { Coin } from "@buf/cosmos_cosmos-sdk.bufbuild_es/cosmos/base/v1beta1/coin_pb";
 import { MsgBeginRedelegate } from "@buf/cosmos_cosmos-sdk.bufbuild_es/cosmos/staking/v1beta1/tx_pb.js";
 import { generateCosmosEIPTypes } from "../base";

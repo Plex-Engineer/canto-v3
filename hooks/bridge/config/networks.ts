@@ -1,4 +1,4 @@
-import { BaseNetwork } from "@/config/interfaces/networks";
+import { BaseNetwork } from "@/config/interfaces";
 import * as ALL_NETWORKS from "@/config/networks";
 
 export const TEST_BRIDGE_NETWORKS: BaseNetwork[] = [

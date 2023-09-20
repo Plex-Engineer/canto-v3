@@ -1,17 +1,15 @@
 import {
   Transaction,
   TransactionDescription,
-} from "@/config/interfaces/transactions";
-import {
-  CTokenLendingTransactionParams,
-  CTokenLendingTxTypes,
-} from "../interfaces/lendingTxTypes";
-import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
+import {
+  CTokenLendingTransactionParams,
+  CTokenLendingTxTypes,
+} from "../interfaces/lendingTxTypes";
 import { _approveTx, checkTokenAllowance } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { formatBalance } from "@/utils/tokenBalances.utils";
@@ -104,6 +102,31 @@ export async function cTokenLendingTx(
       )
     )
   );
+
+  // user should enable token as collateral if supplying and token has collateral factor
+  if (
+    params.txType === CTokenLendingTxTypes.SUPPLY &&
+    !params.cToken.userDetails.isCollateral &&
+    Number(params.cToken.collateralFactor) !== 0
+  ) {
+    // get comptroller address
+    const comptrollerAddress = getCLMAddress(params.chainId, "comptroller");
+    if (!comptrollerAddress) {
+      return NEW_ERROR("cTokenLendingTx: chainId not supported");
+    }
+    txList.push(
+      _collateralizeTx(
+        params.chainId,
+        comptrollerAddress,
+        params.cToken.address,
+        true,
+        TX_DESCRIPTIONS.CTOKEN_COLLATERALIZE(
+          params.cToken.underlying.symbol,
+          true
+        )
+      )
+    );
+  }
   return NO_ERROR(txList);
 }
 

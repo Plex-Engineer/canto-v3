@@ -3,15 +3,13 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
-import {
   BridgeStatus,
   NewTransactionFlow,
   TransactionFlow,
   TransactionStatus,
   TransactionWithStatus,
   UserTransactionFlowMap,
-} from "@/config/interfaces/transactions";
+} from "@/config/interfaces";
 import { TRANSACTION_FLOW_MAP } from "@/config/transactions/txMap";
 import {
   performSingleTransaction,

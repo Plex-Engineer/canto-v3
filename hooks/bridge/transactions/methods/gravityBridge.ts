@@ -4,27 +4,24 @@ import {
   PUB_KEY_BOT_ADDRESS,
   WETH_MAINNET_ADDRESS,
 } from "@/config/consts/addresses";
-import { CANTO_BOT_API_URL } from "@/config/consts/apiUrls";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
-import { ERC20Token } from "@/config/interfaces/tokens";
-import {
+  ERC20Token,
   BridgeStatus,
   Transaction,
   TransactionDescription,
-  TransactionStatus,
-} from "@/config/interfaces/transactions";
+} from "@/config/interfaces";
 import {
   CANTO_MAINNET_COSMOS,
   CANTO_MAINNET_EVM,
   ETH_MAINNET,
 } from "@/config/networks";
 import {
+  areEqualAddresses,
   checkPubKeyCosmos,
   ethToCantoAddress,
   isValidEthAddress,
@@ -50,6 +47,7 @@ import {
   fetchTransaction,
 } from "wagmi/actions";
 import { BridgeTransactionParams } from "../../interfaces/hookParams";
+import { CANTO_DUST_BOT_API_URL } from "@/config/api";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging into gravity bridge
@@ -103,7 +101,7 @@ export async function bridgeInGravity(
     const enoughCanto = new BigNumber(cantoBalance).gte("300000000000000000");
     // call api to send canto if not enough canto
     if (!enoughCanto) {
-      const { error: botError } = await tryFetch(CANTO_BOT_API_URL, {
+      const { error: botError } = await tryFetch(CANTO_DUST_BOT_API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -209,7 +207,7 @@ export async function bridgeInGravity(
  * @returns {boolean} true if tokenAddress is WETH, false otherwise
  */
 function isWETH(tokenAddress: string): boolean {
-  return tokenAddress.toLowerCase() === WETH_MAINNET_ADDRESS.toLowerCase();
+  return areEqualAddresses(tokenAddress, WETH_MAINNET_ADDRESS);
 }
 
 /**
@@ -309,7 +307,7 @@ export async function checkGbridgeTxStatus(
     for (const event of gbridgeQueue.transactions) {
       if (
         Number(event.block_height) === Number(transaction.blockNumber) &&
-        event.sender.toLowerCase() === transaction.from.toLowerCase()
+        areEqualAddresses(event.sender, transaction.from)
       ) {
         // grab data from event
         if (event.confirmed === true) {
