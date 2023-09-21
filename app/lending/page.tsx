@@ -28,7 +28,7 @@ interface LendingProps {
 }
 
 export default function LendingPage() {
-  const { cTokens, position, transaction, selection } = useLendingCombo();
+  const { cTokens, clmPosition, transaction, selection } = useLendingCombo();
   const { cNote, rwas } = cTokens;
   const {
     currentAction,
@@ -183,7 +183,7 @@ export default function LendingPage() {
                 balance={maxAmountForLendingTx(
                   currentAction,
                   selectedToken,
-                  position
+                  clmPosition.position
                 )}
                 decimals={selectedToken.underlying.decimals}
                 value={amount}
@@ -213,30 +213,24 @@ export default function LendingPage() {
           USER POSITION
         </Text>
         <Text size="lg" font="proto_mono">
-          Total Borrow:{" "}
-          {formatBalance(position.totalBorrow, 18, {
+          Maximum Account Liquidity: {}
+          {formatBalance(clmPosition.general.maxAccountLiquidity, 18, {
             commify: true,
             precision: 2,
           })}
         </Text>
         <Text size="lg" font="proto_mono">
-          Total Supply:{" "}
-          {formatBalance(position.totalSupply, 18, {
+          Outstanding Debt:{" "}
+          {formatBalance(clmPosition.general.outstandingDebt, 18, {
             commify: true,
             precision: 2,
           })}
         </Text>
         <Text size="lg" font="proto_mono">
-          Total Liquidity: {formatBalance(position.liquidity, 18)}
+          Percent Limit Used: {clmPosition.general.percentLimitUsed + "%"}
         </Text>
         <Text size="lg" font="proto_mono">
-          Total Shortfall: {formatBalance(position.shortfall, 18)}
-        </Text>
-        <Text size="lg" font="proto_mono">
-          Total Rewards: {formatBalance(position.totalRewards, 18)}
-        </Text>
-        <Text size="lg" font="proto_mono">
-          Average Apr: {position.avgApr}
+          Average Apr: {clmPosition.general.netApr + "%"}
         </Text>{" "}
       </section>
       {cNote && (
