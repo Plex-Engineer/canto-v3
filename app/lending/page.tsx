@@ -10,7 +10,6 @@ import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes"
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { maxAmountForLendingTx } from "@/utils/clm/limits.utils";
 import { formatBalance } from "@/utils/tokenBalances.utils";
-import { useState } from "react";
 import { useLendingCombo } from "./utils";
 import Text from "@/components/text";
 import Container from "@/components/container/container";
@@ -29,25 +28,18 @@ interface LendingProps {
 }
 
 export default function LendingPage() {
+  const { cTokens, position, transaction, selection } = useLendingCombo();
+  const { cNote, rwas } = cTokens;
   const {
-    cTokens,
-    sortedTokens,
-    position,
-    loading,
+    currentAction,
+    setCurrentAction,
     modalOpen,
     setModalOpen,
     selectedToken,
     setSelectedToken,
-    currentAction,
-    setCurrentAction,
-    lendingTx,
-    canPerformTx,
-    txStore,
-    cNote,
     amount,
     setAmount,
-  } = useLendingCombo();
-
+  } = selection;
   interface LSProps {
     action: CTokenLendingTxTypes;
   }
@@ -60,83 +52,62 @@ export default function LendingPage() {
     </Button>
   );
 
-  const columns = [
-    "token",
-    "borrowApy",
-    "distApy",
-    "supplyApy",
-    "price",
-    "wallet balance",
-    "borrow balance",
-    "rewards",
-    "isCollateral",
-    "supply balance",
+  const CTokenRow = ({ cToken }: { cToken: CTokenWithUserData }) => [
+    <>
+      <Icon icon={{ url: cToken.underlying.logoURI, size: 30 }} />
+      <Spacer width="10px" />
+      <Text theme="primary-dark" key={cToken.name + cToken.name}>
+        {cToken.underlying.name}
+      </Text>
+    </>,
+    <Text theme="primary-dark" key={cToken.name + "cToken.supplyApy"}>
+      {cToken.supplyApy + "%"}
+    </Text>,
+    <Text theme="primary-dark" key={cToken.name + "cToken.balance"}>
+      {formatBalance(
+        cToken.userDetails?.balanceOfUnderlying ?? "0",
+        cToken.underlying.decimals,
+        {
+          commify: true,
+        }
+      )}
+    </Text>,
+    <Text theme="primary-dark" key={cToken.name + "cToken.ubalance"}>
+      {formatBalance(
+        cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
+        cToken.underlying.decimals,
+        {
+          commify: true,
+        }
+      )}
+    </Text>,
+    <Text theme="primary-dark" key={cToken.name + "cToken.CF"}>
+      {formatBalance(cToken.collateralFactor, 16) + "%"}
+    </Text>,
+    <Container key={cToken.name + "Test"} direction="row">
+      <Button
+        key={cToken.name + "cToken.supply"}
+        color="primary"
+        onClick={() => {
+          setSelectedToken(cToken);
+          setModalOpen(true);
+        }}
+      >
+        Supply
+      </Button>
+      ,
+      <Button
+        key={cToken.name + "cToken.siwthdraw"}
+        color="secondary"
+        onClick={() => {
+          setSelectedToken(cToken);
+          setModalOpen(true);
+        }}
+      >
+        Withdraw
+      </Button>
+    </Container>,
   ];
-  const CTokenTable = ({ cTokens }: { cTokens: CTokenWithUserData[] }) => (
-    <table>
-      <thead>
-        <tr>
-          {columns.map((column) => (
-            <td key={column} style={{ display: "table-cell" }}>
-              {column}
-            </td>
-          ))}
-        </tr>
-      </thead>
-      {cTokens.map((cToken) => (
-        <CTokenRow key={cToken.address} cToken={cToken} />
-      ))}
-    </table>
-  );
-
-  const CTokenRow = ({ cToken }: { cToken: CTokenWithUserData }) => (
-    <tr
-      style={{
-        fontWeight: "400",
-        lineHeight: "4rem",
-        backgroundColor: "blue",
-        cursor: "pointer",
-      }}
-      onClick={() => {
-        setSelectedToken(cToken);
-        setModalOpen(true);
-      }}
-    >
-      <td>
-        <Icon
-          icon={{
-            url: cToken.underlying.logoURI,
-            size: 25,
-          }}
-        />
-        {cToken.underlying.symbol}
-      </td>
-      <td>{cToken.borrowApy}</td>
-      <td>{cToken.distApy}</td>
-      <td>{cToken.supplyApy}</td>
-      <td>{formatBalance(cToken.price, 36 - cToken.underlying.decimals)}</td>
-      <td>
-        {formatBalance(
-          cToken.userDetails?.balanceOfUnderlying ?? "0",
-          cToken.underlying.decimals
-        )}
-      </td>
-      <td>
-        {formatBalance(
-          cToken.userDetails?.borrowBalance ?? "0",
-          cToken.underlying.decimals
-        )}
-      </td>
-      <td>{formatBalance(cToken.userDetails?.rewards ?? "0", 18)}</td>
-      <td>{cToken.userDetails?.isCollateral ? "yes" : "no"}</td>
-      <td>
-        {formatBalance(
-          cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
-          cToken.underlying.decimals
-        )}
-      </td>
-    </tr>
-  );
 
   return (
     <div>
@@ -227,8 +198,8 @@ export default function LendingPage() {
                 <LendingActionSwitch action={CTokenLendingTxTypes.REPAY} />
               </div>
               <Button
-                disabled={!canPerformTx(amount, currentAction)}
-                onClick={() => lendingTx(amount, currentAction)}
+                disabled={!transaction.canPerformTx(amount, currentAction)}
+                onClick={() => transaction.performTx(amount, currentAction)}
               >
                 CONFIRM
               </Button>
@@ -268,15 +239,21 @@ export default function LendingPage() {
           Average Apr: {position.avgApr}
         </Text>{" "}
       </section>
-
-      {/* <Spacer height="30px" />
-      <Text size="x-lg" font="proto_mono">
-        CNOTE BY ITSELF
-      </Text>
-      <CTokenTable cTokens={cNote ? [cNote] : []} />
-      <Spacer height="30px" />
-      <CTokenTable cTokens={sortedTokens} /> */}
       {cNote && (
+        <Table
+          title="CNOTE"
+          headers={[
+            "Asset",
+            "APR",
+            "Wallet Balance",
+            "Supplied Amount",
+            "Collateral Factor",
+            "",
+          ]}
+          data={[CTokenRow({ cToken: cNote })]}
+        />
+      )}
+      {rwas.length > 0 && (
         <Table
           title="RWAS"
           headers={[
@@ -287,53 +264,7 @@ export default function LendingPage() {
             "Collateral Factor",
             "",
           ]}
-          data={[
-            [
-              <>
-                <Icon icon={{ url: cNote.underlying.logoURI, size: 30 }} />
-                <Spacer width="10px" />
-                <Text theme="primary-dark" key={cNote.name}>
-                  {cNote.underlying.name}
-                </Text>
-              </>,
-              <Text theme="primary-dark" key={cNote.supplyApy}>
-                {cNote.supplyApy}
-              </Text>,
-              <Text theme="primary-dark" key={cNote.supplyApy}>
-                {cNote.userDetails?.balanceOfUnderlying}
-              </Text>,
-              <Text theme="primary-dark" key={cNote.supplyApy}>
-                {cNote.userDetails?.supplyBalanceInUnderlying}
-              </Text>,
-              <Text theme="primary-dark" key={cNote.supplyApy}>
-                {formatBalance(cNote.collateralFactor, 18)}
-              </Text>,
-
-              <Container key={"Test"} direction="row">
-                <Button
-                  key={cNote.address}
-                  color="primary"
-                  onClick={() => {
-                    setSelectedToken(cNote);
-                    setModalOpen(true);
-                  }}
-                >
-                  Supply
-                </Button>
-                ,
-                <Button
-                  key={cNote.address}
-                  color="secondary"
-                  onClick={() => {
-                    setSelectedToken(cNote);
-                    setModalOpen(true);
-                  }}
-                >
-                  Withdraw
-                </Button>
-              </Container>,
-            ],
-          ]}
+          data={[...rwas.map((cToken) => CTokenRow({ cToken }))]}
         />
       )}
     </div>
