@@ -1,0 +1,39 @@
+.table {
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: repeat(7, 1fr);
+  max-width: 1200px;
+  min-width: 400px;
+  width: 100%;
+  background-color: #3873ad1a;
+  border: 1px solid #3873ad;
+  border-radius: 8px;
+  flex-grow: 3;
+}
+.header {
+  background: rgba(56, 115, 173, 0.4);
+  box-shadow: 0px 4px 40px rgba(56, 115, 173, 0.26);
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  grid-template-columns: repeat(7, 1fr);
+  height: 66px;
+  transition: all 0.1s ease-in;
+}
+
+.row:hover {
+  background: rgba(37, 78, 119, 0.4);
+  box-shadow: 0px 4px 40px rgba(56, 115, 173, 0.26);
+}
+
+.cell {
+  width: 100%;
+  border: 1px solid #3873ad1a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffffc9;
+  text-align: center;
+}
