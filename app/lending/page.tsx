@@ -2,6 +2,19 @@
 
 import Table from "@/components/table/table";
 
+interface LendingProps {
+  Asset: string;
+  APR: string;
+  WalletBalance: string;
+  SuppliedAmount: string;
+  CollateralFactor: string;
+  Actions: {
+    name: string;
+    onClick: () => void;
+    disabled?: boolean;
+  }[];
+}
+
 export default function LendingPage() {
   return (
     <div>

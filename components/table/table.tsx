@@ -1,3 +1,4 @@
+import Text from "../text";
 import styles from "./table.module.scss";
 
 interface Props {
@@ -15,11 +16,16 @@ function formatTitle(title: string) {
 const Table = (props: Props) => {
   return (
     <div className={styles.table}>
+      <div className={styles.title}>
+        <Text font="proto_mono" size="lg">
+          {props.title}
+        </Text>
+      </div>
       <div className={styles.row + " " + styles.header}>
         {props.headers.map((header, index) => {
           return (
             <div key={index} className={styles.cell}>
-              {formatTitle(header)}
+              <Text theme="secondary-dark">{formatTitle(header)}</Text>
             </div>
           );
         })}
@@ -30,7 +36,7 @@ const Table = (props: Props) => {
             {row.map((cell, index) => {
               return (
                 <div key={index} className={styles.cell}>
-                  cell
+                  {cell}
                 </div>
               );
             })}

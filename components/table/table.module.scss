@@ -5,14 +5,21 @@
   max-width: 1200px;
   min-width: 400px;
   width: 100%;
-  background-color: #3873ad1a;
-  border: 1px solid #3873ad;
-  border-radius: 8px;
-  flex-grow: 3;
+  margin: 0 auto;
+  padding: 16px;
+  border-radius: var(--border-radius);
+  background: var(--card-sub-surface-color, #dfdfdf);
+  box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  height: 66px;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 .header {
-  background: rgba(56, 115, 173, 0.4);
-  box-shadow: 0px 4px 40px rgba(56, 115, 173, 0.26);
+  //   background: rgba(56, 115, 173, 0.4);
 }
 
 .row {
@@ -30,7 +37,7 @@
 
 .cell {
   width: 100%;
-  border: 1px solid #3873ad1a;
+  //   border: 1px solid #3873ad1a;
   display: flex;
   justify-content: center;
   align-items: center;
