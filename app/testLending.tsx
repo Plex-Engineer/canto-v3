@@ -1,5 +1,7 @@
 import Button from "@/components/button/button";
+import Icon from "@/components/icon/icon";
 import Input from "@/components/input/input";
+import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
@@ -16,15 +18,16 @@ export default function TestLending() {
   const txStore = useStore(useTransactionStore, (state) => state);
 
   const [amount, setAmount] = useState("");
-  const { tokens, position, loading, transaction } = useLending({
+  const { cTokens, position, loading, transaction, cNote } = useLending({
     chainId: signer?.chain.id === 7701 ? 7701 : 7700,
+    cTokenType: "lending",
     userEthAddress: signer?.account.address,
   });
   const sortedTokens = useMemo(() => {
-    return tokens.sort((a, b) =>
+    return cTokens.sort((a, b) =>
       a.underlying.symbol.localeCompare(b.underlying.symbol)
     );
-  }, [tokens]);
+  }, [cTokens]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedToken, setSelectedToken] = useState<any | null>(null);
 
@@ -76,7 +79,7 @@ export default function TestLending() {
   );
 
   const columns = [
-    "symbol",
+    "token",
     "borrowApy",
     "distApy",
     "supplyApy",
@@ -117,7 +120,15 @@ export default function TestLending() {
         setModalOpen(true);
       }}
     >
-      <td>{cToken.underlying.symbol}</td>
+      <td>
+        <Icon
+          icon={{
+            url: cToken.underlying.logoURI,
+            size: 25,
+          }}
+        />
+        {cToken.underlying.symbol}
+      </td>
       <td>{cToken.borrowApy}</td>
       <td>{cToken.distApy}</td>
       <td>{cToken.supplyApy}</td>
@@ -245,7 +256,10 @@ export default function TestLending() {
       <h2>Total Shortfall: {formatBalance(position.shortfall, 18)}</h2>
       <h2>Total Rewards: {formatBalance(position.totalRewards, 18)}</h2>
       <h2>Average Apr: {position.avgApr}</h2>
-
+      <Spacer height="30px" />
+      <h1>CNOTE BY ITSELF</h1>
+      <CTokenTable cTokens={cNote ? [cNote] : []} />
+      <Spacer height="30px" />
       <CTokenTable cTokens={sortedTokens} />
     </div>
   );

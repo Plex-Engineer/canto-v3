@@ -8,7 +8,7 @@ export const WETH_MAINNET_ADDRESS =
 export const PUB_KEY_BOT_ADDRESS =
   "canto1efrhdukv096tmjs7r80m8pqkr3udp9g0uadjfv";
 
-
+// CLM Addresses
 const COMPTROLLER_ADDRESS = {
   mainnet: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
   testnet: "0x9514c07bC6e80B652e4264E64f589C59065C231f",
@@ -17,10 +17,17 @@ const CLM_LENS_ADDRESS = {
   mainnet: "0x03957b7D741F0788163e8E382B1Bd7944BcDd560",
   testnet: "0x33c2E2FA0588789119EbDF892eB1e2aDdDcbc8c4",
 };
+const C_NOTE_ADDRESS = {
+  mainnet: "0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
+  testnet: "0x04E52476d318CdF739C38BD41A922787D441900c",
+};
 
-type ContractName = "comptroller" | "clmLens";
+type ContractName = "comptroller" | "clmLens" | "cNote";
 type ChainType = "mainnet" | "testnet";
-export function getCLMAddress(chainId: number, contractName: ContractName): string | null {
+export function getCLMAddress(
+  chainId: number,
+  contractName: ContractName
+): string | null {
   // make sure on canto chain id
   let chainType: ChainType;
   if (chainId === CANTO_MAINNET_EVM.chainId) chainType = "mainnet";
@@ -32,6 +39,8 @@ export function getCLMAddress(chainId: number, contractName: ContractName): stri
       return COMPTROLLER_ADDRESS[chainType];
     case "clmLens":
       return CLM_LENS_ADDRESS[chainType];
+    case "cNote":
+      return C_NOTE_ADDRESS[chainType];
     default:
       return null;
   }

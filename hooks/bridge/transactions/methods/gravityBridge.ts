@@ -21,6 +21,7 @@ import {
   ETH_MAINNET,
 } from "@/config/networks";
 import {
+  areEqualAddresses,
   checkPubKeyCosmos,
   ethToCantoAddress,
   isValidEthAddress,
@@ -206,7 +207,7 @@ export async function bridgeInGravity(
  * @returns {boolean} true if tokenAddress is WETH, false otherwise
  */
 function isWETH(tokenAddress: string): boolean {
-  return tokenAddress.toLowerCase() === WETH_MAINNET_ADDRESS.toLowerCase();
+  return areEqualAddresses(tokenAddress, WETH_MAINNET_ADDRESS);
 }
 
 /**
@@ -306,7 +307,7 @@ export async function checkGbridgeTxStatus(
     for (const event of gbridgeQueue.transactions) {
       if (
         Number(event.block_height) === Number(transaction.blockNumber) &&
-        event.sender.toLowerCase() === transaction.from.toLowerCase()
+        areEqualAddresses(event.sender, transaction.from)
       ) {
         // grab data from event
         if (event.confirmed === true) {
