@@ -31,6 +31,7 @@ export interface CosmosNetwork extends Network {
   checkAddress: (address: string) => boolean; // check if address is valid for chain
   latestBlockEndpoint?: string; // endpoint to get latest block (might be different from normal rest endpoint)
   extraEndpoints?: string[]; // extra endpoints to use for RPC calls
+  altName?: string; // other name to use for the chain (ex. "Ethereum" for "Ethereum via Gravity Bridge")
 }
 
 export type BaseNetwork = EVMNetwork | CosmosNetwork;

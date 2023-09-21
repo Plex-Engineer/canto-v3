@@ -1,23 +1,34 @@
 "use client";
 
 import Text from "@/components/text";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface PropLinkButton {
   text: string;
 }
 
 const FooterButton = ({ text }: PropLinkButton) => {
+  const [name, setName] = useState("dark");
+
   function setTheme(themeName: string) {
     themeName =
       themeName === "dark" || themeName === "light" ? themeName : "dark";
     document.body.classList.add(themeName);
+
     document.body.classList.remove(themeName == "dark" ? "light" : "dark");
     localStorage.setItem("theme", themeName);
+    setName(themeName == "dark" ? "light" : "dark");
   }
   useEffect(() => {
     setTheme(localStorage.getItem("theme") as string);
+    const themeName = localStorage.getItem("theme");
+    // const localName =
+    //   themeName === "dark" || themeName === "light" ? themeName : "dark";
+    setName(
+      (localStorage.getItem("theme") as string) == "dark" ? "light" : "dark"
+    );
   }, []);
+
   return (
     <button
       style={{
@@ -31,7 +42,7 @@ const FooterButton = ({ text }: PropLinkButton) => {
       }}
     >
       <Text size="x-sm" font="proto_mono">
-        {text}
+        {name + " "} Theme
       </Text>
     </button>
   );

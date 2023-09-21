@@ -7,4 +7,5 @@ export const ETHEREUM_VIA_GRAVITY_BRIDGE: CosmosNetwork = {
     id: "ethereum-via-gravity-bridge",
     name: "Ethereum via Gravity Bridge",
     icon: ETH_MAINNET.icon,
+    altName: "Ethereum",
 }
