@@ -148,51 +148,65 @@ export default function LendingPage() {
         <>
           {selectedToken && (
             <>
-              <h2>{selectedToken.symbol}</h2>
-              <h3>name: {selectedToken.name}</h3>
-              <h3>Address: {selectedToken.address}</h3>
-              <h3>BorrowApy: {selectedToken.borrowApy}</h3>
-              <h3>BorrowCap: {selectedToken.borrowCap}</h3>
-              <h3>Cash: {selectedToken.cash}</h3>
-              <h3>CollateralFactor: {selectedToken.collateralFactor}</h3>
-              <h3>Decimals: {selectedToken.decimals}</h3>
-              <h3>DistApy: {selectedToken.distApy}</h3>
-              <h3>Exchange Rate: {selectedToken.exchangeRate}</h3>
-              <h3>IsListed: {selectedToken.isListed ? "yes" : "no"}</h3>
-              <h3>Liquidity: {selectedToken.liquidity}</h3>
-              <h3>Underlying Price: {selectedToken.price}</h3>
-              <h3>Supply Apy: {selectedToken.supplyApy}</h3>
+              <Text size="lg" font="proto_mono">
+                {selectedToken.symbol}
+              </Text>
+              <Text size="sm">name: {selectedToken.name}</Text>
+              <Text size="sm">Address: {selectedToken.address}</Text>
+              <Text size="sm">BorrowApy: {selectedToken.borrowApy}</Text>
+              <Text size="sm">BorrowCap: {selectedToken.borrowCap}</Text>
+              <Text size="sm">Cash: {selectedToken.cash}</Text>
+              <Text size="sm">
+                CollateralFactor: {selectedToken.collateralFactor}
+              </Text>
+              <Text size="sm">Decimals: {selectedToken.decimals}</Text>
+              <Text size="sm">DistApy: {selectedToken.distApy}</Text>
+              <Text size="sm">Exchange Rate: {selectedToken.exchangeRate}</Text>
+              <Text size="sm">
+                IsListed: {selectedToken.isListed ? "yes" : "no"}
+              </Text>
+              <Text size="sm">Liquidity: {selectedToken.liquidity}</Text>
+              <Text size="sm">Underlying Price: {selectedToken.price}</Text>
+              <Text size="sm">Supply Apy: {selectedToken.supplyApy}</Text>
               <h1>----</h1>
-              <h2>Underlying:</h2>
-              <h3>Address: {selectedToken.underlying.address}</h3>
-              <h3>Decimals: {selectedToken.underlying.decimals}</h3>
-              <h3>Symbol: {selectedToken.underlying.symbol}</h3>
-              <h3>Name: {selectedToken.underlying.name}</h3>
+              <Text size="lg" font="proto_mono">
+                Underlying:
+              </Text>
+              <Text size="sm">Address: {selectedToken.underlying.address}</Text>
+              <Text size="sm">
+                Decimals: {selectedToken.underlying.decimals}
+              </Text>
+              <Text size="sm">Symbol: {selectedToken.underlying.symbol}</Text>
+              <Text size="sm">Name: {selectedToken.underlying.name}</Text>
               <h1>----</h1>
-              <h2>User Data:</h2>
-              <h2>
+              <Text size="lg" font="proto_mono">
+                User Data:
+              </Text>
+              <Text size="sm">
                 CToken Balance: {selectedToken.userDetails?.balanceOfCToken}
-              </h2>
-              <h2>
+              </Text>
+              <Text size="sm">
                 Underlying Balance:{" "}
                 {selectedToken.userDetails?.balanceOfUnderlying}
-              </h2>
-              <h2>
+              </Text>
+              <Text size="sm">
                 Borrow Balance: {selectedToken.userDetails?.borrowBalance}
-              </h2>
-              <h2>Rewards: {selectedToken.userDetails?.rewards}</h2>
-              <h2>
+              </Text>
+              <Text size="sm">
+                Rewards: {selectedToken.userDetails?.rewards}
+              </Text>
+              <Text size="sm">
                 Is Collateral:{" "}
                 {selectedToken.userDetails?.isCollateral ? "yes" : "no"}
-              </h2>
-              <h2>
+              </Text>
+              <Text size="sm">
                 Supply Balance In Underlying:{" "}
                 {selectedToken.userDetails?.supplyBalanceInUnderlying}
-              </h2>
-              <h2>
+              </Text>
+              <Text size="sm">
                 Allowance Underlying:{" "}
                 {selectedToken.userDetails?.underlyingAllowance}
-              </h2>
+              </Text>
               <Input
                 type="amount"
                 balance={maxAmountForLendingTx(
