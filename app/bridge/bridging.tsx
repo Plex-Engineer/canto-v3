@@ -17,6 +17,7 @@ import { BridgingMethod } from "@/hooks/bridge/interfaces/bridgeMethods";
 import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks.utils";
 import { GetWalletClientResult } from "wagmi/actions";
 import { maxBridgeAmountInUnderlying } from "@/hooks/bridge/helpers/amounts";
+import { BaseNetwork } from "@/config/interfaces";
 
 interface BridgeProps {
   hook: BridgeHookReturn;
@@ -98,6 +99,17 @@ const Bridging = (props: BridgeProps) => {
           },
         }
       : {};
+
+  // get network name to display in modal
+  const networkName = (network: BaseNetwork | null) => {
+    if (network) {
+      if (isCosmosNetwork(network) && network.altName) {
+        return network.altName;
+      }
+      return network.name;
+    }
+    return "";
+  };
   return (
     <>
       <Modal
@@ -125,11 +137,11 @@ const Bridging = (props: BridgeProps) => {
             to: props.hook.addresses.getReceiver(),
             name:
               props.hook.direction === "in"
-                ? props.hook.selections.fromNetwork?.name ?? null
-                : props.hook.selections.toNetwork?.name ?? null,
+                ? networkName(props.hook.selections.fromNetwork)
+                : networkName(props.hook.selections.toNetwork),
           }}
-          fromNetwork={props.hook.selections.fromNetwork?.name ?? ""}
-          toNetwork={props.hook.selections.toNetwork?.name ?? ""}
+          fromNetwork={networkName(props.hook.selections.fromNetwork)}
+          toNetwork={networkName(props.hook.selections.toNetwork)}
           type={props.hook.direction}
           amount={formatBalance(
             amountAsBigNumberString,
