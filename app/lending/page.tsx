@@ -12,6 +12,8 @@ import { maxAmountForLendingTx } from "@/utils/clm/limits.utils";
 import { formatBalance } from "@/utils/tokenBalances.utils";
 import { useState } from "react";
 import { useLendingCombo } from "./utils";
+import Text from "@/components/text";
+import Container from "@/components/container/container";
 
 interface LendingProps {
   Asset: string;
@@ -138,7 +140,10 @@ export default function LendingPage() {
 
   return (
     <div>
-      <h1>Test Lending</h1>
+      <Text size="x-lg" font="proto_mono">
+        Lending
+      </Text>
+
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <>
           {selectedToken && (
@@ -217,46 +222,106 @@ export default function LendingPage() {
           )}
         </>
       </Modal>
-      <h1>USER POSITION</h1>
-      <h2>
-        Total Borrow:{" "}
-        {formatBalance(position.totalBorrow, 18, {
-          commify: true,
-          precision: 2,
-        })}
-      </h2>
-      <h2>
-        Total Supply:{" "}
-        {formatBalance(position.totalSupply, 18, {
-          commify: true,
-          precision: 2,
-        })}
-      </h2>
-      <h2>Total Liquidity: {formatBalance(position.liquidity, 18)}</h2>
-      <h2>Total Shortfall: {formatBalance(position.shortfall, 18)}</h2>
-      <h2>Total Rewards: {formatBalance(position.totalRewards, 18)}</h2>
-      <h2>Average Apr: {position.avgApr}</h2>
-      <Spacer height="30px" />
-      <h1>CNOTE BY ITSELF</h1>
+      <section>
+        {" "}
+        <Text size="lg" font="proto_mono">
+          USER POSITION
+        </Text>
+        <Text size="lg" font="proto_mono">
+          Total Borrow:{" "}
+          {formatBalance(position.totalBorrow, 18, {
+            commify: true,
+            precision: 2,
+          })}
+        </Text>
+        <Text size="lg" font="proto_mono">
+          Total Supply:{" "}
+          {formatBalance(position.totalSupply, 18, {
+            commify: true,
+            precision: 2,
+          })}
+        </Text>
+        <Text size="lg" font="proto_mono">
+          Total Liquidity: {formatBalance(position.liquidity, 18)}
+        </Text>
+        <Text size="lg" font="proto_mono">
+          Total Shortfall: {formatBalance(position.shortfall, 18)}
+        </Text>
+        <Text size="lg" font="proto_mono">
+          Total Rewards: {formatBalance(position.totalRewards, 18)}
+        </Text>
+        <Text size="lg" font="proto_mono">
+          Average Apr: {position.avgApr}
+        </Text>{" "}
+      </section>
+
+      {/* <Spacer height="30px" />
+      <Text size="x-lg" font="proto_mono">
+        CNOTE BY ITSELF
+      </Text>
       <CTokenTable cTokens={cNote ? [cNote] : []} />
       <Spacer height="30px" />
-      <CTokenTable cTokens={sortedTokens} />
-    </div>
-  );
-  return (
-    <div>
-      <Table
-        title="RWAS"
-        headers={[
-          "Asset",
-          "APR",
-          "Wallet Balance",
-          "Supplied Amount",
-          "Collateral Factor",
-          "",
-        ]}
-        data={[]}
-      />
+      <CTokenTable cTokens={sortedTokens} /> */}
+      {cNote && (
+        <Table
+          title="RWAS"
+          headers={[
+            "Asset",
+            "APR",
+            "Wallet Balance",
+            "Supplied Amount",
+            "Collateral Factor",
+            "",
+          ]}
+          data={[
+            [
+              <>
+                <Icon icon={{ url: cNote.underlying.logoURI, size: 30 }} />
+                <Spacer width="10px" />
+                <Text theme="primary-dark" key={cNote.name}>
+                  {cNote.underlying.name}
+                </Text>
+              </>,
+              <Text theme="primary-dark" key={cNote.supplyApy}>
+                {cNote.supplyApy}
+              </Text>,
+              <Text theme="primary-dark" key={cNote.supplyApy}>
+                {cNote.userDetails?.balanceOfUnderlying}
+              </Text>,
+              <Text theme="primary-dark" key={cNote.supplyApy}>
+                {cNote.userDetails?.supplyBalanceInUnderlying}
+              </Text>,
+              <Text theme="primary-dark" key={cNote.supplyApy}>
+                {formatBalance(cNote.collateralFactor, 18)}
+              </Text>,
+
+              <Container key={"Test"} direction="row">
+                <Button
+                  key={cNote.address}
+                  color="primary"
+                  onClick={() => {
+                    setSelectedToken(cNote);
+                    setModalOpen(true);
+                  }}
+                >
+                  Supply
+                </Button>
+                ,
+                <Button
+                  key={cNote.address}
+                  color="secondary"
+                  onClick={() => {
+                    setSelectedToken(cNote);
+                    setModalOpen(true);
+                  }}
+                >
+                  Withdraw
+                </Button>
+              </Container>,
+            ],
+          ]}
+        />
+      )}
     </div>
   );
 }

@@ -1,10 +1,11 @@
+import { headers } from "next/dist/client/components/headers";
 import Text from "../text";
 import styles from "./table.module.scss";
 
 interface Props {
   title?: string;
   headers: string[];
-  data: string[][];
+  data: any[][];
 }
 
 function formatTitle(title: string) {
@@ -15,7 +16,14 @@ function formatTitle(title: string) {
 
 const Table = (props: Props) => {
   return (
-    <div className={styles.table}>
+    <div
+      className={styles.table}
+      style={
+        {
+          "--table-columns": headers.length,
+        } as React.CSSProperties
+      }
+    >
       <div className={styles.title}>
         <Text font="proto_mono" size="lg">
           {props.title}
@@ -25,7 +33,9 @@ const Table = (props: Props) => {
         {props.headers.map((header, index) => {
           return (
             <div key={index} className={styles.cell}>
-              <Text theme="secondary-dark">{formatTitle(header)}</Text>
+              <Text theme="secondary-dark" size="sm">
+                {formatTitle(header)}
+              </Text>
             </div>
           );
         })}
