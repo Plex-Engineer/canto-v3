@@ -8,13 +8,10 @@ import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import useLending from "@/hooks/lending/useLending";
-import useTransactionStore from "@/stores/transactionStore";
 import { maxAmountForLendingTx } from "@/utils/clm/limits.utils";
-import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
-import { useMemo, useState } from "react";
-import { useWalletClient } from "wagmi";
-import { useStore } from "zustand";
+import { formatBalance } from "@/utils/tokenBalances.utils";
+import { useState } from "react";
+import { useLendingCombo } from "./utils";
 
 interface LendingProps {
   Asset: string;
@@ -30,57 +27,24 @@ interface LendingProps {
 }
 
 export default function LendingPage() {
-  const { data: signer } = useWalletClient();
-  const txStore = useStore(useTransactionStore, (state) => state);
-
-  const [amount, setAmount] = useState("");
-  const { cTokens, position, loading, transaction, cNote } = useLending({
-    chainId: signer?.chain.id === 7701 ? 7701 : 7700,
-    cTokenType: "lending",
-    userEthAddress: signer?.account.address,
-  });
-  const sortedTokens = useMemo(() => {
-    return cTokens.sort((a, b) =>
-      a.underlying.symbol.localeCompare(b.underlying.symbol)
-    );
-  }, [cTokens]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedToken, setSelectedToken] = useState<any | null>(null);
-
-  const [currentAction, setCurrentAction] = useState<CTokenLendingTxTypes>(
-    CTokenLendingTxTypes.SUPPLY
-  );
-
-  function lendingTx(amount: string, txType: CTokenLendingTxTypes) {
-    const { data, error } = transaction.createNewLendingFlow({
-      chainId: signer?.chain.id ?? 0,
-      ethAccount: signer?.account.address ?? "",
-      cToken: selectedToken,
-      amount: convertToBigNumber(
-        amount,
-        selectedToken.underlying.decimals
-      ).data.toString(),
-      txType,
-    });
-    if (error) {
-      console.log(error);
-      return;
-    }
-    txStore?.addNewFlow({ txFlow: data, signer });
-  }
-
-  const canPerformTx = (amount: string, txType: CTokenLendingTxTypes) =>
-    !isNaN(Number(amount)) &&
-    transaction.canPerformLendingTx({
-      chainId: signer?.chain.id ?? 7700,
-      ethAccount: signer?.account.address ?? "",
-      cToken: selectedToken,
-      amount: convertToBigNumber(
-        amount,
-        selectedToken.underlying.decimals
-      ).data?.toString(),
-      txType,
-    }).data;
+  const {
+    cTokens,
+    sortedTokens,
+    position,
+    loading,
+    modalOpen,
+    setModalOpen,
+    selectedToken,
+    setSelectedToken,
+    currentAction,
+    setCurrentAction,
+    lendingTx,
+    canPerformTx,
+    txStore,
+    cNote,
+    amount,
+    setAmount,
+  } = useLendingCombo();
 
   interface LSProps {
     action: CTokenLendingTxTypes;
