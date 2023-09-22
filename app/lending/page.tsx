@@ -278,6 +278,7 @@ export default function LendingPage() {
       <CTokenTable cTokens={sortedTokens} /> */}
       {cNote && (
         <Table
+          columns={7}
           title="RWAS"
           headers={[
             "Asset",
@@ -300,7 +301,10 @@ export default function LendingPage() {
                 {cNote.supplyApy}
               </Text>,
               <Text theme="primary-dark" key={cNote.supplyApy}>
-                {cNote.userDetails?.balanceOfUnderlying}
+                {formatBalance(
+                  cNote.userDetails?.balanceOfUnderlying!,
+                  cNote.decimals
+                )}
               </Text>,
               <Text theme="primary-dark" key={cNote.supplyApy}>
                 {cNote.userDetails?.supplyBalanceInUnderlying}
@@ -312,7 +316,7 @@ export default function LendingPage() {
               <Container key={"Test"} direction="row">
                 <Button
                   key={cNote.address}
-                  color="primary"
+                  color="secondary"
                   onClick={() => {
                     setSelectedToken(cNote);
                     setModalOpen(true);
@@ -320,7 +324,7 @@ export default function LendingPage() {
                 >
                   Supply
                 </Button>
-                ,
+                <Spacer width="6px" />
                 <Button
                   key={cNote.address}
                   color="secondary"

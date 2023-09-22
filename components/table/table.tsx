@@ -1,10 +1,12 @@
 import { headers } from "next/dist/client/components/headers";
 import Text from "../text";
 import styles from "./table.module.scss";
+import { useEffect, useState } from "react";
 
 interface Props {
   title?: string;
   headers: string[];
+  columns: number;
   data: any[][];
 }
 
@@ -20,7 +22,7 @@ const Table = (props: Props) => {
       className={styles.table}
       style={
         {
-          "--table-columns": headers.length,
+          "--table-columns": props.columns,
         } as React.CSSProperties
       }
     >
@@ -29,30 +31,32 @@ const Table = (props: Props) => {
           {props.title}
         </Text>
       </div>
-      <div className={styles.row + " " + styles.header}>
-        {props.headers.map((header, index) => {
+      <section className={styles.grid}>
+        <div className={styles.row + " " + styles.header}>
+          {props.headers.map((header, index) => {
+            return (
+              <div key={index} className={styles.cell}>
+                <Text theme="secondary-dark" size="sm">
+                  {formatTitle(header)}
+                </Text>
+              </div>
+            );
+          })}
+        </div>
+        {props.data.map((row, index) => {
           return (
-            <div key={index} className={styles.cell}>
-              <Text theme="secondary-dark" size="sm">
-                {formatTitle(header)}
-              </Text>
+            <div key={index} className={styles.row}>
+              {row.map((cell, index) => {
+                return (
+                  <div key={index} className={styles.cell}>
+                    {cell}
+                  </div>
+                );
+              })}
             </div>
           );
         })}
-      </div>
-      {props.data.map((row, index) => {
-        return (
-          <div key={index} className={styles.row}>
-            {row.map((cell, index) => {
-              return (
-                <div key={index} className={styles.cell}>
-                  {cell}
-                </div>
-              );
-            })}
-          </div>
-        );
-      })}
+      </section>
     </div>
   );
 };
