@@ -1,7 +1,6 @@
 .table {
-  display: flex;
-  flex-direction: column;
-  grid-template-columns: repeat(var(--table-columns), 1fr);
+  //   grid-template-rows: 2rem 60px 1fr;
+
   max-width: 1200px;
   min-width: 400px;
   width: 100%;
@@ -11,11 +10,12 @@
   background: var(--card-sub-surface-color, #dfdfdf);
   box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
 }
-
+.grid {
+  display: grid;
+}
 .title {
   display: flex;
   align-items: center;
-  //   height: 66px;
 }
 .header {
   height: 60px !important;
@@ -23,7 +23,7 @@
 }
 
 .row {
-  display: flex;
+  display: grid;
   width: 100%;
   grid-template-columns: repeat(var(--table-columns), 1fr);
   height: 90px;
@@ -46,4 +46,8 @@
   justify-content: center;
   align-items: center;
   text-align: center;
+
+  &:last-child {
+    grid-column: span 2;
+  }
 }

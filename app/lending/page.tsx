@@ -235,6 +235,7 @@ export default function LendingPage() {
       </section>
       {cNote && (
         <Table
+          columns={7}
           title="CNOTE"
           headers={[
             "Asset",
@@ -249,6 +250,7 @@ export default function LendingPage() {
       )}
       {rwas.length > 0 && (
         <Table
+          columns={7}
           title="RWAS"
           headers={[
             "Asset",
