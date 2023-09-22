@@ -43,7 +43,7 @@ export default function useLending(
       // get tokens
       const cTokenAddresses = getCTokenAddressesFromChainId(
         params.chainId,
-        params.cTokenType
+        params.lmType
       );
       if (!cTokenAddresses) throw Error("useLending: chainId not supported");
       return await getAllUserCLMData(
@@ -57,7 +57,6 @@ export default function useLending(
         console.log(error);
       },
       onSuccess(response) {
-        console.log("refetched")
         if (response.error) {
           console.log(response.error);
           return;
@@ -102,7 +101,6 @@ export default function useLending(
   return {
     cTokens,
     position,
-    cNote: cTokens.find((token) => token.symbol === "cNOTE")!,
     loading: loadingCTokens,
     transaction: {
       canPerformLendingTx,

@@ -8,7 +8,8 @@ import {
 import { GetWalletClientResult, writeContract } from "wagmi/actions";
 import { checkOnRightChain } from "../baseTransaction.utils";
 import { BaseError } from "viem";
-import { Contract } from "web3";
+import { Contract, TransactionReceipt } from "web3";
+import { asyncCallWithTimeout } from "../async.utils";
 
 /**
  * @notice performs evm transaction
@@ -41,12 +42,20 @@ export async function performEVMTransaction(
     const contractInstance = new Contract(tx.abi, tx.target, {
       provider: newSigner,
     });
-    const transaction = await contractInstance.methods[tx.method](
-      ...(tx.params as [])
-    ).send({ from: newSigner.account.address, value: tx.value });
-    if (!transaction.transactionHash) {
-      return NEW_ERROR("performEVMTransaction: no tx hash");
-    }
+    // if user doesn't sign in 30 seconds, throw timeout error
+    const { data: transaction, error: timeoutError } =
+      await asyncCallWithTimeout<TransactionReceipt>(
+        async () =>
+          await contractInstance.methods[tx.method](...(tx.params as [])).send({
+            from: newSigner.account.address,
+            value: tx.value,
+          }),
+        30000
+      );
+    if (timeoutError) throw timeoutError;
+    if (!transaction.transactionHash)
+      throw new Error("performEVMTransaction: no tx hash");
+
     return NO_ERROR(transaction.transactionHash as `0x${string}`);
   } catch (err) {
     if (err instanceof BaseError) {

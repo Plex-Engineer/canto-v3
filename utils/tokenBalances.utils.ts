@@ -18,10 +18,15 @@ export function convertToBigNumber(
   decimals: number = 0
 ): ReturnWithError<BigNumber> {
   try {
+    // set this to avoid scientific notation
+    BigNumber.set({ EXPONENTIAL_AT: 35 });
     if (isNaN(Number(amount)) || !amount) throw new Error("Invalid amount");
     // truncate the amount to the number of decimals
     const decimalIndex = amount.indexOf(".");
-    const truncatedAmount = decimalIndex === -1 ? amount : amount.slice(0, decimalIndex + decimals + 1);
+    const truncatedAmount =
+      decimalIndex === -1
+        ? amount
+        : amount.slice(0, decimalIndex + decimals + 1);
     const bigNumber = new BigNumber(truncatedAmount);
     const multiplier = new BigNumber(10).pow(decimals);
     const convertedAmount = bigNumber.multipliedBy(multiplier);
@@ -47,7 +52,7 @@ export function formatBalance(
   }
 ): string {
   // set this to avoid scientific notation
-  BigNumber.set({ EXPONENTIAL_AT: 25 });
+  BigNumber.set({ EXPONENTIAL_AT: 35 });
   const {
     symbol = undefined,
     precision = undefined,
@@ -87,4 +92,20 @@ export function formatBalance(
       ? truncatedAmount.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
       : truncatedAmount
   }${symbol ? " " + symbol : ""}`;
+}
+
+/**
+ * @notice adds two token balances
+ * @dev must be from the same token to keep decimals
+ * @param {string} amount1 first amount to add
+ * @param {string} amount2 second amount to add
+ * @returns {string} sum of the two amounts
+ */
+export function addTokenBalances(amount1: string, amount2: string): string {
+  const [amount1BN, amount2BN] = [
+    convertToBigNumber(amount1),
+    convertToBigNumber(amount2),
+  ];
+  if (amount1BN.error || amount2BN.error) return "0";
+  return amount1BN.data.plus(amount2BN.data).toString();
 }
