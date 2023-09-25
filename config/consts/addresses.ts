@@ -21,8 +21,12 @@ const C_NOTE_ADDRESS = {
   mainnet: "0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
   testnet: "0x04E52476d318CdF739C38BD41A922787D441900c",
 };
+const WCANTO_ADDRESS = {
+  mainnet: "0x826551890Dc65655a0Aceca109aB11AbDbD7a07B",
+  testnet: "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
+};
 
-type ContractName = "comptroller" | "clmLens" | "cNote";
+type ContractName = "comptroller" | "clmLens" | "cNote" | "wcanto";
 type ChainType = "mainnet" | "testnet";
 export function getCLMAddress(
   chainId: number,
@@ -41,6 +45,8 @@ export function getCLMAddress(
       return CLM_LENS_ADDRESS[chainType];
     case "cNote":
       return C_NOTE_ADDRESS[chainType];
+    case "wcanto":
+      return WCANTO_ADDRESS[chainType];
     default:
       return null;
   }
