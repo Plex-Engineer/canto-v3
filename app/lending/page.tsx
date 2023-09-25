@@ -250,6 +250,7 @@ export default function LendingPage() {
       )}
       {rwas.length > 0 && (
         <Table
+          columns={7}
           title="RWAS"
           headers={[
             "Asset",
@@ -259,56 +260,56 @@ export default function LendingPage() {
             "Collateral Factor",
             "",
           ]}
-          data={[
-            [
-              <>
-                <Icon icon={{ url: cNote.underlying.logoURI, size: 30 }} />
-                <Spacer width="10px" />
-                <Text theme="primary-dark" key={cNote.name}>
-                  {cNote.underlying.name}
-                </Text>
-              </>,
-              <Text theme="primary-dark" key={cNote.supplyApy}>
-                {cNote.supplyApy}
-              </Text>,
-              <Text theme="primary-dark" key={cNote.supplyApy}>
-                {formatBalance(
-                  cNote.userDetails?.balanceOfUnderlying!,
-                  cNote.decimals
-                )}
-              </Text>,
-              <Text theme="primary-dark" key={cNote.supplyApy}>
-                {cNote.userDetails?.supplyBalanceInUnderlying}
-              </Text>,
-              <Text theme="primary-dark" key={cNote.supplyApy}>
-                {formatBalance(cNote.collateralFactor, 18)}
-              </Text>,
+          //   data={[
+          //     [
+          //       <>
+          //         <Icon icon={{ url: item.underlying.logoURI, size: 30 }} />
+          //         <Spacer width="10px" />
+          //         <Text theme="primary-dark" key={item.name}>
+          //           {item.underlying.name}
+          //         </Text>
+          //       </>,
+          //       <Text theme="primary-dark" key={item.supplyApy}>
+          //         {item.supplyApy}
+          //       </Text>,
+          //       <Text theme="primary-dark" key={item.supplyApy}>
+          //         {formatBalance(
+          //           item.userDetails?.balanceOfUnderlying!,
+          //           item.decimals
+          //         )}
+          //       </Text>,
+          //       <Text theme="primary-dark" key={item.supplyApy}>
+          //         {item.userDetails?.supplyBalanceInUnderlying}
+          //       </Text>,
+          //       <Text theme="primary-dark" key={item.supplyApy}>
+          //         {formatBalance(item.collateralFactor, 18)}
+          //       </Text>,
 
-              <Container key={"Test"} direction="row">
-                <Button
-                  key={cNote.address}
-                  color="secondary"
-                  onClick={() => {
-                    setSelectedToken(cNote);
-                    setModalOpen(true);
-                  }}
-                >
-                  Supply
-                </Button>
-                <Spacer width="6px" />
-                <Button
-                  key={cNote.address}
-                  color="secondary"
-                  onClick={() => {
-                    setSelectedToken(cNote);
-                    setModalOpen(true);
-                  }}
-                >
-                  Withdraw
-                </Button>
-              </Container>,
-            ],
-          ]}
+          //       <Container key={"Test"} direction="row">
+          //         <Button
+          //           key={item.address}
+          //           color="secondary"
+          //           onClick={() => {
+          //             setSelectedToken(item);
+          //             setModalOpen(true);
+          //           }}
+          //         >
+          //           Supply
+          //         </Button>
+          //         <Spacer width="6px" />
+          //         <Button
+          //           key={item.address}
+          //           color="secondary"
+          //           onClick={() => {
+          //             setSelectedToken(item);
+          //             setModalOpen(true);
+          //           }}
+          //         >
+          //           Withdraw
+          //         </Button>
+          //       </Container>,
+          //     ],
+          //   ]}
           data={[...rwas.map((cToken) => CTokenRow({ cToken }))]}
         />
       )}
