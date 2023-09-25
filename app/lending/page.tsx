@@ -28,7 +28,8 @@ interface LendingProps {
 }
 
 export default function LendingPage() {
-  const { cTokens, clmPosition, transaction, selection } = useLendingCombo();
+  const { cTokens, clmPosition, transaction, selection, isLoading } =
+    useLendingCombo();
   const { cNote, rwas } = cTokens;
   const {
     currentAction,
@@ -207,6 +208,7 @@ export default function LendingPage() {
           )}
         </>
       </Modal>
+
       <section>
         {" "}
         <Text size="lg" font="proto_mono">
@@ -233,7 +235,9 @@ export default function LendingPage() {
           Average Apr: {clmPosition.general.netApr + "%"}
         </Text>{" "}
       </section>
-      {cNote && (
+      {isLoading ? (
+        <Text>Loading...</Text>
+      ) : cNote ? (
         <Table
           columns={7}
           title="CNOTE"
@@ -247,8 +251,12 @@ export default function LendingPage() {
           ]}
           data={[CTokenRow({ cToken: cNote })]}
         />
+      ) : (
+        <Text>No Supply Tokens Found</Text>
       )}
-      {rwas.length > 0 && (
+      {isLoading ? (
+        <Text>Loading...</Text>
+      ) : rwas.length > 0 ? (
         <Table
           columns={7}
           title="RWAS"
@@ -260,58 +268,10 @@ export default function LendingPage() {
             "Collateral Factor",
             "",
           ]}
-          //   data={[
-          //     [
-          //       <>
-          //         <Icon icon={{ url: item.underlying.logoURI, size: 30 }} />
-          //         <Spacer width="10px" />
-          //         <Text theme="primary-dark" key={item.name}>
-          //           {item.underlying.name}
-          //         </Text>
-          //       </>,
-          //       <Text theme="primary-dark" key={item.supplyApy}>
-          //         {item.supplyApy}
-          //       </Text>,
-          //       <Text theme="primary-dark" key={item.supplyApy}>
-          //         {formatBalance(
-          //           item.userDetails?.balanceOfUnderlying!,
-          //           item.decimals
-          //         )}
-          //       </Text>,
-          //       <Text theme="primary-dark" key={item.supplyApy}>
-          //         {item.userDetails?.supplyBalanceInUnderlying}
-          //       </Text>,
-          //       <Text theme="primary-dark" key={item.supplyApy}>
-          //         {formatBalance(item.collateralFactor, 18)}
-          //       </Text>,
-
-          //       <Container key={"Test"} direction="row">
-          //         <Button
-          //           key={item.address}
-          //           color="secondary"
-          //           onClick={() => {
-          //             setSelectedToken(item);
-          //             setModalOpen(true);
-          //           }}
-          //         >
-          //           Supply
-          //         </Button>
-          //         <Spacer width="6px" />
-          //         <Button
-          //           key={item.address}
-          //           color="secondary"
-          //           onClick={() => {
-          //             setSelectedToken(item);
-          //             setModalOpen(true);
-          //           }}
-          //         >
-          //           Withdraw
-          //         </Button>
-          //       </Container>,
-          //     ],
-          //   ]}
           data={[...rwas.map((cToken) => CTokenRow({ cToken }))]}
         />
+      ) : (
+        <Text>No RWAS tokens available</Text>
       )}
     </div>
   );
