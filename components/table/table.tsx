@@ -1,8 +1,5 @@
-import { headers } from "next/dist/client/components/headers";
 import Text from "../text";
 import styles from "./table.module.scss";
-import { useEffect, useState } from "react";
-
 interface Props {
   title?: string;
   headers: string[];

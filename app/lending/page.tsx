@@ -251,6 +251,7 @@ export default function LendingPage() {
       {rwas.length > 0 && (
         <Table
           columns={7}
+          columns={7}
           title="RWAS"
           headers={[
             "Asset",
