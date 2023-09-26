@@ -34,6 +34,7 @@ const TxFlow = (props: Props) => {
     }
     checkRetryParams();
   }, [props.txFlow?.status]);
+  console.log(props.txFlow)
   return (
     <div className={styles.container}>
       {props.txFlow && (

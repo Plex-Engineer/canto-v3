@@ -8,7 +8,7 @@ export const WETH_MAINNET_ADDRESS =
 export const PUB_KEY_BOT_ADDRESS =
   "canto1efrhdukv096tmjs7r80m8pqkr3udp9g0uadjfv";
 
-// CLM Addresses
+// Canto Core Addresses
 const COMPTROLLER_ADDRESS = {
   mainnet: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
   testnet: "0x9514c07bC6e80B652e4264E64f589C59065C231f",
@@ -25,8 +25,12 @@ const WCANTO_ADDRESS = {
   mainnet: "0x826551890Dc65655a0Aceca109aB11AbDbD7a07B",
   testnet: "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
 };
+const ROUTER_ADDRESS = {
+  mainnet: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+  testnet: "0x463e7d4DF8fE5fb42D024cb57c77b76e6e74417a",
+};
 
-type ContractName = "comptroller" | "clmLens" | "cNote" | "wcanto";
+type ContractName = "comptroller" | "clmLens" | "cNote" | "router" | "wcanto";
 type ChainType = "mainnet" | "testnet";
 export function getCLMAddress(
   chainId: number,
@@ -45,6 +49,8 @@ export function getCLMAddress(
       return CLM_LENS_ADDRESS[chainType];
     case "cNote":
       return C_NOTE_ADDRESS[chainType];
+    case "router":
+      return ROUTER_ADDRESS[chainType];
     case "wcanto":
       return WCANTO_ADDRESS[chainType];
     default:

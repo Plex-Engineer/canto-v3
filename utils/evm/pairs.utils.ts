@@ -63,3 +63,37 @@ export async function quoteAddLiquidity(
     return NEW_ERROR("quoteAddLiquidity::" + errMsg(err));
   }
 }
+
+export async function quoteRemoveLiquidity(
+  chainId: number,
+  routerAddress: string,
+  tokenAAddress: string,
+  tokenBAddress: string,
+  stable: boolean,
+  liquidity: string
+): PromiseWithError<{
+  expectedToken1: string;
+  expectedToken2: string;
+}> {
+  try {
+    // get rpc url from chainId
+    const { data: rpcUrl, error } = getRpcUrlFromChainId(chainId);
+    if (error) throw error;
+    // get router contract
+    const routerContract = new Contract(
+      DEX_REOUTER_ABI,
+      routerAddress,
+      getProviderWithoutSigner(rpcUrl)
+    );
+    // query quoteRemoveLiquidity
+    const reponse = await routerContract.methods
+      .quoteRemoveLiquidity(tokenAAddress, tokenBAddress, stable, liquidity)
+      .call();
+    return NO_ERROR({
+      expectedToken1: (reponse.amountA as number).toString(),
+      expectedToken2: (reponse.amountB as number).toString(),
+    });
+  } catch (err) {
+    return NEW_ERROR("quoteRemoveLiquidity::" + errMsg(err));
+  }
+}

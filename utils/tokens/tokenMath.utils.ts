@@ -1,8 +1,4 @@
-import {
-  NEW_ERROR,
-  NO_ERROR,
-  ReturnWithError,
-} from "@/config/interfaces";
+import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
 import { convertToBigNumber } from "../tokenBalances.utils";
 import BigNumber from "bignumber.js";
 
@@ -56,4 +52,24 @@ export function convertNoteAmountToToken(
   const tokenAmount = amountBN.data.times(10 ** 18).div(priceBN.data);
 
   return NO_ERROR(tokenAmount);
+}
+
+/**
+ * @notice Gets the percent of an amount
+ * @param {string} amount Amount to get percent of
+ * @param {number} percent Percent to get (0-100)
+ * @returns {ReturnWithError<string>} Percent of amount
+ */
+export function percentOfAmount(
+  amount: string,
+  percent: number
+): ReturnWithError<string> {
+  // convert everything to bigNumber for precision
+  const amountBN = convertToBigNumber(amount);
+  if (amountBN.error) return NEW_ERROR("getPercentOfAmount: Invalid amount");
+
+  // calculate percent of amount
+  const percentOfAmount = amountBN.data.times(percent).div(100);
+
+  return NO_ERROR(percentOfAmount.toFixed(0));
 }

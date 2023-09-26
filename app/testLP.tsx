@@ -3,8 +3,13 @@ import Icon from "@/components/icon/icon";
 import Input from "@/components/input/input";
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
+import { TransactionFlowType } from "@/config/transactions/txMap";
 import { PairWithUserCTokenData } from "@/hooks/pairs/interfaces/pairs";
+import { PairsTxTypes } from "@/hooks/pairs/interfaces/pairsTxTypes";
+import { lpPairTx } from "@/hooks/pairs/transactions/pairsTx";
 import usePairs from "@/hooks/pairs/usePairs";
+import useTransactionStore from "@/stores/transactionStore";
+import useStore from "@/stores/useStore";
 import { quoteAddLiquidity } from "@/utils/evm/pairs.utils";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 import { useState } from "react";
@@ -12,6 +17,7 @@ import { useWalletClient } from "wagmi";
 
 export default function TestLP() {
   const signer = useWalletClient();
+  const txStore = useStore(useTransactionStore, (state) => state);
   const { pairsWithUserCTokens: pairs } = usePairs({
     chainId: 7701,
     userEthAddress: signer.data?.account.address ?? "",
@@ -184,6 +190,34 @@ export default function TestLP() {
               label={selectedPair.token2.symbol}
               type="number"
             />
+            <Spacer height="50px" />
+            <Button
+              onClick={() => {
+                txStore?.addNewFlow({
+                  txFlow: {
+                    title: "test tx",
+                    icon: "",
+                    txType: TransactionFlowType.DEX_LP_TX,
+                    params: {
+                      chainId: 7701,
+                      ethAccount: signer.data?.account.address ?? "",
+                      pair: selectedPair,
+                      slippage: 2,
+                      deadline: "9999999999999999999999999",
+                      txType: PairsTxTypes.ADD_LIQUIDITY,
+                      stake: false,
+                      amounts: {
+                        amount1: "1000000000000000000",
+                        amount2: "500000000000000000",
+                      }
+                    },
+                  },
+                  signer: signer.data,
+                });
+              }}
+            >
+              TEST TX
+            </Button>
           </div>
         )}
       </Modal>
