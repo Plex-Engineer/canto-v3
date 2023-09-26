@@ -62,10 +62,14 @@ const TxFlow = (props: Props) => {
                 setBridgeStatus={(status) => props.setBridgeStatus(idx, status)}
               />
             ))}
+
           {props.txFlow.status === "ERROR" && (
-            <Button disabled={!canRetry.valid} onClick={props.onRetry}>
-              RETRY
-            </Button>
+            <>
+              <Spacer height="40px" />
+              <Button disabled={!canRetry.valid} onClick={props.onRetry}>
+                RETRY
+              </Button>
+            </>
           )}
         </>
       )}
