@@ -21,7 +21,6 @@
   align-items: center;
   width: 100%;
   cursor: pointer;
-
   user-select: none;
 
   &:hover {
@@ -31,7 +30,7 @@
 
 .collapsable {
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: hidden;
   max-height: 0;
   transition: max-height 0.5s linear;
   position: relative;

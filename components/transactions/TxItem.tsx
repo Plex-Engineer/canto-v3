@@ -121,7 +121,7 @@ const TxItem = (props: TxItemProps) => {
             </Text>
           )}
           {props.tx.tx.bridge && props.tx.tx.bridge.lastStatus !== "NONE" && (
-            <>
+            <Container>
               <Text size="sm" theme="secondary-dark">
                 Bridge Status - {props.tx.tx.bridge.lastStatus.toLowerCase()}
               </Text>
@@ -131,7 +131,7 @@ const TxItem = (props: TxItemProps) => {
                   {formatSecondsToMinutes(props.tx.tx.bridge.timeLeft)}
                 </Text>
               )}
-            </>
+            </Container>
           )}
         </Container>
       </Container>
