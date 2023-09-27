@@ -7,9 +7,7 @@ import Input from "@/components/input/input";
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
-import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
-import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import { maxAmountForLendingTx } from "@/utils/clm/limits.utils";
+
 import { formatBalance } from "@/utils/tokenBalances.utils";
 import { useLendingCombo } from "./utils";
 import Text from "@/components/text";
@@ -55,7 +53,12 @@ export default function LendingPage() {
         Lending
       </Text>
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title="Lending"
+        width="32rem"
+      >
         <LendingModal
           selectedToken={selectedToken}
           transaction={transaction}

@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { useScrollLock } from "../utils/scrollLock";
 import Icon from "../icon/icon";
 import Container from "../container/container";
+import Text from "../text";
 
 interface Props {
   open: boolean;
@@ -59,7 +60,9 @@ const Modal = ({ onClose, children, title, width, height, open }: Props) => {
 
           {title && (
             <div className={styles.header}>
-              <h3 className={styles.title}>{title}</h3>
+              <Text font="proto_mono" size="lg" className={styles.title}>
+                {title}
+              </Text>
             </div>
           )}
           <div className={styles.body}>{children}</div>

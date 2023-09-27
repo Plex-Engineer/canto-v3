@@ -103,6 +103,7 @@
   justify-content: flex-start;
   padding: 0 16px;
   font-size: 25px;
+  height: 40px;
 }
 
 .close {
@@ -111,6 +112,7 @@
   right: 6px;
   cursor: pointer;
   transition: transform 0.2s ease-out;
+  z-index: 30;
   &:hover {
     transform: rotateZ(90deg);
   }
