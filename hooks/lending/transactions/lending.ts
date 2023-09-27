@@ -5,6 +5,7 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
+  TxCreatorFunctionReturn,
 } from "@/config/interfaces";
 import {
   CTokenLendingTransactionParams,
@@ -18,7 +19,7 @@ import { getCLMAddress } from "@/config/consts/addresses";
 
 export async function cTokenLendingTx(
   params: CTokenLendingTransactionParams
-): PromiseWithError<Transaction[]> {
+): PromiseWithError<TxCreatorFunctionReturn> {
   // make sure CToken passed through has user details
   if (!params.cToken.userDetails) {
     return NEW_ERROR("cTokenLendingTx: cToken does not have user details");
@@ -35,18 +36,20 @@ export async function cTokenLendingTx(
     }
     const isCollateralize =
       params.txType === CTokenLendingTxTypes.COLLATERALIZE;
-    return NO_ERROR([
-      _collateralizeTx(
-        params.chainId,
-        comptrollerAddress,
-        params.cToken.address,
-        isCollateralize,
-        TX_DESCRIPTIONS.CTOKEN_COLLATERALIZE(
-          params.cToken.underlying.symbol,
-          isCollateralize
-        )
-      ),
-    ]);
+    return NO_ERROR({
+      transactions: [
+        _collateralizeTx(
+          params.chainId,
+          comptrollerAddress,
+          params.cToken.address,
+          isCollateralize,
+          TX_DESCRIPTIONS.CTOKEN_COLLATERALIZE(
+            params.cToken.underlying.symbol,
+            isCollateralize
+          )
+        ),
+      ],
+    });
   }
   // lending action
   // create tx list
@@ -127,7 +130,7 @@ export async function cTokenLendingTx(
       )
     );
   }
-  return NO_ERROR(txList);
+  return NO_ERROR({ transactions: txList });
 }
 
 /**

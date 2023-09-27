@@ -35,6 +35,13 @@ export interface TransactionStore {
     flowId?: string
   ) => PromiseWithError<boolean>;
   // this should only be called internally
+  performTx: (
+    signer: GetWalletClientResult | undefined,
+    flowId: string,
+    txIndex: number,
+    tx: TransactionWithStatus
+  ) => PromiseWithError<boolean>;
+  // this should only be called internally
   setTxStatus: (
     ethAccount: string,
     flowId: string,
@@ -145,7 +152,7 @@ const useTransactionStore = create<TransactionStore>()(
 
           // create the new transactions to complete the flow
           // we don't need to validate the params since they are validated when creating the transaction list anyways
-          const { data: newTransactions, error: newTransactionListError } =
+          const { data: newFlow, error: newTransactionListError } =
             await TRANSACTION_FLOW_MAP[flowToPerform.txType].tx(
               flowToPerform.params
             );
@@ -169,7 +176,7 @@ const useTransactionStore = create<TransactionStore>()(
           // create updated list
           const updatedTransactionList = [
             ...successfulTransactions,
-            ...newTransactions.map((tx) => ({
+            ...newFlow.transactions.map((tx) => ({
               tx,
               status: "NONE" as TransactionStatus,
             })),
@@ -178,6 +185,7 @@ const useTransactionStore = create<TransactionStore>()(
           // set the transactions to the new list and set status to signing since we are about to sign them
           get().updateTxFlow(ethAddress, flowToPerform.id, {
             transactions: updatedTransactionList,
+            placeholderFlow: newFlow.extraFlow,
             status: "SIGNING",
             error: undefined,
           });
@@ -187,71 +195,145 @@ const useTransactionStore = create<TransactionStore>()(
 
           // go through each transaction and perform it
           for (let i = txIndex; i < updatedTransactionList.length; i++) {
-            try {
-              // set pending since about to be signed
-              // reset error, hash, and txLink since new tx
-              get().setTxStatus(ethAddress, flowToPerform.id, i, {
-                status: "SIGNING",
-                error: undefined,
-                hash: undefined,
-                txLink: undefined,
-                timestamp: undefined,
-              });
-              // request signature and receive txHash once signed
-              const { data: txHash, error: txError } =
-                await performSingleTransaction(
-                  updatedTransactionList[i].tx,
-                  signer
-                );
-              // if error with signature, set status and throw error
-              if (txError) {
-                throw txError;
-              }
-
-              // we have a txHash so we can set status to pending
-              // to get the txLink, we can grab it from the chainId,
-              get().setTxStatus(ethAddress, flowToPerform.id, i, {
-                status: "PENDING",
-                hash: txHash,
-                txLink: getNetworkInfoFromChainId(
-                  updatedTransactionList[i].tx.chainId
-                ).data.blockExplorer?.getTransactionLink(txHash),
-                timestamp: new Date().getTime(),
-              });
-              // wait for the result before moving on
-              const { data: receipt, error: txReceiptError } =
-                await waitForTransaction(
-                  updatedTransactionList[i].tx.type,
-                  updatedTransactionList[i].tx.chainId,
-                  txHash
-                );
-              // check receipt for error
-              if (txReceiptError || receipt.status !== "success") {
-                throw Error(receipt.error);
-              }
-              // transaction was a success so we can set status and
-              get().setTxStatus(ethAddress, flowToPerform.id, i, {
-                status: "SUCCESS",
-              });
-            } catch (err) {
-              // something failed, so set the flow and tx to failure
-              get().setTxStatus(ethAddress, flowToPerform.id, i, {
-                status: "ERROR",
-                error: "useTransactionStore::performFlow:" + errMsg(err),
-                timestamp: new Date().getTime(),
-              });
-              get().updateTxFlow(ethAddress, flowToPerform.id, {
-                status: "ERROR",
-              });
+            const { data: txResult, error: txError } = await get().performTx(
+              signer,
+              flowToPerform.id,
+              i,
+              updatedTransactionList[i]
+            );
+            if (txError || !txResult) {
               return NEW_ERROR(
-                "useTransactionStore::performTransactions: " + errMsg(err)
+                "useTransactionStore::performTransactions: " +
+                  errMsg(txError ?? "")
               );
             }
           }
+
+          // deal with extra flows
+          // if there is an extra flow attached to this one, we need:
+          // 1. get new transactions
+          // 2. add them to the flow
+          // 3. perform all new transactions
+          if (newFlow.extraFlow) {
+            // get new transactions from this flow
+            const { data: extraFlow, error: extraFlowError } =
+              await TRANSACTION_FLOW_MAP[newFlow.extraFlow.txFlowType].tx(
+                newFlow.extraFlow.params
+              );
+            // check if error
+            if (extraFlowError) {
+              return NEW_ERROR(
+                "useTransactionStore::performTransactions: " +
+                  errMsg(extraFlowError)
+              );
+            }
+            // grab the new list after all transactions were completed
+            const completedTxs = get()
+              .getUserTransactionFlows(ethAddress)
+              .find((flow) => flow.id === flowToPerform.id)?.transactions;
+            if (!completedTxs) {
+              return NEW_ERROR(
+                "useTransactionStore::performTransactions: no transactions found"
+              );
+            }
+            console.log(completedTxs)
+            // add these new transactions to this list and delete the extra flow
+            const newFlowTxList = [
+              ...completedTxs,
+              ...extraFlow.transactions.map((tx) => ({
+                tx,
+                status: "NONE" as TransactionStatus,
+              })),
+            ];
+            // update the flow with the new transactions (could be another extra flow to add too)
+            get().updateTxFlow(ethAddress, flowToPerform.id, {
+              transactions: newFlowTxList,
+              placeholderFlow: undefined,
+            });
+            // perform all new transactions that were just added
+            for (let j = completedTxs.length; j < newFlowTxList.length; j++) {
+              const { data: txResult, error: txError } = await get().performTx(
+                signer,
+                flowToPerform.id,
+                j,
+                newFlowTxList[j]
+              );
+              if (txError || !txResult) {
+                return NEW_ERROR(
+                  "useTransactionStore::performTransactions: " +
+                    errMsg(txError ?? "")
+                );
+              }
+            }
+          }
+
           // made it through the whole list, so the flow was a success
           get().updateTxFlow(ethAddress, flowToPerform.id, {
             status: "SUCCESS",
           });
+          return NO_ERROR(true);
+        },
+        performTx: async (signer, flowId, txIndex, tx) => {
+          // make sure signer is here
+          if (!signer) {
+            return NEW_ERROR(
+              "useTransactionStore::performTx: no signer provided"
+            );
+          }
+          const ethAddress = signer.account.address;
+          try {
+            // set pending since about to be signed
+            // reset error, hash, and txLink since new tx
+            get().setTxStatus(ethAddress, flowId, txIndex, {
+              status: "SIGNING",
+              error: undefined,
+              hash: undefined,
+              txLink: undefined,
+              timestamp: undefined,
+            });
+            // request signature and receive txHash once signed
+            const { data: txHash, error: txError } =
+              await performSingleTransaction(tx.tx, signer);
+            // if error with signature, set status and throw error
+            if (txError) {
+              throw txError;
+            }
+
+            // we have a txHash so we can set status to pending
+            // to get the txLink, we can grab it from the chainId,
+            get().setTxStatus(ethAddress, flowId, txIndex, {
+              status: "PENDING",
+              hash: txHash,
+              txLink: getNetworkInfoFromChainId(
+                tx.tx.chainId
+              ).data.blockExplorer?.getTransactionLink(txHash),
+              timestamp: new Date().getTime(),
+            });
+            // wait for the result before moving on
+            const { data: receipt, error: txReceiptError } =
+              await waitForTransaction(tx.tx.type, tx.tx.chainId, txHash);
+            // check receipt for error
+            if (txReceiptError || receipt.status !== "success") {
+              throw Error(receipt.error);
+            }
+            // transaction was a success so we can set status and
+            get().setTxStatus(ethAddress, flowId, txIndex, {
+              status: "SUCCESS",
+            });
+          } catch (err) {
+            // something failed, so set the flow and tx to failure
+            get().setTxStatus(ethAddress, flowId, txIndex, {
+              status: "ERROR",
+              error: "useTransactionStore::performFlow:" + errMsg(err),
+              timestamp: new Date().getTime(),
+            });
+            get().updateTxFlow(ethAddress, flowId, {
+              status: "ERROR",
+            });
+            return NEW_ERROR(
+              "useTransactionStore::performTransactions: " + errMsg(err)
+            );
+          }
           return NO_ERROR(true);
         },
         setTxStatus: (ethAccount, flowId, txIndex, details) => {

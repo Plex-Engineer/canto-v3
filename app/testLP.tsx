@@ -23,7 +23,6 @@ export default function TestLP() {
     userEthAddress: signer.data?.account.address ?? "",
   });
   const sortedPairs = pairs?.sort((a, b) => a.symbol.localeCompare(b.symbol));
-  console.log(sortedPairs);
   const [selectedPair, setSelectedPair] =
     useState<PairWithUserCTokenData | null>(null);
   const [valueToken1, setValueToken1] = useState("");
@@ -205,7 +204,7 @@ export default function TestLP() {
                       slippage: 2,
                       deadline: "9999999999999999999999999",
                       txType: PairsTxTypes.ADD_LIQUIDITY,
-                      stake: false,
+                      stake: true,
                       amounts: {
                         amount1: "1000000000000000000",
                         amount2: "500000000000000000",

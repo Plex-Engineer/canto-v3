@@ -54,7 +54,7 @@ export default function usePairs(params: PairsHookInputParams) {
     },
     {
       onSuccess: (data) => {
-        console.log(data);
+        // console.log(data);
       },
       onError: (error) => {
         console.log(error);

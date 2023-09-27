@@ -5,25 +5,33 @@ import {
   PromiseWithError,
   Transaction,
   TransactionDescription,
+  TxCreatorFunctionReturn,
   errMsg,
 } from "@/config/interfaces";
 import {
   PairsTransactionParams,
   PairsTxTypes,
+  StakeLPParams,
 } from "../interfaces/pairsTxTypes";
 import { cTokenLendingTx } from "@/hooks/lending/transactions/lending";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
-import { _approveTx, checkTokenAllowance } from "@/utils/evm/erc20.utils";
+import {
+  _approveTx,
+  checkTokenAllowance,
+  getTokenBalance,
+} from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { PairWithUserCTokenData } from "../interfaces/pairs";
 import { getCLMAddress } from "@/config/consts/addresses";
 import { areEqualAddresses } from "@/utils/address.utils";
 import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
 import { quoteRemoveLiquidity } from "@/utils/evm/pairs.utils";
+import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
+import { TransactionFlowType } from "@/config/transactions/txMap";
 
 export async function lpPairTx(
   params: PairsTransactionParams
-): PromiseWithError<Transaction[]> {
+): PromiseWithError<TxCreatorFunctionReturn> {
   // make sure pair passed through has user details
   if (!params.pair.clmData) {
     return NEW_ERROR("lpPairTx: pair does not have user details");
@@ -39,21 +47,13 @@ export async function lpPairTx(
     case PairsTxTypes.STAKE:
     case PairsTxTypes.UNSTAKE:
       // if this is only a lending action (supply/withdraw), then call on that function instead
-      if (
-        params.txType === PairsTxTypes.STAKE ||
-        params.txType === PairsTxTypes.UNSTAKE
-      ) {
-        return await cTokenLendingTx({
-          chainId: params.chainId,
-          ethAccount: params.ethAccount,
-          txType:
-            params.txType === PairsTxTypes.STAKE
-              ? CTokenLendingTxTypes.SUPPLY
-              : CTokenLendingTxTypes.WITHDRAW,
-          cToken: params.pair.clmData,
-          amount: params.amountLP,
-        });
-      }
+      return await stakeLPFlow({
+        chainId: params.chainId,
+        ethAccount: params.ethAccount,
+        cLPToken: params.pair.clmData,
+        stake: params.txType === PairsTxTypes.STAKE,
+        amount: params.amountLP,
+      });
     case PairsTxTypes.ADD_LIQUIDITY:
       return await addLiquidityFlow(params, routerAddress);
     case PairsTxTypes.REMOVE_LIQUIDITY:
@@ -69,7 +69,7 @@ export async function lpPairTx(
 async function addLiquidityFlow(
   params: PairsTransactionParams,
   routerAddress: string
-): PromiseWithError<Transaction[]> {
+): PromiseWithError<TxCreatorFunctionReturn> {
   /** check params */
   // check that the correct tx is being passed
   if (params.txType !== PairsTxTypes.ADD_LIQUIDITY) {
@@ -144,13 +144,34 @@ async function addLiquidityFlow(
     )
   );
 
-  return NO_ERROR(txList);
+  // check if staking is needed
+  if (params.stake) {
+    // return extra staking flow, since we don't have the balance yet
+    return NO_ERROR({
+      transactions: txList,
+      extraFlow: {
+        description: {
+          title: "Stake LP Tokens",
+          description: "Stake LP Tokens",
+        },
+        txFlowType: TransactionFlowType.STAKE_LP_TX,
+        params: {
+          chainId: params.chainId,
+          ethAccount: params.ethAccount,
+          cLPToken: params.pair.clmData,
+          stake: true,
+        },
+      },
+    });
+  }
+
+  return NO_ERROR({ transactions: txList });
 }
 
 async function removeLiquidityFlow(
   params: PairsTransactionParams,
   routerAddress: string
-): PromiseWithError<Transaction[]> {
+): PromiseWithError<TxCreatorFunctionReturn> {
   /** check params */
   // check that the correct tx is being passed
   if (params.txType !== PairsTxTypes.REMOVE_LIQUIDITY) {
@@ -176,7 +197,7 @@ async function removeLiquidityFlow(
     if (withdrawError) {
       return NEW_ERROR("removeLiquidityFlow: " + errMsg(withdrawError));
     }
-    txList.push(...withdrawTx);
+    txList.push(...withdrawTx.transactions);
   }
 
   /** Remove liquidity */
@@ -260,7 +281,45 @@ async function removeLiquidityFlow(
       TX_DESCRIPTIONS.REMOVE_LIQUIDITY(params.pair, params.amountLP)
     )
   );
-  return NO_ERROR(txList);
+  return NO_ERROR({ transactions: txList });
+}
+
+// this is exported since it will be used during extra transaction flows
+export async function stakeLPFlow(
+  params: StakeLPParams
+): PromiseWithError<TxCreatorFunctionReturn> {
+  let stakeAmount = "";
+  if (params.stake && !params.amount) {
+    // make sure user details are here
+    if (!params.cLPToken.userDetails) {
+      return NEW_ERROR(
+        "stakeLPFlow: user details not found for cLPToken " +
+          params.cLPToken.symbol
+      );
+    }
+    // we only want to stake the amount of LP tokens the the user just received
+    const prevLPTokens = params.cLPToken.userDetails.balanceOfUnderlying;
+    const { data: currLPTokens, error } = await getTokenBalance(
+      params.chainId,
+      params.cLPToken.underlying.address,
+      params.ethAccount
+    );
+    if (error) {
+      return NEW_ERROR("stakeLPFlow: " + errMsg(error));
+    }
+    stakeAmount = currLPTokens.minus(prevLPTokens).toString();
+  } else {
+    stakeAmount = params.amount ?? "0";
+  }
+  return await cTokenLendingTx({
+    chainId: params.chainId,
+    ethAccount: params.ethAccount,
+    txType: params.stake
+      ? CTokenLendingTxTypes.SUPPLY
+      : CTokenLendingTxTypes.WITHDRAW,
+    cToken: params.cLPToken,
+    amount: stakeAmount,
+  });
 }
 
 /**

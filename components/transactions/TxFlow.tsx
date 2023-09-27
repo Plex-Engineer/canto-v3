@@ -34,7 +34,6 @@ const TxFlow = (props: Props) => {
     }
     checkRetryParams();
   }, [props.txFlow?.status]);
-  console.log(props.txFlow)
   return (
     <div className={styles.container}>
       {props.txFlow && (
@@ -54,15 +53,33 @@ const TxFlow = (props: Props) => {
           {props.txFlow?.error && (
             <Text>{formatError(props.txFlow.error)}</Text>
           )}
-          {!props.txFlow.error &&
-            props.txFlow.transactions.map((tx, idx) => (
-              <TxItem
-                key={idx}
-                tx={tx}
-                idx={idx + 1}
-                setBridgeStatus={(status) => props.setBridgeStatus(idx, status)}
-              />
-            ))}
+          {!props.txFlow.error && (
+            <>
+              {props.txFlow.transactions.map((tx, idx) => (
+                <TxItem
+                  key={idx}
+                  tx={tx}
+                  idx={idx + 1}
+                  setBridgeStatus={(status) =>
+                    props.setBridgeStatus(idx, status)
+                  }
+                />
+              ))}
+              {props.txFlow.placeholderFlow && (
+                <TxItem
+                  tx={{
+                    tx: {
+                      chainId: 0,
+                      description: props.txFlow.placeholderFlow.description,
+                    },
+                    status: "NONE",
+                  }}
+                  idx={props.txFlow.transactions.length + 1}
+                  setBridgeStatus={() => false}
+                />
+              )}
+            </>
+          )}
           {props.txFlow.status === "ERROR" && (
             <Button disabled={!canRetry.valid} onClick={props.onRetry}>
               RETRY

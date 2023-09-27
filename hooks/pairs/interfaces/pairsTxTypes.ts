@@ -1,3 +1,4 @@
+import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { PairWithUserCTokenData } from "./pairs";
 
 export enum PairsTxTypes {
@@ -29,6 +30,14 @@ export type PairsTransactionParams = {
       stake: boolean;
     }
 );
+
+export interface StakeLPParams {
+  chainId: number,
+  ethAccount: string,
+  cLPToken: CTokenWithUserData,
+  stake: boolean,
+  amount?: string
+}
 
 interface AddLiquidityTxAmounts {
   amount1: string;
