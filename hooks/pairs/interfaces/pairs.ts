@@ -28,6 +28,7 @@ interface PairToken {
   logoURI: string;
   name: string;
   symbol: string;
+  balance?: string;
 }
 
 // will include balances, staked, and allowances

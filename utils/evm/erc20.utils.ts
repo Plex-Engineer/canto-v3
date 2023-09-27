@@ -44,21 +44,25 @@ export async function getEVMTokenBalanceList(
     const balances: UserTokenBalances = {};
     await Promise.all(
       data.map(async (result, index) => {
-        if (result.error) {
-          balances[tokens[index].id] = "0";
+        if (!tokens[index].nativeWrappedToken) {
+          // set balance to 0 if error
+          balances[tokens[index].id] = result.error
+            ? "0"
+            : (result.result as number).toString();
         } else {
-          // check to see if we want to add the native balance to the token balance
-          if (tokens[index].nativeWrappedToken) {
-            const nativeBalance = await fetchBalance({
-              address: userEthAddress as `0x${string}`,
-              chainId,
-            });
-            balances[tokens[index].id] = (
-              nativeBalance.value + (result.result as bigint)
-            ).toString();
-          } else {
-            balances[tokens[index].id] = (result.result as number).toString();
-          }
+          // get native balance
+          const nativeBalance = await fetchBalance({
+            address: userEthAddress as `0x${string}`,
+            chainId,
+          });
+          // get token balance (if error set to 0, could be intentional error)
+          const ercBalance = result.error
+            ? BigInt(0)
+            : (result.result as bigint);
+          // add balances and set as string
+          balances[tokens[index].id] = (
+            nativeBalance.value + ercBalance
+          ).toString();
         }
       })
     );

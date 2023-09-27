@@ -3,14 +3,11 @@ import Icon from "@/components/icon/icon";
 import Input from "@/components/input/input";
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
-import { TransactionFlowType } from "@/config/transactions/txMap";
 import { PairWithUserCTokenData } from "@/hooks/pairs/interfaces/pairs";
 import { PairsTxTypes } from "@/hooks/pairs/interfaces/pairsTxTypes";
-import { lpPairTx } from "@/hooks/pairs/transactions/pairsTx";
 import usePairs from "@/hooks/pairs/usePairs";
 import useTransactionStore from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
-import { quoteAddLiquidity } from "@/utils/evm/pairs.utils";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 import { useState } from "react";
 import { useWalletClient } from "wagmi";
@@ -18,60 +15,59 @@ import { useWalletClient } from "wagmi";
 export default function TestLP() {
   const signer = useWalletClient();
   const txStore = useStore(useTransactionStore, (state) => state);
-  const { pairsWithUserCTokens: pairs } = usePairs({
-    chainId: 7701,
+  const { pairs, transaction, amounts, selection } = usePairs({
+    chainId: signer.data?.chain.id ?? 7700,
     userEthAddress: signer.data?.account.address ?? "",
   });
   const sortedPairs = pairs?.sort((a, b) => a.symbol.localeCompare(b.symbol));
-  const [selectedPair, setSelectedPair] =
-    useState<PairWithUserCTokenData | null>(null);
+  const { setPair, pair: selectedPair } = selection;
+
+  // values
   const [valueToken1, setValueToken1] = useState("");
   const [valueToken2, setValueToken2] = useState("");
-
-  function setBothValues(value: string, token1: boolean) {
+  async function setValue(value: string, token1: boolean) {
     if (!selectedPair) return;
+    let optimalAmount;
     if (token1) {
       setValueToken1(value);
-      quoteAddLiquidity(
-        7700,
-        "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
-        selectedPair.token1.address,
-        selectedPair.token2.address,
-        selectedPair.stable,
-        convertToBigNumber(value, selectedPair.token1.decimals).data.toString()
-      ).then((data) => {
-        if (data.error) {
-          console.log(data.error);
-        } else {
-          setValueToken2(
-            formatBalance(
-              data.data.amountBOptimal,
-              selectedPair.token2.decimals
-            )
-          );
-        }
-      });
+      optimalAmount = await amounts.getOptimalAmount2(value, selectedPair);
     } else {
       setValueToken2(value);
-      quoteAddLiquidity(
-        7700,
-        "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
-        selectedPair.token2.address,
-        selectedPair.token1.address,
-        selectedPair.stable,
-        convertToBigNumber(value, selectedPair.token2.decimals).data.toString()
-      ).then((data) => {
-        if (data.error) {
-          console.log(data.error);
-        } else {
-          setValueToken1(
-            formatBalance(
-              data.data.amountBOptimal,
-              selectedPair.token1.decimals
-            )
-          );
-        }
-      });
+      optimalAmount = await amounts.getOptimalAmount1(value, selectedPair);
+    }
+    if (optimalAmount.error) return;
+    token1
+      ? setValueToken2(optimalAmount.data)
+      : setValueToken1(optimalAmount.data);
+  }
+
+  // transactions
+  const [willStake, setWillStake] = useState(false);
+  function addLiquidity() {
+    if (!selectedPair) return;
+    const { data: flow, error } = transaction.createNewPairsFlow({
+      chainId: signer.data?.chain.id ?? 7700,
+      ethAccount: signer.data?.account.address ?? "",
+      pair: selectedPair,
+      slippage: 2,
+      deadline: "9999999999999999999999999",
+      txType: PairsTxTypes.ADD_LIQUIDITY,
+      stake: willStake,
+      amounts: {
+        amount1: convertToBigNumber(
+          valueToken1,
+          selectedPair.token1.decimals
+        ).data.toString(),
+        amount2: convertToBigNumber(
+          valueToken2,
+          selectedPair.token2.decimals
+        ).data.toString(),
+      },
+    });
+    if (error) {
+      console.log(error);
+    } else {
+      txStore?.addNewFlow({ txFlow: flow, signer: signer.data });
     }
   }
 
@@ -129,7 +125,7 @@ export default function TestLP() {
         <td>{pair.token2.symbol}</td>
         <td>{formatBalance(pair.tvl, 18, { commify: true })}</td>
         <td>
-          <Button onClick={() => setSelectedPair(pair)}>Manage</Button>
+          <Button onClick={() => setPair(pair.address)}>Manage</Button>
         </td>
         <td>
           {formatBalance(
@@ -153,7 +149,7 @@ export default function TestLP() {
       <Modal
         open={selectedPair !== null}
         onClose={() => {
-          setSelectedPair(null);
+          setPair(null);
           setValueToken1("");
           setValueToken2("");
         }}
@@ -175,48 +171,32 @@ export default function TestLP() {
             <Input
               value={valueToken1}
               onChange={(e) => {
-                setBothValues(e.target.value, true);
+                setValue(e.target.value, true);
               }}
               label={selectedPair.token1.symbol}
-              type="number"
+              type="amount"
+              balance={selectedPair.token1.balance ?? "0"}
+              decimals={selectedPair.token1.decimals}
             />
             <Spacer height="50px" />
             <Input
               value={valueToken2}
               onChange={(e) => {
-                setBothValues(e.target.value, false);
+                setValue(e.target.value, false);
               }}
               label={selectedPair.token2.symbol}
-              type="number"
+              type="amount"
+              balance={selectedPair.token2.balance ?? "0"}
+              decimals={selectedPair.token2.decimals}
             />
             <Spacer height="50px" />
             <Button
-              onClick={() => {
-                txStore?.addNewFlow({
-                  txFlow: {
-                    title: "test tx",
-                    icon: "",
-                    txType: TransactionFlowType.DEX_LP_TX,
-                    params: {
-                      chainId: 7701,
-                      ethAccount: signer.data?.account.address ?? "",
-                      pair: selectedPair,
-                      slippage: 2,
-                      deadline: "9999999999999999999999999",
-                      txType: PairsTxTypes.ADD_LIQUIDITY,
-                      stake: true,
-                      amounts: {
-                        amount1: "1000000000000000000",
-                        amount2: "500000000000000000",
-                      }
-                    },
-                  },
-                  signer: signer.data,
-                });
-              }}
+              color={willStake ? "accent" : "primary"}
+              onClick={() => setWillStake(!willStake)}
             >
-              TEST TX
+              STAKE {`${willStake ? "ON" : "OFF"}`}
             </Button>
+            <Button onClick={addLiquidity}>Add Liquidity</Button>
           </div>
         )}
       </Modal>

@@ -3,8 +3,8 @@ import { NEW_ERROR, NO_ERROR, PromiseWithError, errMsg } from "../interfaces";
 import { tryFetch } from "@/utils/async.utils";
 
 // canto api
-const cantoMainnetDataBaseUrl = "http://localhost:8010/proxy";
-const cantoTestnetDataBaseUrl = "http://localhost:3001";
+const cantoMainnetDataBaseUrl = "http://146.190.153.53:3000";
+const cantoTestnetDataBaseUrl = "http://146.190.153.53:3001";
 
 // get url from chainId
 const CANTO_DATA_BASE_URL = (chainId: number) => {

@@ -236,7 +236,6 @@ const useTransactionStore = create<TransactionStore>()(
                 "useTransactionStore::performTransactions: no transactions found"
               );
             }
-            console.log(completedTxs)
             // add these new transactions to this list and delete the extra flow
             const newFlowTxList = [
               ...completedTxs,

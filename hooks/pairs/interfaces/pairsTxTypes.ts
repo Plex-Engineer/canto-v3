@@ -13,7 +13,7 @@ export type PairsTransactionParams = {
   ethAccount: string;
   pair: PairWithUserCTokenData;
   slippage: number;
-  deadline: number;
+  deadline: string;
 } & (
   | {
       txType: PairsTxTypes.STAKE | PairsTxTypes.UNSTAKE;
