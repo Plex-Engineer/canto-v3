@@ -3,8 +3,9 @@
   box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
 
   margin: 0 auto;
-  width: 920px;
+  //   width: 920px;
   //   height: 320px;
+  width: 100%;
   padding-bottom: 1rem;
   position: relative;
   overflow: hidden;
@@ -28,25 +29,6 @@
   display: flex;
   width: 70%;
   gap: 2rem;
-}
-
-.item {
-  display: flex;
-  flex-grow: 1;
-  width: 100%;
-  flex-direction: column;
-}
-
-.title {
-  font-size: 16px;
-}
-
-.value {
-  font-size: 32px !important;
-}
-
-.postChild {
-  margin-left: -1rem;
 }
 
 .logo {

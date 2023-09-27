@@ -1,8 +1,8 @@
-import Text from "@/components/text";
 import styles from "./highlightCard.module.scss";
 import Button from "@/components/button/button";
-import Spacer from "@/components/layout/spacer";
 import Image from "next/image";
+import Item from "./item";
+import Icon from "@/components/icon/icon";
 interface Props {
   token: {
     name: string;
@@ -44,14 +44,26 @@ const HighlightCard = (props: Props) => {
           name="Wallet Balance"
           value={props.token.walletBalance ?? "0"}
           postChild={
-            <Image height={24} width={24} src="/tokens/note.svg" alt="eth" />
+            <Icon
+              themed
+              icon={{
+                url: "/tokens/note.svg",
+                size: 24,
+              }}
+            />
           }
         />
         <Item
           name="Amount Staked"
           value={props.token.amountStaked ?? "0"}
           postChild={
-            <Image height={24} width={24} src="/tokens/note.svg" alt="eth" />
+            <Icon
+              themed
+              icon={{
+                url: "/tokens/note.svg",
+                size: 24,
+              }}
+            />
           }
         />
         <Item
@@ -66,6 +78,7 @@ const HighlightCard = (props: Props) => {
           width={"fill"}
           height={"large"}
           fontSize={"lg"}
+          onClick={props.token.supply}
         >
           Stake note
         </Button>
@@ -75,6 +88,7 @@ const HighlightCard = (props: Props) => {
           width={"fill"}
           height={"large"}
           fontSize={"lg"}
+          onClick={props.token.borrow}
         >
           borrow note
         </Button>
@@ -84,26 +98,3 @@ const HighlightCard = (props: Props) => {
 };
 
 export default HighlightCard;
-
-type ItemProps = {
-  name: string;
-  value: string;
-  postChild?: React.ReactNode;
-  theme?:
-    | "primary-light"
-    | "primary-dark"
-    | "secondary-light"
-    | "secondary-dark"
-    | undefined;
-};
-const Item = ({ name, value, theme, postChild }: ItemProps) => (
-  <div className={styles.item}>
-    <Text className={styles.title} theme={theme} font="proto_mono">
-      {name}
-    </Text>
-    <Text className={styles.value} theme={theme} font="proto_mono">
-      {value}{" "}
-      {postChild && <span className={styles.postChild}>{postChild}</span>}
-    </Text>
-  </div>
-);
