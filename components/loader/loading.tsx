@@ -9,6 +9,7 @@ interface Props {
 const LoadingIcon = ({ size, className }: Props) => {
   return (
     <Icon
+      themed
       icon={{
         url: "loader.svg",
         size: size,
