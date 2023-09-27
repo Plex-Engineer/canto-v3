@@ -14,6 +14,10 @@ export interface LendingHookReturn {
   cTokens: CTokenWithUserData[];
   position: UserLMPosition;
   isLoading: boolean;
+  selection: {
+    selectedCToken: CTokenWithUserData | undefined;
+    setSelectedCToken: (cTokenAddress: string | null) => void;
+  };
   transaction: {
     canPerformLendingTx: (
       txParams: CTokenLendingTransactionParams

@@ -1,3 +1,4 @@
+"use client";
 import Button from "@/components/button/button";
 import Text from "@/components/text";
 import Input from "@/components/input/input";
@@ -9,144 +10,123 @@ import styles from "./modal.module.scss";
 import Tabs from "@/components/tabs/tabs";
 import Image from "next/image";
 import Container from "@/components/container/container";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
+import { useState } from "react";
 interface Props {
-  selectedToken: CTokenWithUserData | null;
+  isSupplyModal: boolean;
+  cToken: CTokenWithUserData | null;
+  position: UserLMPosition;
   transaction: {
     performTx: (amount: string, txType: CTokenLendingTxTypes) => void;
     canPerformTx: (amount: string, txType: CTokenLendingTxTypes) => boolean;
   };
-  currentAction: CTokenLendingTxTypes;
-  setCurrentAction: (action: CTokenLendingTxTypes) => void;
-  amount: string;
-  setAmount: (amount: string) => void;
-  clmPosition: {
-    position: UserLMPosition;
-    general: {
-      maxAccountLiquidity: string;
-      outstandingDebt: string;
-      percentLimitUsed: string;
-      netApr: string;
-    };
-  };
 }
 
-interface LSProps {
-  action: CTokenLendingTxTypes;
-}
-export const LendingModal = ({
-  selectedToken,
-  transaction,
-  currentAction,
-  setCurrentAction,
-  amount,
-  setAmount,
-  clmPosition,
-}: Props) => {
-  const LendingActionSwitch = ({ action }: LSProps) => (
-    <Button
-      color={action === currentAction ? "accent" : "primary"}
-      onClick={() => setCurrentAction(action)}
-    >
-      {action}
-    </Button>
+export const LendingModal = (props: Props) => {
+  const Balances = ({
+    cToken,
+    isSupply,
+    liquidityLeft,
+  }: {
+    cToken: CTokenWithUserData;
+    isSupply: boolean;
+    liquidityLeft: string;
+  }) => (
+    <Container className={styles.card} padding="md" width="100%">
+      <Card
+        name="Wallet Balance"
+        value={formatBalance(
+          cToken.userDetails?.balanceOfUnderlying ?? "0",
+          cToken.underlying.decimals,
+          {
+            commify: true,
+            symbol: cToken.underlying.symbol,
+          }
+        )}
+      />
+      {isSupply && (
+        <Card
+          name="Supplied Amount"
+          value={formatBalance(
+            cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
+            cToken.underlying.decimals,
+            {
+              commify: true,
+              symbol: cToken.underlying.symbol,
+            }
+          )}
+        />
+      )}
+      {!isSupply && (
+        <Card
+          name="Borrowed Amount"
+          value={formatBalance(
+            cToken.userDetails?.borrowBalance ?? "0",
+            cToken.underlying.decimals,
+            {
+              commify: true,
+              symbol: cToken.underlying.symbol,
+            }
+          )}
+        />
+      )}
+      <Card
+        name="Account Liquidity Remaining"
+        value={formatBalance(liquidityLeft, 18, {
+          commify: true,
+        })}
+        note
+      />
+    </Container>
   );
 
-  function data() {
-    if (selectedToken == null) {
-      return <Text>No Active Token</Text>;
+  const APRs = ({
+    cToken,
+    isSupply,
+  }: {
+    cToken: CTokenWithUserData;
+    isSupply: boolean;
+  }) => (
+    <Container className={styles.card} padding="md" width="100%">
+      {isSupply && (
+        <>
+          <Card name="Supply APR" value={cToken.supplyApy + "%"} />
+          <Card name="Dist APR" value={cToken.distApy + "%"} />
+        </>
+      )}
+      {!isSupply && (
+        <>
+          <Card name="Borrow APR" value={cToken.borrowApy + "%"} />
+        </>
+      )}
+      <Card
+        name="Collateral Factor"
+        value={formatBalance(cToken.collateralFactor, 16) + "%"}
+      />
+    </Container>
+  );
+
+  function Content(
+    cToken: CTokenWithUserData,
+    isSupplyModal: boolean,
+    actionType: CTokenLendingTxTypes,
+    position: UserLMPosition,
+    transaction: {
+      canPerformTx: (amount: string, txType: CTokenLendingTxTypes) => boolean;
+      performTx: (amount: string, txType: CTokenLendingTxTypes) => void;
     }
-
-    return (
-      <>
-        <Text size="lg" font="proto_mono">
-          {selectedToken.symbol}
-        </Text>
-        <Text size="sm">name: {selectedToken.name}</Text>
-        <Text size="sm">Address: {selectedToken.address}</Text>
-        <Text size="sm">BorrowApy: {selectedToken.borrowApy}</Text>
-        <Text size="sm">BorrowCap: {selectedToken.borrowCap}</Text>
-        <Text size="sm">Cash: {selectedToken.cash}</Text>
-        <Text size="sm">
-          CollateralFactor: {selectedToken.collateralFactor}
-        </Text>
-        <Text size="sm">Decimals: {selectedToken.decimals}</Text>
-        <Text size="sm">DistApy: {selectedToken.distApy}</Text>
-        <Text size="sm">Exchange Rate: {selectedToken.exchangeRate}</Text>
-        <Text size="sm">IsListed: {selectedToken.isListed ? "yes" : "no"}</Text>
-        <Text size="sm">Liquidity: {selectedToken.liquidity}</Text>
-        <Text size="sm">Underlying Price: {selectedToken.price}</Text>
-        <Text size="sm">Supply Apy: {selectedToken.supplyApy}</Text>
-        <h1>----</h1>
-        <Text size="lg" font="proto_mono">
-          Underlying:
-        </Text>
-        <Text size="sm">Address: {selectedToken.underlying.address}</Text>
-        <Text size="sm">Decimals: {selectedToken.underlying.decimals}</Text>
-        <Text size="sm">Symbol: {selectedToken.underlying.symbol}</Text>
-        <Text size="sm">Name: {selectedToken.underlying.name}</Text>
-        <h1>----</h1>
-        <Text size="lg" font="proto_mono">
-          User Data:
-        </Text>
-        <Text size="sm">
-          CToken Balance: {selectedToken.userDetails?.balanceOfCToken}
-        </Text>
-        <Text size="sm">
-          Underlying Balance: {selectedToken.userDetails?.balanceOfUnderlying}
-        </Text>
-        <Text size="sm">
-          Borrow Balance: {selectedToken.userDetails?.borrowBalance}
-        </Text>
-        <Text size="sm">Rewards: {selectedToken.userDetails?.rewards}</Text>
-        <Text size="sm">
-          Is Collateral:{" "}
-          {selectedToken.userDetails?.isCollateral ? "yes" : "no"}
-        </Text>
-        <Text size="sm">
-          Supply Balance In Underlying:{" "}
-          {selectedToken.userDetails?.supplyBalanceInUnderlying}
-        </Text>
-        <Text size="sm">
-          Allowance Underlying: {selectedToken.userDetails?.underlyingAllowance}
-        </Text>
-        <Input
-          type="amount"
-          balance={maxAmountForLendingTx(
-            currentAction,
-            selectedToken,
-            clmPosition.position
-          )}
-          decimals={selectedToken.underlying.decimals}
-          value={amount}
-          onChange={(val) => {
-            setAmount(val.target.value);
-          }}
-        />
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <LendingActionSwitch action={CTokenLendingTxTypes.SUPPLY} />
-          <LendingActionSwitch action={CTokenLendingTxTypes.WITHDRAW} />
-          <LendingActionSwitch action={CTokenLendingTxTypes.BORROW} />
-          <LendingActionSwitch action={CTokenLendingTxTypes.REPAY} />
-        </div>
-        <Button
-          disabled={!transaction.canPerformTx(amount, currentAction)}
-          onClick={() => transaction.performTx(amount, currentAction)}
-        >
-          CONFIRM
-        </Button>
-      </>
-    );
-  }
-
-  function Content(token: CTokenWithUserData) {
+  ) {
+    const [amount, setAmount] = useState("");
+    const bnAmount = (
+      convertToBigNumber(amount, cToken.underlying.decimals).data ?? "0"
+    ).toString();
     return (
       <div className={styles.content}>
         <Spacer height="20px" />
         <Image
-          src={token.underlying.logoURI}
+          src={cToken.underlying.logoURI}
           width={50}
           height={50}
           alt={"Transaction"}
@@ -154,60 +134,17 @@ export const LendingModal = ({
         <Spacer height="10px" />
 
         <Text font="proto_mono" size="lg">
-          {token.symbol}
+          {cToken.underlying.symbol}
         </Text>
         <Spacer height="20px" />
 
         <Container width="100%" gap={20}>
-          <Container className={styles.card} padding="md" width="100%">
-            <Card name="Dist APR" value={token.borrowApy + "%"} />
-            <Card name="Supply APR" value={token.supplyApy + "%"} />
-            <Card
-              name="Collateral Factor"
-              value={formatBalance(token.collateralFactor, 18)}
-            />
-          </Container>
-          <Container className={styles.card} padding="md" width="100%">
-            <Card
-              name="Wallet Balance"
-              value={formatBalance(
-                token.userDetails?.balanceOfUnderlying ?? "0",
-                token.underlying.decimals,
-                {
-                  commify: true,
-                }
-              )}
-              note
-            />
-
-            <Card
-              name="Supplied Amount"
-              value={formatBalance(
-                token.userDetails?.supplyBalanceInUnderlying ?? "0",
-                token.underlying.decimals,
-                {
-                  commify: true,
-                }
-              )}
-              note
-            />
-
-            <Card
-              name="Account Liquidity Remaining"
-              value={
-                clmPosition.general.maxAccountLiquidity === "0"
-                  ? "0"
-                  : formatBalance(
-                      clmPosition.general.maxAccountLiquidity,
-                      token.underlying.decimals,
-                      {
-                        commify: true,
-                      }
-                    )
-              }
-              note
-            />
-          </Container>
+          <APRs cToken={cToken} isSupply={isSupplyModal} />
+          <Balances
+            cToken={cToken}
+            isSupply={isSupplyModal}
+            liquidityLeft={position.liquidity}
+          />
         </Container>
         <Spacer height="70px" />
         <div
@@ -217,8 +154,8 @@ export const LendingModal = ({
         >
           <Input
             type="amount"
-            balance="0"
-            decimals={token.underlying.decimals}
+            balance={maxAmountForLendingTx(actionType, cToken, position)}
+            decimals={cToken.underlying.decimals}
             onChange={(val) => {
               setAmount(val.target.value);
             }}
@@ -228,8 +165,8 @@ export const LendingModal = ({
           <Spacer height="20px" />
           <Button
             width={"fill"}
-            disabled={!transaction.canPerformTx(amount, currentAction)}
-            onClick={() => transaction.performTx(amount, currentAction)}
+            disabled={!transaction.canPerformTx(bnAmount, actionType)}
+            onClick={() => transaction.performTx(bnAmount, actionType)}
           >
             CONFIRM
           </Button>
@@ -239,19 +176,56 @@ export const LendingModal = ({
   }
   return (
     <div className={styles.container}>
-      {selectedToken ? (
+      {props.cToken ? (
         <>
           <Tabs
-            tabs={[
-              {
-                title: "Stake",
-                content: Content(selectedToken),
-              },
-              {
-                title: "withdraw",
-                content: Content(selectedToken),
-              },
-            ]}
+            tabs={
+              props.isSupplyModal
+                ? [
+                    {
+                      title: "Stake",
+                      content: Content(
+                        props.cToken,
+                        true,
+                        CTokenLendingTxTypes.SUPPLY,
+                        props.position,
+                        props.transaction
+                      ),
+                    },
+                    {
+                      title: "withdraw",
+                      content: Content(
+                        props.cToken,
+                        true,
+                        CTokenLendingTxTypes.WITHDRAW,
+                        props.position,
+                        props.transaction
+                      ),
+                    },
+                  ]
+                : [
+                    {
+                      title: "Borrow",
+                      content: Content(
+                        props.cToken,
+                        false,
+                        CTokenLendingTxTypes.BORROW,
+                        props.position,
+                        props.transaction
+                      ),
+                    },
+                    {
+                      title: "Repay",
+                      content: Content(
+                        props.cToken,
+                        false,
+                        CTokenLendingTxTypes.REPAY,
+                        props.position,
+                        props.transaction
+                      ),
+                    },
+                  ]
+            }
           />
         </>
       ) : (
@@ -290,3 +264,87 @@ const Card = ({
     </Text>
   </Container>
 );
+
+// function data() {
+//   if (selectedToken == null) {
+//     return <Text>No Active Token</Text>;
+//   }
+
+//   return (
+//     <>
+//       <Text size="lg" font="proto_mono">
+//         {selectedToken.symbol}
+//       </Text>
+//       <Text size="sm">name: {selectedToken.name}</Text>
+//       <Text size="sm">Address: {selectedToken.address}</Text>
+//       <Text size="sm">BorrowApy: {selectedToken.borrowApy}</Text>
+//       <Text size="sm">BorrowCap: {selectedToken.borrowCap}</Text>
+//       <Text size="sm">Cash: {selectedToken.cash}</Text>
+//       <Text size="sm">CollateralFactor: {selectedToken.collateralFactor}</Text>
+//       <Text size="sm">Decimals: {selectedToken.decimals}</Text>
+//       <Text size="sm">DistApy: {selectedToken.distApy}</Text>
+//       <Text size="sm">Exchange Rate: {selectedToken.exchangeRate}</Text>
+//       <Text size="sm">IsListed: {selectedToken.isListed ? "yes" : "no"}</Text>
+//       <Text size="sm">Liquidity: {selectedToken.liquidity}</Text>
+//       <Text size="sm">Underlying Price: {selectedToken.price}</Text>
+//       <Text size="sm">Supply Apy: {selectedToken.supplyApy}</Text>
+//       <h1>----</h1>
+//       <Text size="lg" font="proto_mono">
+//         Underlying:
+//       </Text>
+//       <Text size="sm">Address: {selectedToken.underlying.address}</Text>
+//       <Text size="sm">Decimals: {selectedToken.underlying.decimals}</Text>
+//       <Text size="sm">Symbol: {selectedToken.underlying.symbol}</Text>
+//       <Text size="sm">Name: {selectedToken.underlying.name}</Text>
+//       <h1>----</h1>
+//       <Text size="lg" font="proto_mono">
+//         User Data:
+//       </Text>
+//       <Text size="sm">
+//         CToken Balance: {selectedToken.userDetails?.balanceOfCToken}
+//       </Text>
+//       <Text size="sm">
+//         Underlying Balance: {selectedToken.userDetails?.balanceOfUnderlying}
+//       </Text>
+//       <Text size="sm">
+//         Borrow Balance: {selectedToken.userDetails?.borrowBalance}
+//       </Text>
+//       <Text size="sm">Rewards: {selectedToken.userDetails?.rewards}</Text>
+//       <Text size="sm">
+//         Is Collateral: {selectedToken.userDetails?.isCollateral ? "yes" : "no"}
+//       </Text>
+//       <Text size="sm">
+//         Supply Balance In Underlying:{" "}
+//         {selectedToken.userDetails?.supplyBalanceInUnderlying}
+//       </Text>
+//       <Text size="sm">
+//         Allowance Underlying: {selectedToken.userDetails?.underlyingAllowance}
+//       </Text>
+//       <Input
+//         type="amount"
+//         balance={maxAmountForLendingTx(
+//           currentAction,
+//           selectedToken,
+//           clmPosition.position
+//         )}
+//         decimals={selectedToken.underlying.decimals}
+//         value={amount}
+//         onChange={(val) => {
+//           setAmount(val.target.value);
+//         }}
+//       />
+//       <div style={{ display: "flex", flexDirection: "row" }}>
+//         <LendingActionSwitch action={CTokenLendingTxTypes.SUPPLY} />
+//         <LendingActionSwitch action={CTokenLendingTxTypes.WITHDRAW} />
+//         <LendingActionSwitch action={CTokenLendingTxTypes.BORROW} />
+//         <LendingActionSwitch action={CTokenLendingTxTypes.REPAY} />
+//       </div>
+//       <Button
+//         disabled={!transaction.canPerformTx(amount, currentAction)}
+//         onClick={() => transaction.performTx(amount, currentAction)}
+//       >
+//         CONFIRM
+//       </Button>
+//     </>
+//   );
+// }

@@ -1,10 +1,7 @@
 "use client";
 
-import Button from "@/components/button/button";
 import styles from "./lending.module.scss";
 import Icon from "@/components/icon/icon";
-import Input from "@/components/input/input";
-import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
 
@@ -18,34 +15,23 @@ import Item from "./components/item";
 import LoadingIcon from "@/components/loader/loading";
 import { LendingModal } from "./components/modal/modal";
 import { CTokenRow } from "./components/cTokenRow";
+import { useState } from "react";
 
-interface LendingProps {
-  Asset: string;
-  APR: string;
-  WalletBalance: string;
-  SuppliedAmount: string;
-  CollateralFactor: string;
-  Actions: {
-    name: string;
-    onClick: () => void;
-    disabled?: boolean;
-  }[];
+enum CLMModalTypes {
+  SUPPLY = "supply",
+  BORROW = "borrow",
+  NONE = "none",
 }
-
 export default function LendingPage() {
+  // track current modal type
+  const [currentModal, setCurrentModal] = useState<CLMModalTypes>(
+    CLMModalTypes.NONE
+  );
+  // get all data from lending combo
   const { cTokens, clmPosition, transaction, selection, isLoading } =
     useLendingCombo();
   const { cNote, rwas } = cTokens;
-  const {
-    currentAction,
-    setCurrentAction,
-    modalOpen,
-    setModalOpen,
-    selectedToken,
-    setSelectedToken,
-    amount,
-    setAmount,
-  } = selection;
+  const { selectedCToken, setSelectedCToken } = selection;
 
   return (
     <div className={styles.container}>
@@ -54,20 +40,19 @@ export default function LendingPage() {
       </Text>
 
       <Modal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        open={currentModal !== CLMModalTypes.NONE}
+        onClose={() => setCurrentModal(CLMModalTypes.NONE)}
         title="Lending"
         width="32rem"
       >
-        <LendingModal
-          selectedToken={selectedToken}
-          transaction={transaction}
-          amount={amount}
-          setAmount={setAmount}
-          currentAction={currentAction}
-          setCurrentAction={setCurrentAction}
-          clmPosition={clmPosition}
-        />
+        {selectedCToken && (
+          <LendingModal
+            isSupplyModal={currentModal === CLMModalTypes.SUPPLY}
+            position={clmPosition.position}
+            cToken={selectedCToken}
+            transaction={transaction}
+          />
+        )}
       </Modal>
 
       <Container className={styles.grid} direction="row">
@@ -113,13 +98,13 @@ export default function LendingPage() {
                     }
                   ),
                   supply: () => {
-                    setSelectedToken(cNote);
-                    setModalOpen(true);
+                    setSelectedCToken(cNote.address);
+                    setCurrentModal(CLMModalTypes.SUPPLY);
                   },
 
                   borrow: () => {
-                    setSelectedToken(cNote);
-                    setModalOpen(true);
+                    setSelectedCToken(cNote.address);
+                    setCurrentModal(CLMModalTypes.BORROW);
                   },
                 }}
               />
@@ -156,8 +141,8 @@ export default function LendingPage() {
                     CTokenRow({
                       cToken,
                       onClick: () => {
-                        setSelectedToken(cToken);
-                        setModalOpen(true);
+                        setSelectedCToken(cToken.address);
+                        setCurrentModal(CLMModalTypes.SUPPLY);
                       },
                     })
                   ),
@@ -199,8 +184,11 @@ export default function LendingPage() {
                 }
               />
               <Item
-                name="Price of Note"
-                value="1.50"
+                name="Price of cNote"
+                value={formatBalance(cNote?.exchangeRate ?? "0", 18, {
+                  precision: 2,
+                  commify: true,
+                })}
                 postChild={
                   <Icon
                     themed
@@ -229,7 +217,7 @@ export default function LendingPage() {
               />
               <Item
                 name="Percent Limit Used"
-                value={clmPosition.general.percentLimitUsed}
+                value={clmPosition.general.percentLimitUsed + "%"}
               />
               <Item
                 name="Maximum Account Liquidity"

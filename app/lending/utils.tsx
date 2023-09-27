@@ -5,12 +5,8 @@ import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 import useLending from "@/hooks/lending/useLending";
 import useTransactionStore from "@/stores/transactionStore";
 import { listIncludesAddress } from "@/utils/address.utils";
-import {
-  addTokenBalances,
-  convertToBigNumber,
-} from "@/utils/tokenBalances.utils";
+import { addTokenBalances } from "@/utils/tokenBalances.utils";
 import BigNumber from "bignumber.js";
-import { useState } from "react";
 import { useWalletClient } from "wagmi";
 import { useStore } from "zustand";
 
@@ -34,21 +30,15 @@ interface LendingComboReturn {
     canPerformTx: (amount: string, txType: CTokenLendingTxTypes) => boolean;
   };
   selection: {
-    selectedToken: CTokenWithUserData | null;
-    setSelectedToken: (token: CTokenWithUserData | null) => void;
-    amount: string;
-    setAmount: (amount: string) => void;
-    modalOpen: boolean;
-    setModalOpen: (open: boolean) => void;
-    currentAction: CTokenLendingTxTypes;
-    setCurrentAction: (action: CTokenLendingTxTypes) => void;
+    selectedCToken: CTokenWithUserData | undefined;
+    setSelectedCToken: (address: string | null) => void;
   };
 }
 export function useLendingCombo(): LendingComboReturn {
   // params for useLending hook
   const { data: signer } = useWalletClient();
   const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
-  const { cTokens, position, isLoading, transaction } = useLending({
+  const { cTokens, position, isLoading, transaction, selection } = useLending({
     chainId,
     lmType: "lending",
     userEthAddress: signer?.account.address,
@@ -66,6 +56,8 @@ export function useLendingCombo(): LendingComboReturn {
     listIncludesAddress(rwaAddressList ?? [], cToken.address)
   );
 
+  const { selectedCToken, setSelectedCToken } = selection;
+
   // relevant user position data to show in UI
   const maxAccountLiquidity = addTokenBalances(
     position.totalBorrow,
@@ -81,24 +73,14 @@ export function useLendingCombo(): LendingComboReturn {
           .toFixed(2);
   const netApr = new BigNumber(position.avgApr).toFixed(2);
 
-  //////TODO:
-  // page state, should be moved to page itself
-  const [selectedToken, setSelectedToken] = useState<any | null>(null);
-  const [amount, setAmount] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [currentAction, setCurrentAction] = useState<CTokenLendingTxTypes>(
-    CTokenLendingTxTypes.SUPPLY
-  );
-
+  // transaction functions
   function lendingTx(amount: string, txType: CTokenLendingTxTypes) {
+    if (!selectedCToken || !signer) return;
     const { data, error } = transaction.createNewLendingFlow({
-      chainId: signer?.chain.id ?? 0,
-      ethAccount: signer?.account.address ?? "",
-      cToken: selectedToken,
-      amount: convertToBigNumber(
-        amount,
-        selectedToken.underlying.decimals
-      ).data.toString(),
+      chainId: signer.chain.id,
+      ethAccount: signer.account.address,
+      cToken: selectedCToken,
+      amount,
       txType,
     });
     if (error) {
@@ -107,19 +89,21 @@ export function useLendingCombo(): LendingComboReturn {
     }
     txStore?.addNewFlow({ txFlow: data, signer });
   }
-
-  const canPerformTx = (amount: string, txType: CTokenLendingTxTypes) =>
-    !isNaN(Number(amount)) &&
+  const canPerformTx = (
+    amount: string,
+    txType: CTokenLendingTxTypes
+  ): boolean =>
+    selectedCToken &&
+    signer &&
     transaction.canPerformLendingTx({
-      chainId: signer?.chain.id ?? 7700,
-      ethAccount: signer?.account.address ?? "",
-      cToken: selectedToken,
-      amount: convertToBigNumber(
-        amount,
-        selectedToken.underlying.decimals
-      ).data?.toString(),
+      chainId: signer.chain.id,
+      ethAccount: signer.account.address,
+      cToken: selectedCToken,
+      amount,
       txType,
-    }).data;
+    }).data
+      ? true
+      : false;
 
   return {
     cTokens: {
@@ -141,14 +125,8 @@ export function useLendingCombo(): LendingComboReturn {
       canPerformTx,
     },
     selection: {
-      selectedToken,
-      setSelectedToken,
-      amount,
-      setAmount,
-      modalOpen,
-      setModalOpen,
-      currentAction,
-      setCurrentAction,
+      selectedCToken,
+      setSelectedCToken,
     },
   };
 }

@@ -83,6 +83,15 @@ export default function useLending(
     });
   }, [params.chainId]);
 
+  // keep track of selected token so we can return it with proper balances
+  const [selectedCTokenAddress, setSelectedCTokenAddress] = useState<
+    string | null
+  >(null);
+  // get token from constantly updating list of cTokens
+  const selectedCToken = cTokens.find((cToken) =>
+    areEqualAddresses(cToken.address, selectedCTokenAddress ?? "")
+  );
+
   ///
   /// external functions
   ///
@@ -102,6 +111,10 @@ export default function useLending(
     cTokens,
     position,
     isLoading: loadingCTokens,
+    selection: {
+      selectedCToken,
+      setSelectedCToken: setSelectedCTokenAddress,
+    },
     transaction: {
       canPerformLendingTx,
       createNewLendingFlow: createNewCTokenLendingFlow,
