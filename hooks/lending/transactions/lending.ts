@@ -11,7 +11,7 @@ import {
   CTokenLendingTransactionParams,
   CTokenLendingTxTypes,
 } from "../interfaces/lendingTxTypes";
-import { _approveTx, checkTokenAllowance } from "@/utils/evm/erc20.utils";
+import { createApprovalTxs } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { formatBalance } from "@/utils/tokenBalances.utils";
 import { CERC20_ABI, COMPTROLLER_ABI } from "@/config/abis";
@@ -64,31 +64,24 @@ export async function cTokenLendingTx(
       params.txType === CTokenLendingTxTypes.REPAY)
   ) {
     // check if we need to approve token
-    const { data: hasAllowance, error: allowanceError } =
-      await checkTokenAllowance(
+    const { data: allowanceTxs, error: allowanceError } =
+      await createApprovalTxs(
         params.chainId,
-        params.cToken.underlying.address,
         params.ethAccount,
-        params.cToken.address,
-        params.amount
+        [
+          {
+            address: params.cToken.underlying.address,
+            symbol: params.cToken.underlying.symbol,
+          },
+        ],
+        [params.amount],
+        { address: params.cToken.address, name: "Lending Market" }
       );
     if (allowanceError) {
-      return NEW_ERROR("cTokenLendingTx::" + errMsg(allowanceError));
+      return NEW_ERROR("addLiquidityFlow: " + errMsg(allowanceError));
     }
-    if (!hasAllowance) {
-      txList.push(
-        _approveTx(
-          params.chainId,
-          params.cToken.underlying.address,
-          params.cToken.address,
-          params.amount,
-          TX_DESCRIPTIONS.APPROVE_TOKEN(
-            params.cToken.underlying.symbol,
-            "Lending Market"
-          )
-        )
-      );
-    }
+    // push allowance txs to the list (might be none)
+    txList.push(...allowanceTxs);
   }
   // create tx for lending
   txList.push(
