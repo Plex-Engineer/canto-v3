@@ -101,7 +101,7 @@ export default function useLending(
   return {
     cTokens,
     position,
-    loading: loadingCTokens,
+    isLoading: loadingCTokens,
     transaction: {
       canPerformLendingTx,
       createNewLendingFlow: createNewCTokenLendingFlow,

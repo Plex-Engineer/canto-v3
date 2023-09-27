@@ -19,6 +19,7 @@ interface LendingComboReturn {
     cNote: CTokenWithUserData | undefined;
     rwas: CTokenWithUserData[];
   };
+  isLoading: boolean;
   clmPosition: {
     position: UserLMPosition;
     general: {
@@ -47,7 +48,7 @@ export function useLendingCombo(): LendingComboReturn {
   // params for useLending hook
   const { data: signer } = useWalletClient();
   const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
-  const { cTokens, position, loading, transaction } = useLending({
+  const { cTokens, position, isLoading, transaction } = useLending({
     chainId,
     lmType: "lending",
     userEthAddress: signer?.account.address,
@@ -125,6 +126,7 @@ export function useLendingCombo(): LendingComboReturn {
       cNote,
       rwas,
     },
+    isLoading,
     clmPosition: {
       position,
       general: {

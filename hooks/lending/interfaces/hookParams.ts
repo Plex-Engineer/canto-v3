@@ -13,7 +13,7 @@ export interface LendingHookInputParams {
 export interface LendingHookReturn {
   cTokens: CTokenWithUserData[];
   position: UserLMPosition;
-  loading: boolean;
+  isLoading: boolean;
   transaction: {
     canPerformLendingTx: (
       txParams: CTokenLendingTransactionParams
