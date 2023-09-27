@@ -13,6 +13,8 @@ import { formatBalance } from "@/utils/tokenBalances.utils";
 import { useLendingCombo } from "./utils";
 import Text from "@/components/text";
 import Container from "@/components/container/container";
+import HighlightCard from "./components/highlightCard";
+import { format } from "path";
 
 interface LendingProps {
   Asset: string;
@@ -238,22 +240,61 @@ export default function LendingPage() {
       {isLoading ? (
         <Text>Loading...</Text>
       ) : cNote ? (
-        <Table
-          columns={7}
-          title="CNOTE"
-          headers={[
-            "Asset",
-            "APR",
-            "Wallet Balance",
-            "Supplied Amount",
-            "Collateral Factor",
-            "",
-          ]}
-          data={[CTokenRow({ cToken: cNote })]}
+        // <Table
+        //   columns={7}
+        //   title="CNOTE"
+        //   headers={[
+        //     "Asset",
+        //     "APR",
+        //     "Wallet Balance",
+        //     "Supplied Amount",
+        //     "Collateral Factor",
+        //     "",
+        //   ]}
+        //   data={[CTokenRow({ cToken: cNote })]}
+        // />
+        <HighlightCard
+          token={{
+            name: cNote.symbol,
+            imgUrl: cNote.underlying.logoURI,
+            supplyAPR: cNote.supplyApy + "%",
+            borrowAPR: cNote.borrowApy + "%",
+            walletBalance: formatBalance(
+              cNote.userDetails?.balanceOfUnderlying ?? "0",
+              cNote.underlying.decimals,
+              {
+                commify: true,
+              }
+            ),
+            amountStaked: formatBalance(
+              cNote.userDetails?.supplyBalanceInUnderlying ?? "0",
+              cNote.underlying.decimals,
+              {
+                commify: true,
+              }
+            ),
+            outStandingDebt: formatBalance(
+              cNote.userDetails?.borrowBalance ?? "0",
+              cNote.underlying.decimals,
+              {
+                commify: true,
+              }
+            ),
+            supply: () => {
+              setSelectedToken(cNote);
+              setModalOpen(true);
+            },
+
+            borrow: () => {
+              setSelectedToken(cNote);
+              setModalOpen(true);
+            },
+          }}
         />
       ) : (
         <Text>No Supply Tokens Found</Text>
       )}
+      <Spacer height="40px" />
       {isLoading ? (
         <Text>Loading...</Text>
       ) : rwas.length > 0 ? (
