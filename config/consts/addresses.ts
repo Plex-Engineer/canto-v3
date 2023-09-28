@@ -8,7 +8,7 @@ export const WETH_MAINNET_ADDRESS =
 export const PUB_KEY_BOT_ADDRESS =
   "canto1efrhdukv096tmjs7r80m8pqkr3udp9g0uadjfv";
 
-// CLM Addresses
+// Canto Core Addresses
 const COMPTROLLER_ADDRESS = {
   mainnet: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
   testnet: "0x9514c07bC6e80B652e4264E64f589C59065C231f",
@@ -24,7 +24,7 @@ const C_NOTE_ADDRESS = {
 
 type ContractName = "comptroller" | "clmLens" | "cNote";
 type ChainType = "mainnet" | "testnet";
-export function getCLMAddress(
+export function getCantoCoreAddress(
   chainId: number,
   contractName: ContractName
 ): string | null {

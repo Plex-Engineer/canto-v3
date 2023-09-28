@@ -14,7 +14,7 @@ import { _approveTx, checkTokenAllowance } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { formatBalance } from "@/utils/tokenBalances.utils";
 import { CERC20_ABI, COMPTROLLER_ABI } from "@/config/abis";
-import { getCLMAddress } from "@/config/consts/addresses";
+import { getCantoCoreAddress } from "@/config/consts/addresses";
 
 export async function cTokenLendingTx(
   params: CTokenLendingTransactionParams
@@ -29,7 +29,7 @@ export async function cTokenLendingTx(
     params.txType === CTokenLendingTxTypes.DECOLLATERALIZE
   ) {
     // get comptroller address
-    const comptrollerAddress = getCLMAddress(params.chainId, "comptroller");
+    const comptrollerAddress = getCantoCoreAddress(params.chainId, "comptroller");
     if (!comptrollerAddress) {
       return NEW_ERROR("cTokenLendingTx: chainId not supported");
     }
@@ -110,7 +110,7 @@ export async function cTokenLendingTx(
     Number(params.cToken.collateralFactor) !== 0
   ) {
     // get comptroller address
-    const comptrollerAddress = getCLMAddress(params.chainId, "comptroller");
+    const comptrollerAddress = getCantoCoreAddress(params.chainId, "comptroller");
     if (!comptrollerAddress) {
       return NEW_ERROR("cTokenLendingTx: chainId not supported");
     }
