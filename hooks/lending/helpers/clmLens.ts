@@ -13,7 +13,7 @@ import {
 import { Contract } from "web3";
 import { CLM_LENS_ABI, COMPTROLLER_ABI } from "@/config/abis";
 import { isCantoChainId } from "@/utils/networks.utils";
-import { getCLMAddress } from "@/config/consts/addresses";
+import { getCantoCoreAddress } from "@/config/consts/addresses";
 
 /**
  * @notice Gets user data from CLM Lens
@@ -35,8 +35,8 @@ export async function getUserCLMLensData(
     try {
       // get all addresses depending on chainId
       const [lensAddress, comptrollerAddress] = [
-        getCLMAddress(chainId, "clmLens"),
-        getCLMAddress(chainId, "comptroller"),
+        getCantoCoreAddress(chainId, "clmLens"),
+        getCantoCoreAddress(chainId, "comptroller"),
       ];
       // make sure addresses exist
       if (!cTokenAddresses || !lensAddress || !comptrollerAddress) {

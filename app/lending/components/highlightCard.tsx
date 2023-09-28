@@ -3,46 +3,57 @@ import Button from "@/components/button/button";
 import Image from "next/image";
 import Item from "./item";
 import Icon from "@/components/icon/icon";
+import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
+import { formatBalance } from "@/utils/tokenBalances.utils";
 interface Props {
-  token: {
-    name: string;
-    imgUrl: string;
-    supplyAPR: string;
-    borrowAPR: string;
-    walletBalance?: string;
-    amountStaked?: string;
-    outStandingDebt?: string;
-    supply: () => void;
-    borrow: () => void;
-  };
+  cToken: CTokenWithUserData;
+  precisionInValues?: number;
+  onSupply: () => void;
+  onBorrow: () => void;
 }
-const HighlightCard = (props: Props) => {
+const HighlightCard = ({
+  cToken,
+  onBorrow,
+  onSupply,
+  precisionInValues,
+}: Props) => {
   return (
     <div className={styles.container}>
       <Image
         className={styles.logo}
-        src={props.token.imgUrl}
+        src={cToken.underlying.logoURI}
         alt={"logo"}
         height={200}
         width={200}
       />
       <div className={styles.header}>
-        <Item name="Asset" value={props.token.name} theme="primary-light" />
+        <Item
+          name="Asset"
+          value={cToken.underlying.name}
+          theme="primary-light"
+        />
         <Item
           name="Supply APR"
-          value={props.token.supplyAPR}
+          value={cToken.supplyApy + "%"}
           theme="primary-light"
         />
         <Item
           name="Borrow APR"
-          value={props.token.borrowAPR}
+          value={cToken.borrowApy + "%"}
           theme="primary-light"
         />
       </div>
       <div className={styles.amounts}>
         <Item
           name="Wallet Balance"
-          value={props.token.walletBalance ?? "0"}
+          value={formatBalance(
+            cToken.userDetails?.balanceOfUnderlying ?? "0",
+            cToken.underlying.decimals,
+            {
+              commify: true,
+              precision: precisionInValues,
+            }
+          )}
           postChild={
             <Icon
               themed
@@ -55,7 +66,14 @@ const HighlightCard = (props: Props) => {
         />
         <Item
           name="Amount Staked"
-          value={props.token.amountStaked ?? "0"}
+          value={formatBalance(
+            cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
+            cToken.underlying.decimals,
+            {
+              commify: true,
+              precision: precisionInValues,
+            }
+          )}
           postChild={
             <Icon
               themed
@@ -68,7 +86,23 @@ const HighlightCard = (props: Props) => {
         />
         <Item
           name="Outstanding Debt"
-          value={props.token.outStandingDebt ?? "0"}
+          value={formatBalance(
+            cToken.userDetails?.borrowBalance ?? "0",
+            cToken.underlying.decimals,
+            {
+              commify: true,
+              precision: precisionInValues,
+            }
+          )}
+          postChild={
+            <Icon
+              themed
+              icon={{
+                url: "/tokens/note.svg",
+                size: 24,
+              }}
+            />
+          }
         />
       </div>
 
@@ -78,7 +112,7 @@ const HighlightCard = (props: Props) => {
           width={"fill"}
           height={"large"}
           fontSize={"lg"}
-          onClick={props.token.supply}
+          onClick={onSupply}
         >
           Stake note
         </Button>
@@ -88,7 +122,7 @@ const HighlightCard = (props: Props) => {
           width={"fill"}
           height={"large"}
           fontSize={"lg"}
-          onClick={props.token.borrow}
+          onClick={onBorrow}
         >
           borrow note
         </Button>

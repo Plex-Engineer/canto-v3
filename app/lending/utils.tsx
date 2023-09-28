@@ -5,8 +5,11 @@ import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 import useLending from "@/hooks/lending/useLending";
 import useTransactionStore from "@/stores/transactionStore";
 import { listIncludesAddress } from "@/utils/address.utils";
+import { getCirculatingNote } from "@/utils/clm/noteStats.utils";
 import { addTokenBalances } from "@/utils/tokenBalances.utils";
+import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
 import BigNumber from "bignumber.js";
+import { useEffect, useMemo, useState } from "react";
 import { useWalletClient } from "wagmi";
 import { useStore } from "zustand";
 
@@ -33,7 +36,13 @@ interface LendingComboReturn {
     selectedCToken: CTokenWithUserData | undefined;
     setSelectedCToken: (address: string | null) => void;
   };
+  lendingStats: {
+    circulatingNote: string;
+    valueOfAllRWA: string;
+    cNotePrice: string;
+  };
 }
+
 export function useLendingCombo(): LendingComboReturn {
   // params for useLending hook
   const { data: signer } = useWalletClient();
@@ -56,8 +65,6 @@ export function useLendingCombo(): LendingComboReturn {
     listIncludesAddress(rwaAddressList ?? [], cToken.address)
   );
 
-  const { selectedCToken, setSelectedCToken } = selection;
-
   // relevant user position data to show in UI
   const maxAccountLiquidity = addTokenBalances(
     position.totalBorrow,
@@ -73,13 +80,44 @@ export function useLendingCombo(): LendingComboReturn {
           .toFixed(2);
   const netApr = new BigNumber(position.avgApr).toFixed(2);
 
+  // lending stats (only need to call on page load, no need to update)
+  const valueOfAllRWA = useMemo(() => {
+    const bnValueOfAllRWA = rwas.reduce((acc, rwa) => {
+      const { data: addedSupply, error } = convertTokenAmountToNote(
+        rwa.underlyingTotalSupply,
+        rwa.price
+      );
+      if (error) return acc;
+      return acc.plus(addedSupply);
+    }, new BigNumber(0));
+    return bnValueOfAllRWA.toString();
+  }, [rwas]);
+  // circulating note
+  const [circulatingNote, setCirculatingNote] = useState("0");
+  useEffect(() => {
+    async function getStats() {
+      if (cNote?.underlying.address) {
+        const { data: circulatingNote, error } = await getCirculatingNote(
+          chainId,
+          cNote.underlying.address
+        );
+        if (error) {
+          console.log(error);
+          return;
+        }
+        setCirculatingNote(circulatingNote);
+      }
+    }
+    getStats();
+  }, [chainId, cNote?.underlying.address]);
+
   // transaction functions
   function lendingTx(amount: string, txType: CTokenLendingTxTypes) {
-    if (!selectedCToken || !signer) return;
+    if (!selection.selectedCToken || !signer) return;
     const { data, error } = transaction.createNewLendingFlow({
       chainId: signer.chain.id,
       ethAccount: signer.account.address,
-      cToken: selectedCToken,
+      cToken: selection.selectedCToken,
       amount,
       txType,
     });
@@ -93,12 +131,12 @@ export function useLendingCombo(): LendingComboReturn {
     amount: string,
     txType: CTokenLendingTxTypes
   ): boolean =>
-    selectedCToken &&
+    selection.selectedCToken &&
     signer &&
     transaction.canPerformLendingTx({
       chainId: signer.chain.id,
       ethAccount: signer.account.address,
-      cToken: selectedCToken,
+      cToken: selection.selectedCToken,
       amount,
       txType,
     }).data
@@ -124,9 +162,11 @@ export function useLendingCombo(): LendingComboReturn {
       performTx: lendingTx,
       canPerformTx,
     },
-    selection: {
-      selectedCToken,
-      setSelectedCToken,
+    selection,
+    lendingStats: {
+      circulatingNote: circulatingNote,
+      valueOfAllRWA: valueOfAllRWA,
+      cNotePrice: cNote?.exchangeRate ?? "0",
     },
   };
 }
