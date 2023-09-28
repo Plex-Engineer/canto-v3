@@ -9,6 +9,7 @@ export const PUB_KEY_BOT_ADDRESS =
   "canto1efrhdukv096tmjs7r80m8pqkr3udp9g0uadjfv";
 
 // Canto Core Addresses
+
 const ACCOUNTANT_ADDRESS = {
   mainnet: "0x4F6DCfa2F69AF7350AAc48D3a3d5B8D03b5378AA",
   testnet: "0xdb91f7127Aa66855845696db77c37d1b6bEAd2db",
@@ -33,6 +34,7 @@ const ROUTER_ADDRESS = {
   mainnet: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
   testnet: "0x463e7d4DF8fE5fb42D024cb57c77b76e6e74417a",
 };
+
 
 type ContractName =
   | "accountant"

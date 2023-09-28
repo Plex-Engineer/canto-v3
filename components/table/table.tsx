@@ -4,7 +4,8 @@ interface Props {
   title?: string;
   headers: string[];
   columns: number;
-  data: any[][];
+  data?: any[][];
+  processedData?: any[];
 }
 
 function formatTitle(title: string) {
@@ -40,19 +41,29 @@ const Table = (props: Props) => {
             );
           })}
         </div>
-        {props.data.map((row, index) => {
-          return (
-            <div key={index} className={styles.row}>
-              {row.map((cell, index) => {
-                return (
-                  <div key={index} className={styles.cell}>
-                    {cell}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
+        {props.processedData &&
+          props.processedData.map((row, index) => {
+            return (
+              <div key={index} className={styles.row}>
+                {row}
+              </div>
+            );
+          })}
+
+        {props.data &&
+          props.data.map((row, index) => {
+            return (
+              <div key={index} className={styles.row}>
+                {row.map((cell, index) => {
+                  return (
+                    <div key={index} className={styles.cell}>
+                      {cell}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
       </section>
     </div>
   );
