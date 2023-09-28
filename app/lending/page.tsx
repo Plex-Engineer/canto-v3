@@ -78,6 +78,7 @@ export default function LendingPage() {
             ) : cNote ? (
               <HighlightCard
                 cToken={cNote}
+                precisionInValues={2}
                 onSupply={() => {
                   setSelectedCToken(cNote.address);
                   setCurrentModal(CLMModalTypes.SUPPLY);

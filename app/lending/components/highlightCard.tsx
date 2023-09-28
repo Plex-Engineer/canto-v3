@@ -7,10 +7,16 @@ import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { formatBalance } from "@/utils/tokenBalances.utils";
 interface Props {
   cToken: CTokenWithUserData;
+  precisionInValues?: number;
   onSupply: () => void;
   onBorrow: () => void;
 }
-const HighlightCard = ({ cToken, onBorrow, onSupply }: Props) => {
+const HighlightCard = ({
+  cToken,
+  onBorrow,
+  onSupply,
+  precisionInValues,
+}: Props) => {
   return (
     <div className={styles.container}>
       <Image
@@ -45,6 +51,7 @@ const HighlightCard = ({ cToken, onBorrow, onSupply }: Props) => {
             cToken.underlying.decimals,
             {
               commify: true,
+              precision: precisionInValues,
             }
           )}
           postChild={
@@ -64,6 +71,7 @@ const HighlightCard = ({ cToken, onBorrow, onSupply }: Props) => {
             cToken.underlying.decimals,
             {
               commify: true,
+              precision: precisionInValues,
             }
           )}
           postChild={
@@ -83,6 +91,7 @@ const HighlightCard = ({ cToken, onBorrow, onSupply }: Props) => {
             cToken.underlying.decimals,
             {
               commify: true,
+              precision: precisionInValues,
             }
           )}
           postChild={
