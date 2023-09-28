@@ -1,15 +1,19 @@
 "use client";
 import Button from "@/components/button/button";
+import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
 import Input from "@/components/input/input";
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
+import Table from "@/components/table/table";
+import Text from "@/components/text";
 import { PairWithUserCTokenData } from "@/hooks/pairs/interfaces/pairs";
 import { PairsTxTypes } from "@/hooks/pairs/interfaces/pairsTxTypes";
 import usePairs from "@/hooks/pairs/usePairs";
 import useTransactionStore from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
+import Image from "next/image";
 import { useState } from "react";
 import { useWalletClient } from "wagmi";
 
@@ -72,7 +76,7 @@ export default function Page() {
     }
   }
 
-  const PairTable = ({ pairs }: { pairs: PairWithUserCTokenData[] }) => {
+  const PairTable2 = ({ pairs }: { pairs: PairWithUserCTokenData[] }) => {
     return (
       <table>
         <thead>
@@ -99,21 +103,45 @@ export default function Page() {
       </table>
     );
   };
+
+  const PairTable = ({ pairs }: { pairs: PairWithUserCTokenData[] }) => {
+    if (pairs.length === 0) return <div>no pairs</div>;
+    return (
+      <Table
+        headers={[
+          "Symbol",
+          "Stable",
+          "LP Price",
+          "Ratio",
+          //   "Token 1",
+          //   "Token 2",
+          "TVL",
+          "user tokens",
+          "user stake",
+          "rewards",
+          "edit",
+        ]}
+        columns={10}
+        processedData={pairs.map((pair) => (
+          <PairRow key={pair.symbol} pair={pair} />
+        ))}
+      />
+    );
+  };
   const PairRow = ({ pair }: { pair: PairWithUserCTokenData }) => {
     return (
-      <tr>
-        <td>
-          <Icon
-            icon={{
-              url: pair.logoURI,
-              size: 54,
-            }}
-          ></Icon>
-        </td>
-        <td>{pair.symbol}</td>
-        <td>{pair.stable ? "stable" : "vol"}</td>
-        <td>{formatBalance(pair.lpPrice, 36 - pair.decimals)}</td>
-        <td>
+      <>
+        <div key={pair.address + "symbol"}>
+          <Image src={pair.logoURI} width={54} height={54} alt="logo" />
+          <Text>{pair.symbol}</Text>
+        </div>
+        <Text key={pair.address + "stable" + (pair.stable ? "stable" : "vol")}>
+          {pair.stable ? "stable" : "vol"}
+        </Text>
+        <Text key={pair.address + "lpPrice"}>
+          {formatBalance(pair.lpPrice, 36 - pair.decimals, { commify: true })}
+        </Text>
+        <Text key={pair.address + "ratio"}>
           {formatBalance(
             pair.ratio,
             18 +
@@ -121,27 +149,32 @@ export default function Page() {
                 ? pair.token1.decimals - pair.token2.decimals
                 : pair.token2.decimals - pair.token1.decimals)
           )}
-        </td>
-        <td>{pair.token1.symbol}</td>
-        <td>{pair.token2.symbol}</td>
-        <td>{formatBalance(pair.tvl, 18, { commify: true })}</td>
-        <td>
-          <Button onClick={() => setPair(pair.address)}>Manage</Button>
-        </td>
-        <td>
+        </Text>
+        {/* <Text key={pair.address + "token1"}>{pair.token1.symbol}</Text> */}
+        {/* <Text key={pair.address + "token2"}>{pair.token2.symbol}</Text> */}
+        <Text key={pair.address + "tvl"}>
+          {formatBalance(pair.tvl, 18, { commify: true })}
+        </Text>
+
+        <Text key={pair.address + "userTokens"}>
           {formatBalance(
             pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
             pair.decimals
           )}
-        </td>
-        <td>
+        </Text>
+        <Text key={pair.address + "userStake"}>
           {formatBalance(
             pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0",
             pair.decimals
           )}
-        </td>
-        <td>{formatBalance(pair.clmData?.userDetails?.rewards ?? "0", 18)}</td>
-      </tr>
+        </Text>
+        <Text key={pair.address + "rewards"}>
+          {formatBalance(pair.clmData?.userDetails?.rewards ?? "0", 18)}
+        </Text>
+        <div key={pair.address + "edit"}>
+          <Button onClick={() => setPair(pair.address)}>Manage</Button>
+        </div>
+      </>
     );
   };
   return (
