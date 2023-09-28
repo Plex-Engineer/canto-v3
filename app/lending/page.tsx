@@ -169,6 +169,7 @@ export default function LendingPage() {
                   commify: true,
                   precision: 2,
                 })}
+                postChild={<NoteIcon />}
               />
               <Item
                 name="Average APR"
@@ -188,6 +189,7 @@ export default function LendingPage() {
                     precision: 2,
                   }
                 )}
+                postChild={<NoteIcon />}
               />
             </OutlineCard>
           </div>
