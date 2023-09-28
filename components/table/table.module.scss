@@ -47,7 +47,11 @@
   align-items: center;
   text-align: center;
 
-  &:last-child {
+  //   &:last-child {
+  //     grid-column: span 1;
+  //   }
+
+  &:first-child {
     grid-column: span 2;
   }
 }

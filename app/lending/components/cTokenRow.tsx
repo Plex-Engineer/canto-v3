@@ -13,13 +13,24 @@ export const CTokenRow = ({
   cToken: CTokenWithUserData;
   onClick: () => void;
 }) => [
-  <>
+  <Container
+    key={cToken.address}
+    direction="row"
+    gap={10}
+    style={{
+      padding: "0 16px",
+    }}
+    center={{
+      vertical: true,
+      horizontal: true,
+    }}
+  >
     <Icon icon={{ url: cToken.underlying.logoURI, size: 30 }} />
-    <Spacer width="10px" />
+    {/* <Spacer width="10px" /> */}
     <Text theme="primary-dark" key={cToken.name + cToken.name}>
       {cToken.underlying.name}
     </Text>
-  </>,
+  </Container>,
   <Text theme="primary-dark" key={cToken.name + "cToken.supplyApy"}>
     {cToken.supplyApy + "%"}
   </Text>,
@@ -47,18 +58,18 @@ export const CTokenRow = ({
   <Container key={cToken.name + "Test"} direction="row">
     <Button
       key={cToken.name + "cToken.supply"}
-      color="primary"
+      color="secondary"
       onClick={onClick}
     >
-      Supply
+      Manage
     </Button>
-    <Spacer width="10px" />
+    {/* <Spacer width="10px" />
     <Button
       key={cToken.name + "cToken.withdraw"}
       color="secondary"
       onClick={onClick}
     >
       Withdraw
-    </Button>
+    </Button> */}
   </Container>,
 ];
