@@ -5,8 +5,11 @@ import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 import useLending from "@/hooks/lending/useLending";
 import useTransactionStore from "@/stores/transactionStore";
 import { listIncludesAddress } from "@/utils/address.utils";
+import { getCirculatingNote } from "@/utils/clm/noteStats.utils";
 import { addTokenBalances } from "@/utils/tokenBalances.utils";
+import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
 import BigNumber from "bignumber.js";
+import { useEffect, useMemo, useState } from "react";
 import { useWalletClient } from "wagmi";
 import { useStore } from "zustand";
 
@@ -33,7 +36,13 @@ interface LendingComboReturn {
     selectedCToken: CTokenWithUserData | undefined;
     setSelectedCToken: (address: string | null) => void;
   };
+  lendingStats: {
+    circulatingNote: string;
+    valueOfAllRWA: string;
+    cNotePrice: string;
+  };
 }
+
 export function useLendingCombo(): LendingComboReturn {
   // params for useLending hook
   const { data: signer } = useWalletClient();
@@ -70,6 +79,37 @@ export function useLendingCombo(): LendingComboReturn {
           .multipliedBy(100)
           .toFixed(2);
   const netApr = new BigNumber(position.avgApr).toFixed(2);
+
+  // lending stats (only need to call on page load, no need to update)
+  const valueOfAllRWA = useMemo(() => {
+    const bnValueOfAllRWA = rwas.reduce((acc, rwa) => {
+      const { data: addedSupply, error } = convertTokenAmountToNote(
+        rwa.underlyingTotalSupply,
+        rwa.price
+      );
+      if (error) return acc;
+      return acc.plus(addedSupply);
+    }, new BigNumber(0));
+    return bnValueOfAllRWA.toString();
+  }, [rwas]);
+  // circulating note
+  const [circulatingNote, setCirculatingNote] = useState("0");
+  useEffect(() => {
+    async function getStats() {
+      if (cNote?.underlying.address) {
+        const { data: circulatingNote, error } = await getCirculatingNote(
+          chainId,
+          cNote.underlying.address
+        );
+        if (error) {
+          console.log(error);
+          return;
+        }
+        setCirculatingNote(circulatingNote);
+      }
+    }
+    getStats();
+  }, [chainId, cNote?.underlying.address]);
 
   // transaction functions
   function lendingTx(amount: string, txType: CTokenLendingTxTypes) {
@@ -123,5 +163,10 @@ export function useLendingCombo(): LendingComboReturn {
       canPerformTx,
     },
     selection,
+    lendingStats: {
+      circulatingNote: circulatingNote,
+      valueOfAllRWA: valueOfAllRWA,
+      cNotePrice: cNote?.exchangeRate ?? "0",
+    },
   };
 }

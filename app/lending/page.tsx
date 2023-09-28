@@ -28,8 +28,14 @@ export default function LendingPage() {
     CLMModalTypes.NONE
   );
   // get all data from lending combo
-  const { cTokens, clmPosition, transaction, selection, isLoading } =
-    useLendingCombo();
+  const {
+    cTokens,
+    clmPosition,
+    transaction,
+    selection,
+    isLoading,
+    lendingStats,
+  } = useLendingCombo();
   const { cNote, rwas } = cTokens;
   const { selectedCToken, setSelectedCToken } = selection;
 
@@ -132,17 +138,21 @@ export default function LendingPage() {
             <OutlineCard>
               <Item
                 name="Note in circulation"
-                value="10,234,234,234"
+                value={formatBalance(lendingStats.circulatingNote, 18, {
+                  commify: true,
+                })}
                 postChild={<NoteIcon />}
               />
               <Item
                 name="Value of rwas on canto"
-                value="3,435,215"
+                value={formatBalance(lendingStats.valueOfAllRWA, 18, {
+                  commify: true,
+                })}
                 postChild={<NoteIcon />}
               />
               <Item
                 name="Price of cNote"
-                value={formatBalance(cNote?.exchangeRate ?? "0", 18, {
+                value={formatBalance(lendingStats.cNotePrice, 18, {
                   precision: 2,
                   commify: true,
                 })}

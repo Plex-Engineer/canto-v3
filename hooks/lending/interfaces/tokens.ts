@@ -21,6 +21,7 @@ export interface CToken {
     name: string;
     symbol: string;
   };
+  underlyingTotalSupply: string;
 }
 export interface UserCTokenDetails {
   cTokenAddress: string;
