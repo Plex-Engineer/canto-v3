@@ -71,41 +71,14 @@ export default function LendingPage() {
               </Container>
             ) : cNote ? (
               <HighlightCard
-                token={{
-                  name: cNote.symbol,
-                  imgUrl: cNote.underlying.logoURI,
-                  supplyAPR: cNote.supplyApy + "%",
-                  borrowAPR: cNote.borrowApy + "%",
-                  walletBalance: formatBalance(
-                    cNote.userDetails?.balanceOfUnderlying ?? "0",
-                    cNote.underlying.decimals,
-                    {
-                      commify: true,
-                    }
-                  ),
-                  amountStaked: formatBalance(
-                    cNote.userDetails?.supplyBalanceInUnderlying ?? "0",
-                    cNote.underlying.decimals,
-                    {
-                      commify: true,
-                    }
-                  ),
-                  outStandingDebt: formatBalance(
-                    cNote.userDetails?.borrowBalance ?? "0",
-                    cNote.underlying.decimals,
-                    {
-                      commify: true,
-                    }
-                  ),
-                  supply: () => {
-                    setSelectedCToken(cNote.address);
-                    setCurrentModal(CLMModalTypes.SUPPLY);
-                  },
-
-                  borrow: () => {
-                    setSelectedCToken(cNote.address);
-                    setCurrentModal(CLMModalTypes.BORROW);
-                  },
+                cToken={cNote}
+                onSupply={() => {
+                  setSelectedCToken(cNote.address);
+                  setCurrentModal(CLMModalTypes.SUPPLY);
+                }}
+                onBorrow={() => {
+                  setSelectedCToken(cNote.address);
+                  setCurrentModal(CLMModalTypes.BORROW);
                 }}
               />
             ) : (
@@ -160,28 +133,12 @@ export default function LendingPage() {
               <Item
                 name="Note in circulation"
                 value="10,234,234,234"
-                postChild={
-                  <Icon
-                    themed
-                    icon={{
-                      url: "/tokens/note.svg",
-                      size: 24,
-                    }}
-                  />
-                }
+                postChild={<NoteIcon />}
               />
               <Item
                 name="Value of rwas on canto"
                 value="3,435,215"
-                postChild={
-                  <Icon
-                    themed
-                    icon={{
-                      url: "/tokens/note.svg",
-                      size: 24,
-                    }}
-                  />
-                }
+                postChild={<NoteIcon />}
               />
               <Item
                 name="Price of cNote"
@@ -189,15 +146,7 @@ export default function LendingPage() {
                   precision: 2,
                   commify: true,
                 })}
-                postChild={
-                  <Icon
-                    themed
-                    icon={{
-                      url: "/tokens/note.svg",
-                      size: 24,
-                    }}
-                  />
-                }
+                postChild={<NoteIcon />}
               />
             </OutlineCard>
           </div>
@@ -237,3 +186,7 @@ export default function LendingPage() {
     </div>
   );
 }
+
+const NoteIcon = () => (
+  <Icon themed icon={{ url: "/tokens/note.svg", size: 24 }} />
+);

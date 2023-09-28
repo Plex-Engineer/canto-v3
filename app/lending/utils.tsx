@@ -56,8 +56,6 @@ export function useLendingCombo(): LendingComboReturn {
     listIncludesAddress(rwaAddressList ?? [], cToken.address)
   );
 
-  const { selectedCToken, setSelectedCToken } = selection;
-
   // relevant user position data to show in UI
   const maxAccountLiquidity = addTokenBalances(
     position.totalBorrow,
@@ -75,11 +73,11 @@ export function useLendingCombo(): LendingComboReturn {
 
   // transaction functions
   function lendingTx(amount: string, txType: CTokenLendingTxTypes) {
-    if (!selectedCToken || !signer) return;
+    if (!selection.selectedCToken || !signer) return;
     const { data, error } = transaction.createNewLendingFlow({
       chainId: signer.chain.id,
       ethAccount: signer.account.address,
-      cToken: selectedCToken,
+      cToken: selection.selectedCToken,
       amount,
       txType,
     });
@@ -93,12 +91,12 @@ export function useLendingCombo(): LendingComboReturn {
     amount: string,
     txType: CTokenLendingTxTypes
   ): boolean =>
-    selectedCToken &&
+    selection.selectedCToken &&
     signer &&
     transaction.canPerformLendingTx({
       chainId: signer.chain.id,
       ethAccount: signer.account.address,
-      cToken: selectedCToken,
+      cToken: selection.selectedCToken,
       amount,
       txType,
     }).data
@@ -124,9 +122,6 @@ export function useLendingCombo(): LendingComboReturn {
       performTx: lendingTx,
       canPerformTx,
     },
-    selection: {
-      selectedCToken,
-      setSelectedCToken,
-    },
+    selection,
   };
 }
