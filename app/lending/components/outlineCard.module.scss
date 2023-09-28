@@ -1,0 +1,32 @@
+.container {
+  width: 100%;
+  aspect-ratio: 1;
+  border-top: 1px solid var(--card-primary-color);
+  border-bottom: 1px solid var(--card-primary-color);
+  position: relative;
+  display: flex;
+  padding: 1rem;
+  flex-direction: column;
+  gap: 10px;
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: calc(100% - 1px);
+    height: 10px;
+    border-left: 1px solid var(--card-primary-color);
+    border-right: 1px solid var(--card-primary-color);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: calc(100% - 1px);
+    height: 10px;
+    border-left: 1px solid var(--card-primary-color);
+    border-right: 1px solid var(--card-primary-color);
+  }
+}

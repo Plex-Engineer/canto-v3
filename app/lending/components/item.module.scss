@@ -1,0 +1,18 @@
+.item {
+  display: flex;
+  flex-grow: 1;
+  width: 100%;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 16px;
+}
+
+.value {
+  font-size: 32px !important;
+}
+
+.postChild {
+  margin-left: -1rem;
+}

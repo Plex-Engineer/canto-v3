@@ -2,6 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  ReturnWithError,
   errMsg,
 } from "@/config/interfaces";
 
@@ -87,4 +88,35 @@ export async function tryFetchWithRetry<T>(
  */
 async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * @notice will call async function, but timeout if takes too long
+ * @param {() => Promise<T>} asyncPromise async function to call
+ * @param {number} timeLimit time limit in milliseconds
+ * @returns {PromiseWithError<T>} object of return type T or error
+ */
+export async function asyncCallWithTimeout<T>(
+  asyncPromise: () => Promise<T>,
+  timeLimit: number
+): PromiseWithError<T> {
+  try {
+    let timeoutHandle: ReturnType<typeof setTimeout>;
+    const timeoutPromise = new Promise((_resolve) => {
+      timeoutHandle = setTimeout(
+        () => _resolve(Error("asyncCallWithTimeout: timeout")),
+        timeLimit
+      );
+    });
+    const result = await Promise.race([asyncPromise(), timeoutPromise]);
+    if (result instanceof Error) {
+      throw result;
+    }
+    return NO_ERROR<T>(result as T);
+  } catch (err) {
+    return {
+      data: null as T,
+      error: err as Error,
+    };
+  }
 }
