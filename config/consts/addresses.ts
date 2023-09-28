@@ -9,40 +9,35 @@ export const PUB_KEY_BOT_ADDRESS =
   "canto1efrhdukv096tmjs7r80m8pqkr3udp9g0uadjfv";
 
 // Canto Core Addresses
+const CANTO_CORE_ADDRESSES = {
+  accountant: {
+    mainnet: "0x4F6DCfa2F69AF7350AAc48D3a3d5B8D03b5378AA",
+    testnet: "0xdb91f7127Aa66855845696db77c37d1b6bEAd2db",
+  },
+  clmLens: {
+    mainnet: "0x03957b7D741F0788163e8E382B1Bd7944BcDd560",
+    testnet: "0x33c2E2FA0588789119EbDF892eB1e2aDdDcbc8c4",
+  },
+  cNote: {
+    mainnet: "0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
+    testnet: "0x04E52476d318CdF739C38BD41A922787D441900c",
+  },
+  comptroller: {
+    mainnet: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
+    testnet: "0x9514c07bC6e80B652e4264E64f589C59065C231f",
+  },
+  router: {
+    mainnet: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
+    testnet: "0x463e7d4DF8fE5fb42D024cb57c77b76e6e74417a",
+  },
+  wcanto: {
+    mainnet: "0x826551890Dc65655a0Aceca109aB11AbDbD7a07B",
+    testnet: "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
+  },
+} as const;
 
-const ACCOUNTANT_ADDRESS = {
-  mainnet: "0x4F6DCfa2F69AF7350AAc48D3a3d5B8D03b5378AA",
-  testnet: "0xdb91f7127Aa66855845696db77c37d1b6bEAd2db",
-};
-const COMPTROLLER_ADDRESS = {
-  mainnet: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
-  testnet: "0x9514c07bC6e80B652e4264E64f589C59065C231f",
-};
-const CLM_LENS_ADDRESS = {
-  mainnet: "0x03957b7D741F0788163e8E382B1Bd7944BcDd560",
-  testnet: "0x33c2E2FA0588789119EbDF892eB1e2aDdDcbc8c4",
-};
-const C_NOTE_ADDRESS = {
-  mainnet: "0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
-  testnet: "0x04E52476d318CdF739C38BD41A922787D441900c",
-};
-const WCANTO_ADDRESS = {
-  mainnet: "0x826551890Dc65655a0Aceca109aB11AbDbD7a07B",
-  testnet: "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
-};
-const ROUTER_ADDRESS = {
-  mainnet: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
-  testnet: "0x463e7d4DF8fE5fb42D024cb57c77b76e6e74417a",
-};
-
-
-type ContractName =
-  | "accountant"
-  | "comptroller"
-  | "clmLens"
-  | "cNote"
-  | "router"
-  | "wcanto";
+type ContractName = keyof typeof CANTO_CORE_ADDRESSES;
+// canto chain types
 type ChainType = "mainnet" | "testnet";
 export function getCantoCoreAddress(
   chainId: number,
@@ -53,21 +48,6 @@ export function getCantoCoreAddress(
   if (chainId === CANTO_MAINNET_EVM.chainId) chainType = "mainnet";
   else if (chainId === CANTO_TESTNET_EVM.chainId) chainType = "testnet";
   else return null;
-  // get address based on contract name
-  switch (contractName) {
-    case "accountant":
-      return ACCOUNTANT_ADDRESS[chainType];
-    case "comptroller":
-      return COMPTROLLER_ADDRESS[chainType];
-    case "clmLens":
-      return CLM_LENS_ADDRESS[chainType];
-    case "cNote":
-      return C_NOTE_ADDRESS[chainType];
-    case "router":
-      return ROUTER_ADDRESS[chainType];
-    case "wcanto":
-      return WCANTO_ADDRESS[chainType];
-    default:
-      return null;
-  }
+
+  return CANTO_CORE_ADDRESSES[contractName][chainType];
 }

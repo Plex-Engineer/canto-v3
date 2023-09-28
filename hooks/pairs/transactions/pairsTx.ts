@@ -17,7 +17,7 @@ import { cTokenLendingTx } from "@/hooks/lending/transactions/lending";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { createApprovalTxs, getTokenBalance } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { getCLMAddress } from "@/config/consts/addresses";
+import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { areEqualAddresses } from "@/utils/address.utils";
 import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
 import { quoteRemoveLiquidity } from "@/utils/evm/pairs.utils";
@@ -31,7 +31,7 @@ export async function lpPairTx(
     return NEW_ERROR("lpPairTx: pair does not have user details");
   }
   // get router address to use for transaction
-  const routerAddress = getCLMAddress(params.chainId, "router");
+  const routerAddress = getCantoCoreAddress(params.chainId, "router");
   if (!routerAddress) {
     return NEW_ERROR(
       "lpPairTx: could not get router address for chainId" + params.chainId
@@ -97,7 +97,7 @@ async function addLiquidityFlow(
   txList.push(...allowanceTxs);
 
   /** check which tokens are canto (for choosing correct method on router) */
-  const wcantoAddress = getCLMAddress(params.chainId, "wcanto");
+  const wcantoAddress = getCantoCoreAddress(params.chainId, "wcanto");
   if (!wcantoAddress) {
     return NEW_ERROR(
       "removeLiquidityFlow: could not get wcanto address for chainId" +
@@ -224,7 +224,7 @@ async function removeLiquidityFlow(
   txList.push(...allowanceTxs);
 
   /** check which tokens are canto (for choosing correct method on router) */
-  const wcantoAddress = getCLMAddress(params.chainId, "wcanto");
+  const wcantoAddress = getCantoCoreAddress(params.chainId, "wcanto");
   if (!wcantoAddress) {
     return NEW_ERROR(
       "removeLiquidityFlow: could not get wcanto address for chainId" +
@@ -336,7 +336,7 @@ const _addLiquidityTx = (
   amount2: string,
   amount1Min: string,
   amount2Min: string,
-  deadline: number,
+  deadline: string,
   description: TransactionDescription
 ): Transaction => {
   const cantoInPair = isToken1Canto || isToken2Canto;
@@ -383,7 +383,7 @@ const _removeLiquidityTx = (
   amountLP: string,
   amount1Min: string,
   amount2Min: string,
-  deadline: number,
+  deadline: string,
   description: TransactionDescription
 ): Transaction => {
   const cantoInPair = isToken1Canto || isToken2Canto;

@@ -1,6 +1,6 @@
 import { ERC20Token } from "@/config/interfaces";
 import { PairWithUserCTokenData } from "../interfaces/pairs";
-import { ZERO_ADDRESS, getCLMAddress } from "@/config/consts/addresses";
+import { ZERO_ADDRESS, getCantoCoreAddress } from "@/config/consts/addresses";
 import { areEqualAddresses } from "@/utils/address.utils";
 
 /**
@@ -14,7 +14,7 @@ export function getUniqueUnderlyingTokensFromPairs(
   pairs: PairWithUserCTokenData[]
 ): ERC20Token[] {
   // get wcanto address to define a native token
-  const wcantoAddress = getCLMAddress(chainId, "wcanto");
+  const wcantoAddress = getCantoCoreAddress(chainId, "wcanto");
   const uniqueAddresses = new Set<string>();
   const uniqueTokens = new Set<ERC20Token>();
 

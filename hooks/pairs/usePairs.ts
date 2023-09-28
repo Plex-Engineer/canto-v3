@@ -50,7 +50,7 @@ export default function usePairs(
   // need the cLP tokens, user position, and transaction functions
   const { cTokens: cLPTokens, position } = useLending({
     ...params,
-    cTokenType: "lp",
+    lmType: "lp",
   });
   // attach clm data with pairs
   const pairsWithUserCTokens = pairs?.map((pair) => {

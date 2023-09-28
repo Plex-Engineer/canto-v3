@@ -1,4 +1,4 @@
-import { getCLMAddress } from "@/config/consts/addresses";
+import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { Pair } from "../interfaces/pairs";
 import { quoteAddLiquidity } from "@/utils/evm/pairs.utils";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
@@ -26,7 +26,7 @@ export async function getOptimalValueBFormatted({
   valueChanged,
   amount,
 }: AddLiquidityValues): PromiseWithError<string> {
-  const routerAddress = getCLMAddress(chainId, "router");
+  const routerAddress = getCantoCoreAddress(chainId, "router");
   if (!routerAddress)
     return NEW_ERROR("getOptimalValueB: Router address not found");
 
