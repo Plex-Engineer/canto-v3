@@ -20,7 +20,10 @@ import { getCTokenAddressesFromChainId } from "./config/cTokenAddresses";
  * @returns
  */
 export default function useLending(
-  params: LendingHookInputParams
+  params: LendingHookInputParams,
+  options?: {
+    refetchInterval?: number;
+  }
 ): LendingHookReturn {
   // internal state for tokens and position (ONLY SET ON SUCCESS)
   // stops failed queries from overwriting the data with empty arrays
@@ -40,7 +43,7 @@ export default function useLending(
       // get tokens
       const cTokenAddresses = getCTokenAddressesFromChainId(
         params.chainId,
-        params.cTokenType
+        params.lmType
       );
       if (!cTokenAddresses) throw Error("useLending: chainId not supported");
       return await getAllUserCLMData(
@@ -61,7 +64,7 @@ export default function useLending(
         setCTokens(response.data.cTokens);
         response.data.position && setPosition(response.data.position);
       },
-      refetchInterval: 10000,
+      refetchInterval: options?.refetchInterval || 5000,
     }
   );
   ///
@@ -79,6 +82,15 @@ export default function useLending(
       avgApr: "0",
     });
   }, [params.chainId]);
+
+  // keep track of selected token so we can return it with proper balances
+  const [selectedCTokenAddress, setSelectedCTokenAddress] = useState<
+    string | null
+  >(null);
+  // get token from constantly updating list of cTokens
+  const selectedCToken = cTokens.find((cToken) =>
+    areEqualAddresses(cToken.address, selectedCTokenAddress ?? "")
+  );
 
   ///
   /// external functions
@@ -98,8 +110,11 @@ export default function useLending(
   return {
     cTokens,
     position,
-    cNote: cTokens.find((token) => token.symbol === "cNOTE")!,
-    loading: loadingCTokens,
+    isLoading: loadingCTokens,
+    selection: {
+      selectedCToken,
+      setSelectedCToken: setSelectedCTokenAddress,
+    },
     transaction: {
       canPerformLendingTx,
       createNewLendingFlow: createNewCTokenLendingFlow,

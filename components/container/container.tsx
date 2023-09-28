@@ -37,7 +37,7 @@ const Container = (props: Props) => {
             : props.center?.horizontal
             ? "center"
             : "unset",
-        alignItems: props.center?.vertical ? "center" : "unset",
+        alignItems: props.center?.vertical ? "center" : "",
         zIndex: props.layer,
         ...props.style,
       }}

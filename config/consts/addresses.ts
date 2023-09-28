@@ -9,6 +9,10 @@ export const PUB_KEY_BOT_ADDRESS =
   "canto1efrhdukv096tmjs7r80m8pqkr3udp9g0uadjfv";
 
 // Canto Core Addresses
+const ACCOUNTANT_ADDRESS = {
+  mainnet: "0x4F6DCfa2F69AF7350AAc48D3a3d5B8D03b5378AA",
+  testnet: "0xdb91f7127Aa66855845696db77c37d1b6bEAd2db",
+};
 const COMPTROLLER_ADDRESS = {
   mainnet: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
   testnet: "0x9514c07bC6e80B652e4264E64f589C59065C231f",
@@ -30,9 +34,15 @@ const ROUTER_ADDRESS = {
   testnet: "0x463e7d4DF8fE5fb42D024cb57c77b76e6e74417a",
 };
 
-type ContractName = "comptroller" | "clmLens" | "cNote" | "router" | "wcanto";
+type ContractName =
+  | "accountant"
+  | "comptroller"
+  | "clmLens"
+  | "cNote"
+  | "router"
+  | "wcanto";
 type ChainType = "mainnet" | "testnet";
-export function getCLMAddress(
+export function getCantoCoreAddress(
   chainId: number,
   contractName: ContractName
 ): string | null {
@@ -43,6 +53,8 @@ export function getCLMAddress(
   else return null;
   // get address based on contract name
   switch (contractName) {
+    case "accountant":
+      return ACCOUNTANT_ADDRESS[chainType];
     case "comptroller":
       return COMPTROLLER_ADDRESS[chainType];
     case "clmLens":

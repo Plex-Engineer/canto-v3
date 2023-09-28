@@ -18,6 +18,10 @@ export interface Item {
 
 interface Props {
   title: string;
+  label?: {
+    text: string;
+    width: string;
+  };
   activeItem?: Item;
   items: Item[];
   onChange: (itemId: string) => void;
@@ -195,7 +199,7 @@ const Selector = (props: Props) => {
       <Button
         color="secondary"
         width="fill"
-        height="large"
+        height={64}
         onClick={() => {
           setIsOpen(true);
         }}
@@ -208,6 +212,18 @@ const Selector = (props: Props) => {
             vertical: true,
           }}
         >
+          {props.label && (
+            <Text
+              theme="secondary-dark"
+              size="sm"
+              style={{
+                width: props.label.width,
+                textAlign: "left",
+              }}
+            >
+              {props.label?.text ?? ""}
+            </Text>
+          )}
           <Image
             src={props.activeItem?.icon ?? ""}
             alt={props.activeItem?.name + " icon"}
