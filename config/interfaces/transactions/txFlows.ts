@@ -40,3 +40,23 @@ export interface NewTransactionFlowPlaceholder {
   txFlowType: TransactionFlowType;
   params: object;
 }
+
+// create const to use for placeholder flows to show in modal
+export const TX_PLACEHOLDER = (
+  placeholder: NewTransactionFlowPlaceholder
+): TransactionWithStatus => ({
+  tx: {
+    chainId: 0,
+    description: placeholder.description,
+    type: "KEPLR",
+    tx: async () => ({
+      error: Error("placeholder tx"),
+      data: null,
+    }),
+    getHash: () => ({
+      error: Error("placeholder tx"),
+      data: "",
+    }),
+  },
+  status: "NONE",
+});

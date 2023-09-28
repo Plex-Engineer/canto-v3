@@ -4,7 +4,11 @@ import Image from "next/image";
 import Text from "../text";
 import TxItem from "./TxItem";
 import Spacer from "../layout/spacer";
-import { BridgeStatus, TransactionFlow } from "@/config/interfaces";
+import {
+  BridgeStatus,
+  TX_PLACEHOLDER,
+  TransactionFlow,
+} from "@/config/interfaces";
 import Button from "../button/button";
 import { TRANSACTION_FLOW_MAP } from "@/config/transactions/txMap";
 import { formatError } from "@/utils/formatting.utils";
@@ -67,13 +71,7 @@ const TxFlow = (props: Props) => {
               ))}
               {props.txFlow.placeholderFlow && (
                 <TxItem
-                  tx={{
-                    tx: {
-                      chainId: 0,
-                      description: props.txFlow.placeholderFlow.description,
-                    },
-                    status: "NONE",
-                  }}
+                  tx={TX_PLACEHOLDER(props.txFlow.placeholderFlow)}
                   idx={props.txFlow.transactions.length + 1}
                   setBridgeStatus={() => false}
                 />

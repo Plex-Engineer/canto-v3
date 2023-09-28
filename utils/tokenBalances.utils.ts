@@ -49,6 +49,7 @@ export function formatBalance(
     symbol?: string;
     precision?: number;
     commify?: boolean;
+    short?: boolean;
   }
 ): string {
   // set this to avoid scientific notation
@@ -57,6 +58,7 @@ export function formatBalance(
     symbol = undefined,
     precision = undefined,
     commify = false,
+    short = true,
   } = options || {};
   const bnAmount = new BigNumber(amount);
   // make sure greater than zero
@@ -83,29 +85,45 @@ export function formatBalance(
           0,
           decimalIndex + truncateAt + (truncateAt === 0 ? 0 : 1)
         );
+  // if short flag is turned on, return the short balance
+  let finalAmount = truncatedAmount;
+  let suffix = "";
+  if (short) {
+    const { shortAmount, suffix: _suffix } = formatBigBalance(truncatedAmount);
+    finalAmount = shortAmount;
+    suffix = _suffix;
+  }
 
-  // // create regex to truncate at the correct number of decimals
-  // const regex = new RegExp("^-?\\d+(?:.\\d{0," + truncateAt + "})?");
-  // const truncatedAmount = formattedAmount.toString().match(regex)?.[0] ?? "0";
   return `${
     commify
-      ? truncatedAmount.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
-      : truncatedAmount
-  }${symbol ? " " + symbol : ""}`;
+      ? finalAmount.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+      : finalAmount
+  }${suffix}${symbol ? " " + symbol : ""}`;
 }
 
 /**
- * @notice adds two token balances
- * @dev must be from the same token to keep decimals
- * @param {string} amount1 first amount to add
- * @param {string} amount2 second amount to add
- * @returns {string} sum of the two amounts
+ * @notice formats a balance to a string
+ * @dev if "short flag is turned on in formatBalance, this will return a short balance"
+ * @param {string} amount amount to format
+ * @returns {string} formatted balance
+ * @example 1,340,000 -> {shortAmount: "1.34", suffx: "M"}
  */
-export function addTokenBalances(amount1: string, amount2: string): string {
-  const [amount1BN, amount2BN] = [
-    convertToBigNumber(amount1),
-    convertToBigNumber(amount2),
-  ];
-  if (amount1BN.error || amount2BN.error) return "0";
-  return amount1BN.data.plus(amount2BN.data).toString();
+function formatBigBalance(amount: string): {
+  shortAmount: string;
+  suffix: string;
+} {
+  const bnAmount = new BigNumber(amount);
+  // get the number of digits in the amount, before decimals
+  const digits = bnAmount.integerValue().toString().length;
+  // only shorted value if greater than 1 million
+  if (digits > 6) {
+    if (digits < 10) {
+      // in the millions range
+      const shortAmount = bnAmount.dividedBy(new BigNumber(10).pow(6));
+      return { shortAmount: shortAmount.toFixed(2), suffix: "M" };
+    }
+  }
+
+  // default to returning the amount
+  return { shortAmount: amount, suffix: "" };
 }

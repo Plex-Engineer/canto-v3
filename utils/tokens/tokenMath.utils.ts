@@ -73,3 +73,36 @@ export function percentOfAmount(
 
   return NO_ERROR(percentOfAmount.toFixed(0));
 }
+
+/**
+ * @notice adds two token balances
+ * @dev must be from the same token to keep decimals
+ * @param {string} amount1 first amount to add
+ * @param {string} amount2 second amount to add
+ * @returns {string} sum of the two amounts
+ */
+export function addTokenBalances(amount1: string, amount2: string): string {
+  const [amount1BN, amount2BN] = [
+    convertToBigNumber(amount1),
+    convertToBigNumber(amount2),
+  ];
+  if (amount1BN.error || amount2BN.error) return "0";
+  return amount1BN.data.plus(amount2BN.data).toString();
+}
+
+/**
+ * @notice divides token balances
+ * @dev must be from the same token to keep decimals
+ * @param {string} numerator numerator
+ * @param {string} denominator denominator
+ * @returns {string} quotient of the two amounts
+ */
+export function divideBalances(numerator: string, denominator: string): string {
+  const [numeratorBN, denominatorBN] = [
+    convertToBigNumber(numerator),
+    convertToBigNumber(denominator),
+  ];
+  if (numeratorBN.error || denominatorBN.error || denominatorBN.data.isZero())
+    return "0";
+  return numeratorBN.data.div(denominatorBN.data).toString();
+}

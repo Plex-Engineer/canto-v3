@@ -54,3 +54,7 @@ export function formatError(errorMsg: string): string {
   const split = errorMsg.split(":");
   return "Error:" + split[split.length - 1];
 }
+
+export function formatPercent(percent: string): string {
+  return (parseFloat(percent) * 100).toFixed(2) + "%";
+}

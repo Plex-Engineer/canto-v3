@@ -16,6 +16,7 @@ import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 import Image from "next/image";
 import { useState } from "react";
 import { useWalletClient } from "wagmi";
+import { UserPairRow } from "./components/pairRow";
 
 export default function Page() {
   const signer = useWalletClient();
@@ -76,110 +77,8 @@ export default function Page() {
     }
   }
 
-  const PairTable2 = ({ pairs }: { pairs: PairWithUserCTokenData[] }) => {
-    return (
-      <table>
-        <thead>
-          <tr>
-            <th>Icon</th>
-            <th>Symbol</th>
-            <th>Stable</th>
-            <th>LP Price</th>
-            <th>Ratio</th>
-            <th>Token 1</th>
-            <th>Token 2</th>
-            <th>TVL</th>
-            <th>edit</th>
-            <th>user tokens</th>
-            <th>user stake</th>
-            <th>rewards</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pairs.map((pair) => (
-            <PairRow key={pair.symbol} pair={pair} />
-          ))}
-        </tbody>
-      </table>
-    );
-  };
-
-  const PairTable = ({ pairs }: { pairs: PairWithUserCTokenData[] }) => {
-    if (pairs.length === 0) return <div>no pairs</div>;
-    return (
-      <Table
-        headers={[
-          "Symbol",
-          "Stable",
-          "LP Price",
-          "Ratio",
-          //   "Token 1",
-          //   "Token 2",
-          "TVL",
-          "user tokens",
-          "user stake",
-          "rewards",
-          "edit",
-        ]}
-        columns={10}
-        processedData={pairs.map((pair) => (
-          <PairRow key={pair.symbol} pair={pair} />
-        ))}
-      />
-    );
-  };
-  const PairRow = ({ pair }: { pair: PairWithUserCTokenData }) => {
-    return (
-      <>
-        <div key={pair.address + "symbol"}>
-          <Image src={pair.logoURI} width={54} height={54} alt="logo" />
-          <Text>{pair.symbol}</Text>
-        </div>
-        <Text key={pair.address + "stable" + (pair.stable ? "stable" : "vol")}>
-          {pair.stable ? "stable" : "vol"}
-        </Text>
-        <Text key={pair.address + "lpPrice"}>
-          {formatBalance(pair.lpPrice, 36 - pair.decimals, { commify: true })}
-        </Text>
-        <Text key={pair.address + "ratio"}>
-          {formatBalance(
-            pair.ratio,
-            18 +
-              (pair.aTob
-                ? pair.token1.decimals - pair.token2.decimals
-                : pair.token2.decimals - pair.token1.decimals)
-          )}
-        </Text>
-        {/* <Text key={pair.address + "token1"}>{pair.token1.symbol}</Text> */}
-        {/* <Text key={pair.address + "token2"}>{pair.token2.symbol}</Text> */}
-        <Text key={pair.address + "tvl"}>
-          {formatBalance(pair.tvl, 18, { commify: true })}
-        </Text>
-
-        <Text key={pair.address + "userTokens"}>
-          {formatBalance(
-            pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
-            pair.decimals
-          )}
-        </Text>
-        <Text key={pair.address + "userStake"}>
-          {formatBalance(
-            pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0",
-            pair.decimals
-          )}
-        </Text>
-        <Text key={pair.address + "rewards"}>
-          {formatBalance(pair.clmData?.userDetails?.rewards ?? "0", 18)}
-        </Text>
-        <div key={pair.address + "edit"}>
-          <Button onClick={() => setPair(pair.address)}>Manage</Button>
-        </div>
-      </>
-    );
-  };
   return (
     <div>
-      TEST LP
       <Modal
         open={selectedPair !== null}
         onClose={() => {
@@ -234,7 +133,27 @@ export default function Page() {
           </div>
         )}
       </Modal>
-      <PairTable pairs={sortedPairs ?? []} />
+      <Table
+        headers={[
+          "Pair",
+          "APR",
+          "Pool Share",
+          "Value",
+          "# LP Tokens",
+          "# Staked",
+          "Rewards",
+          "Edit",
+        ]}
+        columns={10}
+        processedData={sortedPairs.map((pair) => (
+          <UserPairRow
+            key={pair.symbol}
+            pair={pair}
+            onAddLiquidity={() => {}}
+            onRemoveLiquidity={() => {}}
+          />
+        ))}
+      />
     </div>
   );
 }
