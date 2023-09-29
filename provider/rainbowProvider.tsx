@@ -67,7 +67,7 @@ const CantoWalletProvider = ({ children }: RainbowProviderProps) => {
         chains={chains}
         modalSize="wide"
         theme={cantoTheme}
-        initialChain={EVM_CHAINS.CANTO_MAINNET_EVM.chainId}
+        //initialChain={EVM_CHAINS.CANTO_MAINNET_EVM.chainId}
       >
         {children}
       </RainbowKitProvider>

@@ -15,10 +15,11 @@ import {
 } from "@/utils/networks.utils";
 import { useWalletClient } from "wagmi";
 import Bridging from "./bridging";
+import { sign } from "crypto";
 
 export default function BridgePage() {
   const [direction, setDirection] = useState<"in" | "out">("in");
-  const [onTestnet, setOnTestnet] = useState<boolean>(false);
+  const [onTestnet, setOnTestnet] = useState<boolean>(true);
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({
     testnet: onTestnet,
@@ -27,6 +28,8 @@ export default function BridgePage() {
     testnet: onTestnet,
   });
   const transactionStore = useStore(useTransactionStore, (state) => state);
+
+  console.log(signer);
 
   useEffect(() => {
     async function getKeplrInfoForBridge() {

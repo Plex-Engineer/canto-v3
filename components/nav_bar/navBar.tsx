@@ -44,6 +44,15 @@ const NavBar = () => {
         >
           <Text>Bridge</Text>
         </Link>
+        <Link
+          href="/governance"
+          className={clsx(
+            styles["nav-link"],
+            currentPath == "/governance" && styles.active
+          )}
+        >
+          <Text>Governance</Text>
+        </Link> 
         {/* <Link
           href="/staking"
           className={clsx(
