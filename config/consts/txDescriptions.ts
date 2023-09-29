@@ -3,8 +3,8 @@ import { Pair } from "@/hooks/pairs/interfaces/pairs";
 
 export const TX_DESCRIPTIONS = {
   ADD_LIQUIDITY: (pair: Pair, amount1: string, amount2: string) => ({
-    title: "Add Liquidity",
-    description: "add liquidity to the pair",
+    title: `Add Liquidity To ${pair.symbol}`,
+    description: `Add ${amount1} ${pair.token1.symbol} and ${amount2} ${pair.token2.symbol} to ${pair.symbol}`,
   }),
   APPROVE_TOKEN: (tokenSymbol: string, spender: string) => ({
     title: `Approve ${tokenSymbol}`,
@@ -64,8 +64,8 @@ export const TX_DESCRIPTIONS = {
     } ${tokenSymbol} OFT`,
   }),
   REMOVE_LIQUIDITY: (pair: Pair, amount: string) => ({
-    title: "REmove Liquidity",
-    description: "Remove liquidity to the pair",
+    title: `Remove Liquidity From ${pair.symbol}`,
+    description: `Remove ${amount} ${pair.symbol} from ${pair.symbol}`,
   }),
   WRAP_ETH: (amount: string) => ({
     title: "Wrap ETH",
