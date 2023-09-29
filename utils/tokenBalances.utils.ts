@@ -58,7 +58,7 @@ export function formatBalance(
     symbol = undefined,
     precision = undefined,
     commify = false,
-    short = true,
+    short = false,
   } = options || {};
   const bnAmount = new BigNumber(amount);
   // make sure greater than zero

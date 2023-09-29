@@ -16,13 +16,10 @@ export interface PairsHookReturn {
   pairs: PairWithUserCTokenData[];
   position: UserLMPosition;
   amounts: {
-    getOptimalAmount1: (
-      amount: string,
-      pair: PairWithUserCTokenData
-    ) => PromiseWithError<string>;
-    getOptimalAmount2: (
-      amount: string,
-      pair: PairWithUserCTokenData
+    getOptimalAmountFromValue: (
+      token1: boolean,
+      pair: PairWithUserCTokenData,
+      amount: string
     ) => PromiseWithError<string>;
   };
   selection: {

@@ -74,11 +74,9 @@ export const UserPairRow = ({
 export const GeneralPairRow = ({
   pair,
   onAddLiquidity,
-  onRemoveLiquidity,
 }: {
   pair: PairWithUserCTokenData;
   onAddLiquidity: (pairAddress: string) => void;
-  onRemoveLiquidity: (pairAddress: string) => void;
 }) => [
   <div key={pair.address + "symbol"}>
     <Image src={pair.logoURI} width={54} height={54} alt="logo" />
@@ -97,8 +95,5 @@ export const GeneralPairRow = ({
   </Text>,
   <div key={pair.address + "edit"}>
     <Button onClick={() => onAddLiquidity(pair.address)}>Add Liquidity</Button>
-    <Button onClick={() => onRemoveLiquidity(pair.address)}>
-      Remove Liquidity
-    </Button>
   </div>,
 ];

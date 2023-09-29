@@ -106,3 +106,22 @@ export function divideBalances(numerator: string, denominator: string): string {
     return "0";
   return numeratorBN.data.div(denominatorBN.data).toString();
 }
+
+/**
+ * @notice compares token balances
+ * @dev must be from the same token to keep decimals
+ * @param {string} amount1 first amount to compate
+ * @param {string} amount2 second amount to compare
+ * @returns {ReturnWithError<boolean>} true if amount1 is greater than amount2
+ */
+export function greaterThanOrEqualTo(
+  amount1: string,
+  amount2: string
+): ReturnWithError<boolean> {
+  const [amount1BN, amount2BN] = [
+    convertToBigNumber(amount1),
+    convertToBigNumber(amount2),
+  ];
+  if (amount1BN.error || amount2BN.error) return NEW_ERROR("Invalid amounts");
+  return NO_ERROR(amount1BN.data.gte(amount2BN.data));
+}

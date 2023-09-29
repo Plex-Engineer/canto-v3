@@ -11,6 +11,12 @@ import useTokenBalances from "../helpers/useTokenBalances";
 import { getUniqueUnderlyingTokensFromPairs } from "./helpers/underlyingTokens";
 import { areEqualAddresses } from "@/utils/address.utils";
 import { useState } from "react";
+import {
+  PairsTransactionParams,
+  PairsTxTypes,
+} from "./interfaces/pairsTxTypes";
+import BigNumber from "bignumber.js";
+import { greaterThanOrEqualTo } from "@/utils/tokens/tokenMath.utils";
 
 export default function usePairs(
   params: PairsHookInputParams
@@ -97,34 +103,84 @@ export default function usePairs(
   /// external functions
   ///
 
-  // function for getting optimal amount of token 2
-  const getOptimalAmount = async (
-    amountChanged: 1 | 2,
-    pair: PairWithUserCTokenData,
-    amount: string
-  ) =>
-    getOptimalValueBFormatted({
-      chainId: params.chainId,
-      pair,
-      valueChanged: amountChanged,
-      amount,
-    });
+  function canPerformPairsTx(
+    txParams: PairsTransactionParams
+  ): ReturnWithError<boolean> {
+    // make sure user eth address is the same
+    if (!areEqualAddresses(params.userEthAddress ?? "", txParams.ethAccount)) {
+      return NEW_ERROR("canPerformPairsTx: user eth address is not the same");
+    }
+    if (!txParams.pair.clmData?.userDetails) {
+      return NEW_ERROR("canPerformPairsTx: pair clm data not found");
+    }
+    // make sure balances are good depending on tx type
+    switch (txParams.txType) {
+      case PairsTxTypes.ADD_LIQUIDITY:
+        // each token value must be less than or equal to their balance
+        const [token1Good, token2Good] = [
+          greaterThanOrEqualTo(
+            txParams.pair.token1.balance ?? "0",
+            txParams.amounts.amount1
+          ).data && txParams.amounts.amount1 !== "0",
+          greaterThanOrEqualTo(
+            txParams.pair.token2.balance ?? "0",
+            txParams.amounts.amount2
+          ).data && txParams.amounts.amount2 !== "0",
+        ];
+        return NO_ERROR(token1Good && token2Good);
+      case PairsTxTypes.REMOVE_LIQUIDITY:
+        // if unstaking first, check supplyBalance, otherwise check balanceOfUnderlying
+        return NO_ERROR(
+          txParams.amountLP !== "0" &&
+            (txParams.unstake
+              ? greaterThanOrEqualTo(
+                  txParams.pair.clmData.userDetails.supplyBalanceInUnderlying,
+                  txParams.amountLP
+                ).data
+              : greaterThanOrEqualTo(
+                  txParams.pair.clmData.userDetails.balanceOfUnderlying,
+                  txParams.amountLP
+                ).data)
+        );
+      case PairsTxTypes.STAKE:
+        // amount must be less than or equal to balance of underlying
+        return NO_ERROR(
+          greaterThanOrEqualTo(
+            txParams.pair.clmData.userDetails.balanceOfUnderlying,
+            txParams.amountLP
+          ).data && txParams.amountLP !== "0"
+        );
+      case PairsTxTypes.UNSTAKE:
+        // amount must be less than or equal to supply balance in underlying
+        return NO_ERROR(
+          greaterThanOrEqualTo(
+            txParams.pair.clmData.userDetails.supplyBalanceInUnderlying,
+            txParams.amountLP
+          ).data && txParams.amountLP !== "0"
+        );
+      default:
+        return NEW_ERROR("canPerformPairsTx: tx type not found");
+    }
+  }
 
   return {
     pairs: pairsWithUserCTokens ?? [],
     position,
     amounts: {
-      getOptimalAmount1: async (amount, pair) =>
-        getOptimalAmount(2, pair, amount),
-      getOptimalAmount2: async (amount, pair) =>
-        getOptimalAmount(1, pair, amount),
+      getOptimalAmountFromValue: async (token1, pair, amount) =>
+        getOptimalValueBFormatted({
+          chainId: params.chainId,
+          pair,
+          valueChanged: token1 ? 1 : 2,
+          amount,
+        }),
     },
     selection: {
       pair: getPair(selectedPairId ?? "").data,
       setPair: setSelectedPairId,
     },
     transaction: {
-      canPerformPairsTx: () => NO_ERROR(false),
+      canPerformPairsTx,
       createNewPairsFlow: createNewPairsTxFlow,
     },
   };
