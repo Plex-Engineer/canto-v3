@@ -34,7 +34,7 @@ describe("error interface tests", () => {
     const errorObjs = [
       new Error("This is an error"),
       new Error("This is another error"),
-      new Error(""),
+      new Error(" "),
       "This is an error",
       "",
       404,

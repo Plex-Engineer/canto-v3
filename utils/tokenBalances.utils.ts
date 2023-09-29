@@ -117,11 +117,25 @@ function formatBigBalance(amount: string): {
   const digits = bnAmount.integerValue().toString().length;
   // only shorted value if greater than 1 million
   if (digits > 6) {
-    if (digits < 10) {
-      // in the millions range
-      const shortAmount = bnAmount.dividedBy(new BigNumber(10).pow(6));
-      return { shortAmount: shortAmount.toFixed(2), suffix: "M" };
+    let shortAmount;
+    let suffix;
+    if (digits > 12) {
+      // in the trillions range at least
+      suffix = "T";
+      shortAmount = bnAmount.dividedBy(new BigNumber(10).pow(12));
+    } else if (digits > 9) {
+      // billions range
+      suffix = "B";
+      shortAmount = bnAmount.dividedBy(new BigNumber(10).pow(9));
+    } else {
+      // millions range
+      suffix = "M";
+      shortAmount = bnAmount.dividedBy(new BigNumber(10).pow(6));
     }
+    return {
+      shortAmount: shortAmount.toFixed(2),
+      suffix,
+    };
   }
 
   // default to returning the amount
