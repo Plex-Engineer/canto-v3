@@ -1,4 +1,5 @@
 import Button from "@/components/button/button";
+import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
 import { PairWithUserCTokenData } from "@/hooks/pairs/interfaces/pairs";
 import { formatPercent } from "@/utils/formatting.utils";
@@ -61,10 +62,15 @@ export const UserPairRow = ({
       {formatBalance(pair.clmData?.userDetails?.rewards ?? "0", 18)}
     </Text>,
     <div key={pair.address + "edit"}>
-      <Button onClick={() => onAddLiquidity(pair.address)}>
+      <Button onClick={() => onAddLiquidity(pair.address)} color="secondary">
         Add Liquidity
       </Button>
-      <Button onClick={() => onRemoveLiquidity(pair.address)}>
+      <Spacer width="10px" />
+      <Button
+        onClick={() => onRemoveLiquidity(pair.address)}
+        color="secondary"
+        disabled={totalUserLPValue.eq(0)}
+      >
         Remove Liquidity
       </Button>
     </div>,
