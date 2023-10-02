@@ -1,8 +1,10 @@
-import { BaseNetwork } from "@/config/interfaces/networks";
+import {
+  BaseNetwork,
+  NewTransactionFlow,
+  ReturnWithError,
+} from "@/config/interfaces";
 import { BridgeToken } from "./tokens";
 import { BridgingMethod } from "../interfaces/bridgeMethods";
-import { ReturnWithError } from "@/config/interfaces/errors";
-import { NewTransactionFlow } from "@/config/interfaces/transactions";
 
 export interface BridgeHookInputParams {
   testnet?: boolean;

@@ -1,6 +1,10 @@
 import { BridgingMethod } from "@/hooks/bridge/interfaces/bridgeMethods";
 import { ContractAbi } from "web3-types";
-import { TransactionStatus, UnsignedCosmosMessages } from ".";
+import {
+  NewTransactionFlowPlaceholder,
+  TransactionStatus,
+  UnsignedCosmosMessages,
+} from ".";
 import { PromiseWithError, ReturnWithError } from "../errors";
 
 export interface TransactionDescription {
@@ -36,3 +40,9 @@ export type Transaction = {
       getHash: (...args: any[]) => ReturnWithError<string>;
     }
 );
+
+// interface to use for functions that return transactions ready for the txStore
+export interface TxCreatorFunctionReturn {
+  transactions: Transaction[];
+  extraFlow?: NewTransactionFlowPlaceholder;
+}

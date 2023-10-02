@@ -3,29 +3,23 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
-import { EVMNetwork } from "@/config/interfaces/networks";
-import { isValidEthAddress } from "@/utils/address.utils";
-import {
+  EVMNetwork,
   Transaction,
   TransactionDescription,
   TransactionStatus,
-} from "@/config/interfaces/transactions";
+  OFTToken,
+} from "@/config/interfaces";
+import { isValidEthAddress } from "@/utils/address.utils";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
 import { encodePacked } from "web3-utils";
 import BigNumber from "bignumber.js";
 import Web3, { Contract } from "web3";
 import { OFT_ABI } from "@/config/abis";
 import { getProviderWithoutSigner } from "@/utils/evm/helpers.utils";
-import {
-  _approveTx,
-  checkTokenAllowance,
-  getTokenBalance,
-} from "@/utils/evm/erc20.utils";
+import { createApprovalTxs, getTokenBalance } from "@/utils/evm/erc20.utils";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
-import { OFTToken } from "@/config/interfaces/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import {
   BridgingMethod,
   getBridgeMethodInfo,
@@ -91,29 +85,24 @@ export async function bridgeLayerZero(
     // check if normal proxy OFT
     if (token.oftUnderlyingAddress) {
       // check if proxy has allowance for amount
-      const { data: needAllowance, error: allowanceError } =
-        await checkTokenAllowance(
+      const { data: allowanceTxs, error: allowanceError } =
+        await createApprovalTxs(
           token.chainId,
-          token.oftUnderlyingAddress,
           ethSender,
-          token.address,
-          amount
+          [
+            {
+              address: token.oftUnderlyingAddress,
+              symbol: token.symbol,
+            },
+          ],
+          [amount],
+          { address: token.address, name: "OFT Proxy" }
         );
       if (allowanceError) {
-        return NEW_ERROR("bridgeLayerZero::" + errMsg(allowanceError));
+        return NEW_ERROR("addLiquidityFlow: " + errMsg(allowanceError));
       }
-      // if allowance is less than the amount, user must approve
-      if (!needAllowance) {
-        txList.push(
-          _approveTx(
-            token.chainId,
-            token.oftUnderlyingAddress,
-            token.address,
-            amount,
-            TX_DESCRIPTIONS.APPROVE_TOKEN(token.symbol, "OFT Proxy")
-          )
-        );
-      }
+      // push allowance txs to the list (might be none)
+      txList.push(...allowanceTxs);
     } else {
       // must be a native OFT (check if we already have OFT balance)
       const { data: oftBalance, error: balanceError } = await getTokenBalance(
@@ -137,7 +126,7 @@ export async function bridgeLayerZero(
             amountToDeposit,
             TX_DESCRIPTIONS.OFT_DEPOSIT_OR_WITHDRAW(
               token.symbol,
-              formatBalance(amountToDeposit, token.decimals),
+              displayAmount(amountToDeposit, token.decimals),
               true
             )
           )
@@ -158,7 +147,7 @@ export async function bridgeLayerZero(
       gas.toString(),
       TX_DESCRIPTIONS.BRIDGE(
         token.symbol,
-        formatBalance(amount, token.decimals),
+        displayAmount(amount, token.decimals),
         fromNetwork.name,
         toNetwork.name,
         getBridgeMethodInfo(BridgingMethod.LAYER_ZERO).name

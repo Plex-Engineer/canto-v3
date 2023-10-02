@@ -4,27 +4,24 @@ import {
   PUB_KEY_BOT_ADDRESS,
   WETH_MAINNET_ADDRESS,
 } from "@/config/consts/addresses";
-import { CANTO_BOT_API_URL } from "@/config/consts/apiUrls";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
-import { ERC20Token } from "@/config/interfaces/tokens";
-import {
+  ERC20Token,
   BridgeStatus,
   Transaction,
   TransactionDescription,
-  TransactionStatus,
-} from "@/config/interfaces/transactions";
+} from "@/config/interfaces";
 import {
   CANTO_MAINNET_COSMOS,
   CANTO_MAINNET_EVM,
   ETH_MAINNET,
 } from "@/config/networks";
 import {
+  areEqualAddresses,
   checkPubKeyCosmos,
   ethToCantoAddress,
   isValidEthAddress,
@@ -32,12 +29,8 @@ import {
 import { tryFetch } from "@/utils/async.utils";
 import { getCantoBalance } from "@/utils/cosmos/cosmosBalance.utils";
 import { createMsgsSend } from "@/utils/cosmos/transactions/messages/messageSend";
-import {
-  _approveTx,
-  checkTokenAllowance,
-  getTokenBalance,
-} from "@/utils/evm/erc20.utils";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { createApprovalTxs, getTokenBalance } from "@/utils/evm/erc20.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import BigNumber from "bignumber.js";
 import {
   BridgingMethod,
@@ -50,6 +43,7 @@ import {
   fetchTransaction,
 } from "wagmi/actions";
 import { BridgeTransactionParams } from "../../interfaces/hookParams";
+import { CANTO_DUST_BOT_API_URL } from "@/config/api";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging into gravity bridge
@@ -103,7 +97,7 @@ export async function bridgeInGravity(
     const enoughCanto = new BigNumber(cantoBalance).gte("300000000000000000");
     // call api to send canto if not enough canto
     if (!enoughCanto) {
-      const { error: botError } = await tryFetch(CANTO_BOT_API_URL, {
+      const { error: botError } = await tryFetch(CANTO_DUST_BOT_API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -151,36 +145,30 @@ export async function bridgeInGravity(
           token.chainId,
           token.address,
           amountToWrap,
-          TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amountToWrap, token.decimals))
+          TX_DESCRIPTIONS.WRAP_ETH(displayAmount(amountToWrap, token.decimals))
         )
       );
     }
   }
 
-  // check token allowance
-  const { data: hasAllowance, error: allowanceError } =
-    await checkTokenAllowance(
-      token.chainId,
-      token.address,
-      ethSender,
-      GRAVITY_BRIDGE_ETH_ADDRESS,
-      amount
-    );
+  // get token allowance function
+  const { data: allowanceTxs, error: allowanceError } = await createApprovalTxs(
+    token.chainId,
+    ethSender,
+    [
+      {
+        address: token.address,
+        symbol: token.symbol,
+      },
+    ],
+    [amount],
+    { address: GRAVITY_BRIDGE_ETH_ADDRESS, name: "Gravity Bridge" }
+  );
   if (allowanceError) {
-    return NEW_ERROR("bridgeInGravity::" + errMsg(allowanceError));
+    return NEW_ERROR("addLiquidityFlow: " + errMsg(allowanceError));
   }
-  // if no allowance, must approve
-  if (!hasAllowance) {
-    txList.push(
-      _approveTx(
-        token.chainId,
-        token.address,
-        GRAVITY_BRIDGE_ETH_ADDRESS,
-        amount,
-        TX_DESCRIPTIONS.APPROVE_TOKEN(token.symbol, "Gravity Bridge")
-      )
-    );
-  }
+  // push allowance txs to the list (might be none)
+  txList.push(...allowanceTxs);
 
   // send to cosmos
   txList.push(
@@ -191,7 +179,7 @@ export async function bridgeInGravity(
       amount,
       TX_DESCRIPTIONS.BRIDGE(
         token.symbol,
-        formatBalance(amount, token.decimals),
+        displayAmount(amount, token.decimals),
         ETH_MAINNET.name,
         CANTO_MAINNET_EVM.name,
         getBridgeMethodInfo(BridgingMethod.GRAVITY_BRIDGE).name
@@ -209,7 +197,7 @@ export async function bridgeInGravity(
  * @returns {boolean} true if tokenAddress is WETH, false otherwise
  */
 function isWETH(tokenAddress: string): boolean {
-  return tokenAddress.toLowerCase() === WETH_MAINNET_ADDRESS.toLowerCase();
+  return areEqualAddresses(tokenAddress, WETH_MAINNET_ADDRESS);
 }
 
 /**
@@ -309,7 +297,7 @@ export async function checkGbridgeTxStatus(
     for (const event of gbridgeQueue.transactions) {
       if (
         Number(event.block_height) === Number(transaction.blockNumber) &&
-        event.sender.toLowerCase() === transaction.from.toLowerCase()
+        areEqualAddresses(event.sender, transaction.from)
       ) {
         // grab data from event
         if (event.confirmed === true) {

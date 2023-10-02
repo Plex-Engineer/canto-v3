@@ -3,14 +3,14 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+  UserTokenBalances
+} from "@/config/interfaces";
 import { tryFetch } from "../async.utils";
 import {
   getCosmosAPIEndpoint,
   getNetworkInfoFromChainId,
   isCosmosNetwork,
 } from "../networks.utils";
-import { UserTokenBalances } from "@/hooks/bridge/interfaces/tokens";
 
 /**
  * @notice gets canto balance from cosmos

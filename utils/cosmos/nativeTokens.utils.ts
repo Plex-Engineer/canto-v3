@@ -2,7 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import { tryFetch } from "../async.utils";
 import { getCosmosAPIEndpoint } from "../networks.utils";
 import { getCosmosTokenBalanceList } from "./cosmosBalance.utils";

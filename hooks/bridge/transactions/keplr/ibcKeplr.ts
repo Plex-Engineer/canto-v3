@@ -3,18 +3,19 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+  Transaction,
+  CosmosNetwork,
+  IBCToken,
+} from "@/config/interfaces";
 import {
   coin,
   DeliverTxResponse,
   SigningStargateClient,
 } from "@cosmjs/stargate";
-import { CosmosNetwork } from "@/config/interfaces/networks";
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
 import { checkPubKeyETH, ethToCantoAddress } from "@/utils/address.utils";
 import { CANTO_MAINNET_COSMOS, EVMOS, INJECTIVE } from "@/config/networks";
 import { getBlockTimestamp, getIBCData } from "../methods/ibc";
-import { Transaction } from "@/config/interfaces/transactions";
 import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
 import { connectToKeplr } from "@/utils/keplr/connectKeplr";
 // import {
@@ -43,10 +44,8 @@ import {
 } from "@/utils/cosmos/transactions/helpers.utils";
 import { tryFetch } from "@/utils/async.utils";
 import Long from "long";
-import { IBCToken } from "@/config/interfaces/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import {
   BridgingMethod,
   getBridgeMethodInfo,
@@ -55,7 +54,6 @@ import { BridgeTransactionParams } from "../../interfaces/hookParams";
 import { getCosmosTokenBalance } from "@/utils/cosmos/cosmosBalance.utils";
 import { isIBCToken } from "@/utils/tokens/tokens.utils";
 import BigNumber from "bignumber.js";
-
 
 /**
  * @notice creates a list of transactions that need to be made for IBC in to canto using keplr
@@ -163,7 +161,7 @@ export async function ibcInKeplr(
       chainId: cosmosNetwork.chainId,
       description: TX_DESCRIPTIONS.BRIDGE(
         ibcToken.symbol,
-        formatBalance(amount, ibcToken.decimals),
+        displayAmount(amount, ibcToken.decimals),
         cosmosNetwork.name,
         CANTO_MAINNET_COSMOS.name,
         getBridgeMethodInfo(BridgingMethod.IBC).name
@@ -344,7 +342,7 @@ async function signAndBroadcastIBCKeplr(
 //       chainId: injectiveNetwork.chainId,
 //       description: TX_DESCRIPTIONS.BRIDGE(
 //         token.symbol,
-//         formatBalance(amount, token.decimals),
+//         displayAmount(amount, token.decimals),
 //         injectiveNetwork.name,
 //         CANTO_MAINNET_COSMOS.name
 //       ),
@@ -498,7 +496,7 @@ async function evmosIBCIn(
       chainId: evmosNetwork.chainId,
       description: TX_DESCRIPTIONS.BRIDGE(
         token.symbol,
-        formatBalance(amount, token.decimals),
+        displayAmount(amount, token.decimals),
         evmosNetwork.name,
         CANTO_MAINNET_COSMOS.name,
         getBridgeMethodInfo(BridgingMethod.IBC).name
@@ -527,7 +525,9 @@ export async function validateKeplrIBCRetryParams(
   error?: string;
 }> {
   if (!isIBCToken(params.token.data)) {
-    return NEW_ERROR("validateKeplrIBCRetryParams: IBC only works for IBC tokens");
+    return NEW_ERROR(
+      "validateKeplrIBCRetryParams: IBC only works for IBC tokens"
+    );
   }
   // get token balance for user
   const { data: userTokenBalance, error: userTokenBalanceError } =

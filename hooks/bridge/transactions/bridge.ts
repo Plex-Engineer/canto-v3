@@ -3,9 +3,10 @@ import {
   NO_ERROR,
   PromiseWithError,
   ReturnWithError,
-} from "@/config/interfaces/errors";
+  Transaction,
+  TxCreatorFunctionReturn,
+} from "@/config/interfaces";
 import { BridgeTransactionParams } from "../interfaces/hookParams";
-import { Transaction } from "@/config/interfaces/transactions";
 import { BridgingMethod } from "../interfaces/bridgeMethods";
 import {
   getNetworkInfoFromChainId,
@@ -31,11 +32,11 @@ import {
 /**
  * @notice creates a list of transactions that need to be made for bridging into canto
  * @param {BridgeTransactionParams} params parameters for bridging in
- * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
+ * @returns {PromiseWithError<TxCreatorFunctionReturn[]>} list of transactions to make or error
  */
 export async function bridgeInTx(
   params: BridgeTransactionParams
-): PromiseWithError<Transaction[]> {
+): PromiseWithError<TxCreatorFunctionReturn> {
   // create tx list
   let transactions: ReturnWithError<Transaction[]>;
 
@@ -103,17 +104,17 @@ export async function bridgeInTx(
   if (transactions.error) {
     return NEW_ERROR("bridgeInTx::" + transactions.error);
   }
-  return transactions;
+  return NO_ERROR({ transactions: transactions.data });
 }
 
 /**
  * @notice creates a list of transactions that need to be made for bridging out of canto
  * @param {BridgeTransactionParams} params parameters for bridging out
- * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
+ * @returns {PromiseWithError<TxCreatorFunctionReturn>} list of transactions to make or error
  */
 export async function bridgeOutTx(
   params: BridgeTransactionParams
-): PromiseWithError<Transaction[]> {
+): PromiseWithError<TxCreatorFunctionReturn> {
   // create tx list
   let transactions: ReturnWithError<Transaction[]>;
 
@@ -168,7 +169,7 @@ export async function bridgeOutTx(
   if (transactions.error) {
     return NEW_ERROR("bridgeOutTx::" + transactions.error);
   }
-  return transactions;
+  return NO_ERROR({ transactions: transactions.data });
 }
 
 export async function validateBridgeInRetryParams(

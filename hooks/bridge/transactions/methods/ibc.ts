@@ -3,21 +3,19 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
-import {
   Transaction,
   TransactionDescription,
-} from "@/config/interfaces/transactions";
-import { CosmosNetwork } from "@/config/interfaces/networks";
+  CosmosNetwork,
+  IBCToken,
+} from "@/config/interfaces";
 import { ethToCantoAddress, isValidEthAddress } from "@/utils/address.utils";
 import { createMsgsIBCTransfer } from "@/utils/cosmos/transactions/messages/ibc/ibc";
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
 import { tryFetchMultipleEndpoints } from "@/utils/async.utils";
 import { _convertERC20Tx } from "./recovery";
 import { isERC20Token } from "@/utils/tokens/tokens.utils";
-import { IBCToken } from "@/config/interfaces/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
+import { convertToBigNumber, displayAmount } from "@/utils/tokenBalances.utils";
 import { CANTO_MAINNET_COSMOS } from "@/config/networks";
 import {
   BridgingMethod,
@@ -115,7 +113,7 @@ export async function txIBCOut(
           cantoAddress,
           TX_DESCRIPTIONS.CONVERT_ERC20(
             token.symbol,
-            formatBalance(amount, token.decimals)
+            displayAmount(amount, token.decimals)
           )
         )
       );
@@ -136,7 +134,7 @@ export async function txIBCOut(
       "ibc from canto",
       TX_DESCRIPTIONS.BRIDGE(
         token.symbol,
-        formatBalance(amount, token.decimals),
+        displayAmount(amount, token.decimals),
         CANTO_MAINNET_COSMOS.name,
         receivingChain.name,
         getBridgeMethodInfo(BridgingMethod.IBC).name

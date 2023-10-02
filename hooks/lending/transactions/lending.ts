@@ -1,26 +1,25 @@
 import {
   Transaction,
   TransactionDescription,
-} from "@/config/interfaces/transactions";
-import {
-  CTokenLendingTransactionParams,
-  CTokenLendingTxTypes,
-} from "../interfaces/lendingTxTypes";
-import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
-import { _approveTx, checkTokenAllowance } from "@/utils/evm/erc20.utils";
+  TxCreatorFunctionReturn,
+} from "@/config/interfaces";
+import {
+  CTokenLendingTransactionParams,
+  CTokenLendingTxTypes,
+} from "../interfaces/lendingTxTypes";
+import { createApprovalTxs } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import { CERC20_ABI, COMPTROLLER_ABI } from "@/config/abis";
-import { getCLMAddress } from "@/config/consts/addresses";
+import { getCantoCoreAddress } from "@/config/consts/addresses";
 
 export async function cTokenLendingTx(
   params: CTokenLendingTransactionParams
-): PromiseWithError<Transaction[]> {
+): PromiseWithError<TxCreatorFunctionReturn> {
   // make sure CToken passed through has user details
   if (!params.cToken.userDetails) {
     return NEW_ERROR("cTokenLendingTx: cToken does not have user details");
@@ -31,24 +30,26 @@ export async function cTokenLendingTx(
     params.txType === CTokenLendingTxTypes.DECOLLATERALIZE
   ) {
     // get comptroller address
-    const comptrollerAddress = getCLMAddress(params.chainId, "comptroller");
+    const comptrollerAddress = getCantoCoreAddress(params.chainId, "comptroller");
     if (!comptrollerAddress) {
       return NEW_ERROR("cTokenLendingTx: chainId not supported");
     }
     const isCollateralize =
       params.txType === CTokenLendingTxTypes.COLLATERALIZE;
-    return NO_ERROR([
-      _collateralizeTx(
-        params.chainId,
-        comptrollerAddress,
-        params.cToken.address,
-        isCollateralize,
-        TX_DESCRIPTIONS.CTOKEN_COLLATERALIZE(
-          params.cToken.underlying.symbol,
-          isCollateralize
-        )
-      ),
-    ]);
+    return NO_ERROR({
+      transactions: [
+        _collateralizeTx(
+          params.chainId,
+          comptrollerAddress,
+          params.cToken.address,
+          isCollateralize,
+          TX_DESCRIPTIONS.CTOKEN_COLLATERALIZE(
+            params.cToken.underlying.symbol,
+            isCollateralize
+          )
+        ),
+      ],
+    });
   }
   // lending action
   // create tx list
@@ -63,31 +64,24 @@ export async function cTokenLendingTx(
       params.txType === CTokenLendingTxTypes.REPAY)
   ) {
     // check if we need to approve token
-    const { data: hasAllowance, error: allowanceError } =
-      await checkTokenAllowance(
+    const { data: allowanceTxs, error: allowanceError } =
+      await createApprovalTxs(
         params.chainId,
-        params.cToken.underlying.address,
         params.ethAccount,
-        params.cToken.address,
-        params.amount
+        [
+          {
+            address: params.cToken.underlying.address,
+            symbol: params.cToken.underlying.symbol,
+          },
+        ],
+        [params.amount],
+        { address: params.cToken.address, name: "Lending Market" }
       );
     if (allowanceError) {
-      return NEW_ERROR("cTokenLendingTx::" + errMsg(allowanceError));
+      return NEW_ERROR("addLiquidityFlow: " + errMsg(allowanceError));
     }
-    if (!hasAllowance) {
-      txList.push(
-        _approveTx(
-          params.chainId,
-          params.cToken.underlying.address,
-          params.cToken.address,
-          params.amount,
-          TX_DESCRIPTIONS.APPROVE_TOKEN(
-            params.cToken.underlying.symbol,
-            "Lending Market"
-          )
-        )
-      );
-    }
+    // push allowance txs to the list (might be none)
+    txList.push(...allowanceTxs);
   }
   // create tx for lending
   txList.push(
@@ -100,11 +94,36 @@ export async function cTokenLendingTx(
       TX_DESCRIPTIONS.CTOKEN_LENDING(
         params.txType,
         params.cToken.underlying.symbol,
-        formatBalance(params.amount, params.cToken.underlying.decimals)
+        displayAmount(params.amount, params.cToken.underlying.decimals)
       )
     )
   );
-  return NO_ERROR(txList);
+
+  // user should enable token as collateral if supplying and token has collateral factor
+  if (
+    params.txType === CTokenLendingTxTypes.SUPPLY &&
+    !params.cToken.userDetails.isCollateral &&
+    Number(params.cToken.collateralFactor) !== 0
+  ) {
+    // get comptroller address
+    const comptrollerAddress = getCantoCoreAddress(params.chainId, "comptroller");
+    if (!comptrollerAddress) {
+      return NEW_ERROR("cTokenLendingTx: chainId not supported");
+    }
+    txList.push(
+      _collateralizeTx(
+        params.chainId,
+        comptrollerAddress,
+        params.cToken.address,
+        true,
+        TX_DESCRIPTIONS.CTOKEN_COLLATERALIZE(
+          params.cToken.underlying.symbol,
+          true
+        )
+      )
+    );
+  }
+  return NO_ERROR({ transactions: txList });
 }
 
 /**

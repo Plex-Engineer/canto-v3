@@ -1,0 +1,42 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  font-size: 32px !important;
+  padding-left: 4rem;
+  text-align: left;
+  width: 100%;
+  max-width: 1500px;
+}
+
+.grid {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  padding-top: 0rem;
+  max-width: 1500px;
+}
+
+.highlightCard {
+  max-width: 1000px;
+  width: 100%;
+  display: flex;
+  justify-content: stretch;
+}
+
+.mainTable {
+  max-width: 1000px;
+  width: 100%;
+  display: flex;
+  justify-content: stretch;
+}
+
+.widget1 {
+  //   width: 70%;
+}
+
+.widget2 {
+}

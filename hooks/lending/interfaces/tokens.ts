@@ -17,9 +17,11 @@ export interface CToken {
   underlying: {
     address: string;
     decimals: number;
+    logoURI: string;
     name: string;
     symbol: string;
   };
+  underlyingTotalSupply: string;
 }
 export interface UserCTokenDetails {
   cTokenAddress: string;

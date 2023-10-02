@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import Text from "../text";
 import styles from "./footer.module.scss";
@@ -91,7 +92,9 @@ interface PropLink {
 const FooterLink = ({ href, text }: PropLink) => {
   return (
     <Text size="x-sm" font="proto_mono" className={styles.link}>
-      <a href={href}>{text}</a>
+      <a href={href} target="_blank">
+        {text}
+      </a>
     </Text>
   );
 };
@@ -101,6 +104,10 @@ const StatusText = () => {
     chainId: CANTO_MAINNET_EVM.chainId,
     watch: true,
   });
+  const [blockString, setBlockString] = useState("Loading....");
+  useEffect(() => {
+    setBlockString(blockNumber?.toString() ?? "Loading....");
+  }, [blockNumber?.toString()]);
   return (
     <Text
       size="x-sm"
@@ -112,7 +119,7 @@ const StatusText = () => {
       }}
     >
       <span className={styles.status}></span>
-      {blockNumber ? `#${blockNumber}` : "Loading..."}
+      {blockString}
     </Text>
   );
 };

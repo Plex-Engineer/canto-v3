@@ -20,7 +20,8 @@
     text-transform: uppercase;
     transition: background 0.1s ease-out;
     &:hover {
-      background: #cecece;
+      background-color: var(--light-20-color, #222);
+
       cursor: pointer;
       color: var(--primary-color, #111);
     }
@@ -63,8 +64,10 @@
       position: absolute;
       height: 100%;
       width: 100%;
+      top: -1px;
+      left: -1px;
       border-radius: 50%;
-      border: 1px solid var(--primary-color, #111);
+      border: 1px solid var(--primary-90-color, #111);
 
       animation: ripple 1s infinite ease-in-out;
     }

@@ -1,4 +1,4 @@
-import { ERC20Token, IBCToken, OFTToken } from "@/config/interfaces/tokens";
+import { ERC20Token, IBCToken, OFTToken } from "@/config/interfaces";
 
 ///
 /// Functions to check token objects for type (type guarding)

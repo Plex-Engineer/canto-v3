@@ -80,71 +80,73 @@ const TransactionModal = () => {
             </Text>
           </Container>
         ) : transactionFlows && transactionFlows?.length > 0 ? (
-          <div className={styles["scroll-view"]}>
-            {/* <Spacer height="10px" /> */}
-            <div className={clsx(styles["items-list"])}>
-              {transactionFlows
-                .sort((a, b) => Number(b.id) - Number(a.id))
-                .map((flow, idx) => (
-                  <Container
-                    key={idx}
-                    width="100%"
-                    direction="row"
-                    gap={20}
-                    center={{
-                      vertical: true,
-                    }}
-                    className={styles.item}
-                    onClick={() => {
-                      setCurrentFlowId(flow.id);
-                    }}
-                  >
-                    <div className={styles.txImg}>
-                      <StatusIcon status={flow.status} size={24} />
-                    </div>
-                    <Container>
-                      <Text size="sm">{flow.title}</Text>
-                      <Text theme="secondary-dark" size="x-sm">
-                        {dateToMomentsAgo(flow.createdAt)}
-                      </Text>
-                    </Container>
-                    <div
-                      style={{
-                        transform: !(flow.id === currentFlowId)
-                          ? "rotate(-90deg)"
-                          : "rotate(0deg)",
+          <div className={styles.modalClip}>
+            <div className={styles["scroll-view"]}>
+              {/* <Spacer height="10px" /> */}
+              <div className={clsx(styles["items-list"])}>
+                {transactionFlows
+                  .sort((a, b) => Number(b.id) - Number(a.id))
+                  .map((flow, idx) => (
+                    <Container
+                      key={idx}
+                      width="100%"
+                      direction="row"
+                      gap={20}
+                      center={{
+                        vertical: true,
+                      }}
+                      className={styles.item}
+                      onClick={() => {
+                        setCurrentFlowId(flow.id);
                       }}
                     >
-                      <Icon
-                        icon={{
-                          url: "dropdown.svg",
-                          size: 24,
+                      <div className={styles.txImg}>
+                        <StatusIcon status={flow.status} size={24} />
+                      </div>
+                      <Container>
+                        <Text size="sm">{flow.title}</Text>
+                        <Text theme="secondary-dark" size="x-sm">
+                          {dateToMomentsAgo(flow.createdAt)}
+                        </Text>
+                      </Container>
+                      <div
+                        style={{
+                          transform: !(flow.id === currentFlowId)
+                            ? "rotate(-90deg)"
+                            : "rotate(0deg)",
                         }}
-                      />
-                    </div>
-                  </Container>
-                ))}
-              <Spacer height="100%" />
+                      >
+                        <Icon
+                          icon={{
+                            url: "dropdown.svg",
+                            size: 24,
+                          }}
+                        />
+                      </div>
+                    </Container>
+                  ))}
+                <Spacer height="100%" />
 
-              <Container
-                width="100%"
-                center={{
-                  vertical: true,
-                }}
-              >
-                <Button
-                  width={"fill"}
-                  color="secondary"
-                  height={"small"}
-                  fontFamily="proto_mono"
-                  onClick={() =>
-                    txStore?.clearTransactions(signer?.account.address ?? "")
-                  }
+                <Container
+                  width="100%"
+                  center={{
+                    vertical: true,
+                  }}
                 >
-                  CLEAR ALL TXS
-                </Button>
-                <Spacer height="10px" />
-              </Container>
+                  <Button
+                    width={"fill"}
+                    color="secondary"
+                    height={"small"}
+                    fontFamily="proto_mono"
+                    onClick={() =>
+                      txStore?.clearTransactions(signer?.account.address ?? "")
+                    }
+                  >
+                    CLEAR ALL TXS
+                  </Button>
+                  <Spacer height="10px" />
+                </Container>
+              </div>
             </div>
             <Container
               className={clsx(styles["grp-items"])}

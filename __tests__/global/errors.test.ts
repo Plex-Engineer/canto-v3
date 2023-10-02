@@ -1,4 +1,4 @@
-import { NO_ERROR, NEW_ERROR, errMsg } from "../../config/interfaces/errors";
+import { NO_ERROR, NEW_ERROR, errMsg } from "../../config/interfaces";
 
 describe("error interface tests", () => {
   it("should return a ReturnWithError object with no error", async () => {
@@ -34,7 +34,7 @@ describe("error interface tests", () => {
     const errorObjs = [
       new Error("This is an error"),
       new Error("This is another error"),
-      new Error(""),
+      new Error(" "),
       "This is an error",
       "",
       404,

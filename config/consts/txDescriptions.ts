@@ -1,6 +1,11 @@
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
+import { Pair } from "@/hooks/pairs/interfaces/pairs";
 
 export const TX_DESCRIPTIONS = {
+  ADD_LIQUIDITY: (pair: Pair, amount1: string, amount2: string) => ({
+    title: `Add Liquidity To ${pair.symbol}`,
+    description: `Add ${amount1} ${pair.token1.symbol} and ${amount2} ${pair.token2.symbol} to ${pair.symbol}`,
+  }),
   APPROVE_TOKEN: (tokenSymbol: string, spender: string) => ({
     title: `Approve ${tokenSymbol}`,
     description: `Give the ${spender} approval to move ${tokenSymbol}`,
@@ -53,10 +58,14 @@ export const TX_DESCRIPTIONS = {
     amount: string,
     deposit: boolean
   ) => ({
-    title: "Wrap Canto",
+    title: `${deposit ? "Wrap" : "Unwrap"} ${tokenSymbol}`,
     description: `${deposit ? "Wrap" : "Unwrap"} ${amount} ${tokenSymbol} ${
       deposit ? "to" : "from"
     } ${tokenSymbol} OFT`,
+  }),
+  REMOVE_LIQUIDITY: (pair: Pair, amount: string) => ({
+    title: `Remove Liquidity From ${pair.symbol}`,
+    description: `Remove ${amount} ${pair.symbol} from ${pair.symbol}`,
   }),
   WRAP_ETH: (amount: string) => ({
     title: "Wrap ETH",

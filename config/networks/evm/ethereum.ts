@@ -1,4 +1,4 @@
-import { EVMNetwork } from "@/config/interfaces/networks";
+import { EVMNetwork } from "@/config/interfaces";
 import { getEthAddressLink, getEthTransactionLink } from "../helpers";
 
 const ethBlockExplorer = "https://etherscan.io";

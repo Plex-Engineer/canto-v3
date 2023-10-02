@@ -1,6 +1,9 @@
-import { NO_ERROR, ReturnWithError } from "@/config/interfaces/errors";
+import {
+  NO_ERROR,
+  ReturnWithError,
+  NewTransactionFlow,
+} from "@/config/interfaces";
 import { CTokenLendingTransactionParams } from "../interfaces/lendingTxTypes";
-import { NewTransactionFlow } from "@/config/interfaces/transactions";
 import { TransactionFlowType } from "@/config/transactions/txMap";
 
 export function createNewCTokenLendingFlow(
@@ -8,7 +11,7 @@ export function createNewCTokenLendingFlow(
 ): ReturnWithError<NewTransactionFlow> {
   return NO_ERROR({
     title: params.txType + " " + params.cToken.underlying.symbol,
-    icon: "",
+    icon: params.cToken.underlying.logoURI,
     txType: TransactionFlowType.CLM_CTOKEN_TX,
     params: params,
   });

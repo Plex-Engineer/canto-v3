@@ -2,14 +2,14 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
-} from "@/config/interfaces/errors";
+  Transaction,
+} from "@/config/interfaces";
 import {
   GetWalletClientResult,
   getWalletClient,
   switchNetwork,
 } from "wagmi/actions";
 import { performEVMTransaction } from "./evm/performEVMTx";
-import { Transaction } from "@/config/interfaces/transactions";
 import {
   performCosmosTransactionEIP,
   waitForCosmosTx,

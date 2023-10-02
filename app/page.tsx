@@ -1,13 +1,21 @@
 "use client";
+
 import useTestLP from "@/hooks/lpInterface/testUseLP";
-import TestLending from "./testLending";
+import Container from "@/components/container/container";
+import Text from "@/components/text";
 
 export default function Home() {
   const lp = useTestLP();
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1 className="text-4xl font-bold text-center">Welcome to Canto-v3</h1>
-      {/* <TestLending /> */}
-    </main>
+    <Container
+      center={{
+        vertical: true,
+        horizontal: true,
+      }}
+    >
+      <Text font="proto_mono" size="x-lg">
+        Welcome to Canto-v3
+      </Text>
+    </Container>
   );
 }
