@@ -54,3 +54,12 @@ export function formatError(errorMsg: string): string {
   const split = errorMsg.split(":");
   return "Error:" + split[split.length - 1];
 }
+
+/**
+ * @notice Formats a number into a percentage
+ * @param {string} percent percentage to format
+ * @returns {string} Formatted percentage
+ */
+export function formatPercent(percent: string): string {
+  return (parseFloat(percent) * 100).toFixed(2) + "%";
+}

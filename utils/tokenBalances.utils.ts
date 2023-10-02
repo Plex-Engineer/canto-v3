@@ -37,19 +37,49 @@ export function convertToBigNumber(
 }
 
 /**
+ * @notice Options for formatting balances
+ * @param {string} symbol symbol to display with the balance
+ * @param {number} precision number of decimals to display
+ * @param {boolean} commify whether to commify the balance
+ * @param {boolean} short whether to display a short balance
+ */
+interface FormatBalanceOptions {
+  symbol?: string;
+  precision?: number;
+  commify?: boolean;
+  short?: boolean;
+}
+
+/**
+ * @notice function to display balances to the user
+ * @dev will use default formatting for consistency throughout the app
+ * @dev you can still pass in options to override the defaults
+ * @dev use when precision is less important
+ */
+export function displayAmount(
+  amount: string | BigNumber,
+  decimals: number,
+  options?: FormatBalanceOptions
+) {
+  const defaultOptions: FormatBalanceOptions = {
+    symbol: undefined,
+    precision: undefined,
+    commify: true,
+    short: true,
+  };
+  return formatBalance(amount, decimals, { ...defaultOptions, ...options });
+}
+
+/**
  * @notice formats a balance to a string
  * @param {string | BigNumber} amount amount to format
  * @param {number} decimals number of decimals to format to
- * @param {object} options options to format with
+ * @param {FormatBalanceOptions} options options to format with
  */
 export function formatBalance(
   amount: string | BigNumber,
   decimals: number,
-  options?: {
-    symbol?: string;
-    precision?: number;
-    commify?: boolean;
-  }
+  options?: FormatBalanceOptions
 ): string {
   // set this to avoid scientific notation
   BigNumber.set({ EXPONENTIAL_AT: 35 });
@@ -57,6 +87,7 @@ export function formatBalance(
     symbol = undefined,
     precision = undefined,
     commify = false,
+    short = false,
   } = options || {};
   const bnAmount = new BigNumber(amount);
   // make sure greater than zero
@@ -83,29 +114,59 @@ export function formatBalance(
           0,
           decimalIndex + truncateAt + (truncateAt === 0 ? 0 : 1)
         );
+  // if short flag is turned on, return the short balance
+  let finalAmount = truncatedAmount;
+  let suffix = "";
+  if (short) {
+    const { shortAmount, suffix: _suffix } = formatBigBalance(truncatedAmount);
+    finalAmount = shortAmount;
+    suffix = _suffix;
+  }
 
-  // // create regex to truncate at the correct number of decimals
-  // const regex = new RegExp("^-?\\d+(?:.\\d{0," + truncateAt + "})?");
-  // const truncatedAmount = formattedAmount.toString().match(regex)?.[0] ?? "0";
   return `${
     commify
-      ? truncatedAmount.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
-      : truncatedAmount
-  }${symbol ? " " + symbol : ""}`;
+      ? finalAmount.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+      : finalAmount
+  }${suffix}${symbol ? " " + symbol : ""}`;
 }
 
 /**
- * @notice adds two token balances
- * @dev must be from the same token to keep decimals
- * @param {string} amount1 first amount to add
- * @param {string} amount2 second amount to add
- * @returns {string} sum of the two amounts
+ * @notice formats a balance to a string
+ * @dev if "short flag is turned on in formatBalance, this will return a short balance"
+ * @param {string} amount amount to format
+ * @returns {string} formatted balance
+ * @example 1,340,000 -> {shortAmount: "1.34", suffx: "M"}
  */
-export function addTokenBalances(amount1: string, amount2: string): string {
-  const [amount1BN, amount2BN] = [
-    convertToBigNumber(amount1),
-    convertToBigNumber(amount2),
-  ];
-  if (amount1BN.error || amount2BN.error) return "0";
-  return amount1BN.data.plus(amount2BN.data).toString();
+function formatBigBalance(amount: string): {
+  shortAmount: string;
+  suffix: string;
+} {
+  const bnAmount = new BigNumber(amount);
+  // get the number of digits in the amount, before decimals
+  const digits = bnAmount.integerValue().toString().length;
+  // only shorted value if greater than 1 million
+  if (digits > 6) {
+    let shortAmount;
+    let suffix;
+    if (digits > 12) {
+      // in the trillions range at least
+      suffix = "T";
+      shortAmount = bnAmount.dividedBy(new BigNumber(10).pow(12));
+    } else if (digits > 9) {
+      // billions range
+      suffix = "B";
+      shortAmount = bnAmount.dividedBy(new BigNumber(10).pow(9));
+    } else {
+      // millions range
+      suffix = "M";
+      shortAmount = bnAmount.dividedBy(new BigNumber(10).pow(6));
+    }
+    return {
+      shortAmount: shortAmount.toFixed(2),
+      suffix,
+    };
+  }
+
+  // default to returning the amount
+  return { shortAmount: amount, suffix: "" };
 }

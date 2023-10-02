@@ -140,6 +140,10 @@ const Button = (props: Props) => {
         fontFamily: getFontFamily(),
         gap: "12px",
         fontWeight: props.weight == "bold" ? "bold" : "normal",
+        boxShadow:
+          props.disabled == true
+            ? "var(--box-shadow, 0px 0px 0px 0px rgba(17, 17, 17, 0.15))"
+            : "var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15))",
         flexDirection: props.icon?.position == "right" ? "row-reverse" : "row",
       }}
     >

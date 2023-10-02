@@ -67,10 +67,12 @@ describe("formatBalance tests", () => {
         amount: "-10000000000",
         decimals: 0,
         expected: "0",
-      }
+      },
     ];
     params.forEach((p) => {
-      expect(formatBalance(p.amount, p.decimals)).toBe(p.expected);
+      expect(formatBalance(p.amount, p.decimals, { short: false })).toBe(
+        p.expected
+      );
     });
   });
   it("should format balance with options", () => {
@@ -160,8 +162,31 @@ describe("formatBalance tests", () => {
           symbol: "TOKEN",
           commify: true,
           precision: 6,
+          short: false,
         },
         expected: "99,999,999,999,999,999,999.999999 TOKEN",
+      },
+      {
+        amount: "1234567000000",
+        decimals: 6,
+        options: {
+          symbol: "TOKEN",
+          commify: false,
+          precision: 2,
+          short: true,
+        },
+        expected: "1.23M TOKEN",
+      },
+      {
+        amount: "1000000000000000",
+        decimals: 0,
+        options: {
+          symbol: "TOKEN",
+          commify: true,
+          precision: 2,
+          short: true,
+        },
+        expected: "1,000.00T TOKEN",
       },
     ];
     params.forEach((p) => {

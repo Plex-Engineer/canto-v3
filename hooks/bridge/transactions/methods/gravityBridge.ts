@@ -29,12 +29,8 @@ import {
 import { tryFetch } from "@/utils/async.utils";
 import { getCantoBalance } from "@/utils/cosmos/cosmosBalance.utils";
 import { createMsgsSend } from "@/utils/cosmos/transactions/messages/messageSend";
-import {
-  _approveTx,
-  checkTokenAllowance,
-  getTokenBalance,
-} from "@/utils/evm/erc20.utils";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { createApprovalTxs, getTokenBalance } from "@/utils/evm/erc20.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import BigNumber from "bignumber.js";
 import {
   BridgingMethod,
@@ -149,36 +145,30 @@ export async function bridgeInGravity(
           token.chainId,
           token.address,
           amountToWrap,
-          TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amountToWrap, token.decimals))
+          TX_DESCRIPTIONS.WRAP_ETH(displayAmount(amountToWrap, token.decimals))
         )
       );
     }
   }
 
-  // check token allowance
-  const { data: hasAllowance, error: allowanceError } =
-    await checkTokenAllowance(
-      token.chainId,
-      token.address,
-      ethSender,
-      GRAVITY_BRIDGE_ETH_ADDRESS,
-      amount
-    );
+  // get token allowance function
+  const { data: allowanceTxs, error: allowanceError } = await createApprovalTxs(
+    token.chainId,
+    ethSender,
+    [
+      {
+        address: token.address,
+        symbol: token.symbol,
+      },
+    ],
+    [amount],
+    { address: GRAVITY_BRIDGE_ETH_ADDRESS, name: "Gravity Bridge" }
+  );
   if (allowanceError) {
-    return NEW_ERROR("bridgeInGravity::" + errMsg(allowanceError));
+    return NEW_ERROR("addLiquidityFlow: " + errMsg(allowanceError));
   }
-  // if no allowance, must approve
-  if (!hasAllowance) {
-    txList.push(
-      _approveTx(
-        token.chainId,
-        token.address,
-        GRAVITY_BRIDGE_ETH_ADDRESS,
-        amount,
-        TX_DESCRIPTIONS.APPROVE_TOKEN(token.symbol, "Gravity Bridge")
-      )
-    );
-  }
+  // push allowance txs to the list (might be none)
+  txList.push(...allowanceTxs);
 
   // send to cosmos
   txList.push(
@@ -189,7 +179,7 @@ export async function bridgeInGravity(
       amount,
       TX_DESCRIPTIONS.BRIDGE(
         token.symbol,
-        formatBalance(amount, token.decimals),
+        displayAmount(amount, token.decimals),
         ETH_MAINNET.name,
         CANTO_MAINNET_EVM.name,
         getBridgeMethodInfo(BridgingMethod.GRAVITY_BRIDGE).name

@@ -9,7 +9,7 @@ import {
 import { BridgeTransactionParams } from "../interfaces/hookParams";
 import { BridgeToken } from "../interfaces/tokens";
 import { BridgingMethod } from "../interfaces/bridgeMethods";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import { TransactionFlowType } from "@/config/transactions/txMap";
 
 interface CreateBridgeFlowParams extends CreateBridgeTxParams {
@@ -30,10 +30,11 @@ export function createNewBridgeFlow(
     return NEW_ERROR("createNewBridgeFlow::" + errMsg(bridgeParamsError));
   }
   return NO_ERROR({
-    title: `Bridge ${params.bridgeIn ? "In" : "Out"} ${formatBalance(
+    title: `Bridge ${params.bridgeIn ? "In" : "Out"} ${displayAmount(
       bridgeParams.token.amount,
-      bridgeParams.token.data.decimals
-    )} ${bridgeParams.token.data.symbol}`,
+      bridgeParams.token.data.decimals,
+      { symbol: bridgeParams.token.data.symbol }
+    )}`,
     icon: bridgeParams.token.data.icon,
     txType: params.bridgeIn
       ? TransactionFlowType.BRIDGE_IN

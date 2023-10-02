@@ -45,8 +45,7 @@ import {
 import { tryFetch } from "@/utils/async.utils";
 import Long from "long";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import {
   BridgingMethod,
   getBridgeMethodInfo,
@@ -162,7 +161,7 @@ export async function ibcInKeplr(
       chainId: cosmosNetwork.chainId,
       description: TX_DESCRIPTIONS.BRIDGE(
         ibcToken.symbol,
-        formatBalance(amount, ibcToken.decimals),
+        displayAmount(amount, ibcToken.decimals),
         cosmosNetwork.name,
         CANTO_MAINNET_COSMOS.name,
         getBridgeMethodInfo(BridgingMethod.IBC).name
@@ -343,7 +342,7 @@ async function signAndBroadcastIBCKeplr(
 //       chainId: injectiveNetwork.chainId,
 //       description: TX_DESCRIPTIONS.BRIDGE(
 //         token.symbol,
-//         formatBalance(amount, token.decimals),
+//         displayAmount(amount, token.decimals),
 //         injectiveNetwork.name,
 //         CANTO_MAINNET_COSMOS.name
 //       ),
@@ -497,7 +496,7 @@ async function evmosIBCIn(
       chainId: evmosNetwork.chainId,
       description: TX_DESCRIPTIONS.BRIDGE(
         token.symbol,
-        formatBalance(amount, token.decimals),
+        displayAmount(amount, token.decimals),
         evmosNetwork.name,
         CANTO_MAINNET_COSMOS.name,
         getBridgeMethodInfo(BridgingMethod.IBC).name

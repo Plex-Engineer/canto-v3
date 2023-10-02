@@ -12,7 +12,6 @@ import {
 import StatusIcon from "../icon/statusIcon";
 import { useQuery } from "react-query";
 import { getBridgeStatus } from "@/hooks/bridge/transactions/bridgeTxStatus";
-import PopUp from "../popup/popup";
 
 interface TxItemProps {
   tx: TransactionWithStatus;

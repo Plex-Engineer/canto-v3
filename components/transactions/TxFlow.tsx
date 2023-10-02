@@ -4,7 +4,11 @@ import Image from "next/image";
 import Text from "../text";
 import TxItem from "./TxItem";
 import Spacer from "../layout/spacer";
-import { BridgeStatus, TransactionFlow } from "@/config/interfaces";
+import {
+  BridgeStatus,
+  TX_PLACEHOLDER,
+  TransactionFlow,
+} from "@/config/interfaces";
 import Button from "../button/button";
 import { TRANSACTION_FLOW_MAP } from "@/config/transactions/txMap";
 import { formatError } from "@/utils/formatting.utils";
@@ -53,16 +57,27 @@ const TxFlow = (props: Props) => {
           {props.txFlow?.error && (
             <Text>{formatError(props.txFlow.error)}</Text>
           )}
-          {!props.txFlow.error &&
-            props.txFlow.transactions.map((tx, idx) => (
-              <TxItem
-                key={idx}
-                tx={tx}
-                idx={idx + 1}
-                setBridgeStatus={(status) => props.setBridgeStatus(idx, status)}
-              />
-            ))}
-
+          {!props.txFlow.error && (
+            <>
+              {props.txFlow.transactions.map((tx, idx) => (
+                <TxItem
+                  key={idx}
+                  tx={tx}
+                  idx={idx + 1}
+                  setBridgeStatus={(status) =>
+                    props.setBridgeStatus(idx, status)
+                  }
+                />
+              ))}
+              {props.txFlow.placeholderFlow && (
+                <TxItem
+                  tx={TX_PLACEHOLDER(props.txFlow.placeholderFlow)}
+                  idx={props.txFlow.transactions.length + 1}
+                  setBridgeStatus={() => false}
+                />
+              )}
+            </>
+          )}
           {props.txFlow.status === "ERROR" && (
             <>
               <Spacer height="40px" />

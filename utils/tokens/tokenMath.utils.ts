@@ -1,8 +1,4 @@
-import {
-  NEW_ERROR,
-  NO_ERROR,
-  ReturnWithError,
-} from "@/config/interfaces";
+import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
 import { convertToBigNumber } from "../tokenBalances.utils";
 import BigNumber from "bignumber.js";
 
@@ -56,4 +52,76 @@ export function convertNoteAmountToToken(
   const tokenAmount = amountBN.data.times(10 ** 18).div(priceBN.data);
 
   return NO_ERROR(tokenAmount);
+}
+
+/**
+ * @notice Gets the percent of an amount
+ * @param {string} amount Amount to get percent of
+ * @param {number} percent Percent to get (0-100)
+ * @returns {ReturnWithError<string>} Percent of amount
+ */
+export function percentOfAmount(
+  amount: string,
+  percent: number
+): ReturnWithError<string> {
+  // convert everything to bigNumber for precision
+  const amountBN = convertToBigNumber(amount);
+  if (amountBN.error) return NEW_ERROR("getPercentOfAmount: Invalid amount");
+
+  // calculate percent of amount
+  const percentOfAmount = amountBN.data.times(percent).div(100);
+
+  return NO_ERROR(percentOfAmount.toFixed(0));
+}
+
+/**
+ * @notice adds two token balances
+ * @dev must be from the same token to keep decimals
+ * @param {string} amount1 first amount to add
+ * @param {string} amount2 second amount to add
+ * @returns {string} sum of the two amounts
+ */
+export function addTokenBalances(amount1: string, amount2: string): string {
+  const [amount1BN, amount2BN] = [
+    convertToBigNumber(amount1),
+    convertToBigNumber(amount2),
+  ];
+  if (amount1BN.error || amount2BN.error) return "0";
+  return amount1BN.data.plus(amount2BN.data).toString();
+}
+
+/**
+ * @notice divides token balances
+ * @dev must be from the same token to keep decimals
+ * @param {string} numerator numerator
+ * @param {string} denominator denominator
+ * @returns {string} quotient of the two amounts
+ */
+export function divideBalances(numerator: string, denominator: string): string {
+  const [numeratorBN, denominatorBN] = [
+    convertToBigNumber(numerator),
+    convertToBigNumber(denominator),
+  ];
+  if (numeratorBN.error || denominatorBN.error || denominatorBN.data.isZero())
+    return "0";
+  return numeratorBN.data.div(denominatorBN.data).toString();
+}
+
+/**
+ * @notice compares token balances
+ * @dev must be from the same token to keep decimals
+ * @param {string} amount1 first amount to compate
+ * @param {string} amount2 second amount to compare
+ * @returns {ReturnWithError<boolean>} true if amount1 is greater than amount2
+ */
+export function greaterThanOrEqualTo(
+  amount1: string,
+  amount2: string
+): ReturnWithError<boolean> {
+  const [amount1BN, amount2BN] = [
+    convertToBigNumber(amount1),
+    convertToBigNumber(amount2),
+  ];
+  if (amount1BN.error || amount2BN.error) return NEW_ERROR("Invalid amounts");
+  return NO_ERROR(amount1BN.data.gte(amount2BN.data));
 }

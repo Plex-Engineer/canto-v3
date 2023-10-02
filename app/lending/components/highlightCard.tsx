@@ -4,7 +4,7 @@ import Image from "next/image";
 import Item from "./item";
 import Icon from "@/components/icon/icon";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 interface Props {
   cToken: CTokenWithUserData;
   precisionInValues?: number;
@@ -17,6 +17,10 @@ const HighlightCard = ({
   onSupply,
   precisionInValues,
 }: Props) => {
+  const formattedAmount = (amount: string) =>
+    displayAmount(amount, cToken.underlying.decimals, {
+      precision: precisionInValues,
+    });
   return (
     <div className={styles.container}>
       <Image
@@ -46,13 +50,8 @@ const HighlightCard = ({
       <div className={styles.amounts}>
         <Item
           name="Wallet Balance"
-          value={formatBalance(
-            cToken.userDetails?.balanceOfUnderlying ?? "0",
-            cToken.underlying.decimals,
-            {
-              commify: true,
-              precision: precisionInValues,
-            }
+          value={formattedAmount(
+            cToken.userDetails?.balanceOfUnderlying ?? "0"
           )}
           postChild={
             <Icon
@@ -66,13 +65,8 @@ const HighlightCard = ({
         />
         <Item
           name="Amount Staked"
-          value={formatBalance(
-            cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
-            cToken.underlying.decimals,
-            {
-              commify: true,
-              precision: precisionInValues,
-            }
+          value={formattedAmount(
+            cToken.userDetails?.supplyBalanceInUnderlying ?? "0"
           )}
           postChild={
             <Icon
@@ -86,14 +80,7 @@ const HighlightCard = ({
         />
         <Item
           name="Outstanding Debt"
-          value={formatBalance(
-            cToken.userDetails?.borrowBalance ?? "0",
-            cToken.underlying.decimals,
-            {
-              commify: true,
-              precision: precisionInValues,
-            }
-          )}
+          value={formattedAmount(cToken.userDetails?.borrowBalance ?? "0")}
           postChild={
             <Icon
               themed

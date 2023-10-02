@@ -4,7 +4,11 @@ import Selector, { Item } from "@/components/selector/selector";
 import Text from "@/components/text";
 import { BridgeHookReturn } from "@/hooks/bridge/interfaces/hookParams";
 import { TransactionStore } from "@/stores/transactionStore";
-import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
+import {
+  convertToBigNumber,
+  displayAmount,
+  formatBalance,
+} from "@/utils/tokenBalances.utils";
 import { useEffect, useState } from "react";
 import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";
@@ -120,7 +124,6 @@ const Bridging = (props: BridgeProps) => {
           setIsConfirmationModalOpen(false);
         }}
       >
-        {/* <TransactionModal /> */}
         <ConfirmationModal
           {...cosmosProps}
           token={{
@@ -145,10 +148,11 @@ const Bridging = (props: BridgeProps) => {
           type={props.hook.direction}
           amount={formatBalance(
             amountAsBigNumberString,
-            props.hook.selections.token?.decimals ?? 18,
+            props.hook.selections.token?.decimals ?? 0,
             {
+              symbol: props.hook.selections.token?.symbol,
+              precision: props.hook.selections.token?.decimals,
               commify: true,
-              precision: props.hook.selections.token?.decimals ?? 18,
             }
           )}
           confirmation={{
@@ -346,12 +350,9 @@ const Bridging = (props: BridgeProps) => {
                   props.hook.allOptions.tokens.map((token) => ({
                     ...token,
                     name: token.name.length > 24 ? token.symbol : token.name,
-                    secondary: formatBalance(
+                    secondary: displayAmount(
                       token.balance ?? "0",
-                      token.decimals,
-                      {
-                        commify: true,
-                      }
+                      token.decimals
                     ),
                   })) ?? []
                 }
@@ -371,12 +372,7 @@ const Bridging = (props: BridgeProps) => {
                   className={styles["input"]}
                   error={!checkAmount() && Number(amount) !== 0}
                   errorMessage={
-                    Number(
-                      formatBalance(
-                        maxBridgeAmount,
-                        props.hook.selections.token?.decimals ?? 0
-                      )
-                    ) === 0
+                    Number(maxBridgeAmount) === 0
                       ? "You have 0 balance"
                       : `Amount must be less than ${formatBalance(
                           maxBridgeAmount,

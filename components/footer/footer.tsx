@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import Text from "../text";
 import styles from "./footer.module.scss";
@@ -103,6 +104,10 @@ const StatusText = () => {
     chainId: CANTO_MAINNET_EVM.chainId,
     watch: true,
   });
+  const [blockString, setBlockString] = useState("Loading....");
+  useEffect(() => {
+    setBlockString(blockNumber?.toString() ?? "Loading....");
+  }, [blockNumber?.toString()]);
   return (
     <Text
       size="x-sm"
@@ -114,7 +119,7 @@ const StatusText = () => {
       }}
     >
       <span className={styles.status}></span>
-      {blockNumber ? `#${blockNumber}` : "Loading..."}
+      {blockString}
     </Text>
   );
 };

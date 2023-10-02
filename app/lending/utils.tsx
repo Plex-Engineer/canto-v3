@@ -6,8 +6,10 @@ import useLending from "@/hooks/lending/useLending";
 import useTransactionStore from "@/stores/transactionStore";
 import { listIncludesAddress } from "@/utils/address.utils";
 import { getCirculatingNote } from "@/utils/clm/noteStats.utils";
-import { addTokenBalances } from "@/utils/tokenBalances.utils";
-import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
+import {
+  addTokenBalances,
+  convertTokenAmountToNote,
+} from "@/utils/tokens/tokenMath.utils";
 import BigNumber from "bignumber.js";
 import { useEffect, useMemo, useState } from "react";
 import { useWalletClient } from "wagmi";
