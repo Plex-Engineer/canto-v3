@@ -1,11 +1,10 @@
 "use client";
 
-import useTestLP from "@/hooks/lpInterface/testUseLP";
 import Container from "@/components/container/container";
 import Text from "@/components/text";
+import { TestAmbient } from "./testAmbient";
 
 export default function Home() {
-  const lp = useTestLP();
   return (
     <Container
       center={{
@@ -16,6 +15,7 @@ export default function Home() {
       <Text font="proto_mono" size="x-lg">
         Welcome to Canto-v3
       </Text>
+      <TestAmbient />
     </Container>
   );
 }

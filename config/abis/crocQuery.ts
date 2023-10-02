@@ -1,766 +1,324 @@
 export const CROC_QUERY_ABI = [
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "dex",
-        type: "address",
-      },
-    ],
-    stateMutability: "nonpayable",
     type: "constructor",
+    stateMutability: "nonpayable",
+    inputs: [{ type: "address", name: "dex", internalType: "address" }],
   },
   {
-    inputs: [],
-    name: "dex_",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
+    stateMutability: "view",
+    outputs: [{ type: "address", name: "", internalType: "address" }],
+    name: "dex_",
+    inputs: [],
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "base",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "quote",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "poolIdx",
-        type: "uint256",
-      },
+    type: "function",
+    stateMutability: "view",
+    outputs: [
+      { type: "uint128", name: "seeds", internalType: "uint128" },
+      { type: "uint32", name: "timestamp", internalType: "uint32" },
     ],
     name: "queryAmbientPosition",
-    outputs: [
-      {
-        internalType: "uint128",
-        name: "seeds",
-        type: "uint128",
-      },
-      {
-        internalType: "uint32",
-        name: "timestamp",
-        type: "uint32",
-      },
+    inputs: [
+      { type: "address", name: "owner", internalType: "address" },
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "base",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "quote",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "poolIdx",
-        type: "uint256",
-      },
+    type: "function",
+    stateMutability: "view",
+    outputs: [
+      { type: "uint128", name: "liq", internalType: "uint128" },
+      { type: "uint128", name: "baseQty", internalType: "uint128" },
+      { type: "uint128", name: "quoteQty", internalType: "uint128" },
     ],
     name: "queryAmbientTokens",
-    outputs: [
-      {
-        internalType: "uint128",
-        name: "liq",
-        type: "uint128",
-      },
-      {
-        internalType: "uint128",
-        name: "baseQty",
-        type: "uint128",
-      },
-      {
-        internalType: "uint128",
-        name: "quoteQty",
-        type: "uint128",
-      },
+    inputs: [
+      { type: "address", name: "owner", internalType: "address" },
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "base",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "quote",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "poolIdx",
-        type: "uint256",
-      },
-      {
-        internalType: "int24",
-        name: "lowerTick",
-        type: "int24",
-      },
-      {
-        internalType: "int24",
-        name: "upperTick",
-        type: "int24",
-      },
+    type: "function",
+    stateMutability: "view",
+    outputs: [
+      { type: "uint128", name: "liqRewards", internalType: "uint128" },
+      { type: "uint128", name: "baseRewards", internalType: "uint128" },
+      { type: "uint128", name: "quoteRewards", internalType: "uint128" },
     ],
     name: "queryConcRewards",
-    outputs: [
-      {
-        internalType: "uint128",
-        name: "liqRewards",
-        type: "uint128",
-      },
-      {
-        internalType: "uint128",
-        name: "baseRewards",
-        type: "uint128",
-      },
-      {
-        internalType: "uint128",
-        name: "quoteRewards",
-        type: "uint128",
-      },
+    inputs: [
+      { type: "address", name: "owner", internalType: "address" },
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
+      { type: "int24", name: "lowerTick", internalType: "int24" },
+      { type: "int24", name: "upperTick", internalType: "int24" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
+    type: "function",
+    stateMutability: "view",
+    outputs: [
       {
-        internalType: "address",
-        name: "base",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "quote",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "poolIdx",
-        type: "uint256",
+        type: "tuple",
+        name: "curve",
+        internalType: "struct CurveMath.CurveState",
+        components: [
+          { type: "uint128", name: "priceRoot_", internalType: "uint128" },
+          { type: "uint128", name: "ambientSeeds_", internalType: "uint128" },
+          { type: "uint128", name: "concLiq_", internalType: "uint128" },
+          { type: "uint64", name: "seedDeflator_", internalType: "uint64" },
+          { type: "uint64", name: "concGrowth_", internalType: "uint64" },
+        ],
       },
     ],
     name: "queryCurve",
-    outputs: [
-      {
-        components: [
-          {
-            internalType: "uint128",
-            name: "priceRoot_",
-            type: "uint128",
-          },
-          {
-            internalType: "uint128",
-            name: "ambientSeeds_",
-            type: "uint128",
-          },
-          {
-            internalType: "uint128",
-            name: "concLiq_",
-            type: "uint128",
-          },
-          {
-            internalType: "uint64",
-            name: "seedDeflator_",
-            type: "uint64",
-          },
-          {
-            internalType: "uint64",
-            name: "concGrowth_",
-            type: "uint64",
-          },
-        ],
-        internalType: "struct CurveMath.CurveState",
-        name: "curve",
-        type: "tuple",
-      },
+    inputs: [
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "base",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "quote",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "poolIdx",
-        type: "uint256",
-      },
-    ],
+    type: "function",
+    stateMutability: "view",
+    outputs: [{ type: "int24", name: "", internalType: "int24" }],
     name: "queryCurveTick",
-    outputs: [
-      {
-        internalType: "int24",
-        name: "",
-        type: "int24",
-      },
+    inputs: [
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "base",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "quote",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "poolIdx",
-        type: "uint256",
-      },
-      {
-        internalType: "bool",
-        name: "isBid",
-        type: "bool",
-      },
-      {
-        internalType: "int24",
-        name: "tick",
-        type: "int24",
-      },
+    type: "function",
+    stateMutability: "view",
+    outputs: [
+      { type: "uint160", name: "root", internalType: "uint160" },
+      { type: "uint32", name: "pivot", internalType: "uint32" },
+      { type: "uint64", name: "fee", internalType: "uint64" },
     ],
     name: "queryKnockoutMerkle",
-    outputs: [
-      {
-        internalType: "uint160",
-        name: "root",
-        type: "uint160",
-      },
-      {
-        internalType: "uint32",
-        name: "pivot",
-        type: "uint32",
-      },
-      {
-        internalType: "uint64",
-        name: "fee",
-        type: "uint64",
-      },
+    inputs: [
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
+      { type: "bool", name: "isBid", internalType: "bool" },
+      { type: "int24", name: "tick", internalType: "int24" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "base",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "quote",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "poolIdx",
-        type: "uint256",
-      },
-      {
-        internalType: "bool",
-        name: "isBid",
-        type: "bool",
-      },
-      {
-        internalType: "int24",
-        name: "tick",
-        type: "int24",
-      },
+    type: "function",
+    stateMutability: "view",
+    outputs: [
+      { type: "uint96", name: "lots", internalType: "uint96" },
+      { type: "uint32", name: "pivot", internalType: "uint32" },
+      { type: "uint16", name: "range", internalType: "uint16" },
     ],
     name: "queryKnockoutPivot",
-    outputs: [
-      {
-        internalType: "uint96",
-        name: "lots",
-        type: "uint96",
-      },
-      {
-        internalType: "uint32",
-        name: "pivot",
-        type: "uint32",
-      },
-      {
-        internalType: "uint16",
-        name: "range",
-        type: "uint16",
-      },
+    inputs: [
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
+      { type: "bool", name: "isBid", internalType: "bool" },
+      { type: "int24", name: "tick", internalType: "int24" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "base",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "quote",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "poolIdx",
-        type: "uint256",
-      },
-      {
-        internalType: "uint32",
-        name: "pivot",
-        type: "uint32",
-      },
-      {
-        internalType: "bool",
-        name: "isBid",
-        type: "bool",
-      },
-      {
-        internalType: "int24",
-        name: "lowerTick",
-        type: "int24",
-      },
-      {
-        internalType: "int24",
-        name: "upperTick",
-        type: "int24",
-      },
+    type: "function",
+    stateMutability: "view",
+    outputs: [
+      { type: "uint96", name: "lots", internalType: "uint96" },
+      { type: "uint64", name: "mileage", internalType: "uint64" },
+      { type: "uint32", name: "timestamp", internalType: "uint32" },
     ],
     name: "queryKnockoutPos",
-    outputs: [
-      {
-        internalType: "uint96",
-        name: "lots",
-        type: "uint96",
-      },
-      {
-        internalType: "uint64",
-        name: "mileage",
-        type: "uint64",
-      },
-      {
-        internalType: "uint32",
-        name: "timestamp",
-        type: "uint32",
-      },
+    inputs: [
+      { type: "address", name: "owner", internalType: "address" },
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
+      { type: "uint32", name: "pivot", internalType: "uint32" },
+      { type: "bool", name: "isBid", internalType: "bool" },
+      { type: "int24", name: "lowerTick", internalType: "int24" },
+      { type: "int24", name: "upperTick", internalType: "int24" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "base",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "quote",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "poolIdx",
-        type: "uint256",
-      },
-      {
-        internalType: "uint32",
-        name: "pivot",
-        type: "uint32",
-      },
-      {
-        internalType: "bool",
-        name: "isBid",
-        type: "bool",
-      },
-      {
-        internalType: "int24",
-        name: "lowerTick",
-        type: "int24",
-      },
-      {
-        internalType: "int24",
-        name: "upperTick",
-        type: "int24",
-      },
+    type: "function",
+    stateMutability: "view",
+    outputs: [
+      { type: "uint128", name: "liq", internalType: "uint128" },
+      { type: "uint128", name: "baseQty", internalType: "uint128" },
+      { type: "uint128", name: "quoteQty", internalType: "uint128" },
+      { type: "bool", name: "knockedOut", internalType: "bool" },
     ],
     name: "queryKnockoutTokens",
-    outputs: [
-      {
-        internalType: "uint128",
-        name: "liq",
-        type: "uint128",
-      },
-      {
-        internalType: "uint128",
-        name: "baseQty",
-        type: "uint128",
-      },
-      {
-        internalType: "uint128",
-        name: "quoteQty",
-        type: "uint128",
-      },
-      {
-        internalType: "bool",
-        name: "knockedOut",
-        type: "bool",
-      },
+    inputs: [
+      { type: "address", name: "owner", internalType: "address" },
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
+      { type: "uint32", name: "pivot", internalType: "uint32" },
+      { type: "bool", name: "isBid", internalType: "bool" },
+      { type: "int24", name: "lowerTick", internalType: "int24" },
+      { type: "int24", name: "upperTick", internalType: "int24" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "base",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "quote",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "poolIdx",
-        type: "uint256",
-      },
-      {
-        internalType: "int24",
-        name: "tick",
-        type: "int24",
-      },
+    type: "function",
+    stateMutability: "view",
+    outputs: [
+      { type: "uint96", name: "bidLots", internalType: "uint96" },
+      { type: "uint96", name: "askLots", internalType: "uint96" },
+      { type: "uint64", name: "odometer", internalType: "uint64" },
     ],
     name: "queryLevel",
-    outputs: [
-      {
-        internalType: "uint96",
-        name: "bidLots",
-        type: "uint96",
-      },
-      {
-        internalType: "uint96",
-        name: "askLots",
-        type: "uint96",
-      },
-      {
-        internalType: "uint64",
-        name: "odometer",
-        type: "uint64",
-      },
+    inputs: [
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
+      { type: "int24", name: "tick", internalType: "int24" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "base",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "quote",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "poolIdx",
-        type: "uint256",
-      },
-    ],
+    type: "function",
+    stateMutability: "view",
+    outputs: [{ type: "uint128", name: "", internalType: "uint128" }],
     name: "queryLiquidity",
-    outputs: [
-      {
-        internalType: "uint128",
-        name: "",
-        type: "uint128",
-      },
+    inputs: [
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
+    type: "function",
+    stateMutability: "view",
+    outputs: [
       {
-        internalType: "address",
-        name: "base",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "quote",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "poolIdx",
-        type: "uint256",
+        type: "tuple",
+        name: "pool",
+        internalType: "struct PoolSpecs.Pool",
+        components: [
+          { type: "uint8", name: "schema_", internalType: "uint8" },
+          { type: "uint16", name: "feeRate_", internalType: "uint16" },
+          { type: "uint8", name: "protocolTake_", internalType: "uint8" },
+          { type: "uint16", name: "tickSize_", internalType: "uint16" },
+          { type: "uint8", name: "jitThresh_", internalType: "uint8" },
+          { type: "uint8", name: "knockoutBits_", internalType: "uint8" },
+          { type: "uint8", name: "oracleFlags_", internalType: "uint8" },
+        ],
       },
     ],
+    name: "queryPoolParams",
+    inputs: [
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
+    ],
+  },
+  {
+    type: "function",
+    stateMutability: "view",
+    outputs: [
+      {
+        type: "tuple",
+        name: "pool",
+        internalType: "struct PoolSpecs.Pool",
+        components: [
+          { type: "uint8", name: "schema_", internalType: "uint8" },
+          { type: "uint16", name: "feeRate_", internalType: "uint16" },
+          { type: "uint8", name: "protocolTake_", internalType: "uint8" },
+          { type: "uint16", name: "tickSize_", internalType: "uint16" },
+          { type: "uint8", name: "jitThresh_", internalType: "uint8" },
+          { type: "uint8", name: "knockoutBits_", internalType: "uint8" },
+          { type: "uint8", name: "oracleFlags_", internalType: "uint8" },
+        ],
+      },
+    ],
+    name: "queryPoolTemplate",
+    inputs: [{ type: "uint256", name: "poolIdx", internalType: "uint256" }],
+  },
+  {
+    type: "function",
+    stateMutability: "view",
+    outputs: [{ type: "uint128", name: "", internalType: "uint128" }],
     name: "queryPrice",
-    outputs: [
-      {
-        internalType: "uint128",
-        name: "",
-        type: "uint128",
-      },
+    inputs: [
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "token",
-        type: "address",
-      },
-    ],
+    type: "function",
+    stateMutability: "view",
+    outputs: [{ type: "uint128", name: "", internalType: "uint128" }],
     name: "queryProtocolAccum",
-    outputs: [
-      {
-        internalType: "uint128",
-        name: "",
-        type: "uint128",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
+    inputs: [{ type: "address", name: "token", internalType: "address" }],
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "base",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "quote",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "poolIdx",
-        type: "uint256",
-      },
-      {
-        internalType: "int24",
-        name: "lowerTick",
-        type: "int24",
-      },
-      {
-        internalType: "int24",
-        name: "upperTick",
-        type: "int24",
-      },
+    type: "function",
+    stateMutability: "view",
+    outputs: [
+      { type: "uint128", name: "liq", internalType: "uint128" },
+      { type: "uint64", name: "fee", internalType: "uint64" },
+      { type: "uint32", name: "timestamp", internalType: "uint32" },
+      { type: "bool", name: "atomic", internalType: "bool" },
     ],
     name: "queryRangePosition",
-    outputs: [
-      {
-        internalType: "uint128",
-        name: "liq",
-        type: "uint128",
-      },
-      {
-        internalType: "uint64",
-        name: "fee",
-        type: "uint64",
-      },
-      {
-        internalType: "uint32",
-        name: "timestamp",
-        type: "uint32",
-      },
-      {
-        internalType: "bool",
-        name: "atomic",
-        type: "bool",
-      },
+    inputs: [
+      { type: "address", name: "owner", internalType: "address" },
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
+      { type: "int24", name: "lowerTick", internalType: "int24" },
+      { type: "int24", name: "upperTick", internalType: "int24" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "base",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "quote",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "poolIdx",
-        type: "uint256",
-      },
-      {
-        internalType: "int24",
-        name: "lowerTick",
-        type: "int24",
-      },
-      {
-        internalType: "int24",
-        name: "upperTick",
-        type: "int24",
-      },
+    type: "function",
+    stateMutability: "view",
+    outputs: [
+      { type: "uint128", name: "liq", internalType: "uint128" },
+      { type: "uint128", name: "baseQty", internalType: "uint128" },
+      { type: "uint128", name: "quoteQty", internalType: "uint128" },
     ],
     name: "queryRangeTokens",
-    outputs: [
-      {
-        internalType: "uint128",
-        name: "liq",
-        type: "uint128",
-      },
-      {
-        internalType: "uint128",
-        name: "baseQty",
-        type: "uint128",
-      },
-      {
-        internalType: "uint128",
-        name: "quoteQty",
-        type: "uint128",
-      },
+    inputs: [
+      { type: "address", name: "owner", internalType: "address" },
+      { type: "address", name: "base", internalType: "address" },
+      { type: "address", name: "quote", internalType: "address" },
+      { type: "uint256", name: "poolIdx", internalType: "uint256" },
+      { type: "int24", name: "lowerTick", internalType: "int24" },
+      { type: "int24", name: "upperTick", internalType: "int24" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "token",
-        type: "address",
-      },
-    ],
+    type: "function",
+    stateMutability: "view",
+    outputs: [{ type: "uint128", name: "surplus", internalType: "uint128" }],
     name: "querySurplus",
-    outputs: [
-      {
-        internalType: "uint128",
-        name: "surplus",
-        type: "uint128",
-      },
+    inputs: [
+      { type: "address", name: "owner", internalType: "address" },
+      { type: "address", name: "token", internalType: "address" },
     ],
-    stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "tracker",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "salt",
-        type: "uint256",
-      },
-    ],
-    name: "queryVirtual",
-    outputs: [
-      {
-        internalType: "uint128",
-        name: "surplus",
-        type: "uint128",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
+    stateMutability: "view",
+    outputs: [{ type: "uint128", name: "surplus", internalType: "uint128" }],
+    name: "queryVirtual",
+    inputs: [
+      { type: "address", name: "owner", internalType: "address" },
+      { type: "address", name: "tracker", internalType: "address" },
+      { type: "uint256", name: "salt", internalType: "uint256" },
+    ],
   },
 ] as const;
