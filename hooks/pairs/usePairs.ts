@@ -15,7 +15,6 @@ import {
   PairsTransactionParams,
   PairsTxTypes,
 } from "./interfaces/pairsTxTypes";
-import BigNumber from "bignumber.js";
 import { greaterThanOrEqualTo } from "@/utils/tokens/tokenMath.utils";
 
 export default function usePairs(

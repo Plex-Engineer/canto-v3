@@ -1,10 +1,9 @@
 import Button from "@/components/button/button";
 import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
-import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 
 export const CTokenRow = ({
   cToken,
@@ -35,25 +34,19 @@ export const CTokenRow = ({
     {cToken.supplyApy + "%"}
   </Text>,
   <Text theme="primary-dark" key={cToken.name + "cToken.balance"}>
-    {formatBalance(
+    {displayAmount(
       cToken.userDetails?.balanceOfUnderlying ?? "0",
-      cToken.underlying.decimals,
-      {
-        commify: true,
-      }
+      cToken.underlying.decimals
     )}
   </Text>,
   <Text theme="primary-dark" key={cToken.name + "cToken.ubalance"}>
-    {formatBalance(
+    {displayAmount(
       cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
-      cToken.underlying.decimals,
-      {
-        commify: true,
-      }
+      cToken.underlying.decimals
     )}
   </Text>,
   <Text theme="primary-dark" key={cToken.name + "cToken.CF"}>
-    {formatBalance(cToken.collateralFactor, 16) + "%"}
+    {displayAmount(cToken.collateralFactor, 16) + "%"}
   </Text>,
   <Container key={cToken.name + "Test"} direction="row">
     <Button

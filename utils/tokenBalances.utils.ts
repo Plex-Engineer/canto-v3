@@ -37,20 +37,49 @@ export function convertToBigNumber(
 }
 
 /**
+ * @notice Options for formatting balances
+ * @param {string} symbol symbol to display with the balance
+ * @param {number} precision number of decimals to display
+ * @param {boolean} commify whether to commify the balance
+ * @param {boolean} short whether to display a short balance
+ */
+interface FormatBalanceOptions {
+  symbol?: string;
+  precision?: number;
+  commify?: boolean;
+  short?: boolean;
+}
+
+/**
+ * @notice function to display balances to the user
+ * @dev will use default formatting for consistency throughout the app
+ * @dev you can still pass in options to override the defaults
+ * @dev use when precision is less important
+ */
+export function displayAmount(
+  amount: string | BigNumber,
+  decimals: number,
+  options?: FormatBalanceOptions
+) {
+  const defaultOptions: FormatBalanceOptions = {
+    symbol: undefined,
+    precision: undefined,
+    commify: true,
+    short: true,
+  };
+  return formatBalance(amount, decimals, { ...defaultOptions, ...options });
+}
+
+/**
  * @notice formats a balance to a string
  * @param {string | BigNumber} amount amount to format
  * @param {number} decimals number of decimals to format to
- * @param {object} options options to format with
+ * @param {FormatBalanceOptions} options options to format with
  */
 export function formatBalance(
   amount: string | BigNumber,
   decimals: number,
-  options?: {
-    symbol?: string;
-    precision?: number;
-    commify?: boolean;
-    short?: boolean;
-  }
+  options?: FormatBalanceOptions
 ): string {
   // set this to avoid scientific notation
   BigNumber.set({ EXPONENTIAL_AT: 35 });

@@ -58,7 +58,7 @@ export const TX_DESCRIPTIONS = {
     amount: string,
     deposit: boolean
   ) => ({
-    title: "Wrap Canto",
+    title: `${deposit ? "Wrap" : "Unwrap"} ${tokenSymbol}`,
     description: `${deposit ? "Wrap" : "Unwrap"} ${amount} ${tokenSymbol} ${
       deposit ? "to" : "from"
     } ${tokenSymbol} OFT`,

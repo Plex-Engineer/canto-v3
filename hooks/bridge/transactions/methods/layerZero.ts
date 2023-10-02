@@ -19,7 +19,7 @@ import { getProviderWithoutSigner } from "@/utils/evm/helpers.utils";
 import { createApprovalTxs, getTokenBalance } from "@/utils/evm/erc20.utils";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import {
   BridgingMethod,
   getBridgeMethodInfo,
@@ -126,7 +126,7 @@ export async function bridgeLayerZero(
             amountToDeposit,
             TX_DESCRIPTIONS.OFT_DEPOSIT_OR_WITHDRAW(
               token.symbol,
-              formatBalance(amountToDeposit, token.decimals),
+              displayAmount(amountToDeposit, token.decimals),
               true
             )
           )
@@ -147,7 +147,7 @@ export async function bridgeLayerZero(
       gas.toString(),
       TX_DESCRIPTIONS.BRIDGE(
         token.symbol,
-        formatBalance(amount, token.decimals),
+        displayAmount(amount, token.decimals),
         fromNetwork.name,
         toNetwork.name,
         getBridgeMethodInfo(BridgingMethod.LAYER_ZERO).name

@@ -5,7 +5,7 @@ import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
 
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import { useLendingCombo } from "./utils";
 import Text from "@/components/text";
 import Container from "@/components/container/container";
@@ -139,23 +139,18 @@ export default function LendingPage() {
             <OutlineCard>
               <Item
                 name="Note in circulation"
-                value={formatBalance(lendingStats.circulatingNote, 18, {
-                  commify: true,
-                })}
+                value={displayAmount(lendingStats.circulatingNote, 18)}
                 postChild={<NoteIcon />}
               />
               <Item
                 name="Value of rwas on canto"
-                value={formatBalance(lendingStats.valueOfAllRWA, 18, {
-                  commify: true,
-                })}
+                value={displayAmount(lendingStats.valueOfAllRWA, 18)}
                 postChild={<NoteIcon />}
               />
               <Item
                 name="Price of cNote"
-                value={formatBalance(lendingStats.cNotePrice, 18, {
+                value={displayAmount(lendingStats.cNotePrice, 18, {
                   precision: 2,
-                  commify: true,
                 })}
                 postChild={<NoteIcon />}
               />
@@ -166,8 +161,7 @@ export default function LendingPage() {
             <OutlineCard>
               <Item
                 name="Outstanding Debt"
-                value={formatBalance(clmPosition.general.outstandingDebt, 18, {
-                  commify: true,
+                value={displayAmount(clmPosition.general.outstandingDebt, 18, {
                   precision: 2,
                 })}
                 postChild={<NoteIcon />}
@@ -182,11 +176,10 @@ export default function LendingPage() {
               />
               <Item
                 name="Maximum Account Liquidity"
-                value={formatBalance(
+                value={displayAmount(
                   clmPosition.general.maxAccountLiquidity,
                   18,
                   {
-                    commify: true,
                     precision: 2,
                   }
                 )}

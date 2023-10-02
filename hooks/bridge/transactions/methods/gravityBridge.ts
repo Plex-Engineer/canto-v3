@@ -30,7 +30,7 @@ import { tryFetch } from "@/utils/async.utils";
 import { getCantoBalance } from "@/utils/cosmos/cosmosBalance.utils";
 import { createMsgsSend } from "@/utils/cosmos/transactions/messages/messageSend";
 import { createApprovalTxs, getTokenBalance } from "@/utils/evm/erc20.utils";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import BigNumber from "bignumber.js";
 import {
   BridgingMethod,
@@ -145,7 +145,7 @@ export async function bridgeInGravity(
           token.chainId,
           token.address,
           amountToWrap,
-          TX_DESCRIPTIONS.WRAP_ETH(formatBalance(amountToWrap, token.decimals))
+          TX_DESCRIPTIONS.WRAP_ETH(displayAmount(amountToWrap, token.decimals))
         )
       );
     }
@@ -179,7 +179,7 @@ export async function bridgeInGravity(
       amount,
       TX_DESCRIPTIONS.BRIDGE(
         token.symbol,
-        formatBalance(amount, token.decimals),
+        displayAmount(amount, token.decimals),
         ETH_MAINNET.name,
         CANTO_MAINNET_EVM.name,
         getBridgeMethodInfo(BridgingMethod.GRAVITY_BRIDGE).name

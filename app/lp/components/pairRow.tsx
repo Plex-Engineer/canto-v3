@@ -1,9 +1,10 @@
 import Button from "@/components/button/button";
+import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
 import { PairWithUserCTokenData } from "@/hooks/pairs/interfaces/pairs";
 import { formatPercent } from "@/utils/formatting.utils";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import {
   addTokenBalances,
   convertTokenAmountToNote,
@@ -41,25 +42,28 @@ export const UserPairRow = ({
 
     <Text key={pair.address + "share"}>{formatPercent(userPoolShare)}</Text>,
     <Text key={pair.address + "value"}>
-      {formatBalance(totalUserLPValue.toString(), 18, {
-        commify: true,
+      {displayAmount(totalUserLPValue.toString(), 18, {
         precision: 2,
       })}
+      <Icon
+        themed
+        icon={{
+          url: "/tokens/note.svg",
+          size: 16,
+        }}
+      />
     </Text>,
     <Text key={pair.address + "totalUserTokens"}>
-      {formatBalance(totalUserLpTokens, pair.decimals, {
-        commify: true,
-      })}
+      {displayAmount(totalUserLpTokens, pair.decimals)}
     </Text>,
     <Text key={pair.address + "userStake"}>
-      {formatBalance(
+      {displayAmount(
         pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0",
-        pair.decimals,
-        { commify: true }
+        pair.decimals
       )}
     </Text>,
     <Text key={pair.address + "rewards"}>
-      {formatBalance(pair.clmData?.userDetails?.rewards ?? "0", 18)}
+      {displayAmount(pair.clmData?.userDetails?.rewards ?? "0", 18)}
     </Text>,
     <div key={pair.address + "edit"}>
       <Button onClick={() => onAddLiquidity(pair.address)} color="secondary">
@@ -91,10 +95,16 @@ export const GeneralPairRow = ({
   <Text key={pair.address + "apr"}>{pair.clmData?.distApy + "%"}</Text>,
 
   <Text key={pair.address + "tvl"}>
-    {formatBalance(pair.tvl, 18, {
-      commify: true,
+    {displayAmount(pair.tvl, 18, {
       precision: 2,
     })}
+    <Icon
+      themed
+      icon={{
+        url: "/tokens/note.svg",
+        size: 16,
+      }}
+    />
   </Text>,
   <Text key={pair.address + "type"}>
     {pair.stable ? "Stable" : "Volatile"}

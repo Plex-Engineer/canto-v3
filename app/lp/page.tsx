@@ -22,11 +22,13 @@ import { quoteRemoveLiquidity } from "@/utils/evm/pairs.utils";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 
 export default function Page() {
-  const signer = useWalletClient();
+  const { data: signer } = useWalletClient();
+  const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
+
   const txStore = useStore(useTransactionStore, (state) => state);
   const { pairs, transaction, amounts, selection } = usePairs({
-    chainId: signer.data?.chain.id ?? 7700,
-    userEthAddress: signer.data?.account.address ?? "",
+    chainId,
+    userEthAddress: signer?.account.address ?? "",
   });
   const sortedPairs = pairs?.sort((a, b) => a.symbol.localeCompare(b.symbol));
   const userPairs = pairs.filter(
@@ -39,21 +41,21 @@ export default function Page() {
   // transactions
   function sendTxFlow(params: Partial<PairsTransactionParams>) {
     const { data: flow, error } = transaction.createNewPairsFlow({
-      chainId: signer.data?.chain.id ?? 7700,
-      ethAccount: signer.data?.account.address ?? "",
+      chainId,
+      ethAccount: signer?.account.address ?? "",
       pair: selectedPair,
       ...params,
     } as PairsTransactionParams);
     if (error) {
       console.log(error);
     } else {
-      txStore?.addNewFlow({ txFlow: flow, signer: signer.data });
+      txStore?.addNewFlow({ txFlow: flow, signer: signer });
     }
   }
   function canPerformTx(params: Partial<PairsTransactionParams>): boolean {
     const { data: canPerform, error } = transaction.canPerformPairsTx({
-      chainId: signer.data?.chain.id ?? 7700,
-      ethAccount: signer.data?.account.address ?? "",
+      chainId: signer?.chain.id ?? 7700,
+      ethAccount: signer?.account.address ?? "",
       pair: selectedPair,
       ...params,
     } as PairsTransactionParams);

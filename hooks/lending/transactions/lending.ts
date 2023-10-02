@@ -13,7 +13,7 @@ import {
 } from "../interfaces/lendingTxTypes";
 import { createApprovalTxs } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import { CERC20_ABI, COMPTROLLER_ABI } from "@/config/abis";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 
@@ -94,7 +94,7 @@ export async function cTokenLendingTx(
       TX_DESCRIPTIONS.CTOKEN_LENDING(
         params.txType,
         params.cToken.underlying.symbol,
-        formatBalance(params.amount, params.cToken.underlying.decimals)
+        displayAmount(params.amount, params.cToken.underlying.decimals)
       )
     )
   );
