@@ -1,4 +1,4 @@
-import { Transaction, PromiseWithError } from "../interfaces";
+import { Transaction, PromiseWithError, NO_ERROR } from "../interfaces";
 import { BridgeTransactionParams } from "@/hooks/bridge/interfaces/hookParams";
 import {
   bridgeInTx,
@@ -6,6 +6,7 @@ import {
   validateBridgeInRetryParams,
   validateBridgeOutRetryParams,
 } from "@/hooks/bridge/transactions/bridge";
+import { ProposalVoteTx, proposalVoteTx } from "@/hooks/governance/transactions/vote";
 import { CTokenLendingTransactionParams } from "@/hooks/lending/interfaces/lendingTxTypes";
 import {
   cTokenLendingTx,
@@ -16,6 +17,7 @@ export enum TransactionFlowType {
   BRIDGE_IN = "BRIDGE_IN",
   BRIDGE_OUT = "BRIDGE_OUT",
   CLM_CTOKEN_TX = "CLM_CTOKEN_TX",
+  VOTE_TX = "VOTE_TX",
 }
 
 export const TRANSACTION_FLOW_MAP: {
@@ -43,4 +45,8 @@ export const TRANSACTION_FLOW_MAP: {
     tx: async (params: CTokenLendingTransactionParams) =>
       cTokenLendingTx(params),
   },
+  [TransactionFlowType.VOTE_TX]: {
+    validRetry: async (params: ProposalVoteTx) => NO_ERROR({valid: false}),
+    tx: async (params: ProposalVoteTx) => proposalVoteTx(params),
+  }
 };
