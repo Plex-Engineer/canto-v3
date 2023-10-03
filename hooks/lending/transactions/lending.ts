@@ -30,7 +30,10 @@ export async function cTokenLendingTx(
     params.txType === CTokenLendingTxTypes.DECOLLATERALIZE
   ) {
     // get comptroller address
-    const comptrollerAddress = getCantoCoreAddress(params.chainId, "comptroller");
+    const comptrollerAddress = getCantoCoreAddress(
+      params.chainId,
+      "comptroller"
+    );
     if (!comptrollerAddress) {
       return NEW_ERROR("cTokenLendingTx: chainId not supported");
     }
@@ -84,20 +87,38 @@ export async function cTokenLendingTx(
     txList.push(...allowanceTxs);
   }
   // create tx for lending
-  txList.push(
-    _lendingCTokenTx(
-      params.txType,
-      params.chainId,
-      params.cToken.address,
-      isCanto,
-      params.amount,
-      TX_DESCRIPTIONS.CTOKEN_LENDING(
-        params.txType,
-        params.cToken.underlying.symbol,
-        displayAmount(params.amount, params.cToken.underlying.decimals)
-      )
-    )
+  const txDescription = TX_DESCRIPTIONS.CTOKEN_LENDING(
+    params.txType,
+    params.cToken.underlying.symbol,
+    displayAmount(params.amount, params.cToken.underlying.decimals)
   );
+  // check to see if tx is withdrawing entire balance
+  if (
+    params.txType === CTokenLendingTxTypes.WITHDRAW &&
+    params.cToken.userDetails.supplyBalanceInUnderlying === params.amount
+  ) {
+    // push special withdraw all function, passing in the cToken balance instead
+    txList.push(
+      _withdrawAllCTokenTx(
+        params.chainId,
+        params.cToken.address,
+        params.cToken.userDetails.balanceOfCToken,
+        txDescription
+      )
+    );
+  } else {
+    // push normal clm tx using underlying balance
+    txList.push(
+      _lendingCTokenTx(
+        params.txType,
+        params.chainId,
+        params.cToken.address,
+        isCanto,
+        params.amount,
+        txDescription
+      )
+    );
+  }
 
   // user should enable token as collateral if supplying and token has collateral factor
   if (
@@ -106,7 +127,10 @@ export async function cTokenLendingTx(
     Number(params.cToken.collateralFactor) !== 0
   ) {
     // get comptroller address
-    const comptrollerAddress = getCantoCoreAddress(params.chainId, "comptroller");
+    const comptrollerAddress = getCantoCoreAddress(
+      params.chainId,
+      "comptroller"
+    );
     if (!comptrollerAddress) {
       return NEW_ERROR("cTokenLendingTx: chainId not supported");
     }
@@ -154,6 +178,26 @@ const _lendingCTokenTx = (
     value: txDetails.value,
   };
 };
+
+// special function for withdrawing entire cToken balance (since it's a different method)
+// only called when withdrawing entire balance
+// uses cToken balance instead of underlying balance like the _lendingCTokenTx function
+// redeemUnderlying may leave the user with very small amount of cTokens because of "accrueInterest"
+const _withdrawAllCTokenTx = (
+  chainId: number,
+  cTokenAddress: string,
+  amount: string,
+  description: TransactionDescription
+): Transaction => ({
+  description,
+  chainId: chainId,
+  type: "EVM",
+  target: cTokenAddress,
+  abi: CERC20_ABI,
+  method: "redeem",
+  params: [amount],
+  value: "0",
+});
 
 const _collateralizeTx = (
   chainId: number,
