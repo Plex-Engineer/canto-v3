@@ -212,7 +212,7 @@ function methodAndParamsFromLendingTxType(
       };
     case CTokenLendingTxTypes.WITHDRAW:
       return {
-        method: "redeem",
+        method: "redeemUnderlying",
         params: [amount],
         value: "0",
       };
