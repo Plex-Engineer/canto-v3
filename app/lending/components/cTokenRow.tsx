@@ -48,7 +48,7 @@ export const CTokenRow = ({
   <Text theme="primary-dark" key={cToken.name + "cToken.CF"}>
     {displayAmount(cToken.collateralFactor, 16) + "%"}
   </Text>,
-  <Container key={cToken.name + "Test"} direction="row">
+  <Container key={cToken.name + "Manage"} direction="row">
     <Button
       key={cToken.name + "cToken.supply"}
       color="secondary"
