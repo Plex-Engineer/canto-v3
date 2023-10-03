@@ -145,7 +145,7 @@ function formatBigBalance(amount: string): {
   // get the number of digits in the amount, before decimals
   const digits = bnAmount.integerValue().toString().length;
   // only shorted value if greater than 1 million
-  if (digits > 6) {
+  if (digits > 3) {
     let shortAmount;
     let suffix;
     if (digits > 12) {
@@ -156,10 +156,14 @@ function formatBigBalance(amount: string): {
       // billions range
       suffix = "B";
       shortAmount = bnAmount.dividedBy(new BigNumber(10).pow(9));
-    } else {
+    } else if (digits > 6) {
       // millions range
       suffix = "M";
       shortAmount = bnAmount.dividedBy(new BigNumber(10).pow(6));
+    } else {
+      // thousands range
+      suffix = "K";
+      shortAmount = bnAmount.dividedBy(new BigNumber(10).pow(3));
     }
     return {
       shortAmount: shortAmount.toFixed(2),
