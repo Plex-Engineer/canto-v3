@@ -56,7 +56,10 @@ export default function LendingPage() {
             isSupplyModal={currentModal === CLMModalTypes.SUPPLY}
             position={clmPosition.position}
             cToken={selectedCToken}
-            transaction={transaction}
+            transaction={{
+              performTx: transaction.performTx,
+              validateAmount: transaction.validateParams,
+            }}
           />
         )}
       </Modal>

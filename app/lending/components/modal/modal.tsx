@@ -14,13 +14,17 @@ import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import { useState } from "react";
+import { ValidationReturn } from "@/config/interfaces";
 interface Props {
   isSupplyModal: boolean;
   cToken: CTokenWithUserData | null;
   position: UserLMPosition;
   transaction: {
     performTx: (amount: string, txType: CTokenLendingTxTypes) => void;
-    canPerformTx: (amount: string, txType: CTokenLendingTxTypes) => boolean;
+    validateAmount: (
+      amount: string,
+      txType: CTokenLendingTxTypes
+    ) => ValidationReturn;
   };
 }
 
@@ -114,7 +118,10 @@ export const LendingModal = (props: Props) => {
     actionType: CTokenLendingTxTypes,
     position: UserLMPosition,
     transaction: {
-      canPerformTx: (amount: string, txType: CTokenLendingTxTypes) => boolean;
+      validateAmount: (
+        amount: string,
+        txType: CTokenLendingTxTypes
+      ) => ValidationReturn;
       performTx: (amount: string, txType: CTokenLendingTxTypes) => void;
     }
   ) {
@@ -122,6 +129,7 @@ export const LendingModal = (props: Props) => {
     const bnAmount = (
       convertToBigNumber(amount, cToken.underlying.decimals).data ?? "0"
     ).toString();
+    const amountCheck = transaction.validateAmount(bnAmount, actionType);
     return (
       <div className={styles.content}>
         <Spacer height="20px" />
@@ -161,11 +169,13 @@ export const LendingModal = (props: Props) => {
             }}
             placeholder="0.0"
             value={amount}
+            error={!amountCheck.isValid && Number(amount) !== 0}
+            errorMessage={amountCheck.errorMessage}
           />
           <Spacer height="20px" />
           <Button
             width={"fill"}
-            disabled={!transaction.canPerformTx(bnAmount, actionType)}
+            disabled={!amountCheck.isValid}
             onClick={() => transaction.performTx(bnAmount, actionType)}
           >
             CONFIRM

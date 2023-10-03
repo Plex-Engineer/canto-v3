@@ -20,3 +20,8 @@ export const errMsg = (error: any): string => {
   }
   return error;
 };
+
+export type ValidationReturn = {
+  isValid: boolean;
+  errorMessage?: string;
+};
