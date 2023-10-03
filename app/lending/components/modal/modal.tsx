@@ -94,7 +94,7 @@ export const LendingModal = (props: Props) => {
     isSupply: boolean;
   }) => (
     <Container className={styles.card} padding="md" width="100%">
-      {isSupply && (
+      {isSupply && cToken.symbol.toLowerCase() == "cnote" && (
         <>
           <Card name="Supply APR" value={cToken.supplyApy + "%"} />
           <Card name="Dist APR" value={cToken.distApy + "%"} />
