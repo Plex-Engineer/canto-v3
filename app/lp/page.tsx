@@ -20,6 +20,7 @@ import { PairWithUserCTokenData } from "@/hooks/pairs/interfaces/pairs";
 import { PromiseWithError } from "@/config/interfaces";
 import { quoteRemoveLiquidity } from "@/utils/evm/pairs.utils";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
+import Text from "@/components/text";
 
 export default function Page() {
   const { data: signer } = useWalletClient();
@@ -36,6 +37,8 @@ export default function Page() {
       pair.clmData?.userDetails?.balanceOfCToken !== "0" ||
       pair.clmData?.userDetails?.balanceOfUnderlying !== "0"
   );
+
+  console.log(pairs);
   const { setPair, pair: selectedPair } = selection;
 
   // transactions
@@ -74,6 +77,8 @@ export default function Page() {
           />
         )}
       </Modal>
+      <Text size="x-lg">LP Interface</Text>
+      <Spacer height="40px" />;
       <Table
         headers={[
           "Pair",
@@ -85,7 +90,7 @@ export default function Page() {
           "Rewards",
           "Edit",
         ]}
-        columns={10}
+        columns={9}
         processedData={userPairs.map((pair) => (
           <UserPairRow
             key={pair.symbol}
@@ -99,9 +104,10 @@ export default function Page() {
           />
         ))}
       />
+      <Spacer height="40px" />
       <Table
-        headers={["Pair", "APR", "TVL", "Edit"]}
-        columns={10}
+        headers={["Pair", "APR", "TVL", "Type", "action"]}
+        columns={6}
         processedData={sortedPairs.map((pair) => (
           <GeneralPairRow
             key={pair.symbol}
@@ -112,6 +118,7 @@ export default function Page() {
           />
         ))}
       />
+      <Spacer height="40px" />;
     </div>
   );
 }

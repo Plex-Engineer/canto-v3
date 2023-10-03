@@ -98,6 +98,7 @@ const TxItem = (props: TxItemProps) => {
               {props.tx.txLink && (
                 <a
                   href={props.tx.txLink}
+                  target="_blank"
                   style={{
                     textDecoration: "underline",
                   }}

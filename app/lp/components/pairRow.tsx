@@ -36,6 +36,8 @@ export const UserPairRow = ({
   return [
     <div key={pair.address + "symbol"}>
       <Image src={pair.logoURI} width={54} height={54} alt="logo" />
+      <Spacer width="10px" />
+
       <Text>{pair.symbol}</Text>
     </div>,
     <Text key={pair.address + "apr"}>{pair.clmData?.distApy + "%"}</Text>,
@@ -90,6 +92,7 @@ export const GeneralPairRow = ({
 }) => [
   <div key={pair.address + "symbol"}>
     <Image src={pair.logoURI} width={54} height={54} alt="logo" />
+    <Spacer width="10px" />
     <Text>{pair.symbol}</Text>
   </div>,
   <Text key={pair.address + "apr"}>{pair.clmData?.distApy + "%"}</Text>,
