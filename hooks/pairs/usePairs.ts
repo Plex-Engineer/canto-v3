@@ -144,9 +144,14 @@ export default function usePairs(
             token2.decimals
           ),
         ];
+        const prefixError = !token1Check.isValid
+          ? token1.symbol
+          : token2.symbol;
         return {
           isValid: token1Check.isValid && token2Check.isValid,
-          errorMessage: token1Check.errorMessage || token2Check.errorMessage,
+          errorMessage:
+            prefixError +
+            (token1Check.errorMessage || token2Check.errorMessage),
         };
       }
       case PairsTxTypes.REMOVE_LIQUIDITY:
