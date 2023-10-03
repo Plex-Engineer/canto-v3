@@ -32,8 +32,16 @@ const HighlightCard = ({
       />
       <div className={styles.header}>
         <Item
-          name="Asset"
-          value={cToken.underlying.name}
+          name={
+            <Icon
+              themed
+              icon={{
+                url: cToken.underlying.logoURI,
+                size: 24,
+              }}
+            />
+          }
+          value={"$" + cToken.underlying.name}
           theme="primary-light"
         />
         <Item
