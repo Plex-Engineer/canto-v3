@@ -162,23 +162,20 @@ export default function LendingPage() {
 
           <div className={styles.widget2}>
             <OutlineCard>
-              <Item
+              {/* <Item
                 name="Outstanding Debt"
                 value={displayAmount(clmPosition.general.outstandingDebt, 18, {
                   precision: 2,
                 })}
                 postChild={<NoteIcon />}
-              />
-              <Item
-                name="Average APR"
-                value={clmPosition.general.netApr + "%"}
-              />
+              /> */}
+              <Item name="Net APR" value={clmPosition.general.netApr + "%"} />
               <Item
                 name="Percent Limit Used"
                 value={clmPosition.general.percentLimitUsed + "%"}
               />
               <Item
-                name="Maximum Account Liquidity"
+                name="Borrow Limit"
                 value={displayAmount(
                   clmPosition.general.maxAccountLiquidity,
                   18,
