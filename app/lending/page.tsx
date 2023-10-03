@@ -41,6 +41,7 @@ export default function LendingPage() {
 
   return (
     <div className={styles.container}>
+      <hr />
       <Text size="x-lg" font="proto_mono" className={styles.title}>
         Lending
       </Text>
@@ -194,5 +195,5 @@ export default function LendingPage() {
 }
 
 const NoteIcon = () => (
-  <Icon themed icon={{ url: "/tokens/note.svg", size: 24 }} />
+  <Icon themed icon={{ url: "/tokens/note.svg", size: 20 }} />
 );
