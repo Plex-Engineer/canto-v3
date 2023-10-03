@@ -119,6 +119,7 @@ const Selector = (props: Props) => {
                       }}
                     >
                       <Icon
+                        themed
                         icon={{
                           url: "dropdown.svg",
                           size: 24,
@@ -154,6 +155,7 @@ const Selector = (props: Props) => {
                 }}
               >
                 <Icon
+                  themed
                   icon={{
                     url: "dropdown.svg",
                     size: 24,
@@ -235,6 +237,7 @@ const Selector = (props: Props) => {
           </Text>
         </Container>
         <Icon
+          themed
           icon={{
             url: "dropdown.svg",
             size: 24,
