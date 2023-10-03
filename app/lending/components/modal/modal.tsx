@@ -183,7 +183,7 @@ export const LendingModal = (props: Props) => {
               props.isSupplyModal
                 ? [
                     {
-                      title: "Stake",
+                      title: "Supply",
                       content: Content(
                         props.cToken,
                         true,

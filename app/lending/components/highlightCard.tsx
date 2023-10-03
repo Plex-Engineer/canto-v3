@@ -64,7 +64,7 @@ const HighlightCard = ({
           }
         />
         <Item
-          name="Amount Staked"
+          name="Amount Supplied"
           value={formattedAmount(
             cToken.userDetails?.supplyBalanceInUnderlying ?? "0"
           )}
@@ -79,7 +79,7 @@ const HighlightCard = ({
           }
         />
         <Item
-          name="Outstanding Debt"
+          name="Amount Borrowed"
           value={formattedAmount(cToken.userDetails?.borrowBalance ?? "0")}
           postChild={
             <Icon
@@ -101,7 +101,7 @@ const HighlightCard = ({
           fontSize={"lg"}
           onClick={onSupply}
         >
-          Stake note
+          Supply note
         </Button>
 
         <Button
