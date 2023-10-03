@@ -4,9 +4,14 @@ import { Pair, PairWithUserCTokenData } from "./interfaces/pairs";
 import { CANTO_DATA_API_ENDPOINTS } from "@/config/api";
 import { getCantoApiData } from "@/config/api/canto-api";
 import useLending from "../lending/useLending";
-import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
+import {
+  NEW_ERROR,
+  NO_ERROR,
+  NewTransactionFlow,
+  ReturnWithError,
+  ValidationReturn,
+} from "@/config/interfaces";
 import { createNewPairsTxFlow } from "./helpers/createPairsFlow";
-import { getOptimalValueBFormatted } from "./helpers/addLiquidityValues";
 import useTokenBalances from "../helpers/useTokenBalances";
 import { getUniqueUnderlyingTokensFromPairs } from "./helpers/underlyingTokens";
 import { areEqualAddresses } from "@/utils/address.utils";
@@ -15,7 +20,7 @@ import {
   PairsTransactionParams,
   PairsTxTypes,
 } from "./interfaces/pairsTxTypes";
-import { greaterThanOrEqualTo } from "@/utils/tokens/tokenMath.utils";
+import { validateInputTokenAmount } from "@/utils/validation.utils";
 
 export default function usePairs(
   params: PairsHookInputParams
@@ -102,85 +107,100 @@ export default function usePairs(
   /// external functions
   ///
 
-  function canPerformPairsTx(
-    txParams: PairsTransactionParams
-  ): ReturnWithError<boolean> {
+  function validateParams(txParams: PairsTransactionParams): ValidationReturn {
     // make sure user eth address is the same
     if (!areEqualAddresses(params.userEthAddress ?? "", txParams.ethAccount)) {
-      return NEW_ERROR("canPerformPairsTx: user eth address is not the same");
+      return {
+        isValid: false,
+        errorMessage: "user eth address is not the same",
+      };
     }
     if (!txParams.pair.clmData?.userDetails) {
-      return NEW_ERROR("canPerformPairsTx: pair clm data not found");
+      return {
+        isValid: false,
+        errorMessage: "pair clm data not found",
+      };
     }
+    // save user details to variable to stop repetition
+    const pair = txParams.pair;
+    const userDetails = txParams.pair.clmData.userDetails;
     // make sure balances are good depending on tx type
     switch (txParams.txType) {
-      case PairsTxTypes.ADD_LIQUIDITY:
+      case PairsTxTypes.ADD_LIQUIDITY: {
+        const token1 = pair.token1;
+        const token2 = pair.token2;
         // each token value must be less than or equal to their balance
-        const [token1Good, token2Good] = [
-          greaterThanOrEqualTo(
-            txParams.pair.token1.balance ?? "0",
-            txParams.amounts.amount1
-          ).data && txParams.amounts.amount1 !== "0",
-          greaterThanOrEqualTo(
-            txParams.pair.token2.balance ?? "0",
-            txParams.amounts.amount2
-          ).data && txParams.amounts.amount2 !== "0",
+        const [token1Check, token2Check] = [
+          validateInputTokenAmount(
+            txParams.amounts.amount1,
+            token1.balance ?? "0",
+            token1.symbol,
+            token1.decimals
+          ),
+          validateInputTokenAmount(
+            txParams.amounts.amount2,
+            token2.balance ?? "0",
+            token2.symbol,
+            token2.decimals
+          ),
         ];
-        return NO_ERROR(token1Good && token2Good);
+        return {
+          isValid: token1Check.isValid && token2Check.isValid,
+          errorMessage: token1Check.errorMessage || token2Check.errorMessage,
+        };
+      }
       case PairsTxTypes.REMOVE_LIQUIDITY:
         // if unstaking first, check supplyBalance, otherwise check balanceOfUnderlying
-        return NO_ERROR(
-          txParams.amountLP !== "0" &&
-            (txParams.unstake
-              ? greaterThanOrEqualTo(
-                  txParams.pair.clmData.userDetails.supplyBalanceInUnderlying,
-                  txParams.amountLP
-                ).data
-              : greaterThanOrEqualTo(
-                  txParams.pair.clmData.userDetails.balanceOfUnderlying,
-                  txParams.amountLP
-                ).data)
+        return validateInputTokenAmount(
+          txParams.amountLP,
+          txParams.unstake
+            ? userDetails.supplyBalanceInUnderlying
+            : userDetails.balanceOfUnderlying,
+          pair.symbol,
+          pair.decimals
         );
       case PairsTxTypes.STAKE:
-        // amount must be less than or equal to balance of underlying
-        return NO_ERROR(
-          greaterThanOrEqualTo(
-            txParams.pair.clmData.userDetails.balanceOfUnderlying,
-            txParams.amountLP
-          ).data && txParams.amountLP !== "0"
+        return validateInputTokenAmount(
+          txParams.amountLP,
+          userDetails.balanceOfUnderlying,
+          pair.symbol,
+          pair.decimals
         );
       case PairsTxTypes.UNSTAKE:
-        // amount must be less than or equal to supply balance in underlying
-        return NO_ERROR(
-          greaterThanOrEqualTo(
-            txParams.pair.clmData.userDetails.supplyBalanceInUnderlying,
-            txParams.amountLP
-          ).data && txParams.amountLP !== "0"
+        return validateInputTokenAmount(
+          txParams.amountLP,
+          userDetails.supplyBalanceInUnderlying,
+          pair.symbol,
+          pair.decimals
         );
       default:
-        return NEW_ERROR("canPerformPairsTx: tx type not found");
+        return {
+          isValid: false,
+          errorMessage: "tx type not found",
+        };
     }
+  }
+
+  function createNewPairsFlow(
+    params: PairsTransactionParams
+  ): ReturnWithError<NewTransactionFlow> {
+    // validate params
+    const validation = validateParams(params);
+    if (!validation.isValid)
+      return NEW_ERROR("createNewPairsFlow::" + validation.errorMessage);
+    return createNewPairsTxFlow(params);
   }
 
   return {
     pairs: pairsWithUserCTokens ?? [],
     position,
-    amounts: {
-      getOptimalAmountFromValue: async (token1, pair, amount) =>
-        getOptimalValueBFormatted({
-          chainId: params.chainId,
-          pair,
-          valueChanged: token1 ? 1 : 2,
-          amount,
-        }),
-    },
     selection: {
       pair: getPair(selectedPairId ?? "").data,
       setPair: setSelectedPairId,
     },
     transaction: {
-      canPerformPairsTx,
-      createNewPairsFlow: createNewPairsTxFlow,
+      validateParams,
+      createNewPairsFlow,
     },
   };
 }

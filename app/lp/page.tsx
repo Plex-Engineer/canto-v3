@@ -11,23 +11,29 @@ import {
 import usePairs from "@/hooks/pairs/usePairs";
 import useTransactionStore from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
-import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
+import {
+  convertToBigNumber,
+  displayAmount,
+  formatBalance,
+} from "@/utils/tokenBalances.utils";
 import { useEffect, useState } from "react";
 import { useWalletClient } from "wagmi";
 import { GeneralPairRow, UserPairRow } from "./components/pairRow";
 import Container from "@/components/container/container";
 import { PairWithUserCTokenData } from "@/hooks/pairs/interfaces/pairs";
-import { PromiseWithError } from "@/config/interfaces";
+import { PromiseWithError, ValidationReturn } from "@/config/interfaces";
 import { quoteRemoveLiquidity } from "@/utils/evm/pairs.utils";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import Text from "@/components/text";
+import Icon from "@/components/icon/icon";
+import { getOptimalValueBFormatted } from "@/hooks/pairs/helpers/addLiquidityValues";
 
 export default function Page() {
   const { data: signer } = useWalletClient();
   const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
 
   const txStore = useStore(useTransactionStore, (state) => state);
-  const { pairs, transaction, amounts, selection } = usePairs({
+  const { pairs, transaction, selection } = usePairs({
     chainId,
     userEthAddress: signer?.account.address ?? "",
   });
@@ -38,7 +44,7 @@ export default function Page() {
       pair.clmData?.userDetails?.balanceOfUnderlying !== "0"
   );
 
-  console.log(pairs);
+  // console.log(pairs);
   const { setPair, pair: selectedPair } = selection;
 
   // transactions
@@ -55,14 +61,15 @@ export default function Page() {
       txStore?.addNewFlow({ txFlow: flow, signer: signer });
     }
   }
-  function canPerformTx(params: Partial<PairsTransactionParams>): boolean {
-    const { data: canPerform, error } = transaction.canPerformPairsTx({
+  function canPerformTx(
+    params: Partial<PairsTransactionParams>
+  ): ValidationReturn {
+    return transaction.validateParams({
       chainId: signer?.chain.id ?? 7700,
       ethAccount: signer?.account.address ?? "",
       pair: selectedPair,
       ...params,
     } as PairsTransactionParams);
-    return canPerform ?? false;
   }
 
   return (
@@ -71,8 +78,7 @@ export default function Page() {
         {selectedPair && (
           <TestEditModal
             pair={selectedPair}
-            getOptimalAmount={amounts.getOptimalAmountFromValue}
-            canPerformPairsTx={canPerformTx}
+            validateParams={canPerformTx}
             sendTxFlow={sendTxFlow}
           />
         )}
@@ -138,16 +144,11 @@ interface RemoveParams {
 }
 interface TestEditProps {
   pair: PairWithUserCTokenData;
-  getOptimalAmount: (
-    token1: boolean,
-    pair: PairWithUserCTokenData,
-    value: string
-  ) => PromiseWithError<string>;
-  canPerformPairsTx: (params: Partial<PairsTransactionParams>) => boolean;
   sendTxFlow: (params: Partial<PairsTransactionParams>) => void;
+  validateParams: (params: Partial<PairsTransactionParams>) => ValidationReturn;
 }
 const TestEditModal = (props: TestEditProps) => {
-  const [addLiquid, setAddLiquid] = useState(true);
+  const [modalType, setModalType] = useState<"add" | "remove" | "base">("base");
   const createAddProps = (params: AddParams) => ({
     pair: props.pair,
     slippage: params.slippage,
@@ -169,27 +170,64 @@ const TestEditModal = (props: TestEditProps) => {
   });
   return (
     <Container>
-      <Button onClick={() => setAddLiquid(!addLiquid)}>Switch Liquidity</Button>
-      {addLiquid ? (
+      {modalType !== "base" && (
+        <Button onClick={() => setModalType("base")}>Back</Button>
+      )}
+      <Icon icon={{ url: props.pair.logoURI, size: 50 }} />
+      <Text size="lg" weight="bold">
+        {props.pair.symbol}
+      </Text>
+      {modalType === "base" &&
+        props.pair.clmData?.userDetails?.balanceOfUnderlying !== "0" && (
+          <Container>
+            <Text>
+              Unstaked Liquidity{" "}
+              {displayAmount(
+                props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+                props.pair.decimals,
+                {
+                  symbol: props.pair.symbol,
+                }
+              )}
+            </Text>
+            <Button
+              onClick={() =>
+                props.sendTxFlow({
+                  txType: PairsTxTypes.REMOVE_LIQUIDITY,
+                  amountLP:
+                    props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+                  slippage: 2,
+                  deadline: "9999999999999999999999999",
+                })
+              }
+            >
+              Remove Unstaked Liquidity
+            </Button>
+            <Button
+              onClick={() =>
+                props.sendTxFlow({
+                  txType: PairsTxTypes.STAKE,
+                  amountLP:
+                    props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+                })
+              }
+            >
+              Stake Unstaked Liquidity
+            </Button>
+          </Container>
+        )}
+      {modalType === "base" && (
+        <Button color="accent" onClick={() => setModalType("add")}>
+          Add Liquidity
+        </Button>
+      )}
+      {modalType === "add" && (
         <TestAddLiquidityModal
           pair={props.pair}
-          getOptimalAmount={props.getOptimalAmount}
-          addLiquidity={{
-            canAddLiquidity: (params) =>
-              props.canPerformPairsTx(createAddProps(params)),
-            addLiquidityTx: (params) =>
-              props.sendTxFlow(createAddProps(params)),
-          }}
-        />
-      ) : (
-        <TestRemoveLiquidityModal
-          pair={props.pair}
-          removeLiquidity={{
-            canRemoveLiquidity: (params) =>
-              props.canPerformPairsTx(createRemoveParams(params)),
-            removeLiquidityTx: (params) =>
-              props.sendTxFlow(createRemoveParams(params)),
-          }}
+          validateParams={(params) =>
+            props.validateParams(createAddProps(params))
+          }
+          sendTxFlow={(params) => props.sendTxFlow(createAddProps(params))}
         />
       )}
     </Container>
@@ -198,20 +236,13 @@ const TestEditModal = (props: TestEditProps) => {
 
 interface TestAddProps {
   pair: PairWithUserCTokenData;
-  getOptimalAmount: (
-    token1: boolean,
-    pair: PairWithUserCTokenData,
-    value: string
-  ) => PromiseWithError<string>;
-  addLiquidity: {
-    canAddLiquidity: (params: AddParams) => boolean;
-    addLiquidityTx: (params: AddParams) => void;
-  };
+  validateParams: (params: AddParams) => ValidationReturn;
+  sendTxFlow: (params: AddParams) => void;
 }
 const TestAddLiquidityModal = ({
   pair,
-  getOptimalAmount,
-  addLiquidity,
+  validateParams,
+  sendTxFlow,
 }: TestAddProps) => {
   // values
   const [slippage, setSlippage] = useState(2);
@@ -219,21 +250,35 @@ const TestAddLiquidityModal = ({
   const [willStake, setWillStake] = useState(false);
   const [valueToken1, setValueToken1] = useState("");
   const [valueToken2, setValueToken2] = useState("");
+
+  // set values based on optimization
   async function setValue(value: string, token1: boolean) {
     let optimalAmount;
     if (token1) {
       setValueToken1(value);
-      optimalAmount = await getOptimalAmount(true, pair, value);
+      optimalAmount = await getOptimalValueBFormatted({
+        chainId: Number(pair.token1.chainId),
+        pair,
+        valueChanged: 1,
+        amount: value,
+      });
     } else {
       setValueToken2(value);
-      optimalAmount = await getOptimalAmount(false, pair, value);
+      optimalAmount = await getOptimalValueBFormatted({
+        chainId: Number(pair.token1.chainId),
+        pair,
+        valueChanged: 2,
+        amount: value,
+      });
     }
     if (optimalAmount.error) return;
     token1
       ? setValueToken2(optimalAmount.data)
       : setValueToken1(optimalAmount.data);
   }
-  const canAddLiquidity = addLiquidity.canAddLiquidity({
+
+  // validation
+  const paramCheck = validateParams({
     value1: (
       convertToBigNumber(valueToken1, pair.token1.decimals).data ?? "0"
     ).toString(),
@@ -246,8 +291,7 @@ const TestAddLiquidityModal = ({
   });
 
   return (
-    <div>
-      <h1>{pair.symbol}</h1>
+    <Container>
       <h3>
         Reserve Ratio:{" "}
         {formatBalance(
@@ -285,9 +329,9 @@ const TestAddLiquidityModal = ({
         STAKE {`${willStake ? "ON" : "OFF"}`}
       </Button>
       <Button
-        disabled={!canAddLiquidity}
+        disabled={!paramCheck.isValid}
         onClick={() =>
-          addLiquidity.addLiquidityTx({
+          sendTxFlow({
             value1: (
               convertToBigNumber(valueToken1, pair.token1.decimals).data ?? "0"
             ).toString(),
@@ -300,9 +344,9 @@ const TestAddLiquidityModal = ({
           })
         }
       >
-        Add Liquidity
+        {paramCheck.isValid ? "Add Liquidity" : paramCheck.errorMessage}
       </Button>
-    </div>
+    </Container>
   );
 };
 

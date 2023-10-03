@@ -12,8 +12,6 @@ export type PairsTransactionParams = {
   chainId: number;
   ethAccount: string;
   pair: PairWithUserCTokenData;
-  slippage: number;
-  deadline: string;
 } & (
   | {
       txType: PairsTxTypes.STAKE | PairsTxTypes.UNSTAKE;
@@ -23,20 +21,24 @@ export type PairsTransactionParams = {
       txType: PairsTxTypes.REMOVE_LIQUIDITY;
       amountLP: string;
       unstake: boolean;
+      slippage: number;
+      deadline: string;
     }
   | {
       txType: PairsTxTypes.ADD_LIQUIDITY;
       amounts: AddLiquidityTxAmounts;
       stake: boolean;
+      slippage: number;
+      deadline: string;
     }
 );
 
 export interface StakeLPParams {
-  chainId: number,
-  ethAccount: string,
-  cLPToken: CTokenWithUserData,
-  stake: boolean,
-  amount?: string
+  chainId: number;
+  ethAccount: string;
+  cLPToken: CTokenWithUserData;
+  stake: boolean;
+  amount?: string;
 }
 
 interface AddLiquidityTxAmounts {
