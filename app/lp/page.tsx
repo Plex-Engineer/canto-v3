@@ -10,7 +10,7 @@ import { useWalletClient } from "wagmi";
 import { GeneralPairRow, UserPairRow } from "./components/pairRow";
 import Text from "@/components/text";
 import { TestEditModal } from "./components/liquidityModal";
-
+import styles from "./lp.module.scss";
 export default function Page() {
   const { data: signer } = useWalletClient();
   const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
@@ -55,7 +55,7 @@ export default function Page() {
 
   //main content
   return (
-    <div>
+    <div className={styles.container}>
       <Modal open={selectedPair !== null} onClose={() => setPair(null)}>
         {selectedPair && (
           <TestEditModal
@@ -66,35 +66,41 @@ export default function Page() {
           />
         )}
       </Modal>
-      <Text size="x-lg">LP Interface</Text>
-      <Spacer height="40px" />;
-      <Table
-        headers={[
-          "Pair",
-          "APR",
-          "Pool Share",
-          "Value",
-          "# LP Tokens",
-          "# Staked",
-          "Rewards",
-          "Edit",
-        ]}
-        columns={9}
-        processedData={userPairs.map((pair) => (
-          <UserPairRow
-            key={pair.symbol}
-            pair={pair}
-            onAddLiquidity={(pairAddress) => {
-              setPair(pairAddress);
-            }}
-            onRemoveLiquidity={(pairAddress) => {
-              setPair(pairAddress);
-            }}
-          />
-        ))}
-      />
+      <Text size="x-lg" className={styles.title}>
+        LP Interface
+      </Text>
+      <Spacer height="30px" />
+      {userPairs.length > 0 && (
+        <Table
+          title="Your Pairs"
+          headers={[
+            "Pair",
+            "APR",
+            "Pool Share",
+            "Value",
+            "# LP Tokens",
+            "# Staked",
+            "Rewards",
+            "Edit",
+          ]}
+          columns={9}
+          processedData={userPairs.map((pair) => (
+            <UserPairRow
+              key={pair.symbol}
+              pair={pair}
+              onAddLiquidity={(pairAddress) => {
+                setPair(pairAddress);
+              }}
+              onRemoveLiquidity={(pairAddress) => {
+                setPair(pairAddress);
+              }}
+            />
+          ))}
+        />
+      )}
       <Spacer height="40px" />
       <Table
+        title="All Pairs"
         headers={["Pair", "APR", "TVL", "Type", "action"]}
         columns={6}
         processedData={sortedPairs.map((pair) => (
@@ -107,7 +113,7 @@ export default function Page() {
           />
         ))}
       />
-      <Spacer height="40px" />;
+      <Spacer height="40px" />
     </div>
   );
 }
