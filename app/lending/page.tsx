@@ -16,6 +16,7 @@ import LoadingIcon from "@/components/loader/loading";
 import { LendingModal } from "./components/modal/modal";
 import { CTokenRow } from "./components/cTokenRow";
 import { useState } from "react";
+import Spacer from "@/components/layout/spacer";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -41,11 +42,10 @@ export default function LendingPage() {
 
   return (
     <div className={styles.container}>
-      <hr />
       <Text size="x-lg" font="proto_mono" className={styles.title}>
         Lending
       </Text>
-
+      <Spacer height="20px" />
       <Modal
         open={currentModal !== CLMModalTypes.NONE}
         onClose={() => setCurrentModal(CLMModalTypes.NONE)}
