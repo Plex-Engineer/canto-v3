@@ -1,6 +1,7 @@
 import Button from "@/components/button/button";
 import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
+import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { displayAmount } from "@/utils/tokenBalances.utils";
@@ -54,15 +55,15 @@ export const CTokenRow = ({
       color="secondary"
       onClick={onClick}
     >
-      Manage
+      Supply
     </Button>
-    {/* <Spacer width="10px" />
+    <Spacer width="10px" />
     <Button
       key={cToken.name + "cToken.withdraw"}
       color="secondary"
       onClick={onClick}
     >
       Withdraw
-    </Button> */}
+    </Button>
   </Container>,
 ];
