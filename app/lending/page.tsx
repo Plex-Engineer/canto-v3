@@ -133,7 +133,17 @@ export default function LendingPage() {
                 ]}
               />
             ) : (
-              <Text>No RWAS tokens available</Text>
+              <Container
+                width="1000px"
+                height="200px"
+                center={{
+                  horizontal: true,
+                  vertical: true,
+                }}
+                backgroundColor="var(--card-sub-surface-color)"
+              >
+                <Text theme="secondary-dark">No RWAS tokens available</Text>
+              </Container>
             )}
           </div>
         </Container>
