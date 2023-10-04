@@ -21,7 +21,7 @@ export default function useTestAmbient() {
   const { data } = useQuery(
     "testLP",
     async () => {
-      const randomAmbientAddress = "";
+      const randomAmbientAddress = "0x8915da99B69e84DE6C97928d378D9887482C671c";
       // test with canto test pool
       const CNOTE = "0x04E52476d318CdF739C38BD41A922787D441900c";
       const USDC = "0xc51534568489f47949A828C8e3BF68463bdF3566";
@@ -73,9 +73,11 @@ export default function useTestAmbient() {
         crocQuery.methods
           .queryAmbientTokens(randomAmbientAddress, BASE, QUOTE, poolIdx)
           .call(),
+        crocQuery.methods.querySurplus(randomAmbientAddress, BASE).call(),
+        crocQuery.methods.querySurplus(randomAmbientAddress, QUOTE).call(),
       ]);
-      console.log(BigNumber.from(data[3]).toString());
-      console.log(Math.sqrt(Number(data[4])).toString());
+      // console.log(BigNumber.from(data[3]).toString());
+      // console.log(Math.sqrt(Number(data[4])).toString());
 
       return {
         base: { address: BASE, symbol: BASE == CNOTE ? "cNote" : "USDC" },
@@ -92,6 +94,7 @@ export default function useTestAmbient() {
             Number(data[4]),
             BigNumber.from(data[3])
           ).toString(),
+          liquidity: data[3],
         },
         price: {
           actual: data[4],
@@ -105,6 +108,10 @@ export default function useTestAmbient() {
           position: data[5],
           tokens: data[6],
         },
+        surplus: {
+          base: data[7],
+          quote: data[8],
+        },
       };
     },
     {
@@ -114,7 +121,7 @@ export default function useTestAmbient() {
       onError: (error) => {
         console.log(error);
       },
-      refetchInterval: 4000,
+      refetchInterval: 5000,
     }
   );
   return data;

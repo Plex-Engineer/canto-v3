@@ -1,0 +1,26 @@
+export interface BaseAmbientPair {
+  base: AmbientPairToken;
+  quote: AmbientPairToken;
+  poolIdx: number;
+}
+
+export interface AmbientPair extends BaseAmbientPair {
+  q64PriceRoot: string; // price of base in quote in q64 root format
+  currentTick: number; // current tick of curve
+  concLiquidity: string; // concentrated liquidity
+  liquidity: {
+    base: string;
+    quote: string;
+    rootLiquidity: string;
+  };
+}
+
+interface AmbientPairToken {
+  address: string;
+  chainId: number;
+  decimals: number;
+  logoURI: string;
+  name: string;
+  symbol: string;
+  balance?: string;
+}
