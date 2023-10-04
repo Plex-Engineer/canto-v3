@@ -51,32 +51,63 @@
     content: "";
     display: block;
     height: 1px;
-    transform: translateX(-15%) scaleX(0);
-
-    transition: transform 0.3s, height 0.3s 0.1s;
+    transform: translate(-15%, 0%) scale(0, 0);
+    transition: transform 0.3s, height 0.3s 0.1s, width 0.3s 0.1s;
   }
-
-  &:hover::after {
+  &::before {
     content: "";
     display: block;
-    width: 140%;
-    transform: translateX(-15%) scaleX(1);
-    height: 10px;
-    border: 2px solid var(--card-primary-color);
-    border-top: none;
+    height: 1px;
+    transform: translate(-15%, 0%) scale(0, 0);
+
+    transition: transform 0.3s, height 0.3s 0.1s, width 0.3s 0.1s;
   }
+  //   &:hover::after {
+  //     content: "";
+  //     display: block;
+  //     width: 140%;
+  //     transform: translateX(-15%) scaleX(1);
+  //     height: 10px;
+  //     border: 2px solid var(--card-primary-color);
+  //     border-top: none;
+  //   }
 }
 
 .active {
   opacity: 1;
+  //   &::after {
+  //     content: "";
+  //     display: block;
+  //     width: 140%;
+  //     transform: translateX(-15%) scaleX(1);
+  //     height: 10px;
+  //     border: 2px solid var(--card-primary-color);
+  //     border-top: none;
+  //   }
+  position: relative;
+  &::before {
+    content: "";
+    top: 0;
+    right: 0;
+    display: block;
+    position: absolute;
+    width: 10px;
+    transform: translate(0%, 0%) scale(1, 1);
+    height: 10px;
+    border-right: 2px solid var(--card-primary-color);
+    border-top: 2px solid var(--card-primary-color);
+  }
   &::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
     content: "";
     display: block;
-    width: 140%;
-    transform: translateX(-15%) scaleX(1);
+    width: 10px;
+    transform: translate(0%, 10%) scale(1, 1);
     height: 10px;
-    border: 2px solid var(--card-primary-color);
-    border-top: none;
+    border-left: 2px solid var(--card-primary-color);
+    border-bottom: 2px solid var(--card-primary-color);
   }
 }
 .wallet-connect {
