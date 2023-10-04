@@ -34,7 +34,6 @@ const HighlightCard = ({
         <Item
           name={
             <Icon
-              themed
               icon={{
                 url: cToken.underlying.logoURI,
                 size: 24,
