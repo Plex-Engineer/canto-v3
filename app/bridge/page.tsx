@@ -108,7 +108,7 @@ export default function BridgePage() {
       <AnimatedBackground
         initSize="400px"
         direction={bridgeDirection()}
-        time={200}
+        time={20}
       />
       <Container
         height="100vm"
