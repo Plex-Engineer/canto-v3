@@ -69,6 +69,15 @@
 
 .active {
   opacity: 1;
+  &::after {
+    content: "";
+    display: block;
+    width: 140%;
+    transform: translateX(-15%) scaleX(1);
+    height: 10px;
+    border: 2px solid var(--card-primary-color);
+    border-top: none;
+  }
 }
 .wallet-connect {
   display: flex;
