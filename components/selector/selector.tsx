@@ -203,6 +203,7 @@ const Selector = (props: Props) => {
         color="secondary"
         width="fill"
         height={64}
+        shadow="small"
         onClick={() => {
           setIsOpen(true);
         }}
