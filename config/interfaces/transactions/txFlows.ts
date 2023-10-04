@@ -27,6 +27,7 @@ export interface TransactionFlow extends NewTransactionFlow {
   transactions: TransactionWithStatus[];
   placeholderFlow?: NewTransactionFlowPlaceholder;
   error?: string;
+  onSuccessCallback?: () => void;
 }
 
 // user can be on different accounts to make transactions, so we need to map the transaction flows to the account

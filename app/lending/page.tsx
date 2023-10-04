@@ -36,7 +36,11 @@ export default function LendingPage() {
     selection,
     isLoading,
     lendingStats,
-  } = useLendingCombo();
+  } = useLendingCombo({
+    onSuccessTx: () => {
+      setCurrentModal(CLMModalTypes.NONE);
+    },
+  });
   const { cNote, rwas } = cTokens;
   const { selectedCToken, setSelectedCToken } = selection;
 

@@ -49,7 +49,10 @@ interface LendingComboReturn {
   };
 }
 
-export function useLendingCombo(): LendingComboReturn {
+interface LendingComboProps {
+  onSuccessTx?: () => void;
+}
+export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
   // params for useLending hook
   const { data: signer } = useWalletClient();
   const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
@@ -131,7 +134,11 @@ export function useLendingCombo(): LendingComboReturn {
       console.log(error);
       return;
     }
-    txStore?.addNewFlow({ txFlow: data, signer });
+    txStore?.addNewFlow({
+      txFlow: data,
+      signer,
+      onSuccessCallback: props.onSuccessTx,
+    });
   }
   const validateParams = (
     amount: string,

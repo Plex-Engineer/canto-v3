@@ -205,6 +205,7 @@ const TransactionModal = () => {
                       status
                     )
                   }
+                  closeModal={() => setIsOpen(false)}
                 />
               )}
             </Container>

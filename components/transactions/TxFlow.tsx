@@ -17,6 +17,7 @@ interface Props {
   txFlow?: TransactionFlow;
   onRetry: () => void;
   setBridgeStatus: (txIndex: number, status: BridgeStatus) => void;
+  closeModal: () => void;
 }
 
 const TxFlow = (props: Props) => {
@@ -83,6 +84,21 @@ const TxFlow = (props: Props) => {
               <Spacer height="40px" />
               <Button disabled={!canRetry.valid} onClick={props.onRetry}>
                 RETRY
+              </Button>
+            </>
+          )}
+          {props.txFlow.status === "SUCCESS" && (
+            <>
+              <Spacer height="40px" />
+              <Button
+                onClick={() => {
+                  props.closeModal();
+                  if (props.txFlow?.onSuccessCallback) {
+                    props.txFlow.onSuccessCallback();
+                  }
+                }}
+              >
+                CLOSE
               </Button>
             </>
           )}
