@@ -3,8 +3,8 @@ import { PairWithUserCTokenData } from "./pairs";
 import { PairsTransactionParams } from "./pairsTxTypes";
 import {
   NewTransactionFlow,
-  PromiseWithError,
   ReturnWithError,
+  ValidationReturn,
 } from "@/config/interfaces";
 
 export interface PairsHookInputParams {
@@ -15,21 +15,12 @@ export interface PairsHookInputParams {
 export interface PairsHookReturn {
   pairs: PairWithUserCTokenData[];
   position: UserLMPosition;
-  amounts: {
-    getOptimalAmountFromValue: (
-      token1: boolean,
-      pair: PairWithUserCTokenData,
-      amount: string
-    ) => PromiseWithError<string>;
-  };
   selection: {
     pair: PairWithUserCTokenData | undefined;
     setPair: (pairAddress: string | null) => void;
   };
   transaction: {
-    canPerformPairsTx: (
-      txParams: PairsTransactionParams
-    ) => ReturnWithError<boolean>;
+    validateParams: (txParams: PairsTransactionParams) => ValidationReturn;
     createNewPairsFlow: (
       params: PairsTransactionParams
     ) => ReturnWithError<NewTransactionFlow>;

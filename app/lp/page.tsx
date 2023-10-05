@@ -7,16 +7,18 @@ import usePairs from "@/hooks/pairs/usePairs";
 import useTransactionStore from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
 import { useWalletClient } from "wagmi";
+import { ValidationReturn } from "@/config/interfaces";
 import { GeneralPairRow, UserPairRow } from "./components/pairRow";
 import Text from "@/components/text";
 import { TestEditModal } from "./components/liquidityModal";
 import styles from "./lp.module.scss";
+
 export default function Page() {
   const { data: signer } = useWalletClient();
   const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
 
   const txStore = useStore(useTransactionStore, (state) => state);
-  const { pairs, transaction, amounts, selection } = usePairs({
+  const { pairs, transaction, selection } = usePairs({
     chainId,
     userEthAddress: signer?.account.address ?? "",
   });
@@ -26,7 +28,6 @@ export default function Page() {
       pair.clmData?.userDetails?.balanceOfCToken !== "0" ||
       pair.clmData?.userDetails?.balanceOfUnderlying !== "0"
   );
-
   const { setPair, pair: selectedPair } = selection;
 
   // transactions
@@ -43,14 +44,15 @@ export default function Page() {
       txStore?.addNewFlow({ txFlow: flow, signer: signer });
     }
   }
-  function canPerformTx(params: Partial<PairsTransactionParams>): boolean {
-    const { data: canPerform, error } = transaction.canPerformPairsTx({
+  function canPerformTx(
+    params: Partial<PairsTransactionParams>
+  ): ValidationReturn {
+    return transaction.validateParams({
       chainId: signer?.chain.id ?? 7700,
       ethAccount: signer?.account.address ?? "",
       pair: selectedPair,
       ...params,
     } as PairsTransactionParams);
-    return canPerform ?? false;
   }
 
   //main content
@@ -60,8 +62,7 @@ export default function Page() {
         {selectedPair && (
           <TestEditModal
             pair={selectedPair}
-            getOptimalAmount={amounts.getOptimalAmountFromValue}
-            canPerformPairsTx={canPerformTx}
+            validateParams={canPerformTx}
             sendTxFlow={sendTxFlow}
           />
         )}

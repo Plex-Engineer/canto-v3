@@ -6,13 +6,20 @@ import {
   PairsTransactionParams,
   PairsTxTypes,
 } from "@/hooks/pairs/interfaces/pairsTxTypes";
-import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
+import {
+  convertToBigNumber,
+  displayAmount,
+  formatBalance,
+} from "@/utils/tokenBalances.utils";
 import { useEffect, useState } from "react";
 import Container from "@/components/container/container";
 import { PairWithUserCTokenData } from "@/hooks/pairs/interfaces/pairs";
-import { PromiseWithError } from "@/config/interfaces";
 import { quoteRemoveLiquidity } from "@/utils/evm/pairs.utils";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
+import { ValidationReturn } from "@/config/interfaces";
+import Icon from "@/components/icon/icon";
+import Text from "@/components/text";
+import { getOptimalValueBFormatted } from "@/hooks/pairs/helpers/addLiquidityValues";
 
 interface AddParams {
   value1: string;
@@ -29,18 +36,12 @@ interface RemoveParams {
 }
 interface TestEditProps {
   pair: PairWithUserCTokenData;
-  getOptimalAmount: (
-    token1: boolean,
-    pair: PairWithUserCTokenData,
-    value: string
-  ) => PromiseWithError<string>;
-  canPerformPairsTx: (params: Partial<PairsTransactionParams>) => boolean;
   sendTxFlow: (params: Partial<PairsTransactionParams>) => void;
+  validateParams: (params: Partial<PairsTransactionParams>) => ValidationReturn;
 }
-
 export const TestEditModal = (props: TestEditProps) => {
-  const [addLiquid, setAddLiquid] = useState(true);
-  const createAddProps = (params: AddParams) => ({
+  const [modalType, setModalType] = useState<"add" | "remove" | "base">("base");
+  const createAddParams = (params: AddParams) => ({
     pair: props.pair,
     slippage: params.slippage,
     deadline: params.deadline,
@@ -61,48 +62,95 @@ export const TestEditModal = (props: TestEditProps) => {
   });
   return (
     <Container>
-      <Button onClick={() => setAddLiquid(!addLiquid)}>Switch Liquidity</Button>
-      {addLiquid ? (
+      {modalType !== "base" && (
+        <Button onClick={() => setModalType("base")}>Back</Button>
+      )}
+      <Icon icon={{ url: props.pair.logoURI, size: 50 }} />
+      <Text size="lg" weight="bold">
+        {props.pair.symbol}
+      </Text>
+      {modalType === "base" &&
+        props.pair.clmData?.userDetails?.balanceOfUnderlying !== "0" && (
+          <Container>
+            <Text>
+              Unstaked Liquidity{" "}
+              {displayAmount(
+                props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+                props.pair.decimals,
+                {
+                  symbol: props.pair.symbol,
+                }
+              )}
+            </Text>
+            <Button
+              onClick={() =>
+                props.sendTxFlow({
+                  txType: PairsTxTypes.REMOVE_LIQUIDITY,
+                  amountLP:
+                    props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+                  slippage: 2,
+                  deadline: "9999999999999999999999999",
+                })
+              }
+            >
+              Remove Unstaked Liquidity
+            </Button>
+            <Button
+              onClick={() =>
+                props.sendTxFlow({
+                  txType: PairsTxTypes.STAKE,
+                  amountLP:
+                    props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+                })
+              }
+            >
+              Stake Unstaked Liquidity
+            </Button>
+          </Container>
+        )}
+      {modalType === "base" && (
+        <>
+          <Button color="accent" onClick={() => setModalType("add")}>
+            Add Liquidity
+          </Button>
+          {props.pair.clmData?.userDetails?.balanceOfCToken !== "0" && (
+            <Button color="accent" onClick={() => setModalType("remove")}>
+              Remove Liquidity
+            </Button>
+          )}
+        </>
+      )}
+      {modalType === "add" && (
         <TestAddLiquidityModal
           pair={props.pair}
-          getOptimalAmount={props.getOptimalAmount}
-          addLiquidity={{
-            canAddLiquidity: (params) =>
-              props.canPerformPairsTx(createAddProps(params)),
-            addLiquidityTx: (params) =>
-              props.sendTxFlow(createAddProps(params)),
-          }}
+          validateParams={(params) =>
+            props.validateParams(createAddParams(params))
+          }
+          sendTxFlow={(params) => props.sendTxFlow(createAddParams(params))}
         />
-      ) : (
+      )}
+      {modalType === "remove" && (
         <TestRemoveLiquidityModal
           pair={props.pair}
-          removeLiquidity={{
-            canRemoveLiquidity: (params) =>
-              props.canPerformPairsTx(createRemoveParams(params)),
-            removeLiquidityTx: (params) =>
-              props.sendTxFlow(createRemoveParams(params)),
-          }}
+          validateParams={(params) =>
+            props.validateParams(createRemoveParams(params))
+          }
+          sendTxFlow={(params) => props.sendTxFlow(createRemoveParams(params))}
         />
       )}
     </Container>
   );
 };
+
 interface TestAddProps {
   pair: PairWithUserCTokenData;
-  getOptimalAmount: (
-    token1: boolean,
-    pair: PairWithUserCTokenData,
-    value: string
-  ) => PromiseWithError<string>;
-  addLiquidity: {
-    canAddLiquidity: (params: AddParams) => boolean;
-    addLiquidityTx: (params: AddParams) => void;
-  };
+  validateParams: (params: AddParams) => ValidationReturn;
+  sendTxFlow: (params: AddParams) => void;
 }
 const TestAddLiquidityModal = ({
   pair,
-  getOptimalAmount,
-  addLiquidity,
+  validateParams,
+  sendTxFlow,
 }: TestAddProps) => {
   // values
   const [slippage, setSlippage] = useState(2);
@@ -110,21 +158,35 @@ const TestAddLiquidityModal = ({
   const [willStake, setWillStake] = useState(false);
   const [valueToken1, setValueToken1] = useState("");
   const [valueToken2, setValueToken2] = useState("");
+
+  // set values based on optimization
   async function setValue(value: string, token1: boolean) {
     let optimalAmount;
     if (token1) {
       setValueToken1(value);
-      optimalAmount = await getOptimalAmount(true, pair, value);
+      optimalAmount = await getOptimalValueBFormatted({
+        chainId: Number(pair.token1.chainId),
+        pair,
+        valueChanged: 1,
+        amount: value,
+      });
     } else {
       setValueToken2(value);
-      optimalAmount = await getOptimalAmount(false, pair, value);
+      optimalAmount = await getOptimalValueBFormatted({
+        chainId: Number(pair.token1.chainId),
+        pair,
+        valueChanged: 2,
+        amount: value,
+      });
     }
     if (optimalAmount.error) return;
     token1
       ? setValueToken2(optimalAmount.data)
       : setValueToken1(optimalAmount.data);
   }
-  const canAddLiquidity = addLiquidity.canAddLiquidity({
+
+  // validation
+  const paramCheck = validateParams({
     value1: (
       convertToBigNumber(valueToken1, pair.token1.decimals).data ?? "0"
     ).toString(),
@@ -137,8 +199,7 @@ const TestAddLiquidityModal = ({
   });
 
   return (
-    <div>
-      <h1>{pair.symbol}</h1>
+    <Container>
       <h3>
         Reserve Ratio:{" "}
         {formatBalance(
@@ -156,6 +217,12 @@ const TestAddLiquidityModal = ({
         type="amount"
         balance={pair.token1.balance ?? "0"}
         decimals={pair.token1.decimals}
+        error={
+          !paramCheck.isValid &&
+          Number(valueToken1) !== 0 &&
+          paramCheck.errorMessage?.startsWith(pair.token1.symbol)
+        }
+        errorMessage={paramCheck.errorMessage}
       />
       <Spacer height="50px" />
       <Input
@@ -167,6 +234,12 @@ const TestAddLiquidityModal = ({
         type="amount"
         balance={pair.token2.balance ?? "0"}
         decimals={pair.token2.decimals}
+        error={
+          !paramCheck.isValid &&
+          Number(valueToken2) !== 0 &&
+          paramCheck.errorMessage?.startsWith(pair.token2.symbol)
+        }
+        errorMessage={paramCheck.errorMessage}
       />
       <Spacer height="50px" />
       <Button
@@ -176,9 +249,9 @@ const TestAddLiquidityModal = ({
         STAKE {`${willStake ? "ON" : "OFF"}`}
       </Button>
       <Button
-        disabled={!canAddLiquidity}
+        disabled={!paramCheck.isValid}
         onClick={() =>
-          addLiquidity.addLiquidityTx({
+          sendTxFlow({
             value1: (
               convertToBigNumber(valueToken1, pair.token1.decimals).data ?? "0"
             ).toString(),
@@ -191,26 +264,29 @@ const TestAddLiquidityModal = ({
           })
         }
       >
-        Add Liquidity
+        {"Add Liquidity"}
       </Button>
-    </div>
+    </Container>
   );
 };
+
 interface TestRemoveProps {
   pair: PairWithUserCTokenData;
-  removeLiquidity: {
-    canRemoveLiquidity: (params: RemoveParams) => boolean;
-    removeLiquidityTx: (params: RemoveParams) => void;
-  };
+  validateParams: (params: RemoveParams) => ValidationReturn;
+  sendTxFlow: (params: RemoveParams) => void;
 }
+
 const TestRemoveLiquidityModal = ({
   pair,
-  removeLiquidity,
+  validateParams,
+  sendTxFlow,
 }: TestRemoveProps) => {
   const [slippage, setSlippage] = useState(2);
   const [deadline, setDeadline] = useState("9999999999999999999999999");
   const [amountLP, setAmountLP] = useState("");
-  const canRemoveLiquidity = removeLiquidity.canRemoveLiquidity({
+
+  // validation
+  const paramCheck = validateParams({
     amountLP: (
       convertToBigNumber(amountLP, pair.decimals).data ?? "0"
     ).toString(),
@@ -218,6 +294,8 @@ const TestRemoveLiquidityModal = ({
     deadline,
     slippage,
   });
+
+  // expected tokens
   const [expectedTokens, setExpectedTokens] = useState({
     expectedToken1: "0",
     expectedToken2: "0",
@@ -232,7 +310,6 @@ const TestRemoveLiquidityModal = ({
         pair.stable,
         (convertToBigNumber(amountLP, pair.decimals).data ?? "0").toString()
       );
-      console.log(data, error);
       if (error) {
         setExpectedTokens({
           expectedToken1: "0",
@@ -250,7 +327,6 @@ const TestRemoveLiquidityModal = ({
   return (
     <div>
       {" "}
-      <h1>{pair.symbol}</h1>
       <h3>
         Reserve Ratio:{" "}
         {formatBalance(
@@ -266,25 +342,25 @@ const TestRemoveLiquidityModal = ({
         type="amount"
         balance={pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0"}
         decimals={pair.decimals}
+        error={!paramCheck.isValid && Number(amountLP) !== 0}
+        errorMessage={paramCheck.errorMessage}
       />
       <Spacer height="50px" />
       <h3>Expected Tokens</h3>
       <h4>
-        {formatBalance(expectedTokens.expectedToken1, pair.token1.decimals, {
-          commify: true,
+        {displayAmount(expectedTokens.expectedToken1, pair.token1.decimals, {
           symbol: pair.token1.symbol,
         })}
       </h4>
       <h4>
-        {formatBalance(expectedTokens.expectedToken2, pair.token2.decimals, {
-          commify: true,
+        {displayAmount(expectedTokens.expectedToken2, pair.token2.decimals, {
           symbol: pair.token2.symbol,
         })}
       </h4>
       <Button
-        disabled={!canRemoveLiquidity}
+        disabled={!paramCheck.isValid}
         onClick={() =>
-          removeLiquidity.removeLiquidityTx({
+          sendTxFlow({
             amountLP: (
               convertToBigNumber(amountLP, pair.decimals).data ?? "0"
             ).toString(),
