@@ -6,6 +6,10 @@ export const TX_DESCRIPTIONS = {
     title: `Add Liquidity To ${pair.symbol}`,
     description: `Add ${amount1} ${pair.token1.symbol} and ${amount2} ${pair.token2.symbol} to ${pair.symbol}`,
   }),
+  ADD_AMBIENT_CONC_LIQ: () => ({
+    title: "Add Concentrated Liquidity",
+    description: "Add concentrated liquidity to the pool",
+  }),
   APPROVE_TOKEN: (tokenSymbol: string, spender: string) => ({
     title: `Approve ${tokenSymbol}`,
     description: `Give the ${spender} approval to move ${tokenSymbol}`,

@@ -15,10 +15,16 @@ import {
   cTokenLendingTx,
   validateCTokenLendingRetryParams,
 } from "@/hooks/lending/transactions/lending";
-import { PairsTransactionParams, StakeLPParams } from "@/hooks/pairs/interfaces/pairsTxTypes";
+import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
+import { ambientLiquidityTx } from "@/hooks/pairs/ambient/transactions.ts/ambientTx";
+import {
+  PairsTransactionParams,
+  StakeLPParams,
+} from "@/hooks/pairs/interfaces/pairsTxTypes";
 import { lpPairTx, stakeLPFlow } from "@/hooks/pairs/transactions/pairsTx";
 
 export enum TransactionFlowType {
+  AMBIENT_LIQUIDITY_TX = "AMBIENT_LIQUIDITY_TX",
   BRIDGE_IN = "BRIDGE_IN",
   BRIDGE_OUT = "BRIDGE_OUT",
   CLM_CTOKEN_TX = "CLM_CTOKEN_TX",
@@ -35,6 +41,11 @@ export const TRANSACTION_FLOW_MAP: {
     tx: (...params: any[]) => PromiseWithError<TxCreatorFunctionReturn>;
   };
 } = {
+  [TransactionFlowType.AMBIENT_LIQUIDITY_TX]: {
+    validRetry: async (params: AmbientTransactionParams) =>
+      NO_ERROR({ valid: false }),
+    tx: async (params: AmbientTransactionParams) => ambientLiquidityTx(params),
+  },
   [TransactionFlowType.BRIDGE_IN]: {
     validRetry: async (params: BridgeTransactionParams) =>
       validateBridgeInRetryParams(params),
@@ -57,8 +68,7 @@ export const TRANSACTION_FLOW_MAP: {
     tx: async (params: PairsTransactionParams) => lpPairTx(params),
   },
   [TransactionFlowType.STAKE_LP_TX]: {
-    validRetry: async (params: StakeLPParams) =>
-      NO_ERROR({ valid: false }),
+    validRetry: async (params: StakeLPParams) => NO_ERROR({ valid: false }),
     tx: async (params: StakeLPParams) => stakeLPFlow(params),
   },
 };

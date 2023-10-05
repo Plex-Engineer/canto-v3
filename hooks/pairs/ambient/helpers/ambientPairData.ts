@@ -11,7 +11,7 @@ import { multicall } from "wagmi/actions";
 import {
   getBaseLiquidity,
   getQuoteLiquidity,
-} from "@/utils/ambient/ambientMath.utils";
+} from "@/utils/ambient/liquidity.utils";
 
 export async function getGeneralAmbientPairData(
   chainId: number,

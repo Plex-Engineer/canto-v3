@@ -3,11 +3,11 @@ import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
 const AMBIENT_ADDRESSES = {
   crocQuery: {
     mainnet: "",
-    testnet: "0xe950aBb6A77dbA4Ad849bfB6E960e849E022dBb4",
+    testnet: "0x644762D1F81Fa71Dc36d9041bc6d66879c6BAD2e",
   },
   crocDex: {
     mainnet: "",
-    testnet: "0xACB4D5CcFD3291A6b17bE2f117C12A278F57C024",
+    testnet: "0xd9bac85f6ac9fBFd2559A4Ac2883c635C29Feb4b",
   },
 } as const;
 

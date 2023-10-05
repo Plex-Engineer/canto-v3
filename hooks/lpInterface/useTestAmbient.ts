@@ -27,7 +27,7 @@ export default function useTestAmbient() {
       const USDC = "0xc51534568489f47949A828C8e3BF68463bdF3566";
       const [BASE, QUOTE] = sortBaseQuoteTokens(CNOTE, USDC);
 
-      const crocQueryAddress = "0xe950aBb6A77dbA4Ad849bfB6E960e849E022dBb4";
+      const crocQueryAddress = "0x644762D1F81Fa71Dc36d9041bc6d66879c6BAD2e";
       const poolIdx = 36000;
 
       const network = getNetworkInfoFromChainId(CANTO_TESTNET_EVM.chainId).data;
