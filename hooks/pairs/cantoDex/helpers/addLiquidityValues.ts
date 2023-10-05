@@ -1,5 +1,5 @@
 import { getCantoCoreAddress } from "@/config/consts/addresses";
-import { Pair } from "../interfaces/pairs";
+import { CantoDexPair } from "../interfaces/pairs";
 import { quoteAddLiquidity } from "@/utils/evm/pairs.utils";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 import {
@@ -11,7 +11,7 @@ import {
 
 interface AddLiquidityValues {
   chainId: number;
-  pair: Pair;
+  pair: CantoDexPair;
   valueChanged: 1 | 2;
   amount: string;
 }

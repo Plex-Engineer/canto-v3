@@ -2,8 +2,6 @@
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
-import { PairsTransactionParams } from "@/hooks/pairs/interfaces/pairsTxTypes";
-import usePairs from "@/hooks/pairs/usePairs";
 import useTransactionStore from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
 import { useWalletClient } from "wagmi";
@@ -12,16 +10,23 @@ import { GeneralPairRow, UserPairRow } from "./components/pairRow";
 import Text from "@/components/text";
 import { TestEditModal } from "./components/liquidityModal";
 import styles from "./lp.module.scss";
+import useLP from "@/hooks/pairs/useLP";
+import { CantoDexTransactionParams } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
 
 export default function Page() {
   const { data: signer } = useWalletClient();
   const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
 
   const txStore = useStore(useTransactionStore, (state) => state);
-  const { pairs, transaction, selection } = usePairs({
+
+  // all pairs (ambient and cantoDex)
+  const { cantoDex, ambient, selection } = useLP({
     chainId,
     userEthAddress: signer?.account.address ?? "",
   });
+
+  const { pairs, transaction } = cantoDex;
+
   const sortedPairs = pairs?.sort((a, b) => a.symbol.localeCompare(b.symbol));
   const userPairs = pairs.filter(
     (pair) =>
@@ -31,13 +36,13 @@ export default function Page() {
   const { setPair, pair: selectedPair } = selection;
 
   // transactions
-  function sendTxFlow(params: Partial<PairsTransactionParams>) {
+  function sendTxFlow(params: Partial<CantoDexTransactionParams>) {
     const { data: flow, error } = transaction.createNewPairsFlow({
       chainId,
       ethAccount: signer?.account.address ?? "",
       pair: selectedPair,
       ...params,
-    } as PairsTransactionParams);
+    } as CantoDexTransactionParams);
     if (error) {
       console.log(error);
     } else {
@@ -45,14 +50,14 @@ export default function Page() {
     }
   }
   function canPerformTx(
-    params: Partial<PairsTransactionParams>
+    params: Partial<CantoDexTransactionParams>
   ): ValidationReturn {
     return transaction.validateParams({
       chainId: signer?.chain.id ?? 7700,
       ethAccount: signer?.account.address ?? "",
       pair: selectedPair,
       ...params,
-    } as PairsTransactionParams);
+    } as CantoDexTransactionParams);
   }
 
   //main content

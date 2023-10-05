@@ -1,8 +1,8 @@
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
-import { Pair } from "@/hooks/pairs/interfaces/pairs";
+import { CantoDexPair } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 
 export const TX_DESCRIPTIONS = {
-  ADD_LIQUIDITY: (pair: Pair, amount1: string, amount2: string) => ({
+  ADD_LIQUIDITY: (pair: CantoDexPair, amount1: string, amount2: string) => ({
     title: `Add Liquidity To ${pair.symbol}`,
     description: `Add ${amount1} ${pair.token1.symbol} and ${amount2} ${pair.token2.symbol} to ${pair.symbol}`,
   }),
@@ -67,7 +67,7 @@ export const TX_DESCRIPTIONS = {
       deposit ? "to" : "from"
     } ${tokenSymbol} OFT`,
   }),
-  REMOVE_LIQUIDITY: (pair: Pair, amount: string) => ({
+  REMOVE_LIQUIDITY: (pair: CantoDexPair, amount: string) => ({
     title: `Remove Liquidity From ${pair.symbol}`,
     description: `Remove ${amount} ${pair.symbol} from ${pair.symbol}`,
   }),

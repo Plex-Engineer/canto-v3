@@ -3,23 +3,23 @@ import Button from "@/components/button/button";
 import Input from "@/components/input/input";
 import Spacer from "@/components/layout/spacer";
 import {
-  PairsTransactionParams,
-  PairsTxTypes,
-} from "@/hooks/pairs/interfaces/pairsTxTypes";
-import {
   convertToBigNumber,
   displayAmount,
   formatBalance,
 } from "@/utils/tokenBalances.utils";
 import { useEffect, useState } from "react";
 import Container from "@/components/container/container";
-import { PairWithUserCTokenData } from "@/hooks/pairs/interfaces/pairs";
 import { quoteRemoveLiquidity } from "@/utils/evm/pairs.utils";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { ValidationReturn } from "@/config/interfaces";
 import Icon from "@/components/icon/icon";
 import Text from "@/components/text";
-import { getOptimalValueBFormatted } from "@/hooks/pairs/helpers/addLiquidityValues";
+import {
+  CantoDexTransactionParams,
+  CantoDexTxTypes,
+} from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
+import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
+import { getOptimalValueBFormatted } from "@/hooks/pairs/cantoDex/helpers/addLiquidityValues";
 
 interface AddParams {
   value1: string;
@@ -35,9 +35,11 @@ interface RemoveParams {
   deadline: string;
 }
 interface TestEditProps {
-  pair: PairWithUserCTokenData;
-  sendTxFlow: (params: Partial<PairsTransactionParams>) => void;
-  validateParams: (params: Partial<PairsTransactionParams>) => ValidationReturn;
+  pair: CantoDexPairWithUserCTokenData;
+  sendTxFlow: (params: Partial<CantoDexTransactionParams>) => void;
+  validateParams: (
+    params: Partial<CantoDexTransactionParams>
+  ) => ValidationReturn;
 }
 export const TestEditModal = (props: TestEditProps) => {
   const [modalType, setModalType] = useState<"add" | "remove" | "base">("base");
@@ -45,7 +47,7 @@ export const TestEditModal = (props: TestEditProps) => {
     pair: props.pair,
     slippage: params.slippage,
     deadline: params.deadline,
-    txType: PairsTxTypes.ADD_LIQUIDITY,
+    txType: CantoDexTxTypes.ADD_LIQUIDITY,
     amounts: {
       amount1: params.value1,
       amount2: params.value2,
@@ -56,7 +58,7 @@ export const TestEditModal = (props: TestEditProps) => {
     pair: props.pair,
     slippage: params.slippage,
     deadline: params.deadline,
-    txType: PairsTxTypes.REMOVE_LIQUIDITY,
+    txType: CantoDexTxTypes.REMOVE_LIQUIDITY,
     amountLP: params.amountLP,
     unstake: true,
   });
@@ -85,7 +87,7 @@ export const TestEditModal = (props: TestEditProps) => {
             <Button
               onClick={() =>
                 props.sendTxFlow({
-                  txType: PairsTxTypes.REMOVE_LIQUIDITY,
+                  txType: CantoDexTxTypes.REMOVE_LIQUIDITY,
                   amountLP:
                     props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
                   slippage: 2,
@@ -98,7 +100,7 @@ export const TestEditModal = (props: TestEditProps) => {
             <Button
               onClick={() =>
                 props.sendTxFlow({
-                  txType: PairsTxTypes.STAKE,
+                  txType: CantoDexTxTypes.STAKE,
                   amountLP:
                     props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
                 })
@@ -143,7 +145,7 @@ export const TestEditModal = (props: TestEditProps) => {
 };
 
 interface TestAddProps {
-  pair: PairWithUserCTokenData;
+  pair: CantoDexPairWithUserCTokenData;
   validateParams: (params: AddParams) => ValidationReturn;
   sendTxFlow: (params: AddParams) => void;
 }
@@ -271,7 +273,7 @@ const TestAddLiquidityModal = ({
 };
 
 interface TestRemoveProps {
-  pair: PairWithUserCTokenData;
+  pair: CantoDexPairWithUserCTokenData;
   validateParams: (params: RemoveParams) => ValidationReturn;
   sendTxFlow: (params: RemoveParams) => void;
 }

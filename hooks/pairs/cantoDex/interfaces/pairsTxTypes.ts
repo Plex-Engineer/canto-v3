@@ -1,31 +1,31 @@
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import { PairWithUserCTokenData } from "./pairs";
+import { CantoDexPairWithUserCTokenData } from "./pairs";
 
-export enum PairsTxTypes {
+export enum CantoDexTxTypes {
   ADD_LIQUIDITY = "Add Liquidity",
   STAKE = "Stake",
   REMOVE_LIQUIDITY = "Remove Liquidity",
   UNSTAKE = "Unstake",
 }
 
-export type PairsTransactionParams = {
+export type CantoDexTransactionParams = {
   chainId: number;
   ethAccount: string;
-  pair: PairWithUserCTokenData;
+  pair: CantoDexPairWithUserCTokenData;
 } & (
   | {
-      txType: PairsTxTypes.STAKE | PairsTxTypes.UNSTAKE;
+      txType: CantoDexTxTypes.STAKE | CantoDexTxTypes.UNSTAKE;
       amountLP: string;
     }
   | {
-      txType: PairsTxTypes.REMOVE_LIQUIDITY;
+      txType: CantoDexTxTypes.REMOVE_LIQUIDITY;
       amountLP: string;
       unstake: boolean;
       slippage: number;
       deadline: string;
     }
   | {
-      txType: PairsTxTypes.ADD_LIQUIDITY;
+      txType: CantoDexTxTypes.ADD_LIQUIDITY;
       amounts: AddLiquidityTxAmounts;
       stake: boolean;
       slippage: number;

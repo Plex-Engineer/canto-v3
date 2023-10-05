@@ -2,7 +2,7 @@ import Button from "@/components/button/button";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
-import { PairWithUserCTokenData } from "@/hooks/pairs/interfaces/pairs";
+import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { formatPercent } from "@/utils/formatting.utils";
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import {
@@ -17,7 +17,7 @@ export const UserPairRow = ({
   onAddLiquidity,
   onRemoveLiquidity,
 }: {
-  pair: PairWithUserCTokenData;
+  pair: CantoDexPairWithUserCTokenData;
   onAddLiquidity: (pairAddress: string) => void;
   onRemoveLiquidity: (pairAddress: string) => void;
 }) => {
@@ -89,7 +89,7 @@ export const GeneralPairRow = ({
   pair,
   onAddLiquidity,
 }: {
-  pair: PairWithUserCTokenData;
+  pair: CantoDexPairWithUserCTokenData;
   onAddLiquidity: (pairAddress: string) => void;
 }) => [
   <div key={pair.address + "symbol"}>

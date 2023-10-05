@@ -2,13 +2,16 @@ import { useQuery } from "react-query";
 import { AmbientHookInputParams } from "./interfaces/hookParams";
 import { getGeneralAmbientPairData } from "./helpers/ambientPairData";
 import { getAmbientPairsFromChainId } from "./config/ambientPairs";
+import { AmbientPair } from "./interfaces/ambientPairs";
 
 export default function useAmbientPairs(
   params: AmbientHookInputParams,
   options?: {
     refetchInterval?: number;
   }
-) {
+): {
+  ambientPairs: AmbientPair[];
+} {
   const { data: ambientPairs } = useQuery(
     ["ambientPairs", params.chainId, params.userEthAddress],
     async () => {
@@ -19,7 +22,7 @@ export default function useAmbientPairs(
     },
     {
       onSuccess: (response) => {
-        console.log(response);
+        // console.log(response);
       },
       onError: (error) => {
         console.log(error);
@@ -27,5 +30,5 @@ export default function useAmbientPairs(
       refetchInterval: options?.refetchInterval || 5000,
     }
   );
-  return { ambientPairs };
+  return { ambientPairs: ambientPairs ?? [] };
 }

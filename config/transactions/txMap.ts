@@ -18,17 +18,20 @@ import {
 import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
 import { ambientLiquidityTx } from "@/hooks/pairs/ambient/transactions.ts/ambientTx";
 import {
-  PairsTransactionParams,
+  CantoDexTransactionParams,
   StakeLPParams,
-} from "@/hooks/pairs/interfaces/pairsTxTypes";
-import { lpPairTx, stakeLPFlow } from "@/hooks/pairs/transactions/pairsTx";
+} from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
+import {
+  cantoDexLPTx,
+  stakeLPFlow,
+} from "@/hooks/pairs/cantoDex/transactions/pairsTx";
 
 export enum TransactionFlowType {
   AMBIENT_LIQUIDITY_TX = "AMBIENT_LIQUIDITY_TX",
   BRIDGE_IN = "BRIDGE_IN",
   BRIDGE_OUT = "BRIDGE_OUT",
+  CANTO_DEX_LP_TX = "CANTO_DEX_LP_TX",
   CLM_CTOKEN_TX = "CLM_CTOKEN_TX",
-  DEX_LP_TX = "DEX_LP_TX",
   STAKE_LP_TX = "STAKE_LP_TX",
 }
 
@@ -56,16 +59,16 @@ export const TRANSACTION_FLOW_MAP: {
       validateBridgeOutRetryParams(params),
     tx: async (params: BridgeTransactionParams) => bridgeOutTx(params),
   },
+  [TransactionFlowType.CANTO_DEX_LP_TX]: {
+    validRetry: async (params: CantoDexTransactionParams) =>
+      NO_ERROR({ valid: false }),
+    tx: async (params: CantoDexTransactionParams) => cantoDexLPTx(params),
+  },
   [TransactionFlowType.CLM_CTOKEN_TX]: {
     validRetry: async (params: CTokenLendingTransactionParams) =>
       validateCTokenLendingRetryParams(params),
     tx: async (params: CTokenLendingTransactionParams) =>
       cTokenLendingTx(params),
-  },
-  [TransactionFlowType.DEX_LP_TX]: {
-    validRetry: async (params: PairsTransactionParams) =>
-      NO_ERROR({ valid: false }),
-    tx: async (params: PairsTransactionParams) => lpPairTx(params),
   },
   [TransactionFlowType.STAKE_LP_TX]: {
     validRetry: async (params: StakeLPParams) => NO_ERROR({ valid: false }),

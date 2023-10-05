@@ -8,11 +8,6 @@ import {
   TxCreatorFunctionReturn,
   errMsg,
 } from "@/config/interfaces";
-import {
-  PairsTransactionParams,
-  PairsTxTypes,
-  StakeLPParams,
-} from "../interfaces/pairsTxTypes";
 import { cTokenLendingTx } from "@/hooks/lending/transactions/lending";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { createApprovalTxs, getTokenBalance } from "@/utils/evm/erc20.utils";
@@ -22,9 +17,15 @@ import { areEqualAddresses } from "@/utils/address.utils";
 import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
 import { quoteRemoveLiquidity } from "@/utils/evm/pairs.utils";
 import { TransactionFlowType } from "@/config/transactions/txMap";
+import {
+  CantoDexTransactionParams,
+  CantoDexTxTypes,
+  StakeLPParams,
+} from "../interfaces/pairsTxTypes";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 
-export async function lpPairTx(
-  params: PairsTransactionParams
+export async function cantoDexLPTx(
+  params: CantoDexTransactionParams
 ): PromiseWithError<TxCreatorFunctionReturn> {
   // make sure pair passed through has user details
   if (!params.pair.clmData) {
@@ -38,19 +39,19 @@ export async function lpPairTx(
     );
   }
   switch (params.txType) {
-    case PairsTxTypes.STAKE:
-    case PairsTxTypes.UNSTAKE:
+    case CantoDexTxTypes.STAKE:
+    case CantoDexTxTypes.UNSTAKE:
       // if this is only a lending action (supply/withdraw), then call on that function instead
       return await stakeLPFlow({
         chainId: params.chainId,
         ethAccount: params.ethAccount,
         cLPToken: params.pair.clmData,
-        stake: params.txType === PairsTxTypes.STAKE,
+        stake: params.txType === CantoDexTxTypes.STAKE,
         amount: params.amountLP,
       });
-    case PairsTxTypes.ADD_LIQUIDITY:
+    case CantoDexTxTypes.ADD_LIQUIDITY:
       return await addLiquidityFlow(params, routerAddress);
-    case PairsTxTypes.REMOVE_LIQUIDITY:
+    case CantoDexTxTypes.REMOVE_LIQUIDITY:
       return await removeLiquidityFlow(params, routerAddress);
     default:
       return NEW_ERROR("lpPairTx: incorrect tx type passed");
@@ -61,12 +62,12 @@ export async function lpPairTx(
  * TRANSACTION FLOWS TO USE FROM MAIN LP FUNCTION
  */
 async function addLiquidityFlow(
-  params: PairsTransactionParams,
+  params: CantoDexTransactionParams,
   routerAddress: string
 ): PromiseWithError<TxCreatorFunctionReturn> {
   /** check params */
   // check that the correct tx is being passed
-  if (params.txType !== PairsTxTypes.ADD_LIQUIDITY) {
+  if (params.txType !== CantoDexTxTypes.ADD_LIQUIDITY) {
     return NEW_ERROR("addLiquidityFlow: incorrect tx type passed");
   }
   /** create tx list */
@@ -140,8 +141,8 @@ async function addLiquidityFlow(
       params.deadline,
       TX_DESCRIPTIONS.ADD_LIQUIDITY(
         params.pair,
-        params.amounts.amount1,
-        params.amounts.amount2
+        displayAmount(params.amounts.amount1, params.pair.token1.decimals),
+        displayAmount(params.amounts.amount2, params.pair.token2.decimals)
       )
     )
   );
@@ -171,12 +172,12 @@ async function addLiquidityFlow(
 }
 
 async function removeLiquidityFlow(
-  params: PairsTransactionParams,
+  params: CantoDexTransactionParams,
   routerAddress: string
 ): PromiseWithError<TxCreatorFunctionReturn> {
   /** check params */
   // check that the correct tx is being passed
-  if (params.txType !== PairsTxTypes.REMOVE_LIQUIDITY) {
+  if (params.txType !== CantoDexTxTypes.REMOVE_LIQUIDITY) {
     return NEW_ERROR("removeLiquidityFlow: incorrect tx type passed");
   }
   // check for user details
@@ -275,7 +276,10 @@ async function removeLiquidityFlow(
       amount1Min.data,
       amount2Min.data,
       params.deadline,
-      TX_DESCRIPTIONS.REMOVE_LIQUIDITY(params.pair, params.amountLP)
+      TX_DESCRIPTIONS.REMOVE_LIQUIDITY(
+        params.pair,
+        displayAmount(params.amountLP, params.pair.decimals)
+      )
     )
   );
   return NO_ERROR({ transactions: txList });

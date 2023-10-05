@@ -1,7 +1,7 @@
 import { ERC20Token } from "@/config/interfaces";
-import { PairWithUserCTokenData } from "../interfaces/pairs";
 import { ZERO_ADDRESS, getCantoCoreAddress } from "@/config/consts/addresses";
 import { areEqualAddresses } from "@/utils/address.utils";
+import { CantoDexPair } from "../interfaces/pairs";
 
 /**
  * @notice Returns an array of unique ERC20 tokens from an array of pairs
@@ -11,7 +11,7 @@ import { areEqualAddresses } from "@/utils/address.utils";
  */
 export function getUniqueUnderlyingTokensFromPairs(
   chainId: number,
-  pairs: PairWithUserCTokenData[]
+  pairs: CantoDexPair[]
 ): ERC20Token[] {
   // get wcanto address to define a native token
   const wcantoAddress = getCantoCoreAddress(chainId, "wcanto");
