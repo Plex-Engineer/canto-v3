@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./selector.module.scss";
 import Spacer from "@/components/layout/spacer";
 import clsx from "clsx";
+import LoadingIcon from "../loader/loading";
 
 export interface Item {
   id: string;
@@ -119,6 +120,7 @@ const Selector = (props: Props) => {
                       }}
                     >
                       <Icon
+                        themed
                         icon={{
                           url: "dropdown.svg",
                           size: 24,
@@ -154,6 +156,7 @@ const Selector = (props: Props) => {
                 }}
               >
                 <Icon
+                  themed
                   icon={{
                     url: "dropdown.svg",
                     size: 24,
@@ -200,6 +203,7 @@ const Selector = (props: Props) => {
         color="secondary"
         width="fill"
         height={64}
+        shadow="small"
         onClick={() => {
           setIsOpen(true);
         }}
@@ -224,17 +228,22 @@ const Selector = (props: Props) => {
               {props.label?.text ?? ""}
             </Text>
           )}
-          <Image
-            src={props.activeItem?.icon ?? ""}
-            alt={props.activeItem?.name + " icon"}
-            width={30}
-            height={30}
-          />
+          {props.activeItem?.icon == "loader.svg" ? (
+            <LoadingIcon />
+          ) : (
+            <Image
+              src={props.activeItem?.icon ?? ""}
+              alt={props.activeItem?.name + " icon"}
+              width={30}
+              height={30}
+            />
+          )}
           <Text size="md" font="proto_mono">
             {props.activeItem?.name ?? "SELECT ITEM"}
           </Text>
         </Container>
         <Icon
+          themed
           icon={{
             url: "dropdown.svg",
             size: 24,

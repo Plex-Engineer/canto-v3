@@ -23,6 +23,7 @@ import { persist, devtools } from "zustand/middleware";
 interface AddNewFlowParams {
   txFlow: NewTransactionFlow;
   signer: GetWalletClientResult | undefined;
+  onSuccessCallback?: () => void;
 }
 export interface TransactionStore {
   transactionFlows: UserTransactionFlowMap;
@@ -86,6 +87,7 @@ const useTransactionStore = create<TransactionStore>()(
             createdAt: new Date().getTime(),
             status: "POPULATING",
             transactions: [],
+            onSuccessCallback: params.onSuccessCallback,
           };
           // add the flow to the user map and set loading to null
           const currentUserTransactionFlows = get().getUserTransactionFlows(

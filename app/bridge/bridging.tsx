@@ -22,6 +22,7 @@ import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks.utils";
 import { GetWalletClientResult } from "wagmi/actions";
 import { maxBridgeAmountInUnderlying } from "@/hooks/bridge/helpers/amounts";
 import { BaseNetwork } from "@/config/interfaces";
+import { validateInputTokenAmount } from "@/utils/validation.utils";
 
 interface BridgeProps {
   hook: BridgeHookReturn;
@@ -34,10 +35,20 @@ const Bridging = (props: BridgeProps) => {
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
   const [maxBridgeAmount, setMaxBridgeAmount] = useState<string>("0");
+
+  // big number amount
   const amountAsBigNumberString = (
     convertToBigNumber(amount, props.hook.selections.token?.decimals ?? 18)
       .data ?? "0"
   ).toString();
+
+  // validate user input amount
+  const amountCheck = validateInputTokenAmount(
+    amountAsBigNumberString,
+    maxBridgeAmount,
+    props.hook.selections.token?.symbol ?? "",
+    props.hook.selections.token?.decimals
+  );
 
   useEffect(() => {
     async function getMaxAmount() {
@@ -72,6 +83,7 @@ const Bridging = (props: BridgeProps) => {
     props.params.transactionStore?.addNewFlow({
       txFlow: data,
       signer: props.params.signer,
+      onSuccessCallback: () => setIsConfirmationModalOpen(false),
     });
   }
 
@@ -79,11 +91,6 @@ const Bridging = (props: BridgeProps) => {
   const { data: canBridge } = props.hook.bridge.canBridge({
     amount: amountAsBigNumberString,
   });
-
-  // check the amount to see if we can get to confirmation
-  /** Will not tell us if the other parameters are okay */
-  const checkAmount = () =>
-    convertToBigNumber(amountAsBigNumberString).data.lte(maxBridgeAmount);
 
   // if confirmation is open
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -157,7 +164,6 @@ const Bridging = (props: BridgeProps) => {
           )}
           confirmation={{
             onConfirm: () => {
-              setIsConfirmationModalOpen(false);
               bridgeTx();
             },
             canConfirm: canBridge ?? false,
@@ -370,19 +376,8 @@ const Bridging = (props: BridgeProps) => {
                     setAmount(val.target.value);
                   }}
                   className={styles["input"]}
-                  error={!checkAmount() && Number(amount) !== 0}
-                  errorMessage={
-                    Number(maxBridgeAmount) === 0
-                      ? "You have 0 balance"
-                      : `Amount must be less than ${formatBalance(
-                          maxBridgeAmount,
-                          props.hook.selections.token?.decimals ?? 18,
-                          {
-                            commify: true,
-                            symbol: props.hook.selections.token?.symbol,
-                          }
-                        )}`
-                  }
+                  error={!amountCheck.isValid && Number(amount) !== 0}
+                  errorMessage={amountCheck.errorMessage}
                 />
               </Container>
             </Container>
@@ -412,7 +407,7 @@ const Bridging = (props: BridgeProps) => {
           onClick={() => {
             setIsConfirmationModalOpen(true);
           }}
-          disabled={!checkAmount() || Number(amount) <= 0}
+          disabled={!amountCheck.isValid}
         >
           {props.hook.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
         </Button>

@@ -1,12 +1,11 @@
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import BigNumber from "bignumber.js";
 import {
   NEW_ERROR,
   NO_ERROR,
   ReturnWithError,
   errMsg,
 } from "@/config/interfaces";
-import { convertNoteAmountToToken } from "../tokens/tokenMath.utils";
+import { convertNoteAmountToToken, minOf } from "../tokens/tokenMath.utils";
 import { convertToBigNumber } from "../tokenBalances.utils";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
@@ -16,20 +15,20 @@ import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
  * @param {CTokenWithUserData} cToken CToken to borrow from
  * @param {string} currentLiquidity Current liquidity of the user
  * @param {number} percent Percent of the maximum amount to borrow (optional parameter)
- * @returns {ReturnWithError<BigNumber>} Maximum amount of tokens that can be borrowed to reach percent
+ * @returns {ReturnWithError<string>} Maximum amount of tokens that can be borrowed to reach percent
  */
 export function cTokenBorrowLimit(
   cToken: CTokenWithUserData,
   currentLiquidity: string,
   percent: number = 100
-): ReturnWithError<BigNumber> {
+): ReturnWithError<string> {
   // just convert liquidity to token amount
   const { data: maxTokenBorrow, error: maxTokenBorrowError } =
     convertNoteAmountToToken(currentLiquidity, cToken.price);
   if (maxTokenBorrowError) {
     return NEW_ERROR(`cTokenBorrowLimit: ${errMsg(maxTokenBorrowError)}`);
   }
-  return NO_ERROR(maxTokenBorrow.times(percent).div(100));
+  return NO_ERROR(maxTokenBorrow.times(percent).div(100).toString());
 }
 
 /**
@@ -38,13 +37,13 @@ export function cTokenBorrowLimit(
  * @param {CTokenWithUserData} cToken CToken to withdraw from
  * @param {string} currentLiquidity Current liquidity of the user
  * @param {number} percent Percent of the maximum amount to withdraw (optional parameter)
- * @returns {ReturnWithError<BigNumber>} Maximum amount of tokens that can be withdrawn to reach percent
+ * @returns {ReturnWithError<string>} Maximum amount of tokens that can be withdrawn to reach percent
  */
 export function cTokenWithdrawLimit(
   cToken: CTokenWithUserData,
   currentLiquidity: string,
   percent: number = 100
-): ReturnWithError<BigNumber> {
+): ReturnWithError<string> {
   // make sure we have user data
   if (!cToken.userDetails) {
     return NEW_ERROR("cTokenWithdrawLimit: no user details");
@@ -54,9 +53,7 @@ export function cTokenWithdrawLimit(
     cToken.userDetails?.isCollateral === false ||
     Number(cToken.collateralFactor) === 0
   ) {
-    return NO_ERROR(
-      convertToBigNumber(cToken.userDetails.supplyBalanceInUnderlying).data
-    );
+    return NO_ERROR(cToken.userDetails.supplyBalanceInUnderlying);
   }
   // liquidity change = (tokenAmount * price) * CF
   // if this is greater than the current liquidity, then the user cannot withdraw
@@ -78,10 +75,13 @@ export function cTokenWithdrawLimit(
     .times(10 ** 18)
     .div(cToken.collateralFactor);
   // minumum between supplyBalance and totalLimit
-  const userLimit = BigNumber.min(
-    totalLimit,
+  const { data: userLimit, error: minError } = minOf(
+    totalLimit.toString(),
     cToken.userDetails.supplyBalanceInUnderlying
   );
+  if (minError) {
+    return NEW_ERROR(`cTokenWithdrawLimit: ${errMsg(minError)}`);
+  }
   // CF is scaled to 10 ^ 18
   return NO_ERROR(userLimit);
 }
@@ -111,16 +111,18 @@ export function maxAmountForLendingTx(
         percent
       );
       if (maxAmount.error) return "0";
-      return maxAmount.data.toString();
+      return maxAmount.data;
     case CTokenLendingTxTypes.BORROW:
       const maxBorrow = cTokenBorrowLimit(cToken, position.liquidity, percent);
       if (maxBorrow.error) return "0";
-      return maxBorrow.data.toString();
+      return maxBorrow.data;
     case CTokenLendingTxTypes.REPAY:
-      return Math.min(
-        Number(cToken.userDetails.borrowBalance),
-        Number(cToken.userDetails.balanceOfUnderlying)
-      ).toString();
+      const minRepay = minOf(
+        cToken.userDetails.borrowBalance,
+        cToken.userDetails.balanceOfUnderlying
+      );
+      if (minRepay.error) return "0";
+      return minRepay.data;
     default:
       return "0";
   }

@@ -1,3 +1,4 @@
+import { ValidationReturn } from "@/config/interfaces";
 import { getCTokensFromType } from "@/hooks/lending/config/cTokenAddresses";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
@@ -32,7 +33,10 @@ interface LendingComboReturn {
   };
   transaction: {
     performTx: (amount: string, txType: CTokenLendingTxTypes) => void;
-    canPerformTx: (amount: string, txType: CTokenLendingTxTypes) => boolean;
+    validateParams: (
+      amount: string,
+      txType: CTokenLendingTxTypes
+    ) => ValidationReturn;
   };
   selection: {
     selectedCToken: CTokenWithUserData | undefined;
@@ -45,7 +49,10 @@ interface LendingComboReturn {
   };
 }
 
-export function useLendingCombo(): LendingComboReturn {
+interface LendingComboProps {
+  onSuccessTx?: () => void;
+}
+export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
   // params for useLending hook
   const { data: signer } = useWalletClient();
   const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
@@ -127,23 +134,25 @@ export function useLendingCombo(): LendingComboReturn {
       console.log(error);
       return;
     }
-    txStore?.addNewFlow({ txFlow: data, signer });
+    txStore?.addNewFlow({
+      txFlow: data,
+      signer,
+      onSuccessCallback: props.onSuccessTx,
+    });
   }
-  const canPerformTx = (
+  const validateParams = (
     amount: string,
     txType: CTokenLendingTxTypes
-  ): boolean =>
-    selection.selectedCToken &&
-    signer &&
-    transaction.canPerformLendingTx({
+  ): ValidationReturn => {
+    if (!selection.selectedCToken || !signer) return { isValid: false };
+    return transaction.validateParams({
       chainId: signer.chain.id,
       ethAccount: signer.account.address,
       cToken: selection.selectedCToken,
       amount,
       txType,
-    }).data
-      ? true
-      : false;
+    });
+  };
 
   return {
     cTokens: {
@@ -162,7 +171,7 @@ export function useLendingCombo(): LendingComboReturn {
     },
     transaction: {
       performTx: lendingTx,
-      canPerformTx,
+      validateParams,
     },
     selection,
     lendingStats: {

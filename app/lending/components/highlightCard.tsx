@@ -32,8 +32,15 @@ const HighlightCard = ({
       />
       <div className={styles.header}>
         <Item
-          name="Asset"
-          value={cToken.underlying.name}
+          name={
+            <Icon
+              icon={{
+                url: cToken.underlying.logoURI,
+                size: 24,
+              }}
+            />
+          }
+          value={"$" + cToken.underlying.name}
           theme="primary-light"
         />
         <Item
@@ -58,13 +65,13 @@ const HighlightCard = ({
               themed
               icon={{
                 url: "/tokens/note.svg",
-                size: 24,
+                size: 20,
               }}
             />
           }
         />
         <Item
-          name="Amount Staked"
+          name="Amount Supplied"
           value={formattedAmount(
             cToken.userDetails?.supplyBalanceInUnderlying ?? "0"
           )}
@@ -73,20 +80,20 @@ const HighlightCard = ({
               themed
               icon={{
                 url: "/tokens/note.svg",
-                size: 24,
+                size: 20,
               }}
             />
           }
         />
         <Item
-          name="Outstanding Debt"
+          name="Amount Borrowed"
           value={formattedAmount(cToken.userDetails?.borrowBalance ?? "0")}
           postChild={
             <Icon
               themed
               icon={{
                 url: "/tokens/note.svg",
-                size: 24,
+                size: 20,
               }}
             />
           }
@@ -101,7 +108,7 @@ const HighlightCard = ({
           fontSize={"lg"}
           onClick={onSupply}
         >
-          Stake note
+          Supply note
         </Button>
 
         <Button

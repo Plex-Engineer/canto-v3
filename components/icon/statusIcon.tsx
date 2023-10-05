@@ -13,6 +13,7 @@ const StatusIcon = (props: Props) => {
     return <LoadingIcon size={props.size} />;
   return (
     <Icon
+      themed
       icon={{
         url:
           props.status === "SUCCESS"

@@ -40,7 +40,7 @@ export default function BridgePage() {
     [searchParams]
   );
 
-  // const [direction, setDirection] = useState<"in" | "out">("in");
+  // bridge hooks
   const [onTestnet, setOnTestnet] = useState<boolean>(false);
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({
