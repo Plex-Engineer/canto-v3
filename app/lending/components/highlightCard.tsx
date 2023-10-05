@@ -34,7 +34,6 @@ const HighlightCard = ({
         <Item
           name={
             <Icon
-              themed
               icon={{
                 url: cToken.underlying.logoURI,
                 size: 24,
@@ -66,7 +65,7 @@ const HighlightCard = ({
               themed
               icon={{
                 url: "/tokens/note.svg",
-                size: 24,
+                size: 20,
               }}
             />
           }
@@ -81,7 +80,7 @@ const HighlightCard = ({
               themed
               icon={{
                 url: "/tokens/note.svg",
-                size: 24,
+                size: 20,
               }}
             />
           }
@@ -94,7 +93,7 @@ const HighlightCard = ({
               themed
               icon={{
                 url: "/tokens/note.svg",
-                size: 24,
+                size: 20,
               }}
             />
           }

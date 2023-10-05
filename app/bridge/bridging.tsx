@@ -83,6 +83,7 @@ const Bridging = (props: BridgeProps) => {
     props.params.transactionStore?.addNewFlow({
       txFlow: data,
       signer: props.params.signer,
+      onSuccessCallback: () => setIsConfirmationModalOpen(false),
     });
   }
 
@@ -163,7 +164,6 @@ const Bridging = (props: BridgeProps) => {
           )}
           confirmation={{
             onConfirm: () => {
-              setIsConfirmationModalOpen(false);
               bridgeTx();
             },
             canConfirm: canBridge ?? false,

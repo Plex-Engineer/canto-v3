@@ -1,7 +1,12 @@
 import { useQuery } from "react-query";
 import { CTokenWithUserData } from "./interfaces/tokens";
 import { CTokenLendingTransactionParams } from "./interfaces/lendingTxTypes";
-import { ValidationReturn } from "@/config/interfaces";
+import {
+  NEW_ERROR,
+  NewTransactionFlow,
+  ReturnWithError,
+  ValidationReturn,
+} from "@/config/interfaces";
 import {
   LendingHookInputParams,
   LendingHookReturn,
@@ -108,6 +113,15 @@ export default function useLending(
     return lendingTxParamCheck(txParams, position);
   }
 
+  function createNewLendingFlow(
+    txParams: CTokenLendingTransactionParams
+  ): ReturnWithError<NewTransactionFlow> {
+    const validation = validateParams(txParams);
+    if (!validation.isValid)
+      return NEW_ERROR("createNewLendingFlow::" + validation.errorMessage);
+    return createNewCTokenLendingFlow(txParams);
+  }
+
   return {
     cTokens,
     position,
@@ -118,7 +132,7 @@ export default function useLending(
     },
     transaction: {
       validateParams,
-      createNewLendingFlow: createNewCTokenLendingFlow,
+      createNewLendingFlow,
     },
   };
 }

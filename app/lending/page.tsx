@@ -16,6 +16,7 @@ import LoadingIcon from "@/components/loader/loading";
 import { LendingModal } from "./components/modal/modal";
 import { CTokenRow } from "./components/cTokenRow";
 import { useState } from "react";
+import Spacer from "@/components/layout/spacer";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -35,7 +36,11 @@ export default function LendingPage() {
     selection,
     isLoading,
     lendingStats,
-  } = useLendingCombo();
+  } = useLendingCombo({
+    onSuccessTx: () => {
+      setCurrentModal(CLMModalTypes.NONE);
+    },
+  });
   const { cNote, rwas } = cTokens;
   const { selectedCToken, setSelectedCToken } = selection;
 
@@ -44,7 +49,7 @@ export default function LendingPage() {
       <Text size="x-lg" font="proto_mono" className={styles.title}>
         Lending
       </Text>
-
+      <Spacer height="20px" />
       <Modal
         open={currentModal !== CLMModalTypes.NONE}
         onClose={() => setCurrentModal(CLMModalTypes.NONE)}
@@ -132,7 +137,17 @@ export default function LendingPage() {
                 ]}
               />
             ) : (
-              <Text>No RWAS tokens available</Text>
+              <Container
+                width="1000px"
+                height="200px"
+                center={{
+                  horizontal: true,
+                  vertical: true,
+                }}
+                backgroundColor="var(--card-sub-surface-color)"
+              >
+                <Text theme="secondary-dark">No RWAS tokens available</Text>
+              </Container>
             )}
           </div>
         </Container>
@@ -162,23 +177,20 @@ export default function LendingPage() {
 
           <div className={styles.widget2}>
             <OutlineCard>
-              <Item
+              {/* <Item
                 name="Outstanding Debt"
                 value={displayAmount(clmPosition.general.outstandingDebt, 18, {
                   precision: 2,
                 })}
                 postChild={<NoteIcon />}
-              />
-              <Item
-                name="Average APR"
-                value={clmPosition.general.netApr + "%"}
-              />
+              /> */}
+              <Item name="Net APR" value={clmPosition.general.netApr + "%"} />
               <Item
                 name="Percent Limit Used"
                 value={clmPosition.general.percentLimitUsed + "%"}
               />
               <Item
-                name="Maximum Account Liquidity"
+                name="Borrow Limit"
                 value={displayAmount(
                   clmPosition.general.maxAccountLiquidity,
                   18,
@@ -197,5 +209,5 @@ export default function LendingPage() {
 }
 
 const NoteIcon = () => (
-  <Icon themed icon={{ url: "/tokens/note.svg", size: 24 }} />
+  <Icon themed icon={{ url: "/tokens/note.svg", size: 20 }} />
 );

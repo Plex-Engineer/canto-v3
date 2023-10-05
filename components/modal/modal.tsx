@@ -51,6 +51,7 @@ const Modal = ({ onClose, children, title, width, height, open }: Props) => {
         <div className={styles.modal}>
           <Container className={styles.close} onClick={handleClose}>
             <Icon
+              themed
               icon={{
                 url: "close.svg",
                 size: 40,

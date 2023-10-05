@@ -47,6 +47,8 @@ export const UserPairRow = ({
       {displayAmount(totalUserLPValue.toString(), 18, {
         precision: 2,
       })}
+      <Spacer width="5px" />
+
       <Icon
         themed
         icon={{
@@ -101,6 +103,7 @@ export const GeneralPairRow = ({
     {displayAmount(pair.tvl, 18, {
       precision: 2,
     })}
+    <Spacer width="5px" />
     <Icon
       themed
       icon={{

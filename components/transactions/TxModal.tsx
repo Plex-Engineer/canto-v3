@@ -117,6 +117,7 @@ const TransactionModal = () => {
                         }}
                       >
                         <Icon
+                          themed
                           icon={{
                             url: "dropdown.svg",
                             size: 24,
@@ -178,6 +179,7 @@ const TransactionModal = () => {
                     }}
                   >
                     <Icon
+                      themed
                       icon={{
                         url: "dropdown.svg",
                         size: 24,
@@ -203,6 +205,7 @@ const TransactionModal = () => {
                       status
                     )
                   }
+                  closeModal={() => setIsOpen(false)}
                 />
               )}
             </Container>
@@ -230,6 +233,7 @@ const TransactionModal = () => {
         }}
       >
         <Icon
+          themed
           icon={{
             url: "transactions.svg",
             size: 24,
