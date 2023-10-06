@@ -22,6 +22,10 @@ const TESTNET_AMBIENT_PAIRS: BaseAmbientPair[] = [
       symbol: "USDC",
     },
     poolIdx: 36000,
+    address:
+      "0x04E52476d318CdF739C38BD41A922787D441900c-0xc51534568489f47949A828C8e3BF68463bdF3566",
+    symbol: "cNoteUSDCLP",
+    logoURI: "",
   },
 ];
 

@@ -11,7 +11,7 @@ import { TransactionFlowType } from "@/config/transactions/txMap";
  * @param {CantoDexTransactionParams} params - The parameters to create a new transaction flow
  * @returns {ReturnWithError<NewTransactionFlow>} New transaction flow
  */
-export function createNewPairsTxFlow(
+export function createNewCantoDexTxFLow(
   params: CantoDexTransactionParams
 ): ReturnWithError<NewTransactionFlow> {
   return NO_ERROR({

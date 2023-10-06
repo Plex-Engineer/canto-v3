@@ -1,4 +1,7 @@
 export interface BaseAmbientPair {
+  address: string; // this address will never be used for transactions, just for identification in hook
+  symbol: string;
+  logoURI: string;
   base: AmbientPairToken;
   quote: AmbientPairToken;
   poolIdx: number;

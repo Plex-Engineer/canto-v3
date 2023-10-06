@@ -20,7 +20,7 @@ import {
 } from "@/config/interfaces";
 import { areEqualAddresses } from "@/utils/address.utils";
 import { validateInputTokenAmount } from "@/utils/validation.utils";
-import { createNewPairsTxFlow } from "./helpers/createPairsFlow";
+import { createNewCantoDexTxFLow } from "./helpers/createPairsFlow";
 
 export default function useCantoDex(
   params: CantoDexHookInputParams,
@@ -183,7 +183,7 @@ export default function useCantoDex(
     const validation = validateParams(params);
     if (!validation.isValid)
       return NEW_ERROR("createNewPairsFlow::" + validation.errorMessage);
-    return createNewPairsTxFlow(params);
+    return createNewCantoDexTxFLow(params);
   }
 
   return {

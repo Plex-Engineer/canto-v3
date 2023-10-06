@@ -8,10 +8,17 @@ import { useWalletClient } from "wagmi";
 import { ValidationReturn } from "@/config/interfaces";
 import { GeneralPairRow, UserPairRow } from "./components/pairRow";
 import Text from "@/components/text";
-import { TestEditModal } from "./components/liquidityModal";
+import { TestEditModal } from "./components/cantoDexLPModal";
 import styles from "./lp.module.scss";
-import useLP from "@/hooks/pairs/useLP";
 import { CantoDexTransactionParams } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
+import useLP from "@/hooks/pairs/lpCombo/useLP";
+import {
+  isAmbientPair,
+  isCantoDexPair,
+} from "@/hooks/pairs/lpCombo/interfaces.ts/pairTypes";
+import Button from "@/components/button/button";
+import { TestAmbientModal } from "./components/ambientLPModal";
+import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
 
 export default function Page() {
   const { data: signer } = useWalletClient();
@@ -25,19 +32,20 @@ export default function Page() {
     userEthAddress: signer?.account.address ?? "",
   });
 
-  const { pairs, transaction } = cantoDex;
-
-  const sortedPairs = pairs?.sort((a, b) => a.symbol.localeCompare(b.symbol));
-  const userPairs = pairs.filter(
+  /** CANTO DEX */
+  const { pairs: cantoDexPairs } = cantoDex;
+  const sortedPairs = cantoDexPairs?.sort((a, b) =>
+    a.symbol.localeCompare(b.symbol)
+  );
+  const userPairs = cantoDexPairs.filter(
     (pair) =>
       pair.clmData?.userDetails?.balanceOfCToken !== "0" ||
       pair.clmData?.userDetails?.balanceOfUnderlying !== "0"
   );
-  const { setPair, pair: selectedPair } = selection;
 
   // transactions
-  function sendTxFlow(params: Partial<CantoDexTransactionParams>) {
-    const { data: flow, error } = transaction.createNewPairsFlow({
+  function sendCantoDexTxFlow(params: Partial<CantoDexTransactionParams>) {
+    const { data: flow, error } = cantoDex.transaction.createNewPairsFlow({
       chainId,
       ethAccount: signer?.account.address ?? "",
       pair: selectedPair,
@@ -49,26 +57,64 @@ export default function Page() {
       txStore?.addNewFlow({ txFlow: flow, signer: signer });
     }
   }
-  function canPerformTx(
+  function canPerformCantoDexTx(
     params: Partial<CantoDexTransactionParams>
   ): ValidationReturn {
-    return transaction.validateParams({
-      chainId: signer?.chain.id ?? 7700,
+    return cantoDex.transaction.validateParams({
+      chainId: chainId,
       ethAccount: signer?.account.address ?? "",
       pair: selectedPair,
       ...params,
     } as CantoDexTransactionParams);
   }
 
+  /** AMBIENT */
+  const { ambientPairs } = ambient;
+
+  //transactions
+  function sendAmbientTxFlow(params: Partial<AmbientTransactionParams>) {
+    const { data: flow, error } = ambient.transaction.createNewPairsFlow({
+      chainId,
+      ethAccount: signer?.account.address ?? "",
+      pair: selectedPair,
+      ...params,
+    } as AmbientTransactionParams);
+    if (error) {
+      console.log(error);
+    } else {
+      txStore?.addNewFlow({ txFlow: flow, signer: signer });
+    }
+  }
+  function canPerformAmbientTx(
+    params: Partial<AmbientTransactionParams>
+  ): ValidationReturn {
+    return ambient.transaction.validateParams({
+      chainId: chainId,
+      ethAccount: signer?.account.address ?? "",
+      pair: selectedPair,
+      ...params,
+    } as AmbientTransactionParams);
+  }
+
+  /** general selection */
+  const { pair: selectedPair, setPair } = selection;
+
   //main content
   return (
     <div className={styles.container}>
       <Modal open={selectedPair !== null} onClose={() => setPair(null)}>
-        {selectedPair && (
+        {selectedPair && isCantoDexPair(selectedPair) && (
           <TestEditModal
             pair={selectedPair}
-            validateParams={canPerformTx}
-            sendTxFlow={sendTxFlow}
+            validateParams={canPerformCantoDexTx}
+            sendTxFlow={sendCantoDexTxFlow}
+          />
+        )}
+        {selectedPair && isAmbientPair(selectedPair) && (
+          <TestAmbientModal
+            pair={selectedPair}
+            validateParams={canPerformAmbientTx}
+            sendTxFlow={sendAmbientTxFlow}
           />
         )}
       </Modal>
@@ -118,6 +164,18 @@ export default function Page() {
             }}
           />
         ))}
+      />
+      <Spacer height="40px" />
+      <Table
+        title="AmbientPairs"
+        headers={["Pair", "action"]}
+        columns={3}
+        processedData={ambientPairs.map((pair) => [
+          <div key={pair.symbol}>{pair.symbol}</div>,
+          <Button key={"action item"} onClick={() => setPair(pair.address)}>
+            add liquidity
+          </Button>,
+        ])}
       />
       <Spacer height="40px" />
     </div>

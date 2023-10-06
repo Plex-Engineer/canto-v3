@@ -1,8 +1,8 @@
 import { AmbientPair } from "./ambientPairs";
 
 export enum AmbientTxType {
-  ADD_CONC_LIQIDITY,
-  REMOVE_CONC_LIQUIDITY,
+  ADD_CONC_LIQIDITY = "Add concentrated liquidity",
+  REMOVE_CONC_LIQUIDITY = "Remove concentrated liquidity",
 }
 export type AmbientTransactionParams = {
   chainId: number;
