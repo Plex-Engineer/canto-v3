@@ -135,6 +135,12 @@ export async function bridgeLayerZero(
     }
   }
 
+  const { data: needAdapterParams, error: adapterParamsError } =
+    await checkUseAdapterParams(token.chainId, token.address);
+  if (adapterParamsError) {
+    return NEW_ERROR("bridgeLayerZero::" + errMsg(adapterParamsError));
+  }
+
   // will need to call transfer from after depositing
   txList.push(
     _oftTransferTx(
@@ -145,6 +151,7 @@ export async function bridgeLayerZero(
       token.address,
       amount,
       gas.toString(),
+      needAdapterParams,
       TX_DESCRIPTIONS.BRIDGE(
         token.symbol,
         displayAmount(amount, token.decimals),
@@ -162,6 +169,10 @@ export async function bridgeLayerZero(
  * TRANSACTION CREATORS
  * WILL NOT CHECK FOR VALIDITY OF PARAMS, MUST DO THIS BEFORE USING THESE CONSTRUCTORS
  */
+
+// if useCustomAdapterParams is true, we must pass in adapter params
+const DEFAULT_ADAPTER_PARAMS =
+  "0x00010000000000000000000000000000000000000000000000000000000000030d40";
 const _oftTransferTx = (
   chainId: number,
   toLZChainId: number,
@@ -170,6 +181,7 @@ const _oftTransferTx = (
   tokenAddress: string,
   amount: string,
   gas: string,
+  needAdapterParams: boolean,
   description: TransactionDescription
 ): Transaction => ({
   bridge: {
@@ -187,7 +199,11 @@ const _oftTransferTx = (
     toLZChainId,
     toAddressBytes,
     amount,
-    [ethAddress, ZERO_ADDRESS, "0x"],
+    [
+      ethAddress,
+      ZERO_ADDRESS,
+      needAdapterParams ? DEFAULT_ADAPTER_PARAMS : "0x",
+    ],
   ],
   value: gas,
 });
@@ -264,6 +280,31 @@ export async function estimateOFTSendGasFee(
     return NO_ERROR(new BigNumber(gas[0] as string));
   } catch (err) {
     return NEW_ERROR("estimateOFTSendGasFee::" + errMsg(err));
+  }
+}
+
+async function checkUseAdapterParams(
+  chainId: number,
+  oftAddress: string
+): PromiseWithError<boolean> {
+  // get network
+  const { data: network, error: networkError } =
+    getNetworkInfoFromChainId(chainId);
+  if (networkError) {
+    return NEW_ERROR("checkUseAdapterParams::" + errMsg(networkError.message));
+  }
+  const oftContract = new Contract(
+    OFT_ABI,
+    oftAddress,
+    getProviderWithoutSigner(network.rpcUrl)
+  );
+  try {
+    const adapterParams = await oftContract.methods
+      .useCustomAdapterParams()
+      .call();
+    return NO_ERROR(adapterParams);
+  } catch (err) {
+    return NEW_ERROR("checkUseAdapterParams::" + errMsg(err));
   }
 }
 
