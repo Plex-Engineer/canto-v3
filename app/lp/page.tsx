@@ -19,6 +19,12 @@ import {
 import Button from "@/components/button/button";
 import { TestAmbientModal } from "./components/ambientLPModal";
 import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
+import {
+  baseTokenFromConcLiquidity,
+  getQuoteLiquidity,
+  quoteTokenFromConcLiquidity,
+} from "@/utils/ambient/liquidity.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 
 export default function Page() {
   const { data: signer } = useWalletClient();
@@ -168,10 +174,32 @@ export default function Page() {
       <Spacer height="40px" />
       <Table
         title="AmbientPairs"
-        headers={["Pair", "action"]}
-        columns={3}
+        headers={["Pair", "Base Liquidity", "Quote Liquidity", "action"]}
+        columns={5}
         processedData={ambientPairs.map((pair) => [
           <div key={pair.symbol}>{pair.symbol}</div>,
+          <div key={pair.symbol + "baseliq"}>
+            {displayAmount(
+              baseTokenFromConcLiquidity(
+                pair.q64PriceRoot,
+                pair.userDetails?.defaultRangePosition.liquidity ?? "0",
+                pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
+                pair.userDetails?.defaultRangePosition.upperTick ?? 0
+              ),
+              pair.base.decimals
+            )}
+          </div>,
+          <div key={pair.symbol + "quoteLiq"}>
+            {displayAmount(
+              quoteTokenFromConcLiquidity(
+                pair.q64PriceRoot,
+                pair.userDetails?.defaultRangePosition.liquidity ?? "0",
+                pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
+                pair.userDetails?.defaultRangePosition.upperTick ?? 0
+              ),
+              pair.quote.decimals
+            )}
+          </div>,
           <Button key={"action item"} onClick={() => setPair(pair.address)}>
             add liquidity
           </Button>,

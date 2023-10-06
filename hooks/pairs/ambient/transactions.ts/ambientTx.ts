@@ -17,7 +17,7 @@ import { ZERO_ADDRESS } from "@/config/consts/addresses";
 import {
   convertFromQ64RootPrice,
   convertToQ64RootPrice,
-  getTickFromPrice,
+  getPriceFromTick,
 } from "@/utils/ambient/ambientMath.utils";
 import {
   getConcBaseTokensFromQuoteTokens,
@@ -31,25 +31,49 @@ export async function ambientLiquidityTx(
   params: AmbientTransactionParams
 ): PromiseWithError<TxCreatorFunctionReturn> {
   // do all conversions here to pass into flows
-  // get upper and lower ticks from min and max prices
-  const lowerTick = getTickFromPrice(params.minPrice);
-  const upperTick = getTickFromPrice(params.maxPrice);
-  const minPriceQ64 = convertToQ64RootPrice(params.minPrice).toString();
-  const maxPriceQ64 = convertToQ64RootPrice(params.maxPrice).toString();
+  // get upper and lower price limits from ticks
+  const minPriceWei = getPriceFromTick(params.lowerTick);
+  const maxPriceWei = getPriceFromTick(params.upperTick);
+  const minPriceQ64 = convertToQ64RootPrice(minPriceWei)
+    .integerValue()
+    .toString();
+  const maxPriceQ64 = convertToQ64RootPrice(maxPriceWei)
+    .integerValue()
+    .toString();
   const crocDexAddress = getAmbientAddress(params.chainId, "crocDex");
   if (!crocDexAddress) {
     return NEW_ERROR("Ambient liquidity tx:: Invalid chain id");
   }
 
   switch (params.txType) {
-    case AmbientTxType.ADD_CONC_LIQIDITY:
+    case AmbientTxType.ADD_CONC_LIQUIDITY:
       return await addConcLiquidityFlow({
         ...params,
         crocDexAddress,
-        lowerTick,
-        upperTick,
+        minPriceWei,
+        maxPriceWei,
         minPriceQ64,
         maxPriceQ64,
+      });
+    case AmbientTxType.REMOVE_CONC_LIQUIDITY:
+      // there is nothing to check for allowances or other details
+      // return tx here
+      return NO_ERROR({
+        transactions: [
+          _removeConcLiquidityTx(
+            params.chainId,
+            crocDexAddress,
+            params.pair.base.address,
+            params.pair.quote.address,
+            params.pair.poolIdx,
+            params.liquidity,
+            params.lowerTick,
+            params.upperTick,
+            minPriceQ64,
+            maxPriceQ64,
+            TX_DESCRIPTIONS.REMOVE_AMBIENT_CONC_LIQ()
+          ),
+        ],
       });
     default:
       return NEW_ERROR("Invalid transaction type");
@@ -59,18 +83,18 @@ export async function ambientLiquidityTx(
 /**
  * TRANSACTION FLOWS TO USE FROM MAIN LP FUNCTION
  */
-interface AmbientFlowParams extends AmbientTransactionParams {
+type AmbientFlowParams = AmbientTransactionParams & {
   crocDexAddress: string;
-  lowerTick: number;
-  upperTick: number;
+  minPriceWei: string;
   minPriceQ64: string;
+  maxPriceWei: string;
   maxPriceQ64: string;
-}
+};
 async function addConcLiquidityFlow(
   params: AmbientFlowParams
 ): PromiseWithError<TxCreatorFunctionReturn> {
   /** check for correct tx type */
-  if (params.txType !== AmbientTxType.ADD_CONC_LIQIDITY) {
+  if (params.txType !== AmbientTxType.ADD_CONC_LIQUIDITY) {
     return NEW_ERROR("addConcLiquidityFlow:: Invalid transaction type");
   }
   /** create tx list */
@@ -85,16 +109,16 @@ async function addConcLiquidityFlow(
     quoteAmount = getConcQuoteTokensFromBaseTokens(
       params.amount,
       currentPrice,
-      params.minPrice,
-      params.maxPrice
+      params.minPriceWei,
+      params.maxPriceWei
     );
   } else {
     quoteAmount = params.amount;
     baseAmount = getConcBaseTokensFromQuoteTokens(
       params.amount,
       currentPrice,
-      params.minPrice,
-      params.maxPrice
+      params.minPriceWei,
+      params.maxPriceWei
     );
   }
   /** Allowance check on tokens from croc Dex */
@@ -182,6 +206,59 @@ const _addConcLiquidityTx = (
       lowerTick,
       upperTick,
       amount,
+      minPriceQ64,
+      maxPriceQ64,
+      0,
+      ZERO_ADDRESS,
+    ]
+  );
+  return {
+    description,
+    chainId: chainId,
+    type: "EVM",
+    target: crocDexAddress,
+    abi: CROC_SWAP_DEX_ABI,
+    method: "userCmd",
+    params: [2, calldata],
+    value: "0",
+  };
+};
+
+const _removeConcLiquidityTx = (
+  chainId: number,
+  crocDexAddress: string,
+  baseAddress: string,
+  quoteAddress: string,
+  poolIdx: number,
+  liquidity: string,
+  lowerTick: number,
+  upperTick: number,
+  minPriceQ64: string,
+  maxPriceQ64: string,
+  description: TransactionDescription
+): Transaction => {
+  const calldata = eth.abi.encodeParameters(
+    [
+      "uint8",
+      "address",
+      "address",
+      "uint256",
+      "int24",
+      "int24",
+      "uint128",
+      "uint128",
+      "uint128",
+      "uint8",
+      "address",
+    ],
+    [
+      2,
+      baseAddress,
+      quoteAddress,
+      poolIdx,
+      lowerTick,
+      upperTick,
+      liquidity,
       minPriceQ64,
       maxPriceQ64,
       0,

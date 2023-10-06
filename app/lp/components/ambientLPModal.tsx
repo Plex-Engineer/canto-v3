@@ -4,21 +4,28 @@ import Input from "@/components/input/input";
 import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
 import { ValidationReturn } from "@/config/interfaces";
+import { DEFAULT_AMBIENT_TICKS } from "@/hooks/pairs/ambient/config/prices";
 import { AmbientPair } from "@/hooks/pairs/ambient/interfaces/ambientPairs";
 import {
   AmbientTransactionParams,
   AmbientTxType,
 } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
-import { convertFromQ64RootPrice } from "@/utils/ambient/ambientMath.utils";
 import {
+  convertFromQ64RootPrice,
+  getPriceFromTick,
+} from "@/utils/ambient/ambientMath.utils";
+import {
+  baseTokenFromConcLiquidity,
   getConcBaseTokensFromQuoteTokens,
   getConcQuoteTokensFromBaseTokens,
+  quoteTokenFromConcLiquidity,
 } from "@/utils/ambient/liquidity.utils";
 import {
   convertToBigNumber,
   displayAmount,
   formatBalance,
 } from "@/utils/tokenBalances.utils";
+import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
 import { useState } from "react";
 
 interface TestAmbientModalProps {
@@ -29,11 +36,17 @@ interface TestAmbientModalProps {
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
 }
 interface AddParams {
-  minPrice: string;
-  maxPrice: string;
+  lowerTick: number;
+  upperTick: number;
   amount: string;
   isAmountBase: boolean;
-  txType: AmbientTxType.ADD_CONC_LIQIDITY;
+  txType: AmbientTxType.ADD_CONC_LIQUIDITY;
+}
+interface RemoveParams {
+  lowerTick: number;
+  upperTick: number;
+  liquidity: string;
+  txType: AmbientTxType.REMOVE_CONC_LIQUIDITY;
 }
 
 export const TestAmbientModal = (props: TestAmbientModalProps) => {
@@ -64,6 +77,13 @@ export const TestAmbientModal = (props: TestAmbientModalProps) => {
           validateParams={props.validateParams}
         />
       )}
+      {modalType === "remove" && (
+        <TestRemoveAmbientLiquidity
+          pair={props.pair}
+          sendTxFlow={props.sendTxFlow}
+          validateParams={props.validateParams}
+        />
+      )}
     </Container>
   );
 };
@@ -78,9 +98,8 @@ const TestAddAmbientLiquidity = ({
   sendTxFlow,
   validateParams,
 }: TestAddProps) => {
-  // TODO:default price range
-  const defaultMinPrice = convertFromQ64RootPrice("16602069666338596454400000");
-  const defaultMaxPrice = convertFromQ64RootPrice("20291418481080506777600000");
+  const defaultMinPrice = getPriceFromTick(DEFAULT_AMBIENT_TICKS.minTick);
+  const defaultMaxPrice = getPriceFromTick(DEFAULT_AMBIENT_TICKS.maxTick);
   const currentPrice = convertFromQ64RootPrice(pair.q64PriceRoot);
   // values
   const [baseValue, setBaseValue] = useState("");
@@ -121,9 +140,9 @@ const TestAddAmbientLiquidity = ({
 
   // validation
   const paramCheck = validateParams({
-    minPrice: defaultMinPrice,
-    maxPrice: defaultMaxPrice,
-    txType: AmbientTxType.ADD_CONC_LIQIDITY,
+    lowerTick: DEFAULT_AMBIENT_TICKS.minTick,
+    upperTick: DEFAULT_AMBIENT_TICKS.maxTick,
+    txType: AmbientTxType.ADD_CONC_LIQUIDITY,
     amount:
       lastUpdated === "base"
         ? convertToBigNumber(baseValue, pair.base.decimals).data?.toString() ??
@@ -196,9 +215,9 @@ const TestAddAmbientLiquidity = ({
       <Button
         onClick={() =>
           sendTxFlow({
-            minPrice: defaultMinPrice,
-            maxPrice: defaultMaxPrice,
-            txType: AmbientTxType.ADD_CONC_LIQIDITY,
+            lowerTick: DEFAULT_AMBIENT_TICKS.minTick,
+            upperTick: DEFAULT_AMBIENT_TICKS.maxTick,
+            txType: AmbientTxType.ADD_CONC_LIQUIDITY,
             amount:
               lastUpdated === "base"
                 ? convertToBigNumber(
@@ -214,6 +233,82 @@ const TestAddAmbientLiquidity = ({
         }
       >
         ADD CONC LIQUIDITY
+      </Button>
+    </Container>
+  );
+};
+
+interface TestRemoveProps {
+  pair: AmbientPair;
+  sendTxFlow: (params: RemoveParams) => void;
+  validateParams: (params: RemoveParams) => ValidationReturn;
+}
+const TestRemoveAmbientLiquidity = ({
+  pair,
+  sendTxFlow,
+  validateParams,
+}: TestRemoveProps) => {
+  const [percentToRemove, setPercentToRemove] = useState(0);
+  const liquidityToRemove = percentOfAmount(
+    pair.userDetails?.defaultRangePosition?.liquidity ?? "0",
+    percentToRemove
+  );
+
+  return (
+    <Container>
+      <Spacer height="40px" />
+      <Input
+        value={percentToRemove.toString()}
+        onChange={(e) => setPercentToRemove(Number(e.target.value))}
+        type="number"
+        min={0}
+        max={100}
+        label="percent to remove"
+      />
+      <Spacer height="40px" />
+      <Text size="lg" weight="bold">
+        expected base tokens:{" "}
+        {displayAmount(
+          baseTokenFromConcLiquidity(
+            pair.q64PriceRoot,
+            liquidityToRemove.data.toString(),
+            pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
+            pair.userDetails?.defaultRangePosition.upperTick ?? 0
+          ),
+          pair.base.decimals,
+          {
+            symbol: pair.base.symbol,
+          }
+        )}
+      </Text>
+      <Spacer height="40px" />
+      <Text size="lg" weight="bold">
+        expected quote tokens:{" "}
+        {displayAmount(
+          quoteTokenFromConcLiquidity(
+            pair.q64PriceRoot,
+            liquidityToRemove.data.toString(),
+            pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
+            pair.userDetails?.defaultRangePosition.upperTick ?? 0
+          ),
+          pair.quote.decimals,
+          {
+            symbol: pair.quote.symbol,
+          }
+        )}
+      </Text>
+      <Spacer height="40px" />
+      <Button
+        onClick={() =>
+          sendTxFlow({
+            lowerTick: DEFAULT_AMBIENT_TICKS.minTick,
+            upperTick: DEFAULT_AMBIENT_TICKS.maxTick,
+            txType: AmbientTxType.REMOVE_CONC_LIQUIDITY,
+            liquidity: liquidityToRemove.data.toString(),
+          })
+        }
+      >
+        REMOVE CONC LIQUIDITY
       </Button>
     </Container>
   );

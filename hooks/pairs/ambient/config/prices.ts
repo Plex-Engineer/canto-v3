@@ -1,0 +1,5 @@
+// AMBIENT PRICE AND TICK DEFAULTS
+export const DEFAULT_AMBIENT_TICKS = {
+  minTick: 276322 - 800,
+  maxTick: 276322 + 800,
+};

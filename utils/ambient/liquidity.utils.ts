@@ -5,7 +5,11 @@ import {
   quoteTokenForConcLiq,
 } from "@crocswap-libs/sdk";
 import { convertToBigNumber } from "../tokenBalances.utils";
-import { Q64_SCALE } from "./ambientMath.utils";
+import {
+  Q64_SCALE,
+  convertFromQ64RootPrice,
+  getPriceFromTick,
+} from "./ambientMath.utils";
 import { BigNumber } from "ethers";
 
 /**
@@ -71,6 +75,10 @@ export function getConcQuoteTokensFromBaseTokens(
   minPrice: string,
   maxPrice: string
 ): string {
+  // check if zero
+  if (Number(amount) === 0) {
+    return "0";
+  }
   const liquidity = liquidityForBaseConc(
     Number(currentPrice),
     BigNumber.from(amount),
@@ -101,6 +109,10 @@ export function getConcBaseTokensFromQuoteTokens(
   minPrice: string,
   maxPrice: string
 ): string {
+  // check if zero
+  if (Number(amount) === 0) {
+    return "0";
+  }
   const liquidity = liquidityForQuoteConc(
     Number(currentPrice),
     BigNumber.from(amount),
@@ -114,4 +126,62 @@ export function getConcBaseTokensFromQuoteTokens(
     Number(maxPrice)
   );
   return baseTokens.toString();
+}
+
+/**
+ * @notice gets base token amount from range position
+ * @param q64Price q64 price of base in quote
+ * @param liquidity liquidity of position
+ * @param lowerTick lower tick of position
+ * @param upperTick upper tick of position
+ * @returns base token amount
+ */
+export function baseTokenFromConcLiquidity(
+  q64Price: string,
+  liquidity: string,
+  lowerTick: number,
+  upperTick: number
+): string {
+  // convert price to wei
+  const priceWei = convertFromQ64RootPrice(q64Price);
+  // convert ticks to price
+  const lowerPrice = getPriceFromTick(lowerTick);
+  const upperPrice = getPriceFromTick(upperTick);
+  // get base tokens
+  const baseTokens = baseTokenForConcLiq(
+    Number(priceWei),
+    BigNumber.from(liquidity),
+    Number(lowerPrice),
+    Number(upperPrice)
+  );
+  return baseTokens.toString();
+}
+
+/**
+ * @notice gets quote token amount from range position
+ * @param q64Price q64 price of base in quote
+ * @param liquidity liquidity of position
+ * @param lowerTick lower tick of position
+ * @param upperTick upper tick of position
+ * @returns base token amount
+ */
+export function quoteTokenFromConcLiquidity(
+  q64Price: string,
+  liquidity: string,
+  lowerTick: number,
+  upperTick: number
+): string {
+  // convert price to wei
+  const priceWei = convertFromQ64RootPrice(q64Price);
+  // convert ticks to price
+  const lowerPrice = getPriceFromTick(lowerTick);
+  const upperPrice = getPriceFromTick(upperTick);
+  // get quote tokens
+  const quoteTokens = quoteTokenForConcLiq(
+    Number(priceWei),
+    BigNumber.from(liquidity),
+    Number(lowerPrice),
+    Number(upperPrice)
+  );
+  return quoteTokens.toString();
 }

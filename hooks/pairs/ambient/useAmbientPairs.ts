@@ -22,7 +22,10 @@ import {
   getConcBaseTokensFromQuoteTokens,
   getConcQuoteTokensFromBaseTokens,
 } from "@/utils/ambient/liquidity.utils";
-import { convertFromQ64RootPrice } from "@/utils/ambient/ambientMath.utils";
+import {
+  convertFromQ64RootPrice,
+  getPriceFromTick,
+} from "@/utils/ambient/ambientMath.utils";
 import { validateInputTokenAmount } from "@/utils/validation.utils";
 
 export default function useAmbientPairs(
@@ -41,12 +44,18 @@ export default function useAmbientPairs(
     async () => {
       const pairs = getAmbientPairsFromChainId(params.chainId);
       return (
-        (await getGeneralAmbientPairData(params.chainId, pairs)).data ?? []
+        (
+          await getGeneralAmbientPairData(
+            params.chainId,
+            pairs,
+            params.userEthAddress
+          )
+        ).data ?? []
       );
     },
     {
       onSuccess: (response) => {
-        // console.log(response);
+        console.log(response);
       },
       onError: (error) => {
         console.log(error);
@@ -88,7 +97,9 @@ export default function useAmbientPairs(
     txParams: AmbientTransactionParams
   ): ValidationReturn {
     switch (txParams.txType) {
-      case AmbientTxType.ADD_CONC_LIQIDITY: {
+      case AmbientTxType.ADD_CONC_LIQUIDITY: {
+        const minPriceWei = getPriceFromTick(txParams.lowerTick);
+        const maxPriceWei = getPriceFromTick(txParams.upperTick);
         // check that balances are good for each token
         const base = txParams.pair.base;
         const quote = txParams.pair.quote;
@@ -99,16 +110,16 @@ export default function useAmbientPairs(
           quoteAmount = getConcQuoteTokensFromBaseTokens(
             baseAmount,
             convertFromQ64RootPrice(txParams.pair.q64PriceRoot),
-            txParams.minPrice,
-            txParams.maxPrice
+            minPriceWei,
+            maxPriceWei
           );
         } else {
           quoteAmount = txParams.amount;
           baseAmount = getConcBaseTokensFromQuoteTokens(
             quoteAmount,
             convertFromQ64RootPrice(txParams.pair.q64PriceRoot),
-            txParams.minPrice,
-            txParams.maxPrice
+            minPriceWei,
+            maxPriceWei
           );
         }
         const baseCheck = validateInputTokenAmount(
@@ -129,6 +140,14 @@ export default function useAmbientPairs(
           errorMessage:
             prefixError + (baseCheck.errorMessage || quoteCheck.errorMessage),
         };
+      }
+      case AmbientTxType.REMOVE_CONC_LIQUIDITY: {
+        // check enough liquidity there
+        return validateInputTokenAmount(
+          txParams.liquidity,
+          txParams.pair.userDetails?.defaultRangePosition.liquidity ?? "0",
+          txParams.pair.symbol
+        );
       }
       default:
         return {

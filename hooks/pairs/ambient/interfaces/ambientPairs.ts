@@ -16,6 +16,18 @@ export interface AmbientPair extends BaseAmbientPair {
     quote: string;
     rootLiquidity: string;
   };
+  userDetails?: AmbientUserDetails;
+}
+
+interface AmbientUserDetails {
+  liquidity: UserPosition[];
+  defaultRangePosition: UserPosition;
+}
+
+interface UserPosition {
+  lowerTick: number;
+  upperTick: number;
+  liquidity: string;
 }
 
 interface AmbientPairToken {

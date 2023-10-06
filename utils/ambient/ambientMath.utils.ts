@@ -24,7 +24,7 @@ export function convertFromQ64RootPrice(q64RootPrice: string): string {
   // square price to get final value
   const priceFinal = priceScaled.times(priceScaled);
   // return as string
-  return priceFinal.toString();
+  return priceFinal.integerValue().toString();
 }
 
 /**
@@ -51,7 +51,7 @@ export function convertToQ64RootPrice(price: string): BigNumber {
  * @param price Price in terms of base per quote
  * @returns tick of price
  */
-export function getTickFromPrice(price: string): number {
+function getTickFromPrice(price: string): number {
   const tick = Math.log(Number(price)) / Math.log(1.0001);
   return Math.trunc(tick);
 }
@@ -61,7 +61,7 @@ export function getTickFromPrice(price: string): number {
  * @param tick tick to get price of
  * @returns price of tick in terms of base per quote
  */
-function getPriceFromTick(tick: number): string {
+export function getPriceFromTick(tick: number): string {
   const price = Math.pow(1.0001, tick);
-  return price.toString();
+  return Math.trunc(price).toString();
 }

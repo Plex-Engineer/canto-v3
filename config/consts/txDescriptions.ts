@@ -67,6 +67,10 @@ export const TX_DESCRIPTIONS = {
       deposit ? "to" : "from"
     } ${tokenSymbol} OFT`,
   }),
+  REMOVE_AMBIENT_CONC_LIQ: () => ({
+    title: "Remove Concentrated Liquidity",
+    description: "Remove concentrated liquidity from the pool",
+  }),
   REMOVE_LIQUIDITY: (pair: CantoDexPair, amount: string) => ({
     title: `Remove Liquidity From ${pair.symbol}`,
     description: `Remove ${amount} ${pair.symbol} from ${pair.symbol}`,
