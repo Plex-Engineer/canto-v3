@@ -24,6 +24,7 @@ export interface CToken {
   underlyingTotalSupply: string;
 }
 export interface UserCTokenDetails {
+  chainId: number;
   cTokenAddress: string;
   balanceOfCToken: string;
   balanceOfUnderlying: string;
