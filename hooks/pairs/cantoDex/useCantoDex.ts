@@ -21,6 +21,7 @@ import {
 import { areEqualAddresses } from "@/utils/address.utils";
 import { validateInputTokenAmount } from "@/utils/validation.utils";
 import { createNewCantoDexTxFLow } from "./helpers/createPairsFlow";
+import { createNewClaimCLMRewardsFlow } from "@/hooks/lending/helpers/createLendingFlow";
 
 export default function useCantoDex(
   params: CantoDexHookInputParams,
@@ -186,12 +187,21 @@ export default function useCantoDex(
     return createNewCantoDexTxFLow(params);
   }
 
+  function createNewClaimRewardsFlow(): ReturnWithError<NewTransactionFlow> {
+    return createNewClaimCLMRewardsFlow({
+      chainId: params.chainId,
+      ethAccount: params.userEthAddress ?? "",
+      estimatedRewards: position.totalRewards,
+    });
+  }
+
   return {
     pairs: pairsWithUserCTokens ?? [],
     position,
     transaction: {
       validateParams,
       createNewPairsFlow,
+      createClaimRewardsFlow: createNewClaimRewardsFlow,
     },
   };
 }

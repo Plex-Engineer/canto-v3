@@ -10,7 +10,11 @@ import {
   validateBridgeInRetryParams,
   validateBridgeOutRetryParams,
 } from "@/hooks/bridge/transactions/bridge";
-import { CTokenLendingTransactionParams } from "@/hooks/lending/interfaces/lendingTxTypes";
+import {
+  CLMClaimRewardsTxParams,
+  CTokenLendingTransactionParams,
+} from "@/hooks/lending/interfaces/lendingTxTypes";
+import { clmClaimRewardsTx } from "@/hooks/lending/transactions/claimRewards";
 import {
   cTokenLendingTx,
   validateCTokenLendingRetryParams,
@@ -31,6 +35,7 @@ export enum TransactionFlowType {
   BRIDGE_IN = "BRIDGE_IN",
   BRIDGE_OUT = "BRIDGE_OUT",
   CANTO_DEX_LP_TX = "CANTO_DEX_LP_TX",
+  CLM_CLAIM_REWARDS = "CLM_CLAIM_REWARDS",
   CLM_CTOKEN_TX = "CLM_CTOKEN_TX",
   STAKE_LP_TX = "STAKE_LP_TX",
 }
@@ -63,6 +68,11 @@ export const TRANSACTION_FLOW_MAP: {
     validRetry: async (params: CantoDexTransactionParams) =>
       NO_ERROR({ valid: false }),
     tx: async (params: CantoDexTransactionParams) => cantoDexLPTx(params),
+  },
+  [TransactionFlowType.CLM_CLAIM_REWARDS]: {
+    validRetry: async (params: CLMClaimRewardsTxParams) =>
+      NO_ERROR({ valid: true }),
+    tx: async (params: CLMClaimRewardsTxParams) => clmClaimRewardsTx(params),
   },
   [TransactionFlowType.CLM_CTOKEN_TX]: {
     validRetry: async (params: CTokenLendingTransactionParams) =>

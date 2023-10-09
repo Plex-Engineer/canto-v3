@@ -73,6 +73,14 @@ export default function Page() {
       ...params,
     } as CantoDexTransactionParams);
   }
+  function sendClaimRewardsFlow() {
+    const { data: flow, error } = cantoDex.transaction.createClaimRewardsFlow();
+    if (error) {
+      console.log(error);
+    } else {
+      txStore?.addNewFlow({ txFlow: flow, signer: signer });
+    }
+  }
 
   /** AMBIENT */
   const { ambientPairs } = ambient;
@@ -127,6 +135,14 @@ export default function Page() {
       <Text size="x-lg" className={styles.title}>
         LP Interface
       </Text>
+      <Spacer height="30px" />
+      <label>
+        Claimable Rewards:{" "}
+        {displayAmount(cantoDex.position.totalRewards, 18, {
+          symbol: "WCANTO",
+        })}
+      </label>
+      <Button onClick={sendClaimRewardsFlow}>CLAIM REWARDS</Button>
       <Spacer height="30px" />
       {userPairs.length > 0 && (
         <Table

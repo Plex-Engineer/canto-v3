@@ -7,4 +7,5 @@ export * from "./dexRouter";
 export * from "./erc20";
 export * from "./gravityBridge";
 export * from "./oft";
+export * from "./reservoir";
 export * from "./weth";

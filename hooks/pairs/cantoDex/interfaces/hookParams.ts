@@ -6,6 +6,7 @@ import {
 } from "@/config/interfaces";
 import { CantoDexPairWithUserCTokenData } from "./pairs";
 import { CantoDexTransactionParams } from "./pairsTxTypes";
+import { CLMClaimRewardsTxParams } from "@/hooks/lending/interfaces/lendingTxTypes";
 
 export interface CantoDexHookInputParams {
   chainId: number;
@@ -20,5 +21,6 @@ export interface CantoDexHookReturn {
     createNewPairsFlow: (
       params: CantoDexTransactionParams
     ) => ReturnWithError<NewTransactionFlow>;
+    createClaimRewardsFlow: () => ReturnWithError<NewTransactionFlow>;
   };
 }

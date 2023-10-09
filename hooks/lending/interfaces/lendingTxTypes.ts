@@ -16,3 +16,9 @@ export interface CTokenLendingTransactionParams {
   cToken: CTokenWithUserData;
   amount: string;
 }
+
+export interface CLMClaimRewardsTxParams {
+  chainId: number;
+  ethAccount: string;
+  estimatedRewards: string; // estimation before distribution of rewards, only used for drip purposes (all rewards will be claimed)
+}

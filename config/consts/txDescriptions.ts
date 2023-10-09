@@ -24,6 +24,10 @@ export const TX_DESCRIPTIONS = {
     title: `Send ${tokenSymbol} to ${toNetwork} from ${fromNetwork}`,
     description: `Send ${amount} ${tokenSymbol} to ${toNetwork} from ${fromNetwork} through ${method}`,
   }),
+  CLAIM_CLM_RWARDS: (amount: string) => ({
+    title: "Claim Rewards",
+    description: `Claim ${amount} WCANTO in rewards`,
+  }),
   CONVERT_ERC20: (tokenSymbol: string, amount: string) => ({
     title: `Convert ${tokenSymbol}`,
     description: `Convert ${amount} ${tokenSymbol} to native token`,
@@ -52,6 +56,10 @@ export const TX_DESCRIPTIONS = {
     description: `${
       collateralize ? "Collateralize" : "Uncollateralize"
     } ${tokenSymbol} in the lending market`,
+  }),
+  DRIP_COMPTROLLER: () => ({
+    title: "Drip Comptroller",
+    description: "Drip WCANTO rewards to the lending market from the reservoir",
   }),
   GENERATE_PUBLIC_KEY: () => ({
     title: "Generate Public Key",
