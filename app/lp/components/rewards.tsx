@@ -13,7 +13,13 @@ const Rewards = (props: Props) => {
   return (
     <section className={styles.rewards}>
       <div>
-        <Text font="proto_mono" size="x-lg">
+        <Text
+          font="proto_mono"
+          size="x-lg"
+          style={{
+            color: "#000",
+          }}
+        >
           Accumulated WCanto
         </Text>
 
@@ -29,6 +35,7 @@ const Rewards = (props: Props) => {
             size="x-lg"
             style={{
               fontSize: "42px",
+              color: "#000",
             }}
           >
             {props.value}

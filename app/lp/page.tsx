@@ -46,9 +46,12 @@ export default function Page() {
   );
   const userPairs = cantoDexPairs.filter(
     (pair) =>
-      pair.clmData?.userDetails?.balanceOfCToken !== "0" ||
-      pair.clmData?.userDetails?.balanceOfUnderlying !== "0"
+      (pair.clmData?.userDetails?.balanceOfCToken !== "0" ||
+        pair.clmData?.userDetails?.balanceOfUnderlying !== "0") &&
+      pair.clmData?.userDetails?.balanceOfCToken !== undefined
   );
+
+  console.log(userPairs, "your pairs");
 
   // transactions
   function sendCantoDexTxFlow(params: Partial<CantoDexTransactionParams>) {
