@@ -1,3 +1,4 @@
+import { VoteOption } from "@/hooks/governance/interfaces/voteOptions";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 
 export const TX_DESCRIPTIONS = {
@@ -61,5 +62,9 @@ export const TX_DESCRIPTIONS = {
   WRAP_ETH: (amount: string) => ({
     title: "Wrap ETH",
     description: `Wrap ${amount} ETH to WETH`,
+  }),
+  VOTE: (proposalId: number, voteOption: VoteOption) => ({
+    title: `Vote ${voteOption} on proposal #${proposalId}`,
+    description: `Vote ${voteOption} on proposal #${proposalId}`,
   }),
 };

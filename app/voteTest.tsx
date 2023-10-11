@@ -1,7 +1,7 @@
 import Button from "@/components/button/button";
 import { NewTransactionFlow } from "@/config/interfaces";
 import { TransactionFlowType } from "@/config/transactions/txMap";
-import { VotingOption } from "@/hooks/governance/helpers/voteOptions";
+import { VoteOption } from "@/hooks/governance/interfaces/voteOptions";
 import useTransactionStore from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
 import { useWalletClient } from "wagmi";
@@ -18,7 +18,7 @@ export default function VoteTest() {
       params: {
         chainId: signer?.chain.id,
         proposalId: 1,
-        voteOption: VotingOption.YES,
+        voteOption: VoteOption.YES,
         ethSender: signer?.account.address,
       },
     };

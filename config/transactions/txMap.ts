@@ -6,7 +6,8 @@ import {
   validateBridgeInRetryParams,
   validateBridgeOutRetryParams,
 } from "@/hooks/bridge/transactions/bridge";
-import { ProposalVoteTx, proposalVoteTx } from "@/hooks/governance/transactions/vote";
+import { ProposalVoteTxParams } from "@/hooks/governance/interfaces/voteTxParams";
+import { proposalVoteTx } from "@/hooks/governance/transactions/vote";
 import { CTokenLendingTransactionParams } from "@/hooks/lending/interfaces/lendingTxTypes";
 import {
   cTokenLendingTx,
@@ -46,7 +47,8 @@ export const TRANSACTION_FLOW_MAP: {
       cTokenLendingTx(params),
   },
   [TransactionFlowType.VOTE_TX]: {
-    validRetry: async (params: ProposalVoteTx) => NO_ERROR({valid: false}),
-    tx: async (params: ProposalVoteTx) => proposalVoteTx(params),
-  }
+    validRetry: async (params: ProposalVoteTxParams) =>
+      NO_ERROR({ valid: false }),
+    tx: async (params: ProposalVoteTxParams) => proposalVoteTx(params),
+  },
 };
