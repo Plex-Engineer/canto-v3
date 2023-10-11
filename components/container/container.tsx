@@ -17,13 +17,31 @@ interface Props {
   style?: React.CSSProperties;
 }
 
+function getMargin(margin: Props["margin"]) {
+  switch (margin) {
+    case "xx-sm":
+      return "4px";
+    case "x-sm":
+      return "8px";
+    case "sm":
+      return "16px";
+    case "md":
+      return "24px";
+    case "lg":
+      return "32px";
+    case "x-lg":
+      return "48px";
+    default:
+      return margin;
+  }
+}
 const Container = (props: Props) => {
   return (
     <div
       className={props.className}
       onClick={props.onClick}
       style={{
-        margin: props.margin,
+        margin: getMargin(props.margin),
         padding: props.padding,
         width: props.width,
         height: props.height,

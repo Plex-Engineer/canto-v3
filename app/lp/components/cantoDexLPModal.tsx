@@ -23,6 +23,8 @@ import { getOptimalValueBFormatted } from "@/hooks/pairs/cantoDex/helpers/addLiq
 import styles from "./cantoDex.module.scss";
 import Amount from "@/components/amount/amount";
 import Tabs from "@/components/tabs/tabs";
+import { ModalItem } from "@/app/lending/components/modal/modal";
+import Toggle from "@/components/toggle";
 interface AddParams {
   value1: string;
   value2: string;
@@ -65,29 +67,26 @@ export const TestEditModal = (props: TestEditProps) => {
     unstake: true,
   });
   return (
-    <Container
-      className={styles.container}
-      width="32rem"
-      style={{
-        margin: "-16px",
-      }}
-    >
-      {/* back button rendered when not in base */}
+    <Container className={styles.container} width="32rem">
       {modalType !== "base" && (
-        <>
+        <div
+          style={{
+            height: "100%",
+          }}
+        >
           <Container
             direction="row"
-            height="54px"
+            height="50px"
             center={{
               vertical: true,
             }}
             style={{
               padding: "0 16px",
               cursor: "pointer",
+              marginTop: "-14px",
             }}
             onClick={() => setModalType("base")}
           >
-            {/* <Button onClick={() => setModalType("base")}>Back</Button> */}
             <div
               style={{
                 rotate: "90deg",
@@ -100,71 +99,122 @@ export const TestEditModal = (props: TestEditProps) => {
               Liquidity
             </Text>
           </Container>
-          <Tabs
-            tabs={[
-              {
-                title: "Add",
-                content: (
-                  <Container>
-                    <div className={styles.iconTitle}>
-                      <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
-                      <Text size="lg" font="proto_mono">
-                        {props.pair.symbol}
-                      </Text>
-                    </div>
-                    <TestAddLiquidityModal
-                      pair={props.pair}
-                      validateParams={(params) =>
-                        props.validateParams(createAddParams(params))
-                      }
-                      sendTxFlow={(params) =>
-                        props.sendTxFlow(createAddParams(params))
-                      }
-                    />
-                  </Container>
-                ),
-              },
-              {
-                title: "Remove",
-                content: (
-                  <Container>
-                    <div className={styles.iconTitle}>
-                      <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
-                      <Text size="lg" font="proto_mono">
-                        {props.pair.symbol}
-                      </Text>
-                    </div>
-                    <TestRemoveLiquidityModal
-                      pair={props.pair}
-                      validateParams={(params) =>
-                        props.validateParams(createRemoveParams(params))
-                      }
-                      sendTxFlow={(params) =>
-                        props.sendTxFlow(createRemoveParams(params))
-                      }
-                    />
-                  </Container>
-                ),
-              },
-            ]}
-          />
-        </>
+          <div
+            style={{
+              margin: "0  -16px -16px -16px",
+              height: "39rem",
+            }}
+          >
+            <Tabs
+              tabs={[
+                {
+                  title: "Add",
+                  content: (
+                    <Container>
+                      <div className={styles.iconTitle}>
+                        <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+                        <Text size="lg" font="proto_mono">
+                          {props.pair.symbol}
+                        </Text>
+                      </div>
+                      <TestAddLiquidityModal
+                        pair={props.pair}
+                        validateParams={(params) =>
+                          props.validateParams(createAddParams(params))
+                        }
+                        sendTxFlow={(params) =>
+                          props.sendTxFlow(createAddParams(params))
+                        }
+                      />
+                    </Container>
+                  ),
+                },
+                {
+                  title: "Remove",
+                  isDisabled:
+                    props.pair.clmData?.userDetails?.balanceOfCToken === "0",
+                  content: (
+                    <Container>
+                      <div className={styles.iconTitle}>
+                        <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+                        <Text size="lg" font="proto_mono">
+                          {props.pair.symbol}
+                        </Text>
+                      </div>
+                      <TestRemoveLiquidityModal
+                        pair={props.pair}
+                        validateParams={(params) =>
+                          props.validateParams(createRemoveParams(params))
+                        }
+                        sendTxFlow={(params) =>
+                          props.sendTxFlow(createRemoveParams(params))
+                        }
+                      />
+                    </Container>
+                  ),
+                },
+              ]}
+            />
+          </div>
+        </div>
       )}
 
       {modalType === "base" &&
         props.pair.clmData?.userDetails?.balanceOfUnderlying !== "0" && (
-          <Container gap={40}>
-            <Container gap={20}>
-              <Text>
-                Unstaked Liquidity{" "}
-                {displayAmount(
-                  props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
-                  props.pair.decimals,
-                  {
-                    symbol: props.pair.symbol,
-                  }
-                )}
+          <Container gap={40} padding="md">
+            <div className={styles.iconTitle}>
+              <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+              <Text size="lg" font="proto_mono">
+                {props.pair.symbol}
               </Text>
+            </div>
+            <Container className={styles.card} padding="md" width="100%">
+              <ModalItem
+                name="Position Value"
+                value={
+                  props.pair.clmData?.userDetails?.supplyBalanceInUnderlying ??
+                  "0"
+                }
+                note
+              />
+              <ModalItem name="Total # of LP Tokens" value="0" />
+              <ModalItem
+                name="Staked LP Tokens"
+                value={props.pair.clmData?.userDetails?.balanceOfCToken ?? "0"}
+              />
+              <ModalItem
+                name="Unstaked LP Tokens"
+                value={displayAmount(
+                  props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+                  props.pair.decimals
+                  //   {
+                  //     symbol: props.pair.symbol,
+                  //   }
+                )}
+              />
+            </Container>
+            <Container className={styles.card} padding="md" width="100%">
+              <ModalItem
+                name="Pool Liquidity"
+                value={displayAmount(props.pair.tvl, props.pair.decimals)}
+                note
+              />
+              <ModalItem
+                name="Pool Share"
+                value={
+                  props.pair.clmData?.userDetails?.supplyBalanceInUnderlying !==
+                  "0"
+                    ? `${(
+                        Number(
+                          props.pair.clmData?.userDetails
+                            ?.supplyBalanceInUnderlying
+                        ) / Number(props.pair.tvl)
+                      ).toFixed(4)}%`
+                    : "0%"
+                }
+              />
+            </Container>
+            <Container gap={20}>
               <Button
                 onClick={() =>
                   props.sendTxFlow({
@@ -193,20 +243,15 @@ export const TestEditModal = (props: TestEditProps) => {
               </Button>
             </Container>
             <Container gap={20}>
-              <Button color="accent" onClick={() => setModalType("add")}>
-                Add Liquidity
-              </Button>
-              {props.pair.clmData?.userDetails?.balanceOfCToken !== "0" && (
+              <Button onClick={() => setModalType("add")}>Manage LP</Button>
+              {/* {props.pair.clmData?.userDetails?.balanceOfCToken !== "0" && (
                 <Button color="accent" onClick={() => setModalType("remove")}>
                   Remove Liquidity
                 </Button>
-              )}
+              )} */}
             </Container>
           </Container>
         )}
-      <Button color="primary" onClick={() => setModalType("add")}>
-        Add Liquidity
-      </Button>
     </Container>
   );
 };
@@ -269,7 +314,7 @@ const TestAddLiquidityModal = ({
 
   return (
     <Container>
-      <Spacer height="50px" />
+      <Spacer height="10px" />
       <Amount
         decimals={pair.token1.decimals}
         value={valueToken1}
@@ -287,40 +332,8 @@ const TestAddLiquidityModal = ({
         }
         errorMessage={paramCheck.errorMessage}
       />
-      {/* <Input
-        value={valueToken1}
-        onChange={(e) => {
-          setValue(e.target.value, true);
-        }}
-        label={pair.token1.symbol}
-        type="amount"
-        balance={pair.token1.balance ?? "0"}
-        decimals={pair.token1.decimals}
-        error={
-          !paramCheck.isValid &&
-          Number(valueToken1) !== 0 &&
-          paramCheck.errorMessage?.startsWith(pair.token1.symbol)
-        }
-        errorMessage={paramCheck.errorMessage}
-      /> */}
 
       <Spacer height="20px" />
-      {/* <Input
-        value={valueToken2}
-        onChange={(e) => {
-          setValue(e.target.value, false);
-        }}
-        label={pair.token2.symbol}
-        type="amount"
-        balance={pair.token2.balance ?? "0"}
-        decimals={pair.token2.decimals}
-        error={
-          !paramCheck.isValid &&
-          Number(valueToken2) !== 0 &&
-          paramCheck.errorMessage?.startsWith(pair.token2.symbol)
-        }
-        errorMessage={paramCheck.errorMessage}
-      /> */}
 
       <Amount
         decimals={pair.token2.decimals}
@@ -339,23 +352,33 @@ const TestAddLiquidityModal = ({
         }
         errorMessage={paramCheck.errorMessage}
       />
-      <Spacer height="50px" />
+      <Spacer height="20px" />
+      <Container className={styles.card}>
+        <ModalItem
+          name="Reserve Ratio"
+          value={formatBalance(
+            pair.ratio,
+            18 + Math.abs(pair.token1.decimals - pair.token2.decimals)
+          )}
+        />
+      </Container>
 
-      <Text>
-        Reserve Ratio:{" "}
-        {formatBalance(
-          pair.ratio,
-          18 + Math.abs(pair.token1.decimals - pair.token2.decimals)
-        )}
-      </Text>
-      <Button
+      {/* <Button
         color={willStake ? "accent" : "primary"}
         onClick={() => setWillStake(!willStake)}
       >
         STAKE {`${willStake ? "ON" : "OFF"}`}
-      </Button>
+      </Button> */}
+
+      <Container direction="row" gap={14} margin="sm">
+        <Text size="sm" font="proto_mono">
+          Stake
+        </Text>
+        <Toggle onChange={(value) => setWillStake(value)} value={willStake} />
+      </Container>
       <Button
         disabled={!paramCheck.isValid}
+        width={"fill"}
         onClick={() =>
           sendTxFlow({
             value1: (
@@ -372,6 +395,7 @@ const TestAddLiquidityModal = ({
       >
         {"Add Liquidity"}
       </Button>
+      <Spacer height="20px" />
     </Container>
   );
 };

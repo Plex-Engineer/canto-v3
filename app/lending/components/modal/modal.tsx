@@ -39,7 +39,7 @@ export const LendingModal = (props: Props) => {
     liquidityLeft: string;
   }) => (
     <Container className={styles.card} padding="md" width="100%">
-      <Card
+      <ModalItem
         name="Wallet Balance"
         value={formatBalance(
           cToken.userDetails?.balanceOfUnderlying ?? "0",
@@ -51,7 +51,7 @@ export const LendingModal = (props: Props) => {
         )}
       />
       {isSupply && (
-        <Card
+        <ModalItem
           name="Supplied Amount"
           value={formatBalance(
             cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
@@ -64,7 +64,7 @@ export const LendingModal = (props: Props) => {
         />
       )}
       {!isSupply && (
-        <Card
+        <ModalItem
           name="Borrowed Amount"
           value={formatBalance(
             cToken.userDetails?.borrowBalance ?? "0",
@@ -76,7 +76,7 @@ export const LendingModal = (props: Props) => {
           )}
         />
       )}
-      <Card
+      <ModalItem
         name="Account Liquidity Remaining"
         value={formatBalance(liquidityLeft, 18, {
           commify: true,
@@ -97,16 +97,16 @@ export const LendingModal = (props: Props) => {
       {/* might need to change this in future for showing it on more tokens */}
       {isSupply && cToken.symbol.toLowerCase() == "cnote" && (
         <>
-          <Card name="Supply APR" value={cToken.supplyApy + "%"} />
-          <Card name="Dist APR" value={cToken.distApy + "%"} />
+          <ModalItem name="Supply APR" value={cToken.supplyApy + "%"} />
+          <ModalItem name="Dist APR" value={cToken.distApy + "%"} />
         </>
       )}
       {!isSupply && (
         <>
-          <Card name="Borrow APR" value={cToken.borrowApy + "%"} />
+          <ModalItem name="Borrow APR" value={cToken.borrowApy + "%"} />
         </>
       )}
-      <Card
+      <ModalItem
         name="Collateral Factor"
         value={formatBalance(cToken.collateralFactor, 16) + "%"}
       />
@@ -246,7 +246,7 @@ export const LendingModal = (props: Props) => {
   );
 };
 
-const Card = ({
+export const ModalItem = ({
   name,
   value,
   note,
