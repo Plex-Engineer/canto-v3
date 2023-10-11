@@ -69,12 +69,6 @@ export const TestEditModal = (props: TestEditProps) => {
     unstake: true,
   });
 
-  const Modal = {
-    liquidity: TestAddLiquidityModal,
-    stake: TestRemoveLiquidityModal,
-    base: null,
-  }[modalType];
-
   const Liquidity = () => (
     <div
       style={{
@@ -194,7 +188,7 @@ export const TestEditModal = (props: TestEditProps) => {
           <Icon icon={{ url: "./dropdown.svg", size: 24 }} />
         </div>
         <Text font="proto_mono" size="lg">
-          Liquidity
+          Stake
         </Text>
       </Container>
       <div
@@ -206,7 +200,7 @@ export const TestEditModal = (props: TestEditProps) => {
         <Tabs
           tabs={[
             {
-              title: "Add",
+              title: "Stake",
               content: (
                 <Container>
                   <div className={styles.iconTitle}>
@@ -215,20 +209,25 @@ export const TestEditModal = (props: TestEditProps) => {
                       {props.pair.symbol}
                     </Text>
                   </div>
-                  <TestAddLiquidityModal
+                  <StakeLPToken
                     pair={props.pair}
                     validateParams={(params) =>
                       props.validateParams(createAddParams(params))
                     }
                     sendTxFlow={(params) =>
-                      props.sendTxFlow(createAddParams(params))
+                      props.sendTxFlow({
+                        txType: CantoDexTxTypes.STAKE,
+                        amountLP:
+                          props.pair.clmData?.userDetails
+                            ?.balanceOfUnderlying ?? "0",
+                      })
                     }
                   />
                 </Container>
               ),
             },
             {
-              title: "Remove",
+              title: "Unstake",
               isDisabled:
                 props.pair.clmData?.userDetails?.balanceOfCToken === "0",
               content: (
@@ -308,7 +307,7 @@ export const TestEditModal = (props: TestEditProps) => {
             }
           />
         </Container>
-        <Container gap={20}>
+        {/* <Container gap={20}>
           <Button
             onClick={() =>
               props.sendTxFlow({
@@ -333,12 +332,12 @@ export const TestEditModal = (props: TestEditProps) => {
           >
             Stake Unstaked Liquidity
           </Button>
-        </Container>
+        </Container> */}
         <Container gap={20} direction="row">
           <Button width="fill" onClick={() => setModalType("liquidity")}>
             Manage LP
           </Button>
-          <Button width="fill" onClick={() => setModalType("liquidity")}>
+          <Button width="fill" onClick={() => setModalType("stake")}>
             Manage Stake
           </Button>
           {/* {props.pair.clmData?.userDetails?.balanceOfCToken !== "0" && (
@@ -349,11 +348,15 @@ export const TestEditModal = (props: TestEditProps) => {
         </Container>
       </Container>
     );
+
+  const modal = {
+    liquidity: <Liquidity />,
+    stake: <Stake />,
+    base: <Base />,
+  };
   return (
     <Container className={styles.container} width="32rem">
-      {modalType === "liquidity" && <Liquidity />}
-      {modalType === "stake" && <Stake />}
-      {modalType === "base" && <Base />}
+      {modal[modalType]}
     </Container>
   );
 };
@@ -471,6 +474,122 @@ const TestAddLiquidityModal = ({
       >
         STAKE {`${willStake ? "ON" : "OFF"}`}
       </Button> */}
+
+      <Container direction="row" gap={14} margin="sm">
+        <Text size="sm" font="proto_mono">
+          Stake
+        </Text>
+        <Toggle onChange={(value) => setWillStake(value)} value={willStake} />
+      </Container>
+      <Button
+        disabled={!paramCheck.isValid}
+        width={"fill"}
+        onClick={() =>
+          sendTxFlow({
+            value1: (
+              convertToBigNumber(valueToken1, pair.token1.decimals).data ?? "0"
+            ).toString(),
+            value2: (
+              convertToBigNumber(valueToken2, pair.token2.decimals).data ?? "0"
+            ).toString(),
+            willStake,
+            slippage,
+            deadline,
+          })
+        }
+      >
+        {"Add Liquidity"}
+      </Button>
+      <Spacer height="20px" />
+    </Container>
+  );
+};
+
+const StakeLPToken = ({ pair, validateParams, sendTxFlow }: TestAddProps) => {
+  // values
+  const [slippage, setSlippage] = useState(2);
+  const [deadline, setDeadline] = useState("9999999999999999999999999");
+  const [willStake, setWillStake] = useState(false);
+  const [valueToken1, setValueToken1] = useState("");
+  const [valueToken2, setValueToken2] = useState("");
+
+  // set values based on optimization
+  async function setValue(value: string, token1: boolean) {
+    let optimalAmount;
+    if (token1) {
+      setValueToken1(value);
+      optimalAmount = await getOptimalValueBFormatted({
+        chainId: Number(pair.token1.chainId),
+        pair,
+        valueChanged: 1,
+        amount: value,
+      });
+    } else {
+      setValueToken2(value);
+      optimalAmount = await getOptimalValueBFormatted({
+        chainId: Number(pair.token1.chainId),
+        pair,
+        valueChanged: 2,
+        amount: value,
+      });
+    }
+    if (optimalAmount.error) return;
+    token1
+      ? setValueToken2(optimalAmount.data)
+      : setValueToken1(optimalAmount.data);
+  }
+
+  // validation
+  const paramCheck = validateParams({
+    value1: (
+      convertToBigNumber(valueToken1, pair.token1.decimals).data ?? "0"
+    ).toString(),
+    value2: (
+      convertToBigNumber(valueToken2, pair.token2.decimals).data ?? "0"
+    ).toString(),
+    willStake,
+    slippage,
+    deadline,
+  });
+
+  return (
+    <Container>
+      <Spacer height="10px" />
+      <Amount
+        decimals={pair.token1.decimals}
+        value={valueToken1}
+        onChange={(e) => {
+          setValue(e.target.value, true);
+        }}
+        IconUrl={pair.token1.logoURI}
+        title={pair.token1.symbol}
+        max={pair.token1.balance ?? "0"}
+        symbol={pair.token1.symbol}
+        error={
+          !paramCheck.isValid &&
+          Number(valueToken1) !== 0 &&
+          paramCheck.errorMessage?.startsWith(pair.token1.symbol)
+        }
+        errorMessage={paramCheck.errorMessage}
+      />
+
+      <Spacer height="20px" />
+      <Container className={styles.card}>
+        <ModalItem
+          name="Reserve Ratio"
+          value={formatBalance(
+            pair.ratio,
+            18 + Math.abs(pair.token1.decimals - pair.token2.decimals)
+          )}
+        />
+      </Container>
+
+      {/* <Button
+          color={willStake ? "accent" : "primary"}
+          onClick={() => setWillStake(!willStake)}
+        >
+          STAKE {`${willStake ? "ON" : "OFF"}`}
+        </Button> */}
 
       <Container direction="row" gap={14} margin="sm">
         <Text size="sm" font="proto_mono">
