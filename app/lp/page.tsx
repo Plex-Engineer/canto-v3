@@ -25,6 +25,7 @@ import {
   quoteTokenFromConcLiquidity,
 } from "@/utils/ambient/liquidity.utils";
 import { displayAmount } from "@/utils/tokenBalances.utils";
+import Rewards from "./components/rewards";
 
 export default function Page() {
   const { data: signer } = useWalletClient();
@@ -136,13 +137,13 @@ export default function Page() {
         LP Interface
       </Text>
       <Spacer height="30px" />
-      <label>
-        Claimable Rewards:{" "}
-        {displayAmount(cantoDex.position.totalRewards, 18, {
+
+      <Rewards
+        onClick={sendClaimRewardsFlow}
+        value={displayAmount(cantoDex.position.totalRewards, 18, {
           symbol: "WCANTO",
         })}
-      </label>
-      <Button onClick={sendClaimRewardsFlow}>CLAIM REWARDS</Button>
+      />
       <Spacer height="30px" />
       {userPairs.length > 0 && (
         <Table

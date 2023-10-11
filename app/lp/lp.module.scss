@@ -27,3 +27,15 @@
   width: 100%;
   max-width: 1500px;
 }
+
+.rewards {
+  display: flex;
+  height: 150px;
+  width: 50%;
+  margin: 0 0 0 auto;
+  padding: 1rem;
+  background-color: var(--canto-color);
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
+}
