@@ -1,7 +1,6 @@
 "use client";
 import Button from "@/components/button/button";
 import Text from "@/components/text";
-import Input from "@/components/input/input";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { maxAmountForLendingTx } from "@/utils/clm/limits.utils";
@@ -15,6 +14,7 @@ import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import { useState } from "react";
 import { ValidationReturn } from "@/config/interfaces";
+import Amount from "@/components/amount/amount";
 interface Props {
   isSupplyModal: boolean;
   cToken: CTokenWithUserData | null;
@@ -147,6 +147,21 @@ export const LendingModal = (props: Props) => {
         </Text>
         <Spacer height="20px" />
 
+        <Amount
+          decimals={cToken.underlying.decimals}
+          value={amount}
+          onChange={(val) => {
+            setAmount(val.target.value);
+          }}
+          IconUrl={cToken.underlying.logoURI}
+          title={cToken.symbol}
+          max={maxAmountForLendingTx(actionType, cToken, position)}
+          symbol={cToken.symbol}
+          error={!amountCheck.isValid && Number(amount) !== 0}
+          errorMessage={amountCheck.errorMessage}
+        />
+        <Spacer height="40px" />
+
         <Container width="100%" gap={20}>
           <APRs cToken={cToken} isSupply={isSupplyModal} />
           <Balances
@@ -155,24 +170,11 @@ export const LendingModal = (props: Props) => {
             liquidityLeft={position.liquidity}
           />
         </Container>
-        <Spacer height="70px" />
         <div
           style={{
             width: "100%",
           }}
         >
-          <Input
-            type="amount"
-            balance={maxAmountForLendingTx(actionType, cToken, position)}
-            decimals={cToken.underlying.decimals}
-            onChange={(val) => {
-              setAmount(val.target.value);
-            }}
-            placeholder="0.0"
-            value={amount}
-            error={!amountCheck.isValid && Number(amount) !== 0}
-            errorMessage={amountCheck.errorMessage}
-          />
           <Spacer height="20px" />
           <Button
             width={"fill"}
