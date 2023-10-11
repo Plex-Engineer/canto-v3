@@ -1,5 +1,5 @@
 
-export const mapProposalStatus = (status: string | null) => {
+export const mapProposalStatus = (status: string | undefined) => {
     switch (status) {
       case 'PROPOSAL_STATUS_ACTIVE':
         return 'ACTIVE';
@@ -10,4 +10,6 @@ export const mapProposalStatus = (status: string | null) => {
       default:
         return status;
     }
-  };
+};
+
+

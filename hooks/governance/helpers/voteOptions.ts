@@ -5,7 +5,10 @@ export enum VotingOption {
   VETO = "Veto",
   NONE = "None",
 }
-
+export const VoteStatus = {
+  passed: "PROPOSAL_STATUS_PASSED",
+  votingOngoing: "PROPOSAL_STATUS_VOTING_PERIOD",
+};
 /**
  * @notice converts a voting option to a number
  * @param {VotingOption} option option to convert

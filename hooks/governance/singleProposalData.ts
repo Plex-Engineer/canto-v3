@@ -1,4 +1,9 @@
+import { NEW_ERROR, NO_ERROR, PromiseWithError, errMsg } from "@/config/interfaces";
+import { tryFetch } from "@/utils/async.utils";
 import { useEffect, useState } from "react";
+import { castVoteTest, voteTxParams } from "./transactions/vote";
+import { useWalletClient } from "wagmi";
+import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
 
 
 interface Proposal {
@@ -12,62 +17,72 @@ interface Proposal {
     votes_no_with_veto : string;
 }
   
-interface UseGovernanceProposalsResult {
+interface UseSingleProposalsResult {
     proposals: Proposal[];
     loading: boolean;
     error: Error | null;
 }
 
-const SINGLE_PROPOSAL_API_ENDPOINT = 'https://mainnode.plexnode.org:1317/cosmos/gov/v1beta1/proposals/';
+async function useSingleProposalResult(id:string | undefined):PromiseWithError<Proposal>{
+
+    const { data: nodeURL, error: urlError } = getCosmosAPIEndpoint(7700);
+    if (urlError) {
+        return NEW_ERROR("getCosmosTokenBalance::" + errMsg(urlError));
+    }
+    const{data:result, error: proposalsFetchError} = await tryFetch<{
+            proposal: any;
+        }>(nodeURL+"/cosmos/gov/v1beta1/proposals/"+id);
+
+    if(proposalsFetchError){
+        return NEW_ERROR("fetching proposals failed: "+errMsg(proposalsFetchError));
+    }
+    console.log(result);
+    console.log(result.proposal);
+    const proposalData = result.proposal;
+    const extractedProposal : Proposal = {
+            proposal_id: proposalData.proposal_id,
+            title: proposalData.content.title, //- for the mainnode url, include this
+            status: proposalData.status,
+            voting_end_time: proposalData.voting_end_time,
+            votes_yes : proposalData.final_tally_result.yes,
+            votes_abstain : proposalData.final_tally_result.abstain,
+            votes_no : proposalData.final_tally_result.no,
+            votes_no_with_veto : proposalData.final_tally_result.no_with_veto
+    };
+
+    return NO_ERROR(extractedProposal);
+}
 
 
+export function useSingleProposal(id: string | undefined) {
 
-function useSingleProposal(id: string) {
+    // const [delegations, setDelegations] = useState<DelegationResponse[]>([]);
+    // const totalUserStake = calculateTotalStaked(delegations);
+    // const [totalGlobalStake, setTotalGlobalStake] = useState(BigNumber.from(0));
     const [proposal, setProposal] = useState<Proposal | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
+    async function getProposalsResult(){
+        const {data: proposalRes, error: proposalsError} = await useSingleProposalResult(id);
+        if(proposalsError){
+          setError(proposalsError);
+          setLoading(false);
+        }
+        if(proposalRes){
+          setProposal(proposalRes);
+          setLoading(false);
+        }
+    }
+      useEffect(() => {
+        getProposalsResult();
+      }, []);
 
-    useEffect(() => {
+    const voteTx = (params: voteTxParams): void => {
+    castVoteTest(params);
+    // You can also handle any additional logic related to voting here
+    };
 
-        console.log(SINGLE_PROPOSAL_API_ENDPOINT+id);
-        // Fetch the governance proposals from the API
-        fetch(SINGLE_PROPOSAL_API_ENDPOINT+id)
-        .then((response) => response.json())
-        .then((data) => {
-            const extractedProposal = data;
-            const votingEndTime = new Date(data.voting_end_time);
-            const now = new Date();
-            const timeDifference = now.getTime() - votingEndTime.getTime();
-            const daysSinceVotingEnd = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-            const final_tally_result = data.final_tally_result;
-            const votesYes = final_tally_result?.yes;
-            const votesNo = final_tally_result?.no;
-            const votesAbstain = final_tally_result?.abstain;
-            const votesNo_with_veto = final_tally_result?.no_with_veto;
-            console.log(final_tally_result);
-            const proposal_res:Proposal = {
-                proposal_id: data.proposal_id,
-                title: data.content.title,
-                status: data.status,
-                voting_end_time: data.voting_end_time,
-                votes_yes : votesYes,
-                votes_abstain : votesAbstain,
-                votes_no : votesNo,
-                votes_no_with_veto : votesNo_with_veto
-            };
-            setProposal(proposal_res); // Set the extracted data in the proposals state
-            setLoading(false); // Update loading state
-            
-           
-        })
-        .catch((err) => {
-            setProposal(null);
-            setError(err); // Handle any errors
-            setLoading(false); // Update loading state
-        });
-    }, []); // Empty dependency array ensures the effect runs once on component mount
-
-    return { proposal, loading, error };
+    return { proposal, loading, error,voteTx };
 }
 
-export default useSingleProposal;
+//export default useSingleProposal;

@@ -2,11 +2,12 @@ import Button from "@/components/button/button";
 import Container from "@/components/container/container";
 import { Proposal } from "@/hooks/governance/interfaces/proposalParams";
 import { mapProposalStatus } from "@/utils/gov/proposalUtils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ProposalsListParams{
     proposalsList: Proposal[],
-    type: string
+    type: string,
+    onProposalClick: (proposal:Proposal)=>void,
     
 }
 
@@ -15,18 +16,26 @@ export const Proposals = (props:ProposalsListParams)=>{
 
 
 
-    const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [hoveredProposal, setHoveredProposal] = useState<Proposal | null>(null);
 
+    const [currentProposals, setCurrentProposals] = useState<Proposal[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const proposalsPerPage = 10; 
     const totalPages = Math.ceil(props.proposalsList.length / proposalsPerPage);
 
-    const handleProposalClick =  async (proposal: Proposal) => {
-        setSelectedProposal(proposal);
-        setIsModalOpen(true);
+
+
+    const fetchProposals = (proposalsList:Proposal[]) => {
+        const startIndex = (currentPage - 1) * proposalsPerPage;
+        const endIndex = startIndex + proposalsPerPage;
+        const proposalsToDisplay = proposalsList.slice(startIndex, endIndex); 
+        setCurrentProposals(proposalsToDisplay);
       };
+    
+    useEffect(() => {
+        fetchProposals(props.proposalsList);
+    }, [currentPage]);
+
 
     const nextPage = () => {
     setCurrentPage((prevPage) => prevPage + 1);
@@ -51,11 +60,11 @@ export const Proposals = (props:ProposalsListParams)=>{
                               }}>  </div>
                 <div /*className="proposal-container"*/ >
                     <div>
-                        {props.proposalsList.map((proposal,index) => (
+                        {currentProposals.map((proposal,index) => (
                           
                             <div key={proposal.proposal_id}
                               
-                              onClick={() => handleProposalClick(proposal)}
+                              onClick={() => props.onProposalClick(proposal)}
                               onMouseEnter={() => setHoveredProposal(proposal)}
                               onMouseLeave={() => setHoveredProposal(null)}
                               style={{
