@@ -1,141 +1,91 @@
 "use client";
 import Button from "@/components/button/button";
 import Text from "@/components/text";
-import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import { maxAmountForLendingTx } from "@/utils/clm/limits.utils";
-import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 import styles from "./modal.module.scss";
 import Tabs from "@/components/tabs/tabs";
 import Image from "next/image";
 import Container from "@/components/container/container";
-import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
+import {
+  convertToBigNumber,
+  displayAmount,
+  formatBalance,
+} from "@/utils/tokenBalances.utils";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import { useState } from "react";
 import { ValidationReturn } from "@/config/interfaces";
 import Amount from "@/components/amount/amount";
+import { CantoDexTxTypes } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
+import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
 interface Props {
-  isSupplyModal: boolean;
-  cToken: CTokenWithUserData | null;
-  position: UserLMPosition;
+  clpToken: CTokenWithUserData;
   transaction: {
-    performTx: (amount: string, txType: CTokenLendingTxTypes) => void;
+    performTx: (
+      amountLP: string,
+      txType: CantoDexTxTypes.STAKE | CantoDexTxTypes.UNSTAKE
+    ) => void;
     validateAmount: (
       amount: string,
-      txType: CTokenLendingTxTypes
+      txType: CantoDexTxTypes.STAKE | CantoDexTxTypes.UNSTAKE
     ) => ValidationReturn;
   };
 }
 
-export const LendingModal = (props: Props) => {
-  const Balances = ({
-    cToken,
-    isSupply,
-    liquidityLeft,
-  }: {
-    cToken: CTokenWithUserData;
-    isSupply: boolean;
-    liquidityLeft: string;
-  }) => (
+export const StakeLPModal = (props: Props) => {
+  const Balances = ({ cToken }: { cToken: CTokenWithUserData }) => (
     <Container className={styles.card} padding="md" width="100%">
-      <ModalItem
+      <CTokenAmountCard
         name="Wallet Balance"
-        value={formatBalance(
-          cToken.userDetails?.balanceOfUnderlying ?? "0",
-          cToken.underlying.decimals,
-          {
-            commify: true,
-            symbol: cToken.underlying.symbol,
-          }
-        )}
+        amount={cToken.userDetails?.balanceOfUnderlying ?? "0"}
+        decimals={cToken.underlying.decimals}
+        symbol={cToken.underlying.symbol}
+        price={cToken.price}
       />
-      {isSupply && (
-        <ModalItem
-          name="Supplied Amount"
-          value={formatBalance(
-            cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
-            cToken.underlying.decimals,
-            {
-              commify: true,
-              symbol: cToken.underlying.symbol,
-            }
-          )}
-        />
-      )}
-      {!isSupply && (
-        <ModalItem
-          name="Borrowed Amount"
-          value={formatBalance(
-            cToken.userDetails?.borrowBalance ?? "0",
-            cToken.underlying.decimals,
-            {
-              commify: true,
-              symbol: cToken.underlying.symbol,
-            }
-          )}
-        />
-      )}
-      <ModalItem
-        name="Account Liquidity Remaining"
-        value={formatBalance(liquidityLeft, 18, {
-          commify: true,
-        })}
-        note
+      <CTokenAmountCard
+        name="Staked Amount"
+        amount={cToken.userDetails?.supplyBalanceInUnderlying ?? "0"}
+        decimals={cToken.underlying.decimals}
+        symbol={cToken.underlying.symbol}
+        price={cToken.price}
       />
     </Container>
   );
 
-  const APRs = ({
-    cToken,
-    isSupply,
-  }: {
-    cToken: CTokenWithUserData;
-    isSupply: boolean;
-  }) => (
+  const APRs = ({ cToken }: { cToken: CTokenWithUserData }) => (
     <Container className={styles.card} padding="md" width="100%">
-      {/* might need to change this in future for showing it on more tokens */}
-      {isSupply && cToken.symbol.toLowerCase() == "cnote" && (
-        <>
-          <ModalItem name="Supply APR" value={cToken.supplyApy + "%"} />
-          <ModalItem name="Dist APR" value={cToken.distApy + "%"} />
-        </>
-      )}
-      {!isSupply && (
-        <>
-          <ModalItem name="Borrow APR" value={cToken.borrowApy + "%"} />
-        </>
-      )}
-      <ModalItem
-        name="Collateral Factor"
-        value={formatBalance(cToken.collateralFactor, 16) + "%"}
-      />
+      <ModalItem name="Staking APR" value={cToken.distApy + "%"} />
     </Container>
   );
 
   function Content(
-    cToken: CTokenWithUserData,
-    isSupplyModal: boolean,
-    actionType: CTokenLendingTxTypes,
-    position: UserLMPosition,
+    cLPToken: CTokenWithUserData,
     transaction: {
+      performTx: (
+        amountLP: string,
+        txType: CantoDexTxTypes.STAKE | CantoDexTxTypes.UNSTAKE
+      ) => void;
       validateAmount: (
         amount: string,
-        txType: CTokenLendingTxTypes
+        txType: CantoDexTxTypes.STAKE | CantoDexTxTypes.UNSTAKE
       ) => ValidationReturn;
-      performTx: (amount: string, txType: CTokenLendingTxTypes) => void;
-    }
+    },
+    txType: CantoDexTxTypes.STAKE | CantoDexTxTypes.UNSTAKE
   ) {
     const [amount, setAmount] = useState("");
     const bnAmount = (
-      convertToBigNumber(amount, cToken.underlying.decimals).data ?? "0"
+      convertToBigNumber(amount, cLPToken.underlying.decimals).data ?? "0"
     ).toString();
-    const amountCheck = transaction.validateAmount(bnAmount, actionType);
+    const amountCheck = transaction.validateAmount(bnAmount, txType);
+    const maxAmount =
+      (txType === CantoDexTxTypes.STAKE
+        ? cLPToken.userDetails?.balanceOfUnderlying
+        : cLPToken.userDetails?.supplyBalanceInUnderlying) ?? "0";
     return (
       <div className={styles.content}>
         <Spacer height="20px" />
         <Image
-          src={cToken.underlying.logoURI}
+          src={cLPToken.underlying.logoURI}
           width={50}
           height={50}
           alt={"Transaction"}
@@ -143,32 +93,28 @@ export const LendingModal = (props: Props) => {
         <Spacer height="10px" />
 
         <Text font="proto_mono" size="lg">
-          {cToken.underlying.symbol}
+          {cLPToken.underlying.symbol}
         </Text>
         <Spacer height="20px" />
 
         <Amount
-          decimals={cToken.underlying.decimals}
+          decimals={cLPToken.underlying.decimals}
           value={amount}
           onChange={(val) => {
             setAmount(val.target.value);
           }}
-          IconUrl={cToken.underlying.logoURI}
-          title={cToken.symbol}
-          max={maxAmountForLendingTx(actionType, cToken, position)}
-          symbol={cToken.symbol}
+          IconUrl={cLPToken.underlying.logoURI}
+          title={cLPToken.symbol}
+          max={maxAmount}
+          symbol={cLPToken.symbol}
           error={!amountCheck.isValid && Number(amount) !== 0}
           errorMessage={amountCheck.errorMessage}
         />
         <Spacer height="40px" />
 
         <Container width="100%" gap={20}>
-          <APRs cToken={cToken} isSupply={isSupplyModal} />
-          <Balances
-            cToken={cToken}
-            isSupply={isSupplyModal}
-            liquidityLeft={position.liquidity}
-          />
+          <APRs cToken={cLPToken} />
+          <Balances cToken={cLPToken} />
         </Container>
         <div
           style={{
@@ -179,7 +125,7 @@ export const LendingModal = (props: Props) => {
           <Button
             width={"fill"}
             disabled={!amountCheck.isValid}
-            onClick={() => transaction.performTx(bnAmount, actionType)}
+            onClick={() => transaction.performTx(bnAmount, txType)}
           >
             CONFIRM
           </Button>
@@ -189,61 +135,26 @@ export const LendingModal = (props: Props) => {
   }
   return (
     <div className={styles.container}>
-      {props.cToken ? (
-        <>
-          <Tabs
-            tabs={
-              props.isSupplyModal
-                ? [
-                    {
-                      title: "Supply",
-                      content: Content(
-                        props.cToken,
-                        true,
-                        CTokenLendingTxTypes.SUPPLY,
-                        props.position,
-                        props.transaction
-                      ),
-                    },
-                    {
-                      title: "withdraw",
-                      content: Content(
-                        props.cToken,
-                        true,
-                        CTokenLendingTxTypes.WITHDRAW,
-                        props.position,
-                        props.transaction
-                      ),
-                    },
-                  ]
-                : [
-                    {
-                      title: "Borrow",
-                      content: Content(
-                        props.cToken,
-                        false,
-                        CTokenLendingTxTypes.BORROW,
-                        props.position,
-                        props.transaction
-                      ),
-                    },
-                    {
-                      title: "Repay",
-                      content: Content(
-                        props.cToken,
-                        false,
-                        CTokenLendingTxTypes.REPAY,
-                        props.position,
-                        props.transaction
-                      ),
-                    },
-                  ]
-            }
-          />
-        </>
-      ) : (
-        <Text>No Active Token</Text>
-      )}
+      <Tabs
+        tabs={[
+          {
+            title: "Stake",
+            content: Content(
+              props.clpToken,
+              props.transaction,
+              CantoDexTxTypes.STAKE
+            ),
+          },
+          {
+            title: "Unstake",
+            content: Content(
+              props.clpToken,
+              props.transaction,
+              CantoDexTxTypes.UNSTAKE
+            ),
+          },
+        ]}
+      />
     </div>
   );
 };
@@ -277,3 +188,51 @@ export const ModalItem = ({
     </Text>
   </Container>
 );
+
+const CTokenAmountCard = ({
+  name,
+  amount,
+  decimals,
+  symbol,
+  note,
+  price,
+}: {
+  name: string;
+  amount: string;
+  decimals: number;
+  symbol: string;
+  note?: boolean;
+  price?: string;
+}) => {
+  const { data: valueInNote } =
+    price && !note
+      ? convertTokenAmountToNote(amount, price)
+      : { data: undefined };
+
+  return (
+    <Container direction="row" gap="auto">
+      <Text size="sm" font="proto_mono">
+        {name}
+      </Text>
+      <Text size="sm" font="proto_mono">
+        {formatBalance(amount, decimals, {
+          commify: true,
+          symbol: note ? undefined : symbol,
+        })}
+        {valueInNote ? ` (${displayAmount(valueInNote.toString(), 18)} ` : " "}
+        <span>
+          {(note || valueInNote) && (
+            <Icon
+              themed
+              icon={{
+                url: "/tokens/note.svg",
+                size: 14,
+              }}
+            />
+          )}
+        </span>
+        {valueInNote ? ")" : ""}
+      </Text>
+    </Container>
+  );
+};

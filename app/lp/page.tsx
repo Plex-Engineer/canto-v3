@@ -1,279 +1,225 @@
 "use client";
-import Button from "@/components/button/button";
-import Text from "@/components/text";
-import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
-import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import { maxAmountForLendingTx } from "@/utils/clm/limits.utils";
-import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
-import styles from "./modal.module.scss";
-import Tabs from "@/components/tabs/tabs";
-import Image from "next/image";
-import Container from "@/components/container/container";
-import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
-import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
-import { useState } from "react";
+import Modal from "@/components/modal/modal";
+import Table from "@/components/table/table";
+import useTransactionStore from "@/stores/transactionStore";
+import useStore from "@/stores/useStore";
+import { useWalletClient } from "wagmi";
 import { ValidationReturn } from "@/config/interfaces";
-import Amount from "@/components/amount/amount";
-interface Props {
-  isSupplyModal: boolean;
-  cToken: CTokenWithUserData | null;
-  position: UserLMPosition;
-  transaction: {
-    performTx: (amount: string, txType: CTokenLendingTxTypes) => void;
-    validateAmount: (
-      amount: string,
-      txType: CTokenLendingTxTypes
-    ) => ValidationReturn;
-  };
-}
+import { GeneralPairRow, UserPairRow } from "./components/pairRow";
+import Text from "@/components/text";
+import { TestEditModal } from "./components/cantoDexLPModal";
+import styles from "./lp.module.scss";
+import { CantoDexTransactionParams } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
+import useLP from "@/hooks/pairs/lpCombo/useLP";
+import {
+  isAmbientPair,
+  isCantoDexPair,
+} from "@/hooks/pairs/lpCombo/interfaces.ts/pairTypes";
+import Button from "@/components/button/button";
+import { TestAmbientModal } from "./components/ambientLPModal";
+import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
+import {
+  baseTokenFromConcLiquidity,
+  quoteTokenFromConcLiquidity,
+} from "@/utils/ambient/liquidity.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
+import Rewards from "./components/rewards";
 
-export const LendingModal = (props: Props) => {
-  const Balances = ({
-    cToken,
-    isSupply,
-    liquidityLeft,
-  }: {
-    cToken: CTokenWithUserData;
-    isSupply: boolean;
-    liquidityLeft: string;
-  }) => (
-    <Container className={styles.card} padding="md" width="100%">
-      <ModalItem
-        name="Wallet Balance"
-        value={formatBalance(
-          cToken.userDetails?.balanceOfUnderlying ?? "0",
-          cToken.underlying.decimals,
-          {
-            commify: true,
-            symbol: cToken.underlying.symbol,
-          }
-        )}
-      />
-      {isSupply && (
-        <ModalItem
-          name="Supplied Amount"
-          value={formatBalance(
-            cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
-            cToken.underlying.decimals,
-            {
-              commify: true,
-              symbol: cToken.underlying.symbol,
-            }
-          )}
-        />
-      )}
-      {!isSupply && (
-        <ModalItem
-          name="Borrowed Amount"
-          value={formatBalance(
-            cToken.userDetails?.borrowBalance ?? "0",
-            cToken.underlying.decimals,
-            {
-              commify: true,
-              symbol: cToken.underlying.symbol,
-            }
-          )}
-        />
-      )}
-      <ModalItem
-        name="Account Liquidity Remaining"
-        value={formatBalance(liquidityLeft, 18, {
-          commify: true,
-        })}
-        note
-      />
-    </Container>
+export default function Page() {
+  const { data: signer } = useWalletClient();
+  const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
+
+  const txStore = useStore(useTransactionStore, (state) => state);
+
+  // all pairs (ambient and cantoDex)
+  const { cantoDex, ambient, selection } = useLP({
+    chainId,
+    userEthAddress: signer?.account.address ?? "",
+  });
+
+  /** CANTO DEX */
+  const { pairs: cantoDexPairs } = cantoDex;
+  const sortedPairs = cantoDexPairs?.sort((a, b) =>
+    a.symbol.localeCompare(b.symbol)
+  );
+  const userPairs = cantoDexPairs.filter(
+    (pair) =>
+      (pair.clmData?.userDetails?.balanceOfCToken !== "0" ||
+        pair.clmData?.userDetails?.balanceOfUnderlying !== "0") &&
+      pair.clmData?.userDetails?.balanceOfCToken !== undefined
   );
 
-  const APRs = ({
-    cToken,
-    isSupply,
-  }: {
-    cToken: CTokenWithUserData;
-    isSupply: boolean;
-  }) => (
-    <Container className={styles.card} padding="md" width="100%">
-      {/* might need to change this in future for showing it on more tokens */}
-      {isSupply && cToken.symbol.toLowerCase() == "cnote" && (
-        <>
-          <ModalItem name="Supply APR" value={cToken.supplyApy + "%"} />
-          <ModalItem name="Dist APR" value={cToken.distApy + "%"} />
-        </>
-      )}
-      {!isSupply && (
-        <>
-          <ModalItem name="Borrow APR" value={cToken.borrowApy + "%"} />
-        </>
-      )}
-      <ModalItem
-        name="Collateral Factor"
-        value={formatBalance(cToken.collateralFactor, 16) + "%"}
-      />
-    </Container>
-  );
-
-  function Content(
-    cToken: CTokenWithUserData,
-    isSupplyModal: boolean,
-    actionType: CTokenLendingTxTypes,
-    position: UserLMPosition,
-    transaction: {
-      validateAmount: (
-        amount: string,
-        txType: CTokenLendingTxTypes
-      ) => ValidationReturn;
-      performTx: (amount: string, txType: CTokenLendingTxTypes) => void;
+  // transactions
+  function sendCantoDexTxFlow(params: Partial<CantoDexTransactionParams>) {
+    const { data: flow, error } = cantoDex.transaction.createNewPairsFlow({
+      chainId,
+      ethAccount: signer?.account.address ?? "",
+      pair: selectedPair,
+      ...params,
+    } as CantoDexTransactionParams);
+    if (error) {
+      console.log(error);
+    } else {
+      txStore?.addNewFlow({ txFlow: flow, signer: signer });
     }
-  ) {
-    const [amount, setAmount] = useState("");
-    const bnAmount = (
-      convertToBigNumber(amount, cToken.underlying.decimals).data ?? "0"
-    ).toString();
-    const amountCheck = transaction.validateAmount(bnAmount, actionType);
-    return (
-      <div className={styles.content}>
-        <Spacer height="20px" />
-        <Image
-          src={cToken.underlying.logoURI}
-          width={50}
-          height={50}
-          alt={"Transaction"}
-        />
-        <Spacer height="10px" />
-
-        <Text font="proto_mono" size="lg">
-          {cToken.underlying.symbol}
-        </Text>
-        <Spacer height="20px" />
-
-        <Amount
-          decimals={cToken.underlying.decimals}
-          value={amount}
-          onChange={(val) => {
-            setAmount(val.target.value);
-          }}
-          IconUrl={cToken.underlying.logoURI}
-          title={cToken.symbol}
-          max={maxAmountForLendingTx(actionType, cToken, position)}
-          symbol={cToken.symbol}
-          error={!amountCheck.isValid && Number(amount) !== 0}
-          errorMessage={amountCheck.errorMessage}
-        />
-        <Spacer height="40px" />
-
-        <Container width="100%" gap={20}>
-          <APRs cToken={cToken} isSupply={isSupplyModal} />
-          <Balances
-            cToken={cToken}
-            isSupply={isSupplyModal}
-            liquidityLeft={position.liquidity}
-          />
-        </Container>
-        <div
-          style={{
-            width: "100%",
-          }}
-        >
-          <Spacer height="20px" />
-          <Button
-            width={"fill"}
-            disabled={!amountCheck.isValid}
-            onClick={() => transaction.performTx(bnAmount, actionType)}
-          >
-            CONFIRM
-          </Button>
-        </div>
-      </div>
-    );
   }
+  function canPerformCantoDexTx(
+    params: Partial<CantoDexTransactionParams>
+  ): ValidationReturn {
+    return cantoDex.transaction.validateParams({
+      chainId: chainId,
+      ethAccount: signer?.account.address ?? "",
+      pair: selectedPair,
+      ...params,
+    } as CantoDexTransactionParams);
+  }
+  function sendClaimRewardsFlow() {
+    const { data: flow, error } = cantoDex.transaction.createClaimRewardsFlow();
+    if (error) {
+      console.log(error);
+    } else {
+      txStore?.addNewFlow({ txFlow: flow, signer: signer });
+    }
+  }
+
+  /** AMBIENT */
+  const { ambientPairs } = ambient;
+
+  //transactions
+  function sendAmbientTxFlow(params: Partial<AmbientTransactionParams>) {
+    const { data: flow, error } = ambient.transaction.createNewPairsFlow({
+      chainId,
+      ethAccount: signer?.account.address ?? "",
+      pair: selectedPair,
+      ...params,
+    } as AmbientTransactionParams);
+    if (error) {
+      console.log(error);
+    } else {
+      txStore?.addNewFlow({ txFlow: flow, signer: signer });
+    }
+  }
+  function canPerformAmbientTx(
+    params: Partial<AmbientTransactionParams>
+  ): ValidationReturn {
+    return ambient.transaction.validateParams({
+      chainId: chainId,
+      ethAccount: signer?.account.address ?? "",
+      pair: selectedPair,
+      ...params,
+    } as AmbientTransactionParams);
+  }
+
+  /** general selection */
+  const { pair: selectedPair, setPair } = selection;
+
+  //main content
   return (
     <div className={styles.container}>
-      {props.cToken ? (
-        <>
-          <Tabs
-            tabs={
-              props.isSupplyModal
-                ? [
-                    {
-                      title: "Supply",
-                      content: Content(
-                        props.cToken,
-                        true,
-                        CTokenLendingTxTypes.SUPPLY,
-                        props.position,
-                        props.transaction
-                      ),
-                    },
-                    {
-                      title: "withdraw",
-                      content: Content(
-                        props.cToken,
-                        true,
-                        CTokenLendingTxTypes.WITHDRAW,
-                        props.position,
-                        props.transaction
-                      ),
-                    },
-                  ]
-                : [
-                    {
-                      title: "Borrow",
-                      content: Content(
-                        props.cToken,
-                        false,
-                        CTokenLendingTxTypes.BORROW,
-                        props.position,
-                        props.transaction
-                      ),
-                    },
-                    {
-                      title: "Repay",
-                      content: Content(
-                        props.cToken,
-                        false,
-                        CTokenLendingTxTypes.REPAY,
-                        props.position,
-                        props.transaction
-                      ),
-                    },
-                  ]
-            }
-          />
-        </>
-      ) : (
-        <Text>No Active Token</Text>
-      )}
-    </div>
-  );
-};
-
-export const ModalItem = ({
-  name,
-  value,
-  note,
-}: {
-  name: string;
-  value: string;
-  note?: boolean;
-}) => (
-  <Container direction="row" gap="auto">
-    <Text size="sm" font="proto_mono">
-      {name}
-    </Text>
-    <Text size="sm" font="proto_mono">
-      {value}{" "}
-      <span>
-        {note && (
-          <Icon
-            themed
-            icon={{
-              url: "/tokens/note.svg",
-              size: 14,
-            }}
+      <Modal open={selectedPair !== null} onClose={() => setPair(null)}>
+        {selectedPair && isCantoDexPair(selectedPair) && (
+          <TestEditModal
+            pair={selectedPair}
+            validateParams={canPerformCantoDexTx}
+            sendTxFlow={sendCantoDexTxFlow}
           />
         )}
-      </span>
-    </Text>
-  </Container>
-);
+        {selectedPair && isAmbientPair(selectedPair) && (
+          <TestAmbientModal
+            pair={selectedPair}
+            validateParams={canPerformAmbientTx}
+            sendTxFlow={sendAmbientTxFlow}
+          />
+        )}
+      </Modal>
+      <Text size="x-lg" className={styles.title}>
+        LP Interface
+      </Text>
+      <Spacer height="30px" />
+
+      <Rewards
+        onClick={sendClaimRewardsFlow}
+        value={displayAmount(cantoDex.position.totalRewards, 18, {
+          symbol: "WCANTO",
+        })}
+      />
+      <Spacer height="30px" />
+      {userPairs.length > 0 && (
+        <Table
+          title="Your Pairs"
+          headers={[
+            "Pair",
+            "APR",
+            "Pool Share",
+            "Value",
+            "# LP Tokens",
+            "# Staked",
+            "Rewards",
+            "Edit",
+          ]}
+          columns={9}
+          processedData={userPairs.map((pair) => (
+            <UserPairRow
+              key={pair.symbol}
+              pair={pair}
+              onManage={(pairAddress) => {
+                setPair(pairAddress);
+              }}
+            />
+          ))}
+        />
+      )}
+      <Spacer height="40px" />
+      <Table
+        title="All Pairs"
+        headers={["Pair", "APR", "TVL", "Type", "action"]}
+        columns={6}
+        processedData={sortedPairs.map((pair) => (
+          <GeneralPairRow
+            key={pair.symbol}
+            pair={pair}
+            onAddLiquidity={(pairAddress) => {
+              setPair(pairAddress);
+            }}
+          />
+        ))}
+      />
+      <Spacer height="40px" />
+      <Table
+        title="AmbientPairs"
+        headers={["Pair", "Base Liquidity", "Quote Liquidity", "action"]}
+        columns={5}
+        processedData={ambientPairs.map((pair) => [
+          <div key={pair.symbol}>{pair.symbol}</div>,
+          <div key={pair.symbol + "baseliq"}>
+            {displayAmount(
+              baseTokenFromConcLiquidity(
+                pair.q64PriceRoot,
+                pair.userDetails?.defaultRangePosition.liquidity ?? "0",
+                pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
+                pair.userDetails?.defaultRangePosition.upperTick ?? 0
+              ),
+              pair.base.decimals
+            )}
+          </div>,
+          <div key={pair.symbol + "quoteLiq"}>
+            {displayAmount(
+              quoteTokenFromConcLiquidity(
+                pair.q64PriceRoot,
+                pair.userDetails?.defaultRangePosition.liquidity ?? "0",
+                pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
+                pair.userDetails?.defaultRangePosition.upperTick ?? 0
+              ),
+              pair.quote.decimals
+            )}
+          </div>,
+          <Button key={"action item"} onClick={() => setPair(pair.address)}>
+            add liquidity
+          </Button>,
+        ])}
+      />
+      <Spacer height="40px" />
+    </div>
+  );
+}

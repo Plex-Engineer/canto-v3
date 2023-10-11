@@ -25,7 +25,7 @@ import Amount from "@/components/amount/amount";
 import Tabs from "@/components/tabs/tabs";
 import { ModalItem } from "@/app/lending/components/modal/modal";
 import Toggle from "@/components/toggle";
-import { StakeModal } from "../page";
+import { StakeLPModal } from "./stakeModal";
 interface AddParams {
   value1: string;
   value2: string;
@@ -349,11 +349,24 @@ export const TestEditModal = (props: TestEditProps) => {
         </Container>
       </Container>
     );
-
   const modals = {
     liquidity: Liquidity(),
     stake: props.pair.clmData ? (
-      <StakeModal cToken={props.pair.clmData} isSupplyModal />
+      <StakeLPModal
+        clpToken={props.pair.clmData}
+        transaction={{
+          validateAmount: (amountLP, txType) =>
+            props.validateParams({
+              amountLP,
+              txType,
+            }),
+          performTx: (amountLP, txType) =>
+            props.sendTxFlow({
+              txType,
+              amountLP,
+            }),
+        }}
+      />
     ) : (
       "Loading..."
     ),
