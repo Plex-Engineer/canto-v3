@@ -57,7 +57,7 @@ export function convertNoteAmountToToken(
 /**
  * @notice Gets the percent of an amount
  * @param {string} amount Amount to get percent of
- * @param {number} percent Percent to get (0-100)
+ * @param {number} percent Percent to get
  * @returns {ReturnWithError<string>} Percent of amount
  */
 export function percentOfAmount(

@@ -21,7 +21,6 @@ import { TestAmbientModal } from "./components/ambientLPModal";
 import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
 import {
   baseTokenFromConcLiquidity,
-  getQuoteLiquidity,
   quoteTokenFromConcLiquidity,
 } from "@/utils/ambient/liquidity.utils";
 import { displayAmount } from "@/utils/tokenBalances.utils";

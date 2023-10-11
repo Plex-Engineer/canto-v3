@@ -11,6 +11,7 @@ import {
   getPriceFromTick,
 } from "./ambientMath.utils";
 import { BigNumber } from "ethers";
+import { percentOfAmount } from "../tokens/tokenMath.utils";
 
 /**
  * @notice gets the amount of active base token liquidity
@@ -63,6 +64,7 @@ export function getQuoteLiquidity(
 
 /**
  * @notice gets optimal quote tokens from base token amount
+ * @dev this will overestimate by 1% to ensure tx will go through
  * @param amount amount of base tokens wei
  * @params currentPrice current price wei
  * @param minPrice minimum price wei
@@ -91,12 +93,17 @@ export function getConcQuoteTokensFromBaseTokens(
     Number(minPrice),
     Number(maxPrice)
   );
-
-  return quoteTokens.toString();
+  // overestimate amount by 1%
+  const quoteEstimate = percentOfAmount(quoteTokens.toString(), 101);
+  if (quoteEstimate.error) {
+    return "0";
+  }
+  return quoteEstimate.data.toString();
 }
 
 /**
  * @notice gets optimal base tokens from quote token amount
+ * @dev this will overestimate by 1% to ensure tx will go through
  * @param amount amount of quote tokens wei
  * @params currentPrice current price wei
  * @param minPrice minimum price wei
@@ -125,7 +132,12 @@ export function getConcBaseTokensFromQuoteTokens(
     Number(minPrice),
     Number(maxPrice)
   );
-  return baseTokens.toString();
+  // overestimate amount by 1%
+  const baseEstimate = percentOfAmount(baseTokens.toString(), 101);
+  if (baseEstimate.error) {
+    return "0";
+  }
+  return baseEstimate.data.toString();
 }
 
 /**
