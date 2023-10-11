@@ -51,8 +51,6 @@ export default function Page() {
       pair.clmData?.userDetails?.balanceOfCToken !== undefined
   );
 
-  console.log(userPairs, "your pairs");
-
   // transactions
   function sendCantoDexTxFlow(params: Partial<CantoDexTransactionParams>) {
     const { data: flow, error } = cantoDex.transaction.createNewPairsFlow({
@@ -166,10 +164,7 @@ export default function Page() {
             <UserPairRow
               key={pair.symbol}
               pair={pair}
-              onAddLiquidity={(pairAddress) => {
-                setPair(pairAddress);
-              }}
-              onRemoveLiquidity={(pairAddress) => {
+              onManage={(pairAddress) => {
                 setPair(pairAddress);
               }}
             />

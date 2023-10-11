@@ -22,6 +22,7 @@ import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interface
 import { getOptimalValueBFormatted } from "@/hooks/pairs/cantoDex/helpers/addLiquidityValues";
 import styles from "./cantoDex.module.scss";
 import Amount from "@/components/amount/amount";
+import Tabs from "@/components/tabs/tabs";
 interface AddParams {
   value1: string;
   value2: string;
@@ -64,16 +65,91 @@ export const TestEditModal = (props: TestEditProps) => {
     unstake: true,
   });
   return (
-    <Container className={styles.container}>
+    <Container
+      className={styles.container}
+      width="32rem"
+      style={{
+        margin: "-16px",
+      }}
+    >
+      {/* back button rendered when not in base */}
       {modalType !== "base" && (
-        <Button onClick={() => setModalType("base")}>Back</Button>
+        <>
+          <Container
+            direction="row"
+            height="54px"
+            center={{
+              vertical: true,
+            }}
+            style={{
+              padding: "0 16px",
+              cursor: "pointer",
+            }}
+            onClick={() => setModalType("base")}
+          >
+            {/* <Button onClick={() => setModalType("base")}>Back</Button> */}
+            <div
+              style={{
+                rotate: "90deg",
+                marginRight: "6px",
+              }}
+            >
+              <Icon icon={{ url: "./dropdown.svg", size: 24 }} />
+            </div>
+            <Text font="proto_mono" size="lg">
+              Liquidity
+            </Text>
+          </Container>
+          <Tabs
+            tabs={[
+              {
+                title: "Add",
+                content: (
+                  <Container>
+                    <div className={styles.iconTitle}>
+                      <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+                      <Text size="lg" font="proto_mono">
+                        {props.pair.symbol}
+                      </Text>
+                    </div>
+                    <TestAddLiquidityModal
+                      pair={props.pair}
+                      validateParams={(params) =>
+                        props.validateParams(createAddParams(params))
+                      }
+                      sendTxFlow={(params) =>
+                        props.sendTxFlow(createAddParams(params))
+                      }
+                    />
+                  </Container>
+                ),
+              },
+              {
+                title: "Remove",
+                content: (
+                  <Container>
+                    <div className={styles.iconTitle}>
+                      <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+                      <Text size="lg" font="proto_mono">
+                        {props.pair.symbol}
+                      </Text>
+                    </div>
+                    <TestRemoveLiquidityModal
+                      pair={props.pair}
+                      validateParams={(params) =>
+                        props.validateParams(createRemoveParams(params))
+                      }
+                      sendTxFlow={(params) =>
+                        props.sendTxFlow(createRemoveParams(params))
+                      }
+                    />
+                  </Container>
+                ),
+              },
+            ]}
+          />
+        </>
       )}
-      <div className={styles.iconTitle}>
-        <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
-        <Text size="lg" font="proto_mono">
-          {props.pair.symbol}
-        </Text>
-      </div>
 
       {modalType === "base" &&
         props.pair.clmData?.userDetails?.balanceOfUnderlying !== "0" && (
@@ -128,25 +204,9 @@ export const TestEditModal = (props: TestEditProps) => {
             </Container>
           </Container>
         )}
-
-      {modalType === "add" && (
-        <TestAddLiquidityModal
-          pair={props.pair}
-          validateParams={(params) =>
-            props.validateParams(createAddParams(params))
-          }
-          sendTxFlow={(params) => props.sendTxFlow(createAddParams(params))}
-        />
-      )}
-      {modalType === "remove" && (
-        <TestRemoveLiquidityModal
-          pair={props.pair}
-          validateParams={(params) =>
-            props.validateParams(createRemoveParams(params))
-          }
-          sendTxFlow={(params) => props.sendTxFlow(createRemoveParams(params))}
-        />
-      )}
+      <Button color="primary" onClick={() => setModalType("add")}>
+        Add Liquidity
+      </Button>
     </Container>
   );
 };

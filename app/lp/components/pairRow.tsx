@@ -14,12 +14,10 @@ import Image from "next/image";
 
 export const UserPairRow = ({
   pair,
-  onAddLiquidity,
-  onRemoveLiquidity,
+  onManage,
 }: {
   pair: CantoDexPairWithUserCTokenData;
-  onAddLiquidity: (pairAddress: string) => void;
-  onRemoveLiquidity: (pairAddress: string) => void;
+  onManage: (pairAddress: string) => void;
 }) => {
   if (!pair.clmData?.userDetails) return [];
   // add staked and wallet balance
@@ -70,16 +68,8 @@ export const UserPairRow = ({
       {displayAmount(pair.clmData?.userDetails?.rewards ?? "0", 18)}
     </Text>,
     <div key={pair.address + "edit"}>
-      <Button onClick={() => onAddLiquidity(pair.address)} color="secondary">
-        Add Liquidity
-      </Button>
-      <Spacer width="10px" />
-      <Button
-        onClick={() => onRemoveLiquidity(pair.address)}
-        color="secondary"
-        disabled={totalUserLPValue.eq(0)}
-      >
-        Remove Liquidity
+      <Button onClick={() => onManage(pair.address)} color="secondary">
+        Manage LP
       </Button>
     </div>,
   ];
