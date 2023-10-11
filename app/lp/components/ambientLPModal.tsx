@@ -27,6 +27,7 @@ import {
 } from "@/utils/tokenBalances.utils";
 import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
 import { useState } from "react";
+import styles from "./ambientLP.module.css";
 
 interface TestAmbientModalProps {
   pair: AmbientPair;
@@ -52,7 +53,7 @@ interface RemoveParams {
 export const TestAmbientModal = (props: TestAmbientModalProps) => {
   const [modalType, setModalType] = useState<"add" | "remove" | "base">("base");
   return (
-    <Container>
+    <Container backgroundColor="blue">
       {modalType !== "base" && (
         <Button onClick={() => setModalType("base")}>Back</Button>
       )}

@@ -20,7 +20,8 @@ import {
 } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { getOptimalValueBFormatted } from "@/hooks/pairs/cantoDex/helpers/addLiquidityValues";
-
+import styles from "./cantoDex.module.scss";
+import Amount from "@/components/amount/amount";
 interface AddParams {
   value1: string;
   value2: string;
@@ -63,65 +64,71 @@ export const TestEditModal = (props: TestEditProps) => {
     unstake: true,
   });
   return (
-    <Container>
+    <Container className={styles.container}>
       {modalType !== "base" && (
         <Button onClick={() => setModalType("base")}>Back</Button>
       )}
-      <Icon icon={{ url: props.pair.logoURI, size: 50 }} />
-      <Text size="lg" weight="bold">
-        {props.pair.symbol}
-      </Text>
+      <div className={styles.iconTitle}>
+        <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+        <Text size="lg" font="proto_mono">
+          {props.pair.symbol}
+        </Text>
+      </div>
+
       {modalType === "base" &&
         props.pair.clmData?.userDetails?.balanceOfUnderlying !== "0" && (
-          <Container>
-            <Text>
-              Unstaked Liquidity{" "}
-              {displayAmount(
-                props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
-                props.pair.decimals,
-                {
-                  symbol: props.pair.symbol,
+          <Container gap={40}>
+            <Container gap={20}>
+              <Text>
+                Unstaked Liquidity{" "}
+                {displayAmount(
+                  props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+                  props.pair.decimals,
+                  {
+                    symbol: props.pair.symbol,
+                  }
+                )}
+              </Text>
+              <Button
+                onClick={() =>
+                  props.sendTxFlow({
+                    txType: CantoDexTxTypes.REMOVE_LIQUIDITY,
+                    amountLP:
+                      props.pair.clmData?.userDetails?.balanceOfUnderlying ??
+                      "0",
+                    slippage: 2,
+                    deadline: "9999999999999999999999999",
+                  })
                 }
+              >
+                Remove Unstaked Liquidity
+              </Button>
+              <Button
+                onClick={() =>
+                  props.sendTxFlow({
+                    txType: CantoDexTxTypes.STAKE,
+                    amountLP:
+                      props.pair.clmData?.userDetails?.balanceOfUnderlying ??
+                      "0",
+                  })
+                }
+              >
+                Stake Unstaked Liquidity
+              </Button>
+            </Container>
+            <Container gap={20}>
+              <Button color="accent" onClick={() => setModalType("add")}>
+                Add Liquidity
+              </Button>
+              {props.pair.clmData?.userDetails?.balanceOfCToken !== "0" && (
+                <Button color="accent" onClick={() => setModalType("remove")}>
+                  Remove Liquidity
+                </Button>
               )}
-            </Text>
-            <Button
-              onClick={() =>
-                props.sendTxFlow({
-                  txType: CantoDexTxTypes.REMOVE_LIQUIDITY,
-                  amountLP:
-                    props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
-                  slippage: 2,
-                  deadline: "9999999999999999999999999",
-                })
-              }
-            >
-              Remove Unstaked Liquidity
-            </Button>
-            <Button
-              onClick={() =>
-                props.sendTxFlow({
-                  txType: CantoDexTxTypes.STAKE,
-                  amountLP:
-                    props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
-                })
-              }
-            >
-              Stake Unstaked Liquidity
-            </Button>
+            </Container>
           </Container>
         )}
-      {modalType === "base" && (
-        <>
-          <Button color="accent" onClick={() => setModalType("add")}>
-            Add Liquidity
-          </Button>
-          {props.pair.clmData?.userDetails?.balanceOfCToken !== "0" && (
-            <Button color="accent" onClick={() => setModalType("remove")}>
-              Remove Liquidity
-            </Button>
-          )}
-        </>
-      )}
+
       {modalType === "add" && (
         <TestAddLiquidityModal
           pair={props.pair}
@@ -202,15 +209,25 @@ const TestAddLiquidityModal = ({
 
   return (
     <Container>
-      <h3>
-        Reserve Ratio:{" "}
-        {formatBalance(
-          pair.ratio,
-          18 + Math.abs(pair.token1.decimals - pair.token2.decimals)
-        )}
-      </h3>
       <Spacer height="50px" />
-      <Input
+      <Amount
+        decimals={pair.token1.decimals}
+        value={valueToken1}
+        onChange={(e) => {
+          setValue(e.target.value, true);
+        }}
+        IconUrl={pair.token1.logoURI}
+        title={pair.token1.symbol}
+        max={pair.token1.balance ?? "0"}
+        symbol={pair.token1.symbol}
+        error={
+          !paramCheck.isValid &&
+          Number(valueToken1) !== 0 &&
+          paramCheck.errorMessage?.startsWith(pair.token1.symbol)
+        }
+        errorMessage={paramCheck.errorMessage}
+      />
+      {/* <Input
         value={valueToken1}
         onChange={(e) => {
           setValue(e.target.value, true);
@@ -225,9 +242,10 @@ const TestAddLiquidityModal = ({
           paramCheck.errorMessage?.startsWith(pair.token1.symbol)
         }
         errorMessage={paramCheck.errorMessage}
-      />
-      <Spacer height="50px" />
-      <Input
+      /> */}
+
+      <Spacer height="20px" />
+      {/* <Input
         value={valueToken2}
         onChange={(e) => {
           setValue(e.target.value, false);
@@ -242,8 +260,34 @@ const TestAddLiquidityModal = ({
           paramCheck.errorMessage?.startsWith(pair.token2.symbol)
         }
         errorMessage={paramCheck.errorMessage}
+      /> */}
+
+      <Amount
+        decimals={pair.token2.decimals}
+        value={valueToken2}
+        onChange={(e) => {
+          setValue(e.target.value, false);
+        }}
+        IconUrl={pair.token2.logoURI}
+        title={pair.token2.symbol}
+        max={pair.token2.balance ?? "0"}
+        symbol={pair.token2.symbol}
+        error={
+          !paramCheck.isValid &&
+          Number(valueToken2) !== 0 &&
+          paramCheck.errorMessage?.startsWith(pair.token2.symbol)
+        }
+        errorMessage={paramCheck.errorMessage}
       />
       <Spacer height="50px" />
+
+      <Text>
+        Reserve Ratio:{" "}
+        {formatBalance(
+          pair.ratio,
+          18 + Math.abs(pair.token1.decimals - pair.token2.decimals)
+        )}
+      </Text>
       <Button
         color={willStake ? "accent" : "primary"}
         onClick={() => setWillStake(!willStake)}
