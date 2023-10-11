@@ -349,15 +349,14 @@ export const TestEditModal = (props: TestEditProps) => {
       </Container>
     );
 
+  const modals = {
+    liquidity: Liquidity(),
+    stake: Stake(),
+    base: Base(),
+  }[modalType];
   return (
-    <Container className={styles.container} width="32rem">
-      {modalType === "liquidity" ? (
-        <Liquidity />
-      ) : modalType == "stake" ? (
-        <Stake />
-      ) : (
-        <Base />
-      )}
+    <Container className={styles.container} width="28rem">
+      {modals}
     </Container>
   );
 };
