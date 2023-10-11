@@ -46,7 +46,9 @@ interface TestEditProps {
   ) => ValidationReturn;
 }
 export const TestEditModal = (props: TestEditProps) => {
-  const [modalType, setModalType] = useState<"add" | "remove" | "base">("base");
+  const [modalType, setModalType] = useState<"liquidity" | "stake" | "base">(
+    "base"
+  );
   const createAddParams = (params: AddParams) => ({
     pair: props.pair,
     slippage: params.slippage,
@@ -66,192 +68,292 @@ export const TestEditModal = (props: TestEditProps) => {
     amountLP: params.amountLP,
     unstake: true,
   });
-  return (
-    <Container className={styles.container} width="32rem">
-      {modalType !== "base" && (
+
+  const Modal = {
+    liquidity: TestAddLiquidityModal,
+    stake: TestRemoveLiquidityModal,
+    base: null,
+  }[modalType];
+
+  const Liquidity = () => (
+    <div
+      style={{
+        height: "100%",
+      }}
+    >
+      <Container
+        direction="row"
+        height="50px"
+        center={{
+          vertical: true,
+        }}
+        style={{
+          padding: "0 16px",
+          cursor: "pointer",
+          marginTop: "-14px",
+        }}
+        onClick={() => setModalType("base")}
+      >
         <div
           style={{
-            height: "100%",
+            rotate: "90deg",
+            marginRight: "6px",
           }}
         >
-          <Container
-            direction="row"
-            height="50px"
-            center={{
-              vertical: true,
-            }}
-            style={{
-              padding: "0 16px",
-              cursor: "pointer",
-              marginTop: "-14px",
-            }}
-            onClick={() => setModalType("base")}
-          >
-            <div
-              style={{
-                rotate: "90deg",
-                marginRight: "6px",
-              }}
-            >
-              <Icon icon={{ url: "./dropdown.svg", size: 24 }} />
-            </div>
-            <Text font="proto_mono" size="lg">
-              Liquidity
-            </Text>
-          </Container>
-          <div
-            style={{
-              margin: "0  -16px -16px -16px",
-              height: "39rem",
-            }}
-          >
-            <Tabs
-              tabs={[
-                {
-                  title: "Add",
-                  content: (
-                    <Container>
-                      <div className={styles.iconTitle}>
-                        <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
-                        <Text size="lg" font="proto_mono">
-                          {props.pair.symbol}
-                        </Text>
-                      </div>
-                      <TestAddLiquidityModal
-                        pair={props.pair}
-                        validateParams={(params) =>
-                          props.validateParams(createAddParams(params))
-                        }
-                        sendTxFlow={(params) =>
-                          props.sendTxFlow(createAddParams(params))
-                        }
-                      />
-                    </Container>
-                  ),
-                },
-                {
-                  title: "Remove",
-                  isDisabled:
-                    props.pair.clmData?.userDetails?.balanceOfCToken === "0",
-                  content: (
-                    <Container>
-                      <div className={styles.iconTitle}>
-                        <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
-                        <Text size="lg" font="proto_mono">
-                          {props.pair.symbol}
-                        </Text>
-                      </div>
-                      <TestRemoveLiquidityModal
-                        pair={props.pair}
-                        validateParams={(params) =>
-                          props.validateParams(createRemoveParams(params))
-                        }
-                        sendTxFlow={(params) =>
-                          props.sendTxFlow(createRemoveParams(params))
-                        }
-                      />
-                    </Container>
-                  ),
-                },
-              ]}
-            />
-          </div>
+          <Icon icon={{ url: "./dropdown.svg", size: 24 }} />
         </div>
-      )}
+        <Text font="proto_mono" size="lg">
+          Liquidity
+        </Text>
+      </Container>
+      <div
+        style={{
+          margin: "0  -16px -16px -16px",
+          height: "39rem",
+        }}
+      >
+        <Tabs
+          tabs={[
+            {
+              title: "Add",
+              content: (
+                <Container>
+                  <div className={styles.iconTitle}>
+                    <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+                    <Text size="lg" font="proto_mono">
+                      {props.pair.symbol}
+                    </Text>
+                  </div>
+                  <TestAddLiquidityModal
+                    pair={props.pair}
+                    validateParams={(params) =>
+                      props.validateParams(createAddParams(params))
+                    }
+                    sendTxFlow={(params) =>
+                      props.sendTxFlow(createAddParams(params))
+                    }
+                  />
+                </Container>
+              ),
+            },
+            {
+              title: "Remove",
+              isDisabled:
+                props.pair.clmData?.userDetails?.balanceOfCToken === "0",
+              content: (
+                <Container>
+                  <div className={styles.iconTitle}>
+                    <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+                    <Text size="lg" font="proto_mono">
+                      {props.pair.symbol}
+                    </Text>
+                  </div>
+                  <TestRemoveLiquidityModal
+                    pair={props.pair}
+                    validateParams={(params) =>
+                      props.validateParams(createRemoveParams(params))
+                    }
+                    sendTxFlow={(params) =>
+                      props.sendTxFlow(createRemoveParams(params))
+                    }
+                  />
+                </Container>
+              ),
+            },
+          ]}
+        />
+      </div>
+    </div>
+  );
 
-      {modalType === "base" &&
-        props.pair.clmData?.userDetails?.balanceOfUnderlying !== "0" && (
-          <Container gap={40} padding="md">
-            <div className={styles.iconTitle}>
-              <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
-              <Text size="lg" font="proto_mono">
-                {props.pair.symbol}
-              </Text>
-            </div>
-            <Container className={styles.card} padding="md" width="100%">
-              <ModalItem
-                name="Position Value"
-                value={
-                  props.pair.clmData?.userDetails?.supplyBalanceInUnderlying ??
-                  "0"
-                }
-                note
-              />
-              <ModalItem name="Total # of LP Tokens" value="0" />
-              <ModalItem
-                name="Staked LP Tokens"
-                value={props.pair.clmData?.userDetails?.balanceOfCToken ?? "0"}
-              />
-              <ModalItem
-                name="Unstaked LP Tokens"
-                value={displayAmount(
+  const Stake = () => (
+    <div
+      style={{
+        height: "100%",
+      }}
+    >
+      <Container
+        direction="row"
+        height="50px"
+        center={{
+          vertical: true,
+        }}
+        style={{
+          padding: "0 16px",
+          cursor: "pointer",
+          marginTop: "-14px",
+        }}
+        onClick={() => setModalType("base")}
+      >
+        <div
+          style={{
+            rotate: "90deg",
+            marginRight: "6px",
+          }}
+        >
+          <Icon icon={{ url: "./dropdown.svg", size: 24 }} />
+        </div>
+        <Text font="proto_mono" size="lg">
+          Liquidity
+        </Text>
+      </Container>
+      <div
+        style={{
+          margin: "0  -16px -16px -16px",
+          height: "39rem",
+        }}
+      >
+        <Tabs
+          tabs={[
+            {
+              title: "Add",
+              content: (
+                <Container>
+                  <div className={styles.iconTitle}>
+                    <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+                    <Text size="lg" font="proto_mono">
+                      {props.pair.symbol}
+                    </Text>
+                  </div>
+                  <TestAddLiquidityModal
+                    pair={props.pair}
+                    validateParams={(params) =>
+                      props.validateParams(createAddParams(params))
+                    }
+                    sendTxFlow={(params) =>
+                      props.sendTxFlow(createAddParams(params))
+                    }
+                  />
+                </Container>
+              ),
+            },
+            {
+              title: "Remove",
+              isDisabled:
+                props.pair.clmData?.userDetails?.balanceOfCToken === "0",
+              content: (
+                <Container>
+                  <div className={styles.iconTitle}>
+                    <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+                    <Text size="lg" font="proto_mono">
+                      {props.pair.symbol}
+                    </Text>
+                  </div>
+                  <TestRemoveLiquidityModal
+                    pair={props.pair}
+                    validateParams={(params) =>
+                      props.validateParams(createRemoveParams(params))
+                    }
+                    sendTxFlow={(params) =>
+                      props.sendTxFlow(createRemoveParams(params))
+                    }
+                  />
+                </Container>
+              ),
+            },
+          ]}
+        />
+      </div>
+    </div>
+  );
+  const Base = () =>
+    props.pair.clmData?.userDetails?.balanceOfUnderlying !== "0" && (
+      <Container gap={40} padding="md">
+        <div className={styles.iconTitle}>
+          <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+          <Text size="lg" font="proto_mono">
+            {props.pair.symbol}
+          </Text>
+        </div>
+        <Container className={styles.card} padding="md" width="100%">
+          <ModalItem
+            name="Position Value"
+            value={
+              props.pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0"
+            }
+            note
+          />
+          <ModalItem name="Total # of LP Tokens" value="0" />
+          <ModalItem
+            name="Staked LP Tokens"
+            value={props.pair.clmData?.userDetails?.balanceOfCToken ?? "0"}
+          />
+          <ModalItem
+            name="Unstaked LP Tokens"
+            value={displayAmount(
+              props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+              props.pair.decimals
+              //   {
+              //     symbol: props.pair.symbol,
+              //   }
+            )}
+          />
+        </Container>
+        <Container className={styles.card} padding="md" width="100%">
+          <ModalItem
+            name="Pool Liquidity"
+            value={displayAmount(props.pair.tvl, props.pair.decimals)}
+            note
+          />
+          <ModalItem
+            name="Pool Share"
+            value={
+              props.pair.clmData?.userDetails?.supplyBalanceInUnderlying !== "0"
+                ? `${(
+                    Number(
+                      props.pair.clmData?.userDetails?.supplyBalanceInUnderlying
+                    ) / Number(props.pair.tvl)
+                  ).toFixed(4)}%`
+                : "0%"
+            }
+          />
+        </Container>
+        <Container gap={20}>
+          <Button
+            onClick={() =>
+              props.sendTxFlow({
+                txType: CantoDexTxTypes.REMOVE_LIQUIDITY,
+                amountLP:
                   props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
-                  props.pair.decimals
-                  //   {
-                  //     symbol: props.pair.symbol,
-                  //   }
-                )}
-              />
-            </Container>
-            <Container className={styles.card} padding="md" width="100%">
-              <ModalItem
-                name="Pool Liquidity"
-                value={displayAmount(props.pair.tvl, props.pair.decimals)}
-                note
-              />
-              <ModalItem
-                name="Pool Share"
-                value={
-                  props.pair.clmData?.userDetails?.supplyBalanceInUnderlying !==
-                  "0"
-                    ? `${(
-                        Number(
-                          props.pair.clmData?.userDetails
-                            ?.supplyBalanceInUnderlying
-                        ) / Number(props.pair.tvl)
-                      ).toFixed(4)}%`
-                    : "0%"
-                }
-              />
-            </Container>
-            <Container gap={20}>
-              <Button
-                onClick={() =>
-                  props.sendTxFlow({
-                    txType: CantoDexTxTypes.REMOVE_LIQUIDITY,
-                    amountLP:
-                      props.pair.clmData?.userDetails?.balanceOfUnderlying ??
-                      "0",
-                    slippage: 2,
-                    deadline: "9999999999999999999999999",
-                  })
-                }
-              >
-                Remove Unstaked Liquidity
+                slippage: 2,
+                deadline: "9999999999999999999999999",
+              })
+            }
+          >
+            Remove Unstaked Liquidity
+          </Button>
+          <Button
+            onClick={() =>
+              props.sendTxFlow({
+                txType: CantoDexTxTypes.STAKE,
+                amountLP:
+                  props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+              })
+            }
+          >
+            Stake Unstaked Liquidity
+          </Button>
+        </Container>
+        <Container gap={20} direction="row">
+          <Button width="fill" onClick={() => setModalType("liquidity")}>
+            Manage LP
+          </Button>
+          <Button width="fill" onClick={() => setModalType("liquidity")}>
+            Manage Stake
+          </Button>
+          {/* {props.pair.clmData?.userDetails?.balanceOfCToken !== "0" && (
+              <Button color="accent" onClick={() => setModalType("remove")}>
+                Remove Liquidity
               </Button>
-              <Button
-                onClick={() =>
-                  props.sendTxFlow({
-                    txType: CantoDexTxTypes.STAKE,
-                    amountLP:
-                      props.pair.clmData?.userDetails?.balanceOfUnderlying ??
-                      "0",
-                  })
-                }
-              >
-                Stake Unstaked Liquidity
-              </Button>
-            </Container>
-            <Container gap={20}>
-              <Button onClick={() => setModalType("add")}>Manage LP</Button>
-              {/* {props.pair.clmData?.userDetails?.balanceOfCToken !== "0" && (
-                <Button color="accent" onClick={() => setModalType("remove")}>
-                  Remove Liquidity
-                </Button>
-              )} */}
-            </Container>
-          </Container>
-        )}
+            )} */}
+        </Container>
+      </Container>
+    );
+  return (
+    <Container className={styles.container} width="32rem">
+      {modalType === "liquidity" && <Liquidity />}
+      {modalType === "stake" && <Stake />}
+      {modalType === "base" && <Base />}
     </Container>
   );
 };
