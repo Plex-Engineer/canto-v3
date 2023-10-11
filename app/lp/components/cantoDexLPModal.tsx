@@ -25,6 +25,7 @@ import Amount from "@/components/amount/amount";
 import Tabs from "@/components/tabs/tabs";
 import { ModalItem } from "@/app/lending/components/modal/modal";
 import Toggle from "@/components/toggle";
+import { StakeModal } from "../page";
 interface AddParams {
   value1: string;
   value2: string;
@@ -160,101 +161,101 @@ export const TestEditModal = (props: TestEditProps) => {
     </div>
   );
 
-  const Stake = () => (
-    <div
-      style={{
-        height: "100%",
-      }}
-    >
-      <Container
-        direction="row"
-        height="50px"
-        center={{
-          vertical: true,
-        }}
-        style={{
-          padding: "0 16px",
-          cursor: "pointer",
-          marginTop: "-14px",
-        }}
-        onClick={() => setModalType("base")}
-      >
-        <div
-          style={{
-            rotate: "90deg",
-            marginRight: "6px",
-          }}
-        >
-          <Icon icon={{ url: "./dropdown.svg", size: 24 }} />
-        </div>
-        <Text font="proto_mono" size="lg">
-          Stake
-        </Text>
-      </Container>
-      <div
-        style={{
-          margin: "0  -16px -16px -16px",
-          height: "39rem",
-        }}
-      >
-        <Tabs
-          tabs={[
-            {
-              title: "Stake",
-              content: (
-                <Container>
-                  <div className={styles.iconTitle}>
-                    <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
-                    <Text size="lg" font="proto_mono">
-                      {props.pair.symbol}
-                    </Text>
-                  </div>
-                  <StakeLPToken
-                    pair={props.pair}
-                    validateParams={(params) =>
-                      props.validateParams(createAddParams(params))
-                    }
-                    sendTxFlow={(params) =>
-                      props.sendTxFlow({
-                        txType: CantoDexTxTypes.STAKE,
-                        amountLP:
-                          props.pair.clmData?.userDetails
-                            ?.balanceOfUnderlying ?? "0",
-                      })
-                    }
-                  />
-                </Container>
-              ),
-            },
-            {
-              title: "Unstake",
-              isDisabled:
-                props.pair.clmData?.userDetails?.balanceOfCToken === "0",
-              content: (
-                <Container>
-                  <div className={styles.iconTitle}>
-                    <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
-                    <Text size="lg" font="proto_mono">
-                      {props.pair.symbol}
-                    </Text>
-                  </div>
-                  <TestRemoveLiquidityModal
-                    pair={props.pair}
-                    validateParams={(params) =>
-                      props.validateParams(createRemoveParams(params))
-                    }
-                    sendTxFlow={(params) =>
-                      props.sendTxFlow(createRemoveParams(params))
-                    }
-                  />
-                </Container>
-              ),
-            },
-          ]}
-        />
-      </div>
-    </div>
-  );
+  //   const Stake = () => (
+  //     <div
+  //       style={{
+  //         height: "100%",
+  //       }}
+  //     >
+  //       <Container
+  //         direction="row"
+  //         height="50px"
+  //         center={{
+  //           vertical: true,
+  //         }}
+  //         style={{
+  //           padding: "0 16px",
+  //           cursor: "pointer",
+  //           marginTop: "-14px",
+  //         }}
+  //         onClick={() => setModalType("base")}
+  //       >
+  //         <div
+  //           style={{
+  //             rotate: "90deg",
+  //             marginRight: "6px",
+  //           }}
+  //         >
+  //           <Icon icon={{ url: "./dropdown.svg", size: 24 }} />
+  //         </div>
+  //         <Text font="proto_mono" size="lg">
+  //           Stake
+  //         </Text>
+  //       </Container>
+  //       <div
+  //         style={{
+  //           margin: "0  -16px -16px -16px",
+  //           height: "39rem",
+  //         }}
+  //       >
+  //         <Tabs
+  //           tabs={[
+  //             {
+  //               title: "Stake",
+  //               content: (
+  //                 <Container>
+  //                   <div className={styles.iconTitle}>
+  //                     <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+  //                     <Text size="lg" font="proto_mono">
+  //                       {props.pair.symbol}
+  //                     </Text>
+  //                   </div>
+  //                   <StakeLPToken
+  //                     pair={props.pair}
+  //                     validateParams={(params) =>
+  //                       props.validateParams(createAddParams(params))
+  //                     }
+  //                     sendTxFlow={(params) =>
+  //                       props.sendTxFlow({
+  //                         txType: CantoDexTxTypes.STAKE,
+  //                         amountLP:
+  //                           props.pair.clmData?.userDetails
+  //                             ?.balanceOfUnderlying ?? "0",
+  //                       })
+  //                     }
+  //                   />
+  //                 </Container>
+  //               ),
+  //             },
+  //             {
+  //               title: "Unstake",
+  //               isDisabled:
+  //                 props.pair.clmData?.userDetails?.balanceOfCToken === "0",
+  //               content: (
+  //                 <Container>
+  //                   <div className={styles.iconTitle}>
+  //                     <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+  //                     <Text size="lg" font="proto_mono">
+  //                       {props.pair.symbol}
+  //                     </Text>
+  //                   </div>
+  //                   <TestRemoveLiquidityModal
+  //                     pair={props.pair}
+  //                     validateParams={(params) =>
+  //                       props.validateParams(createRemoveParams(params))
+  //                     }
+  //                     sendTxFlow={(params) =>
+  //                       props.sendTxFlow(createRemoveParams(params))
+  //                     }
+  //                   />
+  //                 </Container>
+  //               ),
+  //             },
+  //           ]}
+  //         />
+  //       </div>
+  //     </div>
+  //   );
   const Base = () =>
     props.pair.clmData?.userDetails?.balanceOfUnderlying !== "0" && (
       <Container gap={40} padding="md">
@@ -351,7 +352,11 @@ export const TestEditModal = (props: TestEditProps) => {
 
   const modals = {
     liquidity: Liquidity(),
-    stake: Stake(),
+    stake: props.pair.clmData ? (
+      <StakeModal cToken={props.pair.clmData} isSupplyModal />
+    ) : (
+      "Loading..."
+    ),
     base: Base(),
   }[modalType];
   return (
