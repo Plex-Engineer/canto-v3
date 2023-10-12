@@ -161,9 +161,9 @@ export const LendingModal = (props: Props) => {
             setAmount(val.target.value);
           }}
           IconUrl={cToken.underlying.logoURI}
-          title={cToken.symbol}
+          title={cToken.underlying.symbol}
           max={maxAmountForLendingTx(actionType, cToken, position)}
-          symbol={cToken.symbol}
+          symbol={cToken.underlying.symbol}
           error={!amountCheck.isValid && Number(amount) !== 0}
           errorMessage={amountCheck.errorMessage}
         />
