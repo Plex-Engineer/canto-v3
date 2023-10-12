@@ -1,10 +1,21 @@
+"use client";
 import Button from "@/components/button/button";
-import Container from "@/components/container/container";
 import Input from "@/components/input/input";
 import Spacer from "@/components/layout/spacer";
-import Text from "@/components/text";
+import {
+  convertToBigNumber,
+  displayAmount,
+  formatBalance,
+} from "@/utils/tokenBalances.utils";
+import { useState } from "react";
+import Container from "@/components/container/container";
 import { ValidationReturn } from "@/config/interfaces";
-import { DEFAULT_AMBIENT_TICKS } from "@/hooks/pairs/ambient/config/prices";
+import Icon from "@/components/icon/icon";
+import Text from "@/components/text";
+import styles from "./cantoDex.module.scss";
+import Amount from "@/components/amount/amount";
+import Tabs from "@/components/tabs/tabs";
+import { ModalItem } from "@/app/lending/components/modal/modal";
 import { AmbientPair } from "@/hooks/pairs/ambient/interfaces/ambientPairs";
 import {
   AmbientTransactionParams,
@@ -14,87 +25,133 @@ import {
   convertFromQ64RootPrice,
   getPriceFromTick,
 } from "@/utils/ambient/ambientMath.utils";
+import { DEFAULT_AMBIENT_TICKS } from "@/hooks/pairs/ambient/config/prices";
 import {
   baseTokenFromConcLiquidity,
   getConcBaseTokensFromQuoteTokens,
   getConcQuoteTokensFromBaseTokens,
   quoteTokenFromConcLiquidity,
 } from "@/utils/ambient/liquidity.utils";
-import {
-  convertToBigNumber,
-  displayAmount,
-  formatBalance,
-} from "@/utils/tokenBalances.utils";
 import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
-import { useState } from "react";
-import styles from "./ambientLP.module.css";
 
-interface TestAmbientModalProps {
+interface AmbientModalProps {
   pair: AmbientPair;
   validateParams: (
     params: Partial<AmbientTransactionParams>
   ) => ValidationReturn;
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
 }
-interface AddParams {
+
+export const AmbientModal = (props: AmbientModalProps) => {
+  return (
+    <Container className={styles.container} width="32rem">
+      <div
+        style={{
+          height: "100%",
+        }}
+      >
+        <Container
+          direction="row"
+          height="50px"
+          center={{
+            vertical: true,
+          }}
+          style={{
+            cursor: "pointer",
+            marginTop: "-14px",
+          }}
+        >
+          <Text font="proto_mono" size="lg">
+            Liquidity
+          </Text>
+        </Container>
+        <div
+          style={{
+            margin: "0  -16px -16px -16px",
+            height: "39rem",
+          }}
+        >
+          <Tabs
+            tabs={[
+              {
+                title: "Add",
+                content: (
+                  <Container width="100%" margin="sm">
+                    <div className={styles.iconTitle}>
+                      <div style={{ display: "flex", flexDirection: "row" }}>
+                        <Icon
+                          icon={{ url: props.pair.base.logoURI, size: 60 }}
+                        />
+                        <Icon
+                          icon={{ url: props.pair.quote.logoURI, size: 60 }}
+                        />
+                      </div>
+                      <Text size="lg" font="proto_mono">
+                        {props.pair.symbol}
+                      </Text>
+                    </div>
+                    <AddAmbientLiquidity
+                      pair={props.pair}
+                      sendTxFlow={props.sendTxFlow}
+                      validateParams={props.validateParams}
+                    />
+                  </Container>
+                ),
+              },
+              {
+                title: "Remove",
+                isDisabled:
+                  props.pair.userDetails?.defaultRangePosition.liquidity ===
+                  "0",
+                content: (
+                  <Container width="100%" margin="sm">
+                    <div className={styles.iconTitle}>
+                      <div style={{ display: "flex", flexDirection: "row" }}>
+                        <Icon
+                          icon={{ url: props.pair.base.logoURI, size: 60 }}
+                        />
+                        <Icon
+                          icon={{ url: props.pair.quote.logoURI, size: 60 }}
+                        />
+                      </div>
+                      <Text size="lg" font="proto_mono">
+                        {props.pair.symbol}
+                      </Text>
+                    </div>
+                    <RemoveAmbientLiquidity
+                      pair={props.pair}
+                      sendTxFlow={props.sendTxFlow}
+                      validateParams={props.validateParams}
+                    />
+                  </Container>
+                ),
+              },
+            ]}
+          />
+        </div>
+      </div>
+    </Container>
+  );
+};
+
+interface AddConcParams {
   lowerTick: number;
   upperTick: number;
   amount: string;
   isAmountBase: boolean;
   txType: AmbientTxType.ADD_CONC_LIQUIDITY;
 }
-interface RemoveParams {
-  lowerTick: number;
-  upperTick: number;
-  liquidity: string;
-  txType: AmbientTxType.REMOVE_CONC_LIQUIDITY;
-}
-
-export const TestAmbientModal = (props: TestAmbientModalProps) => {
-  const [modalType, setModalType] = useState<"add" | "remove" | "base">("base");
-  return (
-    <Container backgroundColor="blue">
-      {modalType !== "base" && (
-        <Button onClick={() => setModalType("base")}>Back</Button>
-      )}
-      <Text size="lg" weight="bold">
-        {props.pair.symbol}
-      </Text>
-      <Spacer height="20px" />
-      {modalType === "base" && (
-        <>
-          <Button onClick={() => setModalType("add")}>Add</Button>
-          <Button onClick={() => setModalType("remove")}>Remove</Button>
-        </>
-      )}
-      {modalType === "add" && (
-        <TestAddAmbientLiquidity
-          pair={props.pair}
-          sendTxFlow={props.sendTxFlow}
-          validateParams={props.validateParams}
-        />
-      )}
-      {modalType === "remove" && (
-        <TestRemoveAmbientLiquidity
-          pair={props.pair}
-          sendTxFlow={props.sendTxFlow}
-          validateParams={props.validateParams}
-        />
-      )}
-    </Container>
-  );
-};
-
-interface TestAddProps {
+interface AddModalProps {
   pair: AmbientPair;
-  sendTxFlow: (params: AddParams) => void;
-  validateParams: (params: AddParams) => ValidationReturn;
+  sendTxFlow: (params: AddConcParams) => void;
+  validateParams: (params: AddConcParams) => ValidationReturn;
 }
-const TestAddAmbientLiquidity = ({
+const AddAmbientLiquidity = ({
   pair,
-  sendTxFlow,
   validateParams,
-}: TestAddProps) => {
+  sendTxFlow,
+}: AddModalProps) => {
+  // values
   const defaultMinPrice = getPriceFromTick(DEFAULT_AMBIENT_TICKS.minTick);
   const defaultMaxPrice = getPriceFromTick(DEFAULT_AMBIENT_TICKS.maxTick);
   const currentPrice = convertFromQ64RootPrice(pair.q64PriceRoot);
@@ -153,37 +210,17 @@ const TestAddAmbientLiquidity = ({
 
   return (
     <Container>
-      <h3>
-        price:{" "}
-        {displayAmount(
-          currentPrice,
-          Math.abs(pair.base.decimals - pair.quote.decimals)
-        )}
-      </h3>
-      <h3>
-        min-price:{" "}
-        {displayAmount(
-          defaultMinPrice,
-          Math.abs(pair.base.decimals - pair.quote.decimals)
-        )}
-      </h3>
-      <h3>
-        max-price:{" "}
-        {displayAmount(
-          defaultMaxPrice,
-          Math.abs(pair.base.decimals - pair.quote.decimals)
-        )}
-      </h3>
-      <Spacer height="40px" />
-      <Input
-        label={pair.base.symbol}
+      <Spacer height="10px" />
+      <Amount
+        decimals={pair.base.decimals}
         value={baseValue}
         onChange={(e) => {
           setValue(e.target.value, true);
         }}
-        type="amount"
-        balance={pair.base.balance ?? "0"}
-        decimals={pair.base.decimals}
+        IconUrl={pair.base.logoURI}
+        title={pair.base.symbol}
+        max={pair.base.balance ?? "0"}
+        symbol={pair.base.symbol}
         error={
           !paramCheck.isValid &&
           Number(baseValue) !== 0 &&
@@ -191,16 +228,19 @@ const TestAddAmbientLiquidity = ({
         }
         errorMessage={paramCheck.errorMessage}
       />
-      <Spacer height="40px" />
-      <Input
-        label={pair.quote.symbol}
+
+      <Spacer height="20px" />
+
+      <Amount
+        decimals={pair.quote.decimals}
         value={quoteValue}
         onChange={(e) => {
           setValue(e.target.value, false);
         }}
-        type="amount"
-        balance={pair.quote.balance ?? "0"}
-        decimals={pair.quote.decimals}
+        IconUrl={pair.quote.logoURI}
+        title={pair.quote.symbol}
+        max={pair.quote.balance ?? "0"}
+        symbol={pair.quote.symbol}
         error={
           !paramCheck.isValid &&
           Number(quoteValue) !== 0 &&
@@ -208,8 +248,36 @@ const TestAddAmbientLiquidity = ({
         }
         errorMessage={paramCheck.errorMessage}
       />
-      <Spacer height="40px" />
+      <Spacer height="20px" />
+      <Container className={styles.card}>
+        <ModalItem
+          name="Price"
+          value={displayAmount(
+            currentPrice,
+            Math.abs(pair.base.decimals - pair.quote.decimals)
+          )}
+        />
+
+        <ModalItem
+          name="Min Price"
+          value={displayAmount(
+            defaultMinPrice,
+            Math.abs(pair.base.decimals - pair.quote.decimals)
+          )}
+        />
+
+        <ModalItem
+          name="Max Price"
+          value={displayAmount(
+            defaultMaxPrice,
+            Math.abs(pair.base.decimals - pair.quote.decimals)
+          )}
+        />
+      </Container>
+      <Spacer height="30px" />
       <Button
+        disabled={!paramCheck.isValid}
+        width={"fill"}
         onClick={() =>
           sendTxFlow({
             lowerTick: DEFAULT_AMBIENT_TICKS.minTick,
@@ -229,22 +297,30 @@ const TestAddAmbientLiquidity = ({
           })
         }
       >
-        ADD CONC LIQUIDITY
+        {"Add Liquidity"}
       </Button>
+      <Spacer height="20px" />
     </Container>
   );
 };
 
-interface TestRemoveProps {
-  pair: AmbientPair;
-  sendTxFlow: (params: RemoveParams) => void;
-  validateParams: (params: RemoveParams) => ValidationReturn;
+interface RemoveConcParams {
+  lowerTick: number;
+  upperTick: number;
+  liquidity: string;
+  txType: AmbientTxType.REMOVE_CONC_LIQUIDITY;
 }
-const TestRemoveAmbientLiquidity = ({
+interface RemoveProps {
+  pair: AmbientPair;
+  sendTxFlow: (params: RemoveConcParams) => void;
+  validateParams: (params: RemoveConcParams) => ValidationReturn;
+}
+
+const RemoveAmbientLiquidity = ({
   pair,
-  sendTxFlow,
   validateParams,
-}: TestRemoveProps) => {
+  sendTxFlow,
+}: RemoveProps) => {
   const [percentToRemove, setPercentToRemove] = useState(0);
   const liquidityToRemove = percentOfAmount(
     pair.userDetails?.defaultRangePosition?.liquidity ?? "0",
@@ -252,8 +328,8 @@ const TestRemoveAmbientLiquidity = ({
   );
 
   return (
-    <Container>
-      <Spacer height="40px" />
+    <div>
+      <Spacer height="10px" />
       <Input
         value={percentToRemove.toString()}
         onChange={(e) => setPercentToRemove(Number(e.target.value))}
@@ -261,41 +337,59 @@ const TestRemoveAmbientLiquidity = ({
         min={0}
         max={100}
         label="percent to remove"
+        error={Number(percentToRemove) < 0 || Number(percentToRemove) > 100}
+        errorMessage="Percentage must be between 0 and 100%"
       />
-      <Spacer height="40px" />
-      <Text size="lg" weight="bold">
-        expected base tokens:{" "}
-        {displayAmount(
-          baseTokenFromConcLiquidity(
-            pair.q64PriceRoot,
-            liquidityToRemove.data.toString(),
-            pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
-            pair.userDetails?.defaultRangePosition.upperTick ?? 0
-          ),
-          pair.base.decimals,
-          {
-            symbol: pair.base.symbol,
-          }
-        )}
+      <Spacer height="20px" />
+
+      <Text
+        font="proto_mono"
+        size="xx-sm"
+        style={{
+          marginLeft: "16px",
+        }}
+      >
+        Expected Tokens
       </Text>
-      <Spacer height="40px" />
-      <Text size="lg" weight="bold">
-        expected quote tokens:{" "}
-        {displayAmount(
-          quoteTokenFromConcLiquidity(
-            pair.q64PriceRoot,
-            liquidityToRemove.data.toString(),
-            pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
-            pair.userDetails?.defaultRangePosition.upperTick ?? 0
-          ),
-          pair.quote.decimals,
-          {
-            symbol: pair.quote.symbol,
-          }
-        )}
-      </Text>
-      <Spacer height="40px" />
+      <Spacer height="6px" />
+
+      <Container className={styles.card}>
+        <ModalItem
+          name={pair.base.symbol}
+          value={displayAmount(
+            baseTokenFromConcLiquidity(
+              pair.q64PriceRoot,
+              liquidityToRemove.data.toString(),
+              pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
+              pair.userDetails?.defaultRangePosition.upperTick ?? 0
+            ),
+            pair.base.decimals,
+            {
+              symbol: pair.base.symbol,
+            }
+          )}
+        />
+        <ModalItem
+          name={pair.quote.symbol}
+          value={displayAmount(
+            quoteTokenFromConcLiquidity(
+              pair.q64PriceRoot,
+              liquidityToRemove.data.toString(),
+              pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
+              pair.userDetails?.defaultRangePosition.upperTick ?? 0
+            ),
+            pair.quote.decimals,
+            {
+              symbol: pair.quote.symbol,
+            }
+          )}
+        />
+      </Container>
+      <Spacer height="30px" />
+
       <Button
+        disabled={Number(percentToRemove) <= 0 || Number(percentToRemove) > 100}
+        width={"fill"}
         onClick={() =>
           sendTxFlow({
             lowerTick: DEFAULT_AMBIENT_TICKS.minTick,
@@ -305,8 +399,8 @@ const TestRemoveAmbientLiquidity = ({
           })
         }
       >
-        REMOVE CONC LIQUIDITY
+        Remove Liquidity
       </Button>
-    </Container>
+    </div>
   );
 };

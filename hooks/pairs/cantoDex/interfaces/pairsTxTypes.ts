@@ -20,7 +20,6 @@ export type CantoDexTransactionParams = {
   | {
       txType: CantoDexTxTypes.REMOVE_LIQUIDITY;
       amountLP: string;
-      unstake: boolean;
       slippage: number;
       deadline: string;
     }

@@ -13,6 +13,11 @@ import {
   getQuoteLiquidity,
 } from "@/utils/ambient/liquidity.utils";
 import { DEFAULT_AMBIENT_TICKS } from "../config/prices";
+import {
+  addTokenBalances,
+  convertTokenAmountToNote,
+} from "@/utils/tokens/tokenMath.utils";
+import BigNumber from "bignumber.js";
 
 export async function getGeneralAmbientPairData(
   chainId: number,
@@ -80,6 +85,23 @@ export async function getGeneralAmbientPairData(
         const q64PriceRoot = ((curve.priceRoot_ ?? 0) as number).toString();
         const concLiquidity = ((curve.concLiq_ ?? 0) as number).toString();
         const rootLiquidity = (chunkedData[index][2].result ?? 0).toString();
+        const baseLiquidity = getBaseLiquidity(q64PriceRoot, rootLiquidity);
+        const quoteLiquidity = getQuoteLiquidity(q64PriceRoot, rootLiquidity);
+
+        // get tvl
+        const baseTokensInNote = convertTokenAmountToNote(
+          baseLiquidity,
+          new BigNumber(10).pow(36 - pair.base.decimals).toString()
+        );
+        const quoteTokensInNote = convertTokenAmountToNote(
+          quoteLiquidity,
+          new BigNumber(10).pow(36 - pair.quote.decimals).toString()
+        );
+        const tvl = addTokenBalances(
+          baseTokensInNote.data.toString(),
+          quoteTokensInNote.data.toString()
+        );
+
         const userPosition = chunkedData[index][3].result
           ? {
               userDetails: {
@@ -97,9 +119,10 @@ export async function getGeneralAmbientPairData(
           q64PriceRoot,
           currentTick: chunkedData[index][1].result ?? 0,
           liquidity: {
+            tvl,
             rootLiquidity,
-            base: getBaseLiquidity(q64PriceRoot, rootLiquidity),
-            quote: getQuoteLiquidity(q64PriceRoot, rootLiquidity),
+            base: baseLiquidity,
+            quote: quoteLiquidity,
           },
           concLiquidity,
           ...userPosition,

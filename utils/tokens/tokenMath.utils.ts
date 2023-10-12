@@ -91,6 +91,25 @@ export function addTokenBalances(amount1: string, amount2: string): string {
 }
 
 /**
+ * @notice subtracts two token balances
+ * @dev must be from the same token to keep decimals
+ * @param {string} amount1 first amount to subtract from
+ * @param {string} amount2 second amount to subtract
+ * @returns {string} difference of the two amounts
+ */
+export function subtractTokenBalances(
+  amount1: string,
+  amount2: string
+): string {
+  const [amount1BN, amount2BN] = [
+    convertToBigNumber(amount1),
+    convertToBigNumber(amount2),
+  ];
+  if (amount1BN.error || amount2BN.error) return "0";
+  return amount1BN.data.minus(amount2BN.data).toString();
+}
+
+/**
  * @notice divides token balances
  * @dev must be from the same token to keep decimals
  * @param {string} numerator numerator

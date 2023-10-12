@@ -32,7 +32,7 @@ export function getBaseLiquidity(
   // don't square price, want square root
   const baseLiquidity = priceScaled.times(rootLiquidity);
   // return as string
-  return baseLiquidity.toString();
+  return baseLiquidity.integerValue().toString();
 }
 
 /**
@@ -59,7 +59,7 @@ export function getQuoteLiquidity(
   // don't square price, want square root
   const quoteLiquidity = rootLiquidityBN.dividedBy(priceScaled);
   // return as string
-  return quoteLiquidity.toString();
+  return quoteLiquidity.integerValue().toString();
 }
 
 /**

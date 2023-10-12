@@ -17,7 +17,10 @@ import { useState } from "react";
 import { ValidationReturn } from "@/config/interfaces";
 import Amount from "@/components/amount/amount";
 import { CantoDexTxTypes } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
-import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
+import {
+  addTokenBalances,
+  convertTokenAmountToNote,
+} from "@/utils/tokens/tokenMath.utils";
 import { ModalItem } from "@/app/lending/components/modal/modal";
 interface Props {
   clpToken: CTokenWithUserData;
@@ -35,28 +38,33 @@ interface Props {
 }
 
 export const StakeLPModal = (props: Props) => {
-  const Balances = ({ cToken }: { cToken: CTokenWithUserData }) => (
-    <Container className={styles.card} padding="md" width="100%">
-      <CTokenAmountCard
-        name="Wallet Balance"
-        amount={cToken.userDetails?.balanceOfUnderlying ?? "0"}
-        decimals={cToken.underlying.decimals}
-        symbol={cToken.underlying.symbol}
-        price={cToken.price}
-      />
-      <CTokenAmountCard
-        name="Staked Amount"
-        amount={cToken.userDetails?.supplyBalanceInUnderlying ?? "0"}
-        decimals={cToken.underlying.decimals}
-        symbol={cToken.underlying.symbol}
-        price={cToken.price}
-      />
-    </Container>
+  // get total values to decide what can be done with tokens
+  const totalLP = addTokenBalances(
+    props.clpToken.userDetails?.supplyBalanceInUnderlying ?? "0",
+    props.clpToken.userDetails?.balanceOfUnderlying ?? "0"
   );
 
-  const APRs = ({ cToken }: { cToken: CTokenWithUserData }) => (
-    <Container className={styles.card} padding="md" width="100%">
-      <ModalItem name="Staking APR" value={cToken.distApy + "%"} />
+  const CLMInfo = ({ cToken }: { cToken: CTokenWithUserData }) => (
+    <Container width="100%" gap={20}>
+      <Container className={styles.card} padding="md" width="100%">
+        <ModalItem name="Staking APR" value={cToken.distApy + "%"} />
+      </Container>
+      <Container className={styles.card} padding="md" width="100%">
+        <CTokenAmountCard
+          name="Unstaked Balance"
+          amount={cToken.userDetails?.balanceOfUnderlying ?? "0"}
+          decimals={cToken.underlying.decimals}
+          symbol={""}
+          price={cToken.price}
+        />
+        <CTokenAmountCard
+          name="Staked Amount"
+          amount={cToken.userDetails?.supplyBalanceInUnderlying ?? "0"}
+          decimals={cToken.underlying.decimals}
+          symbol={""}
+          price={cToken.price}
+        />
+      </Container>
     </Container>
   );
 
@@ -106,18 +114,14 @@ export const StakeLPModal = (props: Props) => {
             setAmount(val.target.value);
           }}
           IconUrl={cLPToken.underlying.logoURI}
-          title={cLPToken.symbol}
+          title={cLPToken.underlying.symbol}
           max={maxAmount}
-          symbol={cLPToken.symbol}
+          symbol={cLPToken.underlying.symbol}
           error={!amountCheck.isValid && Number(amount) !== 0}
           errorMessage={amountCheck.errorMessage}
         />
         <Spacer height="40px" />
-
-        <Container width="100%" gap={20}>
-          <APRs cToken={cLPToken} />
-          <Balances cToken={cLPToken} />
-        </Container>
+        <CLMInfo cToken={cLPToken} />
         <div
           style={{
             width: "100%",
