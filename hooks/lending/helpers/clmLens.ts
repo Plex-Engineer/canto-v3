@@ -70,6 +70,7 @@ export async function getUserCLMLensData(
             .call()
         ).map((data) => {
           return {
+            chainId,
             cTokenAddress: data.cTokenAddress,
             balanceOfCToken: data.balanceOfCToken.toString(),
             balanceOfUnderlying: data.balanceOfUnderlying.toString(),
@@ -80,7 +81,7 @@ export async function getUserCLMLensData(
               data.supplyBalanceInUnderlying.toString(),
             underlyingAllowance: data.underlyingAllowance.toString(),
           };
-        }) as UserCTokenDetails[],
+        }),
         lensContract.methods
           .getAccountLimits(comptrollerAddress, userEthAddress)
           .call() as Promise<{ liquidity: number; shortfall: number }>,
