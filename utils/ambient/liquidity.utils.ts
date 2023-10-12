@@ -19,10 +19,7 @@ import { percentOfAmount } from "../tokens/tokenMath.utils";
  * @param rootLiquidity sqrt(x*y) of base and quote liquidity
  * @returns amount of active base token liquidity
  */
-export function getBaseLiquidity(
-  q64RootPrice: string,
-  rootLiquidity: string
-): string {
+function getBaseLiquidity(q64RootPrice: string, rootLiquidity: string): string {
   const { data: priceBN, error } = convertToBigNumber(q64RootPrice);
   if (error) {
     return "0";
@@ -41,7 +38,7 @@ export function getBaseLiquidity(
  * @param rootLiquidity sqrt(x*y) of quote and quote liquidity
  * @returns amount of active quote token liquidity
  */
-export function getQuoteLiquidity(
+function getQuoteLiquidity(
   q64RootPrice: string,
   rootLiquidity: string
 ): string {

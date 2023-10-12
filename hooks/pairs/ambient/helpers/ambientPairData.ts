@@ -9,8 +9,8 @@ import { getAmbientAddress } from "../config/addresses";
 import { CROC_QUERY_ABI } from "@/config/abis";
 import { multicall } from "wagmi/actions";
 import {
-  getBaseLiquidity,
-  getQuoteLiquidity,
+  baseTokenFromConcLiquidity,
+  quoteTokenFromConcLiquidity,
 } from "@/utils/ambient/liquidity.utils";
 import { DEFAULT_AMBIENT_TICKS } from "../config/prices";
 import {
@@ -85,9 +85,18 @@ export async function getGeneralAmbientPairData(
         const q64PriceRoot = ((curve.priceRoot_ ?? 0) as number).toString();
         const concLiquidity = ((curve.concLiq_ ?? 0) as number).toString();
         const rootLiquidity = (chunkedData[index][2].result ?? 0).toString();
-        const baseLiquidity = getBaseLiquidity(q64PriceRoot, rootLiquidity);
-        const quoteLiquidity = getQuoteLiquidity(q64PriceRoot, rootLiquidity);
-
+        const baseLiquidity = baseTokenFromConcLiquidity(
+          q64PriceRoot,
+          concLiquidity,
+          DEFAULT_AMBIENT_TICKS.minTick,
+          DEFAULT_AMBIENT_TICKS.maxTick
+        );
+        const quoteLiquidity = quoteTokenFromConcLiquidity(
+          q64PriceRoot,
+          concLiquidity,
+          DEFAULT_AMBIENT_TICKS.minTick,
+          DEFAULT_AMBIENT_TICKS.maxTick
+        );
         // get tvl
         const baseTokensInNote = convertTokenAmountToNote(
           baseLiquidity,

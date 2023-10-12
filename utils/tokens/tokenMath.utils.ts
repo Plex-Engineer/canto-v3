@@ -71,7 +71,7 @@ export function percentOfAmount(
   // calculate percent of amount
   const percentOfAmount = amountBN.data.times(percent).div(100);
 
-  return NO_ERROR(percentOfAmount.toFixed(0));
+  return NO_ERROR(percentOfAmount.integerValue().toString());
 }
 
 /**
