@@ -15,7 +15,7 @@ import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { areEqualAddresses } from "@/utils/address.utils";
 import {
-  greaterThanOrEqualTo,
+  greaterThan,
   percentOfAmount,
   subtractTokenBalances,
 } from "@/utils/tokens/tokenMath.utils";
@@ -208,10 +208,10 @@ async function removeLiquidityFlow(
     params.amountLP,
     params.pair.clmData.userDetails.balanceOfUnderlying
   );
-  if (greaterThanOrEqualTo(unstakeAmount, "0").data) {
+  if (greaterThan(unstakeAmount, "0").data) {
     // check that the user has enough LP to unstake
     if (
-      greaterThanOrEqualTo(
+      greaterThan(
         unstakeAmount,
         params.pair.clmData.userDetails.supplyBalanceInUnderlying
       ).data

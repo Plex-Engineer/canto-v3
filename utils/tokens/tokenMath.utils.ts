@@ -133,7 +133,7 @@ export function divideBalances(numerator: string, denominator: string): string {
  * @param {string} amount2 second amount to compare
  * @returns {ReturnWithError<boolean>} true if amount1 is greater than amount2
  */
-export function greaterThanOrEqualTo(
+export function greaterThan(
   amount1: string,
   amount2: string
 ): ReturnWithError<boolean> {
@@ -142,7 +142,7 @@ export function greaterThanOrEqualTo(
     convertToBigNumber(amount2),
   ];
   if (amount1BN.error || amount2BN.error) return NEW_ERROR("Invalid amounts");
-  return NO_ERROR(amount1BN.data.gte(amount2BN.data));
+  return NO_ERROR(amount1BN.data.gt(amount2BN.data));
 }
 
 /**
