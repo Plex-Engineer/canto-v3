@@ -14,7 +14,11 @@ import { createApprovalTxs, getTokenBalance } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { areEqualAddresses } from "@/utils/address.utils";
-import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
+import {
+  greaterThanOrEqualTo,
+  percentOfAmount,
+  subtractTokenBalances,
+} from "@/utils/tokens/tokenMath.utils";
 import { quoteRemoveLiquidity } from "@/utils/evm/pairs.utils";
 import { TransactionFlowType } from "@/config/transactions/txMap";
 import {
@@ -23,6 +27,7 @@ import {
   StakeLPParams,
 } from "../interfaces/pairsTxTypes";
 import { displayAmount } from "@/utils/tokenBalances.utils";
+import { getEVMTimestamp } from "@/utils/evm/helpers.utils";
 
 export async function cantoDexLPTx(
   params: CantoDexTransactionParams
@@ -123,6 +128,15 @@ async function addLiquidityFlow(
     );
   }
 
+  // add deadline to block timestamp
+  const { data: timestamp, error: timestampError } = await getEVMTimestamp(
+    params.chainId
+  );
+  if (timestampError) {
+    return NEW_ERROR("addLiquidityFlow: " + errMsg(timestampError));
+  }
+  const timeoutDeadline = timestamp + Math.floor(Number(params.deadline)) * 60;
+
   /** add add liquidity tx to list */
   txList.push(
     _addLiquidityTx(
@@ -138,7 +152,7 @@ async function addLiquidityFlow(
       params.amounts.amount2,
       amount1Min.data,
       amount2Min.data,
-      params.deadline,
+      timeoutDeadline.toString(),
       TX_DESCRIPTIONS.ADD_LIQUIDITY(
         params.pair,
         displayAmount(params.amounts.amount1, params.pair.token1.decimals),
@@ -181,21 +195,38 @@ async function removeLiquidityFlow(
     return NEW_ERROR("removeLiquidityFlow: incorrect tx type passed");
   }
   // check for user details
-  if (!params.pair.clmData) {
+  if (!params.pair.clmData || !params.pair.clmData.userDetails) {
     return NEW_ERROR("removeLiquidityFlow: pair does not have user details");
   }
   /** create tx list */
   const txList: Transaction[] = [];
 
   /** Unstake */
-  if (params.unstake) {
+
+  // check if the amount is greater than LP balance and unstake enough for tx
+  const unstakeAmount = subtractTokenBalances(
+    params.amountLP,
+    params.pair.clmData.userDetails.balanceOfUnderlying
+  );
+  if (greaterThanOrEqualTo(unstakeAmount, "0").data) {
+    // check that the user has enough LP to unstake
+    if (
+      greaterThanOrEqualTo(
+        unstakeAmount,
+        params.pair.clmData.userDetails.supplyBalanceInUnderlying
+      ).data
+    ) {
+      return NEW_ERROR(
+        "removeLiquidityFlow: user does not have enough LP to unstake"
+      );
+    }
     // remove LP from clm
     const { data: withdrawTx, error: withdrawError } = await cTokenLendingTx({
       chainId: params.chainId,
       ethAccount: params.ethAccount,
       txType: CTokenLendingTxTypes.WITHDRAW,
       cToken: params.pair.clmData,
-      amount: params.amountLP,
+      amount: unstakeAmount,
     });
     if (withdrawError) {
       return NEW_ERROR("removeLiquidityFlow: " + errMsg(withdrawError));
@@ -261,6 +292,15 @@ async function removeLiquidityFlow(
     );
   }
 
+  // add deadline to block timestamp
+  const { data: timestamp, error: timestampError } = await getEVMTimestamp(
+    params.chainId
+  );
+  if (timestampError) {
+    return NEW_ERROR("removeLiquidityFlow: " + errMsg(timestampError));
+  }
+  const timeoutDeadline = timestamp + Math.floor(Number(params.deadline)) * 60;
+
   /** add remove liquidity tx to list */
   txList.push(
     _removeLiquidityTx(
@@ -275,7 +315,7 @@ async function removeLiquidityFlow(
       params.amountLP,
       amount1Min.data,
       amount2Min.data,
-      params.deadline,
+      timeoutDeadline.toString(),
       TX_DESCRIPTIONS.REMOVE_LIQUIDITY(
         params.pair,
         displayAmount(params.amountLP, params.pair.decimals)

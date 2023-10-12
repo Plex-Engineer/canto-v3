@@ -55,7 +55,7 @@ export default function useAmbientPairs(
     },
     {
       onSuccess: (response) => {
-        console.log(response);
+        // console.log(response);
       },
       onError: (error) => {
         console.log(error);
@@ -125,20 +125,22 @@ export default function useAmbientPairs(
         const baseCheck = validateInputTokenAmount(
           baseAmount,
           base.balance ?? "0",
-          base.address,
+          base.symbol,
           base.decimals
         );
         const quoteCheck = validateInputTokenAmount(
           quoteAmount,
           quote.balance ?? "0",
-          quote.address,
+          quote.symbol,
           quote.decimals
         );
         const prefixError = !baseCheck.isValid ? base.symbol : quote.symbol;
         return {
           isValid: baseCheck.isValid && quoteCheck.isValid,
           errorMessage:
-            prefixError + (baseCheck.errorMessage || quoteCheck.errorMessage),
+            prefixError +
+            " " +
+            (baseCheck.errorMessage || quoteCheck.errorMessage),
         };
       }
       case AmbientTxType.REMOVE_CONC_LIQUIDITY: {

@@ -20,7 +20,7 @@ import {
   validateCTokenLendingRetryParams,
 } from "@/hooks/lending/transactions/lending";
 import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
-import { ambientLiquidityTx } from "@/hooks/pairs/ambient/transactions.ts/ambientTx";
+import { ambientLiquidityTx } from "@/hooks/pairs/ambient/transactions/ambientTx";
 import {
   CantoDexTransactionParams,
   StakeLPParams,

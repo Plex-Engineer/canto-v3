@@ -22,6 +22,7 @@ import { areEqualAddresses } from "@/utils/address.utils";
 import { validateInputTokenAmount } from "@/utils/validation.utils";
 import { createNewCantoDexTxFLow } from "./helpers/createPairsFlow";
 import { createNewClaimCLMRewardsFlow } from "@/hooks/lending/helpers/createLendingFlow";
+import { addTokenBalances } from "@/utils/tokens/tokenMath.utils";
 
 export default function useCantoDex(
   params: CantoDexHookInputParams,
@@ -142,6 +143,7 @@ export default function useCantoDex(
           isValid: token1Check.isValid && token2Check.isValid,
           errorMessage:
             prefixError +
+            " " +
             (token1Check.errorMessage || token2Check.errorMessage),
         };
       }
@@ -149,9 +151,10 @@ export default function useCantoDex(
         // if unstaking first, check supplyBalance, otherwise check balanceOfUnderlying
         return validateInputTokenAmount(
           txParams.amountLP,
-          txParams.unstake
-            ? userDetails.supplyBalanceInUnderlying
-            : userDetails.balanceOfUnderlying,
+          addTokenBalances(
+            userDetails.supplyBalanceInUnderlying,
+            userDetails.balanceOfUnderlying
+          ),
           pair.symbol,
           pair.decimals
         );

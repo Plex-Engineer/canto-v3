@@ -23,6 +23,6 @@
       "@/*": ["./*"]
     },
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "__tests__/utils/cosmos/transactions/txMessages.test.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "__tests__/utils/cosmos/transactions/txMessages.test.ts", "hooks/pairs/ambient/transactions"],
   "exclude": ["node_modules"]
 }

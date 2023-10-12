@@ -79,7 +79,7 @@
                 "name": "cNote",
                 "symbol": "cNOTE",
                 "decimals": 18,
-                "icon": "/tokens/note.svg",
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
                 "isOFT": true,
                 "isOFTProxy": false,
                 "bridgeMethods": [
@@ -488,7 +488,7 @@
                 "name": "cNote",
                 "symbol": "cNOTE",
                 "decimals": 18,
-                "icon": "/tokens/note.svg",
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
                 "isOFT": true,
                 "isOFTProxy": false,
                 "bridgeMethods": [
@@ -518,7 +518,7 @@
                 "name": "cNote",
                 "symbol": "cNOTE",
                 "decimals": 18,
-                "icon": "/tokens/note.svg",
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
                 "isOFT": true,
                 "isOFTProxy": false,
                 "bridgeMethods": [
@@ -548,7 +548,7 @@
                 "name": "cNote",
                 "symbol": "cNOTE",
                 "decimals": 18,
-                "icon": "/tokens/note.svg",
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
                 "isOFT": true,
                 "isOFTProxy": false,
                 "bridgeMethods": [
@@ -578,7 +578,7 @@
                 "name": "cNote",
                 "symbol": "cNOTE",
                 "decimals": 18,
-                "icon": "/tokens/note.svg",
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
                 "isOFT": true,
                 "isOFTProxy": false,
                 "bridgeMethods": [
@@ -608,7 +608,7 @@
                 "name": "cNote",
                 "symbol": "cNOTE",
                 "decimals": 18,
-                "icon": "/tokens/note.svg",
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
                 "isOFT": true,
                 "isOFTProxy": false,
                 "bridgeMethods": [

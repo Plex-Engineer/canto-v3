@@ -6,9 +6,14 @@ import useTransactionStore from "@/stores/transactionStore";
 import useStore from "@/stores/useStore";
 import { useWalletClient } from "wagmi";
 import { ValidationReturn } from "@/config/interfaces";
-import { GeneralPairRow, UserPairRow } from "./components/pairRow";
+import {
+  GeneralAmbientPairRow,
+  GeneralCantoDexPairRow,
+  UserAmbientPairRow,
+  UserCantoDexPairRow,
+} from "./components/pairRow";
 import Text from "@/components/text";
-import { TestEditModal } from "./components/cantoDexLPModal";
+import { CantoDexLPModal } from "./components/cantoDexLPModal";
 import styles from "./lp.module.scss";
 import { CantoDexTransactionParams } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
 import useLP from "@/hooks/pairs/lpCombo/useLP";
@@ -17,7 +22,7 @@ import {
   isCantoDexPair,
 } from "@/hooks/pairs/lpCombo/interfaces.ts/pairTypes";
 import Button from "@/components/button/button";
-import { AmbientModal } from "./components/newAmbientLPModal";
+import { AmbientModal } from "./components/ambientLPModal";
 import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
 import {
   baseTokenFromConcLiquidity,
@@ -25,6 +30,13 @@ import {
 } from "@/utils/ambient/liquidity.utils";
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import Rewards from "./components/rewards";
+import Image from "next/image";
+import {
+  divideBalances,
+  percentOfAmount,
+} from "@/utils/tokens/tokenMath.utils";
+import Icon from "@/components/icon/icon";
+import { formatPercent } from "@/utils/formatting.utils";
 
 export default function Page() {
   const { data: signer } = useWalletClient();
@@ -43,7 +55,7 @@ export default function Page() {
   const sortedPairs = cantoDexPairs?.sort((a, b) =>
     a.symbol.localeCompare(b.symbol)
   );
-  const userPairs = cantoDexPairs.filter(
+  const userCantoDexPairs = cantoDexPairs.filter(
     (pair) =>
       (pair.clmData?.userDetails?.balanceOfCToken !== "0" ||
         pair.clmData?.userDetails?.balanceOfUnderlying !== "0") &&
@@ -61,7 +73,11 @@ export default function Page() {
     if (error) {
       console.log(error);
     } else {
-      txStore?.addNewFlow({ txFlow: flow, signer: signer });
+      txStore?.addNewFlow({
+        txFlow: flow,
+        signer: signer,
+        onSuccessCallback: () => selection.setPair(null),
+      });
     }
   }
   function canPerformCantoDexTx(
@@ -79,12 +95,19 @@ export default function Page() {
     if (error) {
       console.log(error);
     } else {
-      txStore?.addNewFlow({ txFlow: flow, signer: signer });
+      txStore?.addNewFlow({
+        txFlow: flow,
+        signer: signer,
+        onSuccessCallback: () => selection.setPair(null),
+      });
     }
   }
 
   /** AMBIENT */
   const { ambientPairs } = ambient;
+  const userAmbientPairs = ambientPairs.filter(
+    (pair) => Number(pair.userDetails?.defaultRangePosition.liquidity) !== 0
+  );
 
   //transactions
   function sendAmbientTxFlow(params: Partial<AmbientTransactionParams>) {
@@ -97,7 +120,11 @@ export default function Page() {
     if (error) {
       console.log(error);
     } else {
-      txStore?.addNewFlow({ txFlow: flow, signer: signer });
+      txStore?.addNewFlow({
+        txFlow: flow,
+        signer: signer,
+        onSuccessCallback: () => selection.setPair(null),
+      });
     }
   }
   function canPerformAmbientTx(
@@ -119,7 +146,7 @@ export default function Page() {
     <div className={styles.container}>
       <Modal open={selectedPair !== null} onClose={() => setPair(null)}>
         {selectedPair && isCantoDexPair(selectedPair) && (
-          <TestEditModal
+          <CantoDexLPModal
             pair={selectedPair}
             validateParams={canPerformCantoDexTx}
             sendTxFlow={sendCantoDexTxFlow}
@@ -145,7 +172,7 @@ export default function Page() {
         })}
       />
       <Spacer height="30px" />
-      {userPairs.length > 0 && (
+      {userCantoDexPairs.length + userAmbientPairs.length > 0 && (
         <Table
           title="Your Pairs"
           headers={[
@@ -153,21 +180,32 @@ export default function Page() {
             "APR",
             "Pool Share",
             "Value",
-            "# LP Tokens",
-            "# Staked",
+            // "# LP Tokens",
+            // "# Staked",
             "Rewards",
             "Edit",
           ]}
-          columns={9}
-          processedData={userPairs.map((pair) => (
-            <UserPairRow
-              key={pair.symbol}
-              pair={pair}
-              onManage={(pairAddress) => {
-                setPair(pairAddress);
-              }}
-            />
-          ))}
+          columns={7}
+          processedData={[
+            ...userCantoDexPairs.map((pair) => (
+              <UserCantoDexPairRow
+                key={pair.symbol}
+                pair={pair}
+                onManage={(pairAddress) => {
+                  setPair(pairAddress);
+                }}
+              />
+            )),
+            ...userAmbientPairs.map((pair) => (
+              <UserAmbientPairRow
+                key={pair.symbol}
+                pair={pair}
+                onManage={(pairAddress) => {
+                  setPair(pairAddress);
+                }}
+              />
+            )),
+          ]}
         />
       )}
       <Spacer height="40px" />
@@ -175,52 +213,24 @@ export default function Page() {
         title="All Pairs"
         headers={["Pair", "APR", "TVL", "Type", "action"]}
         columns={6}
-        processedData={sortedPairs.map((pair) => (
-          <GeneralPairRow
-            key={pair.symbol}
-            pair={pair}
-            onAddLiquidity={(pairAddress) => {
-              setPair(pairAddress);
-            }}
-          />
-        ))}
-      />
-      <Spacer height="40px" />
-      <Table
-        title="AmbientPairs"
-        headers={["Pair", "Base Liquidity", "Quote Liquidity", "action"]}
-        columns={5}
-        processedData={ambientPairs.map((pair) => [
-          <Text key={pair.symbol}>{pair.symbol}</Text>,
-          <Text key={pair.symbol + "baseliq"}>
-            {displayAmount(
-              baseTokenFromConcLiquidity(
-                pair.q64PriceRoot,
-                pair.userDetails?.defaultRangePosition.liquidity ?? "0",
-                pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
-                pair.userDetails?.defaultRangePosition.upperTick ?? 0
-              ),
-              pair.base.decimals
-            )}
-          </Text>,
-          <Text key={pair.symbol + "quoteLiq"}>
-            {displayAmount(
-              quoteTokenFromConcLiquidity(
-                pair.q64PriceRoot,
-                pair.userDetails?.defaultRangePosition.liquidity ?? "0",
-                pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
-                pair.userDetails?.defaultRangePosition.upperTick ?? 0
-              ),
-              pair.quote.decimals
-            )}
-          </Text>,
-          <div key={"action"}>
-            <Button key={"action item"} onClick={() => setPair(pair.address)}>
-              Manage
-            </Button>
-            ,
-          </div>,
-        ])}
+        processedData={[
+          ...sortedPairs.map((pair) => (
+            <GeneralCantoDexPairRow
+              key={pair.symbol}
+              pair={pair}
+              onAddLiquidity={(pairAddress) => {
+                setPair(pairAddress);
+              }}
+            />
+          )),
+          ...ambientPairs.map((pair) => (
+            <GeneralAmbientPairRow
+              key={pair.symbol}
+              pair={pair}
+              onAddLiquidity={(pairAddress) => setPair(pairAddress)}
+            />
+          )),
+        ]}
       />
       <Spacer height="40px" />
     </div>

@@ -5,6 +5,7 @@ export interface BaseAmbientPair {
   base: AmbientPairToken;
   quote: AmbientPairToken;
   poolIdx: number;
+  stable: boolean;
 }
 
 export interface AmbientPair extends BaseAmbientPair {
@@ -12,6 +13,7 @@ export interface AmbientPair extends BaseAmbientPair {
   currentTick: number; // current tick of curve
   concLiquidity: string; // concentrated liquidity
   liquidity: {
+    tvl: string;
     base: string;
     quote: string;
     rootLiquidity: string;
