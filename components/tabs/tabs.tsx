@@ -11,6 +11,7 @@ interface Props {
     onClick?: () => void;
     content: React.ReactNode;
   }[];
+  shadows?: boolean;
 }
 
 const Tabs = (props: Props) => {

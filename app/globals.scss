@@ -9,6 +9,18 @@
   box-sizing: border-box;
 }
 
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 button {
   border: none;
   background: none;
@@ -56,6 +68,7 @@ a {
   --border-stoke-dark-color: #222;
   --dark-mode: 0;
   --light-mode: 1;
+  --box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
 }
 
 .dim {

@@ -30,6 +30,26 @@
                 ]
             },
             {
+                "id": "0xEbe265c9299d0C879bcc2A76948511BA6ED6C36D",
+                "chainId": 7700,
+                "address": "0xEbe265c9299d0C879bcc2A76948511BA6ED6C36D",
+                "name": "cNote",
+                "symbol": "cNOTE",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
+                "isOFT": true,
+                "isOFTProxy": true,
+                "oftUnderlyingAddress": "0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
+                "bridgeMethods": [
+                    {
+                        "chainId": "eth-mainnet",
+                        "methods": [
+                            "2"
+                        ]
+                    }
+                ]
+            },
+            {
                 "id": "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
                 "chainId": 7700,
                 "address": "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
@@ -595,7 +615,7 @@
                 "name": "cNote",
                 "symbol": "cNOTE",
                 "decimals": 18,
-                "icon": "/tokens/note.svg",
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
                 "isOFT": true,
                 "isOFTProxy": true,
                 "oftUnderlyingAddress": "0x04E52476d318CdF739C38BD41A922787D441900c",

@@ -13,7 +13,6 @@ export default function Theme() {
           />
           <span className="ml-2 text-gray-700">Dark Mode</span>
         </label>
-        <Toggle />
       </div>
     </div>
   );

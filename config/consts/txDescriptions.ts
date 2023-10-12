@@ -1,10 +1,14 @@
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
-import { Pair } from "@/hooks/pairs/interfaces/pairs";
+import { CantoDexPair } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 
 export const TX_DESCRIPTIONS = {
-  ADD_LIQUIDITY: (pair: Pair, amount1: string, amount2: string) => ({
+  ADD_LIQUIDITY: (pair: CantoDexPair, amount1: string, amount2: string) => ({
     title: `Add Liquidity To ${pair.symbol}`,
     description: `Add ${amount1} ${pair.token1.symbol} and ${amount2} ${pair.token2.symbol} to ${pair.symbol}`,
+  }),
+  ADD_AMBIENT_CONC_LIQ: () => ({
+    title: "Add Concentrated Liquidity",
+    description: "Add concentrated liquidity to the pool",
   }),
   APPROVE_TOKEN: (tokenSymbol: string, spender: string) => ({
     title: `Approve ${tokenSymbol}`,
@@ -19,6 +23,10 @@ export const TX_DESCRIPTIONS = {
   ) => ({
     title: `Send ${tokenSymbol} to ${toNetwork} from ${fromNetwork}`,
     description: `Send ${amount} ${tokenSymbol} to ${toNetwork} from ${fromNetwork} through ${method}`,
+  }),
+  CLAIM_CLM_RWARDS: (amount: string) => ({
+    title: "Claim Rewards",
+    description: `Claim ${amount} WCANTO in rewards`,
   }),
   CONVERT_ERC20: (tokenSymbol: string, amount: string) => ({
     title: `Convert ${tokenSymbol}`,
@@ -49,6 +57,10 @@ export const TX_DESCRIPTIONS = {
       collateralize ? "Collateralize" : "Uncollateralize"
     } ${tokenSymbol} in the lending market`,
   }),
+  DRIP_COMPTROLLER: () => ({
+    title: "Drip Comptroller",
+    description: "Drip WCANTO rewards to the lending market from the reservoir",
+  }),
   GENERATE_PUBLIC_KEY: () => ({
     title: "Generate Public Key",
     description: "Generate a public key",
@@ -63,7 +75,11 @@ export const TX_DESCRIPTIONS = {
       deposit ? "to" : "from"
     } ${tokenSymbol} OFT`,
   }),
-  REMOVE_LIQUIDITY: (pair: Pair, amount: string) => ({
+  REMOVE_AMBIENT_CONC_LIQ: () => ({
+    title: "Remove Concentrated Liquidity",
+    description: "Remove concentrated liquidity from the pool",
+  }),
+  REMOVE_LIQUIDITY: (pair: CantoDexPair, amount: string) => ({
     title: `Remove Liquidity From ${pair.symbol}`,
     description: `Remove ${amount} ${pair.symbol} from ${pair.symbol}`,
   }),

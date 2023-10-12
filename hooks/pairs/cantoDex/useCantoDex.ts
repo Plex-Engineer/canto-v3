@@ -1,39 +1,44 @@
 import { useQuery } from "react-query";
-import { PairsHookInputParams, PairsHookReturn } from "./interfaces/hookParams";
-import { Pair, PairWithUserCTokenData } from "./interfaces/pairs";
-import { CANTO_DATA_API_ENDPOINTS } from "@/config/api";
-import { getCantoApiData } from "@/config/api/canto-api";
-import useLending from "../lending/useLending";
+import {
+  CantoDexHookInputParams,
+  CantoDexHookReturn,
+} from "./interfaces/hookParams";
+import { CantoDexPair } from "./interfaces/pairs";
+import { CANTO_DATA_API_ENDPOINTS, getCantoApiData } from "@/config/api";
+import useTokenBalances from "@/hooks/helpers/useTokenBalances";
+import { getUniqueUnderlyingTokensFromPairs } from "./helpers/underlyingTokens";
+import useLending from "@/hooks/lending/useLending";
+import {
+  CantoDexTransactionParams,
+  CantoDexTxTypes,
+} from "./interfaces/pairsTxTypes";
 import {
   NEW_ERROR,
-  NO_ERROR,
   NewTransactionFlow,
   ReturnWithError,
   ValidationReturn,
 } from "@/config/interfaces";
-import { createNewPairsTxFlow } from "./helpers/createPairsFlow";
-import useTokenBalances from "../helpers/useTokenBalances";
-import { getUniqueUnderlyingTokensFromPairs } from "./helpers/underlyingTokens";
 import { areEqualAddresses } from "@/utils/address.utils";
-import { useState } from "react";
-import {
-  PairsTransactionParams,
-  PairsTxTypes,
-} from "./interfaces/pairsTxTypes";
 import { validateInputTokenAmount } from "@/utils/validation.utils";
+import { createNewCantoDexTxFLow } from "./helpers/createPairsFlow";
+import { createNewClaimCLMRewardsFlow } from "@/hooks/lending/helpers/createLendingFlow";
+import { addTokenBalances } from "@/utils/tokens/tokenMath.utils";
 
-export default function usePairs(
-  params: PairsHookInputParams
-): PairsHookReturn {
+export default function useCantoDex(
+  params: CantoDexHookInputParams,
+  options?: {
+    refetchInterval?: number;
+  }
+): CantoDexHookReturn {
   ///
   /// Internal Hooks
   ///
 
   // query for all pair data
   const { data: pairs } = useQuery(
-    ["lp pairs", params.chainId],
-    async (): Promise<Pair[]> => {
-      const { data, error } = await getCantoApiData<Pair[]>(
+    ["canto dex", params.chainId],
+    async (): Promise<CantoDexPair[]> => {
+      const { data, error } = await getCantoApiData<CantoDexPair[]>(
         params.chainId,
         CANTO_DATA_API_ENDPOINTS.allPairs
       );
@@ -47,7 +52,7 @@ export default function usePairs(
       onError: (error) => {
         console.log(error);
       },
-      refetchInterval: 10000,
+      refetchInterval: options?.refetchInterval ?? 5000,
     }
   );
   // get balances of all the underlying tokens
@@ -89,25 +94,12 @@ export default function usePairs(
   });
 
   ///
-  /// internal functions
-  ///
-
-  // state for the pair so that balances can always update
-  const [selectedPairId, setSelectedPairId] = useState<string | null>(null);
-
-  // get the pair from the pair list with balances
-  function getPair(address: string): ReturnWithError<PairWithUserCTokenData> {
-    const pair = pairsWithUserCTokens?.find((pair) =>
-      areEqualAddresses(pair.address, address)
-    );
-    return pair ? NO_ERROR(pair) : NEW_ERROR("Pair not found");
-  }
-
-  ///
   /// external functions
   ///
 
-  function validateParams(txParams: PairsTransactionParams): ValidationReturn {
+  function validateParams(
+    txParams: CantoDexTransactionParams
+  ): ValidationReturn {
     // make sure user eth address is the same
     if (!areEqualAddresses(params.userEthAddress ?? "", txParams.ethAccount)) {
       return {
@@ -126,7 +118,7 @@ export default function usePairs(
     const userDetails = txParams.pair.clmData.userDetails;
     // make sure balances are good depending on tx type
     switch (txParams.txType) {
-      case PairsTxTypes.ADD_LIQUIDITY: {
+      case CantoDexTxTypes.ADD_LIQUIDITY: {
         const token1 = pair.token1;
         const token2 = pair.token2;
         // each token value must be less than or equal to their balance
@@ -151,27 +143,29 @@ export default function usePairs(
           isValid: token1Check.isValid && token2Check.isValid,
           errorMessage:
             prefixError +
+            " " +
             (token1Check.errorMessage || token2Check.errorMessage),
         };
       }
-      case PairsTxTypes.REMOVE_LIQUIDITY:
+      case CantoDexTxTypes.REMOVE_LIQUIDITY:
         // if unstaking first, check supplyBalance, otherwise check balanceOfUnderlying
         return validateInputTokenAmount(
           txParams.amountLP,
-          txParams.unstake
-            ? userDetails.supplyBalanceInUnderlying
-            : userDetails.balanceOfUnderlying,
+          addTokenBalances(
+            userDetails.supplyBalanceInUnderlying,
+            userDetails.balanceOfUnderlying
+          ),
           pair.symbol,
           pair.decimals
         );
-      case PairsTxTypes.STAKE:
+      case CantoDexTxTypes.STAKE:
         return validateInputTokenAmount(
           txParams.amountLP,
           userDetails.balanceOfUnderlying,
           pair.symbol,
           pair.decimals
         );
-      case PairsTxTypes.UNSTAKE:
+      case CantoDexTxTypes.UNSTAKE:
         return validateInputTokenAmount(
           txParams.amountLP,
           userDetails.supplyBalanceInUnderlying,
@@ -187,25 +181,30 @@ export default function usePairs(
   }
 
   function createNewPairsFlow(
-    params: PairsTransactionParams
+    params: CantoDexTransactionParams
   ): ReturnWithError<NewTransactionFlow> {
     // validate params
     const validation = validateParams(params);
     if (!validation.isValid)
       return NEW_ERROR("createNewPairsFlow::" + validation.errorMessage);
-    return createNewPairsTxFlow(params);
+    return createNewCantoDexTxFLow(params);
+  }
+
+  function createNewClaimRewardsFlow(): ReturnWithError<NewTransactionFlow> {
+    return createNewClaimCLMRewardsFlow({
+      chainId: params.chainId,
+      ethAccount: params.userEthAddress ?? "",
+      estimatedRewards: position.totalRewards,
+    });
   }
 
   return {
     pairs: pairsWithUserCTokens ?? [],
     position,
-    selection: {
-      pair: getPair(selectedPairId ?? "").data,
-      setPair: setSelectedPairId,
-    },
     transaction: {
       validateParams,
       createNewPairsFlow,
+      createClaimRewardsFlow: createNewClaimRewardsFlow,
     },
   };
 }

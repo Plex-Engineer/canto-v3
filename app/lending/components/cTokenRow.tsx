@@ -55,15 +55,7 @@ export const CTokenRow = ({
       color="secondary"
       onClick={onClick}
     >
-      Supply
-    </Button>
-    <Spacer width="10px" />
-    <Button
-      key={cToken.name + "cToken.withdraw"}
-      color="secondary"
-      onClick={onClick}
-    >
-      Withdraw
+      Manage
     </Button>
   </Container>,
 ];

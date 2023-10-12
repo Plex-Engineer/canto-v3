@@ -1,6 +1,6 @@
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 
-export interface Pair {
+export interface CantoDexPair {
   aTob: boolean;
   address: string;
   cDecimals: number;
@@ -32,6 +32,6 @@ interface PairToken {
 }
 
 // will include balances, staked, and allowances
-export interface PairWithUserCTokenData extends Pair {
+export interface CantoDexPairWithUserCTokenData extends CantoDexPair {
   clmData?: CTokenWithUserData;
 }

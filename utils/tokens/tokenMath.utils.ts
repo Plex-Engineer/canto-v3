@@ -57,7 +57,7 @@ export function convertNoteAmountToToken(
 /**
  * @notice Gets the percent of an amount
  * @param {string} amount Amount to get percent of
- * @param {number} percent Percent to get (0-100)
+ * @param {number} percent Percent to get
  * @returns {ReturnWithError<string>} Percent of amount
  */
 export function percentOfAmount(
@@ -91,6 +91,25 @@ export function addTokenBalances(amount1: string, amount2: string): string {
 }
 
 /**
+ * @notice subtracts two token balances
+ * @dev must be from the same token to keep decimals
+ * @param {string} amount1 first amount to subtract from
+ * @param {string} amount2 second amount to subtract
+ * @returns {string} difference of the two amounts
+ */
+export function subtractTokenBalances(
+  amount1: string,
+  amount2: string
+): string {
+  const [amount1BN, amount2BN] = [
+    convertToBigNumber(amount1),
+    convertToBigNumber(amount2),
+  ];
+  if (amount1BN.error || amount2BN.error) return "0";
+  return amount1BN.data.minus(amount2BN.data).toString();
+}
+
+/**
  * @notice divides token balances
  * @dev must be from the same token to keep decimals
  * @param {string} numerator numerator
@@ -114,7 +133,7 @@ export function divideBalances(numerator: string, denominator: string): string {
  * @param {string} amount2 second amount to compare
  * @returns {ReturnWithError<boolean>} true if amount1 is greater than amount2
  */
-export function greaterThanOrEqualTo(
+export function greaterThan(
   amount1: string,
   amount2: string
 ): ReturnWithError<boolean> {
@@ -123,7 +142,7 @@ export function greaterThanOrEqualTo(
     convertToBigNumber(amount2),
   ];
   if (amount1BN.error || amount2BN.error) return NEW_ERROR("Invalid amounts");
-  return NO_ERROR(amount1BN.data.gte(amount2BN.data));
+  return NO_ERROR(amount1BN.data.gt(amount2BN.data));
 }
 
 /**

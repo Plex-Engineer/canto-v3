@@ -1,7 +1,6 @@
 "use client";
 import Button from "@/components/button/button";
 import Text from "@/components/text";
-import Input from "@/components/input/input";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { maxAmountForLendingTx } from "@/utils/clm/limits.utils";
@@ -17,8 +16,9 @@ import {
 } from "@/utils/tokenBalances.utils";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
-import { useState } from "react";
+import React, { useState } from "react";
 import { ValidationReturn } from "@/config/interfaces";
+import Amount from "@/components/amount/amount";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { areEqualAddresses } from "@/utils/address.utils";
 import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
@@ -81,7 +81,7 @@ export const LendingModal = (props: Props) => {
             price={cToken.price}
           />
         )}
-        <Card
+        <ModalItem
           name="Account Liquidity Remaining"
           value={formatBalance(liquidityLeft, 18, {
             commify: true,
@@ -101,19 +101,19 @@ export const LendingModal = (props: Props) => {
   }) => (
     <Container className={styles.card} padding="md" width="100%">
       {/* might need to change this in future for showing it on more tokens */}
-      {isSupply &&
-        (Number(cToken.supplyApy) !== 0 || Number(cToken.distApy) !== 0) && (
-          <>
-            <Card name="Supply APR" value={cToken.supplyApy + "%"} />
-            <Card name="Dist APR" value={cToken.distApy + "%"} />
-          </>
-        )}
-      {!isSupply && (
+      {isSupply && cToken.symbol.toLowerCase() == "cnote" && (
         <>
-          <Card name="Borrow APR" value={cToken.borrowApy + "%"} />
+          <ModalItem name="Supply APR" value={cToken.supplyApy + "%"} />
+          <ModalItem name="Dist APR" value={cToken.distApy + "%"} />
         </>
       )}
-      <Card
+
+      {!isSupply && (
+        <>
+          <ModalItem name="Borrow APR" value={cToken.borrowApy + "%"} />
+        </>
+      )}
+      <ModalItem
         name="Collateral Factor"
         value={formatBalance(cToken.collateralFactor, 16) + "%"}
       />
@@ -154,6 +154,21 @@ export const LendingModal = (props: Props) => {
         </Text>
         <Spacer height="20px" />
 
+        <Amount
+          decimals={cToken.underlying.decimals}
+          value={amount}
+          onChange={(val) => {
+            setAmount(val.target.value);
+          }}
+          IconUrl={cToken.underlying.logoURI}
+          title={cToken.underlying.symbol}
+          max={maxAmountForLendingTx(actionType, cToken, position)}
+          symbol={cToken.underlying.symbol}
+          error={!amountCheck.isValid && Number(amount) !== 0}
+          errorMessage={amountCheck.errorMessage}
+        />
+        <Spacer height="40px" />
+
         <Container width="100%" gap={20}>
           <APRs cToken={cToken} isSupply={isSupplyModal} />
           <Balances
@@ -162,24 +177,11 @@ export const LendingModal = (props: Props) => {
             liquidityLeft={position.liquidity}
           />
         </Container>
-        <Spacer height="70px" />
         <div
           style={{
             width: "100%",
           }}
         >
-          <Input
-            type="amount"
-            balance={maxAmountForLendingTx(actionType, cToken, position)}
-            decimals={cToken.underlying.decimals}
-            onChange={(val) => {
-              setAmount(val.target.value);
-            }}
-            placeholder="0.0"
-            value={amount}
-            error={!amountCheck.isValid && Number(amount) !== 0}
-            errorMessage={amountCheck.errorMessage}
-          />
           <Spacer height="20px" />
           <Button
             width={"fill"}
@@ -253,33 +255,43 @@ export const LendingModal = (props: Props) => {
   );
 };
 
-const Card = ({
+export const ModalItem = ({
   name,
   value,
   note,
 }: {
   name: string;
-  value: string;
+  value: string | React.ReactNode;
   note?: boolean;
 }) => (
-  <Container direction="row" gap="auto">
+  <Container
+    direction="row"
+    gap="auto"
+    center={{
+      vertical: true,
+    }}
+  >
     <Text size="sm" font="proto_mono">
       {name}
     </Text>
-    <Text size="sm" font="proto_mono">
-      {value}{" "}
-      <span>
-        {note && (
-          <Icon
-            themed
-            icon={{
-              url: "/tokens/note.svg",
-              size: 14,
-            }}
-          />
-        )}
-      </span>
-    </Text>
+    {typeof value === "string" ? (
+      <Text size="sm" font="proto_mono">
+        {value}{" "}
+        <span>
+          {note && (
+            <Icon
+              themed
+              icon={{
+                url: "/tokens/note.svg",
+                size: 14,
+              }}
+            />
+          )}
+        </span>
+      </Text>
+    ) : (
+      value
+    )}
   </Container>
 );
 

@@ -26,6 +26,10 @@ const CANTO_CORE_ADDRESSES = {
     mainnet: "0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C",
     testnet: "0x9514c07bC6e80B652e4264E64f589C59065C231f",
   },
+  reservoir: {
+    mainnet: "0x07C50Bf0804A06860AeACAcFaf029F9a1c014F91",
+    testnet: "0xc481BCA47fa855e92d53a35C5ADA4bbbA3b0AC88",
+  },
   router: {
     mainnet: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
     testnet: "0x463e7d4DF8fE5fb42D024cb57c77b76e6e74417a",

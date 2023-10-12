@@ -127,17 +127,17 @@ const Button = (props: Props) => {
 
   function getShadow() {
     if (props.disabled) {
-      return "var(--box-shadow, 0px 0px 0px 0px rgba(17, 17, 17, 0.15))";
+      return "0px 0px 0px 0px rgba(17, 17, 17, 0.15)";
     }
     switch (props.shadow) {
       case "small":
-        return "var(--box-shadow, 1px 1px 0px 0px rgba(17, 17, 17, 0.15))";
+        return "1px 1px 0px 0px rgba(17, 17, 17, 0.15)";
       case "medium":
-        return "var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15))";
+        return "3px 3px 0px 0px rgba(17, 17, 17, 0.15)";
       case "none":
-        return "var(--box-shadow, 0px 0px 0px 0px rgba(17, 17, 17, 0.15))";
+        return "0px 0px 0px 0px rgba(17, 17, 17, 0.15)";
       default:
-        return "var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15))";
+        return "3px 3px 0px 0px rgba(17, 17, 17, 0.15)";
     }
   }
 

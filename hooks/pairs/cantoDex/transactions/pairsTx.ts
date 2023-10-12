@@ -8,23 +8,29 @@ import {
   TxCreatorFunctionReturn,
   errMsg,
 } from "@/config/interfaces";
-import {
-  PairsTransactionParams,
-  PairsTxTypes,
-  StakeLPParams,
-} from "../interfaces/pairsTxTypes";
 import { cTokenLendingTx } from "@/hooks/lending/transactions/lending";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { createApprovalTxs, getTokenBalance } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { areEqualAddresses } from "@/utils/address.utils";
-import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
+import {
+  greaterThan,
+  percentOfAmount,
+  subtractTokenBalances,
+} from "@/utils/tokens/tokenMath.utils";
 import { quoteRemoveLiquidity } from "@/utils/evm/pairs.utils";
 import { TransactionFlowType } from "@/config/transactions/txMap";
+import {
+  CantoDexTransactionParams,
+  CantoDexTxTypes,
+  StakeLPParams,
+} from "../interfaces/pairsTxTypes";
+import { displayAmount } from "@/utils/tokenBalances.utils";
+import { getEVMTimestamp } from "@/utils/evm/helpers.utils";
 
-export async function lpPairTx(
-  params: PairsTransactionParams
+export async function cantoDexLPTx(
+  params: CantoDexTransactionParams
 ): PromiseWithError<TxCreatorFunctionReturn> {
   // make sure pair passed through has user details
   if (!params.pair.clmData) {
@@ -38,19 +44,19 @@ export async function lpPairTx(
     );
   }
   switch (params.txType) {
-    case PairsTxTypes.STAKE:
-    case PairsTxTypes.UNSTAKE:
+    case CantoDexTxTypes.STAKE:
+    case CantoDexTxTypes.UNSTAKE:
       // if this is only a lending action (supply/withdraw), then call on that function instead
       return await stakeLPFlow({
         chainId: params.chainId,
         ethAccount: params.ethAccount,
         cLPToken: params.pair.clmData,
-        stake: params.txType === PairsTxTypes.STAKE,
+        stake: params.txType === CantoDexTxTypes.STAKE,
         amount: params.amountLP,
       });
-    case PairsTxTypes.ADD_LIQUIDITY:
+    case CantoDexTxTypes.ADD_LIQUIDITY:
       return await addLiquidityFlow(params, routerAddress);
-    case PairsTxTypes.REMOVE_LIQUIDITY:
+    case CantoDexTxTypes.REMOVE_LIQUIDITY:
       return await removeLiquidityFlow(params, routerAddress);
     default:
       return NEW_ERROR("lpPairTx: incorrect tx type passed");
@@ -61,12 +67,12 @@ export async function lpPairTx(
  * TRANSACTION FLOWS TO USE FROM MAIN LP FUNCTION
  */
 async function addLiquidityFlow(
-  params: PairsTransactionParams,
+  params: CantoDexTransactionParams,
   routerAddress: string
 ): PromiseWithError<TxCreatorFunctionReturn> {
   /** check params */
   // check that the correct tx is being passed
-  if (params.txType !== PairsTxTypes.ADD_LIQUIDITY) {
+  if (params.txType !== CantoDexTxTypes.ADD_LIQUIDITY) {
     return NEW_ERROR("addLiquidityFlow: incorrect tx type passed");
   }
   /** create tx list */
@@ -122,6 +128,15 @@ async function addLiquidityFlow(
     );
   }
 
+  // add deadline to block timestamp
+  const { data: timestamp, error: timestampError } = await getEVMTimestamp(
+    params.chainId
+  );
+  if (timestampError) {
+    return NEW_ERROR("addLiquidityFlow: " + errMsg(timestampError));
+  }
+  const timeoutDeadline = timestamp + Math.floor(Number(params.deadline)) * 60;
+
   /** add add liquidity tx to list */
   txList.push(
     _addLiquidityTx(
@@ -137,11 +152,11 @@ async function addLiquidityFlow(
       params.amounts.amount2,
       amount1Min.data,
       amount2Min.data,
-      params.deadline,
+      timeoutDeadline.toString(),
       TX_DESCRIPTIONS.ADD_LIQUIDITY(
         params.pair,
-        params.amounts.amount1,
-        params.amounts.amount2
+        displayAmount(params.amounts.amount1, params.pair.token1.decimals),
+        displayAmount(params.amounts.amount2, params.pair.token2.decimals)
       )
     )
   );
@@ -171,30 +186,47 @@ async function addLiquidityFlow(
 }
 
 async function removeLiquidityFlow(
-  params: PairsTransactionParams,
+  params: CantoDexTransactionParams,
   routerAddress: string
 ): PromiseWithError<TxCreatorFunctionReturn> {
   /** check params */
   // check that the correct tx is being passed
-  if (params.txType !== PairsTxTypes.REMOVE_LIQUIDITY) {
+  if (params.txType !== CantoDexTxTypes.REMOVE_LIQUIDITY) {
     return NEW_ERROR("removeLiquidityFlow: incorrect tx type passed");
   }
   // check for user details
-  if (!params.pair.clmData) {
+  if (!params.pair.clmData || !params.pair.clmData.userDetails) {
     return NEW_ERROR("removeLiquidityFlow: pair does not have user details");
   }
   /** create tx list */
   const txList: Transaction[] = [];
 
   /** Unstake */
-  if (params.unstake) {
+
+  // check if the amount is greater than LP balance and unstake enough for tx
+  const unstakeAmount = subtractTokenBalances(
+    params.amountLP,
+    params.pair.clmData.userDetails.balanceOfUnderlying
+  );
+  if (greaterThan(unstakeAmount, "0").data) {
+    // check that the user has enough LP to unstake
+    if (
+      greaterThan(
+        unstakeAmount,
+        params.pair.clmData.userDetails.supplyBalanceInUnderlying
+      ).data
+    ) {
+      return NEW_ERROR(
+        "removeLiquidityFlow: user does not have enough LP to unstake"
+      );
+    }
     // remove LP from clm
     const { data: withdrawTx, error: withdrawError } = await cTokenLendingTx({
       chainId: params.chainId,
       ethAccount: params.ethAccount,
       txType: CTokenLendingTxTypes.WITHDRAW,
       cToken: params.pair.clmData,
-      amount: params.amountLP,
+      amount: unstakeAmount,
     });
     if (withdrawError) {
       return NEW_ERROR("removeLiquidityFlow: " + errMsg(withdrawError));
@@ -260,6 +292,15 @@ async function removeLiquidityFlow(
     );
   }
 
+  // add deadline to block timestamp
+  const { data: timestamp, error: timestampError } = await getEVMTimestamp(
+    params.chainId
+  );
+  if (timestampError) {
+    return NEW_ERROR("removeLiquidityFlow: " + errMsg(timestampError));
+  }
+  const timeoutDeadline = timestamp + Math.floor(Number(params.deadline)) * 60;
+
   /** add remove liquidity tx to list */
   txList.push(
     _removeLiquidityTx(
@@ -274,8 +315,11 @@ async function removeLiquidityFlow(
       params.amountLP,
       amount1Min.data,
       amount2Min.data,
-      params.deadline,
-      TX_DESCRIPTIONS.REMOVE_LIQUIDITY(params.pair, params.amountLP)
+      timeoutDeadline.toString(),
+      TX_DESCRIPTIONS.REMOVE_LIQUIDITY(
+        params.pair,
+        displayAmount(params.amountLP, params.pair.decimals)
+      )
     )
   );
   return NO_ERROR({ transactions: txList });
