@@ -191,8 +191,8 @@ export default function Page() {
         headers={["Pair", "Base Liquidity", "Quote Liquidity", "action"]}
         columns={5}
         processedData={ambientPairs.map((pair) => [
-          <div key={pair.symbol}>{pair.symbol}</div>,
-          <div key={pair.symbol + "baseliq"}>
+          <Text key={pair.symbol}>{pair.symbol}</Text>,
+          <Text key={pair.symbol + "baseliq"}>
             {displayAmount(
               baseTokenFromConcLiquidity(
                 pair.q64PriceRoot,
@@ -202,8 +202,8 @@ export default function Page() {
               ),
               pair.base.decimals
             )}
-          </div>,
-          <div key={pair.symbol + "quoteLiq"}>
+          </Text>,
+          <Text key={pair.symbol + "quoteLiq"}>
             {displayAmount(
               quoteTokenFromConcLiquidity(
                 pair.q64PriceRoot,
@@ -213,10 +213,13 @@ export default function Page() {
               ),
               pair.quote.decimals
             )}
+          </Text>,
+          <div key={"action"}>
+            <Button key={"action item"} onClick={() => setPair(pair.address)}>
+              Manage
+            </Button>
+            ,
           </div>,
-          <Button key={"action item"} onClick={() => setPair(pair.address)}>
-            add liquidity
-          </Button>,
         ])}
       />
       <Spacer height="40px" />
