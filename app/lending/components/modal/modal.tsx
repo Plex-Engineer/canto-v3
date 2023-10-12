@@ -12,7 +12,7 @@ import Container from "@/components/container/container";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
-import { useState } from "react";
+import React, { useState } from "react";
 import { ValidationReturn } from "@/config/interfaces";
 import Amount from "@/components/amount/amount";
 interface Props {
@@ -254,26 +254,36 @@ export const ModalItem = ({
   note,
 }: {
   name: string;
-  value: string;
+  value: string | React.ReactNode;
   note?: boolean;
 }) => (
-  <Container direction="row" gap="auto">
+  <Container
+    direction="row"
+    gap="auto"
+    center={{
+      vertical: true,
+    }}
+  >
     <Text size="sm" font="proto_mono">
       {name}
     </Text>
-    <Text size="sm" font="proto_mono">
-      {value}{" "}
-      <span>
-        {note && (
-          <Icon
-            themed
-            icon={{
-              url: "/tokens/note.svg",
-              size: 14,
-            }}
-          />
-        )}
-      </span>
-    </Text>
+    {typeof value === "string" ? (
+      <Text size="sm" font="proto_mono">
+        {value}{" "}
+        <span>
+          {note && (
+            <Icon
+              themed
+              icon={{
+                url: "/tokens/note.svg",
+                size: 14,
+              }}
+            />
+          )}
+        </span>
+      </Text>
+    ) : (
+      value
+    )}
   </Container>
 );

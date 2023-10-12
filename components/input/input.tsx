@@ -46,7 +46,7 @@ const Input = (props: InputProps) => {
     switch (height) {
       //   in px
       case "sm":
-        return "40px";
+        return "30px";
       case "md":
         return "50px";
       case "lg":

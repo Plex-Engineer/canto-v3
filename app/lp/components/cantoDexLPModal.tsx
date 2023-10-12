@@ -113,12 +113,12 @@ export const TestEditModal = (props: TestEditProps) => {
               content: (
                 <Container width="100%" margin="sm">
                   <div className={styles.iconTitle}>
-                    <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+                    <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
                     <Text size="lg" font="proto_mono">
                       {props.pair.symbol}
                     </Text>
                   </div>
-                  <TestAddLiquidityModal
+                  <AddLiquidityModal
                     pair={props.pair}
                     validateParams={(params) =>
                       props.validateParams(createAddParams(params))
@@ -137,7 +137,7 @@ export const TestEditModal = (props: TestEditProps) => {
               content: (
                 <Container width="100%" margin="sm">
                   <div className={styles.iconTitle}>
-                    <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+                    <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
                     <Text size="lg" font="proto_mono">
                       {props.pair.symbol}
                     </Text>
@@ -384,14 +384,14 @@ interface TestAddProps {
   validateParams: (params: AddParams) => ValidationReturn;
   sendTxFlow: (params: AddParams) => void;
 }
-const TestAddLiquidityModal = ({
+const AddLiquidityModal = ({
   pair,
   validateParams,
   sendTxFlow,
 }: TestAddProps) => {
   // values
   const [slippage, setSlippage] = useState(2);
-  const [deadline, setDeadline] = useState("9999999999999999999999999");
+  const [deadline, setDeadline] = useState("10");
   const [willStake, setWillStake] = useState(false);
   const [valueToken1, setValueToken1] = useState("");
   const [valueToken2, setValueToken2] = useState("");
@@ -492,6 +492,63 @@ const TestAddLiquidityModal = ({
       >
         STAKE {`${willStake ? "ON" : "OFF"}`}
       </Button> */}
+      <Container className={styles.card}>
+        {/* <ModalItem
+          name="Reserve Ratio"
+          value={formatBalance(
+            pair.ratio,
+            18 + Math.abs(pair.token1.decimals - pair.token2.decimals)
+          )}
+        /> */}
+        <ModalItem
+          name="Slippage"
+          value={
+            <Container
+              center={{
+                vertical: true,
+              }}
+              gap={40}
+              direction="row"
+              style={{
+                width: "120px",
+              }}
+            >
+              <Input
+                height={"sm"}
+                type="number"
+                placeholder={Number(slippage).toString()}
+                value={Number(slippage).toString()}
+                onChange={(e) => setSlippage(Number(e.target.value))}
+              />
+              <Text>%</Text>
+            </Container>
+          }
+        />
+        <ModalItem
+          name="Deadline"
+          value={
+            <Container
+              center={{
+                vertical: true,
+              }}
+              gap={10}
+              direction="row"
+              style={{
+                width: "120px",
+              }}
+            >
+              <Input
+                height={"sm"}
+                type="number"
+                placeholder={Number(deadline).toString()}
+                value={Number(deadline).toString()}
+                onChange={(e) => setDeadline(e.target.value)}
+              />
+              <Text>mins</Text>
+            </Container>
+          }
+        />
+      </Container>
 
       <Container direction="row" gap={14} margin="sm">
         <Text size="sm" font="proto_mono">
@@ -499,6 +556,7 @@ const TestAddLiquidityModal = ({
         </Text>
         <Toggle onChange={(value) => setWillStake(value)} value={willStake} />
       </Container>
+
       <Button
         disabled={!paramCheck.isValid}
         width={"fill"}
@@ -651,7 +709,7 @@ const RemoveLiquidityModal = ({
   sendTxFlow,
 }: TestRemoveProps) => {
   const [slippage, setSlippage] = useState(2);
-  const [deadline, setDeadline] = useState("9999999999999999999999999");
+  const [deadline, setDeadline] = useState("10");
   const [amountLP, setAmountLP] = useState("");
 
   // validation
@@ -716,8 +774,54 @@ const RemoveLiquidityModal = ({
             18 + Math.abs(pair.token1.decimals - pair.token2.decimals)
           )}
         /> */}
-        <ModalItem name="Slippage" value={`${slippage}%`} />
-        <ModalItem name="Deadline" value={deadline} />
+        <ModalItem
+          name="Slippage"
+          value={
+            <Container
+              center={{
+                vertical: true,
+              }}
+              gap={40}
+              direction="row"
+              style={{
+                width: "120px",
+              }}
+            >
+              <Input
+                height={"sm"}
+                type="number"
+                placeholder={Number(slippage).toString()}
+                value={Number(slippage).toString()}
+                onChange={(e) => setSlippage(Number(e.target.value))}
+              />
+              <Text>%</Text>
+            </Container>
+          }
+        />
+        <ModalItem
+          name="Deadline"
+          value={
+            <Container
+              center={{
+                vertical: true,
+              }}
+              gap={10}
+              direction="row"
+              style={{
+                width: "120px",
+              }}
+            >
+              <Input
+                height={"sm"}
+                type="number"
+                placeholder={Number(deadline).toString()}
+                value={Number(deadline).toString()}
+                onChange={(e) => setDeadline(e.target.value)}
+              />
+              <Text>mins</Text>
+            </Container>
+          }
+        />
       </Container>
       <Spacer height="6px" />
 
@@ -754,7 +858,7 @@ const RemoveLiquidityModal = ({
           )}
         />
       </Container>
-      <Spacer height="10px" />
+      <Spacer height="30px" />
 
       <Button
         disabled={!paramCheck.isValid}
