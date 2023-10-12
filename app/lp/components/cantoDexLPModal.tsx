@@ -83,7 +83,6 @@ export const TestEditModal = (props: TestEditProps) => {
           vertical: true,
         }}
         style={{
-          padding: "0 16px",
           cursor: "pointer",
           marginTop: "-14px",
         }}
@@ -95,7 +94,7 @@ export const TestEditModal = (props: TestEditProps) => {
             marginRight: "6px",
           }}
         >
-          <Icon icon={{ url: "./dropdown.svg", size: 24 }} />
+          <Icon icon={{ url: "./dropdown.svg", size: 24 }} themed />
         </div>
         <Text font="proto_mono" size="lg">
           Liquidity
@@ -112,7 +111,7 @@ export const TestEditModal = (props: TestEditProps) => {
             {
               title: "Add",
               content: (
-                <Container>
+                <Container width="100%" margin="sm">
                   <div className={styles.iconTitle}>
                     <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
                     <Text size="lg" font="proto_mono">
@@ -133,17 +132,17 @@ export const TestEditModal = (props: TestEditProps) => {
             },
             {
               title: "Remove",
-              isDisabled:
-                props.pair.clmData?.userDetails?.balanceOfCToken === "0",
+              //   isDisabled:
+              //     props.pair.clmData?.userDetails?.balanceOfCToken === "0",
               content: (
-                <Container>
+                <Container width="100%" margin="sm">
                   <div className={styles.iconTitle}>
                     <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
                     <Text size="lg" font="proto_mono">
                       {props.pair.symbol}
                     </Text>
                   </div>
-                  <TestRemoveLiquidityModal
+                  <RemoveLiquidityModal
                     pair={props.pair}
                     validateParams={(params) =>
                       props.validateParams(createRemoveParams(params))
@@ -348,6 +347,7 @@ export const TestEditModal = (props: TestEditProps) => {
         </Container>
       </Container>
     );
+
   const modals = {
     liquidity: Liquidity(),
     stake: props.pair.clmData ? (
@@ -476,7 +476,7 @@ const TestAddLiquidityModal = ({
         errorMessage={paramCheck.errorMessage}
       />
       <Spacer height="20px" />
-      <Container className={styles.card}>
+      {/* <Container className={styles.card}>
         <ModalItem
           name="Reserve Ratio"
           value={formatBalance(
@@ -484,7 +484,7 @@ const TestAddLiquidityModal = ({
             18 + Math.abs(pair.token1.decimals - pair.token2.decimals)
           )}
         />
-      </Container>
+      </Container> */}
 
       {/* <Button
         color={willStake ? "accent" : "primary"}
@@ -591,7 +591,7 @@ const StakeLPToken = ({ pair, validateParams, sendTxFlow }: TestAddProps) => {
         errorMessage={paramCheck.errorMessage}
       />
 
-      <Spacer height="20px" />
+      {/* <Spacer height="20px" />
       <Container className={styles.card}>
         <ModalItem
           name="Reserve Ratio"
@@ -600,7 +600,7 @@ const StakeLPToken = ({ pair, validateParams, sendTxFlow }: TestAddProps) => {
             18 + Math.abs(pair.token1.decimals - pair.token2.decimals)
           )}
         />
-      </Container>
+      </Container> */}
 
       {/* <Button
           color={willStake ? "accent" : "primary"}
@@ -645,7 +645,7 @@ interface TestRemoveProps {
   sendTxFlow: (params: RemoveParams) => void;
 }
 
-const TestRemoveLiquidityModal = ({
+const RemoveLiquidityModal = ({
   pair,
   validateParams,
   sendTxFlow,
@@ -695,39 +695,70 @@ const TestRemoveLiquidityModal = ({
   }, [amountLP]);
   return (
     <div>
-      {" "}
-      <h3>
-        Reserve Ratio:{" "}
-        {formatBalance(
-          pair.ratio,
-          18 + Math.abs(pair.token1.decimals - pair.token2.decimals)
-        )}
-      </h3>
-      <Spacer height="50px" />
-      <Input
+      <Spacer height="10px" />
+      <Amount
         value={amountLP}
-        onChange={(e) => setAmountLP(e.target.value)}
-        label={pair.symbol}
-        type="amount"
-        balance={pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0"}
         decimals={pair.decimals}
+        onChange={(e) => setAmountLP(e.target.value)}
+        IconUrl={pair.logoURI}
+        title={pair.symbol}
+        max={pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0"}
+        symbol={pair.symbol}
         error={!paramCheck.isValid && Number(amountLP) !== 0}
         errorMessage={paramCheck.errorMessage}
       />
-      <Spacer height="50px" />
-      <h3>Expected Tokens</h3>
-      <h4>
-        {displayAmount(expectedTokens.expectedToken1, pair.token1.decimals, {
-          symbol: pair.token1.symbol,
-        })}
-      </h4>
-      <h4>
-        {displayAmount(expectedTokens.expectedToken2, pair.token2.decimals, {
-          symbol: pair.token2.symbol,
-        })}
-      </h4>
+      <Spacer height="20px" />
+      <Container className={styles.card}>
+        {/* <ModalItem
+          name="Reserve Ratio"
+          value={formatBalance(
+            pair.ratio,
+            18 + Math.abs(pair.token1.decimals - pair.token2.decimals)
+          )}
+        /> */}
+        <ModalItem name="Slippage" value={`${slippage}%`} />
+        <ModalItem name="Deadline" value={deadline} />
+      </Container>
+      <Spacer height="6px" />
+
+      <Text
+        font="proto_mono"
+        size="xx-sm"
+        style={{
+          marginLeft: "16px",
+        }}
+      >
+        Expected Tokens
+      </Text>
+      <Spacer height="6px" />
+
+      <Container className={styles.card}>
+        <ModalItem
+          name={pair.token1.symbol}
+          value={displayAmount(
+            expectedTokens.expectedToken1,
+            pair.token1.decimals,
+            {
+              symbol: pair.token1.symbol,
+            }
+          )}
+        />
+        <ModalItem
+          name={pair.token2.symbol}
+          value={displayAmount(
+            expectedTokens.expectedToken2,
+            pair.token2.decimals,
+            {
+              symbol: pair.token2.symbol,
+            }
+          )}
+        />
+      </Container>
+      <Spacer height="10px" />
+
       <Button
         disabled={!paramCheck.isValid}
+        width={"fill"}
         onClick={() =>
           sendTxFlow({
             amountLP: (
