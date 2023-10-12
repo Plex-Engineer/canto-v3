@@ -63,12 +63,8 @@ export const TestAmbientModal = (props: TestAmbientModalProps) => {
       <Spacer height="20px" />
       {modalType === "base" && (
         <>
-          <Button onClick={() => setModalType("add")}>
-            ADD CONC LIQUIDITY
-          </Button>
-          <Button onClick={() => setModalType("remove")}>
-            REMOVE CONC LIQUIDITY
-          </Button>
+          <Button onClick={() => setModalType("add")}>Add</Button>
+          <Button onClick={() => setModalType("remove")}>Remove</Button>
         </>
       )}
       {modalType === "add" && (

@@ -17,7 +17,7 @@ import {
   isCantoDexPair,
 } from "@/hooks/pairs/lpCombo/interfaces.ts/pairTypes";
 import Button from "@/components/button/button";
-import { TestAmbientModal } from "./components/ambientLPModal";
+import { AmbientModal } from "./components/newAmbientLPModal";
 import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
 import {
   baseTokenFromConcLiquidity,
@@ -126,7 +126,7 @@ export default function Page() {
           />
         )}
         {selectedPair && isAmbientPair(selectedPair) && (
-          <TestAmbientModal
+          <AmbientModal
             pair={selectedPair}
             validateParams={canPerformAmbientTx}
             sendTxFlow={sendAmbientTxFlow}
