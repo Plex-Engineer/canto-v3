@@ -146,7 +146,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
                       {props.pair.symbol}
                     </Text>
                   </div>
-                  <RemoveAbmientLiquidity
+                  <RemoveAmbientLiquidity
                     pair={props.pair}
                     sendTxFlow={props.sendTxFlow}
                     validateParams={props.validateParams}
@@ -324,6 +324,7 @@ const AddAmbientLiquidity = ({
         <Toggle onChange={(value) => setWillStake(value)} value={willStake} />
       </Container> */}
 
+      <Spacer height="30px" />
       <Button
         disabled={!paramCheck.isValid}
         width={"fill"}
@@ -359,7 +360,7 @@ interface RemoveProps {
   validateParams: (params: RemoveParams) => ValidationReturn;
 }
 
-const RemoveAbmientLiquidity = ({
+const RemoveAmbientLiquidity = ({
   pair,
   validateParams,
   sendTxFlow,
@@ -382,16 +383,6 @@ const RemoveAbmientLiquidity = ({
         label="percent to remove"
       />
       <Spacer height="20px" />
-      <Container className={styles.card}>
-        {/* <ModalItem
-          name="Reserve Ratio"
-          value={formatBalance(
-            pair.ratio,
-            18 + Math.abs(pair.token1.decimals - pair.token2.decimals)
-          )}
-        /> */}
-      </Container>
-      <Spacer height="6px" />
 
       <Text
         font="proto_mono"
