@@ -161,7 +161,6 @@ export const TestEditModal = (props: TestEditProps) => {
     </div>
   );
 
-  //   const Stake = () => (
   //     <div
   //       style={{
   //         height: "100%",
@@ -353,6 +352,7 @@ export const TestEditModal = (props: TestEditProps) => {
     liquidity: Liquidity(),
     stake: props.pair.clmData ? (
       <StakeLPModal
+        onBack={() => setModalType("base")}
         clpToken={props.pair.clmData}
         transaction={{
           validateAmount: (amountLP, txType) =>

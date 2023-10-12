@@ -18,8 +18,10 @@ import { ValidationReturn } from "@/config/interfaces";
 import Amount from "@/components/amount/amount";
 import { CantoDexTxTypes } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
 import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
+import { ModalItem } from "@/app/lending/components/modal/modal";
 interface Props {
   clpToken: CTokenWithUserData;
+  onBack: () => void;
   transaction: {
     performTx: (
       amountLP: string,
@@ -135,59 +137,62 @@ export const StakeLPModal = (props: Props) => {
   }
   return (
     <div className={styles.container}>
-      <Tabs
-        tabs={[
-          {
-            title: "Stake",
-            content: Content(
-              props.clpToken,
-              props.transaction,
-              CantoDexTxTypes.STAKE
-            ),
-          },
-          {
-            title: "Unstake",
-            content: Content(
-              props.clpToken,
-              props.transaction,
-              CantoDexTxTypes.UNSTAKE
-            ),
-          },
-        ]}
-      />
+      <div
+        style={{
+          height: "100%",
+        }}
+      >
+        <Container
+          direction="row"
+          height="50px"
+          center={{
+            vertical: true,
+          }}
+          style={{
+            padding: "0 16px",
+            cursor: "pointer",
+            marginTop: "-14px",
+          }}
+          onClick={props.onBack}
+        >
+          <div
+            style={{
+              rotate: "90deg",
+              marginRight: "6px",
+            }}
+          >
+            <Icon icon={{ url: "./dropdown.svg", size: 24 }} />
+          </div>
+          <Text font="proto_mono" size="lg">
+            Stake
+          </Text>
+        </Container>
+        <div>
+          <Tabs
+            tabs={[
+              {
+                title: "Stake",
+                content: Content(
+                  props.clpToken,
+                  props.transaction,
+                  CantoDexTxTypes.STAKE
+                ),
+              },
+              {
+                title: "Unstake",
+                content: Content(
+                  props.clpToken,
+                  props.transaction,
+                  CantoDexTxTypes.UNSTAKE
+                ),
+              },
+            ]}
+          />
+        </div>
+      </div>
     </div>
   );
 };
-
-export const ModalItem = ({
-  name,
-  value,
-  note,
-}: {
-  name: string;
-  value: string;
-  note?: boolean;
-}) => (
-  <Container direction="row" gap="auto">
-    <Text size="sm" font="proto_mono">
-      {name}
-    </Text>
-    <Text size="sm" font="proto_mono">
-      {value}{" "}
-      <span>
-        {note && (
-          <Icon
-            themed
-            icon={{
-              url: "/tokens/note.svg",
-              size: 14,
-            }}
-          />
-        )}
-      </span>
-    </Text>
-  </Container>
-);
 
 const CTokenAmountCard = ({
   name,
