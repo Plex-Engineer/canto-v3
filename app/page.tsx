@@ -5,12 +5,12 @@ import Text from "@/components/text";
 import styles from "./home.module.scss";
 import EcoTile from "./components/ecoTile";
 import Icon from "@/components/icon/icon";
-import { url } from "inspector";
 import Button from "@/components/button/button";
 import Link from "next/link";
 export default function Home() {
   return (
     <Container
+      className={styles.container}
       center={{
         vertical: true,
         horizontal: true,

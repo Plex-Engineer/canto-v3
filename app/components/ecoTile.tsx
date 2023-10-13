@@ -1,6 +1,6 @@
 import Text from "@/components/text";
 import styles from "./ecoTile.module.scss";
-import Image from "next/image";
+import Icon from "@/components/icon/icon";
 
 interface Props {
   name: string;
@@ -33,7 +33,16 @@ const EcoTile = (props: Props) => {
       </a>
 
       <div className={styles["card-image"]}>
-        <Image src={props.image} alt={props.name} width={300} height={300} />
+        <Icon
+          themed
+          icon={{
+            url: props.image,
+            size: {
+              width: 200,
+              height: 200,
+            },
+          }}
+        />
       </div>
       <Text size="sm" theme="secondary-dark" className={styles.desc}>
         {props.description}

@@ -4,7 +4,14 @@
   max-width: 1400px;
   padding: 2rem 0;
 }
-
+.container {
+  background: repeating-linear-gradient(
+    var(--card-background-color),
+    var(--card-background-color) 6px,
+    rgba(var(--dark-color), 0.04) 6px,
+    rgba(var(--dark-color), 0.04) 12px
+  );
+}
 .eco-grid {
   display: grid;
   gap: 4rem;
@@ -24,6 +31,6 @@
   gap: 3rem;
   max-width: 1400px;
   width: 100%;
-  background-color: rgba(var(--dark-color), 0.2);
+  //   background-color: rgba(var(--dark-color), 0.2);
   min-height: calc(100vh - 50px);
 }

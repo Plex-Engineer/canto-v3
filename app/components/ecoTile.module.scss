@@ -23,10 +23,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
   img {
     height: 100%;
     width: 100%;
     object-fit: contain;
+    mix-blend-mode: luminosity;
   }
 }
 
