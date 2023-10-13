@@ -157,7 +157,7 @@ export default function Page() {
       <Rewards
         onClick={sendClaimRewardsFlow}
         value={displayAmount(cantoDex.position.totalRewards, 18, {
-          symbol: "WCANTO",
+          precision: 4,
         })}
       />
       <Spacer height="30px" />
