@@ -2,6 +2,7 @@
   min-height: calc(100vh - 100px);
   width: 100%;
   max-width: 1400px;
+  padding: 2rem 0;
 }
 
 .eco-grid {
@@ -13,4 +14,16 @@
 
 .eco-title {
   font-size: 48px;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  max-width: 1400px;
+  width: 100%;
+  background-color: rgba(var(--dark-color), 0.2);
+  min-height: calc(100vh - 50px);
 }
