@@ -26,7 +26,7 @@ const NavBar = () => {
       </div>
 
       <div className={styles["nav-links"]}>
-        {/* <Link
+        <Link
           href="/"
           className={clsx(
             styles["nav-link"],
@@ -34,7 +34,7 @@ const NavBar = () => {
           )}
         >
           <Text>Home</Text>
-        </Link> */}
+        </Link>
         <Link
           href="/bridge"
           className={clsx(
