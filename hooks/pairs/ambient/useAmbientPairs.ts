@@ -55,7 +55,7 @@ export default function useAmbientPairs(
     },
     {
       onSuccess: (response) => {
-        console.log(response);
+        // console.log(response);
       },
       onError: (error) => {
         console.log(error);
