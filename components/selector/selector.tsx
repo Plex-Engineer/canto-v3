@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./selector.module.scss";
 import Spacer from "@/components/layout/spacer";
 import clsx from "clsx";
+import LoadingIcon from "../loader/loading";
 
 export interface Item {
   id: string;
@@ -18,6 +19,10 @@ export interface Item {
 
 interface Props {
   title: string;
+  label?: {
+    text: string;
+    width: string;
+  };
   activeItem?: Item;
   items: Item[];
   onChange: (itemId: string) => void;
@@ -115,6 +120,7 @@ const Selector = (props: Props) => {
                       }}
                     >
                       <Icon
+                        themed
                         icon={{
                           url: "dropdown.svg",
                           size: 24,
@@ -150,6 +156,7 @@ const Selector = (props: Props) => {
                 }}
               >
                 <Icon
+                  themed
                   icon={{
                     url: "dropdown.svg",
                     size: 24,
@@ -195,7 +202,8 @@ const Selector = (props: Props) => {
       <Button
         color="secondary"
         width="fill"
-        height="large"
+        height={64}
+        shadow="small"
         onClick={() => {
           setIsOpen(true);
         }}
@@ -208,17 +216,34 @@ const Selector = (props: Props) => {
             vertical: true,
           }}
         >
-          <Image
-            src={props.activeItem?.icon ?? ""}
-            alt={props.activeItem?.name + " icon"}
-            width={30}
-            height={30}
-          />
+          {props.label && (
+            <Text
+              theme="secondary-dark"
+              size="sm"
+              style={{
+                width: props.label.width,
+                textAlign: "left",
+              }}
+            >
+              {props.label?.text ?? ""}
+            </Text>
+          )}
+          {props.activeItem?.icon == "loader.svg" ? (
+            <LoadingIcon />
+          ) : (
+            <Image
+              src={props.activeItem?.icon ?? ""}
+              alt={props.activeItem?.name + " icon"}
+              width={30}
+              height={30}
+            />
+          )}
           <Text size="md" font="proto_mono">
             {props.activeItem?.name ?? "SELECT ITEM"}
           </Text>
         </Container>
         <Icon
+          themed
           icon={{
             url: "dropdown.svg",
             size: 24,

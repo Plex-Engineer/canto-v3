@@ -2,15 +2,20 @@ import {
   NEW_ERROR,
   NO_ERROR,
   ReturnWithError,
-} from "@/config/interfaces/errors";
-import {
   BaseNetwork,
   CosmosNetwork,
   EVMNetwork,
-} from "@/config/interfaces/networks";
-import { Chain } from "@/config/interfaces/transactions";
+  Chain,
+} from "@/config/interfaces";
 import * as NETWORKS from "@/config/networks";
 import * as COSMOS_NETWORKS from "@/config/networks/cosmos";
+
+export function isCantoChainId(chainId: number): boolean {
+  return (
+    chainId === NETWORKS.CANTO_MAINNET_EVM.chainId ||
+    chainId === NETWORKS.CANTO_TESTNET_EVM.chainId
+  );
+}
 
 /**
  * @notice checks if network is an EVM chain

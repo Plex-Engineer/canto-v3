@@ -7,7 +7,6 @@ import NavBar from "@/components/nav_bar/navBar";
 import CantoWalletProvider from "@/provider/rainbowProvider";
 import { QueryClient, QueryClientProvider } from "react-query";
 import localFont from "next/font/local";
-import clsx from "clsx";
 
 const rm_mono = localFont({
   src: "../fonts/rm-mono-regular.ttf",
@@ -30,8 +29,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      {/* <head>
+        <link
+          rel="icon"
+          href="/icon?<generated>"
+          type="image/png"
+          sizes="32x32"
+        />
+      </head> */}
       <body
-        className={clsx("dark")}
+        className={"dark"}
         style={
           {
             "--rm-mono": rm_mono.style.fontFamily,

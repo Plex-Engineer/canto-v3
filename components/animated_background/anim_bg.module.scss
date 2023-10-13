@@ -7,14 +7,7 @@
   position: relative;
   overflow: hidden;
   z-index: 0;
-  // background: url("/wires.svg") no-repeat center center;
-  //   mask-image: radial-gradient(
-  //     circle at 50% 50%,
-  //     black 0%,
-  //     black 50%,
-  //     transparent 100%
-  //   );
-
+  transform: translateY(11px);
   mask-image: radial-gradient(
     50% 50% at 50% 50%,
     #d9d9d9 0%,
@@ -34,42 +27,37 @@
 
 .moving {
   width: 10px;
-  border: 2px solid var(--anim-bg-color, #dfdfdf);
   opacity: 0.5;
+  border: 2px solid var(--anim-bg-color, #dfdfdf);
   aspect-ratio: 1.23433242507;
   position: absolute;
   --anim-step: 0.16666666;
 
-  animation: moving var(--anim-time) var(--direction) ease-in infinite;
+  animation: moving var(--anim-time) var(--direction) ease-in infinite; //!re-enable this
 
   &:nth-of-type(1) {
     animation-delay: calc(var(--anim-time) * 0 * var(--anim-step));
   }
 
   &:nth-of-type(2) {
-    animation-delay: calc(var(--anim-time) * 1 * var(--anim-step));
+    animation-delay: calc(var(--anim-time) * -1 * var(--anim-step));
   }
 
   &:nth-of-type(3) {
-    animation-delay: calc(var(--anim-time) * 2 * var(--anim-step));
+    animation-delay: calc(var(--anim-time) * -2 * var(--anim-step));
   }
 
   &:nth-of-type(4) {
-    animation-delay: calc(var(--anim-time) * 3 * var(--anim-step));
+    animation-delay: calc(var(--anim-time) * -3 * var(--anim-step));
   }
 
   &:nth-of-type(5) {
-    animation-delay: calc(var(--anim-time) * 4 * var(--anim-step));
+    animation-delay: calc(var(--anim-time) * -4 * var(--anim-step));
   }
 
   &:nth-of-type(6) {
-    animation-delay: calc(var(--anim-time) * 5 * var(--anim-step));
+    animation-delay: calc(var(--anim-time) * -5 * var(--anim-step));
   }
-
-  //   &:nth-of-type(7) {
-  //     animation-delay: calc(var(--anim-time) * 6 * var(--anim-step));
-  //     border-color: blue !important;
-  //   }
 
   @keyframes moving {
     0% {

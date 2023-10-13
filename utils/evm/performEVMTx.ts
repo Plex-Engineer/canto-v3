@@ -3,10 +3,13 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
-import { Transaction } from "@/config/interfaces/transactions";
+  Transaction,
+} from "@/config/interfaces";
 import { GetWalletClientResult, writeContract } from "wagmi/actions";
 import { checkOnRightChain } from "../baseTransaction.utils";
+import { BaseError } from "viem";
+import { Contract, TransactionReceipt } from "web3";
+import { asyncCallWithTimeout } from "../async.utils";
 
 /**
  * @notice performs evm transaction
@@ -27,28 +30,59 @@ export async function performEVMTransaction(
   if (typeof tx.chainId !== "number") {
     return NEW_ERROR("performEVMTransaction: invalid chainId: " + tx.chainId);
   }
-  const { data: onRightChain, error: chainError } = await checkOnRightChain(
+  const { data: newSigner, error: chainError } = await checkOnRightChain(
     signer,
     tx.chainId
   );
-  if (chainError || !onRightChain) {
+  if (chainError || !newSigner) {
     return NEW_ERROR("performEVMTransaction::" + chainError);
   }
 
-  // try to sign tx
   try {
-    const contractCall = {
-      address: tx.target as `0x${string}`,
-      abi: tx.abi,
-      functionName: tx.method,
-      args: tx.params,
-      value: BigInt(tx.value),
-      chainId: tx.chainId,
-      account: signer.account.address,
-    };
-    const { hash } = await writeContract(contractCall);
-    return NO_ERROR(hash);
+    const contractInstance = new Contract(tx.abi, tx.target, {
+      provider: newSigner,
+    });
+    // if user doesn't sign in 30 seconds, throw timeout error
+    const { data: transaction, error: timeoutError } =
+      await asyncCallWithTimeout<TransactionReceipt>(
+        async () =>
+          await contractInstance.methods[tx.method](...(tx.params as [])).send({
+            from: newSigner.account.address,
+            value: tx.value,
+          }),
+        30000
+      );
+    if (timeoutError) throw timeoutError;
+    if (!transaction.transactionHash)
+      throw new Error("performEVMTransaction: no tx hash");
+
+    return NO_ERROR(transaction.transactionHash as `0x${string}`);
   } catch (err) {
+    if (err instanceof BaseError) {
+      console.log(err.shortMessage);
+      return NEW_ERROR("performEVMTransaction: " + err.shortMessage);
+    }
     return NEW_ERROR("performEVMTransaction: " + errMsg(err));
   }
+
+  // // try to sign tx
+  // try {
+  //   const contractCall = {
+  //     address: tx.target as `0x${string}`,
+  //     abi: tx.abi,
+  //     functionName: tx.method,
+  //     args: tx.params,
+  //     value: BigInt(tx.value),
+  //     chainId: tx.chainId,
+  //     account: newSigner.account.address,
+  //   };
+  //   const { hash } = await writeContract(contractCall);
+  //   return NO_ERROR(hash);
+  // } catch (err) {
+  //   if (err instanceof BaseError) {
+  //     console.log(err.shortMessage);
+  //     return NEW_ERROR("performEVMTransaction: " + err.shortMessage);
+  //   }
+  //   return NEW_ERROR("performEVMTransaction: " + errMsg(err));
+  // }
 }

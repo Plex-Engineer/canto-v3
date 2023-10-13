@@ -2,10 +2,14 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
-} from "@/config/interfaces/errors";
-import { GetWalletClientResult, switchNetwork } from "wagmi/actions";
+  Transaction,
+} from "@/config/interfaces";
+import {
+  GetWalletClientResult,
+  getWalletClient,
+  switchNetwork,
+} from "wagmi/actions";
 import { performEVMTransaction } from "./evm/performEVMTx";
-import { Transaction } from "@/config/interfaces/transactions";
 import {
   performCosmosTransactionEIP,
   waitForCosmosTx,
@@ -62,7 +66,7 @@ export async function waitForTransaction(
       const receipt = await evmWait({
         chainId: chainId as number,
         hash: hash as `0x${string}`,
-        confirmations: 1,
+        confirmations: 2,
       });
       return NO_ERROR({
         status: receipt.status,
@@ -81,12 +85,12 @@ export async function waitForTransaction(
  * @dev for EVM wallets
  * @param {GetWalletClientResult} signer EVM signing wallet client
  * @param {number} chainId chainId signer should be on
- * @returns {PromiseWithError<boolean>} if the signer is on the chain
+ * @returns {PromiseWithError<GetWalletClientResult>} new signer if switch was made or error
  */
 export async function checkOnRightChain(
   signer: GetWalletClientResult,
   chainId: number
-): PromiseWithError<boolean> {
+): PromiseWithError<GetWalletClientResult> {
   if (!signer) {
     return NEW_ERROR("checkOnRightChain: no signer");
   }
@@ -97,9 +101,15 @@ export async function checkOnRightChain(
       if (!network || network.id !== chainId) {
         return NEW_ERROR("checkOnRightChain: error switching chains");
       }
+      const newSigner = await getWalletClient({ chainId });
+      if (!newSigner) {
+        // still some error getting the signer
+        return NEW_ERROR("checkOnRightChain: error switching chains");
+      }
+      return NO_ERROR(newSigner);
     } catch (error) {
       return NEW_ERROR("checkOnRightChain: error switching chains");
     }
   }
-  return NO_ERROR(true);
+  return NO_ERROR(signer);
 }

@@ -3,27 +3,30 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
-import {
   Transaction,
   TransactionDescription,
-} from "@/config/interfaces/transactions";
-import { CosmosNetwork } from "@/config/interfaces/networks";
+  CosmosNetwork,
+  IBCToken,
+} from "@/config/interfaces";
 import { ethToCantoAddress, isValidEthAddress } from "@/utils/address.utils";
 import { createMsgsIBCTransfer } from "@/utils/cosmos/transactions/messages/ibc/ibc";
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
 import { tryFetchMultipleEndpoints } from "@/utils/async.utils";
 import { _convertERC20Tx } from "./recovery";
 import { isERC20Token } from "@/utils/tokens/tokens.utils";
-import { IBCToken } from "@/config/interfaces/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { convertToBigNumber, displayAmount } from "@/utils/tokenBalances.utils";
 import { CANTO_MAINNET_COSMOS } from "@/config/networks";
-import { BridgingMethod, getBridgeMethodInfo } from "../../interfaces/bridgeMethods";
+import {
+  BridgingMethod,
+  getBridgeMethodInfo,
+} from "../../interfaces/bridgeMethods";
+import { BridgeTransactionParams } from "../../interfaces/hookParams";
+import { getCosmosTokenBalance } from "@/utils/cosmos/cosmosBalance.utils";
+import { getTokenBalance } from "@/utils/evm/erc20.utils";
 
 /**
  * @notice creates a list of transactions that need to be made for IBC out of canto
- * @param {number} chainId chainId to send tx on
  * @param {string} senderEthAddress eth address to send tx from
  * @param {string} receiverCosmosAddress cosmos address to send tx to
  * @param {CosmosNetwork} receivingChain chain to send tx to
@@ -33,7 +36,6 @@ import { BridgingMethod, getBridgeMethodInfo } from "../../interfaces/bridgeMeth
  * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
  */
 export async function txIBCOut(
-  chainId: number,
   senderEthAddress: string,
   receiverCosmosAddress: string,
   receivingChain: CosmosNetwork,
@@ -93,23 +95,33 @@ export async function txIBCOut(
         "txIBCOut: token must be ERC20 to convert to IBC: " + token.id
       );
     }
-    allTxs.push(
-      _convertERC20Tx(
-        chainId,
-        token.address,
-        amount,
-        senderEthAddress,
-        cantoAddress,
-        TX_DESCRIPTIONS.CONVERT_ERC20(
-          token.symbol,
-          formatBalance(amount, token.decimals)
+    // we also need to check if there is already native balance on the chain
+    const { data: nativeBalance, error: nativeBalanceError } =
+      await getCosmosTokenBalance(token.chainId, cantoAddress, token.ibcDenom);
+    if (nativeBalanceError) {
+      return NEW_ERROR("txIBCOut::" + nativeBalanceError.message);
+    }
+    const amountToConvert =
+      convertToBigNumber(amount).data.minus(nativeBalance);
+    if (amountToConvert.gt(0)) {
+      allTxs.push(
+        _convertERC20Tx(
+          token.chainId,
+          token.address,
+          amountToConvert.toString(),
+          senderEthAddress,
+          cantoAddress,
+          TX_DESCRIPTIONS.CONVERT_ERC20(
+            token.symbol,
+            displayAmount(amount, token.decimals)
+          )
         )
-      )
-    );
+      );
+    }
   }
   allTxs.push(
     _ibcOutTx(
-      chainId,
+      token.chainId,
       "transfer",
       channelId.fromCanto,
       amount,
@@ -122,7 +134,7 @@ export async function txIBCOut(
       "ibc from canto",
       TX_DESCRIPTIONS.BRIDGE(
         token.symbol,
-        formatBalance(amount, token.decimals),
+        displayAmount(amount, token.decimals),
         CANTO_MAINNET_COSMOS.name,
         receivingChain.name,
         getBridgeMethodInfo(BridgingMethod.IBC).name
@@ -196,7 +208,7 @@ export async function getIBCData(
   );
   const ibcData = await tryFetchMultipleEndpoints<IBCData>(allEndpoints);
   if (ibcData.error) {
-    return NEW_ERROR("getIBCData::" + ibcData.error.message);
+    return NEW_ERROR("getIBCData::" + errMsg(ibcData.error));
   }
   return ibcData;
 }
@@ -232,4 +244,31 @@ export async function getBlockTimestamp(
   } catch (err) {
     return NEW_ERROR("getBlockTimestamp: " + errMsg(err));
   }
+}
+
+/**
+ * @notice validates the parameters for retrying bridging out through IBC
+ * @param {BridgeTransactionParams} params parameters for bridging out
+ * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
+ */
+export async function validateIBCOutRetryParams(
+  params: BridgeTransactionParams
+): PromiseWithError<{
+  valid: boolean;
+  error?: string;
+}> {
+  // get token balance for user
+  const { data: userTokenBalance, error: userTokenBalanceError } =
+    await getTokenBalance(
+      params.token.data.chainId,
+      params.token.data.address ?? "",
+      params.from.account
+    );
+  if (userTokenBalanceError) {
+    return NEW_ERROR("validateGBridgeParams::" + userTokenBalanceError);
+  }
+  if (userTokenBalance.lt(params.token.amount)) {
+    return NO_ERROR({ valid: false, error: "insufficient funds" });
+  }
+  return NO_ERROR({ valid: true });
 }

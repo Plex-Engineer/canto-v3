@@ -13,10 +13,12 @@ interface Props {
   };
   padding?: "sm" | "md" | "lg" | number;
   fontFamily?: "rm_mono" | "proto_mono";
+  fontSize?: "sm" | "md" | "lg" | number;
   weight?: "regular" | "bold";
   children: React.ReactNode;
   isLoading?: boolean;
   disabled?: boolean;
+  shadow?: "small" | "medium" | "none";
 }
 
 const Button = (props: Props) => {
@@ -108,6 +110,37 @@ const Button = (props: Props) => {
     }
   };
 
+  function getFontSize() {
+    switch (props.fontSize) {
+      case "sm":
+        return 14;
+      case "md":
+        return 16;
+      case "lg":
+        return 18;
+      case undefined:
+        return 16;
+      default:
+        return props.fontSize;
+    }
+  }
+
+  function getShadow() {
+    if (props.disabled) {
+      return "0px 0px 0px 0px rgba(17, 17, 17, 0.15)";
+    }
+    switch (props.shadow) {
+      case "small":
+        return "1px 1px 0px 0px rgba(17, 17, 17, 0.15)";
+      case "medium":
+        return "3px 3px 0px 0px rgba(17, 17, 17, 0.15)";
+      case "none":
+        return "0px 0px 0px 0px rgba(17, 17, 17, 0.15)";
+      default:
+        return "3px 3px 0px 0px rgba(17, 17, 17, 0.15)";
+    }
+  }
+
   return (
     <button
       className={styles.container}
@@ -115,8 +148,8 @@ const Button = (props: Props) => {
       disabled={props.disabled}
       style={{
         height: getHeight() + "px",
-        cursor: props.disabled ? "not-allowed" : "pointer",
-
+        // cursor: props.disabled ? "not-allowed" : "pointer",
+        fontSize: getFontSize() + "px",
         width: getWidth(),
         backgroundColor: getBGColor(),
         padding: getPadding() + "px",
@@ -124,6 +157,7 @@ const Button = (props: Props) => {
         fontFamily: getFontFamily(),
         gap: "12px",
         fontWeight: props.weight == "bold" ? "bold" : "normal",
+        boxShadow: getShadow(),
         flexDirection: props.icon?.position == "right" ? "row-reverse" : "row",
       }}
     >

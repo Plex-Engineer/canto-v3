@@ -41,9 +41,14 @@
   border-top: none;
   border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
   background-color: var(--card-sub-surface-color, #dfdfdf);
-  filter: brightness(0.9);
+  filter: brightness(0.92);
 
   transition: all 0.3s;
+  .dark:has(&) {
+    .react-tabs__tab {
+      filter: brightness(0.75);
+    }
+  }
 
   &:first-child {
     border-left: none;
@@ -72,8 +77,8 @@
   border-right: 0.5px solid var(--border-stroke-color, #b3b3b3);
   border-bottom: 1px solid var(--card-sub-surface-color, #dfdfdf);
   padding-top: 2px; //optional effect
-  filter: brightness(1);
-
+  filter: brightness(1) !important;
+  //   background-color: var(--card-sub-surface-color, #dfdfdf);
   &:hover {
     filter: brightness(1);
   }
@@ -81,8 +86,8 @@
 
 .react-tabs__tab-panel {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  //   justify-content: center;
+  //   align-items: center;
 }
 
 .react-tabs__tab-panel--selected {

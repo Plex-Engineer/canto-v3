@@ -1,4 +1,4 @@
-import { EVMNetwork } from "@/config/interfaces/networks";
+import { EVMNetwork } from "@/config/interfaces";
 import { getEthAddressLink, getEthTransactionLink } from "../helpers";
 
 const ethBlockExplorer = "https://etherscan.io";
@@ -29,7 +29,7 @@ export const ETH_MAINNET: EVMNetwork = {
 export const GOERLI_TESTNET: EVMNetwork = {
   id: "goerli-testnet",
   chainId: 5,
-  icon: "",
+  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/eth-white.svg",
   name: "Goerli Testnet",
   isTestChain: true,
   rpcUrl: "https://rpc.ankr.com/eth_goerli",

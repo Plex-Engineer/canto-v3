@@ -1,0 +1,57 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1400px;
+  margin: 2rem auto;
+  border-top: 1px solid var(--primary-90-color);
+  //   border-bottom: 1px solid var(--primary-90-color);
+  position: relative;
+  padding-top: 2rem;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: calc(100% - 1px);
+    height: 10px;
+    border-left: 1px solid var(--primary-90-color);
+    border-right: 1px solid var(--primary-90-color);
+  }
+}
+
+.title {
+  font-size: 32px !important;
+  text-align: left;
+  width: 100%;
+  max-width: 1500px;
+}
+
+.grid {
+  display: flex;
+  gap: 3rem;
+  padding-top: 0rem;
+  max-width: 1500px;
+}
+
+.highlightCard {
+  max-width: 1000px;
+  width: 100%;
+  display: flex;
+  justify-content: stretch;
+}
+
+.mainTable {
+  max-width: 1000px;
+  width: 100%;
+  display: flex;
+  justify-content: stretch;
+}
+
+.widget1 {
+  //   width: 70%;
+}
+
+.widget2 {
+}

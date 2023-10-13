@@ -3,12 +3,12 @@ import Text from "../text";
 import styles from "./transactions.module.scss";
 import Container from "../container/container";
 import Spacer from "../layout/spacer";
+import { BridgeStatus, TransactionWithStatus } from "@/config/interfaces";
 import {
-  BridgeStatus,
-  TransactionWithStatus,
-} from "@/config/interfaces/transactions";
-import Button from "../button/button";
-import { dateToMomentsAgo } from "@/utils/formatting.utils";
+  dateToMomentsAgo,
+  formatError,
+  formatSecondsToMinutes,
+} from "@/utils/formatting.utils";
 import StatusIcon from "../icon/statusIcon";
 import { useQuery } from "react-query";
 import { getBridgeStatus } from "@/hooks/bridge/transactions/bridgeTxStatus";
@@ -16,7 +16,6 @@ import { getBridgeStatus } from "@/hooks/bridge/transactions/bridgeTxStatus";
 interface TxItemProps {
   tx: TransactionWithStatus;
   idx: number;
-  onRetry: () => void;
   setBridgeStatus: (status: BridgeStatus) => void;
 }
 const TxItem = (props: TxItemProps) => {
@@ -39,7 +38,9 @@ const TxItem = (props: TxItemProps) => {
       }
     },
     {
-      enabled: props.tx.tx.bridge !== undefined && props.tx.tx.bridge.lastStatus !== "SUCCESS",
+      enabled:
+        props.tx.tx.bridge !== undefined &&
+        props.tx.tx.bridge.lastStatus !== "SUCCESS",
       refetchInterval: 10000,
     }
   );
@@ -74,50 +75,66 @@ const TxItem = (props: TxItemProps) => {
         <div
           className={styles.collapsable}
           style={{
-            maxHeight: isRevealing ? "120px" : "0px",
+            maxHeight: isRevealing ? "500px" : "0px",
             width: "100%",
           }}
         >
           <Text size="sm" theme="secondary-dark">
             {props.tx.tx.description.description}
           </Text>
+          <Spacer height="8px" />
           {props.tx.txLink && (
-            <Container direction="row" gap={"auto"}>
+            <Container direction="row" gap="auto">
+              {props.tx.hash && (
+                // <PopUp width="600px" content={<Text>{props.tx.hash}</Text>}>
+                <Text size="sm">
+                  #
+                  {props.tx.hash.slice(0, 4) +
+                    "..." +
+                    props.tx.hash.slice(-5, -1)}
+                </Text>
+                // </PopUp>
+              )}
               {props.tx.txLink && (
                 <a
                   href={props.tx.txLink}
+                  target="_blank"
                   style={{
                     textDecoration: "underline",
                   }}
                 >
-                  {props.tx.hash ? (
-                    <Text size="sm">#{props.tx.hash.slice(0, 6) + "..."}</Text>
-                  ) : (
-                    <Text size="sm">view link</Text>
-                  )}
+                  <Text size="sm">view explorer</Text>
                 </a>
               )}
             </Container>
           )}
+          {props.tx.error && (
+            <Text size="sm" style={{ color: "var(--extra-failure-color,red)" }}>
+              {formatError(props.tx.error)}
+            </Text>
+          )}
         </div>
-
-        {props.tx.timestamp && (
-          <Text size="sm" theme="secondary-dark">
-            {dateToMomentsAgo(props.tx.timestamp)}
-          </Text>
-        )}
-        {props.tx.tx.bridge && props.tx.tx.bridge.lastStatus !== "NONE" && (
-          <Text size="sm" theme="secondary-dark">
-            BRIDGE STATUS - {props.tx.tx.bridge.lastStatus} Time left:
-            {props.tx.tx.bridge.timeLeft}
-          </Text>
-        )}
+        <Container direction="row" gap={"auto"}>
+          {props.tx.timestamp && (
+            <Text size="sm" theme="secondary-dark">
+              {dateToMomentsAgo(props.tx.timestamp)}
+            </Text>
+          )}
+          {props.tx.tx.bridge && props.tx.tx.bridge.lastStatus !== "NONE" && (
+            <Container>
+              <Text size="sm" theme="secondary-dark">
+                Bridge Status - {props.tx.tx.bridge.lastStatus.toLowerCase()}
+              </Text>
+              {props.tx.tx.bridge.timeLeft !== undefined && (
+                <Text size="sm" theme="secondary-dark">
+                  TIME LEFT:{" "}
+                  {formatSecondsToMinutes(props.tx.tx.bridge.timeLeft)}
+                </Text>
+              )}
+            </Container>
+          )}
+        </Container>
       </Container>
-      {props.tx.status === "ERROR" && (
-        <Button onClick={props.onRetry} color="primary">
-          retry
-        </Button>
-      )}
     </div>
   );
 };

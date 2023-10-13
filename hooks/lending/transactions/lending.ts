@@ -1,56 +1,58 @@
 import {
   Transaction,
   TransactionDescription,
-} from "@/config/interfaces/transactions";
-import {
-  CTokenLendingTransactionParams,
-  CTokenLendingTxTypes,
-} from "../interfaces/lendingTxTypes";
-import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
-import { _approveTx, checkTokenAllowance } from "@/utils/evm/erc20.utils";
+  TxCreatorFunctionReturn,
+} from "@/config/interfaces";
+import {
+  CTokenLendingTransactionParams,
+  CTokenLendingTxTypes,
+} from "../interfaces/lendingTxTypes";
+import { createApprovalTxs } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import { CERC20_ABI, COMPTROLLER_ABI } from "@/config/abis";
-import { CANTO_MAINNET_EVM } from "@/config/networks";
-import { COMPTROLLER_ADDRESS_CANTO_MAINNET } from "@/config/consts/addresses";
+import { getCantoCoreAddress } from "@/config/consts/addresses";
 
 export async function cTokenLendingTx(
   params: CTokenLendingTransactionParams
-): PromiseWithError<Transaction[]> {
+): PromiseWithError<TxCreatorFunctionReturn> {
   // make sure CToken passed through has user details
   if (!params.cToken.userDetails) {
     return NEW_ERROR("cTokenLendingTx: cToken does not have user details");
   }
   // check if collateralizing tx
   if (
-    params.type === CTokenLendingTxTypes.COLLATERALIZE ||
-    params.type === CTokenLendingTxTypes.DECOLLATERALIZE
+    params.txType === CTokenLendingTxTypes.COLLATERALIZE ||
+    params.txType === CTokenLendingTxTypes.DECOLLATERALIZE
   ) {
     // get comptroller address
-    let comptrollerAddress;
-    if (params.chainId === CANTO_MAINNET_EVM.chainId) {
-      comptrollerAddress = COMPTROLLER_ADDRESS_CANTO_MAINNET;
-    } else {
+    const comptrollerAddress = getCantoCoreAddress(
+      params.chainId,
+      "comptroller"
+    );
+    if (!comptrollerAddress) {
       return NEW_ERROR("cTokenLendingTx: chainId not supported");
     }
-    const isCollateralize = params.type === CTokenLendingTxTypes.COLLATERALIZE;
-    return NO_ERROR([
-      _collateralizeTx(
-        params.chainId,
-        comptrollerAddress,
-        params.cToken.address,
-        isCollateralize,
-        TX_DESCRIPTIONS.CTOKEN_COLLATERALIZE(
-          params.cToken.underlying.symbol,
-          isCollateralize
-        )
-      ),
-    ]);
+    const isCollateralize =
+      params.txType === CTokenLendingTxTypes.COLLATERALIZE;
+    return NO_ERROR({
+      transactions: [
+        _collateralizeTx(
+          params.chainId,
+          comptrollerAddress,
+          params.cToken.address,
+          isCollateralize,
+          TX_DESCRIPTIONS.CTOKEN_COLLATERALIZE(
+            params.cToken.underlying.symbol,
+            isCollateralize
+          )
+        ),
+      ],
+    });
   }
   // lending action
   // create tx list
@@ -61,52 +63,91 @@ export async function cTokenLendingTx(
   // check to see if we need to enable token (only for supplying and repaying)
   if (
     !isCanto &&
-    (params.type === CTokenLendingTxTypes.SUPPLY ||
-      params.type === CTokenLendingTxTypes.REPAY)
+    (params.txType === CTokenLendingTxTypes.SUPPLY ||
+      params.txType === CTokenLendingTxTypes.REPAY)
   ) {
     // check if we need to approve token
-    const { data: needAllowance, error: allowanceError } =
-      await checkTokenAllowance(
+    const { data: allowanceTxs, error: allowanceError } =
+      await createApprovalTxs(
         params.chainId,
-        params.cToken.underlying.address,
         params.ethAccount,
-        params.cToken.address,
-        params.amount
+        [
+          {
+            address: params.cToken.underlying.address,
+            symbol: params.cToken.underlying.symbol,
+          },
+        ],
+        [params.amount],
+        { address: params.cToken.address, name: "Lending Market" }
       );
     if (allowanceError) {
-      return NEW_ERROR("cTokenLendingTx::" + errMsg(allowanceError));
+      return NEW_ERROR("addLiquidityFlow: " + errMsg(allowanceError));
     }
-    if (needAllowance) {
-      txList.push(
-        _approveTx(
-          params.chainId,
-          params.cToken.underlying.address,
-          params.cToken.address,
-          params.amount,
-          TX_DESCRIPTIONS.APPROVE_TOKEN(
-            params.cToken.underlying.symbol,
-            "Lending Market"
-          )
-        )
-      );
-    }
+    // push allowance txs to the list (might be none)
+    txList.push(...allowanceTxs);
   }
   // create tx for lending
-  txList.push(
-    _lendingCTokenTx(
-      params.type,
-      params.chainId,
-      params.cToken.address,
-      isCanto,
-      params.amount,
-      TX_DESCRIPTIONS.CTOKEN_LENDING(
-        params.type,
-        params.cToken.underlying.symbol,
-        formatBalance(params.amount, params.cToken.underlying.decimals)
-      )
-    )
+  const txDescription = TX_DESCRIPTIONS.CTOKEN_LENDING(
+    params.txType,
+    params.cToken.underlying.symbol,
+    displayAmount(params.amount, params.cToken.underlying.decimals)
   );
-  return NO_ERROR(txList);
+  // check to see if tx is withdrawing entire balance
+  if (
+    params.txType === CTokenLendingTxTypes.WITHDRAW &&
+    params.cToken.userDetails.supplyBalanceInUnderlying === params.amount
+  ) {
+    // push special withdraw all function, passing in the cToken balance instead
+    txList.push(
+      _withdrawAllCTokenTx(
+        params.chainId,
+        params.cToken.address,
+        params.cToken.userDetails.balanceOfCToken,
+        txDescription
+      )
+    );
+  } else {
+    // push normal clm tx using underlying balance
+    txList.push(
+      _lendingCTokenTx(
+        params.txType,
+        params.chainId,
+        params.cToken.address,
+        isCanto,
+        params.amount,
+        txDescription
+      )
+    );
+  }
+
+  // user should enable token as collateral if supplying and token has collateral factor
+  if (
+    params.txType === CTokenLendingTxTypes.SUPPLY &&
+    !params.cToken.userDetails.isCollateral &&
+    Number(params.cToken.collateralFactor) !== 0
+  ) {
+    // get comptroller address
+    const comptrollerAddress = getCantoCoreAddress(
+      params.chainId,
+      "comptroller"
+    );
+    if (!comptrollerAddress) {
+      return NEW_ERROR("cTokenLendingTx: chainId not supported");
+    }
+    txList.push(
+      _collateralizeTx(
+        params.chainId,
+        comptrollerAddress,
+        params.cToken.address,
+        true,
+        TX_DESCRIPTIONS.CTOKEN_COLLATERALIZE(
+          params.cToken.underlying.symbol,
+          true
+        )
+      )
+    );
+  }
+  return NO_ERROR({ transactions: txList });
 }
 
 /**
@@ -137,6 +178,26 @@ const _lendingCTokenTx = (
     value: txDetails.value,
   };
 };
+
+// special function for withdrawing entire cToken balance (since it's a different method)
+// only called when withdrawing entire balance
+// uses cToken balance instead of underlying balance like the _lendingCTokenTx function
+// redeemUnderlying may leave the user with very small amount of cTokens because of "accrueInterest"
+const _withdrawAllCTokenTx = (
+  chainId: number,
+  cTokenAddress: string,
+  amount: string,
+  description: TransactionDescription
+): Transaction => ({
+  description,
+  chainId: chainId,
+  type: "EVM",
+  target: cTokenAddress,
+  abi: CERC20_ABI,
+  method: "redeem",
+  params: [amount],
+  value: "0",
+});
 
 const _collateralizeTx = (
   chainId: number,
@@ -195,11 +256,25 @@ function methodAndParamsFromLendingTxType(
       };
     case CTokenLendingTxTypes.WITHDRAW:
       return {
-        method: "redeem",
+        method: "redeemUnderlying",
         params: [amount],
         value: "0",
       };
     default:
       throw new Error("Invalid tx type");
   }
+}
+
+/**
+ * @notice validates the parameters for a lending market cToken transaction
+ * @param {CTokenLendingTransactionParams} params parameters for lending tx
+ * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
+ */
+export async function validateCTokenLendingRetryParams(
+  params: CTokenLendingTransactionParams
+): PromiseWithError<{
+  valid: boolean;
+  error?: string;
+}> {
+  return NO_ERROR({ valid: true });
 }

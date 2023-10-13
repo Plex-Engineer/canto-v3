@@ -1,10 +1,35 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 :root {
   --dark-mode: 0;
   --light-mode: 1;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
 ::selection {
@@ -21,6 +46,8 @@
   --text-only-light: #ffffff;
   --primary-90-color: #222222;
   --primary-10-color: #22222220;
+  --light-10-color: #ffffff20;
+  --light-20-color: #ffffff40;
   --text-light-color: #ffffff;
   --card-background-color: #c1c1c1;
   --text-light-30-color: #ffffff4c;
@@ -41,6 +68,7 @@
   --border-stoke-dark-color: #222;
   --dark-mode: 0;
   --light-mode: 1;
+  --box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
 }
 
 .dim {
@@ -115,7 +143,8 @@
   --text-only-light: #ffffff;
   --primary-90-color: #eeeeee;
   --primary-10-color: #eeeeee31; // new
-
+  --light-10-color: #121212e3;
+  --light-20-color: #2d2d2d;
   --text-light-color: #111111;
   --card-background-color: #0b0b0b;
   --text-light-30-color: #1111114c;
@@ -147,7 +176,23 @@
     outline: 2px solid none;
   }
 }
-
+// img {
+//   position: relative;
+//   &::before {
+//     content: "";
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     bottom: 0;
+//     right: 0;
+//     background-color: rgba(var(--dark-color), 0.2);
+//     border-radius: 50%;
+//     display: block;
+//     width: 100%;
+//     height: 100%;
+//     overflow: hidden;
+//   }
+// }
 body {
   background-color: var(--card-background-color);
   color: var(--text-dark-color);

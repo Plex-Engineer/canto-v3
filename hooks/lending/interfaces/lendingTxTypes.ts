@@ -1,18 +1,24 @@
-import { FormattedCToken } from "./tokens";
+import { CTokenWithUserData } from "./tokens";
 
 export enum CTokenLendingTxTypes {
-  SUPPLY = "supply",
-  BORROW = "borrow",
-  REPAY = "repay",
-  WITHDRAW = "withdraw",
-  COLLATERALIZE = "collateralize",
-  DECOLLATERALIZE = "decollateralize",
+  SUPPLY = "Supply",
+  BORROW = "Borrow",
+  REPAY = "Repay",
+  WITHDRAW = "Withdraw",
+  COLLATERALIZE = "Collateralize",
+  DECOLLATERALIZE = "Decollateralize",
 }
 
 export interface CTokenLendingTransactionParams {
   chainId: number;
   ethAccount: string;
-  type: CTokenLendingTxTypes;
-  cToken: FormattedCToken;
+  txType: CTokenLendingTxTypes;
+  cToken: CTokenWithUserData;
   amount: string;
+}
+
+export interface CLMClaimRewardsTxParams {
+  chainId: number;
+  ethAccount: string;
+  estimatedRewards: string; // estimation before distribution of rewards, only used for drip purposes (all rewards will be claimed)
 }

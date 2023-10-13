@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import AnimatedBackground from "@/components/animated_background/animatedBackground";
 import Container from "@/components/container/container";
 import Tabs from "@/components/tabs/tabs";
@@ -15,9 +15,32 @@ import {
 } from "@/utils/networks.utils";
 import { useWalletClient } from "wagmi";
 import Bridging from "./bridging";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 export default function BridgePage() {
-  const [direction, setDirection] = useState<"in" | "out">("in");
+  // router info
+  const pathName = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  // query params
+  const bridgeDirection = () => {
+    const direction = searchParams.get("direction");
+
+    if (direction === "in") return "in";
+    if (direction === "out") return "out";
+    return "in";
+  };
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(name, value);
+      return params.toString();
+    },
+    [searchParams]
+  );
+
+  // bridge hooks
   const [onTestnet, setOnTestnet] = useState<boolean>(false);
   const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({
@@ -82,7 +105,11 @@ export default function BridgePage() {
 
   return (
     <>
-      <AnimatedBackground initSize="400px" direction={direction} time={20} />
+      <AnimatedBackground
+        initSize="400px"
+        direction={bridgeDirection()}
+        time={20}
+      />
       <Container
         height="100vm"
         layer={1}
@@ -98,6 +125,7 @@ export default function BridgePage() {
           backgroundColor="var(--card-sub-surface-color, #DFDFDF)"
         >
           <Tabs
+            defaultIndex={bridgeDirection() === "in" ? 0 : 1}
             tabs={[
               {
                 title: "BRIDGE IN",
@@ -110,7 +138,10 @@ export default function BridgePage() {
                     }}
                   />
                 ),
-                onClick: () => setDirection("in"),
+                onClick: () =>
+                  router.push(
+                    pathName + "?" + createQueryString("direction", "in")
+                  ),
               },
               {
                 title: "BRIDGE OUT",
@@ -123,7 +154,10 @@ export default function BridgePage() {
                     }}
                   />
                 ),
-                onClick: () => setDirection("out"),
+                onClick: () =>
+                  router.push(
+                    pathName + "?" + createQueryString("direction", "out")
+                  ),
               },
             ]}
           />

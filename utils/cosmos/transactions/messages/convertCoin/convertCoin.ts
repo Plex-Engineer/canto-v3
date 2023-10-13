@@ -4,7 +4,7 @@ import {
   CosmosNativeMessage,
   EIP712Message,
   UnsignedCosmosMessages,
-} from "@/config/interfaces/transactions";
+} from "@/config/interfaces";
 import { generateCosmosEIPTypes } from "../base";
 import { CONVERT_FEE } from "@/config/consts/fees";
 

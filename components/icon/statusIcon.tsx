@@ -2,17 +2,18 @@ import LoadingIcon from "../loader/loading";
 import Icon from "./icon";
 
 interface Props {
-  status: "NONE" | "PENDING" | "SIGNING" | "SUCCESS" | "ERROR";
+  status: "NONE" | "POPULATING" | "PENDING" | "SIGNING" | "SUCCESS" | "ERROR";
   color?: "primary" | "accent" | "dark";
   className?: string;
   size?: number;
 }
 
 const StatusIcon = (props: Props) => {
-  if (props.status === "PENDING" || props.status === "SIGNING")
+  if (["PENDING", "SIGNING", "POPULATING"].includes(props.status))
     return <LoadingIcon size={props.size} />;
   return (
     <Icon
+      themed
       icon={{
         url:
           props.status === "SUCCESS"

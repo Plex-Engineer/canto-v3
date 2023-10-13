@@ -3,8 +3,8 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
-import { CosmosNetwork } from "@/config/interfaces/networks";
+  CosmosNetwork,
+} from "@/config/interfaces";
 import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
 
 /**

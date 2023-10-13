@@ -3,7 +3,7 @@ import {
   CosmosNativeMessage,
   EIP712Message,
   UnsignedCosmosMessages,
-} from "@/config/interfaces/transactions";
+} from "@/config/interfaces";
 import { generateCosmosEIPTypes } from "../base";
 import { MsgWithdrawDelegatorReward } from "@buf/cosmos_cosmos-sdk.bufbuild_es/cosmos/distribution/v1beta1/tx_pb.js";
 

@@ -4,14 +4,12 @@ import {
   PromiseWithError,
   ReturnWithError,
   errMsg,
-} from "@/config/interfaces/errors";
-import {
   CosmosTxContext,
   EIP712FeeObject,
   Fee,
   Sender,
   UnsignedCosmosMessages,
-} from "@/config/interfaces/transactions";
+} from "@/config/interfaces";
 import { tryFetch } from "@/utils/async.utils";
 import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
 import {
@@ -168,7 +166,7 @@ export async function signAndBroadcastCosmosTransaction(
 
     if (broadcastPost.error) {
       return NEW_ERROR(
-        "signAndBroadcastCosmosTransaction: " + broadcastPost.error.message
+        "signAndBroadcastCosmosTransaction: " + errMsg(broadcastPost.error)
       );
     }
     return NO_ERROR(broadcastPost.data);
@@ -213,7 +211,7 @@ export async function getSenderObj(
 ): PromiseWithError<Sender> {
   const cosmosAccount = await getCosmosAccount(senderCosmosAddress, chainid);
   if (cosmosAccount.error) {
-    return NEW_ERROR("getSenderObj::" + cosmosAccount.error.message);
+    return NEW_ERROR("getSenderObj::" + errMsg(cosmosAccount.error));
   }
   return reformatSender(cosmosAccount.data, eip712);
 }

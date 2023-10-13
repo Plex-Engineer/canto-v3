@@ -1,18 +1,19 @@
 import { GRAVITY_BRIDGE_ABI } from "@/config/abis";
 import { GRAVITY_BRIDGE_ETH_ADDRESS } from "@/config/consts/addresses";
-import { GRAVITY_BRIDGE_API_URL } from "@/config/consts/apiUrls";
+import { GRAVITY_BRIDGE_API_URL } from "@/config/api";
 import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
   errMsg,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import { tryFetch } from "@/utils/async.utils";
 import {
   getProviderWithoutSigner,
   getRpcUrlFromChainId,
 } from "@/utils/evm/helpers.utils";
 import { Contract } from "web3";
+import { areEqualAddresses } from "@/utils/address.utils";
 
 export interface UserGBridgeInHistory {
   completed: SendToCosmosEvent[];
@@ -136,8 +137,8 @@ export async function getGBridgeQueueForUser(
   }
   return NO_ERROR({
     latestBlock: latestTransactions.latest_eth_block,
-    transactions: latestTransactions.deposit_events.filter(
-      (event) => event.sender.toLowerCase() === ethAccount.toLowerCase()
+    transactions: latestTransactions.deposit_events.filter((event) =>
+      areEqualAddresses(event.sender, ethAccount)
     ),
   });
 }

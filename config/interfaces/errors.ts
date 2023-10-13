@@ -15,8 +15,13 @@ export const NEW_ERROR = <T>(msg: string): ReturnWithError<T> => ({
 });
 
 export const errMsg = (error: any): string => {
-  if (error instanceof Error) {
+  if (error.message) {
     return error.message;
   }
   return error;
+};
+
+export type ValidationReturn = {
+  isValid: boolean;
+  errorMessage?: string;
 };

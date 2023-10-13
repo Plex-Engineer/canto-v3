@@ -1,4 +1,4 @@
-import { CosmosNetwork } from "@/config/interfaces/networks";
+import { CosmosNetwork } from "@/config/interfaces";
 import {
   checkCosmosAddress,
   getCosmosAddressLink,

@@ -1,6 +1,5 @@
-import { BridgeStatus } from "@/config/interfaces/transactions";
 import { BridgingMethod } from "../interfaces/bridgeMethods";
-import { NEW_ERROR, PromiseWithError } from "@/config/interfaces/errors";
+import { NEW_ERROR, PromiseWithError, BridgeStatus } from "@/config/interfaces";
 import { checkGbridgeTxStatus } from "./methods/gravityBridge";
 import { checkLZBridgeStatus } from "./methods/layerZero";
 

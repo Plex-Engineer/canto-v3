@@ -7,6 +7,8 @@ interface Props {
   };
   color?: "primary" | "accent" | "dark";
   className?: string;
+  themed?: boolean;
+  style?: React.CSSProperties;
 }
 
 const Icon = (props: Props) => {
@@ -15,12 +17,14 @@ const Icon = (props: Props) => {
       className={props.className}
       src={props.icon.url}
       style={{
-        filter:
-          props.color == "primary"
+        filter: props.themed
+          ? props.color == "primary"
             ? "invert(var(--light-mode))"
             : props.color == "accent"
             ? "invert(0)"
-            : "invert(var(--dark-mode))",
+            : "invert(var(--dark-mode))"
+          : "",
+        ...props.style,
       }}
       alt="icon"
       width={props.icon.size || 16}

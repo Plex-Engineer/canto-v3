@@ -12,21 +12,25 @@ import useAutoSelect from "../helpers/useAutoSelect";
 import {
   NEW_ERROR,
   NO_ERROR,
-  PromiseWithError,
   ReturnWithError,
-} from "@/config/interfaces/errors";
-import { BaseNetwork } from "@/config/interfaces/networks";
+  errMsg,
+  NewTransactionFlow,
+  ERC20Token,
+} from "@/config/interfaces";
+import { BaseNetwork, CosmosNetwork } from "@/config/interfaces";
 import { BridgeOutToken } from "./interfaces/tokens";
 import { BridgingMethod } from "./interfaces/bridgeMethods";
-import { MAIN_BRIDGE_OUT_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
-import { Transaction } from "@/config/interfaces/transactions";
+import {
+  MAIN_BRIDGE_OUT_NETWORKS,
+  TEST_BRIDGE_NETWORKS,
+} from "./config/networks";
 import useTokenBalances from "../helpers/useTokenBalances";
-import { bridgeOutTx } from "./transactions/bridge";
-import { isERC20TokenList } from "@/utils/tokens/tokens.utils";
+import { isERC20TokenList, isOFTToken } from "@/utils/tokens/tokens.utils";
 import { isBridgeOutToken } from "@/utils/tokens/bridgeTokens.utils";
 import { convertToBigNumber } from "@/utils/tokenBalances.utils";
 import { isValidEthAddress } from "@/utils/address.utils";
 import { isCosmosNetwork } from "@/utils/networks.utils";
+import { createNewBridgeFlow } from "./helpers/createBridgeFlow";
 
 export default function useBridgeOut(
   props: BridgeHookInputParams
@@ -75,7 +79,19 @@ export default function useBridgeOut(
   // contains object mapping of the token balances
   const userTokenBalances = useTokenBalances(
     state.fromNetwork?.chainId,
-    isERC20TokenList(state.availableTokens) ? state.availableTokens : [],
+    isERC20TokenList(state.availableTokens)
+      ? (state.availableTokens.map((token) => {
+          if (
+            isOFTToken(token) &&
+            token.isOFTProxy &&
+            token.oftUnderlyingAddress
+          ) {
+            return { ...token, address: token.oftUnderlyingAddress };
+          } else {
+            return token;
+          }
+        }) as ERC20Token[])
+      : [],
     state.connectedEthAddress,
     null
   );
@@ -102,7 +118,7 @@ export default function useBridgeOut(
   function getToken(id: string): ReturnWithError<BridgeOutToken> {
     const token = state.availableTokens.find((token) => token.id === id);
     if (!isBridgeOutToken(token)) {
-      throw new Error("useBridgeOut::getToken: invalid token type: " + id);
+      return NEW_ERROR("useBridgeOut::getToken: invalid token type: " + id);
     }
     // check if we have a balance for the token
     const balance = userTokenBalances[token.id];
@@ -286,105 +302,55 @@ export default function useBridgeOut(
 
   // will tell the parent if bridging params look good to bridge
   function canBridge(params: BridgeHookTxParams): ReturnWithError<boolean> {
-    // check to make sure all parameters are defined and valid
-    // check current state
-    if (!state.selectedToken) {
-      return NEW_ERROR("useBridgeOut::canBridge: no token selected");
+    // check if we can create valid params
+    const { error: bridgeParamsError } = createBridgeOutTxFlow(params);
+    if (bridgeParamsError) {
+      return NEW_ERROR("useBridgeOut::canBridge::" + errMsg(bridgeParamsError));
     }
-    if (!state.fromNetwork || !state.toNetwork) {
-      return NEW_ERROR("useBridgeOut::canBridge: network undefined");
-    }
-    if (!state.selectedMethod) {
-      return NEW_ERROR("useBridgeOut::canBridge: method undefined");
-    }
-    // check addresses
-    if (!getSender()) {
-      return NEW_ERROR("useBridgeOut::canBridge: sender undefined");
-    }
-    if (!getReceiver()) {
-      return NEW_ERROR("useBridgeOut::canBridge: receiver undefined");
-    }
-    // make sure balance exists for token
-    const balance = userTokenBalances[state.selectedToken.id];
-    if (balance === undefined) {
-      return NEW_ERROR(
-        "useBridgeOut::canBridge: balance undefined for token: " +
-          state.selectedToken.id
-      );
-    }
-    // make sure amount it less than or equal to the token balance
+    // simple amount check, does not account for gas
     const { data: userAmount, error: bigNumberError } = convertToBigNumber(
       params.amount
     );
     if (bigNumberError) {
       return NEW_ERROR("useBridgeOut::canBridge::" + bigNumberError.message);
     }
-    // token balance is already formatted with decimals
-    const { data: tokenAmount, error: tokenBigNumberError } =
-      convertToBigNumber(balance);
-    if (tokenBigNumberError) {
-      return NEW_ERROR(
-        "useBridgeOut::canBridge::" + tokenBigNumberError.message
-      );
+    const tokenBalance = getToken(state.selectedToken?.id ?? "").data.balance;
+    if (!tokenBalance) {
+      return NEW_ERROR("useBridgeOut::canBridge: no token balance");
     }
-
     // final check if ibc transfer (check input address)
     if (state.selectedMethod === BridgingMethod.IBC) {
       if (
-        !isCosmosNetwork(state.toNetwork) ||
-        !state.toNetwork.checkAddress(state.userInputCosmosAddress ?? "")
+        !isCosmosNetwork(state.toNetwork as CosmosNetwork) ||
+        !(state.toNetwork as CosmosNetwork).checkAddress(
+          state.userInputCosmosAddress ?? ""
+        )
       ) {
         return NEW_ERROR(
           "useBridgeOut::canBridge: input cosmos address doesn't match network" +
             state.userInputCosmosAddress +
             "->" +
-            state.toNetwork.name
+            state.toNetwork?.name
         );
       }
     }
-
-    return NO_ERROR(userAmount.lte(tokenAmount) && userAmount.gt(0));
+    return NO_ERROR(userAmount.lte(tokenBalance) && userAmount.gt(0));
   }
 
-  // will return the list of transactions needed to perform the bridge
-  async function bridgeOut(
+  // will return a new transaction flow object that we can pass into the transaction store
+  function createBridgeOutTxFlow(
     params: BridgeHookTxParams
-  ): PromiseWithError<Transaction[]> {
-    // check basic parameters to make sure they exist
-    if (!state.selectedToken) {
-      return NEW_ERROR("useBridgeOut::bridgeOut: no token selected");
-    }
-    if (!state.toNetwork || !state.fromNetwork) {
-      return NEW_ERROR("useBridgeOut::bridgeOut: no network selected");
-    }
-    // check sender and receiver
-    const sender = getSender();
-    if (!sender) {
-      return NEW_ERROR("useBridgeOut::bridgeOut: sender undefined");
-    }
-    const receiver = getReceiver();
-    if (!receiver) {
-      return NEW_ERROR("useBridgeOut::bridgeOut: receiver undefined");
-    }
-    const { data: transactions, error: transactionsError } = await bridgeOutTx({
-      from: {
-        network: state.fromNetwork,
-        account: sender,
-      },
-      to: {
-        network: state.toNetwork,
-        account: receiver,
-      },
-      token: {
-        data: state.selectedToken,
-        amount: params.amount,
-      },
+  ): ReturnWithError<NewTransactionFlow> {
+    return createNewBridgeFlow({
+      bridgeIn: false,
+      token: getToken(state.selectedToken?.id ?? "").data,
+      fromNetwork: state.fromNetwork,
+      toNetwork: state.toNetwork,
       method: state.selectedMethod,
+      sender: getSender(),
+      receiver: getReceiver(),
+      amount: params.amount,
     });
-    if (transactionsError) {
-      return NEW_ERROR("useBridgeOut::bridgeOut::" + transactionsError.message);
-    }
-    return NO_ERROR(transactions);
   }
 
   return {
@@ -410,7 +376,7 @@ export default function useBridgeOut(
     },
     setState: generalSetter,
     bridge: {
-      bridgeTx: bridgeOut,
+      createNewBridgeFlow: createBridgeOutTxFlow,
       canBridge,
     },
   };

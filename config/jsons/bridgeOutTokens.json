@@ -18,6 +18,28 @@
                 "symbol": "CANTO",
                 "decimals": 18,
                 "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+                "isOFT": true,
+                "isOFTProxy": true,
+                "bridgeMethods": [
+                    {
+                        "chainId": "eth-mainnet",
+                        "methods": [
+                            "2"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0xEbe265c9299d0C879bcc2A76948511BA6ED6C36D",
+                "chainId": 7700,
+                "address": "0xEbe265c9299d0C879bcc2A76948511BA6ED6C36D",
+                "name": "cNote",
+                "symbol": "cNOTE",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
+                "isOFT": true,
+                "isOFTProxy": true,
+                "oftUnderlyingAddress": "0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
                 "bridgeMethods": [
                     {
                         "chainId": "eth-mainnet",
@@ -551,6 +573,52 @@
                 "symbol": "CANTO",
                 "decimals": 18,
                 "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+                "isOFT": true,
+                "isOFTProxy": true,
+                "bridgeMethods": [
+                    {
+                        "chainId": "mumbai-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    },
+                    {
+                        "chainId": "fantom-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    },
+                    {
+                        "chainId": "goerli-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    },
+                    {
+                        "chainId": "avalanche-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    },
+                    {
+                        "chainId": "optimism-testnet",
+                        "methods": [
+                            "2"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "0x428383C265a423304D929adaC92a9ac8d8a2F113",
+                "chainId": 7701,
+                "address": "0x428383C265a423304D929adaC92a9ac8d8a2F113",
+                "name": "cNote",
+                "symbol": "cNOTE",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
+                "isOFT": true,
+                "isOFTProxy": true,
+                "oftUnderlyingAddress": "0x04E52476d318CdF739C38BD41A922787D441900c",
                 "bridgeMethods": [
                     {
                         "chainId": "mumbai-testnet",

@@ -52,7 +52,7 @@ const NavBar = () => {
           )}
         >
           <Text>Staking</Text>
-        </Link>
+        </Link> */}
         <Link
           href="/lending"
           className={clsx(
@@ -63,6 +63,15 @@ const NavBar = () => {
           <Text>Lending</Text>
         </Link>
         <Link
+          href="/lp"
+          className={clsx(
+            styles["nav-link"],
+            currentPath == "/lp" && styles.active
+          )}
+        >
+          <Text>LP</Text>
+        </Link>
+        {/* <Link
           href="/governance"
           className={clsx(
             styles["nav-link"],

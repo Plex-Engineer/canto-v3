@@ -2,7 +2,7 @@ import {
   CosmosNativeMessage,
   EIP712Message,
   UnsignedCosmosMessages,
-} from "@/config/interfaces/transactions";
+} from "@/config/interfaces";
 import {
   MsgDelegate,
   MsgUndelegate,

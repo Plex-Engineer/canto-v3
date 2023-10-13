@@ -1,4 +1,4 @@
-import { ERC20Token, IBCToken } from "@/config/interfaces/tokens";
+import { ERC20Token, IBCToken, OFTToken } from "@/config/interfaces";
 
 ///
 /// Functions to check token objects for type (type guarding)
@@ -50,5 +50,14 @@ export function isIBCToken(object: any): object is IBCToken {
     "icon" in object &&
     "ibcDenom" in object &&
     "nativeName" in object
+  );
+}
+
+export function isOFTToken(object: any): object is OFTToken {
+  return (
+    isERC20Token(object) &&
+    "isOFTProxy" in object &&
+    "isOFT" in object &&
+    object.isOFT === true
   );
 }

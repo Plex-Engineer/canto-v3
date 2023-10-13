@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
-import { MAIN_BRIDGE_IN_NETWORKS, TEST_BRIDGE_NETWORKS } from "./config/networks";
+import {
+  MAIN_BRIDGE_IN_NETWORKS,
+  TEST_BRIDGE_NETWORKS,
+} from "./config/networks";
 import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
 import BRIDGE_IN_TOKEN_LIST from "@/config/jsons/bridgeInTokens.json";
 import {
   NEW_ERROR,
   NO_ERROR,
-  PromiseWithError,
   ReturnWithError,
-} from "@/config/interfaces/errors";
+  errMsg,
+  BaseNetwork,
+  NewTransactionFlow,
+  ERC20Token,
+} from "@/config/interfaces";
 import {
   BridgeHookInputParams,
   BridgeHookReturn,
@@ -16,19 +22,17 @@ import {
   HookSetterParam,
 } from "./interfaces/hookParams";
 import useAutoSelect from "../helpers/useAutoSelect";
-import { BaseNetwork } from "@/config/interfaces/networks";
 import { BridgeInToken } from "./interfaces/tokens";
 import { BridgingMethod } from "./interfaces/bridgeMethods";
-import { Transaction } from "@/config/interfaces/transactions";
 import useTokenBalances from "../helpers/useTokenBalances";
-import { bridgeInTx } from "./transactions/bridge";
-import { isERC20TokenList } from "@/utils/tokens/tokens.utils";
+import { isERC20TokenList, isOFTToken } from "@/utils/tokens/tokens.utils";
 import {
   isBridgeInToken,
   isBridgeInTokenList,
 } from "@/utils/tokens/bridgeTokens.utils";
 import { convertToBigNumber } from "@/utils/tokenBalances.utils";
 import { isValidEthAddress } from "@/utils/address.utils";
+import { createNewBridgeFlow } from "./helpers/createBridgeFlow";
 
 export default function useBridgeIn(
   props: BridgeHookInputParams
@@ -75,7 +79,22 @@ export default function useBridgeIn(
   // contains object mapping of the token balances
   const userTokenBalances = useTokenBalances(
     state.fromNetwork?.chainId,
-    isERC20TokenList(state.availableTokens) ? state.availableTokens : [],
+    isERC20TokenList(state.availableTokens)
+      ? (state.availableTokens.map((token) => {
+          if (
+            isOFTToken(token) &&
+            token.isOFTProxy &&
+            token.oftUnderlyingAddress
+          ) {
+            return {
+              ...token,
+              address: token.oftUnderlyingAddress,
+            };
+          } else {
+            return token;
+          }
+        }) as ERC20Token[])
+      : [],
     state.connectedEthAddress,
     state.connectedCosmosAddress
   );
@@ -270,89 +289,39 @@ export default function useBridgeIn(
 
   // will tell the parent if bridging params look good to bridge
   function canBridge(params: BridgeHookTxParams): ReturnWithError<boolean> {
-    // check to make sure all parameters are defined and valid
-    // check current state
-    if (!state.selectedToken) {
-      return NEW_ERROR("useBridgeIn::canBridge: no token selected");
+    // check if we can create valid params
+    const { error: bridgeParamsError } = createBridgeInTxFlow(params);
+    if (bridgeParamsError) {
+      return NEW_ERROR("useBridgeIn::canBridge::" + errMsg(bridgeParamsError));
     }
-    if (!state.fromNetwork || !state.toNetwork) {
-      return NEW_ERROR("useBridgeIn::canBridge: network undefined");
-    }
-    if (!state.selectedMethod) {
-      return NEW_ERROR("useBridgeIn::canBridge: method undefined");
-    }
-    // check addresses
-    if (!getSender()) {
-      return NEW_ERROR("useBridgeIn::canBridge: sender undefined");
-    }
-    if (!getReceiver()) {
-      return NEW_ERROR("useBridgeIn::canBridge: receiver undefined");
-    }
-    // make sure balance exists for token
-    const balance = userTokenBalances[state.selectedToken.id];
-    if (balance === undefined) {
-      return NEW_ERROR(
-        "useBridgeIn::canBridge: balance undefined for token: " +
-          state.selectedToken.id
-      );
-    }
-    // make sure amount it less than or equal to the token balance
+    // simple amount check, does not account for gas
     const { data: userAmount, error: bigNumberError } = convertToBigNumber(
       params.amount
     );
     if (bigNumberError) {
       return NEW_ERROR("useBridgeIn::canBridge::" + bigNumberError.message);
     }
-    // token balance is already formatted with decimals
-    const { data: tokenAmount, error: tokenBigNumberError } =
-      convertToBigNumber(balance);
-    if (tokenBigNumberError) {
-      return NEW_ERROR(
-        "useBridgeIn::canBridge::" + tokenBigNumberError.message
-      );
+    const tokenBalance = getToken(state.selectedToken?.id ?? "").data?.balance;
+    if (!tokenBalance) {
+      return NEW_ERROR("useBridgeIn::canBridge: no token balance");
     }
-    return NO_ERROR(userAmount.lte(tokenAmount) && userAmount.gt(0));
+    return NO_ERROR(userAmount.lte(tokenBalance) && userAmount.gt(0));
   }
 
-  // will return the list of transactions needed to perform the bridge
-  async function bridgeIn(
+  // will return a new transaction flow object that we can pass into the transaction store
+  function createBridgeInTxFlow(
     params: BridgeHookTxParams
-  ): PromiseWithError<Transaction[]> {
-    // check basic parameters to make sure they exist
-    if (!state.selectedToken) {
-      return NEW_ERROR("useBridgeIn::bridgeIn: no token selected");
-    }
-    if (!state.fromNetwork || !state.toNetwork) {
-      return NEW_ERROR("useBridgeIn::bridgeIn: network undefined");
-    }
-    // check sender and receiver
-    const sender = getSender();
-    if (!sender) {
-      return NEW_ERROR("useBridgeIn::bridgeIn: sender undefined");
-    }
-    const receiver = getReceiver();
-    if (!receiver) {
-      return NEW_ERROR("useBridgeIn::bridgeIn: receiver undefined");
-    }
-    const { data: transactions, error: transactionsError } = await bridgeInTx({
-      from: {
-        network: state.fromNetwork,
-        account: sender,
-      },
-      to: {
-        network: state.toNetwork,
-        account: receiver,
-      },
-      token: {
-        data: state.selectedToken,
-        amount: params.amount,
-      },
+  ): ReturnWithError<NewTransactionFlow> {
+    return createNewBridgeFlow({
+      bridgeIn: true,
+      token: getToken(state.selectedToken?.id ?? "").data,
+      fromNetwork: state.fromNetwork,
+      toNetwork: state.toNetwork,
       method: state.selectedMethod,
+      sender: getSender(),
+      receiver: getReceiver(),
+      amount: params.amount,
     });
-    if (transactionsError) {
-      return NEW_ERROR("useBridgeIn::bridgeIn::" + transactionsError.message);
-    }
-    return NO_ERROR(transactions);
   }
 
   return {
@@ -378,7 +347,7 @@ export default function useBridgeIn(
     },
     setState: generalSetter,
     bridge: {
-      bridgeTx: bridgeIn,
+      createNewBridgeFlow: createBridgeInTxFlow,
       canBridge,
     },
   };

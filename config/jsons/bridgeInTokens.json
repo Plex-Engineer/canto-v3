@@ -66,6 +66,22 @@
                 "symbol": "CANTO",
                 "decimals": 18,
                 "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+                "isOFT": true,
+                "isOFTProxy": false,
+                "bridgeMethods": [
+                    "2"
+                ]
+            },
+            {
+                "id": "0xEbe265c9299d0C879bcc2A76948511BA6ED6C36D",
+                "chainId": 1,
+                "address": "0xEbe265c9299d0C879bcc2A76948511BA6ED6C36D",
+                "name": "cNote",
+                "symbol": "cNOTE",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
+                "isOFT": true,
+                "isOFTProxy": false,
                 "bridgeMethods": [
                     "2"
                 ]
@@ -459,6 +475,22 @@
                 "symbol": "CANTO",
                 "decimals": 18,
                 "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+                "isOFT": true,
+                "isOFTProxy": false,
+                "bridgeMethods": [
+                    "2"
+                ]
+            },
+            {
+                "id": "0x62E0FC40A1458B49359C9130bf18E5EEb1afCB0A",
+                "chainId": 80001,
+                "address": "0x62E0FC40A1458B49359C9130bf18E5EEb1afCB0A",
+                "name": "cNote",
+                "symbol": "cNOTE",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
+                "isOFT": true,
+                "isOFTProxy": false,
                 "bridgeMethods": [
                     "2"
                 ]
@@ -473,6 +505,22 @@
                 "symbol": "CANTO",
                 "decimals": 18,
                 "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+                "isOFT": true,
+                "isOFTProxy": false,
+                "bridgeMethods": [
+                    "2"
+                ]
+            },
+            {
+                "id": "0x62E0FC40A1458B49359C9130bf18E5EEb1afCB0A",
+                "chainId": 4002,
+                "address": "0x62E0FC40A1458B49359C9130bf18E5EEb1afCB0A",
+                "name": "cNote",
+                "symbol": "cNOTE",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
+                "isOFT": true,
+                "isOFTProxy": false,
                 "bridgeMethods": [
                     "2"
                 ]
@@ -487,6 +535,22 @@
                 "symbol": "CANTO",
                 "decimals": 18,
                 "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+                "isOFT": true,
+                "isOFTProxy": false,
+                "bridgeMethods": [
+                    "2"
+                ]
+            },
+            {
+                "id": "0x6C6EC0082Dd59372e4Ddb45EDd80CAeadb161C2b",
+                "chainId": 5,
+                "address": "0x6C6EC0082Dd59372e4Ddb45EDd80CAeadb161C2b",
+                "name": "cNote",
+                "symbol": "cNOTE",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
+                "isOFT": true,
+                "isOFTProxy": false,
                 "bridgeMethods": [
                     "2"
                 ]
@@ -501,6 +565,22 @@
                 "symbol": "CANTO",
                 "decimals": 18,
                 "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+                "isOFT": true,
+                "isOFTProxy": false,
+                "bridgeMethods": [
+                    "2"
+                ]
+            },
+            {
+                "id": "0x62E0FC40A1458B49359C9130bf18E5EEb1afCB0A",
+                "chainId": 43113,
+                "address": "0x62E0FC40A1458B49359C9130bf18E5EEb1afCB0A",
+                "name": "cNote",
+                "symbol": "cNOTE",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
+                "isOFT": true,
+                "isOFTProxy": false,
                 "bridgeMethods": [
                     "2"
                 ]
@@ -509,12 +589,28 @@
         "optimism-testnet": [
             {
                 "id": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
-                "chainId": 43113,
+                "chainId": 420,
                 "address": "0x6175a322E284E6a5ff5f8BcdBE82d30B047E22d4",
                 "name": "Canto",
                 "symbol": "CANTO",
                 "decimals": 18,
                 "icon": "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+                "isOFT": true,
+                "isOFTProxy": false,
+                "bridgeMethods": [
+                    "2"
+                ]
+            },
+            {
+                "id": "0x62E0FC40A1458B49359C9130bf18E5EEb1afCB0A",
+                "chainId": 420,
+                "address": "0x62E0FC40A1458B49359C9130bf18E5EEb1afCB0A",
+                "name": "cNote",
+                "symbol": "cNOTE",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
+                "isOFT": true,
+                "isOFTProxy": false,
                 "bridgeMethods": [
                     "2"
                 ]

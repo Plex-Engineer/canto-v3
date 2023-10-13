@@ -3,7 +3,7 @@ import {
   NO_ERROR,
   PromiseWithError,
   ReturnWithError,
-} from "@/config/interfaces/errors";
+} from "@/config/interfaces";
 import { ethToCantoAddress } from "@/utils/address.utils";
 import { tryFetch } from "@/utils/async.utils";
 import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
