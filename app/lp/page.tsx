@@ -171,7 +171,7 @@ export default function Page() {
 
       <Container direction="row" gap={"auto"} width="100%">
         <Text size="x-lg" className={styles.title}>
-          LP Interface
+          LP
         </Text>
         <Spacer height="30px" />
 

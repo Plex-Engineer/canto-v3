@@ -20,20 +20,28 @@
     border-left: 1px solid var(--primary-90-color);
     border-right: 1px solid var(--primary-90-color);
   }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 10px;
+    border-left: 1px solid var(--primary-90-color);
+  }
 }
 
 .title {
   font-size: 32px !important;
-  text-align: left;
   width: 100%;
-  max-width: 1500px;
 }
 
 .rewards {
   display: flex;
   height: 150px;
-  width: 100%;
-  margin: 0 0 0 auto;
+  width: calc(100% - 2rem);
   padding: 1rem;
   background-color: var(--canto-color);
   justify-content: space-between;
@@ -62,6 +70,17 @@
     height: 10px;
     border-left: 1px solid var(--primary-90-color);
     border-right: 1px solid var(--primary-90-color);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 10px;
+    border-left: 1px solid var(--primary-90-color);
   }
 
   animation: loading 1.4s infinite ease-in;
