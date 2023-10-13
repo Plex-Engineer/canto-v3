@@ -26,9 +26,11 @@ import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambie
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
+import { useEffect, useState } from "react";
 
 export default function Page() {
   const { data: signer } = useWalletClient();
+  const [isLoading, setIsLoading] = useState(true);
   const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
 
   const txStore = useStore(useTransactionStore, (state) => state);
@@ -129,6 +131,23 @@ export default function Page() {
 
   /** general selection */
   const { pair: selectedPair, setPair } = selection;
+  useEffect(() => {
+    // balances are loaded
+    if (
+      cantoDex.position.totalRewards !== undefined &&
+      sortedPairs.length !== 0 &&
+      sortedPairs[0].clmData?.userDetails?.balanceOfCToken !== undefined &&
+      sortedPairs[0].clmData?.userDetails?.balanceOfUnderlying !== undefined &&
+      sortedPairs[0].clmData?.userDetails?.supplyBalanceInUnderlying !==
+        undefined
+    ) {
+      setIsLoading(false);
+    }
+  }, [sortedPairs, cantoDex.position.totalRewards]);
+
+  if (isLoading) {
+    return <div className={styles.loading}>{""}</div>;
+  }
 
   //main content
   return (
