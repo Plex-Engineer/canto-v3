@@ -317,7 +317,11 @@ const AddLiquidityModal = ({
         amount: value,
       });
     }
-    if (optimalAmount.error) return;
+    console.log(optimalAmount)
+    if (optimalAmount.error) {
+      token1 ? setValueToken2("") : setValueToken1("");
+      return;
+    }
     token1
       ? setValueToken2(optimalAmount.data)
       : setValueToken1(optimalAmount.data);

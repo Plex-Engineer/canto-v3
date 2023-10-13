@@ -78,14 +78,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
                 content: (
                   <Container width="100%" margin="sm">
                     <div className={styles.iconTitle}>
-                      <div style={{ display: "flex", flexDirection: "row" }}>
-                        <Icon
-                          icon={{ url: props.pair.base.logoURI, size: 60 }}
-                        />
-                        <Icon
-                          icon={{ url: props.pair.quote.logoURI, size: 60 }}
-                        />
-                      </div>
+                      <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
                       <Text size="lg" font="proto_mono">
                         {props.pair.symbol}
                       </Text>
@@ -106,14 +99,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
                 content: (
                   <Container width="100%" margin="sm">
                     <div className={styles.iconTitle}>
-                      <div style={{ display: "flex", flexDirection: "row" }}>
-                        <Icon
-                          icon={{ url: props.pair.base.logoURI, size: 60 }}
-                        />
-                        <Icon
-                          icon={{ url: props.pair.quote.logoURI, size: 60 }}
-                        />
-                      </div>
+                      <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
                       <Text size="lg" font="proto_mono">
                         {props.pair.symbol}
                       </Text>
