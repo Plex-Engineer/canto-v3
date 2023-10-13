@@ -21,22 +21,10 @@ import {
   isAmbientPair,
   isCantoDexPair,
 } from "@/hooks/pairs/lpCombo/interfaces.ts/pairTypes";
-import Button from "@/components/button/button";
 import { AmbientModal } from "./components/ambientLPModal";
 import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
-import {
-  baseTokenFromConcLiquidity,
-  quoteTokenFromConcLiquidity,
-} from "@/utils/ambient/liquidity.utils";
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import Rewards from "./components/rewards";
-import Image from "next/image";
-import {
-  divideBalances,
-  percentOfAmount,
-} from "@/utils/tokens/tokenMath.utils";
-import Icon from "@/components/icon/icon";
-import { formatPercent } from "@/utils/formatting.utils";
 
 export default function Page() {
   const { data: signer } = useWalletClient();
@@ -160,6 +148,7 @@ export default function Page() {
           />
         )}
       </Modal>
+
       <Text size="x-lg" className={styles.title}>
         LP Interface
       </Text>

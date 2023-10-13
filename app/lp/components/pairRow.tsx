@@ -107,7 +107,7 @@ export const GeneralCantoDexPairRow = ({
     {pair.stable ? "Stable" : "Volatile"}
   </Text>,
   <div key={pair.address + "edit"}>
-    <Button onClick={() => onAddLiquidity(pair.address)}>Add Liquidity</Button>
+    <Button onClick={() => onAddLiquidity(pair.address)}>Add LP</Button>
   </div>,
 ];
 
@@ -142,7 +142,7 @@ export const GeneralAmbientPairRow = ({
   </Text>,
   <div key={"action"}>
     <Button key={"action item"} onClick={() => onAddLiquidity(pair.address)}>
-      Add Liquidity
+      Add LP
     </Button>
   </div>,
 ];
