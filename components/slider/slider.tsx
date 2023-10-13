@@ -1,3 +1,4 @@
+import Text from "../text";
 import styles from "./slider.module.scss";
 
 interface Props {
@@ -12,6 +13,10 @@ interface Props {
 const Slider = (props: Props) => {
   return (
     <div className={styles.container}>
+      <Text className={styles.label} size="sm">
+        {props.label}
+      </Text>
+
       <input
         className={styles.slider}
         type="range"
@@ -21,7 +26,19 @@ const Slider = (props: Props) => {
         onChange={(e) => props.onChange(parseInt(e.target.value))}
         step={props.step}
       />
-      <div className={styles.label}>{props.label}</div>
+      <div className={styles.steps}>
+        <div className={styles.step}></div>
+        <div className={styles.step}></div>
+        <div className={styles.step}></div>
+        <div className={styles.step}></div>
+        <div className={styles.step}></div>
+        <div className={styles.step}></div>
+        <div className={styles.step}></div>
+        <div className={styles.step}></div>
+        <div className={styles.step}></div>
+        <div className={styles.step}></div>
+        <div className={styles.step}></div>
+      </div>
     </div>
   );
 };
