@@ -1,0 +1,16 @@
+.ecosystem {
+  min-height: calc(100vh - 100px);
+  width: 100%;
+  max-width: 1400px;
+}
+
+.eco-grid {
+  display: grid;
+  gap: 4rem;
+  padding: 2rem 0;
+  grid-template-columns: repeat(2, minmax(300px, 1fr));
+}
+
+.eco-title {
+  font-size: 48px;
+}
