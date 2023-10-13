@@ -18,15 +18,16 @@ export default function Home() {
       }}
     >
       <section className={styles.hero}>
-        <Text
-          font="rm_mono"
-          weight="bold"
-          style={{
-            fontSize: "3.5rem",
+        <Icon
+          icon={{
+            url: "/canto.svg",
+            size: {
+              width: 300,
+              height: 80,
+            },
           }}
-        >
-          CANTO
-        </Text>
+          themed
+        />
 
         <Icon
           icon={{
@@ -140,17 +141,17 @@ export default function Home() {
           />
 
           <EcoTile
-            name="Cadence Protocol"
-            description="Next-gen decentralized perpetuals"
-            image="/ecosystem/cad.png"
-            link="https://www.cadenceprotocol.io/"
+            name="Canto Identity Protocol"
+            description="Build your onchain identity with expressive traits and NFTs"
+            image="/ecosystem/cipp.png"
+            link="https://cantoidentity.build/"
           />
 
           <EcoTile
-            name="Vivacity (coming soon)"
-            description="Yet to be announced"
-            image="/ecosystem/blankRasa.svg"
-            link="https://blankrasa.io/"
+            name="Vivacity"
+            description="Coming Soon"
+            image="/ecosystem/coming.svg"
+            link=""
           />
         </div>
       </section>
