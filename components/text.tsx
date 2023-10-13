@@ -1,7 +1,7 @@
 interface Props {
   font?: "rm_mono" | "proto_mono";
   weight?: "normal" | "bold";
-  size?: "xx-sm" | "x-sm" | "sm" | "md" | "lg" | "x-lg";
+  size?: "xx-sm" | "x-sm" | "sm" | "md" | "lg" | "x-lg" | "title";
   opacity?: number;
   theme?:
     | "primary-light"
@@ -21,6 +21,7 @@ const sizes = {
   md: 18,
   lg: 20,
   "x-lg": 24,
+  title: 32,
 };
 
 const themes = {
