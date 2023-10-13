@@ -101,9 +101,9 @@ export const AmbientModal = (props: AmbientModalProps) => {
               },
               {
                 title: "Remove",
-                // isDisabled:
-                //   props.pair.userDetails?.defaultRangePosition.liquidity ===
-                //   "0",
+                isDisabled:
+                  props.pair.userDetails?.defaultRangePosition.liquidity ===
+                  "0",
                 content: (
                   <Container width="100%" margin="sm">
                     <div className={styles.iconTitle}>
