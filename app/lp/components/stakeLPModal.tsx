@@ -58,7 +58,7 @@ export const StakeLPModal = (props: Props) => {
           price={cToken.price}
         />
         <CTokenAmountCard
-          name="Staked Amount"
+          name="Staked Balance"
           amount={cToken.userDetails?.supplyBalanceInUnderlying ?? "0"}
           decimals={cToken.underlying.decimals}
           symbol={""}

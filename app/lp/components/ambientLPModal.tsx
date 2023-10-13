@@ -33,6 +33,7 @@ import {
   quoteTokenFromConcLiquidity,
 } from "@/utils/ambient/liquidity.utils";
 import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
+import Slider from "@/components/slider/slider";
 
 interface AmbientModalProps {
   pair: AmbientPair;
@@ -93,9 +94,9 @@ export const AmbientModal = (props: AmbientModalProps) => {
               },
               {
                 title: "Remove",
-                isDisabled:
-                  props.pair.userDetails?.defaultRangePosition.liquidity ===
-                  "0",
+                // isDisabled:
+                //   props.pair.userDetails?.defaultRangePosition.liquidity ===
+                //   "0",
                 content: (
                   <Container width="100%" margin="sm">
                     <div className={styles.iconTitle}>
@@ -316,16 +317,23 @@ const RemoveAmbientLiquidity = ({
   return (
     <div>
       <Spacer height="10px" />
-      <Input
-        value={percentToRemove.toString()}
-        onChange={(e) => setPercentToRemove(Number(e.target.value))}
-        type="number"
-        min={0}
-        max={100}
-        label="percent to remove"
-        error={Number(percentToRemove) < 0 || Number(percentToRemove) > 100}
-        errorMessage="Percentage must be between 0 and 100%"
-      />
+      <Container direction="row">
+        <Slider
+          value={percentToRemove}
+          onChange={(val) => setPercentToRemove(val)}
+          min={1}
+          max={100}
+          step={1}
+          label="percent to remove"
+        />
+        <Input
+          value={percentToRemove.toString()}
+          onChange={(e) => setPercentToRemove(Number(e.target.value))}
+          type="number"
+          min={0}
+          max={100}
+        />
+      </Container>
       <Spacer height="20px" />
 
       <Text

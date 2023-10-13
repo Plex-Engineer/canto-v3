@@ -20,7 +20,7 @@ const Rewards = (props: Props) => {
             color: "#000",
           }}
         >
-          Accumulated WCanto
+          Rewards
         </Text>
 
         <Container

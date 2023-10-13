@@ -25,9 +25,12 @@ import { AmbientModal } from "./components/ambientLPModal";
 import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import Rewards from "./components/rewards";
+import Container from "@/components/container/container";
+import { useEffect, useState } from "react";
 
 export default function Page() {
   const { data: signer } = useWalletClient();
+  const [isLoading, setIsLoading] = useState(true);
   const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
 
   const txStore = useStore(useTransactionStore, (state) => state);
@@ -128,6 +131,23 @@ export default function Page() {
 
   /** general selection */
   const { pair: selectedPair, setPair } = selection;
+  useEffect(() => {
+    // balances are loaded
+    if (
+      cantoDex.position.totalRewards !== undefined &&
+      sortedPairs.length !== 0 &&
+      sortedPairs[0].clmData?.userDetails?.balanceOfCToken !== undefined &&
+      sortedPairs[0].clmData?.userDetails?.balanceOfUnderlying !== undefined &&
+      sortedPairs[0].clmData?.userDetails?.supplyBalanceInUnderlying !==
+        undefined
+    ) {
+      setIsLoading(false);
+    }
+  }, [sortedPairs, cantoDex.position.totalRewards]);
+
+  if (isLoading) {
+    return <div className={styles.loading}>{""}</div>;
+  }
 
   //main content
   return (
@@ -149,17 +169,19 @@ export default function Page() {
         )}
       </Modal>
 
-      <Text size="x-lg" className={styles.title}>
-        LP Interface
-      </Text>
-      <Spacer height="30px" />
+      <Container direction="row" gap={"auto"} width="100%">
+        <Text size="x-lg" className={styles.title}>
+          LP
+        </Text>
+        <Spacer height="30px" />
 
-      <Rewards
-        onClick={sendClaimRewardsFlow}
-        value={displayAmount(cantoDex.position.totalRewards, 18, {
-          symbol: "WCANTO",
-        })}
-      />
+        <Rewards
+          onClick={sendClaimRewardsFlow}
+          value={displayAmount(cantoDex.position.totalRewards, 18, {
+            precision: 4,
+          })}
+        />
+      </Container>
       <Spacer height="30px" />
       {userCantoDexPairs.length + userAmbientPairs.length > 0 && (
         <Table
