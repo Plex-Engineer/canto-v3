@@ -25,6 +25,7 @@ import { AmbientModal } from "./components/ambientLPModal";
 import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import Rewards from "./components/rewards";
+import Container from "@/components/container/container";
 
 export default function Page() {
   const { data: signer } = useWalletClient();
@@ -149,17 +150,19 @@ export default function Page() {
         )}
       </Modal>
 
-      <Text size="x-lg" className={styles.title}>
-        LP Interface
-      </Text>
-      <Spacer height="30px" />
+      <Container direction="row" gap={"auto"} width="100%">
+        <Text size="x-lg" className={styles.title}>
+          LP Interface
+        </Text>
+        <Spacer height="30px" />
 
-      <Rewards
-        onClick={sendClaimRewardsFlow}
-        value={displayAmount(cantoDex.position.totalRewards, 18, {
-          precision: 4,
-        })}
-      />
+        <Rewards
+          onClick={sendClaimRewardsFlow}
+          value={displayAmount(cantoDex.position.totalRewards, 18, {
+            precision: 4,
+          })}
+        />
+      </Container>
       <Spacer height="30px" />
       {userCantoDexPairs.length + userAmbientPairs.length > 0 && (
         <Table
