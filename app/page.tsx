@@ -7,6 +7,7 @@ import EcoTile from "./components/ecoTile";
 import Icon from "@/components/icon/icon";
 import Button from "@/components/button/button";
 import Link from "next/link";
+
 export default function Home() {
   return (
     <Container
