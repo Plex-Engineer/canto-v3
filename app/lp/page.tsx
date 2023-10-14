@@ -131,6 +131,7 @@ export default function Page() {
 
   /** general selection */
   const { pair: selectedPair, setPair } = selection;
+
   useEffect(() => {
     // balances are loaded
     if (
@@ -139,11 +140,12 @@ export default function Page() {
       sortedPairs[0].clmData?.userDetails?.balanceOfCToken !== undefined &&
       sortedPairs[0].clmData?.userDetails?.balanceOfUnderlying !== undefined &&
       sortedPairs[0].clmData?.userDetails?.supplyBalanceInUnderlying !==
-        undefined
+        undefined &&
+      isLoading == true
     ) {
       setIsLoading(false);
     }
-  }, [sortedPairs, cantoDex.position.totalRewards]);
+  }, [sortedPairs, cantoDex.position.totalRewards, isLoading]);
 
   if (isLoading) {
     return <div className={styles.loading}>{""}</div>;
