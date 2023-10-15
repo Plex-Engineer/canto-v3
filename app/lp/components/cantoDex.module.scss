@@ -18,3 +18,16 @@
   box-shadow: -3px -3px 0px 0px rgba(17, 17, 17, 0.2) inset,
     2px 2px 0px 0px rgba(255, 255, 255, 0.4) inset;
 }
+
+.infoPop {
+  border-radius: 50px;
+  border: 1px solid var(--border-stroke-color);
+  background-color: rgba(var(--dark-color), 0.04);
+
+  min-width: 24px;
+  padding: 0 6px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
