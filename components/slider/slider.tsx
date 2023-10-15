@@ -13,7 +13,7 @@ interface Props {
 const Slider = (props: Props) => {
   return (
     <div className={styles.container}>
-      <Text className={styles.label} size="sm">
+      <Text className={styles.label} font="proto_mono" size="sm">
         {props.label}
       </Text>
 
@@ -28,15 +28,34 @@ const Slider = (props: Props) => {
       />
       <div className={styles.steps}>
         <div className={styles.step}></div>
+        <div className={styles.smallStep}></div>
         <div className={styles.step}></div>
+        <div className={styles.smallStep}></div>
+
         <div className={styles.step}></div>
+        <div className={styles.smallStep}></div>
+
         <div className={styles.step}></div>
+        <div className={styles.smallStep}></div>
+
         <div className={styles.step}></div>
+        <div className={styles.smallStep}></div>
+
         <div className={styles.step}></div>
+        <div className={styles.smallStep}></div>
+
         <div className={styles.step}></div>
+        <div className={styles.smallStep}></div>
+
         <div className={styles.step}></div>
+        <div className={styles.smallStep}></div>
+
         <div className={styles.step}></div>
+        <div className={styles.smallStep}></div>
+
         <div className={styles.step}></div>
+        <div className={styles.smallStep}></div>
+
         <div className={styles.step}></div>
       </div>
     </div>

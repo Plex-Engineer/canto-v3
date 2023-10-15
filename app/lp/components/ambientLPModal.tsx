@@ -34,6 +34,7 @@ import {
 } from "@/utils/ambient/liquidity.utils";
 import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
 import Slider from "@/components/slider/slider";
+import clsx from "clsx";
 
 interface AmbientModalProps {
   pair: AmbientPair;
@@ -317,13 +318,22 @@ const RemoveAmbientLiquidity = ({
   return (
     <div>
       <Spacer height="10px" />
-      <Container direction="row">
+      <Container
+        direction="row"
+        backgroundColor="var(--card-surface-color)"
+        gap={20}
+        center={{
+          horizontal: true,
+          vertical: true,
+        }}
+        className={clsx(styles.card, styles.sliderContainer)}
+      >
         <Slider
           value={percentToRemove}
           onChange={(val) => setPercentToRemove(val)}
-          min={1}
+          min={0}
           max={100}
-          step={1}
+          step={5}
           label="percent to remove"
         />
         <Input
@@ -334,15 +344,9 @@ const RemoveAmbientLiquidity = ({
           max={100}
         />
       </Container>
-      <Spacer height="20px" />
+      <Spacer height="40px" />
 
-      <Text
-        font="proto_mono"
-        size="xx-sm"
-        style={{
-          marginLeft: "16px",
-        }}
-      >
+      <Text font="proto_mono" size="sm">
         Expected Tokens
       </Text>
       <Spacer height="6px" />
@@ -379,7 +383,7 @@ const RemoveAmbientLiquidity = ({
           )}
         />
       </Container>
-      <Spacer height="30px" />
+      <Spacer height="140px" />
 
       <Button
         disabled={Number(percentToRemove) <= 0 || Number(percentToRemove) > 100}

@@ -1,7 +1,6 @@
 .container {
   width: 100%;
   height: min-content;
-  margin-bottom: 2rem;
 }
 
 .slider {
@@ -17,30 +16,23 @@
   -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
   transition: opacity 0.2s;
 
-  z-index: 3;
-  //   /* Mouse-over effects */
-  //   &:hover {
-  //     opacity: 1; /* Fully shown on mouse-over */
-  //   }
-
-  /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
   &::-webkit-slider-thumb {
-    -webkit-appearance: none; /* Override default look */
+    -webkit-appearance: none;
     appearance: none;
-    width: 8px; /* Set a specific slider handle width */
-    height: 25px; /* Slider handle height */
-    box-shadow: 2px 2px 0px 0px rgba(17, 17, 17, 0.15); /* Specified shadow */
-    background: var(--card-surface-color); /* Green background */
-    cursor: pointer; /* Cursor on hover */
-    z-index: 2;
+    width: 8px;
+    height: 25px;
+    box-shadow: 2px 2px 0px 0px rgba(17, 17, 17, 0.15);
+    background: rgba(var(--dark-color), 1);
+    cursor: pointer;
+    clip-path: polygon(100% 0, 100% 80%, 50% 100%, 0 80%, 0 0);
   }
 
   &::-moz-range-thumb {
-    width: 25px; /* Set a specific slider handle width */
+    width: 8px; /* Set a specific slider handle width */
     height: 25px; /* Slider handle height */
-    background: #04aa6d; /* Green background */
+    background: rgba(var(--dark-color), 1); /* Green background */
+
     cursor: pointer; /* Cursor on hover */
-    z-index: 2;
   }
 }
 
@@ -50,11 +42,19 @@
   flex-direction: row;
   justify-content: space-between;
   padding: 0 4px;
-  z-index: 1;
+  margin-top: 8px;
 }
 
 .step {
   width: 2px;
-  height: 10px;
-  background: var(--primary-90-color);
+  height: 6px;
+  background: rgba(var(--dark-color), 0.6);
+  z-index: 1;
+}
+
+.smallStep {
+  width: 1px;
+  height: 6px;
+  background: rgba(var(--dark-color), 0.2);
+  z-index: 1;
 }
