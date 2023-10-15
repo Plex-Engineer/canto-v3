@@ -40,17 +40,23 @@ export default function Home() {
           themed
         />
 
-        <Container direction="row" gap={20}>
+        <Container
+          direction="row"
+          gap={30}
+          style={{
+            zIndex: 1,
+          }}
+        >
           <Link href="/bridge">
-            <Button>Bridge To Canto</Button>
+            <Button width={280}>Bridge To Canto</Button>
           </Link>
-          <a href="#ecosystem">
+          {/* <a href="#ecosystem">
             {" "}
-            <Button>Explore Ecosystem</Button>
-          </a>
+            <Button width={280}>Explore Ecosystem</Button>
+          </a> */}
         </Container>
 
-        <svg
+        {/* <svg
           xmlns="http://www.w3.org/2000/svg"
           width="28"
           height="16"
@@ -117,7 +123,7 @@ export default function Home() {
             height="3.07692"
             fill="var(--primary-90-color)"
           />
-        </svg>
+        </svg> */}
       </section>
 
       {/* <section className={styles.ecosystem} id="ecosystem">

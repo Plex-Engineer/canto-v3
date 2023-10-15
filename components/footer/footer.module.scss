@@ -1,6 +1,11 @@
 .container {
   display: flex;
   height: 40px;
+  position: fixed;
+  width: 100%;
+  background-color: var(--card-background-color);
+  bottom: 0;
+  z-index: 9;
 
   align-items: center;
   justify-content: space-between;
