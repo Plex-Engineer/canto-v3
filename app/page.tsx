@@ -30,6 +30,9 @@ export default function Home() {
         />
 
         <Icon
+          style={{
+            opacity: 0.5,
+          }}
           icon={{
             url: "/orb.svg",
             size: {
