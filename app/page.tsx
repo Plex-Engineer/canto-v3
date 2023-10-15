@@ -120,7 +120,7 @@ export default function Home() {
         </svg>
       </section>
 
-      <section className={styles.ecosystem} id="ecosystem">
+      {/* <section className={styles.ecosystem} id="ecosystem">
         <Text font="proto_mono" size="title">
           Ecosystem
         </Text>
@@ -154,7 +154,7 @@ export default function Home() {
             link=""
           />
         </div>
-      </section>
+      </section> */}
     </Container>
   );
 }
