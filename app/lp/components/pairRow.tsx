@@ -156,7 +156,7 @@ export const UserAmbientPairRow = ({
 }) => {
   return [
     <div key={pair.address + "symbol"}>
-      <Image src={pair.logoURI} width={30} height={54} alt="logo" />
+      <Image src={pair.logoURI} width={54} height={54} alt="logo" />
       <Spacer width="10px" />
       <Text>{pair.symbol}</Text>
     </div>,
