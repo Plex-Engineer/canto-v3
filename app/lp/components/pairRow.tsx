@@ -4,6 +4,7 @@ import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
 import { AmbientPair } from "@/hooks/pairs/ambient/interfaces/ambientPairs";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
+import { getNoteFromConcLiquidity } from "@/utils/ambient/liquidity.utils";
 import { formatPercent } from "@/utils/formatting.utils";
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import {
@@ -12,6 +13,7 @@ import {
   divideBalances,
   percentOfAmount,
 } from "@/utils/tokens/tokenMath.utils";
+import BigNumber from "bignumber.js";
 import Image from "next/image";
 
 export const UserCantoDexPairRow = ({
@@ -154,6 +156,15 @@ export const UserAmbientPairRow = ({
   pair: AmbientPair;
   onManage: (pairAddress: string) => void;
 }) => {
+  // get user value
+  const userValue = getNoteFromConcLiquidity(
+    pair.q64PriceRoot,
+    pair.userDetails?.defaultRangePosition.liquidity ?? "0",
+    pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
+    pair.userDetails?.defaultRangePosition.upperTick ?? 0,
+    new BigNumber(10).pow(36 - pair.base.decimals).toString(),
+    new BigNumber(10).pow(36 - pair.quote.decimals).toString()
+  );
   return [
     <div key={pair.address + "symbol"}>
       <Image src={pair.logoURI} width={54} height={54} alt="logo" />
@@ -170,18 +181,7 @@ export const UserAmbientPairRow = ({
       )}
     </Text>,
     <Text key={pair.symbol + "value"}>
-      {displayAmount(
-        percentOfAmount(
-          pair.liquidity.tvl,
-          Number(
-            divideBalances(
-              pair.userDetails?.defaultRangePosition.liquidity ?? "0",
-              pair.liquidity.rootLiquidity
-            )
-          )
-        ).data,
-        18
-      )}
+      {displayAmount(userValue, 18)}
       <Icon
         style={{ marginLeft: "5px" }}
         themed

@@ -10,13 +10,10 @@ import { CROC_QUERY_ABI } from "@/config/abis";
 import { multicall } from "wagmi/actions";
 import {
   baseTokenFromConcLiquidity,
+  getNoteFromConcLiquidity,
   quoteTokenFromConcLiquidity,
 } from "@/utils/ambient/liquidity.utils";
 import { DEFAULT_AMBIENT_TICKS } from "../config/prices";
-import {
-  addTokenBalances,
-  convertTokenAmountToNote,
-} from "@/utils/tokens/tokenMath.utils";
 import BigNumber from "bignumber.js";
 
 export async function getGeneralAmbientPairData(
@@ -98,17 +95,13 @@ export async function getGeneralAmbientPairData(
           DEFAULT_AMBIENT_TICKS.maxTick
         );
         // get tvl
-        const baseTokensInNote = convertTokenAmountToNote(
-          baseLiquidity,
-          new BigNumber(10).pow(36 - pair.base.decimals).toString()
-        );
-        const quoteTokensInNote = convertTokenAmountToNote(
-          quoteLiquidity,
+        const tvl = getNoteFromConcLiquidity(
+          q64PriceRoot,
+          concLiquidity,
+          DEFAULT_AMBIENT_TICKS.minTick,
+          DEFAULT_AMBIENT_TICKS.maxTick,
+          new BigNumber(10).pow(36 - pair.base.decimals).toString(),
           new BigNumber(10).pow(36 - pair.quote.decimals).toString()
-        );
-        const tvl = addTokenBalances(
-          baseTokensInNote.data.toString(),
-          quoteTokensInNote.data.toString()
         );
 
         const userPosition = chunkedData[index][3].result
