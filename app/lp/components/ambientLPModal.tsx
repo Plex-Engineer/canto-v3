@@ -25,7 +25,7 @@ import {
   convertFromQ64RootPrice,
   getPriceFromTick,
 } from "@/utils/ambient/ambientMath.utils";
-import { DEFAULT_AMBIENT_TICKS } from "@/hooks/pairs/ambient/config/prices";
+import { getDefaultTickRangeFromChainId } from "@/hooks/pairs/ambient/config/prices";
 import {
   baseTokenFromConcLiquidity,
   getConcBaseTokensFromQuoteTokens,
@@ -139,9 +139,11 @@ const AddAmbientLiquidity = ({
   validateParams,
   sendTxFlow,
 }: AddModalProps) => {
+  // default ticks
+  const DEFAULT_TICKS = getDefaultTickRangeFromChainId(pair.base.chainId);
   // values
-  const defaultMinPrice = getPriceFromTick(DEFAULT_AMBIENT_TICKS.minTick);
-  const defaultMaxPrice = getPriceFromTick(DEFAULT_AMBIENT_TICKS.maxTick);
+  const defaultMinPrice = getPriceFromTick(DEFAULT_TICKS.minTick);
+  const defaultMaxPrice = getPriceFromTick(DEFAULT_TICKS.maxTick);
   const currentPrice = convertFromQ64RootPrice(pair.q64PriceRoot);
   // values
   const [baseValue, setBaseValue] = useState("");
@@ -182,8 +184,8 @@ const AddAmbientLiquidity = ({
 
   // validation
   const paramCheck = validateParams({
-    lowerTick: DEFAULT_AMBIENT_TICKS.minTick,
-    upperTick: DEFAULT_AMBIENT_TICKS.maxTick,
+    lowerTick: DEFAULT_TICKS.minTick,
+    upperTick: DEFAULT_TICKS.maxTick,
     txType: AmbientTxType.ADD_CONC_LIQUIDITY,
     amount:
       lastUpdated === "base"
@@ -268,8 +270,8 @@ const AddAmbientLiquidity = ({
         width={"fill"}
         onClick={() =>
           sendTxFlow({
-            lowerTick: DEFAULT_AMBIENT_TICKS.minTick,
-            upperTick: DEFAULT_AMBIENT_TICKS.maxTick,
+            lowerTick: DEFAULT_TICKS.minTick,
+            upperTick: DEFAULT_TICKS.maxTick,
             txType: AmbientTxType.ADD_CONC_LIQUIDITY,
             amount:
               lastUpdated === "base"
@@ -309,6 +311,9 @@ const RemoveAmbientLiquidity = ({
   validateParams,
   sendTxFlow,
 }: RemoveProps) => {
+  // default ticks
+  const DEFAULT_TICKS = getDefaultTickRangeFromChainId(pair.base.chainId);
+  // percent state
   const [percentToRemove, setPercentToRemove] = useState(0);
   const liquidityToRemove = percentOfAmount(
     pair.userDetails?.defaultRangePosition?.liquidity ?? "0",
@@ -390,8 +395,8 @@ const RemoveAmbientLiquidity = ({
         width={"fill"}
         onClick={() =>
           sendTxFlow({
-            lowerTick: DEFAULT_AMBIENT_TICKS.minTick,
-            upperTick: DEFAULT_AMBIENT_TICKS.maxTick,
+            lowerTick: DEFAULT_TICKS.minTick,
+            upperTick: DEFAULT_TICKS.maxTick,
             txType: AmbientTxType.REMOVE_CONC_LIQUIDITY,
             liquidity: liquidityToRemove.data.toString(),
           })

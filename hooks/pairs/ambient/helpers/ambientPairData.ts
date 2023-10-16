@@ -13,7 +13,7 @@ import {
   getNoteFromConcLiquidity,
   quoteTokenFromConcLiquidity,
 } from "@/utils/ambient/liquidity.utils";
-import { DEFAULT_AMBIENT_TICKS } from "../config/prices";
+import { getDefaultTickRangeFromChainId } from "../config/prices";
 import BigNumber from "bignumber.js";
 
 export async function getGeneralAmbientPairData(
@@ -24,6 +24,8 @@ export async function getGeneralAmbientPairData(
   if (!pairs.length) return NO_ERROR([]);
   // will use multicall to get all data at once
   try {
+    // default ticks
+    const DEFAULT_TICKS = getDefaultTickRangeFromChainId(chainId);
     // get crocQueryAddress
     const crocQueryAddress = getAmbientAddress(chainId, "crocQuery");
     if (!crocQueryAddress) throw Error("chainId not supported");
@@ -48,8 +50,8 @@ export async function getGeneralAmbientPairData(
                 pair.base.address,
                 pair.quote.address,
                 pair.poolIdx,
-                DEFAULT_AMBIENT_TICKS.minTick,
-                DEFAULT_AMBIENT_TICKS.maxTick,
+                DEFAULT_TICKS.minTick,
+                DEFAULT_TICKS.maxTick,
               ],
             },
           ]
@@ -85,21 +87,21 @@ export async function getGeneralAmbientPairData(
         const baseLiquidity = baseTokenFromConcLiquidity(
           q64PriceRoot,
           concLiquidity,
-          DEFAULT_AMBIENT_TICKS.minTick,
-          DEFAULT_AMBIENT_TICKS.maxTick
+          DEFAULT_TICKS.minTick,
+          DEFAULT_TICKS.maxTick
         );
         const quoteLiquidity = quoteTokenFromConcLiquidity(
           q64PriceRoot,
           concLiquidity,
-          DEFAULT_AMBIENT_TICKS.minTick,
-          DEFAULT_AMBIENT_TICKS.maxTick
+          DEFAULT_TICKS.minTick,
+          DEFAULT_TICKS.maxTick
         );
         // get tvl
         const tvl = getNoteFromConcLiquidity(
           q64PriceRoot,
           concLiquidity,
-          DEFAULT_AMBIENT_TICKS.minTick,
-          DEFAULT_AMBIENT_TICKS.maxTick,
+          DEFAULT_TICKS.minTick,
+          DEFAULT_TICKS.maxTick,
           new BigNumber(10).pow(36 - pair.base.decimals).toString(),
           new BigNumber(10).pow(36 - pair.quote.decimals).toString()
         );
@@ -110,8 +112,8 @@ export async function getGeneralAmbientPairData(
                 liquidity: [],
                 defaultRangePosition: {
                   liquidity: (chunkedData[index][3].result[0] ?? 0).toString(),
-                  lowerTick: DEFAULT_AMBIENT_TICKS.minTick,
-                  upperTick: DEFAULT_AMBIENT_TICKS.maxTick,
+                  lowerTick: DEFAULT_TICKS.minTick,
+                  upperTick: DEFAULT_TICKS.maxTick,
                 },
               },
             }
