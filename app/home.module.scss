@@ -34,7 +34,7 @@
   padding: 2rem;
   margin: 2rem 0;
   margin-bottom: 4rem;
-  min-height: calc(100vh - 50px);
+  max-height: calc(100vh - 50px);
   position: relative;
   &::before {
     content: "";
