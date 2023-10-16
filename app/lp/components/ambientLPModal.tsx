@@ -244,7 +244,7 @@ const AddAmbientLiquidity = ({
           name="Price"
           value={displayAmount(
             currentPrice,
-            Math.abs(pair.base.decimals - pair.quote.decimals)
+            pair.base.decimals - pair.quote.decimals
           )}
         />
 
@@ -252,7 +252,7 @@ const AddAmbientLiquidity = ({
           name="Min Price"
           value={displayAmount(
             defaultMinPrice,
-            Math.abs(pair.base.decimals - pair.quote.decimals)
+            pair.base.decimals - pair.quote.decimals
           )}
         />
 
@@ -260,7 +260,7 @@ const AddAmbientLiquidity = ({
           name="Max Price"
           value={displayAmount(
             defaultMaxPrice,
-            Math.abs(pair.base.decimals - pair.quote.decimals)
+            pair.base.decimals - pair.quote.decimals
           )}
         />
       </Container>

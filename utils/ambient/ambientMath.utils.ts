@@ -1,5 +1,4 @@
 import BigNumber from "bignumber.js";
-import { convertToBigNumber } from "../tokenBalances.utils";
 
 ///
 /// IMPORTANT NOTES:
@@ -7,7 +6,6 @@ import { convertToBigNumber } from "../tokenBalances.utils";
 ///
 
 export const Q64_SCALE = new BigNumber(2).pow(64);
-
 /**
  * @notice converts a Q64 price to a string
  * @dev Will return how much base token is worth in quote token (not scaled)
@@ -15,34 +13,30 @@ export const Q64_SCALE = new BigNumber(2).pow(64);
  * @returns {string} converted price (wei of base per wei of quote)
  */
 export function convertFromQ64RootPrice(q64RootPrice: string): string {
-  const { data: priceBN, error } = convertToBigNumber(q64RootPrice);
-  if (error) {
-    return "0";
-  }
+  // convert price to big number
+  const priceBN = new BigNumber(q64RootPrice);
   // divide price by scale
   const priceScaled = priceBN.div(Q64_SCALE);
   // square price to get final value
   const priceFinal = priceScaled.times(priceScaled);
   // return as string
-  return priceFinal.integerValue().toString();
+  return priceFinal.toString();
 }
 
 /**
  * @notice converts a string price to a Q64 price
  * @param {string} price price to convert
- * @returns {BigNumber} converted price Q64 notation
+ * @returns {string} converted price Q64 notation
  */
-export function convertToQ64RootPrice(price: string): BigNumber {
-  const { data: priceBN, error } = convertToBigNumber(price);
-  if (error) {
-    return new BigNumber("0");
-  }
+export function convertToQ64RootPrice(price: string): string {
+  // convert price to big number
+  const priceBN = new BigNumber(price);
   // take square root of the price
   const priceRoot = priceBN.sqrt();
   // multiply by scale
   const priceScaled = priceRoot.times(Q64_SCALE);
   // return
-  return priceScaled;
+  return priceScaled.integerValue().toString();
 }
 
 /**
@@ -63,5 +57,6 @@ function getTickFromPrice(price: string): number {
  */
 export function getPriceFromTick(tick: number): string {
   const price = Math.pow(1.0001, tick);
-  return Math.trunc(price).toString();
+  // remove scientific notation
+  return new BigNumber(price).toString();
 }
