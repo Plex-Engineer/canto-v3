@@ -89,7 +89,9 @@ export default function Page() {
   /** AMBIENT */
   const { ambientPairs } = ambient;
   const userAmbientPairs = ambientPairs.filter(
-    (pair) => Number(pair.userDetails?.defaultRangePosition.liquidity) !== 0
+    (pair) =>
+      pair.userDetails &&
+      Number(pair.userDetails?.defaultRangePosition.liquidity) !== 0
   );
 
   //transactions
@@ -177,8 +179,8 @@ export default function Page() {
           ]}
           columns={7}
           processedData={[
-            ...userCantoDexPairs.map((pair) => (
-              <UserCantoDexPairRow
+            ...userAmbientPairs.map((pair) => (
+              <UserAmbientPairRow
                 key={pair.symbol}
                 pair={pair}
                 onManage={(pairAddress) => {
@@ -186,8 +188,8 @@ export default function Page() {
                 }}
               />
             )),
-            ...userAmbientPairs.map((pair) => (
-              <UserAmbientPairRow
+            ...userCantoDexPairs.map((pair) => (
+              <UserCantoDexPairRow
                 key={pair.symbol}
                 pair={pair}
                 onManage={(pairAddress) => {
@@ -204,6 +206,13 @@ export default function Page() {
         headers={["Pair", "APR", "TVL", "Type", "action"]}
         columns={6}
         processedData={[
+          ...ambientPairs.map((pair) => (
+            <GeneralAmbientPairRow
+              key={pair.symbol}
+              pair={pair}
+              onAddLiquidity={(pairAddress) => setPair(pairAddress)}
+            />
+          )),
           ...sortedPairs.map((pair) => (
             <GeneralCantoDexPairRow
               key={pair.symbol}
@@ -211,13 +220,6 @@ export default function Page() {
               onAddLiquidity={(pairAddress) => {
                 setPair(pairAddress);
               }}
-            />
-          )),
-          ...ambientPairs.map((pair) => (
-            <GeneralAmbientPairRow
-              key={pair.symbol}
-              pair={pair}
-              onAddLiquidity={(pairAddress) => setPair(pairAddress)}
             />
           )),
         ]}

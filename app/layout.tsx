@@ -23,12 +23,6 @@ const proto_mono = localFont({
   style: "normal",
   variable: "--proto-mono",
 });
-export const metadata: Metadata = {
-  title: "Canto-v3",
-  icons: [
-    "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/canto.svg",
-  ],
-};
 
 export default function RootLayout({
   children,
