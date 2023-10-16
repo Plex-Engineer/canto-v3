@@ -99,7 +99,7 @@ export function formatBalance(
     precision ??
     2 - Math.floor(Math.log(formattedAmount.toNumber()) / Math.log(10));
   // make sure tuncation is not negative or greater than decimals
-  truncateAt = Math.max(0, Math.min(truncateAt, decimals));
+  truncateAt = Math.max(0, Math.min(truncateAt, decimals < 0 ? truncateAt : decimals));
   // convert amount to string
   const stringAmount = formattedAmount.toString();
   // get index of the decimal in the string

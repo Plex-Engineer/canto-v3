@@ -80,7 +80,11 @@ export function getConcQuoteTokensFromBaseTokens(
   maxPrice: string
 ): string {
   // check if zero
-  if (Number(amount) === 0) {
+  if (
+    Number(amount) === 0 ||
+    Number(currentPrice) < Number(minPrice) ||
+    Number(currentPrice) > Number(maxPrice)
+  ) {
     return "0";
   }
   const liquidity = liquidityForBaseConc(
@@ -119,7 +123,11 @@ export function getConcBaseTokensFromQuoteTokens(
   maxPrice: string
 ): string {
   // check if zero
-  if (Number(amount) === 0) {
+  if (
+    Number(amount) === 0 ||
+    Number(currentPrice) < Number(minPrice) ||
+    Number(currentPrice) > Number(maxPrice)
+  ) {
     return "0";
   }
   const liquidity = liquidityForQuoteConc(
