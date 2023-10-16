@@ -26,7 +26,7 @@ export default function Home() {
               height: 80,
             },
           }}
-          themed
+          //   themed
         />
 
         <Icon

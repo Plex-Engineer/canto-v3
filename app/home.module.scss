@@ -45,6 +45,10 @@
     width: 100%;
     height: 100%;
     background-image: url("/bg.jpg");
-    filter: invert(var(--dark-mode));
+    background-repeat: no-repeat;
+    // filter: invert(var(--dark-mode));
+    &:has(.dark-mode) {
+      filter: invert(var(--dark-mode));
+    }
   }
 }

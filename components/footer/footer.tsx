@@ -34,7 +34,7 @@ const Footer = () => {
         <FooterLink href="https://canto.mirror.xyz/" text="about" />
         <FooterLink href="https://docs.canto.io/" text="docs" />
         <FooterLink href="https://canto.build/" text="commons" />
-        {/* <FooterLink href="https://canto.canny.io/" text="report bug" /> */}
+        <FooterLink href="https://canto.canny.io/" text="report bug" />
         {/* <FooterLink href="https://v2.canto.io/" text="canto v2" /> */}
         <FooterButton text="theme" />
       </div>
