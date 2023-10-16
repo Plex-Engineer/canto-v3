@@ -1,0 +1,60 @@
+.container {
+  width: 100%;
+  height: min-content;
+}
+
+.slider {
+  -webkit-appearance: none; /* Override default CSS styles */
+  appearance: none;
+  width: 100%; /* Full-width */
+  height: 4px; /* Specified height */
+  background: #d3d3d3; /* Grey background */
+  border: 1px solid var(--border-stroke-color);
+  box-shadow: 2px 2px 0px 0px rgba(17, 17, 17, 0.15); /* Specified shadow */
+  outline: none; /* Remove outline */
+  opacity: 1; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+  transition: opacity 0.2s;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 8px;
+    height: 25px;
+    box-shadow: 2px 2px 0px 0px rgba(17, 17, 17, 0.15);
+    background: rgba(var(--dark-color), 1);
+    cursor: pointer;
+    clip-path: polygon(100% 0, 100% 80%, 50% 100%, 0 80%, 0 0);
+  }
+
+  &::-moz-range-thumb {
+    width: 8px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: rgba(var(--dark-color), 1); /* Green background */
+
+    cursor: pointer; /* Cursor on hover */
+  }
+}
+
+.steps {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 4px;
+  margin-top: 8px;
+}
+
+.step {
+  width: 2px;
+  height: 6px;
+  background: rgba(var(--dark-color), 0.6);
+  z-index: 1;
+}
+
+.smallStep {
+  width: 1px;
+  height: 6px;
+  background: rgba(var(--dark-color), 0.2);
+  z-index: 1;
+}

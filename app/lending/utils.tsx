@@ -1,10 +1,10 @@
 import { ValidationReturn } from "@/config/interfaces";
+import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { getCTokensFromType } from "@/hooks/lending/config/cTokenAddresses";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 import useLending from "@/hooks/lending/useLending";
-import useTransactionStore from "@/stores/transactionStore";
 import { listIncludesAddress } from "@/utils/address.utils";
 import { getCirculatingNote } from "@/utils/clm/noteStats.utils";
 import {
@@ -13,8 +13,6 @@ import {
 } from "@/utils/tokens/tokenMath.utils";
 import BigNumber from "bignumber.js";
 import { useEffect, useMemo, useState } from "react";
-import { useWalletClient } from "wagmi";
-import { useStore } from "zustand";
 
 interface LendingComboReturn {
   cTokens: {
@@ -54,16 +52,12 @@ interface LendingComboProps {
 }
 export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
   // params for useLending hook
-  const { data: signer } = useWalletClient();
-  const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
+  const { chainId, signer, txStore } = useCantoSigner();
   const { cTokens, position, isLoading, transaction, selection } = useLending({
     chainId,
     lmType: "lending",
     userEthAddress: signer?.account.address,
   });
-
-  // transaction store
-  const txStore = useStore(useTransactionStore, (state) => state);
 
   // sorted tokens
   const cNoteAddress = getCTokensFromType(chainId, "cNote");

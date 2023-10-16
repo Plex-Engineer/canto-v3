@@ -14,6 +14,7 @@ export interface CantoDexHookInputParams {
 }
 
 export interface CantoDexHookReturn {
+  isLoading: boolean;
   pairs: CantoDexPairWithUserCTokenData[];
   position: UserLMPosition;
   transaction: {

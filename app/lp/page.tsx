@@ -2,9 +2,6 @@
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
-import useTransactionStore from "@/stores/transactionStore";
-import useStore from "@/stores/useStore";
-import { useWalletClient } from "wagmi";
 import { ValidationReturn } from "@/config/interfaces";
 import {
   GeneralAmbientPairRow,
@@ -21,31 +18,17 @@ import {
   isAmbientPair,
   isCantoDexPair,
 } from "@/hooks/pairs/lpCombo/interfaces.ts/pairTypes";
-import Button from "@/components/button/button";
 import { AmbientModal } from "./components/ambientLPModal";
 import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
-import {
-  baseTokenFromConcLiquidity,
-  quoteTokenFromConcLiquidity,
-} from "@/utils/ambient/liquidity.utils";
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import Rewards from "./components/rewards";
-import Image from "next/image";
-import {
-  divideBalances,
-  percentOfAmount,
-} from "@/utils/tokens/tokenMath.utils";
-import Icon from "@/components/icon/icon";
-import { formatPercent } from "@/utils/formatting.utils";
+import Container from "@/components/container/container";
+import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 
 export default function Page() {
-  const { data: signer } = useWalletClient();
-  const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
-
-  const txStore = useStore(useTransactionStore, (state) => state);
-
+  const { txStore, signer, chainId } = useCantoSigner();
   // all pairs (ambient and cantoDex)
-  const { cantoDex, ambient, selection } = useLP({
+  const { cantoDex, ambient, selection, isLoading } = useLP({
     chainId,
     userEthAddress: signer?.account.address ?? "",
   });
@@ -141,6 +124,10 @@ export default function Page() {
   /** general selection */
   const { pair: selectedPair, setPair } = selection;
 
+  if (isLoading) {
+    return <div className={styles.loading}>{""}</div>;
+  }
+
   //main content
   return (
     <div className={styles.container}>
@@ -160,17 +147,20 @@ export default function Page() {
           />
         )}
       </Modal>
-      <Text size="x-lg" className={styles.title}>
-        LP Interface
-      </Text>
-      <Spacer height="30px" />
 
-      <Rewards
-        onClick={sendClaimRewardsFlow}
-        value={displayAmount(cantoDex.position.totalRewards, 18, {
-          symbol: "WCANTO",
-        })}
-      />
+      <Container direction="row" gap={"auto"} width="100%">
+        <Text size="x-lg" className={styles.title}>
+          LP
+        </Text>
+        <Spacer height="30px" />
+
+        <Rewards
+          onClick={sendClaimRewardsFlow}
+          value={displayAmount(cantoDex.position.totalRewards, 18, {
+            precision: 4,
+          })}
+        />
+      </Container>
       <Spacer height="30px" />
       {userCantoDexPairs.length + userAmbientPairs.length > 0 && (
         <Table

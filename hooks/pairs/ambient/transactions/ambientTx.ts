@@ -22,6 +22,7 @@ import {
 import {
   getConcBaseTokensFromQuoteTokens,
   getConcQuoteTokensFromBaseTokens,
+  roundLiquidityForAmbientTx,
 } from "@/utils/ambient/liquidity.utils";
 import { getAmbientAddress } from "../config/addresses";
 import { createApprovalTxs } from "@/utils/evm/erc20.utils";
@@ -34,12 +35,10 @@ export async function ambientLiquidityTx(
   // get upper and lower price limits from ticks
   const minPriceWei = getPriceFromTick(params.lowerTick);
   const maxPriceWei = getPriceFromTick(params.upperTick);
-  const minPriceQ64 = convertToQ64RootPrice(minPriceWei)
-    .integerValue()
-    .toString();
-  const maxPriceQ64 = convertToQ64RootPrice(maxPriceWei)
-    .integerValue()
-    .toString();
+  const minPriceQ64 = convertToQ64RootPrice(minPriceWei);
+  const maxPriceQ64 = convertToQ64RootPrice(maxPriceWei);
+
+  // get croc dex address
   const crocDexAddress = getAmbientAddress(params.chainId, "crocDex");
   if (!crocDexAddress) {
     return NEW_ERROR("Ambient liquidity tx:: Invalid chain id");
@@ -257,7 +256,7 @@ const _removeConcLiquidityTx = (
       poolIdx,
       lowerTick,
       upperTick,
-      liquidity,
+      roundLiquidityForAmbientTx(liquidity),
       minPriceQ64,
       maxPriceQ64,
       0,

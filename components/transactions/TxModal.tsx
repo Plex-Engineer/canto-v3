@@ -3,9 +3,6 @@ import Modal from "../modal/modal";
 import Button from "../button/button";
 import Icon from "../icon/icon";
 import TxFlow from "./TxFlow";
-import useStore from "@/stores/useStore";
-import useTransactionStore from "@/stores/transactionStore";
-import { useWalletClient } from "wagmi";
 import Container from "../container/container";
 import Text from "../text";
 import styles from "./transactions.module.scss";
@@ -14,6 +11,7 @@ import clsx from "clsx";
 import StatusIcon from "../icon/statusIcon";
 import Splash from "../splash/splash";
 import { dateToMomentsAgo } from "@/utils/formatting.utils";
+import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 
 const TransactionModal = () => {
   // set modal open state
@@ -22,9 +20,7 @@ const TransactionModal = () => {
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
 
   // connected signer
-  const { data: signer } = useWalletClient();
-  // transaction store
-  const txStore = useStore(useTransactionStore, (state) => state);
+  const { signer, txStore } = useCantoSigner();
 
   // get transaction flows for user
   const transactionFlows = txStore?.getUserTransactionFlows(

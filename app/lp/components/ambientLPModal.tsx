@@ -25,7 +25,7 @@ import {
   convertFromQ64RootPrice,
   getPriceFromTick,
 } from "@/utils/ambient/ambientMath.utils";
-import { DEFAULT_AMBIENT_TICKS } from "@/hooks/pairs/ambient/config/prices";
+import { getDefaultTickRangeFromChainId } from "@/hooks/pairs/ambient/config/prices";
 import {
   baseTokenFromConcLiquidity,
   getConcBaseTokensFromQuoteTokens,
@@ -33,6 +33,8 @@ import {
   quoteTokenFromConcLiquidity,
 } from "@/utils/ambient/liquidity.utils";
 import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
+import Slider from "@/components/slider/slider";
+import clsx from "clsx";
 
 interface AmbientModalProps {
   pair: AmbientPair;
@@ -78,14 +80,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
                 content: (
                   <Container width="100%" margin="sm">
                     <div className={styles.iconTitle}>
-                      <div style={{ display: "flex", flexDirection: "row" }}>
-                        <Icon
-                          icon={{ url: props.pair.base.logoURI, size: 60 }}
-                        />
-                        <Icon
-                          icon={{ url: props.pair.quote.logoURI, size: 60 }}
-                        />
-                      </div>
+                      <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
                       <Text size="lg" font="proto_mono">
                         {props.pair.symbol}
                       </Text>
@@ -106,14 +101,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
                 content: (
                   <Container width="100%" margin="sm">
                     <div className={styles.iconTitle}>
-                      <div style={{ display: "flex", flexDirection: "row" }}>
-                        <Icon
-                          icon={{ url: props.pair.base.logoURI, size: 60 }}
-                        />
-                        <Icon
-                          icon={{ url: props.pair.quote.logoURI, size: 60 }}
-                        />
-                      </div>
+                      <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
                       <Text size="lg" font="proto_mono">
                         {props.pair.symbol}
                       </Text>
@@ -151,9 +139,11 @@ const AddAmbientLiquidity = ({
   validateParams,
   sendTxFlow,
 }: AddModalProps) => {
+  // default ticks
+  const DEFAULT_TICKS = getDefaultTickRangeFromChainId(pair.base.chainId);
   // values
-  const defaultMinPrice = getPriceFromTick(DEFAULT_AMBIENT_TICKS.minTick);
-  const defaultMaxPrice = getPriceFromTick(DEFAULT_AMBIENT_TICKS.maxTick);
+  const defaultMinPrice = getPriceFromTick(DEFAULT_TICKS.minTick);
+  const defaultMaxPrice = getPriceFromTick(DEFAULT_TICKS.maxTick);
   const currentPrice = convertFromQ64RootPrice(pair.q64PriceRoot);
   // values
   const [baseValue, setBaseValue] = useState("");
@@ -161,6 +151,11 @@ const AddAmbientLiquidity = ({
   const [lastUpdated, setLastUpdated] = useState<"base" | "quote">("base");
 
   function setValue(value: string, isBase: boolean) {
+    if (value === "") {
+      setQuoteValue("");
+      setBaseValue("");
+      return;
+    }
     if (isBase) {
       setLastUpdated("base");
       setBaseValue(value);
@@ -194,8 +189,8 @@ const AddAmbientLiquidity = ({
 
   // validation
   const paramCheck = validateParams({
-    lowerTick: DEFAULT_AMBIENT_TICKS.minTick,
-    upperTick: DEFAULT_AMBIENT_TICKS.maxTick,
+    lowerTick: DEFAULT_TICKS.minTick,
+    upperTick: DEFAULT_TICKS.maxTick,
     txType: AmbientTxType.ADD_CONC_LIQUIDITY,
     amount:
       lastUpdated === "base"
@@ -254,7 +249,7 @@ const AddAmbientLiquidity = ({
           name="Price"
           value={displayAmount(
             currentPrice,
-            Math.abs(pair.base.decimals - pair.quote.decimals)
+            pair.base.decimals - pair.quote.decimals
           )}
         />
 
@@ -262,7 +257,7 @@ const AddAmbientLiquidity = ({
           name="Min Price"
           value={displayAmount(
             defaultMinPrice,
-            Math.abs(pair.base.decimals - pair.quote.decimals)
+            pair.base.decimals - pair.quote.decimals
           )}
         />
 
@@ -270,18 +265,18 @@ const AddAmbientLiquidity = ({
           name="Max Price"
           value={displayAmount(
             defaultMaxPrice,
-            Math.abs(pair.base.decimals - pair.quote.decimals)
+            pair.base.decimals - pair.quote.decimals
           )}
         />
       </Container>
       <Spacer height="30px" />
       <Button
-        disabled={!paramCheck.isValid}
+        disabled={!paramCheck.isValid || Number(baseValue) === 0 || Number(quoteValue) === 0}
         width={"fill"}
         onClick={() =>
           sendTxFlow({
-            lowerTick: DEFAULT_AMBIENT_TICKS.minTick,
-            upperTick: DEFAULT_AMBIENT_TICKS.maxTick,
+            lowerTick: DEFAULT_TICKS.minTick,
+            upperTick: DEFAULT_TICKS.maxTick,
             txType: AmbientTxType.ADD_CONC_LIQUIDITY,
             amount:
               lastUpdated === "base"
@@ -321,6 +316,9 @@ const RemoveAmbientLiquidity = ({
   validateParams,
   sendTxFlow,
 }: RemoveProps) => {
+  // default ticks
+  const DEFAULT_TICKS = getDefaultTickRangeFromChainId(pair.base.chainId);
+  // percent state
   const [percentToRemove, setPercentToRemove] = useState(0);
   const liquidityToRemove = percentOfAmount(
     pair.userDetails?.defaultRangePosition?.liquidity ?? "0",
@@ -330,25 +328,35 @@ const RemoveAmbientLiquidity = ({
   return (
     <div>
       <Spacer height="10px" />
-      <Input
-        value={percentToRemove.toString()}
-        onChange={(e) => setPercentToRemove(Number(e.target.value))}
-        type="number"
-        min={0}
-        max={100}
-        label="percent to remove"
-        error={Number(percentToRemove) < 0 || Number(percentToRemove) > 100}
-        errorMessage="Percentage must be between 0 and 100%"
-      />
-      <Spacer height="20px" />
-
-      <Text
-        font="proto_mono"
-        size="xx-sm"
-        style={{
-          marginLeft: "16px",
+      <Container
+        direction="row"
+        backgroundColor="var(--card-surface-color)"
+        gap={20}
+        center={{
+          horizontal: true,
+          vertical: true,
         }}
+        className={clsx(styles.card, styles.sliderContainer)}
       >
+        <Slider
+          value={percentToRemove}
+          onChange={(val) => setPercentToRemove(val)}
+          min={0}
+          max={100}
+          step={5}
+          label="percent to remove"
+        />
+        <Input
+          value={percentToRemove.toString()}
+          onChange={(e) => setPercentToRemove(Number(e.target.value))}
+          type="number"
+          min={0}
+          max={100}
+        />
+      </Container>
+      <Spacer height="40px" />
+
+      <Text font="proto_mono" size="sm">
         Expected Tokens
       </Text>
       <Spacer height="6px" />
@@ -385,15 +393,15 @@ const RemoveAmbientLiquidity = ({
           )}
         />
       </Container>
-      <Spacer height="30px" />
+      <Spacer height="140px" />
 
       <Button
         disabled={Number(percentToRemove) <= 0 || Number(percentToRemove) > 100}
         width={"fill"}
         onClick={() =>
           sendTxFlow({
-            lowerTick: DEFAULT_AMBIENT_TICKS.minTick,
-            upperTick: DEFAULT_AMBIENT_TICKS.maxTick,
+            lowerTick: DEFAULT_TICKS.minTick,
+            upperTick: DEFAULT_TICKS.maxTick,
             txType: AmbientTxType.REMOVE_CONC_LIQUIDITY,
             liquidity: liquidityToRemove.data.toString(),
           })

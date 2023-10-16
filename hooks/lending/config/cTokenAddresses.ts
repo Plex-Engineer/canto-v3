@@ -3,7 +3,7 @@ import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
 const C_TOKEN_ADDRESSES_BY_TYPE = {
   mainnet: {
     cNote: "0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
-    rwas: [],
+    rwas: ["0x0355E393cF0cf5486D9CAefB64407b7B1033C2f1"],
     lps: [
       "0x3C96dCfd875253A37acB3D2B102b6f328349b16B", //cCantoNoteLP
       "0xC0D6574b2fe71eED8Cd305df0DA2323237322557", //cCantoAtomLP

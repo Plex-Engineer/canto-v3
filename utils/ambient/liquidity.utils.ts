@@ -3,6 +3,7 @@ import {
   liquidityForBaseConc,
   liquidityForQuoteConc,
   quoteTokenForConcLiq,
+  roundForConcLiq,
 } from "@crocswap-libs/sdk";
 import { convertToBigNumber } from "../tokenBalances.utils";
 import {
@@ -11,7 +12,11 @@ import {
   getPriceFromTick,
 } from "./ambientMath.utils";
 import { BigNumber } from "ethers";
-import { percentOfAmount } from "../tokens/tokenMath.utils";
+import {
+  addTokenBalances,
+  convertTokenAmountToNote,
+  percentOfAmount,
+} from "../tokens/tokenMath.utils";
 
 /**
  * @notice gets the amount of active base token liquidity
@@ -75,7 +80,11 @@ export function getConcQuoteTokensFromBaseTokens(
   maxPrice: string
 ): string {
   // check if zero
-  if (Number(amount) === 0) {
+  if (
+    !amount ||
+    Number(amount) === 0 ||
+    Number(currentPrice) < Number(minPrice)
+  ) {
     return "0";
   }
   const liquidity = liquidityForBaseConc(
@@ -114,7 +123,11 @@ export function getConcBaseTokensFromQuoteTokens(
   maxPrice: string
 ): string {
   // check if zero
-  if (Number(amount) === 0) {
+  if (
+    !amount ||
+    Number(amount) === 0 ||
+    Number(currentPrice) > Number(maxPrice)
+  ) {
     return "0";
   }
   const liquidity = liquidityForQuoteConc(
@@ -193,4 +206,58 @@ export function quoteTokenFromConcLiquidity(
     Number(upperPrice)
   );
   return quoteTokens.toString();
+}
+
+/**
+ * @notice gets note amount from range position
+ * @param q64Price q64 price of base in quote
+ * @param liquidity liquidity of position
+ * @param lowerTick lower tick of position
+ * @param upperTick upper tick of position
+ * @param priceBase price of base token
+ * @param priceQuote price of quote token
+ * @returns note amount
+ */
+export function getNoteFromConcLiquidity(
+  q64Price: string,
+  liquidity: string,
+  lowerTick: number,
+  upperTick: number,
+  priceBase: string,
+  priceQuote: string
+): string {
+  // get tokens from liquidity
+  const baseTokens = baseTokenFromConcLiquidity(
+    q64Price,
+    liquidity,
+    lowerTick,
+    upperTick
+  );
+  const quoteTokens = quoteTokenFromConcLiquidity(
+    q64Price,
+    liquidity,
+    lowerTick,
+    upperTick
+  );
+  // get note from tokens
+  const baseNote = convertTokenAmountToNote(baseTokens, priceBase);
+  const quoteNote = convertTokenAmountToNote(quoteTokens, priceQuote);
+  if (baseNote.error || quoteNote.error) {
+    return "0";
+  }
+  // add note amounts
+  const noteAmount = addTokenBalances(
+    baseNote.data.toString(),
+    quoteNote.data.toString()
+  );
+  return noteAmount;
+}
+
+/**
+ * @notice rounds liquidity value to acceptable ambient tx value
+ * @param liq liquidity value
+ * @returns rounded liquidity value
+ */
+export function roundLiquidityForAmbientTx(liq: string): string {
+  return roundForConcLiq(BigNumber.from(liq)).toString();
 }

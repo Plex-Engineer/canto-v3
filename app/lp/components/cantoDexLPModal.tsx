@@ -29,6 +29,7 @@ import {
 } from "@/utils/tokens/tokenMath.utils";
 import { formatPercent } from "@/utils/formatting.utils";
 import { areEqualAddresses } from "@/utils/address.utils";
+import PopUp from "@/components/popup/popup";
 
 interface ManageCantoDexLPProps {
   pair: CantoDexPairWithUserCTokenData;
@@ -317,7 +318,10 @@ const AddLiquidityModal = ({
         amount: value,
       });
     }
-    if (optimalAmount.error) return;
+    if (optimalAmount.error) {
+      token1 ? setValueToken2("") : setValueToken1("");
+      return;
+    }
     token1
       ? setValueToken2(optimalAmount.data)
       : setValueToken1(optimalAmount.data);
@@ -445,11 +449,55 @@ const AddLiquidityModal = ({
         />
       </Container>
 
-      <Container direction="row" gap={14} margin="sm">
-        <Text size="sm" font="proto_mono">
-          Stake
-        </Text>
-        <Toggle onChange={(value) => setWillStake(value)} value={willStake} />
+      <Container
+        direction="row"
+        gap={"auto"}
+        width="fill"
+        style={{
+          padding: "16px 0",
+        }}
+      >
+        <div></div>
+        <Container
+          direction="row"
+          gap={12}
+          center={{
+            vertical: true,
+          }}
+        >
+          <Text size="sm" font="proto_mono">
+            Stake
+          </Text>
+          <div>
+            <PopUp
+              content={
+                <Text>
+                  To receive rewards you&apos;ll need to stake your LP tokens.
+                </Text>
+              }
+              width="300px"
+            >
+              {/* <Icon
+          icon={{
+            url: "/check.svg",
+            size: 24,
+          }}
+        /> */}
+              <span className={styles.infoPop}>
+                <Text
+                  theme="secondary-dark"
+                  size="sm"
+                  style={{
+                    textAlign: "right",
+                  }}
+                >
+                  ?
+                </Text>
+              </span>
+            </PopUp>
+          </div>
+          <Toggle onChange={(value) => setWillStake(value)} value={willStake} />
+        </Container>
       </Container>
 
       <Button

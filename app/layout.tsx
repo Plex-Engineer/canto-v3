@@ -7,6 +7,7 @@ import NavBar from "@/components/nav_bar/navBar";
 import CantoWalletProvider from "@/provider/rainbowProvider";
 import { QueryClient, QueryClientProvider } from "react-query";
 import localFont from "next/font/local";
+import DesktopOnly from "@/components/desktop-only/desktop-only";
 
 const rm_mono = localFont({
   src: "../fonts/rm-mono-regular.ttf",
@@ -46,10 +47,11 @@ export default function RootLayout({
           } as React.CSSProperties
         }
       >
+        <DesktopOnly />
         <CantoWalletProvider>
           <QueryClientProvider client={new QueryClient()}>
             <div className="body">
-              {/* <InfoBar
+              <InfoBar
                 values={[
                   {
                     name: "contracts w/ CSR enabled:",
@@ -76,8 +78,7 @@ export default function RootLayout({
                     isPositive: false,
                   },
                 ]}
-              /> */}
-              <div></div>
+              />
               <NavBar />
               {children}
               <div id="modal-root"></div>
