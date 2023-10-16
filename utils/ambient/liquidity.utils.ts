@@ -3,6 +3,7 @@ import {
   liquidityForBaseConc,
   liquidityForQuoteConc,
   quoteTokenForConcLiq,
+  roundForConcLiq,
 } from "@crocswap-libs/sdk";
 import { convertToBigNumber } from "../tokenBalances.utils";
 import {
@@ -242,4 +243,13 @@ export function getNoteFromConcLiquidity(
     quoteNote.data.toString()
   );
   return noteAmount;
+}
+
+/**
+ * @notice rounds liquidity value to acceptable ambient tx value
+ * @param liq liquidity value
+ * @returns rounded liquidity value
+ */
+export function roundLiquidityForAmbientTx(liq: string): string {
+  return roundForConcLiq(BigNumber.from(liq)).toString();
 }

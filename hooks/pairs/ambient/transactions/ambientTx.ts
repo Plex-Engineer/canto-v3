@@ -22,6 +22,7 @@ import {
 import {
   getConcBaseTokensFromQuoteTokens,
   getConcQuoteTokensFromBaseTokens,
+  roundLiquidityForAmbientTx,
 } from "@/utils/ambient/liquidity.utils";
 import { getAmbientAddress } from "../config/addresses";
 import { createApprovalTxs } from "@/utils/evm/erc20.utils";
@@ -257,7 +258,7 @@ const _removeConcLiquidityTx = (
       poolIdx,
       lowerTick,
       upperTick,
-      liquidity,
+      roundLiquidityForAmbientTx(liquidity),
       minPriceQ64,
       maxPriceQ64,
       0,
