@@ -12,6 +12,7 @@ interface UseLPProps {
   userEthAddress?: string;
 }
 interface UseLPReturn {
+  isLoading: boolean;
   cantoDex: CantoDexHookReturn;
   ambient: AmbientHookReturn;
   selection: {
@@ -43,6 +44,7 @@ export default function useLP(props: UseLPProps): UseLPReturn {
   }
 
   return {
+    isLoading: cantoDex.isLoading && ambient.isLoading,
     cantoDex,
     ambient,
     selection: {

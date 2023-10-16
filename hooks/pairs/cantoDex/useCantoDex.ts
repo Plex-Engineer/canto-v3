@@ -35,7 +35,7 @@ export default function useCantoDex(
   ///
 
   // query for all pair data
-  const { data: pairs } = useQuery(
+  const { data: pairs, isLoading } = useQuery(
     ["canto dex", params.chainId],
     async (): Promise<CantoDexPair[]> => {
       const { data, error } = await getCantoApiData<CantoDexPair[]>(
@@ -199,6 +199,7 @@ export default function useCantoDex(
   }
 
   return {
+    isLoading,
     pairs: pairsWithUserCTokens ?? [],
     position,
     transaction: {

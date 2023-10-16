@@ -12,6 +12,7 @@ export interface AmbientHookInputParams {
 }
 
 export interface AmbientHookReturn {
+  isLoading: boolean;
   ambientPairs: AmbientPair[];
   transaction: {
     validateParams: (txParams: AmbientTransactionParams) => ValidationReturn;

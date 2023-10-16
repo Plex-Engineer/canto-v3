@@ -39,7 +39,7 @@ export default function useAmbientPairs(
   ///
 
   // use query for all ambient pair data
-  const { data: ambientPairs } = useQuery(
+  const { data: ambientPairs, isLoading } = useQuery(
     ["ambientPairs", params.chainId, params.userEthAddress],
     async () => {
       const pairs = getAmbientPairsFromChainId(params.chainId);
@@ -171,6 +171,7 @@ export default function useAmbientPairs(
   }
 
   return {
+    isLoading,
     ambientPairs: pairsWithBalances ?? [],
     transaction: {
       validateParams: validateTxParams,
