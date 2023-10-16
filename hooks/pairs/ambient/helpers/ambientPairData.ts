@@ -106,7 +106,7 @@ export async function getGeneralAmbientPairData(
           new BigNumber(10).pow(36 - pair.quote.decimals).toString()
         );
 
-        const userPosition = chunkedData[index][3].result
+        const userPosition = userEthAddress
           ? {
               userDetails: {
                 liquidity: [],

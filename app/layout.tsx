@@ -8,6 +8,7 @@ import CantoWalletProvider from "@/provider/rainbowProvider";
 import { QueryClient, QueryClientProvider } from "react-query";
 import localFont from "next/font/local";
 import DesktopOnly from "@/components/desktop-only/desktop-only";
+import { Metadata } from "next";
 
 const rm_mono = localFont({
   src: "../fonts/rm-mono-regular.ttf",
