@@ -2,9 +2,6 @@
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
-import useTransactionStore from "@/stores/transactionStore";
-import useStore from "@/stores/useStore";
-import { useWalletClient } from "wagmi";
 import { ValidationReturn } from "@/config/interfaces";
 import {
   GeneralAmbientPairRow,
@@ -26,13 +23,10 @@ import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambie
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
+import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 
 export default function Page() {
-  const { data: signer } = useWalletClient();
-  const chainId = signer?.chain.id === 7701 ? 7701 : 7700;
-
-  const txStore = useStore(useTransactionStore, (state) => state);
-
+  const { txStore, signer, chainId } = useCantoSigner();
   // all pairs (ambient and cantoDex)
   const { cantoDex, ambient, selection, isLoading } = useLP({
     chainId,

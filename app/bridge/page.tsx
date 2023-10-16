@@ -6,16 +6,14 @@ import Tabs from "@/components/tabs/tabs";
 import styles from "./bridge.module.scss";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
-import useTransactionStore from "@/stores/transactionStore";
-import useStore from "@/stores/useStore";
 import { connectToKeplr } from "@/utils/keplr/connectKeplr";
 import {
   getNetworkInfoFromChainId,
   isCosmosNetwork,
 } from "@/utils/networks.utils";
-import { useWalletClient } from "wagmi";
 import Bridging from "./bridging";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 
 export default function BridgePage() {
   // router info
@@ -41,15 +39,14 @@ export default function BridgePage() {
   );
 
   // bridge hooks
+  const { txStore, signer } = useCantoSigner();
   const [onTestnet, setOnTestnet] = useState<boolean>(false);
-  const { data: signer } = useWalletClient();
   const bridgeOut = useBridgeOut({
     testnet: onTestnet,
   });
   const bridgeIn = useBridgeIn({
     testnet: onTestnet,
   });
-  const transactionStore = useStore(useTransactionStore, (state) => state);
 
   useEffect(() => {
     async function getKeplrInfoForBridge() {
@@ -77,15 +74,6 @@ export default function BridgePage() {
     bridgeIn.setState("ethAddress", signer?.account.address);
     bridgeOut.setState("ethAddress", signer?.account.address);
   }, [signer?.account.address]);
-
-  function BridgeOut() {
-    return (
-      <>
-        <div className={styles["network-selection"]}></div>
-        <div className={styles["token-selection"]}></div>
-      </>
-    );
-  }
 
   function TxHistory() {
     return (
@@ -134,7 +122,7 @@ export default function BridgePage() {
                     hook={bridgeIn}
                     params={{
                       signer: signer,
-                      transactionStore: transactionStore,
+                      transactionStore: txStore,
                     }}
                   />
                 ),
@@ -150,7 +138,7 @@ export default function BridgePage() {
                     hook={bridgeOut}
                     params={{
                       signer: signer,
-                      transactionStore: transactionStore,
+                      transactionStore: txStore,
                     }}
                   />
                 ),
