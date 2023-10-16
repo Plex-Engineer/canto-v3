@@ -46,9 +46,6 @@
     height: 100%;
     background-image: url("/bg.jpg");
     background-repeat: no-repeat;
-    // filter: invert(var(--dark-mode));
-    &:has(.dark-mode) {
-      filter: invert(var(--dark-mode));
-    }
+    filter: brightness(var(--temp-bg-brightness, 1));
   }
 }

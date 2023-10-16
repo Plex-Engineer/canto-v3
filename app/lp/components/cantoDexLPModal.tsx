@@ -472,8 +472,7 @@ const AddLiquidityModal = ({
             <PopUp
               content={
                 <Text>
-                  To receive rewards you need to stake you&apos;ll need to stake
-                  your LP tokens
+                  To receive rewards you&apos;ll need to stake your LP tokens.
                 </Text>
               }
               width="300px"

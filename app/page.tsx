@@ -20,13 +20,13 @@ export default function Home() {
       <section className={styles.hero}>
         <Icon
           icon={{
-            url: "/Canto.svg",
+            url: "/cantoo.svg",
             size: {
               width: 300,
               height: 80,
             },
           }}
-          //   themed
+          themed
         />
 
         <Icon

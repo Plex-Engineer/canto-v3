@@ -132,9 +132,13 @@ a {
   --dark-mode: 1;
   --light-mode: 0;
   --box-shadow: 0;
+
+  --temp-bg-brightness: 1;
 }
 
 .dark {
+  --temp-bg-brightness: 0.24;
+
   --anim-bg-color: #1b4633;
   --canto-color: #06fc99;
   --light-color: 17, 17, 17;
