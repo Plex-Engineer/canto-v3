@@ -81,9 +81,9 @@ export function getConcQuoteTokensFromBaseTokens(
 ): string {
   // check if zero
   if (
+    !amount ||
     Number(amount) === 0 ||
-    Number(currentPrice) < Number(minPrice) ||
-    Number(currentPrice) > Number(maxPrice)
+    Number(currentPrice) < Number(minPrice)
   ) {
     return "0";
   }
@@ -124,8 +124,8 @@ export function getConcBaseTokensFromQuoteTokens(
 ): string {
   // check if zero
   if (
+    !amount ||
     Number(amount) === 0 ||
-    Number(currentPrice) < Number(minPrice) ||
     Number(currentPrice) > Number(maxPrice)
   ) {
     return "0";

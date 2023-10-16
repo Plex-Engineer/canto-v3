@@ -151,6 +151,11 @@ const AddAmbientLiquidity = ({
   const [lastUpdated, setLastUpdated] = useState<"base" | "quote">("base");
 
   function setValue(value: string, isBase: boolean) {
+    if (value === "") {
+      setQuoteValue("");
+      setBaseValue("");
+      return;
+    }
     if (isBase) {
       setLastUpdated("base");
       setBaseValue(value);
@@ -266,7 +271,7 @@ const AddAmbientLiquidity = ({
       </Container>
       <Spacer height="30px" />
       <Button
-        disabled={!paramCheck.isValid}
+        disabled={!paramCheck.isValid || Number(baseValue) === 0 || Number(quoteValue) === 0}
         width={"fill"}
         onClick={() =>
           sendTxFlow({

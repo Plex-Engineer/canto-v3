@@ -6,8 +6,8 @@ const DEFAULT_TESTNET_AMBIENT_TICKS = {
   maxTick: 276322 + 800,
 };
 const DEFAULT_MAINNET_AMBIENT_TICKS = {
-  minTick: -276324 - 75,
-  maxTick: -276324 + 75,
+  minTick: -276325 - 75,
+  maxTick: -276325 + 75,
 };
 export function getDefaultTickRangeFromChainId(chainId: number) {
   if (chainId === CANTO_TESTNET_EVM.chainId) {
