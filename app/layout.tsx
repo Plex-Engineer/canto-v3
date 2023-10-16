@@ -51,7 +51,7 @@ export default function RootLayout({
         <CantoWalletProvider>
           <QueryClientProvider client={new QueryClient()}>
             <div className="body">
-              {/* <InfoBar
+              <InfoBar
                 values={[
                   {
                     name: "contracts w/ CSR enabled:",
@@ -78,8 +78,7 @@ export default function RootLayout({
                     isPositive: false,
                   },
                 ]}
-              /> */}
-              <div></div>
+              />
               <NavBar />
               {children}
               <div id="modal-root"></div>
