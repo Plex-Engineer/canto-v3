@@ -8,6 +8,7 @@ import CantoWalletProvider from "@/provider/rainbowProvider";
 import { QueryClient, QueryClientProvider } from "react-query";
 import localFont from "next/font/local";
 import DesktopOnly from "@/components/desktop-only/desktop-only";
+import { Metadata } from "next";
 
 const rm_mono = localFont({
   src: "../fonts/rm-mono-regular.ttf",
@@ -22,6 +23,12 @@ const proto_mono = localFont({
   style: "normal",
   variable: "--proto-mono",
 });
+export const metadata: Metadata = {
+  title: "Canto-v3",
+  icons: [
+    "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/canto.svg",
+  ],
+};
 
 export default function RootLayout({
   children,
