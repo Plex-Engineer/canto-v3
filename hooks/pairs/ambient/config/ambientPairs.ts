@@ -1,7 +1,35 @@
 import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
 import { BaseAmbientPair } from "../interfaces/ambientPairs";
 
-const MAINNET_AMBIENT_PAIRS: BaseAmbientPair[] = [];
+const MAINNET_AMBIENT_PAIRS: BaseAmbientPair[] = [
+  {
+    base: {
+      address: "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
+      chainId: 7700,
+      decimals: 6,
+      logoURI:
+        "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/usdc.svg",
+      name: "USDC",
+      symbol: "USDC",
+    },
+    quote: {
+      address: "0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
+      chainId: 7700,
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
+      name: "Collateral Note",
+      symbol: "cNote",
+    },
+    poolIdx: 36000,
+    address:
+      "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd-0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
+    symbol: "cNoteUSDCLP",
+    logoURI:
+      "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/LP/cNoteUSDCLP.svg",
+    stable: true,
+  },
+];
 const TESTNET_AMBIENT_PAIRS: BaseAmbientPair[] = [
   {
     base: {
