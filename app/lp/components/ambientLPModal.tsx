@@ -249,7 +249,10 @@ const AddAmbientLiquidity = ({
           name="Price"
           value={displayAmount(
             currentPrice,
-            pair.base.decimals - pair.quote.decimals
+            pair.base.decimals - pair.quote.decimals,
+            {
+              precision: 3,
+            }
           )}
         />
 
@@ -257,7 +260,10 @@ const AddAmbientLiquidity = ({
           name="Min Price"
           value={displayAmount(
             defaultMinPrice,
-            pair.base.decimals - pair.quote.decimals
+            pair.base.decimals - pair.quote.decimals,
+            {
+              precision: 3,
+            }
           )}
         />
 
@@ -265,13 +271,20 @@ const AddAmbientLiquidity = ({
           name="Max Price"
           value={displayAmount(
             defaultMaxPrice,
-            pair.base.decimals - pair.quote.decimals
+            pair.base.decimals - pair.quote.decimals,
+            {
+              precision: 3,
+            }
           )}
         />
       </Container>
       <Spacer height="30px" />
       <Button
-        disabled={!paramCheck.isValid || Number(baseValue) === 0 || Number(quoteValue) === 0}
+        disabled={
+          !paramCheck.isValid ||
+          Number(baseValue) === 0 ||
+          Number(quoteValue) === 0
+        }
         width={"fill"}
         onClick={() =>
           sendTxFlow({
