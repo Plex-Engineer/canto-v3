@@ -125,7 +125,7 @@ export async function getGeneralAmbientPairData(
               },
             }
           : {};
-          console.log( ambientAPR("550000000000000000", tvl, cantoPrice ?? "0"))
+
         return {
           ...pair,
           feeRate: chunkedData[index][3].result?.feeRate_ ?? 0,
@@ -161,6 +161,6 @@ function ambientAPR(
   const apr = blocksPerYear
     .multipliedBy(cantoPerBlock)
     .multipliedBy(priceCanto)
-    .dividedBy(tvlNote)
+    .dividedBy(tvlNote);
   return apr.toString();
 }
