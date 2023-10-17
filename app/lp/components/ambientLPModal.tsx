@@ -35,6 +35,7 @@ import {
 import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
 import Slider from "@/components/slider/slider";
 import clsx from "clsx";
+import PopUp from "@/components/popup/popup";
 
 interface AmbientModalProps {
   pair: AmbientPair;
@@ -70,7 +71,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
         <div
           style={{
             margin: "0  -16px -16px -16px",
-            height: "39rem",
+            height: "42rem",
           }}
         >
           <Tabs
@@ -276,6 +277,39 @@ const AddAmbientLiquidity = ({
               precision: 3,
             }
           )}
+        />
+
+        <ModalItem
+          name="Fee"
+          value={
+            <Container>
+              <PopUp
+                content={
+                  <Text>
+                    Liquidity providers will receive fee on swaps
+                  </Text>
+                }
+                width="300px"
+              >
+                <Container
+                  style={{ display: "flex", flexDirection: "row", gap: "6px" }}
+                >
+                  <span className={styles.infoPop}>
+                    <Text
+                      theme="secondary-dark"
+                      size="sm"
+                      style={{
+                        textAlign: "right",
+                      }}
+                    >
+                      ?
+                    </Text>
+                  </span>
+                  <Text>{pair.feeRate * 0.0001 + "%"}</Text>
+                </Container>
+              </PopUp>
+            </Container>
+          }
         />
       </Container>
       <Spacer height="30px" />
