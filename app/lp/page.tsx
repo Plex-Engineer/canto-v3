@@ -15,15 +15,15 @@ import styles from "./lp.module.scss";
 import { CantoDexTransactionParams } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
 import useLP from "@/hooks/pairs/lpCombo/useLP";
 import {
-  isAmbientPair,
+  isAmbientPool,
   isCantoDexPair,
 } from "@/hooks/pairs/lpCombo/interfaces.ts/pairTypes";
 import { AmbientModal } from "./components/ambientLPModal";
-import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
+import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
 
 export default function Page() {
   const { txStore, signer, chainId } = useCantoSigner();
@@ -87,16 +87,14 @@ export default function Page() {
   }
 
   /** AMBIENT */
-  const { ambientPairs } = ambient;
-  const userAmbientPairs = ambientPairs.filter(
-    (pair) =>
-      pair.userDetails &&
-      Number(pair.userDetails?.defaultRangePosition.liquidity) !== 0
+  const { ambientPools } = ambient;
+  const userAmbientPools = ambientPools.filter(
+    (pool) => pool.userPositions.length > 0
   );
 
   //transactions
   function sendAmbientTxFlow(params: Partial<AmbientTransactionParams>) {
-    const { data: flow, error } = ambient.transaction.createNewPairsFlow({
+    const { data: flow, error } = ambient.transaction.createNewPoolFlow({
       chainId,
       ethAccount: signer?.account.address ?? "",
       pair: selectedPair,
@@ -141,7 +139,7 @@ export default function Page() {
             sendTxFlow={sendCantoDexTxFlow}
           />
         )}
-        {selectedPair && isAmbientPair(selectedPair) && (
+        {selectedPair && isAmbientPool(selectedPair) && (
           <AmbientModal
             pair={selectedPair}
             validateParams={canPerformAmbientTx}
@@ -164,7 +162,7 @@ export default function Page() {
         />
       </Container>
       <Spacer height="30px" />
-      {userCantoDexPairs.length + userAmbientPairs.length > 0 && (
+      {userCantoDexPairs.length + userAmbientPools.length > 0 && (
         <Table
           title="Your Pairs"
           headers={[
@@ -179,12 +177,12 @@ export default function Page() {
           ]}
           columns={7}
           processedData={[
-            ...userAmbientPairs.map((pair) => (
+            ...userAmbientPools.map((pool) => (
               <UserAmbientPairRow
-                key={pair.symbol}
-                pair={pair}
-                onManage={(pairAddress) => {
-                  setPair(pairAddress);
+                key={pool.symbol}
+                pool={pool}
+                onManage={(poolAddress) => {
+                  setPair(poolAddress);
                 }}
               />
             )),
@@ -206,11 +204,11 @@ export default function Page() {
         headers={["Pair", "APR", "TVL", "Type", "action"]}
         columns={6}
         processedData={[
-          ...ambientPairs.map((pair) => (
+          ...ambientPools.map((pool) => (
             <GeneralAmbientPairRow
-              key={pair.symbol}
-              pair={pair}
-              onAddLiquidity={(pairAddress) => setPair(pairAddress)}
+              key={pool.symbol}
+              pool={pool}
+              onAddLiquidity={(poolAddress) => setPair(poolAddress)}
             />
           )),
           ...sortedPairs.map((pair) => (

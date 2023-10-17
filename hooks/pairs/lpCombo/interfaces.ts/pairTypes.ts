@@ -1,10 +1,10 @@
-import { AmbientPair } from "../../ambient/interfaces/ambientPairs";
 import { CantoDexPairWithUserCTokenData } from "../../cantoDex/interfaces/pairs";
+import { AmbientPool } from "../../newAmbient/interfaces/ambientPools";
 
-export type LPPairType = AmbientPair | CantoDexPairWithUserCTokenData;
+export type LPPairType = AmbientPool | CantoDexPairWithUserCTokenData;
 
 // utilities for deciding pair type for hook functionality
-export function isAmbientPair(pair: LPPairType): pair is AmbientPair {
+export function isAmbientPool(pair: LPPairType): pair is AmbientPool {
   return (
     typeof pair === "object" &&
     "base" in pair &&

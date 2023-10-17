@@ -2,10 +2,10 @@ import { useState } from "react";
 import { areEqualAddresses } from "@/utils/address.utils";
 import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
 import { CantoDexHookReturn } from "../cantoDex/interfaces/hookParams";
-import { AmbientHookReturn } from "../ambient/interfaces/hookParams";
 import useCantoDex from "../cantoDex/useCantoDex";
-import useAmbientPairs from "../ambient/useAmbientPairs";
 import { LPPairType } from "./interfaces.ts/pairTypes";
+import useAmbientPools from "../newAmbient/useAmbientPools";
+import { AmbientHookReturn } from "../newAmbient/interfaces/hookParams";
 
 interface UseLPProps {
   chainId: number;
@@ -23,10 +23,10 @@ interface UseLPReturn {
 export default function useLP(props: UseLPProps): UseLPReturn {
   // grab data from canto dex and ambient
   const cantoDex = useCantoDex(props);
-  const ambient = useAmbientPairs(props);
+  const ambient = useAmbientPools(props);
 
   // create list with all pairs
-  const allPairs: LPPairType[] = [...cantoDex.pairs, ...ambient.ambientPairs];
+  const allPairs: LPPairType[] = [...cantoDex.pairs, ...ambient.ambientPools];
 
   ///
   /// INTERNAL FUNCTIONS
