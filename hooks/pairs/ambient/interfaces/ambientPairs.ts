@@ -12,7 +12,9 @@ export interface AmbientPair extends BaseAmbientPair {
   q64PriceRoot: string; // price of base in quote in q64 root format
   currentTick: number; // current tick of curve
   concLiquidity: string; // concentrated liquidity
+  feeRate: number; // fee rate of pool
   liquidity: {
+    apr: string;
     tvl: string;
     base: string;
     quote: string;

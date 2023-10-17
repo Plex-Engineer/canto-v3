@@ -11,7 +11,6 @@ import {
   addTokenBalances,
   convertTokenAmountToNote,
   divideBalances,
-  percentOfAmount,
 } from "@/utils/tokens/tokenMath.utils";
 import BigNumber from "bignumber.js";
 import Image from "next/image";
@@ -125,7 +124,7 @@ export const GeneralAmbientPairRow = ({
     <Spacer width="10px" />
     <Text>{pair.symbol}</Text>
   </div>,
-  <Text key={pair.symbol + "apr"}>{"0.00%"}</Text>,
+  <Text key={pair.symbol + "apr"}>{formatPercent(pair.liquidity.apr)}</Text>,
   <Text key={pair.address + "tvl"}>
     {displayAmount(pair.liquidity.tvl, 18, {
       precision: 2,
@@ -171,7 +170,7 @@ export const UserAmbientPairRow = ({
       <Spacer width="10px" />
       <Text>{pair.symbol}</Text>
     </div>,
-    <Text key={pair.symbol + "apr"}>{"0.00%"}</Text>,
+    <Text key={pair.symbol + "apr"}>{formatPercent(pair.liquidity.apr)}</Text>,
     <Text key={pair.symbol + "pool share"}>
       {formatPercent(
         divideBalances(

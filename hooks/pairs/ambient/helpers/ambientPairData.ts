@@ -15,6 +15,8 @@ import {
 } from "@/utils/ambient/liquidity.utils";
 import { getDefaultTickRangeFromChainId } from "../config/prices";
 import BigNumber from "bignumber.js";
+import { getCantoCoreAddress } from "@/config/consts/addresses";
+import { getTokenPriceInUSDC } from "@/utils/tokens/prices.utils";
 
 export async function getGeneralAmbientPairData(
   chainId: number,
@@ -24,6 +26,10 @@ export async function getGeneralAmbientPairData(
   if (!pairs.length) return NO_ERROR([]);
   // will use multicall to get all data at once
   try {
+    // get wcanto price
+    const wcantoAddress = getCantoCoreAddress(chainId, "wcanto");
+    if (!wcantoAddress) throw Error("chainId not supported");
+    const { data: cantoPrice } = await getTokenPriceInUSDC(wcantoAddress, 18);
     // default ticks
     const DEFAULT_TICKS = getDefaultTickRangeFromChainId(chainId);
     // get crocQueryAddress
@@ -62,6 +68,7 @@ export async function getGeneralAmbientPairData(
       crocQueryCall(pair, "queryCurve"),
       crocQueryCall(pair, "queryCurveTick"),
       crocQueryCall(pair, "queryLiquidity"),
+      crocQueryCall(pair, "queryPoolParams"),
       ...userQueryCalls(pair),
     ]);
 
@@ -111,18 +118,21 @@ export async function getGeneralAmbientPairData(
               userDetails: {
                 liquidity: [],
                 defaultRangePosition: {
-                  liquidity: (chunkedData[index][3].result[0] ?? 0).toString(),
+                  liquidity: (chunkedData[index][4].result[0] ?? 0).toString(),
                   lowerTick: DEFAULT_TICKS.minTick,
                   upperTick: DEFAULT_TICKS.maxTick,
                 },
               },
             }
           : {};
+
         return {
           ...pair,
+          feeRate: chunkedData[index][3].result?.feeRate_ ?? 0,
           q64PriceRoot,
           currentTick: chunkedData[index][1].result ?? 0,
           liquidity: {
+            apr: ambientAPR("550000000000000000", tvl, cantoPrice ?? "0"),
             tvl,
             rootLiquidity,
             base: baseLiquidity,
@@ -136,4 +146,21 @@ export async function getGeneralAmbientPairData(
   } catch (err) {
     return NEW_ERROR("getGeneralAmbientPairData::" + errMsg(err));
   }
+}
+
+function ambientAPR(
+  cantoPerBlock: string,
+  tvlNote: string,
+  priceCanto: string
+) {
+  // seconds per day / seconds per block
+  const blockPerDay = new BigNumber(86400).dividedBy(5.8);
+  // days per year * blocks per day
+  const blocksPerYear = blockPerDay.multipliedBy(365);
+  // calculate apr (canto per year * price canto/ tvl of pool in Note)
+  const apr = blocksPerYear
+    .multipliedBy(cantoPerBlock)
+    .multipliedBy(priceCanto)
+    .dividedBy(tvlNote);
+  return apr.toString();
 }

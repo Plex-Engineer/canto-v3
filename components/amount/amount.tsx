@@ -28,10 +28,24 @@ const Amount = (props: Props) => {
     );
   }
 
+  function commify2(str: string) {
+    if (str[0] == ".") {
+      return (str = "" + str);
+    }
+    if (str[str.length - 1] == ".") {
+      return commify(str.slice(0, str.length - 1)) + ".";
+    }
+
+    const parts = str.split(".");
+    return (
+      parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") +
+      (parts[1] ? "." + parts[1] : "")
+    );
+  }
+
   function decommify(str: string) {
     return str.replace(/,/g, "");
   }
-
   //   shows only up to 4 decimals and ~ if there are more
   function formatAmount(amount: string, decimals: number) {
     const parts = amount.split(".");
@@ -105,7 +119,7 @@ const Amount = (props: Props) => {
       <input
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        value={focused ? commify(props.value) : displayAmount(props.value, 4)}
+        value={focused ? commify2(props.value) : displayAmount(props.value, 4)}
         onChange={(e) => {
           e.target.value = decommify(e.target.value);
           if (e.target.value === "" || e.target.value.match(/^\d*\.?\d*$/)) {
