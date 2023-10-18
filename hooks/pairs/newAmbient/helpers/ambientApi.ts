@@ -7,7 +7,7 @@ import {
 import { tryFetch } from "@/utils/async.utils";
 import { isCantoChainId } from "@/utils/networks.utils";
 
-const MAINNET_AMBIENT_API_URL = "http://157.245.133.198:8080";
+const MAINNET_AMBIENT_API_URL = process.env.NEXT_PUBLIC_AMBIENT_API_URL;
 // get url from chainId
 const AMBIENT_API_URL = (chainId: number) => {
   return chainId === 7701 ? "" : MAINNET_AMBIENT_API_URL;
