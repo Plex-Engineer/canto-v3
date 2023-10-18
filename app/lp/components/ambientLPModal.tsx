@@ -225,7 +225,7 @@ const AddAmbientLiquidity = ({
         errorMessage={paramCheck.errorMessage}
       />
 
-      <Spacer height="20px" />
+      <Spacer height="12px" />
 
       <Amount
         decimals={pair.quote.decimals}
@@ -285,15 +285,15 @@ const AddAmbientLiquidity = ({
             <Container>
               <PopUp
                 content={
-                  <Text>
-                    Liquidity providers will receive fee on swaps
-                  </Text>
+                  <Text>Liquidity providers will receive fee on swaps</Text>
                 }
                 width="300px"
               >
                 <Container
                   style={{ display: "flex", flexDirection: "row", gap: "6px" }}
                 >
+                  <Text>{pair.feeRate * 0.0001 + "%"}</Text>
+
                   <span className={styles.infoPop}>
                     <Text
                       theme="secondary-dark"
@@ -305,14 +305,19 @@ const AddAmbientLiquidity = ({
                       ?
                     </Text>
                   </span>
-                  <Text>{pair.feeRate * 0.0001 + "%"}</Text>
                 </Container>
               </PopUp>
             </Container>
           }
         />
       </Container>
-      <Spacer height="30px" />
+      <Spacer height="8px" />
+
+      <Text size="x-sm" theme="secondary-dark">
+        This is a concentrated liquidity stable pool. The default range above is
+        selected for optimal rewards.
+      </Text>
+      <Spacer height="8px" />
       <Button
         disabled={
           !paramCheck.isValid ||
