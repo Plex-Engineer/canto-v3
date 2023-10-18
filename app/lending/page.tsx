@@ -17,6 +17,11 @@ import { LendingModal } from "./components/modal/modal";
 import { CTokenRow } from "./components/cTokenRow";
 import { useState } from "react";
 import Spacer from "@/components/layout/spacer";
+import {
+  addTokenBalances,
+  divideBalances,
+} from "@/utils/tokens/tokenMath.utils";
+import { formatPercent } from "@/utils/formatting.utils";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -156,13 +161,27 @@ export default function LendingPage() {
           <div className={styles.widget1}>
             <OutlineCard>
               <Item
-                name="Note in circulation"
-                value={displayAmount(lendingStats.circulatingNote, 18)}
+                name="Total Note"
+                value={displayAmount(
+                  addTokenBalances(
+                    lendingStats.circulatingNote,
+                    lendingStats.circulatingCNote
+                  ),
+                  18
+                )}
                 postChild={<NoteIcon />}
               />
               <Item
-                name="CNote in circulation"
-                value={displayAmount(lendingStats.circulatingCNote, 18)}
+                name="Percent Note Deposited"
+                value={formatPercent(
+                  divideBalances(
+                    lendingStats.circulatingCNote,
+                    addTokenBalances(
+                      lendingStats.circulatingNote,
+                      lendingStats.circulatingCNote
+                    )
+                  )
+                )}
               />
               <Item
                 name="Value of rwas on canto"
