@@ -10,33 +10,26 @@ import {
 import {
   AmbientTransactionParams,
   AmbientTxType,
-} from "../interfaces/ambientTxTypes";
-import { CROC_SWAP_DEX_ABI } from "@/config/abis";
-import { eth } from "web3";
-import { ZERO_ADDRESS } from "@/config/consts/addresses";
-import {
-  convertFromQ64RootPrice,
-  convertToQ64RootPrice,
-  getPriceFromTick,
-} from "@/utils/ambient/ambientMath.utils";
+} from "../interfaces/ambientPoolTxTypes";
+import { convertToQ64RootPrice } from "@/utils/ambient/ambientMath.utils";
+import { getAmbientAddress } from "../config/addresses";
 import {
   getConcBaseTokensFromQuoteTokens,
   getConcQuoteTokensFromBaseTokens,
   roundLiquidityForAmbientTx,
 } from "@/utils/ambient/liquidity.utils";
-import { getAmbientAddress } from "../config/addresses";
 import { createApprovalTxs } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
+import { ZERO_ADDRESS } from "@/config/consts/addresses";
+import { CROC_SWAP_DEX_ABI } from "@/config/abis";
+import { eth } from "web3";
 
 export async function ambientLiquidityTx(
   params: AmbientTransactionParams
 ): PromiseWithError<TxCreatorFunctionReturn> {
   // do all conversions here to pass into flows
-  // get upper and lower price limits from ticks
-  const minPriceWei = getPriceFromTick(params.lowerTick);
-  const maxPriceWei = getPriceFromTick(params.upperTick);
-  const minPriceQ64 = convertToQ64RootPrice(minPriceWei);
-  const maxPriceQ64 = convertToQ64RootPrice(maxPriceWei);
+  const minPriceQ64 = convertToQ64RootPrice(params.minPriceWei);
+  const maxPriceQ64 = convertToQ64RootPrice(params.maxPriceWei);
 
   // get croc dex address
   const crocDexAddress = getAmbientAddress(params.chainId, "crocDex");
@@ -48,8 +41,8 @@ export async function ambientLiquidityTx(
       return await addConcLiquidityFlow({
         ...params,
         crocDexAddress,
-        minPriceWei,
-        maxPriceWei,
+        minPriceWei: params.minPriceWei,
+        maxPriceWei: params.maxPriceWei,
         minPriceQ64,
         maxPriceQ64,
       });
@@ -99,14 +92,13 @@ async function addConcLiquidityFlow(
   const txList: Transaction[] = [];
 
   /** estimate amounts of tokens needed for tx */
-  const currentPrice = convertFromQ64RootPrice(params.pair.q64PriceRoot);
   let baseAmount: string;
   let quoteAmount: string;
   if (params.isAmountBase) {
     baseAmount = params.amount;
     quoteAmount = getConcQuoteTokensFromBaseTokens(
       params.amount,
-      currentPrice,
+      params.pair.stats.lastPriceLiq.toString(),
       params.minPriceWei,
       params.maxPriceWei
     );
@@ -114,7 +106,7 @@ async function addConcLiquidityFlow(
     quoteAmount = params.amount;
     baseAmount = getConcBaseTokensFromQuoteTokens(
       params.amount,
-      currentPrice,
+      params.pair.stats.lastPriceLiq.toString(),
       params.minPriceWei,
       params.maxPriceWei
     );

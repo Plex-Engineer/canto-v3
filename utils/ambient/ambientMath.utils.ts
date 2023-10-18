@@ -5,14 +5,14 @@ import BigNumber from "bignumber.js";
 /// Price = Base / QUOTE (base per quote)
 ///
 
-export const Q64_SCALE = new BigNumber(2).pow(64);
+const Q64_SCALE = new BigNumber(2).pow(64);
 /**
  * @notice converts a Q64 price to a string
  * @dev Will return how much base token is worth in quote token (not scaled)
  * @param {string} q64RootPrice price to convert
  * @returns {string} converted price (wei of base per wei of quote)
  */
-export function convertFromQ64RootPrice(q64RootPrice: string): string {
+function convertFromQ64RootPrice(q64RootPrice: string): string {
   // convert price to big number
   const priceBN = new BigNumber(q64RootPrice);
   // divide price by scale
@@ -45,7 +45,7 @@ export function convertToQ64RootPrice(price: string): string {
  * @param price Price in terms of base per quote
  * @returns tick of price
  */
-function getTickFromPrice(price: string): number {
+export function getTickFromPrice(price: string): number {
   const tick = Math.log(Number(price)) / Math.log(1.0001);
   return Math.trunc(tick);
 }

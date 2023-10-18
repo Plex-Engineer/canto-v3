@@ -16,29 +16,32 @@ import styles from "./cantoDex.module.scss";
 import Amount from "@/components/amount/amount";
 import Tabs from "@/components/tabs/tabs";
 import { ModalItem } from "@/app/lending/components/modal/modal";
-import { AmbientPair } from "@/hooks/pairs/ambient/interfaces/ambientPairs";
-import {
-  AmbientTransactionParams,
-  AmbientTxType,
-} from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
-import {
-  convertFromQ64RootPrice,
-  getPriceFromTick,
-} from "@/utils/ambient/ambientMath.utils";
-import { getDefaultTickRangeFromChainId } from "@/hooks/pairs/ambient/config/prices";
-import {
-  baseTokenFromConcLiquidity,
-  getConcBaseTokensFromQuoteTokens,
-  getConcQuoteTokensFromBaseTokens,
-  quoteTokenFromConcLiquidity,
-} from "@/utils/ambient/liquidity.utils";
 import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
 import Slider from "@/components/slider/slider";
 import clsx from "clsx";
 import PopUp from "@/components/popup/popup";
+import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
+import {
+  AmbientTransactionParams,
+  AmbientTxType,
+} from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
+import { getDefaultTickRangeFromChainId } from "@/hooks/pairs/newAmbient/config/defaultTicks";
+import {
+  getPriceFromTick,
+  getTickFromPrice,
+} from "@/utils/ambient/ambientMath.utils";
+import {
+  baseTokenFromConcLiquidity,
+  concLiquidityNoteValue,
+  getConcBaseTokensFromQuoteTokens,
+  getConcQuoteTokensFromBaseTokens,
+  quoteTokenFromConcLiquidity,
+} from "@/utils/ambient/liquidity.utils";
+import { formatPercent } from "@/utils/formatting.utils";
+import BigNumber from "bignumber.js";
 
 interface AmbientModalProps {
-  pair: AmbientPair;
+  pair: AmbientPool;
   validateParams: (
     params: Partial<AmbientTransactionParams>
   ) => ValidationReturn;
@@ -96,9 +99,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
               },
               {
                 title: "Remove",
-                isDisabled:
-                  props.pair.userDetails?.defaultRangePosition.liquidity ===
-                  "0",
+                isDisabled: props.pair.userPositions.length === 0,
                 content: (
                   <Container width="100%" margin="sm">
                     <div className={styles.iconTitle}>
@@ -108,7 +109,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
                       </Text>
                     </div>
                     <RemoveAmbientLiquidity
-                      pair={props.pair}
+                      pool={props.pair}
                       sendTxFlow={props.sendTxFlow}
                       validateParams={props.validateParams}
                     />
@@ -126,12 +127,14 @@ export const AmbientModal = (props: AmbientModalProps) => {
 interface AddConcParams {
   lowerTick: number;
   upperTick: number;
+  minPriceWei: string;
+  maxPriceWei: string;
   amount: string;
   isAmountBase: boolean;
-  txType: AmbientTxType.ADD_CONC_LIQUIDITY;
+  txType: AmbientTxType;
 }
 interface AddModalProps {
-  pair: AmbientPair;
+  pair: AmbientPool;
   sendTxFlow: (params: AddConcParams) => void;
   validateParams: (params: AddConcParams) => ValidationReturn;
 }
@@ -141,18 +144,20 @@ const AddAmbientLiquidity = ({
   sendTxFlow,
 }: AddModalProps) => {
   // default ticks
-  const DEFAULT_TICKS = getDefaultTickRangeFromChainId(pair.base.chainId);
+  const currentTick = getTickFromPrice(pair.stats.lastPriceLiq.toString());
+  const [selectedLowerTick, setSelectedLowerTick] = useState(currentTick - 75);
+  const [selectedUpperTick, setSelectedUpperTick] = useState(currentTick + 75);
   // values
-  const defaultMinPrice = getPriceFromTick(DEFAULT_TICKS.minTick);
-  const defaultMaxPrice = getPriceFromTick(DEFAULT_TICKS.maxTick);
-  const currentPrice = convertFromQ64RootPrice(pair.q64PriceRoot);
+  const defaultMinPrice = getPriceFromTick(selectedLowerTick);
+  const defaultMaxPrice = getPriceFromTick(selectedUpperTick);
+  const currentPrice = pair.stats.lastPriceLiq.toString();
   // values
   const [baseValue, setBaseValue] = useState("");
   const [quoteValue, setQuoteValue] = useState("");
   const [lastUpdated, setLastUpdated] = useState<"base" | "quote">("base");
 
   function setValue(value: string, isBase: boolean) {
-    if (value === "") {
+    if (value === "" || isNaN(Number(value))) {
       setQuoteValue("");
       setBaseValue("");
       return;
@@ -188,10 +193,11 @@ const AddAmbientLiquidity = ({
     }
   }
 
-  // validation
-  const paramCheck = validateParams({
-    lowerTick: DEFAULT_TICKS.minTick,
-    upperTick: DEFAULT_TICKS.maxTick,
+  const txParams = () => ({
+    lowerTick: selectedLowerTick,
+    upperTick: selectedUpperTick,
+    minPriceWei: defaultMinPrice,
+    maxPriceWei: defaultMaxPrice,
     txType: AmbientTxType.ADD_CONC_LIQUIDITY,
     amount:
       lastUpdated === "base"
@@ -203,6 +209,9 @@ const AddAmbientLiquidity = ({
           ).data?.toString() ?? "0",
     isAmountBase: lastUpdated === "base",
   });
+
+  // validation
+  const paramCheck = validateParams(txParams());
 
   return (
     <Container>
@@ -247,14 +256,20 @@ const AddAmbientLiquidity = ({
       <Spacer height="20px" />
       <Container className={styles.card}>
         <ModalItem
-          name="Price"
-          value={displayAmount(
-            currentPrice,
-            pair.base.decimals - pair.quote.decimals,
-            {
-              precision: 3,
-            }
-          )}
+          name="Current Price"
+          value={
+            displayAmount(
+              currentPrice,
+              pair.base.decimals - pair.quote.decimals,
+              {
+                precision: 3,
+              }
+            ) +
+            " " +
+            pair.base.symbol +
+            " = 1 " +
+            pair.quote.symbol
+          }
         />
 
         <ModalItem
@@ -285,9 +300,7 @@ const AddAmbientLiquidity = ({
             <Container>
               <PopUp
                 content={
-                  <Text>
-                    Liquidity providers will receive fee on swaps
-                  </Text>
+                  <Text>Liquidity providers will receive fee on swaps</Text>
                 }
                 width="300px"
               >
@@ -305,7 +318,7 @@ const AddAmbientLiquidity = ({
                       ?
                     </Text>
                   </span>
-                  <Text>{pair.feeRate * 0.0001 + "%"}</Text>
+                  <Text>{formatPercent(pair.stats.feeRate.toString())}</Text>
                 </Container>
               </PopUp>
             </Container>
@@ -320,24 +333,7 @@ const AddAmbientLiquidity = ({
           Number(quoteValue) === 0
         }
         width={"fill"}
-        onClick={() =>
-          sendTxFlow({
-            lowerTick: DEFAULT_TICKS.minTick,
-            upperTick: DEFAULT_TICKS.maxTick,
-            txType: AmbientTxType.ADD_CONC_LIQUIDITY,
-            amount:
-              lastUpdated === "base"
-                ? convertToBigNumber(
-                    baseValue,
-                    pair.base.decimals
-                  ).data?.toString() ?? "0"
-                : convertToBigNumber(
-                    quoteValue,
-                    pair.quote.decimals
-                  ).data?.toString() ?? "0",
-            isAmountBase: lastUpdated === "base",
-          })
-        }
+        onClick={() => sendTxFlow(txParams())}
       >
         {"Add Liquidity"}
       </Button>
@@ -349,32 +345,83 @@ const AddAmbientLiquidity = ({
 interface RemoveConcParams {
   lowerTick: number;
   upperTick: number;
+  minPriceWei: string;
+  maxPriceWei: string;
   liquidity: string;
   txType: AmbientTxType.REMOVE_CONC_LIQUIDITY;
+  positionId: string;
 }
 interface RemoveProps {
-  pair: AmbientPair;
+  pool: AmbientPool;
   sendTxFlow: (params: RemoveConcParams) => void;
   validateParams: (params: RemoveConcParams) => ValidationReturn;
 }
 
 const RemoveAmbientLiquidity = ({
-  pair,
+  pool,
   validateParams,
   sendTxFlow,
 }: RemoveProps) => {
-  // default ticks
-  const DEFAULT_TICKS = getDefaultTickRangeFromChainId(pair.base.chainId);
+  const [position, setPosition] = useState(pool.userPositions[0]);
   // percent state
   const [percentToRemove, setPercentToRemove] = useState(0);
   const liquidityToRemove = percentOfAmount(
-    pair.userDetails?.defaultRangePosition?.liquidity ?? "0",
+    position.concLiq.toString(),
     percentToRemove
   );
+  const defaultMinPrice = getPriceFromTick(position.bidTick);
+  const defaultMaxPrice = getPriceFromTick(position.askTick);
 
   return (
     <div>
       <Spacer height="10px" />
+      <Text>Select position to remove</Text>
+      <Spacer height="10px" />
+      <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
+        {pool.userPositions.map((pos, idx) => (
+          <Button
+            color={
+              pos.positionId === position.positionId ? "accent" : "primary"
+            }
+            key={idx}
+            onClick={() => setPosition(pos)}
+            // width={"fill"}
+            height={"large"}
+          >
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div>
+                {`RANGE: ${displayAmount(
+                  getPriceFromTick(pos.bidTick),
+                  pool.base.decimals - pool.quote.decimals,
+                  {
+                    precision: 3,
+                  }
+                )}-${displayAmount(
+                  getPriceFromTick(pos.askTick),
+                  pool.base.decimals - pool.quote.decimals,
+                  {
+                    precision: 3,
+                  }
+                )}`}
+              </div>
+              <div>
+                {`VALUE: ${displayAmount(
+                  concLiquidityNoteValue(
+                    pos.concLiq,
+                    pool.stats.lastPriceLiq.toString(),
+                    pos.bidTick,
+                    pos.askTick,
+                    new BigNumber(10).pow(36 - pool.base.decimals).toString(),
+                    new BigNumber(10).pow(36 - pool.quote.decimals).toString()
+                  ),
+                  18
+                )} $NOTE`}
+              </div>
+            </div>
+          </Button>
+        ))}
+      </div>
+      <Spacer height="20px" />
       <Container
         direction="row"
         backgroundColor="var(--card-surface-color)"
@@ -410,47 +457,50 @@ const RemoveAmbientLiquidity = ({
 
       <Container className={styles.card}>
         <ModalItem
-          name={pair.base.symbol}
+          name={pool.base.symbol}
           value={displayAmount(
             baseTokenFromConcLiquidity(
-              pair.q64PriceRoot,
               liquidityToRemove.data.toString(),
-              pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
-              pair.userDetails?.defaultRangePosition.upperTick ?? 0
+              pool.stats.lastPriceLiq.toString(),
+              position.bidTick,
+              position.askTick
             ),
-            pair.base.decimals,
+            pool.base.decimals,
             {
-              symbol: pair.base.symbol,
+              symbol: pool.base.symbol,
             }
           )}
         />
         <ModalItem
-          name={pair.quote.symbol}
+          name={pool.quote.symbol}
           value={displayAmount(
             quoteTokenFromConcLiquidity(
-              pair.q64PriceRoot,
               liquidityToRemove.data.toString(),
-              pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
-              pair.userDetails?.defaultRangePosition.upperTick ?? 0
+              pool.stats.lastPriceLiq.toString(),
+              position.bidTick,
+              position.askTick
             ),
-            pair.quote.decimals,
+            pool.quote.decimals,
             {
-              symbol: pair.quote.symbol,
+              symbol: pool.quote.symbol,
             }
           )}
         />
       </Container>
-      <Spacer height="140px" />
+      <Spacer height="80px" />
 
       <Button
         disabled={Number(percentToRemove) <= 0 || Number(percentToRemove) > 100}
         width={"fill"}
         onClick={() =>
           sendTxFlow({
-            lowerTick: DEFAULT_TICKS.minTick,
-            upperTick: DEFAULT_TICKS.maxTick,
+            minPriceWei: defaultMinPrice,
+            maxPriceWei: defaultMaxPrice,
+            lowerTick: position.bidTick,
+            upperTick: position.askTick,
             txType: AmbientTxType.REMOVE_CONC_LIQUIDITY,
             liquidity: liquidityToRemove.data.toString(),
+            positionId: position.positionId,
           })
         }
       >
