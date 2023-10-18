@@ -144,13 +144,13 @@ const AddAmbientLiquidity = ({
   sendTxFlow,
 }: AddModalProps) => {
   // default ticks
-  const currentTick = getTickFromPrice(pair.stats.lastPriceLiq.toString());
+  const currentTick = getTickFromPrice(pair.stats.lastPriceSwap.toString());
   const [selectedLowerTick, setSelectedLowerTick] = useState(currentTick - 75);
   const [selectedUpperTick, setSelectedUpperTick] = useState(currentTick + 75);
   // values
   const defaultMinPrice = getPriceFromTick(selectedLowerTick);
   const defaultMaxPrice = getPriceFromTick(selectedUpperTick);
-  const currentPrice = pair.stats.lastPriceLiq.toString();
+  const currentPrice = pair.stats.lastPriceSwap.toString();
   // values
   const [baseValue, setBaseValue] = useState("");
   const [quoteValue, setQuoteValue] = useState("");
@@ -408,7 +408,7 @@ const RemoveAmbientLiquidity = ({
                 {`VALUE: ${displayAmount(
                   concLiquidityNoteValue(
                     pos.concLiq,
-                    pool.stats.lastPriceLiq.toString(),
+                    pool.stats.lastPriceSwap.toString(),
                     pos.bidTick,
                     pos.askTick,
                     new BigNumber(10).pow(36 - pool.base.decimals).toString(),
@@ -461,7 +461,7 @@ const RemoveAmbientLiquidity = ({
           value={displayAmount(
             baseTokenFromConcLiquidity(
               liquidityToRemove.data.toString(),
-              pool.stats.lastPriceLiq.toString(),
+              pool.stats.lastPriceSwap.toString(),
               position.bidTick,
               position.askTick
             ),
@@ -476,7 +476,7 @@ const RemoveAmbientLiquidity = ({
           value={displayAmount(
             quoteTokenFromConcLiquidity(
               liquidityToRemove.data.toString(),
-              pool.stats.lastPriceLiq.toString(),
+              pool.stats.lastPriceSwap.toString(),
               position.bidTick,
               position.askTick
             ),

@@ -45,7 +45,7 @@ export default function useAmbientPools(
     },
     {
       onSuccess: (response) => {
-        // console.log(response);
+        console.log(response);
       },
       onError: (error) => {
         console.log(error);
@@ -97,7 +97,7 @@ export default function useAmbientPools(
           baseAmount = txParams.amount;
           quoteAmount = getConcQuoteTokensFromBaseTokens(
             baseAmount,
-            txParams.pair.stats.lastPriceLiq.toString(),
+            txParams.pair.stats.lastPriceSwap.toString(),
             txParams.minPriceWei,
             txParams.maxPriceWei
           );
@@ -105,7 +105,7 @@ export default function useAmbientPools(
           quoteAmount = txParams.amount;
           baseAmount = getConcBaseTokensFromQuoteTokens(
             quoteAmount,
-            txParams.pair.stats.lastPriceLiq.toString(),
+            txParams.pair.stats.lastPriceSwap.toString(),
             txParams.minPriceWei,
             txParams.maxPriceWei
           );

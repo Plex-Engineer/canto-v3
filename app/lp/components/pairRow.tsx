@@ -160,7 +160,7 @@ export const UserAmbientPairRow = ({
       acc,
       concLiquidityNoteValue(
         position.concLiq,
-        pool.stats.lastPriceLiq,
+        pool.stats.lastPriceSwap,
         position.bidTick,
         position.askTick,
         new BigNumber(10).pow(36 - pool.base.decimals).toString(),

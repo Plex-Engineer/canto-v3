@@ -98,7 +98,7 @@ async function addConcLiquidityFlow(
     baseAmount = params.amount;
     quoteAmount = getConcQuoteTokensFromBaseTokens(
       params.amount,
-      params.pair.stats.lastPriceLiq.toString(),
+      params.pair.stats.lastPriceSwap.toString(),
       params.minPriceWei,
       params.maxPriceWei
     );
@@ -106,7 +106,7 @@ async function addConcLiquidityFlow(
     quoteAmount = params.amount;
     baseAmount = getConcBaseTokensFromQuoteTokens(
       params.amount,
-      params.pair.stats.lastPriceLiq.toString(),
+      params.pair.stats.lastPriceSwap.toString(),
       params.minPriceWei,
       params.maxPriceWei
     );
