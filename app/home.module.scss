@@ -54,7 +54,8 @@
     background-blend-mode: difference;
     animation: buzz 0.2s infinite alternate;
     background-repeat: no-repeat;
-    filter: brightness(var(--temp-bg-brightness, 1));
+    filter: brightness(var(--temp-bg-brightness, 1))
+      opacity(var(--temp-opacity, 0.2));
   }
 }
 @keyframes buzz {
