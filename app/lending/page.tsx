@@ -184,15 +184,15 @@ export default function LendingPage() {
                 )}
               />
               <Item
-                name="Value of rwas on canto"
-                value={displayAmount(lendingStats.valueOfAllRWA, 18)}
-                postChild={<NoteIcon />}
-              />
-              <Item
                 name="Price of cNote"
                 value={displayAmount(lendingStats.cNotePrice, 18, {
                   precision: 2,
                 })}
+                postChild={<NoteIcon />}
+              />
+              <Item
+                name="Value of rwas on canto"
+                value={displayAmount(lendingStats.valueOfAllRWA, 18)}
                 postChild={<NoteIcon />}
               />
             </OutlineCard>
