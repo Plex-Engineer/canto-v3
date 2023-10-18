@@ -6,7 +6,10 @@ import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 import useLending from "@/hooks/lending/useLending";
 import { listIncludesAddress } from "@/utils/address.utils";
-import { getCirculatingNote } from "@/utils/clm/noteStats.utils";
+import {
+  getCirculatingCNote,
+  getCirculatingNote,
+} from "@/utils/clm/noteStats.utils";
 import {
   addTokenBalances,
   convertTokenAmountToNote,
@@ -41,6 +44,7 @@ interface LendingComboReturn {
     setSelectedCToken: (address: string | null) => void;
   };
   lendingStats: {
+    circulatingCNote: string;
     circulatingNote: string;
     valueOfAllRWA: string;
     cNotePrice: string;
@@ -97,18 +101,20 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
   }, [rwas]);
   // circulating note
   const [circulatingNote, setCirculatingNote] = useState("0");
+  const [circulatingCNote, setCirculatingCNote] = useState("0");
   useEffect(() => {
     async function getStats() {
       if (cNote?.underlying.address) {
-        const { data: circulatingNote, error } = await getCirculatingNote(
-          chainId,
-          cNote.underlying.address
-        );
-        if (error) {
-          console.log(error);
+        const [circulatingNote, circulatingCNote] = await Promise.all([
+          getCirculatingNote(chainId, cNote.underlying.address),
+          getCirculatingCNote(chainId, cNote.address),
+        ]);
+        if (circulatingNote.error || circulatingCNote.error) {
+          console.log(circulatingNote.error ?? circulatingCNote.error);
           return;
         }
-        setCirculatingNote(circulatingNote);
+        setCirculatingNote(circulatingNote.data);
+        setCirculatingCNote(circulatingCNote.data);
       }
     }
     getStats();
@@ -169,6 +175,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     },
     selection,
     lendingStats: {
+      circulatingCNote: circulatingCNote,
       circulatingNote: circulatingNote,
       valueOfAllRWA: valueOfAllRWA,
       cNotePrice: cNote?.exchangeRate ?? "0",

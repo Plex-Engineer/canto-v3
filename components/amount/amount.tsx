@@ -9,11 +9,12 @@ import Spacer from "../layout/spacer";
 interface Props {
   IconUrl: string;
   title: string;
-  max: string;
   symbol: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   decimals: number;
   value: string;
+  max: string;
+  limitName?: string;
   error?: boolean;
   errorMessage?: string;
 }
@@ -91,7 +92,7 @@ const Amount = (props: Props) => {
       </Container>
       <Container direction="row" gap={6} className={styles.balance}>
         <Text size="xx-sm" theme="secondary-dark">
-          Balance :{" "}
+          {props.limitName ? "Limit: " : "Balance: "}
           {formatBalance(props.max, props.decimals, {
             commify: true,
           })}{" "}
@@ -111,7 +112,7 @@ const Amount = (props: Props) => {
           }}
         >
           <Text size="xx-sm" weight="bold">
-            (max)
+            {`(${props.limitName ?? "max"})`}
           </Text>
         </span>
       </Container>
