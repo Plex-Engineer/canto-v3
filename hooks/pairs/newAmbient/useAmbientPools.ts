@@ -45,7 +45,7 @@ export default function useAmbientPools(
     },
     {
       onSuccess: (response) => {
-        console.log(response);
+        // console.log(response);
       },
       onError: (error) => {
         console.log(error);

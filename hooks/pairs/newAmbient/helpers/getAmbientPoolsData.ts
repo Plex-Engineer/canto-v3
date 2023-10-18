@@ -78,14 +78,16 @@ export async function getAllAmbientPoolsData(
         lastPriceIndic: new BigNumber(stats.lastPriceIndic).toString(),
         feeRate: stats.feeRate,
       };
-      const userPosArray = userPositions.map((pos) => ({
-        ...pos,
-        ambientLiq: new BigNumber(pos.ambientLiq).toString(),
-        concLiq: new BigNumber(pos.concLiq).toString(),
-        rewardLiq: new BigNumber(pos.rewardLiq).toString(),
-        aprPostLiq: new BigNumber(pos.aprPostLiq).toString(),
-        aprContributedLiq: new BigNumber(pos.aprContributedLiq).toString(),
-      }));
+      const userPosArray = userPositions
+        .map((pos) => ({
+          ...pos,
+          ambientLiq: new BigNumber(pos.ambientLiq).toString(),
+          concLiq: new BigNumber(pos.concLiq).toString(),
+          rewardLiq: new BigNumber(pos.rewardLiq).toString(),
+          aprPostLiq: new BigNumber(pos.aprPostLiq).toString(),
+          aprContributedLiq: new BigNumber(pos.aprContributedLiq).toString(),
+        }))
+        .filter((pos) => pos?.concLiq !== "0");
 
       // get tvl of pool
       const { data: baseTvl } = convertTokenAmountToNote(
