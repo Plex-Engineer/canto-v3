@@ -14,19 +14,21 @@ const NavBar = () => {
   return (
     <div className={styles.container}>
       <div className={styles.logo}>
-        <Image
-          src="/tokens/canto.svg"
-          width={50}
-          height={50}
-          alt="canto"
-          style={{
-            filter: "invert(var(--dark-mode))",
-          }}
-        />
+        <Link href="/">
+          <Image
+            src="/tokens/canto.svg"
+            width={50}
+            height={50}
+            alt="canto"
+            style={{
+              filter: "invert(var(--dark-mode))",
+            }}
+          />
+        </Link>
       </div>
 
       <div className={styles["nav-links"]}>
-        <Link
+        {/* <Link
           href="/"
           className={clsx(
             styles["nav-link"],
@@ -34,7 +36,7 @@ const NavBar = () => {
           )}
         >
           <Text>Home</Text>
-        </Link>
+        </Link> */}
         <Link
           href="/bridge"
           className={clsx(

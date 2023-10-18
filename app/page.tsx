@@ -7,6 +7,7 @@ import EcoTile from "./components/ecoTile";
 import Icon from "@/components/icon/icon";
 import Button from "@/components/button/button";
 import Link from "next/link";
+import Glitch from "@/components/glitch/glitch";
 
 export default function Home() {
   return (
@@ -28,21 +29,21 @@ export default function Home() {
           }}
           themed
         />
-
-        <Icon
-          style={{
-            opacity: 0.5,
-          }}
-          icon={{
-            url: "/orb.svg",
-            size: {
-              width: 800,
-              height: 400,
-            },
-          }}
-          themed
-        />
-
+        <Glitch>
+          <Icon
+            style={{
+              opacity: 0.5,
+            }}
+            icon={{
+              url: "/orb.svg",
+              size: {
+                width: 800,
+                height: 400,
+              },
+            }}
+            themed
+          />
+        </Glitch>
         <Container
           direction="row"
           gap={30}

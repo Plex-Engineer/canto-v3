@@ -215,7 +215,7 @@ const AddAmbientLiquidity = ({
 
   return (
     <Container>
-      <Spacer height="10px" />
+      <Spacer height="4px" />
       <Amount
         decimals={pair.base.decimals}
         value={baseValue}
@@ -234,7 +234,7 @@ const AddAmbientLiquidity = ({
         errorMessage={paramCheck.errorMessage}
       />
 
-      <Spacer height="20px" />
+      <Spacer height="10px" />
 
       <Amount
         decimals={pair.quote.decimals}
@@ -253,7 +253,7 @@ const AddAmbientLiquidity = ({
         }
         errorMessage={paramCheck.errorMessage}
       />
-      <Spacer height="20px" />
+      <Spacer height="10px" />
       <Container className={styles.card}>
         <ModalItem
           name="Current Price"
@@ -307,6 +307,7 @@ const AddAmbientLiquidity = ({
                 <Container
                   style={{ display: "flex", flexDirection: "row", gap: "6px" }}
                 >
+                  <Text>{formatPercent(pair.stats.feeRate.toString())}</Text>
                   <span className={styles.infoPop}>
                     <Text
                       theme="secondary-dark"
@@ -318,14 +319,19 @@ const AddAmbientLiquidity = ({
                       ?
                     </Text>
                   </span>
-                  <Text>{formatPercent(pair.stats.feeRate.toString())}</Text>
                 </Container>
               </PopUp>
             </Container>
           }
         />
       </Container>
-      <Spacer height="30px" />
+      <Spacer height="8px" />
+
+      <Text size="x-sm" theme="secondary-dark">
+        This is a concentrated liquidity stable pool. The default range above is
+        selected for optimal rewards. Rewards will be released in weekly epochs.
+      </Text>
+      <Spacer height="8px" />
       <Button
         disabled={
           !paramCheck.isValid ||

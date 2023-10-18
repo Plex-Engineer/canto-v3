@@ -33,7 +33,7 @@ a {
 }
 
 ::selection {
-  background: var(--border-stoke-dark-color);
+  background: var(--card-primary-color);
   color: var(--text-light-color);
 }
 
@@ -42,6 +42,8 @@ a {
   --canto-color: var(--extra-success-color, #06fc99);
   --dark-color: 17, 17, 17;
   --light-color: 255, 255, 255;
+  --primary-dark-color: #222;
+  --primary-light-color: #eee;
   --text-only-dark: #212121;
   --text-only-light: #ffffff;
   --primary-90-color: #222222;
@@ -69,6 +71,7 @@ a {
   --dark-mode: 0;
   --light-mode: 1;
   --box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
+  --temp-bg-brightness: 1;
 }
 
 .dim {
@@ -143,6 +146,8 @@ a {
   --canto-color: #06fc99;
   --light-color: 17, 17, 17;
   --dark-color: 255, 255, 255;
+  --primary-dark-color: #eee;
+  --primary-light-color: #222;
   --text-only-dark: #222222;
   --text-only-light: #ffffff;
   --primary-90-color: #eeeeee;
@@ -169,6 +174,7 @@ a {
   --dark-mode: 1;
   --light-mode: 0;
   --box-shadow: 0;
+  ---temp-opacity: 1;
 }
 
 * {
