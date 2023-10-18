@@ -1,7 +1,7 @@
 import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "@/config/networks";
-import { BaseAmbientPair } from "../interfaces/ambientPairs";
+import { BaseAmbientPool } from "../interfaces/ambientPools";
 
-const MAINNET_AMBIENT_PAIRS: BaseAmbientPair[] = [
+const MAINNET_AMBIENT_POOLS: BaseAmbientPool[] = [
   {
     base: {
       address: "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
@@ -30,7 +30,7 @@ const MAINNET_AMBIENT_PAIRS: BaseAmbientPair[] = [
     stable: true,
   },
 ];
-const TESTNET_AMBIENT_PAIRS: BaseAmbientPair[] = [
+const TESTNET_AMBIENT_POOLS: BaseAmbientPool[] = [
   {
     base: {
       address: "0x04E52476d318CdF739C38BD41A922787D441900c",
@@ -60,12 +60,12 @@ const TESTNET_AMBIENT_PAIRS: BaseAmbientPair[] = [
   },
 ];
 
-export function getAmbientPairsFromChainId(chainId: number): BaseAmbientPair[] {
+export function getAmbientPoolsFromChainId(chainId: number): BaseAmbientPool[] {
   switch (chainId) {
     case CANTO_MAINNET_EVM.chainId:
-      return MAINNET_AMBIENT_PAIRS;
+      return MAINNET_AMBIENT_POOLS;
     case CANTO_TESTNET_EVM.chainId:
-      return TESTNET_AMBIENT_PAIRS;
+      return TESTNET_AMBIENT_POOLS;
     default:
       return [];
   }

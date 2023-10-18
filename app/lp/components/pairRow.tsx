@@ -2,9 +2,9 @@ import Button from "@/components/button/button";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
-import { AmbientPair } from "@/hooks/pairs/ambient/interfaces/ambientPairs";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
-import { getNoteFromConcLiquidity } from "@/utils/ambient/liquidity.utils";
+import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
+import { concLiquidityNoteValue } from "@/utils/ambient/liquidity.utils";
 import { formatPercent } from "@/utils/formatting.utils";
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import {
@@ -113,20 +113,20 @@ export const GeneralCantoDexPairRow = ({
 ];
 
 export const GeneralAmbientPairRow = ({
-  pair,
+  pool,
   onAddLiquidity,
 }: {
-  pair: AmbientPair;
-  onAddLiquidity: (pairAddress: string) => void;
+  pool: AmbientPool;
+  onAddLiquidity: (poolAddress: string) => void;
 }) => [
-  <div key={pair.address + "symbol"}>
-    <Image src={pair.logoURI} width={54} height={54} alt="logo" />
+  <div key={pool.address + "symbol"}>
+    <Image src={pool.logoURI} width={54} height={54} alt="logo" />
     <Spacer width="10px" />
-    <Text>{pair.symbol}</Text>
+    <Text>{pool.symbol}</Text>
   </div>,
-  <Text key={pair.symbol + "apr"}>{formatPercent(pair.liquidity.apr)}</Text>,
-  <Text key={pair.address + "tvl"}>
-    {displayAmount(pair.liquidity.tvl, 18, {
+  <Text key={pool.symbol + "apr"}>{formatPercent(pool.totals.apr)}</Text>,
+  <Text key={pool.address + "tvl"}>
+    {displayAmount(pool.totals.noteTvl, 18, {
       precision: 2,
     })}
     <Icon
@@ -138,49 +138,48 @@ export const GeneralAmbientPairRow = ({
       }}
     />
   </Text>,
-  <Text key={pair.address + "type"}>
-    {pair.stable ? "Concentrated" : "Volatile"}
+  <Text key={pool.address + "type"}>
+    {pool.stable ? "Concentrated" : "Volatile"}
   </Text>,
   <div key={"action"}>
-    <Button key={"action item"} onClick={() => onAddLiquidity(pair.address)}>
+    <Button key={"action item"} onClick={() => onAddLiquidity(pool.address)}>
       Add LP
     </Button>
   </div>,
 ];
 
 export const UserAmbientPairRow = ({
-  pair,
+  pool,
   onManage,
 }: {
-  pair: AmbientPair;
-  onManage: (pairAddress: string) => void;
+  pool: AmbientPool;
+  onManage: (poolAddress: string) => void;
 }) => {
-  // get user value
-  const userValue = getNoteFromConcLiquidity(
-    pair.q64PriceRoot,
-    pair.userDetails?.defaultRangePosition.liquidity ?? "0",
-    pair.userDetails?.defaultRangePosition.lowerTick ?? 0,
-    pair.userDetails?.defaultRangePosition.upperTick ?? 0,
-    new BigNumber(10).pow(36 - pair.base.decimals).toString(),
-    new BigNumber(10).pow(36 - pair.quote.decimals).toString()
-  );
+  const value = pool.userPositions.reduce((acc, position) => {
+    return addTokenBalances(
+      acc,
+      concLiquidityNoteValue(
+        position.concLiq,
+        pool.stats.lastPriceSwap,
+        position.bidTick,
+        position.askTick,
+        new BigNumber(10).pow(36 - pool.base.decimals).toString(),
+        new BigNumber(10).pow(36 - pool.quote.decimals).toString()
+      )
+    );
+  }, "0");
   return [
-    <div key={pair.address + "symbol"}>
-      <Image src={pair.logoURI} width={54} height={54} alt="logo" />
+    <div key={pool.address + "symbol"}>
+      <Image src={pool.logoURI} width={54} height={54} alt="logo" />
       <Spacer width="10px" />
-      <Text>{pair.symbol}</Text>
+      <Text>{pool.symbol}</Text>
     </div>,
-    <Text key={pair.symbol + "apr"}>{formatPercent(pair.liquidity.apr)}</Text>,
-    <Text key={pair.symbol + "pool share"}>
-      {formatPercent(
-        divideBalances(
-          pair.userDetails?.defaultRangePosition.liquidity ?? "0",
-          pair.liquidity.rootLiquidity
-        )
-      )}
+    <Text key={pool.symbol + "apr"}>{formatPercent(pool.totals.apr)}</Text>,
+    <Text key={pool.symbol + "pool share"}>
+      {formatPercent(divideBalances(value, pool.totals.noteTvl))}
     </Text>,
-    <Text key={pair.symbol + "value"}>
-      {displayAmount(userValue, 18)}
+    <Text key={pool.symbol + "value"}>
+      {displayAmount(value, 18)}
       <Icon
         style={{ marginLeft: "5px" }}
         themed
@@ -190,12 +189,12 @@ export const UserAmbientPairRow = ({
         }}
       />
     </Text>,
-    <Text key={pair.symbol + "rewards"}>{"0"}</Text>,
+    <Text key={pool.symbol + "rewards"}>{"0"}</Text>,
     <div key={"action"}>
       <Button
         color="secondary"
         key={"action item"}
-        onClick={() => onManage(pair.address)}
+        onClick={() => onManage(pool.address)}
       >
         Manage LP
       </Button>

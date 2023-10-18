@@ -19,8 +19,6 @@ import {
   cTokenLendingTx,
   validateCTokenLendingRetryParams,
 } from "@/hooks/lending/transactions/lending";
-import { AmbientTransactionParams } from "@/hooks/pairs/ambient/interfaces/ambientTxTypes";
-import { ambientLiquidityTx } from "@/hooks/pairs/ambient/transactions/ambientTx";
 import {
   CantoDexTransactionParams,
   StakeLPParams,
@@ -29,6 +27,8 @@ import {
   cantoDexLPTx,
   stakeLPFlow,
 } from "@/hooks/pairs/cantoDex/transactions/pairsTx";
+import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
+import { ambientLiquidityTx } from "@/hooks/pairs/newAmbient/transactions/ambientTx";
 
 export enum TransactionFlowType {
   AMBIENT_LIQUIDITY_TX = "AMBIENT_LIQUIDITY_TX",

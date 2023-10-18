@@ -3,8 +3,8 @@ import {
   NewTransactionFlow,
   ReturnWithError,
 } from "@/config/interfaces";
-import { AmbientTransactionParams } from "../interfaces/ambientTxTypes";
 import { TransactionFlowType } from "@/config/transactions/txMap";
+import { AmbientTransactionParams } from "../interfaces/ambientPoolTxTypes";
 
 export function createNewAmbientTxFlow(
   params: AmbientTransactionParams

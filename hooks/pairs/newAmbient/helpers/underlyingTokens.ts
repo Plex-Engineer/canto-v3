@@ -1,8 +1,8 @@
 import { ERC20Token } from "@/config/interfaces";
-import { AmbientPair } from "../interfaces/ambientPairs";
+import { AmbientPool } from "../interfaces/ambientPools";
 
 export function getUniqueUnderlyingTokensFromPairs(
-  pairs: AmbientPair[]
+  pools: AmbientPool[]
 ): ERC20Token[] {
   // look for unique addresses and add tokens to set
   const uniqueAddresses = new Set<string>();
@@ -18,14 +18,14 @@ export function getUniqueUnderlyingTokensFromPairs(
     uniqueAddresses.add(token.address);
   }
 
-  pairs.forEach((pair) => {
-    if (!uniqueAddresses.has(pair.base.address)) {
-      addToken(pair.base);
-      uniqueAddresses.add(pair.base.address);
+  pools.forEach((pool) => {
+    if (!uniqueAddresses.has(pool.base.address)) {
+      addToken(pool.base);
+      uniqueAddresses.add(pool.base.address);
     }
-    if (!uniqueAddresses.has(pair.quote.address)) {
-      addToken(pair.quote);
-      uniqueAddresses.add(pair.quote.address);
+    if (!uniqueAddresses.has(pool.quote.address)) {
+      addToken(pool.quote);
+      uniqueAddresses.add(pool.quote.address);
     }
   });
   return Array.from(uniqueTokens);
