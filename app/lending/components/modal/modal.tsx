@@ -138,6 +138,25 @@ export const LendingModal = (props: Props) => {
       convertToBigNumber(amount, cToken.underlying.decimals).data ?? "0"
     ).toString();
     const amountCheck = transaction.validateAmount(bnAmount, actionType);
+
+    // limits
+    const needLimit =
+      actionType === CTokenLendingTxTypes.BORROW ||
+      (actionType === CTokenLendingTxTypes.WITHDRAW &&
+        Number(position.totalBorrow) !== 0);
+    const maxAmount = maxAmountForLendingTx(
+      actionType,
+      cToken,
+      position,
+      needLimit ? 90 : 100
+    );
+    const maxLabel =
+      !needLimit ||
+      (actionType === CTokenLendingTxTypes.WITHDRAW &&
+        maxAmount === cToken.userDetails?.supplyBalanceInUnderlying)
+        ? undefined
+        : "90% limit";
+
     return (
       <div className={styles.content}>
         <Spacer height="20px" />
@@ -162,10 +181,11 @@ export const LendingModal = (props: Props) => {
           }}
           IconUrl={cToken.underlying.logoURI}
           title={cToken.underlying.symbol}
-          max={maxAmountForLendingTx(actionType, cToken, position)}
+          max={maxAmount}
           symbol={cToken.underlying.symbol}
           error={!amountCheck.isValid && Number(amount) !== 0}
           errorMessage={amountCheck.errorMessage}
+          limitName={maxLabel}
         />
         <Spacer height="40px" />
 

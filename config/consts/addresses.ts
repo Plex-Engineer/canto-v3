@@ -1,6 +1,8 @@
 import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "../networks";
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+export const MAX_UINT256 = "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+
 export const GRAVITY_BRIDGE_ETH_ADDRESS =
   "0xa4108aA1Ec4967F8b52220a4f7e94A8201F2D906";
 export const WETH_MAINNET_ADDRESS =
