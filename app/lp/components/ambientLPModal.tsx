@@ -26,7 +26,10 @@ import {
   AmbientTxType,
 } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
 import { getDefaultTickRangeFromChainId } from "@/hooks/pairs/newAmbient/config/defaultTicks";
-import { getPriceFromTick } from "@/utils/ambient/ambientMath.utils";
+import {
+  getPriceFromTick,
+  getTickFromPrice,
+} from "@/utils/ambient/ambientMath.utils";
 import {
   baseTokenFromConcLiquidity,
   getConcBaseTokensFromQuoteTokens,
@@ -139,13 +142,9 @@ const AddAmbientLiquidity = ({
   sendTxFlow,
 }: AddModalProps) => {
   // default ticks
-  const DEFAULT_TICKS = getDefaultTickRangeFromChainId(pair.base.chainId);
-  const [selectedLowerTick, setSelectedLowerTick] = useState(
-    DEFAULT_TICKS.narrow.lowerTick
-  );
-  const [selectedUpperTick, setSelectedUpperTick] = useState(
-    DEFAULT_TICKS.narrow.upperTick
-  );
+  const currentTick = getTickFromPrice(pair.stats.lastPriceLiq.toString());
+  const [selectedLowerTick, setSelectedLowerTick] = useState(currentTick - 75);
+  const [selectedUpperTick, setSelectedUpperTick] = useState(currentTick + 75);
   // values
   const defaultMinPrice = getPriceFromTick(selectedLowerTick);
   const defaultMaxPrice = getPriceFromTick(selectedUpperTick);
@@ -375,7 +374,9 @@ const RemoveAmbientLiquidity = ({
     <div>
       <Spacer height="10px" />
       {pool.userPositions.map((pos, idx) => (
-        <Button key={idx} onClick={() => setPosition(pos)}>{"position: " + idx}</Button>
+        <Button key={idx} onClick={() => setPosition(pos)}>
+          {"position: " + idx}
+        </Button>
       ))}
       <Container
         direction="row"

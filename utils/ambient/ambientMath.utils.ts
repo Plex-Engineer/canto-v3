@@ -45,7 +45,7 @@ export function convertToQ64RootPrice(price: string): string {
  * @param price Price in terms of base per quote
  * @returns tick of price
  */
-function getTickFromPrice(price: string): number {
+export function getTickFromPrice(price: string): number {
   const tick = Math.log(Number(price)) / Math.log(1.0001);
   return Math.trunc(tick);
 }
