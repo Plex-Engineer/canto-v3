@@ -14,8 +14,8 @@ interface Props {
 const InfoBar = ({ values }: Props) => {
   return (
     <div className={styles.container}>
-      <Marquee delay={1} pauseOnHover speed={20}>
-        {/* <div className={styles.content}>
+      {/* <Marquee delay={1} pauseOnHover speed={20}> */}
+      {/* <div className={styles.content}>
           {values.map((value, idx) => (
             <div
               key={value.name}
@@ -53,11 +53,11 @@ const InfoBar = ({ values }: Props) => {
             </div>
           ))}
         </div> */}
-        <Text font="proto_mono" color="var(--text-only-light)" size="sm">
-          Welcome to the canto.io Beta - Please report issues using the link in
-          the footer.
-        </Text>
-      </Marquee>
+      <Text font="proto_mono" color="var(--text-only-light)" size="sm">
+        Welcome to the canto.io Beta - Please report issues using the link in
+        the footer.
+      </Text>
+      {/* </Marquee> */}
     </div>
   );
 };
