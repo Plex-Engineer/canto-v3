@@ -1,6 +1,6 @@
 // glitch effect for svg image
 .container {
-  animation: glitch 1s linear infinite;
+  animation: glitch 5s linear infinite;
 
   @keyframes glitch {
     2%,
@@ -11,7 +11,7 @@
     60% {
       transform: translate(-2px, 0) skew(0deg);
     }
-    62% {
+    61% {
       transform: translate(0, 0) skew(5deg);
     }
   }
@@ -28,7 +28,7 @@
     top: 0;
     left: 0;
     opacity: 0.4;
-    animation: glitch 1s linear infinite;
+    animation: glitch 5s linear infinite;
 
     animation-delay: 0.1s;
     filter: hue-rotate(20deg);
@@ -39,7 +39,7 @@
     top: 0;
     left: 0;
     opacity: 0.6;
-    animation: glitch 1s linear infinite;
+    animation: glitch 5s linear infinite;
     animation-delay: 0.2s;
 
     filter: hue-rotate(65deg);
@@ -50,7 +50,7 @@
     top: 0;
     left: 0;
     opacity: 0.2;
-    animation: glitch 1s linear infinite;
+    animation: glitch 5s linear infinite;
     animation-delay: 0.34s;
 
     filter: invert(1) hue-rotate(900deg);
