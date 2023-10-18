@@ -143,21 +143,42 @@ const AddAmbientLiquidity = ({
   validateParams,
   sendTxFlow,
 }: AddModalProps) => {
-  // default ticks
-  const currentTick = getTickFromPrice(pair.stats.lastPriceSwap.toString());
-  const [selectedLowerTick, setSelectedLowerTick] = useState(currentTick - 75);
-  const [selectedUpperTick, setSelectedUpperTick] = useState(currentTick + 75);
-  // values
+  // current pool values
+  const currentPrice = pair.stats.lastPriceSwap.toString();
+
+  // selection price
+  const [userMidpointPrice, setUserMidpointPrice] = useState(
+    formatBalance(currentPrice, pair.base.decimals - pair.quote.decimals, {
+      precision: 5,
+    })
+  );
+  // price from user input
+  const midpointWeiPrice = userMidpointPrice
+    ? BigNumber(userMidpointPrice)
+        .multipliedBy(
+          BigNumber(10).pow(pair.base.decimals - pair.quote.decimals)
+        )
+        .toString()
+    : currentPrice;
+  // selected ticks from price
+  const midPointTick = getTickFromPrice(midpointWeiPrice);
+  const selectedLowerTick = midPointTick - 75;
+  const selectedUpperTick = midPointTick + 75;
+  // min/max price values
   const defaultMinPrice = getPriceFromTick(selectedLowerTick);
   const defaultMaxPrice = getPriceFromTick(selectedUpperTick);
-  const currentPrice = pair.stats.lastPriceSwap.toString();
-  // values
+
+  // base and quote values
   const [baseValue, setBaseValue] = useState("");
   const [quoteValue, setQuoteValue] = useState("");
   const [lastUpdated, setLastUpdated] = useState<"base" | "quote">("base");
 
   function setValue(value: string, isBase: boolean) {
-    if (value === "" || isNaN(Number(value))) {
+    if (
+      value === "" ||
+      isNaN(Number(value)) ||
+      Number(userMidpointPrice) === 0
+    ) {
       setQuoteValue("");
       setBaseValue("");
       return;
@@ -271,29 +292,6 @@ const AddAmbientLiquidity = ({
             pair.quote.symbol
           }
         />
-
-        <ModalItem
-          name="Min Price"
-          value={displayAmount(
-            defaultMinPrice,
-            pair.base.decimals - pair.quote.decimals,
-            {
-              precision: 3,
-            }
-          )}
-        />
-
-        <ModalItem
-          name="Max Price"
-          value={displayAmount(
-            defaultMaxPrice,
-            pair.base.decimals - pair.quote.decimals,
-            {
-              precision: 3,
-            }
-          )}
-        />
-
         <ModalItem
           name="Fee"
           value={
@@ -323,6 +321,56 @@ const AddAmbientLiquidity = ({
               </PopUp>
             </Container>
           }
+        />
+      </Container>
+      <Container className={styles.card}>
+        <ModalItem
+          name="Midpoint"
+          value={
+            <Container
+              center={{
+                vertical: true,
+              }}
+              gap={10}
+              direction="row"
+              style={{
+                width: "100px",
+              }}
+            >
+              <Input
+                height={"sm"}
+                type="number"
+                value={userMidpointPrice}
+                onChange={(e) => {
+                  setValue(
+                    lastUpdated === "base" ? baseValue : quoteValue,
+                    lastUpdated === "base"
+                  );
+                  setUserMidpointPrice(e.target.value);
+                }}
+              />
+            </Container>
+          }
+        />
+        <ModalItem
+          name="Min Price"
+          value={displayAmount(
+            defaultMinPrice,
+            pair.base.decimals - pair.quote.decimals,
+            {
+              precision: 3,
+            }
+          )}
+        />
+        <ModalItem
+          name="Max Price"
+          value={displayAmount(
+            defaultMaxPrice,
+            pair.base.decimals - pair.quote.decimals,
+            {
+              precision: 3,
+            }
+          )}
         />
       </Container>
       <Spacer height="30px" />
