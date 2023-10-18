@@ -1,0 +1,58 @@
+// glitch effect for svg image
+.container {
+  animation: glitch 1s linear infinite;
+
+  @keyframes glitch {
+    2%,
+    64% {
+      transform: translate(2px, 0) skew(0deg);
+    }
+    4%,
+    60% {
+      transform: translate(-2px, 0) skew(0deg);
+    }
+    62% {
+      transform: translate(0, 0) skew(5deg);
+    }
+  }
+
+  .glitch__img {
+    width: 100%;
+    height: auto;
+    filter: grayscale(100%);
+    mix-blend-mode: difference;
+  }
+
+  .glitch__img--alt {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.4;
+    animation: glitch 1s linear infinite;
+
+    animation-delay: 0.1s;
+    filter: hue-rotate(20deg);
+  }
+
+  .glitch__img--alt2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.6;
+    animation: glitch 1s linear infinite;
+    animation-delay: 0.2s;
+
+    filter: hue-rotate(65deg);
+  }
+
+  .glitch__img--alt3 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.2;
+    animation: glitch 1s linear infinite;
+    animation-delay: 0.34s;
+
+    filter: invert(1) hue-rotate(900deg);
+  }
+}

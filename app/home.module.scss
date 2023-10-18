@@ -45,9 +45,20 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url("/bg.jpg");
+    // background-image: url("/bg.jpg");
+
+    background: repeating-radial-gradient(#000 0 0.0001%, #fff 0 0.0002%) 50% 0/2500px
+        2500px,
+      repeating-conic-gradient(#000 0 0.0001%, #fff 0 0.0002%) 60% 60%/2500px
+        2500px;
+    background-blend-mode: difference;
+    animation: buzz 0.2s infinite alternate;
     background-repeat: no-repeat;
-    background-size: cover;
     filter: brightness(var(--temp-bg-brightness, 1));
+  }
+}
+@keyframes buzz {
+  100% {
+    background-position: 50% 0, 60% 50%;
   }
 }
