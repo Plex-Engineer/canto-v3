@@ -2,11 +2,7 @@
 import Button from "@/components/button/button";
 import Input from "@/components/input/input";
 import Spacer from "@/components/layout/spacer";
-import {
-  convertToBigNumber,
-  displayAmount,
-  formatBalance,
-} from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import { useState } from "react";
 import Container from "@/components/container/container";
 import { ValidationReturn } from "@/config/interfaces";
@@ -25,20 +21,15 @@ import {
   AmbientTransactionParams,
   AmbientTxType,
 } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
-import { getDefaultTickRangeFromChainId } from "@/hooks/pairs/newAmbient/config/defaultTicks";
-import {
-  getPriceFromTick,
-  getTickFromPrice,
-} from "@/utils/ambient/ambientMath.utils";
+import { getPriceFromTick } from "@/utils/ambient/ambientMath.utils";
 import {
   baseTokenFromConcLiquidity,
   concLiquidityNoteValue,
-  getConcBaseTokensFromQuoteTokens,
-  getConcQuoteTokensFromBaseTokens,
   quoteTokenFromConcLiquidity,
 } from "@/utils/ambient/liquidity.utils";
 import { formatPercent } from "@/utils/formatting.utils";
 import BigNumber from "bignumber.js";
+import useAddAmbientLiquidityController from "@/hooks/pairs/newAmbient/useAmbientLiqController";
 
 interface AmbientModalProps {
   pair: AmbientPool;
@@ -90,7 +81,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
                       </Text>
                     </div>
                     <AddAmbientLiquidity
-                      pair={props.pair}
+                      pool={props.pair}
                       sendTxFlow={props.sendTxFlow}
                       validateParams={props.validateParams}
                     />
@@ -134,101 +125,30 @@ interface AddConcParams {
   txType: AmbientTxType;
 }
 interface AddModalProps {
-  pair: AmbientPool;
+  pool: AmbientPool;
   sendTxFlow: (params: AddConcParams) => void;
   validateParams: (params: AddConcParams) => ValidationReturn;
 }
 const AddAmbientLiquidity = ({
-  pair,
+  pool,
   validateParams,
   sendTxFlow,
 }: AddModalProps) => {
-  // current pool values
-  const currentPrice = pair.stats.lastPriceSwap.toString();
-
-  // selection price
-  const [userMidpointPrice, setUserMidpointPrice] = useState(
-    formatBalance(currentPrice, pair.base.decimals - pair.quote.decimals, {
-      precision: 5,
-    })
-  );
-  // price from user input
-  const midpointWeiPrice = userMidpointPrice
-    ? BigNumber(userMidpointPrice)
-        .multipliedBy(
-          BigNumber(10).pow(pair.base.decimals - pair.quote.decimals)
-        )
-        .toString()
-    : currentPrice;
-  // selected ticks from price
-  const midPointTick = getTickFromPrice(midpointWeiPrice);
-  const selectedLowerTick = midPointTick - 75;
-  const selectedUpperTick = midPointTick + 75;
-  // min/max price values
-  const defaultMinPrice = getPriceFromTick(selectedLowerTick);
-  const defaultMaxPrice = getPriceFromTick(selectedUpperTick);
-
-  // base and quote values
-  const [baseValue, setBaseValue] = useState("");
-  const [quoteValue, setQuoteValue] = useState("");
-  const [lastUpdated, setLastUpdated] = useState<"base" | "quote">("base");
-
-  function setValue(value: string, isBase: boolean) {
-    if (
-      value === "" ||
-      isNaN(Number(value)) ||
-      Number(userMidpointPrice) === 0
-    ) {
-      setQuoteValue("");
-      setBaseValue("");
-      return;
-    }
-    if (isBase) {
-      setLastUpdated("base");
-      setBaseValue(value);
-      setQuoteValue(
-        formatBalance(
-          getConcQuoteTokensFromBaseTokens(
-            convertToBigNumber(value, pair.base.decimals).data.toString(),
-            currentPrice,
-            defaultMinPrice,
-            defaultMaxPrice
-          ),
-          pair.quote.decimals
-        )
-      );
-    } else {
-      setLastUpdated("quote");
-      setQuoteValue(value);
-      setBaseValue(
-        formatBalance(
-          getConcBaseTokensFromQuoteTokens(
-            convertToBigNumber(value, pair.quote.decimals).data.toString(),
-            currentPrice,
-            defaultMinPrice,
-            defaultMaxPrice
-          ),
-          pair.base.decimals
-        )
-      );
-    }
-  }
+  // get values from controller
+  const { addLiqParamsWei, externalState } =
+    useAddAmbientLiquidityController(pool);
 
   const txParams = () => ({
-    lowerTick: selectedLowerTick,
-    upperTick: selectedUpperTick,
-    minPriceWei: defaultMinPrice,
-    maxPriceWei: defaultMaxPrice,
+    lowerTick: addLiqParamsWei.lowerTick,
+    upperTick: addLiqParamsWei.upperTick,
+    minPriceWei: addLiqParamsWei.minPriceWei,
+    maxPriceWei: addLiqParamsWei.maxPriceWei,
     txType: AmbientTxType.ADD_CONC_LIQUIDITY,
     amount:
-      lastUpdated === "base"
-        ? convertToBigNumber(baseValue, pair.base.decimals).data?.toString() ??
-          "0"
-        : convertToBigNumber(
-            quoteValue,
-            pair.quote.decimals
-          ).data?.toString() ?? "0",
-    isAmountBase: lastUpdated === "base",
+      addLiqParamsWei.lastUpdatedToken === "base"
+        ? addLiqParamsWei.amountBaseWei
+        : addLiqParamsWei.amountQuoteWei,
+    isAmountBase: addLiqParamsWei.lastUpdatedToken === "base",
   });
 
   // validation
@@ -238,19 +158,19 @@ const AddAmbientLiquidity = ({
     <Container>
       <Spacer height="10px" />
       <Amount
-        decimals={pair.base.decimals}
-        value={baseValue}
+        decimals={pool.base.decimals}
+        value={externalState.amountBase}
         onChange={(e) => {
-          setValue(e.target.value, true);
+          externalState.setAmount(e.target.value, true);
         }}
-        IconUrl={pair.base.logoURI}
-        title={pair.base.symbol}
-        max={pair.base.balance ?? "0"}
-        symbol={pair.base.symbol}
+        IconUrl={pool.base.logoURI}
+        title={pool.base.symbol}
+        max={pool.base.balance ?? "0"}
+        symbol={pool.base.symbol}
         error={
           !paramCheck.isValid &&
-          Number(baseValue) !== 0 &&
-          paramCheck.errorMessage?.startsWith(pair.base.symbol)
+          Number(externalState.amountBase) !== 0 &&
+          paramCheck.errorMessage?.startsWith(pool.base.symbol)
         }
         errorMessage={paramCheck.errorMessage}
       />
@@ -258,19 +178,19 @@ const AddAmbientLiquidity = ({
       <Spacer height="20px" />
 
       <Amount
-        decimals={pair.quote.decimals}
-        value={quoteValue}
+        decimals={pool.quote.decimals}
+        value={externalState.amountQuote}
         onChange={(e) => {
-          setValue(e.target.value, false);
+          externalState.setAmount(e.target.value, false);
         }}
-        IconUrl={pair.quote.logoURI}
-        title={pair.quote.symbol}
-        max={pair.quote.balance ?? "0"}
-        symbol={pair.quote.symbol}
+        IconUrl={pool.quote.logoURI}
+        title={pool.quote.symbol}
+        max={pool.quote.balance ?? "0"}
+        symbol={pool.quote.symbol}
         error={
           !paramCheck.isValid &&
-          Number(quoteValue) !== 0 &&
-          paramCheck.errorMessage?.startsWith(pair.quote.symbol)
+          Number(externalState.amountQuote) !== 0 &&
+          paramCheck.errorMessage?.startsWith(pool.quote.symbol)
         }
         errorMessage={paramCheck.errorMessage}
       />
@@ -280,16 +200,16 @@ const AddAmbientLiquidity = ({
           name="Current Price"
           value={
             displayAmount(
-              currentPrice,
-              pair.base.decimals - pair.quote.decimals,
+              pool.stats.lastPriceSwap.toString(),
+              pool.base.decimals - pool.quote.decimals,
               {
                 precision: 3,
               }
             ) +
             " " +
-            pair.base.symbol +
+            pool.base.symbol +
             " = 1 " +
-            pair.quote.symbol
+            pool.quote.symbol
           }
         />
         <ModalItem
@@ -316,7 +236,7 @@ const AddAmbientLiquidity = ({
                       ?
                     </Text>
                   </span>
-                  <Text>{formatPercent(pair.stats.feeRate.toString())}</Text>
+                  <Text>{formatPercent(pool.stats.feeRate.toString())}</Text>
                 </Container>
               </PopUp>
             </Container>
@@ -340,13 +260,9 @@ const AddAmbientLiquidity = ({
               <Input
                 height={"sm"}
                 type="number"
-                value={userMidpointPrice}
+                value={externalState.midpointPrice}
                 onChange={(e) => {
-                  setValue(
-                    lastUpdated === "base" ? baseValue : quoteValue,
-                    lastUpdated === "base"
-                  );
-                  setUserMidpointPrice(e.target.value);
+                  externalState.setMidpointPrice(e.target.value);
                 }}
               />
             </Container>
@@ -355,8 +271,8 @@ const AddAmbientLiquidity = ({
         <ModalItem
           name="Min Price"
           value={displayAmount(
-            defaultMinPrice,
-            pair.base.decimals - pair.quote.decimals,
+            addLiqParamsWei.minPriceWei,
+            pool.base.decimals - pool.quote.decimals,
             {
               precision: 3,
             }
@@ -365,8 +281,8 @@ const AddAmbientLiquidity = ({
         <ModalItem
           name="Max Price"
           value={displayAmount(
-            defaultMaxPrice,
-            pair.base.decimals - pair.quote.decimals,
+            addLiqParamsWei.maxPriceWei,
+            pool.base.decimals - pool.quote.decimals,
             {
               precision: 3,
             }
@@ -377,8 +293,8 @@ const AddAmbientLiquidity = ({
       <Button
         disabled={
           !paramCheck.isValid ||
-          Number(baseValue) === 0 ||
-          Number(quoteValue) === 0
+          Number(externalState.amountQuote) === 0 ||
+          Number(externalState.amountBase) === 0
         }
         width={"fill"}
         onClick={() => sendTxFlow(txParams())}
