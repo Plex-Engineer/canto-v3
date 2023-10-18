@@ -161,6 +161,10 @@ export default function LendingPage() {
                 postChild={<NoteIcon />}
               />
               <Item
+                name="CNote in circulation"
+                value={displayAmount(lendingStats.circulatingCNote, 18)}
+              />
+              <Item
                 name="Value of rwas on canto"
                 value={displayAmount(lendingStats.valueOfAllRWA, 18)}
                 postChild={<NoteIcon />}
