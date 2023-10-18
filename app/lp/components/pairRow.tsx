@@ -1,5 +1,7 @@
 import Button from "@/components/button/button";
+import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
+import InfoPop from "@/components/infopop/infopop";
 import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
@@ -138,9 +140,19 @@ export const GeneralAmbientPairRow = ({
       }}
     />
   </Text>,
-  <Text key={pool.address + "type"}>
-    {pool.stable ? "Concentrated" : "Volatile"}
-  </Text>,
+
+  <Container key={"popkey"} direction="row" gap={10}>
+    <Text key={pool.address + "type"}>
+      {pool.stable ? "Concentrated" : "Volatile"}
+    </Text>
+
+    <InfoPop>
+      <Text>
+        This is a concentrated liquidity stable pool. The default range will be
+        selected for optimal rewards.
+      </Text>
+    </InfoPop>
+  </Container>,
   <div key={"action"}>
     <Button key={"action item"} onClick={() => onAddLiquidity(pool.address)}>
       Add LP

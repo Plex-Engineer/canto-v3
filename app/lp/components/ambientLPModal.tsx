@@ -307,8 +307,7 @@ const AddAmbientLiquidity = ({
                 <Container
                   style={{ display: "flex", flexDirection: "row", gap: "6px" }}
                 >
-                  <Text>{pair.feeRate * 0.0001 + "%"}</Text>
-
+                  <Text>{formatPercent(pair.stats.feeRate.toString())}</Text>
                   <span className={styles.infoPop}>
                     <Text
                       theme="secondary-dark"
@@ -320,7 +319,6 @@ const AddAmbientLiquidity = ({
                       ?
                     </Text>
                   </span>
-                  <Text>{formatPercent(pair.stats.feeRate.toString())}</Text>
                 </Container>
               </PopUp>
             </Container>
