@@ -32,11 +32,13 @@ import {
 } from "@/utils/ambient/ambientMath.utils";
 import {
   baseTokenFromConcLiquidity,
+  concLiquidityNoteValue,
   getConcBaseTokensFromQuoteTokens,
   getConcQuoteTokensFromBaseTokens,
   quoteTokenFromConcLiquidity,
 } from "@/utils/ambient/liquidity.utils";
 import { formatPercent } from "@/utils/formatting.utils";
+import BigNumber from "bignumber.js";
 
 interface AmbientModalProps {
   pair: AmbientPool;
@@ -254,7 +256,7 @@ const AddAmbientLiquidity = ({
       <Spacer height="20px" />
       <Container className={styles.card}>
         <ModalItem
-          name="Price"
+          name="Current Price"
           value={
             displayAmount(
               currentPrice,
@@ -265,7 +267,7 @@ const AddAmbientLiquidity = ({
             ) +
             " " +
             pair.base.symbol +
-            " - 1 " +
+            " = 1 " +
             pair.quote.symbol
           }
         />
@@ -373,11 +375,53 @@ const RemoveAmbientLiquidity = ({
   return (
     <div>
       <Spacer height="10px" />
-      {pool.userPositions.map((pos, idx) => (
-        <Button key={idx} onClick={() => setPosition(pos)}>
-          {"position: " + idx}
-        </Button>
-      ))}
+      <Text>Select position to remove</Text>
+      <Spacer height="10px" />
+      <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
+        {pool.userPositions.map((pos, idx) => (
+          <Button
+            color={
+              pos.positionId === position.positionId ? "accent" : "primary"
+            }
+            key={idx}
+            onClick={() => setPosition(pos)}
+            // width={"fill"}
+            height={"large"}
+          >
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div>
+                {`RANGE: ${displayAmount(
+                  getPriceFromTick(pos.bidTick),
+                  pool.base.decimals - pool.quote.decimals,
+                  {
+                    precision: 3,
+                  }
+                )}-${displayAmount(
+                  getPriceFromTick(pos.askTick),
+                  pool.base.decimals - pool.quote.decimals,
+                  {
+                    precision: 3,
+                  }
+                )}`}
+              </div>
+              <div>
+                {`VALUE: ${displayAmount(
+                  concLiquidityNoteValue(
+                    pos.concLiq,
+                    pool.stats.lastPriceLiq.toString(),
+                    pos.bidTick,
+                    pos.askTick,
+                    new BigNumber(10).pow(36 - pool.base.decimals).toString(),
+                    new BigNumber(10).pow(36 - pool.quote.decimals).toString()
+                  ),
+                  18
+                )} $NOTE`}
+              </div>
+            </div>
+          </Button>
+        ))}
+      </div>
+      <Spacer height="20px" />
       <Container
         direction="row"
         backgroundColor="var(--card-surface-color)"
@@ -443,7 +487,7 @@ const RemoveAmbientLiquidity = ({
           )}
         />
       </Container>
-      <Spacer height="140px" />
+      <Spacer height="80px" />
 
       <Button
         disabled={Number(percentToRemove) <= 0 || Number(percentToRemove) > 100}

@@ -139,7 +139,7 @@ export const GeneralAmbientPairRow = ({
     />
   </Text>,
   <Text key={pool.address + "type"}>
-    {pool.stable ? "Stable" : "Volatile"}
+    {pool.stable ? "Concentrated" : "Volatile"}
   </Text>,
   <div key={"action"}>
     <Button key={"action item"} onClick={() => onAddLiquidity(pool.address)}>
