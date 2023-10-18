@@ -50,7 +50,7 @@ export async function performEVMTransaction(
             from: newSigner.account.address,
             value: tx.value,
           }),
-        30000
+        90000
       );
     if (timeoutError) throw timeoutError;
     if (!transaction.transactionHash)
