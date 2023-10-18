@@ -3,32 +3,28 @@ import {
   AmbientHookInputParams,
   AmbientHookReturn,
 } from "./interfaces/hookParams";
-import { getGeneralAmbientPairData } from "./helpers/ambientPairData";
-import { getAmbientPairsFromChainId } from "./config/ambientPairs";
+import { AmbientPool } from "./interfaces/ambientPools";
+import { getAllAmbientPoolsData } from "./helpers/getAmbientPoolsData";
+import useTokenBalances from "@/hooks/helpers/useTokenBalances";
+import { getUniqueUnderlyingTokensFromPairs } from "./helpers/underlyingTokens";
 import {
   AmbientTransactionParams,
   AmbientTxType,
-} from "./interfaces/ambientTxTypes";
+} from "./interfaces/ambientPoolTxTypes";
 import {
   NEW_ERROR,
   NewTransactionFlow,
   ReturnWithError,
   ValidationReturn,
 } from "@/config/interfaces";
-import { createNewAmbientTxFlow } from "./helpers/createAmbientFlow";
-import useTokenBalances from "@/hooks/helpers/useTokenBalances";
-import { getUniqueUnderlyingTokensFromPairs } from "./helpers/underlyingTokens";
 import {
   getConcBaseTokensFromQuoteTokens,
   getConcQuoteTokensFromBaseTokens,
 } from "@/utils/ambient/liquidity.utils";
-import {
-  convertFromQ64RootPrice,
-  getPriceFromTick,
-} from "@/utils/ambient/ambientMath.utils";
 import { validateInputTokenAmount } from "@/utils/validation.utils";
+import { createNewAmbientTxFlow } from "./helpers/createAmbientFlow";
 
-export default function useAmbientPairs(
+export default function useAmbientPools(
   params: AmbientHookInputParams,
   options?: {
     refetchInterval?: number;
@@ -38,19 +34,13 @@ export default function useAmbientPairs(
   /// INTERNAL STATE
   ///
 
-  // use query for all ambient pair data
-  const { data: ambientPairs, isLoading } = useQuery(
-    ["ambientPairs", params.chainId, params.userEthAddress],
-    async () => {
-      const pairs = getAmbientPairsFromChainId(params.chainId);
+  // use query for all ambient pool data
+  const { data: allPools, isLoading } = useQuery(
+    ["ambient pools", params.chainId, params.userEthAddress],
+    async (): Promise<AmbientPool[]> => {
       return (
-        (
-          await getGeneralAmbientPairData(
-            params.chainId,
-            pairs,
-            params.userEthAddress
-          )
-        ).data ?? []
+        (await getAllAmbientPoolsData(params.chainId, params.userEthAddress))
+          .data ?? []
       );
     },
     {
@@ -67,22 +57,22 @@ export default function useAmbientPairs(
   // get balances of all underlying tokens
   const underlyingTokenBalances = useTokenBalances(
     params.chainId,
-    getUniqueUnderlyingTokensFromPairs(ambientPairs ?? []),
+    getUniqueUnderlyingTokensFromPairs(allPools ?? []),
     params.userEthAddress
   );
 
-  const pairsWithBalances = ambientPairs?.map((pair) => {
+  const poolsWithBalances = allPools?.map((pool) => {
     // look for balances
-    const baseBalance = underlyingTokenBalances[pair.base.address];
-    const quoteBalance = underlyingTokenBalances[pair.quote.address];
+    const baseBalance = underlyingTokenBalances[pool.base.address];
+    const quoteBalance = underlyingTokenBalances[pool.quote.address];
     return {
-      ...pair,
+      ...pool,
       base: {
-        ...pair.base,
+        ...pool.base,
         balance: baseBalance ?? "0",
       },
       quote: {
-        ...pair.quote,
+        ...pool.quote,
         balance: quoteBalance ?? "0",
       },
     };
@@ -98,8 +88,6 @@ export default function useAmbientPairs(
   ): ValidationReturn {
     switch (txParams.txType) {
       case AmbientTxType.ADD_CONC_LIQUIDITY: {
-        const minPriceWei = getPriceFromTick(txParams.lowerTick);
-        const maxPriceWei = getPriceFromTick(txParams.upperTick);
         // check that balances are good for each token
         const base = txParams.pair.base;
         const quote = txParams.pair.quote;
@@ -109,17 +97,17 @@ export default function useAmbientPairs(
           baseAmount = txParams.amount;
           quoteAmount = getConcQuoteTokensFromBaseTokens(
             baseAmount,
-            convertFromQ64RootPrice(txParams.pair.q64PriceRoot),
-            minPriceWei,
-            maxPriceWei
+            txParams.pair.stats.lastPriceSwap.toString(),
+            txParams.minPriceWei,
+            txParams.maxPriceWei
           );
         } else {
           quoteAmount = txParams.amount;
           baseAmount = getConcBaseTokensFromQuoteTokens(
             quoteAmount,
-            convertFromQ64RootPrice(txParams.pair.q64PriceRoot),
-            minPriceWei,
-            maxPriceWei
+            txParams.pair.stats.lastPriceSwap.toString(),
+            txParams.minPriceWei,
+            txParams.maxPriceWei
           );
         }
         const baseCheck = validateInputTokenAmount(
@@ -144,10 +132,20 @@ export default function useAmbientPairs(
         };
       }
       case AmbientTxType.REMOVE_CONC_LIQUIDITY: {
+        // get position
+        const position = txParams.pair.userPositions.find(
+          (pos) => pos.positionId === txParams.positionId
+        );
+        if (!position) {
+          return {
+            isValid: false,
+            errorMessage: "position not found",
+          };
+        }
         // check enough liquidity there
         return validateInputTokenAmount(
           txParams.liquidity,
-          txParams.pair.userDetails?.defaultRangePosition.liquidity ?? "0",
+          position.concLiq.toString(),
           txParams.pair.symbol
         );
       }
@@ -160,22 +158,22 @@ export default function useAmbientPairs(
   }
 
   // tx flow creator
-  function createNewPairsFlow(
+  function createNewPoolFlow(
     params: AmbientTransactionParams
   ): ReturnWithError<NewTransactionFlow> {
     const validation = validateTxParams(params);
     if (!validation.isValid) {
-      return NEW_ERROR("createNewPairsFlow::" + validation.errorMessage);
+      return NEW_ERROR("createNewPoolFlow::" + validation.errorMessage);
     }
     return createNewAmbientTxFlow(params);
   }
 
   return {
     isLoading,
-    ambientPairs: pairsWithBalances ?? [],
+    ambientPools: poolsWithBalances ?? [],
     transaction: {
       validateParams: validateTxParams,
-      createNewPairsFlow,
+      createNewPoolFlow,
     },
   };
 }
