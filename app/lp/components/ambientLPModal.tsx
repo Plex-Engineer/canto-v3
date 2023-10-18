@@ -375,7 +375,7 @@ const RemoveAmbientLiquidity = ({
     <div>
       <Spacer height="10px" />
       {pool.userPositions.map((pos, idx) => (
-        <Button onClick={() => setPosition(pos)}>{"position: " + idx}</Button>
+        <Button key={idx} onClick={() => setPosition(pos)}>{"position: " + idx}</Button>
       ))}
       <Container
         direction="row"
