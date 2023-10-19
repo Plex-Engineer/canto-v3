@@ -54,21 +54,21 @@ export const AmbientModal = (props: AmbientModalProps) => {
   >();
   return (
     <Container className={styles.container} width="32rem">
-      <Container
-        direction="row"
-        height="50px"
-        center={{
-          vertical: true,
-        }}
-        style={{
-          cursor: "pointer",
-          marginTop: "-14px",
-        }}
-      >
-        <Text font="proto_mono" size="lg">
-          Liquidity
-        </Text>
-      </Container>
+      {/* title */}
+      <div>
+        <Container
+          direction="row"
+          height="24px"
+          center={{
+            vertical: true,
+          }}
+        >
+          <Text font="proto_mono" size="lg">
+            Liquidity
+          </Text>
+        </Container>
+        <Spacer height="14px" />
+      </div>
       <div className={styles.inner}>
         {props.pair.userPositions.length === 0 ||
         selectedPosition != undefined ? (
@@ -77,7 +77,11 @@ export const AmbientModal = (props: AmbientModalProps) => {
               {
                 title: "Add",
                 content: (
-                  <Container width="100%" margin="sm">
+                  <Container
+                    width="100%"
+                    margin="sm"
+                    className={styles["scroll-view"]}
+                  >
                     <div className={styles.iconTitle}>
                       <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
                       <Text size="lg" font="proto_mono">
@@ -96,7 +100,11 @@ export const AmbientModal = (props: AmbientModalProps) => {
                 title: "Remove",
                 isDisabled: props.pair.userPositions.length === 0,
                 content: (
-                  <Container width="100%" margin="sm">
+                  <Container
+                    width="100%"
+                    margin="sm"
+                    className={styles["scroll-view"]}
+                  >
                     <div className={styles.iconTitle}>
                       <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
                       <Text size="lg" font="proto_mono">
@@ -114,7 +122,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
             ]}
           />
         ) : (
-          <>
+          <Container height="calc(100% - 0px)">
             <div className={styles.iconTitle}>
               <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
               <Text size="lg" font="proto_mono">
@@ -194,7 +202,6 @@ export const AmbientModal = (props: AmbientModalProps) => {
                 ))}
               </Container>
             </div>
-            <Spacer height="100%" />
             <div
               style={{
                 margin: "1rem",
@@ -209,7 +216,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
                 New Position
               </Button>
             </div>
-          </>
+          </Container>
         )}
       </div>
     </Container>

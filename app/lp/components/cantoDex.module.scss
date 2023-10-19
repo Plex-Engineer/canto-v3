@@ -1,6 +1,35 @@
 .container {
-  min-height: 42rem;
+  display: flex;
   max-height: 42rem;
+  height: 100vh;
+}
+
+.scroll-view {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  flex-grow: 1;
+  //   border-top: 1px solid var(--border-stroke-color);
+  //   border-bottom: 1px solid var(--border-stroke-color);
+  padding: 1px;
+  &::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+  }
+}
+
+.inner {
+  display: flex;
+  height: calc(100% - 22px);
+  flex-direction: column;
+  margin: 0px -16px -16px -16px;
+}
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: transform 0.5s ease-out;
+  background-color: var(--card-sub-surface-color);
 }
 .iconTitle {
   width: 100%;
@@ -37,14 +66,6 @@
   padding: 1rem;
 }
 
-.items-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  transition: transform 0.5s ease-out;
-  background-color: var(--card-sub-surface-color);
-}
-
 .item {
   display: flex;
   flex-direction: row;
@@ -78,26 +99,4 @@
     background-color: rgba(var(--dark-color), 0.3);
     opacity: 0.8;
   }
-}
-
-.scroll-view {
-  height: 500px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  position: relative;
-  scroll-behavior: smooth;
-  border-top: 1px solid var(--border-stroke-color);
-  border-bottom: 1px solid var(--border-stroke-color);
-  &::-webkit-scrollbar {
-    width: 0px;
-    background: transparent;
-  }
-}
-
-.inner {
-  margin: 0 -16px -16px -16px;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  max-height: 100%;
 }
