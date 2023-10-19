@@ -56,6 +56,30 @@ export const AmbientModal = (props: AmbientModalProps) => {
     </div>
   );
   return (
+    // <Container
+    //     direction="row"
+    //     height="50px"
+    //     center={{
+    //       vertical: true,
+    //     }}
+    //     style={{
+    //       cursor: "pointer",
+    //       marginTop: "-14px",
+    //     }}
+    //     onClick={() => setModalType("base")}
+    //   >
+    //     <div
+    //       style={{
+    //         rotate: "90deg",
+    //         marginRight: "6px",
+    //       }}
+    //     >
+    //       <Icon icon={{ url: "./dropdown.svg", size: 24 }} themed />
+    //     </div>
+    //     <Text font="proto_mono" size="lg">
+    //       Liquidity
+    //     </Text>
+    //   </Container>
     <Container className={styles.container} width="32rem">
       {/* title */}
       <div>
@@ -65,7 +89,21 @@ export const AmbientModal = (props: AmbientModalProps) => {
           center={{
             vertical: true,
           }}
+          style={{
+            cursor: "pointer",
+          }}
+          onClick={() => setSelectedPosition(null)}
         >
+          {selectedPosition !== null && (
+            <div
+              style={{
+                rotate: "90deg",
+                marginRight: "6px",
+              }}
+            >
+              <Icon icon={{ url: "./dropdown.svg", size: 24 }} themed />
+            </div>
+          )}
           <Text font="proto_mono" size="lg">
             {props.pool.userPositions.length === 0 || selectedPosition === "new"
               ? "Create New Position"
@@ -547,15 +585,7 @@ const PositionList = ({
                 precision: 3,
               }
             )}
-            ){" "}
-            <span
-              style={{
-                position: "absolute",
-                transform: "translate(10%,-20%)",
-              }}
-            >
-              <Icon icon={{ url: pool.logoURI, size: 42 }} />
-            </span>
+            )
           </Text>
           <Text size="md" font="proto_mono">
             {displayAmount(
