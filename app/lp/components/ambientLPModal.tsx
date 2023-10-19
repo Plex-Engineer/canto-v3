@@ -12,7 +12,7 @@ import styles from "./cantoDex.module.scss";
 import Amount from "@/components/amount/amount";
 import Tabs from "@/components/tabs/tabs";
 import { ModalItem } from "@/app/lending/components/modal/modal";
-import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
+import { greaterThan, percentOfAmount } from "@/utils/tokens/tokenMath.utils";
 import Slider from "@/components/slider/slider";
 import clsx from "clsx";
 import PopUp from "@/components/popup/popup";
@@ -242,6 +242,9 @@ const AddAmbientLiquidity = ({
 
   // validation
   const paramCheck = validateParams(txParams());
+  const isPriceValid =
+    Number(pool.stats.lastPriceSwap) > Number(addLiqParamsWei.minPriceWei) &&
+    Number(pool.stats.lastPriceSwap) < Number(addLiqParamsWei.maxPriceWei);
 
   return (
     <Container>
@@ -371,6 +374,7 @@ const AddAmbientLiquidity = ({
                   onChange={(e) => {
                     externalState.setMidpointPrice(e.target.value);
                   }}
+                  error={!isPriceValid}
                 />
               </Container>
             )
@@ -397,12 +401,22 @@ const AddAmbientLiquidity = ({
           )}
         />
       </Container>
+      <span
+        className={styles["error-message"]}
+        style={{
+          opacity: !isPriceValid ? 1 : 0,
+          color: "var(--extra-failure-color, #ff0000)",
+        }}
+      >
+        {"Please enter a range that includes the current price"}
+      </span>
       <Spacer height="30px" />
       <Button
         disabled={
           !paramCheck.isValid ||
           Number(externalState.amountQuote) === 0 ||
-          Number(externalState.amountBase) === 0
+          Number(externalState.amountBase) === 0 ||
+          !isPriceValid
         }
         width={"fill"}
         onClick={() => sendTxFlow(txParams())}
