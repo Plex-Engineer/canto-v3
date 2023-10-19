@@ -1,5 +1,6 @@
 .container {
   min-height: 42rem;
+  max-height: 42rem;
 }
 .iconTitle {
   width: 100%;
@@ -40,7 +41,6 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  overflow-y: auto;
   transition: transform 0.5s ease-out;
   background-color: var(--card-sub-surface-color);
 }
@@ -81,13 +81,13 @@
 }
 
 .scroll-view {
-  //   height: calc(100% - 26px);
-  height: 100%;
-  flex-grow: 1;
+  height: 500px;
   overflow-x: hidden;
   overflow-y: auto;
   position: relative;
   scroll-behavior: smooth;
+  border-top: 1px solid var(--border-stroke-color);
+  border-bottom: 1px solid var(--border-stroke-color);
   &::-webkit-scrollbar {
     width: 0px;
     background: transparent;
@@ -99,4 +99,5 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  max-height: 100%;
 }

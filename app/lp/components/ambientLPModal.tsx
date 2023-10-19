@@ -49,6 +49,9 @@ interface AmbientModalProps {
 }
 
 export const AmbientModal = (props: AmbientModalProps) => {
+  const [selectedPosition, setSelectedPosition] = useState<
+    (typeof props.pair.userPositions)[0] | "new"
+  >();
   return (
     <Container className={styles.container} width="32rem">
       <Container
@@ -67,7 +70,8 @@ export const AmbientModal = (props: AmbientModalProps) => {
         </Text>
       </Container>
       <div className={styles.inner}>
-        {props.pair.userPositions.length === 0 ? (
+        {props.pair.userPositions.length === 0 ||
+        selectedPosition != undefined ? (
           <Tabs
             tabs={[
               {
@@ -128,7 +132,9 @@ export const AmbientModal = (props: AmbientModalProps) => {
                       horizontal: true,
                     }}
                     className={styles.item}
-                    onClick={() => {}}
+                    onClick={() => {
+                      setSelectedPosition(item);
+                    }}
                   >
                     <Container direction="row" gap={20} width="100%">
                       <Text>Position</Text>
@@ -194,7 +200,14 @@ export const AmbientModal = (props: AmbientModalProps) => {
                 margin: "1rem",
               }}
             >
-              <Button width={"fill"}>New Position</Button>
+              <Button
+                width={"fill"}
+                onClick={() => {
+                  setSelectedPosition("new");
+                }}
+              >
+                New Position
+              </Button>
             </div>
           </>
         )}
