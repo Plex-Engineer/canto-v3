@@ -78,14 +78,18 @@ export const AmbientModal = (props: AmbientModalProps) => {
       </div>
       <div className={styles.inner}>
         {props.pool.userPositions.length === 0 || selectedPosition === "new" ? (
-          <>
+          <Container
+            width="100%"
+            className={styles["scroll-view"]}
+            style={{ padding: "0 1rem" }}
+          >
             <PoolHeader />
             <AddAmbientLiquidity
               pool={props.pool}
               sendTxFlow={props.sendTxFlow}
               validateParams={props.validateParams}
             />
-          </>
+          </Container>
         ) : !selectedPosition ? (
           <Container height="calc(100% - 0px)">
             <PoolHeader />
@@ -113,6 +117,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
           </Container>
         ) : (
           <Tabs
+            shadows={true}
             tabs={[
               {
                 title: "Add",
