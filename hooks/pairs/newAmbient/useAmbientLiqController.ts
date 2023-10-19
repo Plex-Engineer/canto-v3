@@ -2,7 +2,7 @@ import {
   getPriceFromTick,
   getTickFromPrice,
 } from "@/utils/ambient/ambientMath.utils";
-import { AmbientPool } from "./interfaces/ambientPools";
+import { AmbientPool, AmbientUserPosition } from "./interfaces/ambientPools";
 import { useState } from "react";
 import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
 import {
@@ -37,11 +37,12 @@ const DEFAULT_TICK_RANGE = 75;
 // This hook is used for making calculations and displaying vales for
 // adding concentrated liquidity in an ambient pool
 export default function useAddAmbientLiquidityController(
-  pool: AmbientPool
+  pool: AmbientPool,
+  position?: AmbientUserPosition
 ): ControllerReturn {
   /** INTERNAL STATE */
-  const initialState = (): AddConcLiqParams => {
-    // use defaults for user selections
+  // default state if no position is passed
+  const defaultState = (): AddConcLiqParams => {
     const midpointPrice = pool.stats.lastPriceSwap;
     const midpointTick = getTickFromPrice(midpointPrice);
     const lowerTick = midpointTick - DEFAULT_TICK_RANGE;
@@ -57,8 +58,22 @@ export default function useAddAmbientLiquidityController(
       lastUpdatedToken: "base",
     };
   };
+  // default state if position is passed
+  const defaultStateWithPosition = (
+    pos: AmbientUserPosition
+  ): AddConcLiqParams => ({
+    lowerTick: pos.bidTick,
+    upperTick: pos.askTick,
+    minPriceWei: getPriceFromTick(pos.bidTick),
+    midpointPriceWei: getPriceFromTick((pos.askTick + pos.bidTick) / 2),
+    maxPriceWei: getPriceFromTick(pos.askTick),
+    amountBaseWei: "0",
+    amountQuoteWei: "0",
+    lastUpdatedToken: "base",
+  });
+
   const [internalState, setInternalState] = useState<AddConcLiqParams>(
-    initialState()
+    position ? defaultStateWithPosition(position) : defaultState()
   );
   /**  Internal Partial Setter */
   function setPartialInternalState(

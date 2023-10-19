@@ -31,32 +31,33 @@ export interface AmbientPool extends BaseAmbientPool {
     lastPriceIndic: string;
     feeRate: number;
   };
-  userPositions: {
-    chainId: string;
-    base: string;
-    quote: string;
-    poolIdx: number;
-    bidTick: number;
-    askTick: number;
-    isBid: boolean;
-    user: string;
-    timeFirstMint: number;
-    latestUpdateTime: number;
-    lastMintTx: string;
-    firstMintTx: string;
-    positionType: "concentrated" | "ambient";
-    ambientLiq: string;
-    concLiq: string;
-    rewardLiq: string;
-    liqRefreshTime: number;
-    aprDuration: number;
-    aprPostLiq: string;
-    aprContributedLiq: string;
-    aprEst: number;
-    positionId: string;
-  }[];
+  userPositions: AmbientUserPosition[];
   totals: {
     noteTvl: string;
     apr: string;
   };
+}
+export interface AmbientUserPosition {
+  chainId: string;
+  base: string;
+  quote: string;
+  poolIdx: number;
+  bidTick: number;
+  askTick: number;
+  isBid: boolean;
+  user: string;
+  timeFirstMint: number;
+  latestUpdateTime: number;
+  lastMintTx: string;
+  firstMintTx: string;
+  positionType: "concentrated" | "ambient";
+  ambientLiq: string;
+  concLiq: string;
+  rewardLiq: string;
+  liqRefreshTime: number;
+  aprDuration: number;
+  aprPostLiq: string;
+  aprContributedLiq: string;
+  aprEst: number;
+  positionId: string;
 }

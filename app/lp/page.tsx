@@ -141,7 +141,7 @@ export default function Page() {
         )}
         {selectedPair && isAmbientPool(selectedPair) && (
           <AmbientModal
-            pair={selectedPair}
+            pool={selectedPair}
             validateParams={canPerformAmbientTx}
             sendTxFlow={sendAmbientTxFlow}
           />
