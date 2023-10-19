@@ -26,8 +26,8 @@ interface ControllerReturn {
   externalState: {
     amountBase: string;
     amountQuote: string;
-    midpointPrice: string;
     setAmount: (value: string, isBase: boolean) => void;
+    midpointPrice: string;
     setMidpointPrice: (value: string) => void;
   };
 }
@@ -84,63 +84,25 @@ export default function useAddAmbientLiquidityController(
   );
   // set non-wei amount
   function setAmount(amount: string, isBase: boolean) {
-    // first check value before performing operations
-    if (
-      amount === "" ||
-      isNaN(Number(amount)) ||
-      !internalState.minPriceWei ||
-      !internalState.maxPriceWei
-    ) {
-      setPartialInternalState({
-        amountBaseWei: "",
-        amountQuoteWei: "",
-      });
-      setUserAmountBase(isBase ? amount : "");
-      setUserAmountQuote(isBase ? "" : amount);
-      return;
-    }
-    // convert to wei
-    const weiAmount =
-      convertToBigNumber(
-        amount,
-        isBase ? pool.base.decimals : pool.quote.decimals
-      ).data?.toString() ?? "0";
-    let baseEstimateWei;
-    let quoteEstimateWei;
-
-    // get estimates
-    if (isBase) {
-      // get quote estimate
-      quoteEstimateWei = getConcQuoteTokensFromBaseTokens(
-        weiAmount,
-        pool.stats.lastPriceSwap,
-        internalState.minPriceWei,
-        internalState.maxPriceWei
-      );
-      baseEstimateWei = weiAmount;
-    } else {
-      // get base estimate
-      baseEstimateWei = getConcBaseTokensFromQuoteTokens(
-        weiAmount,
-        pool.stats.lastPriceSwap,
-        internalState.minPriceWei,
-        internalState.maxPriceWei
-      );
-      quoteEstimateWei = weiAmount;
-    }
-    // set wei values and readable values
+    // can use current state to get min/max prices
+    const amounts = getTokenAmountsFromPrice(
+      amount,
+      isBase,
+      internalState.minPriceWei,
+      internalState.maxPriceWei,
+      pool
+    );
+    // set internal state with new wei amounts
     setPartialInternalState({
-      amountBaseWei: baseEstimateWei,
-      amountQuoteWei: quoteEstimateWei,
+      amountBaseWei: amounts.baseAmountWei,
+      amountQuoteWei: amounts.quoteAmountWei,
       lastUpdatedToken: isBase ? "base" : "quote",
     });
-    setUserAmountBase(
-      isBase ? amount : formatBalance(baseEstimateWei, pool.base.decimals)
-    );
-    setUserAmountQuote(
-      isBase ? formatBalance(quoteEstimateWei, pool.quote.decimals) : amount
-    );
+    // set human readable values
+    setUserAmountBase(amounts.baseAmountFormatted);
+    setUserAmountQuote(amounts.quoteAmountFormatted);
   }
+
   // set non-wei price
   function setMidpointPrice(price: string) {
     // set readable value first
@@ -171,21 +133,29 @@ export default function useAddAmbientLiquidityController(
     // get wei prices from ticks
     const minPriceWei = getPriceFromTick(lowerTick);
     const maxPriceWei = getPriceFromTick(upperTick);
-    // set values to state
+    // get new amounts from price range
+    const amounts = getTokenAmountsFromPrice(
+      internalState.lastUpdatedToken === "base"
+        ? userAmountBase
+        : userAmountQuote,
+      internalState.lastUpdatedToken === "base",
+      minPriceWei,
+      maxPriceWei,
+      pool
+    );
+    // set values to internal state
     setPartialInternalState({
       lowerTick,
       upperTick,
       minPriceWei,
       midpointPriceWei,
       maxPriceWei,
+      amountBaseWei: amounts.baseAmountWei,
+      amountQuoteWei: amounts.quoteAmountWei,
     });
-    // set human readable values with new prices
-    setAmount(
-      internalState.lastUpdatedToken === "base"
-        ? userAmountBase
-        : userAmountQuote,
-      internalState.lastUpdatedToken === "base"
-    );
+    // set human readable values
+    setUserAmountBase(amounts.baseAmountFormatted);
+    setUserAmountQuote(amounts.quoteAmountFormatted);
   }
 
   return {
@@ -193,9 +163,77 @@ export default function useAddAmbientLiquidityController(
     externalState: {
       amountBase: userAmountBase,
       amountQuote: userAmountQuote,
-      midpointPrice: userMidpointPrice,
       setAmount,
+      midpointPrice: userMidpointPrice,
       setMidpointPrice,
     },
+  };
+}
+
+function getTokenAmountsFromPrice(
+  nonWeiAmount: string,
+  isBase: boolean,
+  minPriceWei: string,
+  maxPriceWei: string,
+  pool: AmbientPool
+): {
+  baseAmountWei: string;
+  baseAmountFormatted: string;
+  quoteAmountWei: string;
+  quoteAmountFormatted: string;
+} {
+  // first check value before performing operations
+  if (
+    nonWeiAmount === "" ||
+    isNaN(Number(nonWeiAmount)) ||
+    !minPriceWei ||
+    !maxPriceWei
+  ) {
+    return {
+      baseAmountWei: "0",
+      baseAmountFormatted: isBase ? nonWeiAmount : "",
+      quoteAmountWei: "0",
+      quoteAmountFormatted: isBase ? "" : nonWeiAmount,
+    };
+  }
+  // convert to wei
+  const weiAmount =
+    convertToBigNumber(
+      nonWeiAmount,
+      isBase ? pool.base.decimals : pool.quote.decimals
+    ).data?.toString() ?? "0";
+  let baseEstimateWei;
+  let quoteEstimateWei;
+
+  // get estimates
+  if (isBase) {
+    // get quote estimate
+    quoteEstimateWei = getConcQuoteTokensFromBaseTokens(
+      weiAmount,
+      pool.stats.lastPriceSwap,
+      minPriceWei,
+      maxPriceWei
+    );
+    baseEstimateWei = weiAmount;
+  } else {
+    // get base estimate
+    baseEstimateWei = getConcBaseTokensFromQuoteTokens(
+      weiAmount,
+      pool.stats.lastPriceSwap,
+      minPriceWei,
+      maxPriceWei
+    );
+    quoteEstimateWei = weiAmount;
+  }
+  // return all values
+  return {
+    baseAmountWei: baseEstimateWei,
+    baseAmountFormatted: isBase
+      ? nonWeiAmount
+      : formatBalance(baseEstimateWei, pool.base.decimals),
+    quoteAmountWei: quoteEstimateWei,
+    quoteAmountFormatted: isBase
+      ? formatBalance(quoteEstimateWei, pool.quote.decimals)
+      : nonWeiAmount,
   };
 }
