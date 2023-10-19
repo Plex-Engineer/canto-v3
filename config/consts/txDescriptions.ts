@@ -12,7 +12,7 @@ export const TX_DESCRIPTIONS = {
   }),
   APPROVE_TOKEN: (tokenSymbol: string, spender: string) => ({
     title: `Approve ${tokenSymbol}`,
-    description: `Give the ${spender} approval to move ${tokenSymbol}`,
+    description: `Give ${spender} approval to move ${tokenSymbol}`,
   }),
   BRIDGE: (
     tokenSymbol: string,
