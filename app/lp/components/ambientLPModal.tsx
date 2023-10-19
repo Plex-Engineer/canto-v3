@@ -51,32 +51,23 @@ interface AmbientModalProps {
 export const AmbientModal = (props: AmbientModalProps) => {
   return (
     <Container className={styles.container} width="32rem">
-      <div
+      <Container
+        direction="row"
+        height="50px"
+        center={{
+          vertical: true,
+        }}
         style={{
-          height: "100%",
+          cursor: "pointer",
+          marginTop: "-14px",
         }}
       >
-        <Container
-          direction="row"
-          height="50px"
-          center={{
-            vertical: true,
-          }}
-          style={{
-            cursor: "pointer",
-            marginTop: "-14px",
-          }}
-        >
-          <Text font="proto_mono" size="lg">
-            Liquidity
-          </Text>
-        </Container>
-        <div
-          style={{
-            margin: "0  -16px -16px -16px",
-            height: "42rem",
-          }}
-        >
+        <Text font="proto_mono" size="lg">
+          Liquidity
+        </Text>
+      </Container>
+      <div className={styles.inner}>
+        {props.pair.userPositions.length === 0 ? (
           <Tabs
             tabs={[
               {
@@ -118,7 +109,95 @@ export const AmbientModal = (props: AmbientModalProps) => {
               },
             ]}
           />
-        </div>
+        ) : (
+          <>
+            <div className={styles.iconTitle}>
+              <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
+              <Text size="lg" font="proto_mono">
+                {props.pair.symbol}
+              </Text>
+            </div>
+            <div className={styles["scroll-view"]}>
+              <Container margin="md" gap={20} className={styles["items-list"]}>
+                {props.pair.userPositions.map((item, idx) => (
+                  <Container
+                    key={idx}
+                    width="100%"
+                    gap={10}
+                    center={{
+                      horizontal: true,
+                    }}
+                    className={styles.item}
+                    onClick={() => {}}
+                  >
+                    <Container direction="row" gap={20} width="100%">
+                      <Text>Position</Text>
+                      <Text size="md" font="proto_mono">
+                        {idx + 1}
+                      </Text>
+                    </Container>
+
+                    <Container direction="row" gap={"auto"} width="100%">
+                      <Text size="md" font="proto_mono">
+                        Range: (
+                        {displayAmount(
+                          getPriceFromTick(item.bidTick),
+                          props.pair.base.decimals - props.pair.quote.decimals,
+                          {
+                            precision: 3,
+                          }
+                        )}{" "}
+                        -{" "}
+                        {displayAmount(
+                          getPriceFromTick(item.askTick),
+                          props.pair.base.decimals - props.pair.quote.decimals,
+                          {
+                            precision: 3,
+                          }
+                        )}
+                        ){" "}
+                        <span
+                          style={{
+                            position: "absolute",
+                            transform: "translate(10%,-20%)",
+                          }}
+                        >
+                          <Icon icon={{ url: props.pair.logoURI, size: 42 }} />
+                        </span>
+                      </Text>
+                      <Text size="md" font="proto_mono">
+                        {displayAmount(
+                          concLiquidityNoteValue(
+                            item.concLiq,
+                            props.pair.stats.lastPriceSwap.toString(),
+                            item.bidTick,
+                            item.askTick,
+                            new BigNumber(10)
+                              .pow(36 - props.pair.base.decimals)
+                              .toString(),
+                            new BigNumber(10)
+                              .pow(36 - props.pair.quote.decimals)
+                              .toString()
+                          ),
+                          18
+                        )}{" "}
+                        <Icon icon={{ url: "tokens/note.svg", size: 16 }} />
+                      </Text>
+                    </Container>
+                  </Container>
+                ))}
+              </Container>
+            </div>
+            <Spacer height="100%" />
+            <div
+              style={{
+                margin: "1rem",
+              }}
+            >
+              <Button width={"fill"}>New Position</Button>
+            </div>
+          </>
+        )}
       </div>
     </Container>
   );
