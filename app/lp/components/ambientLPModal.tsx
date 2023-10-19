@@ -40,40 +40,39 @@ interface AmbientModalProps {
 }
 
 export const AmbientModal = (props: AmbientModalProps) => {
+  const [selectedPosition, setSelectedPosition] = useState<
+    (typeof props.pair.userPositions)[0] | "new"
+  >();
   return (
     <Container className={styles.container} width="32rem">
-      <div
-        style={{
-          height: "100%",
-        }}
-      >
+      {/* title */}
+      <div>
         <Container
           direction="row"
-          height="50px"
+          height="24px"
           center={{
             vertical: true,
-          }}
-          style={{
-            cursor: "pointer",
-            marginTop: "-14px",
           }}
         >
           <Text font="proto_mono" size="lg">
             Liquidity
           </Text>
         </Container>
-        <div
-          style={{
-            margin: "0  -16px -16px -16px",
-            height: "42rem",
-          }}
-        >
+        <Spacer height="14px" />
+      </div>
+      <div className={styles.inner}>
+        {props.pair.userPositions.length === 0 ||
+        selectedPosition != undefined ? (
           <Tabs
             tabs={[
               {
                 title: "Add",
                 content: (
-                  <Container width="100%" margin="sm">
+                  <Container
+                    width="100%"
+                    margin="sm"
+                    className={styles["scroll-view"]}
+                  >
                     <div className={styles.iconTitle}>
                       <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
                       <Text size="lg" font="proto_mono">
@@ -92,7 +91,11 @@ export const AmbientModal = (props: AmbientModalProps) => {
                 title: "Remove",
                 isDisabled: props.pair.userPositions.length === 0,
                 content: (
-                  <Container width="100%" margin="sm">
+                  <Container
+                    width="100%"
+                    margin="sm"
+                    className={styles["scroll-view"]}
+                  >
                     <div className={styles.iconTitle}>
                       <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
                       <Text size="lg" font="proto_mono">
@@ -109,7 +112,103 @@ export const AmbientModal = (props: AmbientModalProps) => {
               },
             ]}
           />
-        </div>
+        ) : (
+          <Container height="calc(100% - 0px)">
+            <div className={styles.iconTitle}>
+              <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
+              <Text size="lg" font="proto_mono">
+                {props.pair.symbol}
+              </Text>
+            </div>
+            <div className={styles["scroll-view"]}>
+              <Container margin="md" gap={20} className={styles["items-list"]}>
+                {props.pair.userPositions.map((item, idx) => (
+                  <Container
+                    key={idx}
+                    width="100%"
+                    gap={10}
+                    center={{
+                      horizontal: true,
+                    }}
+                    className={styles.item}
+                    onClick={() => {
+                      setSelectedPosition(item);
+                    }}
+                  >
+                    <Container direction="row" gap={20} width="100%">
+                      <Text>Position</Text>
+                      <Text size="md" font="proto_mono">
+                        {idx + 1}
+                      </Text>
+                    </Container>
+
+                    <Container direction="row" gap={"auto"} width="100%">
+                      <Text size="md" font="proto_mono">
+                        Range: (
+                        {displayAmount(
+                          getPriceFromTick(item.bidTick),
+                          props.pair.base.decimals - props.pair.quote.decimals,
+                          {
+                            precision: 3,
+                          }
+                        )}{" "}
+                        -{" "}
+                        {displayAmount(
+                          getPriceFromTick(item.askTick),
+                          props.pair.base.decimals - props.pair.quote.decimals,
+                          {
+                            precision: 3,
+                          }
+                        )}
+                        ){" "}
+                        <span
+                          style={{
+                            position: "absolute",
+                            transform: "translate(10%,-20%)",
+                          }}
+                        >
+                          <Icon icon={{ url: props.pair.logoURI, size: 42 }} />
+                        </span>
+                      </Text>
+                      <Text size="md" font="proto_mono">
+                        {displayAmount(
+                          concLiquidityNoteValue(
+                            item.concLiq,
+                            props.pair.stats.lastPriceSwap.toString(),
+                            item.bidTick,
+                            item.askTick,
+                            new BigNumber(10)
+                              .pow(36 - props.pair.base.decimals)
+                              .toString(),
+                            new BigNumber(10)
+                              .pow(36 - props.pair.quote.decimals)
+                              .toString()
+                          ),
+                          18
+                        )}{" "}
+                        <Icon icon={{ url: "tokens/note.svg", size: 16 }} />
+                      </Text>
+                    </Container>
+                  </Container>
+                ))}
+              </Container>
+            </div>
+            <div
+              style={{
+                margin: "1rem",
+              }}
+            >
+              <Button
+                width={"fill"}
+                onClick={() => {
+                  setSelectedPosition("new");
+                }}
+              >
+                New Position
+              </Button>
+            </div>
+          </Container>
+        )}
       </div>
     </Container>
   );
@@ -156,7 +255,7 @@ const AddAmbientLiquidity = ({
 
   return (
     <Container>
-      <Spacer height="10px" />
+      <Spacer height="4px" />
       <Amount
         decimals={pool.base.decimals}
         value={externalState.amountBase}
@@ -175,7 +274,7 @@ const AddAmbientLiquidity = ({
         errorMessage={paramCheck.errorMessage}
       />
 
-      <Spacer height="20px" />
+      <Spacer height="10px" />
 
       <Amount
         decimals={pool.quote.decimals}
@@ -194,7 +293,7 @@ const AddAmbientLiquidity = ({
         }
         errorMessage={paramCheck.errorMessage}
       />
-      <Spacer height="20px" />
+      <Spacer height="10px" />
       <Container className={styles.card}>
         <ModalItem
           name="Current Price"
@@ -225,6 +324,7 @@ const AddAmbientLiquidity = ({
                 <Container
                   style={{ display: "flex", flexDirection: "row", gap: "6px" }}
                 >
+                  <Text>{formatPercent(pair.stats.feeRate.toString())}</Text>
                   <span className={styles.infoPop}>
                     <Text
                       theme="secondary-dark"
@@ -243,6 +343,15 @@ const AddAmbientLiquidity = ({
           }
         />
       </Container>
+
+      <Spacer height="8px" />
+
+      <Text size="x-sm" theme="secondary-dark">
+        This is a concentrated liquidity stable pool. The default range above is
+        selected for optimal rewards. Rewards will be released in weekly epochs.
+      </Text>
+      <Spacer height="8px" />
+
       <Container className={styles.card}>
         <ModalItem
           name="Midpoint"

@@ -39,6 +39,34 @@ export default function RootLayout({
           sizes="32x32"
         />
       </head> */}
+      {/* <!-- Primary Meta Tags --> */}
+      <title>Canto.io - Layer-1 Blockchain</title>
+      <meta name="title" content="Canto.io - Layer-1 Blockchain" />
+      <meta
+        name="description"
+        content="canto is a layer-1 blockchain built to deliver on the promise of defi. as a post-traditional financial movement, canto enables accessibility, transparency, and freedom for new systems. driven by a loosely organized collective of chain-native builders, canto provides a new commons powered by free public infrastructure_"
+      />
+
+      {/* <!-- Open Graph / Facebook --> */}
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="https://canto.io" />
+      <meta property="og:title" content="Canto.io - Layer-1 Blockchain" />
+      <meta
+        property="og:description"
+        content="canto is a layer-1 blockchain built to deliver on the promise of defi. as a post-traditional financial movement, canto enables accessibility, transparency, and freedom for new systems. driven by a loosely organized collective of chain-native builders, canto provides a new commons powered by free public infrastructure_"
+      />
+      <meta property="og:image" content="https://beta.canto.io/meta.png" />
+
+      {/* <!-- Twitter --> */}
+      <meta property="twitter:card" content="summary_large_image" />
+      <meta property="twitter:url" content="https://canto.io" />
+      <meta property="twitter:title" content="Canto.io - Layer-1 Blockchain" />
+      <meta
+        property="twitter:description"
+        content="canto is a layer-1 blockchain built to deliver on the promise of defi. as a post-traditional financial movement, canto enables accessibility, transparency, and freedom for new systems. driven by a loosely organized collective of chain-native builders, canto provides a new commons powered by free public infrastructure_"
+      />
+      <meta property="twitter:image" content="https://beta.canto.io/meta.png" />
+
       <body
         className={"dark"}
         style={
