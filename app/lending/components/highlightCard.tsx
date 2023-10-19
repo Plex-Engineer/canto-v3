@@ -5,6 +5,10 @@ import Item from "./item";
 import Icon from "@/components/icon/icon";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { displayAmount } from "@/utils/tokenBalances.utils";
+import Text from "@/components/text";
+import InfoPop from "@/components/infopop/infopop";
+import PopUp from "@/components/popup/popup";
+import Container from "@/components/container/container";
 interface Props {
   cToken: CTokenWithUserData;
   precisionInValues?: number;
@@ -56,7 +60,7 @@ const HighlightCard = ({
       </div>
       <div className={styles.amounts}>
         <Item
-          name="Wallet Balance"
+          name={cToken.underlying.symbol + " Balance"}
           value={formattedAmount(
             cToken.userDetails?.balanceOfUnderlying ?? "0"
           )}
@@ -70,20 +74,23 @@ const HighlightCard = ({
             />
           }
         />
+
+        <InfoPop>
+          <Text>
+            cNOTE is collateralized NOTE. Supply NOTE to receive cNOTE or buy it
+            directly on{" "}
+            <a
+              style={{ textDecoration: "underline" }}
+              href="https://app.slingshot.finance/swap/Canto/canto_0xee602429ef7ece0a13e4ffe8dbc16e101049504c"
+              target="_blank"
+            >
+              Slingshot
+            </a>
+          </Text>
+        </InfoPop>
         <Item
-          name="Amount Supplied"
-          value={formattedAmount(
-            cToken.userDetails?.supplyBalanceInUnderlying ?? "0"
-          )}
-          postChild={
-            <Icon
-              themed
-              icon={{
-                url: "/tokens/note.svg",
-                size: 20,
-              }}
-            />
-          }
+          name={cToken.symbol + " Balance"}
+          value={formattedAmount(cToken.userDetails?.balanceOfCToken ?? "0")}
         />
         <Item
           name="Amount Borrowed"

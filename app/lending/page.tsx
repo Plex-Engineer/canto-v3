@@ -186,7 +186,7 @@ export default function LendingPage() {
               <Item
                 name="Price of cNote"
                 value={displayAmount(lendingStats.cNotePrice, 18, {
-                  precision: 2,
+                  precision: 4,
                 })}
                 postChild={<NoteIcon />}
               />
