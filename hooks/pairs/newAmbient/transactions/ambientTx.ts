@@ -23,6 +23,7 @@ import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
 import { CROC_SWAP_DEX_ABI } from "@/config/abis";
 import { eth } from "web3";
+import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
 
 export async function ambientLiquidityTx(
   params: AmbientTransactionParams
@@ -112,6 +113,21 @@ async function addConcLiquidityFlow(
     );
   }
   /** Allowance check on tokens from croc Dex */
+  // approve more than we actually need to give room for error
+  const { data: baseApproval, error: baseApprovalError } = percentOfAmount(
+    baseAmount,
+    110
+  );
+  if (baseApprovalError) {
+    return NEW_ERROR("addConcLiquidityFlow: " + errMsg(baseApprovalError));
+  }
+  const { data: quoteApproval, error: quoteApprovalError } = percentOfAmount(
+    quoteAmount,
+    110
+  );
+  if (quoteApprovalError) {
+    return NEW_ERROR("addConcLiquidityFlow: " + errMsg(quoteApprovalError));
+  }
   const { data: allowanceTxs, error: allowanceError } = await createApprovalTxs(
     params.chainId,
     params.ethAccount,
@@ -125,7 +141,7 @@ async function addConcLiquidityFlow(
         symbol: params.pair.quote.symbol,
       },
     ],
-    [baseAmount, quoteAmount],
+    [baseApproval, quoteApproval],
     { address: params.crocDexAddress, name: "Ambient" }
   );
   if (allowanceError) {
