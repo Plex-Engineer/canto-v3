@@ -2,11 +2,7 @@
 import Button from "@/components/button/button";
 import Input from "@/components/input/input";
 import Spacer from "@/components/layout/spacer";
-import {
-  convertToBigNumber,
-  displayAmount,
-  formatBalance,
-} from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import { useState } from "react";
 import Container from "@/components/container/container";
 import { ValidationReturn } from "@/config/interfaces";
@@ -20,28 +16,26 @@ import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
 import Slider from "@/components/slider/slider";
 import clsx from "clsx";
 import PopUp from "@/components/popup/popup";
-import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
+import {
+  AmbientPool,
+  AmbientUserPosition,
+} from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
 import {
   AmbientTransactionParams,
   AmbientTxType,
 } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
-import { getDefaultTickRangeFromChainId } from "@/hooks/pairs/newAmbient/config/defaultTicks";
-import {
-  getPriceFromTick,
-  getTickFromPrice,
-} from "@/utils/ambient/ambientMath.utils";
+import { getPriceFromTick } from "@/utils/ambient/ambientMath.utils";
 import {
   baseTokenFromConcLiquidity,
   concLiquidityNoteValue,
-  getConcBaseTokensFromQuoteTokens,
-  getConcQuoteTokensFromBaseTokens,
   quoteTokenFromConcLiquidity,
 } from "@/utils/ambient/liquidity.utils";
 import { formatPercent } from "@/utils/formatting.utils";
 import BigNumber from "bignumber.js";
+import useAddAmbientLiquidityController from "@/hooks/pairs/newAmbient/useAmbientLiqController";
 
 interface AmbientModalProps {
-  pair: AmbientPool;
+  pool: AmbientPool;
   validateParams: (
     params: Partial<AmbientTransactionParams>
   ) => ValidationReturn;
@@ -49,48 +43,89 @@ interface AmbientModalProps {
 }
 
 export const AmbientModal = (props: AmbientModalProps) => {
+  const [selectedPosition, setSelectedPosition] = useState<
+    AmbientUserPosition | null | "new"
+  >(null);
+
+  const PoolHeader = () => (
+    <div className={styles.iconTitle}>
+      <Icon icon={{ url: props.pool.logoURI, size: 60 }} />
+      <Text size="lg" font="proto_mono">
+        {props.pool.symbol}
+      </Text>
+    </div>
+  );
   return (
     <Container className={styles.container} width="32rem">
-      <div
-        style={{
-          height: "100%",
-        }}
-      >
+      {/* title */}
+      <div>
         <Container
           direction="row"
-          height="50px"
+          height="24px"
           center={{
             vertical: true,
           }}
-          style={{
-            cursor: "pointer",
-            marginTop: "-14px",
-          }}
         >
           <Text font="proto_mono" size="lg">
-            Liquidity
+            {props.pool.userPositions.length === 0 || selectedPosition === "new"
+              ? "Create New Position"
+              : selectedPosition === null
+              ? "Your Positions"
+              : "Manage Position"}
           </Text>
         </Container>
-        <div
-          style={{
-            margin: "0  -16px -16px -16px",
-            height: "42rem",
-          }}
-        >
+        <Spacer height="14px" />
+      </div>
+      <div className={styles.inner}>
+        {props.pool.userPositions.length === 0 || selectedPosition === "new" ? (
+          <>
+            <PoolHeader />
+            <AddAmbientLiquidity
+              pool={props.pool}
+              sendTxFlow={props.sendTxFlow}
+              validateParams={props.validateParams}
+            />
+          </>
+        ) : !selectedPosition ? (
+          <Container height="calc(100% - 0px)">
+            <PoolHeader />
+            <div className={styles["scroll-view"]}>
+              <PositionList
+                pool={props.pool}
+                positions={props.pool.userPositions}
+                setSelectedPosition={setSelectedPosition}
+              />
+            </div>
+            <div
+              style={{
+                margin: "1rem",
+              }}
+            >
+              <Button
+                width={"fill"}
+                onClick={() => {
+                  setSelectedPosition("new");
+                }}
+              >
+                New Position
+              </Button>
+            </div>
+          </Container>
+        ) : (
           <Tabs
             tabs={[
               {
                 title: "Add",
                 content: (
-                  <Container width="100%" margin="sm">
-                    <div className={styles.iconTitle}>
-                      <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
-                      <Text size="lg" font="proto_mono">
-                        {props.pair.symbol}
-                      </Text>
-                    </div>
+                  <Container
+                    width="100%"
+                    margin="sm"
+                    className={styles["scroll-view"]}
+                  >
+                    <PoolHeader />
                     <AddAmbientLiquidity
-                      pair={props.pair}
+                      position={selectedPosition}
+                      pool={props.pool}
                       sendTxFlow={props.sendTxFlow}
                       validateParams={props.validateParams}
                     />
@@ -99,17 +134,16 @@ export const AmbientModal = (props: AmbientModalProps) => {
               },
               {
                 title: "Remove",
-                isDisabled: props.pair.userPositions.length === 0,
                 content: (
-                  <Container width="100%" margin="sm">
-                    <div className={styles.iconTitle}>
-                      <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
-                      <Text size="lg" font="proto_mono">
-                        {props.pair.symbol}
-                      </Text>
-                    </div>
+                  <Container
+                    width="100%"
+                    margin="sm"
+                    className={styles["scroll-view"]}
+                  >
+                    <PoolHeader />
                     <RemoveAmbientLiquidity
-                      pool={props.pair}
+                      position={selectedPosition}
+                      pool={props.pool}
                       sendTxFlow={props.sendTxFlow}
                       validateParams={props.validateParams}
                     />
@@ -118,7 +152,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
               },
             ]}
           />
-        </div>
+        )}
       </div>
     </Container>
   );
@@ -134,80 +168,33 @@ interface AddConcParams {
   txType: AmbientTxType;
 }
 interface AddModalProps {
-  pair: AmbientPool;
+  pool: AmbientPool;
+  position?: AmbientUserPosition;
   sendTxFlow: (params: AddConcParams) => void;
   validateParams: (params: AddConcParams) => ValidationReturn;
 }
 const AddAmbientLiquidity = ({
-  pair,
+  pool,
+  position,
   validateParams,
   sendTxFlow,
 }: AddModalProps) => {
-  // default ticks
-  const currentTick = getTickFromPrice(pair.stats.lastPriceSwap.toString());
-  const [selectedLowerTick, setSelectedLowerTick] = useState(currentTick - 75);
-  const [selectedUpperTick, setSelectedUpperTick] = useState(currentTick + 75);
-  // values
-  const defaultMinPrice = getPriceFromTick(selectedLowerTick);
-  const defaultMaxPrice = getPriceFromTick(selectedUpperTick);
-  const currentPrice = pair.stats.lastPriceSwap.toString();
-  // values
-  const [baseValue, setBaseValue] = useState("");
-  const [quoteValue, setQuoteValue] = useState("");
-  const [lastUpdated, setLastUpdated] = useState<"base" | "quote">("base");
-
-  function setValue(value: string, isBase: boolean) {
-    if (value === "" || isNaN(Number(value))) {
-      setQuoteValue("");
-      setBaseValue("");
-      return;
-    }
-    if (isBase) {
-      setLastUpdated("base");
-      setBaseValue(value);
-      setQuoteValue(
-        formatBalance(
-          getConcQuoteTokensFromBaseTokens(
-            convertToBigNumber(value, pair.base.decimals).data.toString(),
-            currentPrice,
-            defaultMinPrice,
-            defaultMaxPrice
-          ),
-          pair.quote.decimals
-        )
-      );
-    } else {
-      setLastUpdated("quote");
-      setQuoteValue(value);
-      setBaseValue(
-        formatBalance(
-          getConcBaseTokensFromQuoteTokens(
-            convertToBigNumber(value, pair.quote.decimals).data.toString(),
-            currentPrice,
-            defaultMinPrice,
-            defaultMaxPrice
-          ),
-          pair.base.decimals
-        )
-      );
-    }
-  }
-
+  // get values from controller
+  const { addLiqParamsWei, externalState } = useAddAmbientLiquidityController(
+    pool,
+    position
+  );
   const txParams = () => ({
-    lowerTick: selectedLowerTick,
-    upperTick: selectedUpperTick,
-    minPriceWei: defaultMinPrice,
-    maxPriceWei: defaultMaxPrice,
+    lowerTick: addLiqParamsWei.lowerTick,
+    upperTick: addLiqParamsWei.upperTick,
+    minPriceWei: addLiqParamsWei.minPriceWei,
+    maxPriceWei: addLiqParamsWei.maxPriceWei,
     txType: AmbientTxType.ADD_CONC_LIQUIDITY,
     amount:
-      lastUpdated === "base"
-        ? convertToBigNumber(baseValue, pair.base.decimals).data?.toString() ??
-          "0"
-        : convertToBigNumber(
-            quoteValue,
-            pair.quote.decimals
-          ).data?.toString() ?? "0",
-    isAmountBase: lastUpdated === "base",
+      addLiqParamsWei.lastUpdatedToken === "base"
+        ? addLiqParamsWei.amountBaseWei
+        : addLiqParamsWei.amountQuoteWei,
+    isAmountBase: addLiqParamsWei.lastUpdatedToken === "base",
   });
 
   // validation
@@ -217,19 +204,19 @@ const AddAmbientLiquidity = ({
     <Container>
       <Spacer height="4px" />
       <Amount
-        decimals={pair.base.decimals}
-        value={baseValue}
+        decimals={pool.base.decimals}
+        value={externalState.amountBase}
         onChange={(e) => {
-          setValue(e.target.value, true);
+          externalState.setAmount(e.target.value, true);
         }}
-        IconUrl={pair.base.logoURI}
-        title={pair.base.symbol}
-        max={pair.base.balance ?? "0"}
-        symbol={pair.base.symbol}
+        IconUrl={pool.base.logoURI}
+        title={pool.base.symbol}
+        max={pool.base.balance ?? "0"}
+        symbol={pool.base.symbol}
         error={
           !paramCheck.isValid &&
-          Number(baseValue) !== 0 &&
-          paramCheck.errorMessage?.startsWith(pair.base.symbol)
+          Number(externalState.amountBase) !== 0 &&
+          paramCheck.errorMessage?.startsWith(pool.base.symbol)
         }
         errorMessage={paramCheck.errorMessage}
       />
@@ -237,19 +224,19 @@ const AddAmbientLiquidity = ({
       <Spacer height="10px" />
 
       <Amount
-        decimals={pair.quote.decimals}
-        value={quoteValue}
+        decimals={pool.quote.decimals}
+        value={externalState.amountQuote}
         onChange={(e) => {
-          setValue(e.target.value, false);
+          externalState.setAmount(e.target.value, false);
         }}
-        IconUrl={pair.quote.logoURI}
-        title={pair.quote.symbol}
-        max={pair.quote.balance ?? "0"}
-        symbol={pair.quote.symbol}
+        IconUrl={pool.quote.logoURI}
+        title={pool.quote.symbol}
+        max={pool.quote.balance ?? "0"}
+        symbol={pool.quote.symbol}
         error={
           !paramCheck.isValid &&
-          Number(quoteValue) !== 0 &&
-          paramCheck.errorMessage?.startsWith(pair.quote.symbol)
+          Number(externalState.amountQuote) !== 0 &&
+          paramCheck.errorMessage?.startsWith(pool.quote.symbol)
         }
         errorMessage={paramCheck.errorMessage}
       />
@@ -259,41 +246,18 @@ const AddAmbientLiquidity = ({
           name="Current Price"
           value={
             displayAmount(
-              currentPrice,
-              pair.base.decimals - pair.quote.decimals,
+              pool.stats.lastPriceSwap.toString(),
+              pool.base.decimals - pool.quote.decimals,
               {
                 precision: 3,
               }
             ) +
             " " +
-            pair.base.symbol +
+            pool.base.symbol +
             " = 1 " +
-            pair.quote.symbol
+            pool.quote.symbol
           }
         />
-
-        <ModalItem
-          name="Min Price"
-          value={displayAmount(
-            defaultMinPrice,
-            pair.base.decimals - pair.quote.decimals,
-            {
-              precision: 3,
-            }
-          )}
-        />
-
-        <ModalItem
-          name="Max Price"
-          value={displayAmount(
-            defaultMaxPrice,
-            pair.base.decimals - pair.quote.decimals,
-            {
-              precision: 3,
-            }
-          )}
-        />
-
         <ModalItem
           name="Fee"
           value={
@@ -307,7 +271,6 @@ const AddAmbientLiquidity = ({
                 <Container
                   style={{ display: "flex", flexDirection: "row", gap: "6px" }}
                 >
-                  <Text>{formatPercent(pair.stats.feeRate.toString())}</Text>
                   <span className={styles.infoPop}>
                     <Text
                       theme="secondary-dark"
@@ -319,12 +282,14 @@ const AddAmbientLiquidity = ({
                       ?
                     </Text>
                   </span>
+                  <Text>{formatPercent(pool.stats.feeRate.toString())}</Text>
                 </Container>
               </PopUp>
             </Container>
           }
         />
       </Container>
+
       <Spacer height="8px" />
 
       <Text size="x-sm" theme="secondary-dark">
@@ -332,11 +297,69 @@ const AddAmbientLiquidity = ({
         selected for optimal rewards. Rewards will be released in weekly epochs.
       </Text>
       <Spacer height="8px" />
+
+      <Container className={styles.card}>
+        <ModalItem
+          name="Midpoint"
+          value={
+            position ? (
+              displayAmount(
+                addLiqParamsWei.midpointPriceWei,
+                pool.base.decimals - pool.quote.decimals,
+                {
+                  precision: 3,
+                }
+              )
+            ) : (
+              <Container
+                center={{
+                  vertical: true,
+                }}
+                gap={10}
+                direction="row"
+                style={{
+                  width: "100px",
+                }}
+              >
+                <Input
+                  height={"sm"}
+                  type="number"
+                  value={externalState.midpointPrice}
+                  onChange={(e) => {
+                    externalState.setMidpointPrice(e.target.value);
+                  }}
+                />
+              </Container>
+            )
+          }
+        />
+        <ModalItem
+          name="Min Price"
+          value={displayAmount(
+            addLiqParamsWei.minPriceWei,
+            pool.base.decimals - pool.quote.decimals,
+            {
+              precision: 3,
+            }
+          )}
+        />
+        <ModalItem
+          name="Max Price"
+          value={displayAmount(
+            addLiqParamsWei.maxPriceWei,
+            pool.base.decimals - pool.quote.decimals,
+            {
+              precision: 3,
+            }
+          )}
+        />
+      </Container>
+      <Spacer height="30px" />
       <Button
         disabled={
           !paramCheck.isValid ||
-          Number(baseValue) === 0 ||
-          Number(quoteValue) === 0
+          Number(externalState.amountQuote) === 0 ||
+          Number(externalState.amountBase) === 0
         }
         width={"fill"}
         onClick={() => sendTxFlow(txParams())}
@@ -359,16 +382,16 @@ interface RemoveConcParams {
 }
 interface RemoveProps {
   pool: AmbientPool;
+  position: AmbientUserPosition;
   sendTxFlow: (params: RemoveConcParams) => void;
   validateParams: (params: RemoveConcParams) => ValidationReturn;
 }
 
 const RemoveAmbientLiquidity = ({
   pool,
-  validateParams,
+  position,
   sendTxFlow,
 }: RemoveProps) => {
-  const [position, setPosition] = useState(pool.userPositions[0]);
   // percent state
   const [percentToRemove, setPercentToRemove] = useState(0);
   const liquidityToRemove = percentOfAmount(
@@ -381,53 +404,6 @@ const RemoveAmbientLiquidity = ({
   return (
     <div>
       <Spacer height="10px" />
-      <Text>Select position to remove</Text>
-      <Spacer height="10px" />
-      <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
-        {pool.userPositions.map((pos, idx) => (
-          <Button
-            color={
-              pos.positionId === position.positionId ? "accent" : "primary"
-            }
-            key={idx}
-            onClick={() => setPosition(pos)}
-            // width={"fill"}
-            height={"large"}
-          >
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <div>
-                {`RANGE: ${displayAmount(
-                  getPriceFromTick(pos.bidTick),
-                  pool.base.decimals - pool.quote.decimals,
-                  {
-                    precision: 3,
-                  }
-                )}-${displayAmount(
-                  getPriceFromTick(pos.askTick),
-                  pool.base.decimals - pool.quote.decimals,
-                  {
-                    precision: 3,
-                  }
-                )}`}
-              </div>
-              <div>
-                {`VALUE: ${displayAmount(
-                  concLiquidityNoteValue(
-                    pos.concLiq,
-                    pool.stats.lastPriceSwap.toString(),
-                    pos.bidTick,
-                    pos.askTick,
-                    new BigNumber(10).pow(36 - pool.base.decimals).toString(),
-                    new BigNumber(10).pow(36 - pool.quote.decimals).toString()
-                  ),
-                  18
-                )} $NOTE`}
-              </div>
-            </div>
-          </Button>
-        ))}
-      </div>
-      <Spacer height="20px" />
       <Container
         direction="row"
         backgroundColor="var(--card-surface-color)"
@@ -515,3 +491,83 @@ const RemoveAmbientLiquidity = ({
     </div>
   );
 };
+
+// Listing Positions
+interface PositionListProps {
+  pool: AmbientPool;
+  positions: AmbientUserPosition[];
+  setSelectedPosition: (position: AmbientUserPosition) => void;
+}
+const PositionList = ({
+  pool,
+  positions,
+  setSelectedPosition,
+}: PositionListProps) => (
+  <Container margin="md" gap={20} className={styles["items-list"]}>
+    {positions.map((item, idx) => (
+      <Container
+        key={idx}
+        width="100%"
+        gap={10}
+        center={{
+          horizontal: true,
+        }}
+        className={styles.item}
+        onClick={() => {
+          setSelectedPosition(item);
+        }}
+      >
+        <Container direction="row" gap={20} width="100%">
+          <Text>Position</Text>
+          <Text size="md" font="proto_mono">
+            {idx + 1}
+          </Text>
+        </Container>
+
+        <Container direction="row" gap={"auto"} width="100%">
+          <Text size="md" font="proto_mono">
+            Range: (
+            {displayAmount(
+              getPriceFromTick(item.bidTick),
+              pool.base.decimals - pool.quote.decimals,
+              {
+                precision: 3,
+              }
+            )}{" "}
+            -{" "}
+            {displayAmount(
+              getPriceFromTick(item.askTick),
+              pool.base.decimals - pool.quote.decimals,
+              {
+                precision: 3,
+              }
+            )}
+            ){" "}
+            <span
+              style={{
+                position: "absolute",
+                transform: "translate(10%,-20%)",
+              }}
+            >
+              <Icon icon={{ url: pool.logoURI, size: 42 }} />
+            </span>
+          </Text>
+          <Text size="md" font="proto_mono">
+            {displayAmount(
+              concLiquidityNoteValue(
+                item.concLiq,
+                pool.stats.lastPriceSwap.toString(),
+                item.bidTick,
+                item.askTick,
+                new BigNumber(10).pow(36 - pool.base.decimals).toString(),
+                new BigNumber(10).pow(36 - pool.quote.decimals).toString()
+              ),
+              18
+            )}{" "}
+            <Icon icon={{ url: "tokens/note.svg", size: 16 }} />
+          </Text>
+        </Container>
+      </Container>
+    ))}
+  </Container>
+);
