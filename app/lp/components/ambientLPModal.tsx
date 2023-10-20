@@ -401,15 +401,15 @@ const AddAmbientLiquidity = ({
           )}
         />
       </Container>
-      <span
-        className={styles["error-message"]}
+      <Text
         style={{
           opacity: !isPriceValid ? 1 : 0,
           color: "var(--extra-failure-color, #ff0000)",
         }}
+        size="x-sm"
       >
         {"Please enter a range that includes the current price"}
-      </span>
+      </Text>
       <Spacer height="30px" />
       <Button
         disabled={
