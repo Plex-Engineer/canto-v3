@@ -33,6 +33,7 @@ import {
 import { formatPercent } from "@/utils/formatting.utils";
 import BigNumber from "bignumber.js";
 import useAddAmbientLiquidityController from "@/hooks/pairs/newAmbient/useAmbientLiqController";
+import { NewAmbientPositionModal } from "./newAmbientPosition";
 
 interface AmbientModalProps {
   pool: AmbientPool;
@@ -121,11 +122,9 @@ export const AmbientModal = (props: AmbientModalProps) => {
             className={styles["scroll-view"]}
             style={{ padding: "0 1rem" }}
           >
-            <PoolHeader />
-            <AddAmbientLiquidity
+            <NewAmbientPositionModal
               pool={props.pool}
               sendTxFlow={props.sendTxFlow}
-              validateParams={props.validateParams}
             />
           </Container>
         ) : !selectedPosition ? (
@@ -248,7 +247,6 @@ const AddAmbientLiquidity = ({
 
   return (
     <Container>
-      <Spacer height="4px" />
       <Amount
         decimals={pool.base.decimals}
         value={externalState.amountBase}
