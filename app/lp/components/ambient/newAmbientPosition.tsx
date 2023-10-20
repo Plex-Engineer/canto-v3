@@ -1,4 +1,4 @@
-import styles from "./cantoDex.module.scss";
+import styles from "../cantoDex.module.scss";
 import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
 import Text from "@/components/text";
