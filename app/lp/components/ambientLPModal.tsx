@@ -588,7 +588,7 @@ const PositionList = ({
               getPriceFromTick(item.bidTick),
               pool.base.decimals - pool.quote.decimals,
               {
-                precision: 3,
+                precision: 5,
               }
             )}{" "}
             -{" "}
@@ -596,7 +596,7 @@ const PositionList = ({
               getPriceFromTick(item.askTick),
               pool.base.decimals - pool.quote.decimals,
               {
-                precision: 3,
+                precision: 5,
               }
             )}
             )
