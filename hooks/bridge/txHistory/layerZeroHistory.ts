@@ -9,11 +9,7 @@ import {
   PromiseWithError,
   errMsg,
 } from "@/config/interfaces";
-import {
-  getProviderWithoutSigner,
-  getRpcUrlFromChainId,
-} from "@/utils/evm/helpers.utils";
-import { Contract } from "web3";
+import { newContractInstance } from "@/utils/evm/helpers.utils";
 
 // this must be done on each OFT contract
 // TODO: allow list to be passed through, only works for single OFT contract right now
@@ -35,17 +31,15 @@ export async function getUserLayerZeroHistory(
   oftContractAddress: string,
   ethAccount: string
 ): PromiseWithError<UserLayerZeroHistory> {
-  // get rpcUrl for chain
-  const { data: rpcUrl, error: rpcError } = getRpcUrlFromChainId(chainId);
-  if (rpcError) {
-    return NEW_ERROR("getUserLayerZeroHistory::" + rpcError.message);
-  }
   // create OFT contract instance
-  const oftContract = new Contract(
-    OFT_ABI,
+  const { data: oftContract, error } = newContractInstance<typeof OFT_ABI>(
+    chainId,
     oftContractAddress,
-    getProviderWithoutSigner(rpcUrl)
+    OFT_ABI
   );
+  if (error) {
+    return NEW_ERROR("getUserLayerZeroHistory::" + errMsg(error));
+  }
 
   try {
     const sendToChainEvents = await oftContract.getPastEvents("SendToChain", {

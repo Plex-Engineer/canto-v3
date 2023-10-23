@@ -4,11 +4,7 @@ import {
   PromiseWithError,
   errMsg,
 } from "@/config/interfaces/errors";
-import {
-  getProviderWithoutSigner,
-  getRpcUrlFromChainId,
-} from "./helpers.utils";
-import { Contract } from "web3";
+import { newContractInstance } from "./helpers.utils";
 import { DEX_REOUTER_ABI } from "@/config/abis";
 
 /**
@@ -36,15 +32,12 @@ export async function quoteAddLiquidity(
   expectedLiquidity: string;
 }> {
   try {
-    // get rpc url from chainId
-    const { data: rpcUrl, error } = getRpcUrlFromChainId(chainId);
+    // get contract instance
+    const { data: routerContract, error } = newContractInstance<
+      typeof DEX_REOUTER_ABI
+    >(chainId, routerAddress, DEX_REOUTER_ABI);
     if (error) throw error;
-    // get router contract
-    const routerContract = new Contract(
-      DEX_REOUTER_ABI,
-      routerAddress,
-      getProviderWithoutSigner(rpcUrl)
-    );
+
     // query quoteAddLiquidity with amount B as infinite
     const response = await routerContract.methods
       .quoteAddLiquidity(
@@ -76,15 +69,11 @@ export async function quoteRemoveLiquidity(
   expectedToken2: string;
 }> {
   try {
-    // get rpc url from chainId
-    const { data: rpcUrl, error } = getRpcUrlFromChainId(chainId);
+    // get contract instance
+    const { data: routerContract, error } = newContractInstance<
+      typeof DEX_REOUTER_ABI
+    >(chainId, routerAddress, DEX_REOUTER_ABI);
     if (error) throw error;
-    // get router contract
-    const routerContract = new Contract(
-      DEX_REOUTER_ABI,
-      routerAddress,
-      getProviderWithoutSigner(rpcUrl)
-    );
     // query quoteRemoveLiquidity
     const reponse = await routerContract.methods
       .quoteRemoveLiquidity(tokenAAddress, tokenBAddress, stable, liquidity)
