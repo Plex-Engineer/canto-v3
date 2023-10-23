@@ -6,11 +6,7 @@ import {
 } from "@/config/interfaces";
 import { UserCTokenDetails } from "@/hooks/lending/interfaces/tokens";
 import { isValidEthAddress } from "@/utils/address.utils";
-import {
-  getProviderWithoutSigner,
-  getRpcUrlFromChainId,
-} from "@/utils/evm/helpers.utils";
-import { Contract } from "web3";
+import { newContractInstance } from "@/utils/evm/helpers.utils";
 import { CLM_LENS_ABI, COMPTROLLER_ABI } from "@/config/abis";
 import { isCantoChainId } from "@/utils/networks.utils";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
@@ -42,22 +38,20 @@ export async function getUserCLMLensData(
       if (!cTokenAddresses || !lensAddress || !comptrollerAddress) {
         throw Error("getUserCLMLensData: chainId not supported");
       }
-      const { data: rpcUrl, error } = getRpcUrlFromChainId(chainId);
-      if (error) {
-        throw error;
-      }
-      // create contract instances
-      const lensContract = new Contract(
-        CLM_LENS_ABI,
-        lensAddress,
-        getProviderWithoutSigner(rpcUrl)
-      );
+      // get lens contract
+      const { data: lensContract, error: lensError } = newContractInstance<
+        typeof CLM_LENS_ABI
+      >(chainId, lensAddress, CLM_LENS_ABI);
+      if (lensError) throw lensError;
 
-      const comptrollerContract = new Contract(
-        COMPTROLLER_ABI,
-        comptrollerAddress,
-        getProviderWithoutSigner(rpcUrl)
-      );
+      // get comptroller contract
+      const { data: comptrollerContract, error: comptrollerError } =
+        newContractInstance<typeof COMPTROLLER_ABI>(
+          chainId,
+          comptrollerAddress,
+          COMPTROLLER_ABI
+        );
+      if (comptrollerError) throw comptrollerError;
 
       const [cTokens, limits, compAccrued] = await Promise.all([
         (

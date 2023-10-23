@@ -8,11 +8,7 @@ import {
   errMsg,
 } from "@/config/interfaces";
 import { tryFetch } from "@/utils/async.utils";
-import {
-  getProviderWithoutSigner,
-  getRpcUrlFromChainId,
-} from "@/utils/evm/helpers.utils";
-import { Contract } from "web3";
+import { newContractInstance } from "@/utils/evm/helpers.utils";
 import { areEqualAddresses } from "@/utils/address.utils";
 
 export interface UserGBridgeInHistory {
@@ -70,17 +66,11 @@ async function getUserGBridgeInEvents(
   chainId: number,
   ethAddress: string
 ): PromiseWithError<SendToCosmosEvent[]> {
-  // get rpcUrl for chain
-  const { data: rpcUrl, error: rpcError } = getRpcUrlFromChainId(chainId);
-  if (rpcError) {
-    return NEW_ERROR("getUserGBridgeInEvents::" + rpcError.message);
-  }
   // create contract instance
-  const gBridgeContract = new Contract(
-    GRAVITY_BRIDGE_ABI,
-    GRAVITY_BRIDGE_ETH_ADDRESS,
-    getProviderWithoutSigner(rpcUrl)
-  );
+  const { data: gBridgeContract, error } = newContractInstance<
+    typeof GRAVITY_BRIDGE_ABI
+  >(chainId, GRAVITY_BRIDGE_ETH_ADDRESS, GRAVITY_BRIDGE_ABI);
+  if (error) return NEW_ERROR("getUserGBridgeInEvents::" + errMsg(error));
   try {
     // filter by eth sender
     const events = await gBridgeContract.getPastEvents("SendToCosmosEvent", {

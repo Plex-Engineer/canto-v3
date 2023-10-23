@@ -9,11 +9,7 @@ import {
   ERC20Token,
 } from "@/config/interfaces";
 import BigNumber from "bignumber.js";
-import {
-  getProviderWithoutSigner,
-  getRpcUrlFromChainId,
-} from "./helpers.utils";
-import { Contract } from "web3";
+import { newContractInstance } from "./helpers.utils";
 import { ERC20_ABI } from "@/config/abis";
 import { fetchBalance, multicall } from "wagmi/actions";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
@@ -85,15 +81,10 @@ export async function getTokenBalance(
   account: string
 ): PromiseWithError<BigNumber> {
   try {
-    const { data: rpcUrl, error } = getRpcUrlFromChainId(chainId);
-    if (error) {
-      throw new Error(error.message);
-    }
-    const tokenContract = new Contract(
-      ERC20_ABI,
-      tokenAddress,
-      getProviderWithoutSigner(rpcUrl)
-    );
+    const { data: tokenContract, error } = newContractInstance<
+      typeof ERC20_ABI
+    >(chainId, tokenAddress, ERC20_ABI);
+    if (error) throw error;
     const balance = await tokenContract.methods.balanceOf(account).call();
     return NO_ERROR(new BigNumber(balance as string));
   } catch (err) {
@@ -118,15 +109,10 @@ async function checkTokenAllowance(
   amount: string
 ): PromiseWithError<boolean> {
   try {
-    const { data: rpcUrl, error } = getRpcUrlFromChainId(chainId);
-    if (error) {
-      throw new Error(error.message);
-    }
-    const tokenContract = new Contract(
-      ERC20_ABI,
-      tokenAddress,
-      getProviderWithoutSigner(rpcUrl)
-    );
+    const { data: tokenContract, error } = newContractInstance<
+      typeof ERC20_ABI
+    >(chainId, tokenAddress, ERC20_ABI);
+    if (error) throw error;
     const allowance = await tokenContract.methods
       .allowance(account, spender)
       .call();
