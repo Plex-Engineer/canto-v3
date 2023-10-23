@@ -5,7 +5,10 @@ import {
   errMsg,
 } from "@/config/interfaces";
 import { tryFetch } from "@/utils/async.utils";
+import { newContractInstance } from "@/utils/evm/helpers.utils";
 import { isCantoChainId } from "@/utils/networks.utils";
+import { getAmbientAddress } from "../config/addresses";
+import { AMBIENT_REWARD_LEDGER_ABI } from "@/config/abis";
 
 const MAINNET_AMBIENT_API_URL = process.env.NEXT_PUBLIC_AMBIENT_API_URL;
 // get url from chainId
@@ -177,4 +180,27 @@ export function queryAllUserPositions(
       chainId
     )}&user=${userEthAddress}`
   );
+}
+
+export async function queryUserAmbientRewards(
+  chainId: number,
+  userEthAddress: string
+): PromiseWithError<string> {
+  // get ledger address
+  const ledgerAddress = getAmbientAddress(chainId, "rewardLedger");
+  if (!ledgerAddress) {
+    return NEW_ERROR("queryUserAmbientRewards: chainId not supported");
+  }
+  // get ambient rewards ledger contract
+  const { data: rewardsLedger, error } = newContractInstance<
+    typeof AMBIENT_REWARD_LEDGER_ABI
+  >(chainId, ledgerAddress, AMBIENT_REWARD_LEDGER_ABI);
+  if (error) {
+    return NEW_ERROR("queryUserAmbientRewards: " + errMsg(error));
+  }
+  // get rewards
+  const rewards = await rewardsLedger.methods
+    .getUnclaimedRewards(userEthAddress)
+    .call();
+  return NO_ERROR(rewards.toString());
 }

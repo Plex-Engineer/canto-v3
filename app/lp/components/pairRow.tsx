@@ -163,9 +163,11 @@ export const GeneralAmbientPairRow = ({
 export const UserAmbientPairRow = ({
   pool,
   onManage,
+  rewards,
 }: {
   pool: AmbientPool;
   onManage: (poolAddress: string) => void;
+  rewards?: string;
 }) => {
   const value = pool.userPositions.reduce((acc, position) => {
     return addTokenBalances(
@@ -201,7 +203,9 @@ export const UserAmbientPairRow = ({
         }}
       />
     </Text>,
-    <Text key={pool.symbol + "rewards"}>{"0"}</Text>,
+    <Text key={pool.symbol + "rewards"}>
+      {displayAmount(rewards ?? "0", 18)}
+    </Text>,
     <div key={"action"}>
       <Button
         color="secondary"
