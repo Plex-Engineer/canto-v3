@@ -47,7 +47,7 @@
     "zustand": "^4.3.9"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.6.0",
+    "@cloudflare/next-on-pages": "1.7.2",
     "@keplr-wallet/types": "^0.12.21",
     "@testing-library/jest-dom": "^6.1.2",
     "@testing-library/react": "^14.0.0",
