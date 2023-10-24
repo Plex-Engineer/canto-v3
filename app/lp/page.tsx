@@ -19,11 +19,12 @@ import {
   isCantoDexPair,
 } from "@/hooks/pairs/lpCombo/interfaces.ts/pairTypes";
 import { AmbientModal } from "./components/ambientLPModal";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { convertToBigNumber, displayAmount } from "@/utils/tokenBalances.utils";
 import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
+import BigNumber from "bignumber.js";
 
 export default function Page() {
   const { txStore, signer, chainId } = useCantoSigner();
@@ -157,9 +158,15 @@ export default function Page() {
 
         <Rewards
           onClick={sendClaimRewardsFlow}
-          value={displayAmount(cantoDex.position.totalRewards, 18, {
-            precision: 4,
-          })}
+          value={displayAmount(
+            convertToBigNumber(cantoDex.position.totalRewards, 18).data.plus(
+              convertToBigNumber(ambient.rewards, 18).data
+            ),
+            18,
+            {
+              precision: 4,
+            }
+          )}
         />
       </Container>
       <Spacer height="30px" />
