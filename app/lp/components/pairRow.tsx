@@ -141,7 +141,15 @@ export const GeneralAmbientPairRow = ({
     />
   </Text>,
 
-  <Container key={"popkey"} direction="row" gap={10}>
+  <Container
+    key={"popkey"}
+    direction="row"
+    gap={10}
+    center={{
+      horizontal: true,
+      vertical: true,
+    }}
+  >
     <Text key={pool.address + "type"}>
       {pool.stable ? "Concentrated" : "Volatile"}
     </Text>
@@ -227,7 +235,15 @@ const AprBlock = ({ pool }: { pool: AmbientPool }) => {
     (quoteApr ? Number(quoteApr.supply) + Number(quoteApr.dist) : 0);
 
   return (
-    <Container key={"popkey1"} direction="row" gap={10}>
+    <Container
+      key={"popkey1"}
+      direction="row"
+      gap={10}
+      center={{
+        horizontal: true,
+        vertical: true,
+      }}
+    >
       <Text key={pool.address + "apr"}>{totalApr.toFixed(2)}%</Text>
       <InfoPop>
         <Container gap={6}>
