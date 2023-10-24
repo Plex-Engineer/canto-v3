@@ -15,6 +15,7 @@ interface AmbientPoolToken {
   name: string;
   symbol: string;
   balance?: string;
+  isCToken?: boolean;
 }
 
 export interface AmbientPool extends BaseAmbientPool {
@@ -34,7 +35,18 @@ export interface AmbientPool extends BaseAmbientPool {
   userPositions: AmbientUserPosition[];
   totals: {
     noteTvl: string;
-    apr: string;
+    apr: {
+      poolApr: string;
+      // each token could have underlying apr from the lending market
+      base?: {
+        dist: string;
+        supply: string;
+      };
+      quote?: {
+        dist: string;
+        supply: string;
+      };
+    };
   };
 }
 export interface AmbientUserPosition {

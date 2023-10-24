@@ -78,6 +78,38 @@ export function queryAmbientPoolStats(
   );
 }
 
+export interface LiquidityCurveReturn {
+  data: {
+    ambientLiq: number;
+    liquidityBumps: {
+      bumpTick: number;
+      liquidityDelta: number;
+      knockoutBidLiq: number;
+      knockoutAskLiq: number;
+      knockoutBidWidth: number;
+      knockoutAskWidth: number;
+      latestUpdateTime: number;
+    }[];
+  };
+  provenance: {
+    hostname: string;
+    serveTime: number;
+  };
+}
+export function queryAmbientPoolLiquidityCurve(
+  chainid: number,
+  base: string,
+  quote: string,
+  poolIdx: number
+): PromiseWithError<LiquidityCurveReturn> {
+  return getAmbientApiData<LiquidityCurveReturn>(
+    chainid,
+    `/gcgo/pool_liq_curve?chainId=${chainIdToHex(
+      chainid
+    )}&base=${base}&quote=${quote}&poolIdx=${poolIdx}`
+  );
+}
+
 interface SinglePositionReturn {
   data: {
     chainId: string;
