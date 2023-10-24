@@ -13,9 +13,9 @@ import { isValidEthAddress } from "@/utils/address.utils";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
 import { encodePacked } from "web3-utils";
 import BigNumber from "bignumber.js";
-import Web3, { Contract } from "web3";
+import Web3 from "web3";
 import { OFT_ABI } from "@/config/abis";
-import { getProviderWithoutSigner } from "@/utils/evm/helpers.utils";
+import { newContractInstance } from "@/utils/evm/helpers.utils";
 import { createApprovalTxs, getTokenBalance } from "@/utils/evm/erc20.utils";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
@@ -252,20 +252,13 @@ export async function estimateOFTSendGasFee(
     { type: "uint16", value: adapterParams[0] },
     { type: "uint256", value: adapterParams[1] }
   );
-  // get network
-  const { data: fromNetwork, error: fromNetworkError } =
-    getNetworkInfoFromChainId(fromChainId);
-
-  if (fromNetworkError) {
-    return NEW_ERROR(
-      "estimateOFTSendGasFee::" + errMsg(fromNetworkError.message)
-    );
+  // get contract instance
+  const { data: oftContract, error: oftError } = newContractInstance<
+    typeof OFT_ABI
+  >(fromChainId, oftAddress, OFT_ABI);
+  if (oftError) {
+    return NEW_ERROR("estimateOFTSendGasFee::" + errMsg(oftError));
   }
-  const oftContract = new Contract(
-    OFT_ABI,
-    oftAddress,
-    getProviderWithoutSigner(fromNetwork.rpcUrl)
-  );
   const toAddressBytes = new Web3().eth.abi.encodeParameter("address", account);
   try {
     const gas = await oftContract.methods
@@ -287,17 +280,15 @@ async function checkUseAdapterParams(
   chainId: number,
   oftAddress: string
 ): PromiseWithError<boolean> {
-  // get network
-  const { data: network, error: networkError } =
-    getNetworkInfoFromChainId(chainId);
-  if (networkError) {
-    return NEW_ERROR("checkUseAdapterParams::" + errMsg(networkError.message));
-  }
-  const oftContract = new Contract(
-    OFT_ABI,
+  // get contract instance
+  const { data: oftContract, error } = newContractInstance<typeof OFT_ABI>(
+    chainId,
     oftAddress,
-    getProviderWithoutSigner(network.rpcUrl)
+    OFT_ABI
   );
+  if (error) {
+    return NEW_ERROR("checkUseAdapterParams::" + errMsg(error));
+  }
   try {
     const adapterParams = await oftContract.methods
       .useCustomAdapterParams()

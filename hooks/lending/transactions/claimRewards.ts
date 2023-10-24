@@ -14,7 +14,6 @@ import { getTokenBalance } from "@/utils/evm/erc20.utils";
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import { CLMClaimRewardsTxParams } from "../interfaces/lendingTxTypes";
 
-
 export async function clmClaimRewardsTx(
   params: CLMClaimRewardsTxParams
 ): PromiseWithError<TxCreatorFunctionReturn> {
@@ -53,8 +52,10 @@ export async function clmClaimRewardsTx(
       params.chainId,
       params.ethAccount,
       comptrollerAddress,
-      TX_DESCRIPTIONS.CLAIM_CLM_RWARDS(
-        displayAmount(params.estimatedRewards, 18)
+      TX_DESCRIPTIONS.CLAIM_REWARDS(
+        displayAmount(params.estimatedRewards, 18),
+        "WCANTO",
+        "Lending"
       )
     )
   );

@@ -5,11 +5,12 @@ import {
   errMsg,
   Transaction,
 } from "@/config/interfaces";
-import { GetWalletClientResult, writeContract } from "wagmi/actions";
+import { GetWalletClientResult } from "wagmi/actions";
 import { checkOnRightChain } from "../baseTransaction.utils";
 import { BaseError } from "viem";
-import { Contract, TransactionReceipt } from "web3";
+import { TransactionReceipt } from "web3";
 import { asyncCallWithTimeout } from "../async.utils";
+import { newContractInstance } from "./helpers.utils";
 
 /**
  * @notice performs evm transaction
@@ -39,9 +40,12 @@ export async function performEVMTransaction(
   }
 
   try {
-    const contractInstance = new Contract(tx.abi, tx.target, {
-      provider: newSigner,
-    });
+    // get contract instance
+    const { data: contractInstance, error: contractError } =
+      newContractInstance<typeof tx.abi>(tx.chainId, tx.target, tx.abi, {
+        signer: newSigner,
+      });
+    if (contractError) throw contractError;
     // if user doesn't sign in 30 seconds, throw timeout error
     const { data: transaction, error: timeoutError } =
       await asyncCallWithTimeout<TransactionReceipt>(

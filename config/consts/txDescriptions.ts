@@ -24,9 +24,9 @@ export const TX_DESCRIPTIONS = {
     title: `Send ${tokenSymbol} to ${toNetwork} from ${fromNetwork}`,
     description: `Send ${amount} ${tokenSymbol} to ${toNetwork} from ${fromNetwork} through ${method}`,
   }),
-  CLAIM_CLM_RWARDS: (amount: string) => ({
-    title: "Claim Rewards",
-    description: `Claim ${amount} WCANTO in rewards`,
+  CLAIM_REWARDS: (amount: string, tokenSymbol: string, location: string) => ({
+    title: `Claim ${location} Rewards`,
+    description: `Claim ${amount} ${tokenSymbol} in ${location} rewards`,
   }),
   CONVERT_ERC20: (tokenSymbol: string, amount: string) => ({
     title: `Convert ${tokenSymbol}`,

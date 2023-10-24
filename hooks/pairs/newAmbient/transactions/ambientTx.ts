@@ -2,6 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  ReturnWithError,
   Transaction,
   TransactionDescription,
   TxCreatorFunctionReturn,
@@ -21,9 +22,11 @@ import {
 import { createApprovalTxs } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
-import { CROC_SWAP_DEX_ABI } from "@/config/abis";
+import { AMBIENT_REWARD_LEDGER_ABI, CROC_SWAP_DEX_ABI } from "@/config/abis";
 import { eth } from "web3";
 import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
+import { CLMClaimRewardsTxParams } from "@/hooks/lending/interfaces/lendingTxTypes";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 
 export async function ambientLiquidityTx(
   params: AmbientTransactionParams
@@ -70,6 +73,31 @@ export async function ambientLiquidityTx(
     default:
       return NEW_ERROR("Invalid transaction type");
   }
+}
+
+export function claimAmbientRewardsTx(
+  txParams: CLMClaimRewardsTxParams
+): ReturnWithError<TxCreatorFunctionReturn> {
+  const rewardsLedgerAddress = getAmbientAddress(
+    txParams.chainId,
+    "rewardLedger"
+  );
+  if (!rewardsLedgerAddress) {
+    return NEW_ERROR("claimAmbientRewardsTx:: Invalid chain id");
+  }
+  return NO_ERROR({
+    transactions: [
+      _ambientClaimRewardsTx(
+        txParams.chainId,
+        rewardsLedgerAddress,
+        TX_DESCRIPTIONS.CLAIM_REWARDS(
+          displayAmount(txParams.estimatedRewards, 18),
+          "CANTO",
+          "Ambient"
+        )
+      ),
+    ],
+  });
 }
 
 /**
@@ -282,3 +310,18 @@ const _removeConcLiquidityTx = (
     value: "0",
   };
 };
+
+const _ambientClaimRewardsTx = (
+  chainId: number,
+  rewardsLedgerAddress: string,
+  description: TransactionDescription
+): Transaction => ({
+  description,
+  chainId: chainId,
+  type: "EVM",
+  target: rewardsLedgerAddress,
+  abi: AMBIENT_REWARD_LEDGER_ABI,
+  method: "claimRewards",
+  params: [],
+  value: "0",
+});
