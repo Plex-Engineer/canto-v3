@@ -10,7 +10,7 @@ export const AMBIENT_REWARD_LEDGER_ABI = [
     type: "function",
     stateMutability: "nonpayable",
     inputs: [],
-    name: "claimRwards",
+    name: "claimRewards",
     outputs: [
       {
         internalType: "bool",
