@@ -230,37 +230,64 @@ const AprBlock = ({ pool }: { pool: AmbientPool }) => {
     <Container key={"popkey1"} direction="row" gap={10}>
       <Text key={pool.address + "apr"}>{totalApr.toFixed(2)}%</Text>
       <InfoPop>
-        <ul>
-          <li>pool incentive: {Number(pool.totals.apr.poolApr).toFixed(2)}%</li>
+        <Container gap={6}>
+          <Container gap={"auto"} direction="row">
+            <Text font="proto_mono" size="x-sm">
+              pool incentive:
+            </Text>
+            <Text font="proto_mono" size="x-sm">
+              {Number(pool.totals.apr.poolApr).toFixed(2)}%
+            </Text>
+          </Container>
           {baseApr && (
             <>
               {Number(baseApr.supply) !== 0 && (
-                <li>
-                  {pool.base.symbol} supply apr: {baseApr.supply}%
-                </li>
+                <Container gap={"auto"} direction="row">
+                  <Text font="proto_mono" size="x-sm">
+                    {pool.base.symbol} supply apr:
+                  </Text>
+                  <Text font="proto_mono" size="x-sm">
+                    {baseApr.supply}%
+                  </Text>
+                </Container>
               )}
               {Number(baseApr.dist) !== 0 && (
-                <li>
-                  {pool.base.symbol} dist apr: {baseApr.dist}%
-                </li>
+                <Container gap={"auto"} direction="row">
+                  <Text font="proto_mono" size="x-sm">
+                    {pool.base.symbol} dist apr:
+                  </Text>
+                  <Text font="proto_mono" size="x-sm">
+                    {baseApr.dist}%
+                  </Text>
+                </Container>
               )}
             </>
           )}
           {quoteApr && (
             <>
               {Number(quoteApr.supply) !== 0 && (
-                <li>
-                  {pool.quote.symbol} supply apr: {quoteApr.supply}%
-                </li>
+                <Container gap={"auto"} direction="row">
+                  <Text font="proto_mono" size="x-sm">
+                    {pool.quote.symbol} supply apr:
+                  </Text>
+                  <Text font="proto_mono" size="x-sm">
+                    {quoteApr.supply}%
+                  </Text>
+                </Container>
               )}
               {Number(quoteApr.dist) !== 0 && (
-                <li>
-                  {pool.quote.symbol} dist apr: {quoteApr.dist}%
-                </li>
+                <Container gap={"auto"} direction="row">
+                  <Text font="proto_mono" size="x-sm">
+                    {pool.quote.symbol} dist apr:
+                  </Text>
+                  <Text font="proto_mono" size="x-sm">
+                    {quoteApr.dist}%
+                  </Text>
+                </Container>
               )}
             </>
           )}
-        </ul>
+        </Container>
       </InfoPop>
     </Container>
   );
