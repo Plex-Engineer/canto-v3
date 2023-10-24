@@ -25,6 +25,7 @@ import Container from "@/components/container/container";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
 import BigNumber from "bignumber.js";
+import { addTokenBalances } from "@/utils/tokens/tokenMath.utils";
 
 export default function Page() {
   const { txStore, signer, chainId } = useCantoSigner();
@@ -159,9 +160,7 @@ export default function Page() {
         <Rewards
           onClick={sendClaimRewardsFlow}
           value={displayAmount(
-            convertToBigNumber(cantoDex.position.totalRewards, 18).data.plus(
-              convertToBigNumber(ambient.rewards, 18).data
-            ),
+            addTokenBalances(cantoDex.position.totalRewards, ambient.rewards),
             18,
             {
               precision: 4,
