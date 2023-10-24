@@ -234,22 +234,30 @@ const AprBlock = ({ pool }: { pool: AmbientPool }) => {
           <li>pool incentive: {Number(pool.totals.apr.poolApr).toFixed(2)}%</li>
           {baseApr && (
             <>
-              <li>
-                {pool.base.symbol} supply apr: {baseApr.supply}%
-              </li>
-              <li>
-                {pool.base.symbol} dist apr: {baseApr.dist}%
-              </li>
+              {Number(baseApr.supply) !== 0 && (
+                <li>
+                  {pool.base.symbol} supply apr: {baseApr.supply}%
+                </li>
+              )}
+              {Number(baseApr.dist) !== 0 && (
+                <li>
+                  {pool.base.symbol} dist apr: {baseApr.dist}%
+                </li>
+              )}
             </>
           )}
           {quoteApr && (
             <>
-              <li>
-                {pool.quote.symbol} supply apr: {quoteApr.supply}%
-              </li>
-              <li>
-                {pool.quote.symbol} dist apr: {quoteApr.dist}%
-              </li>
+              {Number(quoteApr.supply) !== 0 && (
+                <li>
+                  {pool.quote.symbol} supply apr: {quoteApr.supply}%
+                </li>
+              )}
+              {Number(quoteApr.dist) !== 0 && (
+                <li>
+                  {pool.quote.symbol} dist apr: {quoteApr.dist}%
+                </li>
+              )}
             </>
           )}
         </ul>
