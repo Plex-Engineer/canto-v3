@@ -19,16 +19,18 @@ import {
   isCantoDexPair,
 } from "@/hooks/pairs/lpCombo/interfaces.ts/pairTypes";
 import { AmbientModal } from "./components/ambientLPModal";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { convertToBigNumber, displayAmount } from "@/utils/tokenBalances.utils";
 import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
+import BigNumber from "bignumber.js";
+import { addTokenBalances } from "@/utils/tokens/tokenMath.utils";
 
 export default function Page() {
   const { txStore, signer, chainId } = useCantoSigner();
   // all pairs (ambient and cantoDex)
-  const { cantoDex, ambient, selection, isLoading } = useLP({
+  const { cantoDex, ambient, selection, isLoading, claimRewards } = useLP({
     chainId,
     userEthAddress: signer?.account.address ?? "",
   });
@@ -73,18 +75,6 @@ export default function Page() {
       ...params,
     } as CantoDexTransactionParams);
   }
-  function sendClaimRewardsFlow() {
-    const { data: flow, error } = cantoDex.transaction.createClaimRewardsFlow();
-    if (error) {
-      console.log(error);
-    } else {
-      txStore?.addNewFlow({
-        txFlow: flow,
-        signer: signer,
-        onSuccessCallback: () => selection.setPair(null),
-      });
-    }
-  }
 
   /** AMBIENT */
   const { ambientPools } = ambient;
@@ -124,6 +114,19 @@ export default function Page() {
   /** general selection */
   const { pair: selectedPair, setPair } = selection;
 
+  function sendClaimRewardsFlow() {
+    const { data: flow, error } = claimRewards();
+    if (error) {
+      console.log(error);
+    } else {
+      txStore?.addNewFlow({
+        txFlow: flow,
+        signer: signer,
+        onSuccessCallback: () => selection.setPair(null),
+      });
+    }
+  }
+
   if (isLoading) {
     return <div className={styles.loading}>{""}</div>;
   }
@@ -156,9 +159,13 @@ export default function Page() {
 
         <Rewards
           onClick={sendClaimRewardsFlow}
-          value={displayAmount(cantoDex.position.totalRewards, 18, {
-            precision: 4,
-          })}
+          value={displayAmount(
+            addTokenBalances(cantoDex.position.totalRewards, ambient.rewards),
+            18,
+            {
+              precision: 4,
+            }
+          )}
         />
       </Container>
       <Spacer height="30px" />
@@ -184,6 +191,7 @@ export default function Page() {
                 onManage={(poolAddress) => {
                   setPair(poolAddress);
                 }}
+                rewards={ambient.rewards}
               />
             )),
             ...userCantoDexPairs.map((pair) => (

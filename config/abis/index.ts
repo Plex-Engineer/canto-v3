@@ -1,13 +1,9 @@
-export * from "./cErc20";
-export * from "./clmLens";
-export * from "./comptroller";
-export * from "./crocQuery";
-export * from "./crocSwapDex";
-export * from "./cRWA";
+// folders
+export * from "./ambient";
+export * from "./bridge";
+export * from "./clm";
+export * from "./rwa";
+// single contracts
 export * from "./dexRouter";
 export * from "./erc20";
-export * from "./gravityBridge";
-export * from "./oft";
-export * from "./reservoir";
-export * from "./rwaOracle";
 export * from "./weth";

@@ -20,6 +20,8 @@ import { GetWalletClientResult } from "wagmi/actions";
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 
+// only save last 100 flows for each user to save space
+const USER_FLOW_LIMIT = 100;
 interface AddNewFlowParams {
   txFlow: NewTransactionFlow;
   signer: GetWalletClientResult | undefined;
@@ -93,12 +95,16 @@ const useTransactionStore = create<TransactionStore>()(
           const currentUserTransactionFlows = get().getUserTransactionFlows(
             params.signer.account.address
           );
+          // make new list but make sure we don't go over the limit (take last 100)
+          const newUserList = [...currentUserTransactionFlows, newFlow].slice(
+            USER_FLOW_LIMIT * -1
+          );
           set({
             transactionFlows: new Map(
-              get().transactionFlows.set(params.signer.account.address, [
-                ...currentUserTransactionFlows,
-                newFlow,
-              ])
+              get().transactionFlows.set(
+                params.signer.account.address,
+                newUserList
+              )
             ),
           });
           // we are expecting a signer so call performTransactions

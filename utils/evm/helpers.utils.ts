@@ -6,14 +6,15 @@ import {
   errMsg,
 } from "@/config/interfaces";
 import * as NETWORKS from "@/config/networks";
-import Web3 from "web3";
+import { GetWalletClientResult } from "wagmi/actions";
+import Web3, { Contract, ContractAbi } from "web3";
 
 /**
  * @notice gets rpc url from chainId
  * @param {number} chainId chainId to get rpc url for
  * @returns {ReturnWithError<string>} rpc url or error
  */
-export function getRpcUrlFromChainId(chainId: number): ReturnWithError<string> {
+function getRpcUrlFromChainId(chainId: number): ReturnWithError<string> {
   for (const [key, network] of Object.entries(NETWORKS)) {
     if (network.chainId === chainId) {
       return NO_ERROR(network.rpcUrl);
@@ -27,8 +28,38 @@ export function getRpcUrlFromChainId(chainId: number): ReturnWithError<string> {
  * @param {string} rpcUrl rpc url to get provider with signer for
  * @returns {Web3} provider with signer
  */
-export function getProviderWithoutSigner(rpcUrl: string): Web3 {
+function getProviderWithoutSigner(rpcUrl: string): Web3 {
   return new Web3(rpcUrl);
+}
+
+/**
+ * @notice gets contract instance from abi, address, and chainId
+ * @dev pass in signer to perform transactions with contract
+ * @param {number} chainId chainId to get contract instance for
+ * @param {string} address address of contract
+ * @param {ContractAbi} abi abi of contract
+ * @param {GetWalletClientResult} options.signer signer to sign transaction with
+ * @returns {ReturnWithError<Contract<T>>} contract instance or error
+ */
+export function newContractInstance<T extends ContractAbi>(
+  chainId: number,
+  address: string,
+  abi: ContractAbi,
+  options?: {
+    signer?: GetWalletClientResult;
+  }
+): ReturnWithError<Contract<T>> {
+  const rpc = getRpcUrlFromChainId(chainId);
+  if (rpc.error) return NEW_ERROR("newContractInstance::" + errMsg(rpc.error));
+  if (options?.signer) {
+    return NO_ERROR(
+      new Contract(abi, address, {
+        provider: options.signer,
+      })
+    );
+  }
+  const provider = getProviderWithoutSigner(rpc.data);
+  return NO_ERROR(new Contract(abi, address, provider));
 }
 
 /**

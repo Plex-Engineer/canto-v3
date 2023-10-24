@@ -10,11 +10,7 @@ import {
   validateBridgeInRetryParams,
   validateBridgeOutRetryParams,
 } from "@/hooks/bridge/transactions/bridge";
-import {
-  CLMClaimRewardsTxParams,
-  CTokenLendingTransactionParams,
-} from "@/hooks/lending/interfaces/lendingTxTypes";
-import { clmClaimRewardsTx } from "@/hooks/lending/transactions/claimRewards";
+import { CTokenLendingTransactionParams } from "@/hooks/lending/interfaces/lendingTxTypes";
 import {
   cTokenLendingTx,
   validateCTokenLendingRetryParams,
@@ -27,15 +23,19 @@ import {
   cantoDexLPTx,
   stakeLPFlow,
 } from "@/hooks/pairs/cantoDex/transactions/pairsTx";
+import {
+  ClaimDexRewardsParams,
+  claimDexRewardsComboTx,
+} from "@/hooks/pairs/lpCombo/transactions/claimRewards";
 import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
 import { ambientLiquidityTx } from "@/hooks/pairs/newAmbient/transactions/ambientTx";
 
 export enum TransactionFlowType {
-  AMBIENT_LIQUIDITY_TX = "AMBIENT_LIQUIDITY_TX",
   BRIDGE_IN = "BRIDGE_IN",
   BRIDGE_OUT = "BRIDGE_OUT",
+  AMBIENT_LIQUIDITY_TX = "AMBIENT_LIQUIDITY_TX",
   CANTO_DEX_LP_TX = "CANTO_DEX_LP_TX",
-  CLM_CLAIM_REWARDS = "CLM_CLAIM_REWARDS",
+  CLAIM_LP_REWARDS_TX = "CLAIM_LP_REWARDS_TX",
   CLM_CTOKEN_TX = "CLM_CTOKEN_TX",
   STAKE_LP_TX = "STAKE_LP_TX",
 }
@@ -49,11 +49,6 @@ export const TRANSACTION_FLOW_MAP: {
     tx: (...params: any[]) => PromiseWithError<TxCreatorFunctionReturn>;
   };
 } = {
-  [TransactionFlowType.AMBIENT_LIQUIDITY_TX]: {
-    validRetry: async (params: AmbientTransactionParams) =>
-      NO_ERROR({ valid: false }),
-    tx: async (params: AmbientTransactionParams) => ambientLiquidityTx(params),
-  },
   [TransactionFlowType.BRIDGE_IN]: {
     validRetry: async (params: BridgeTransactionParams) =>
       validateBridgeInRetryParams(params),
@@ -64,15 +59,20 @@ export const TRANSACTION_FLOW_MAP: {
       validateBridgeOutRetryParams(params),
     tx: async (params: BridgeTransactionParams) => bridgeOutTx(params),
   },
+  [TransactionFlowType.AMBIENT_LIQUIDITY_TX]: {
+    validRetry: async (params: AmbientTransactionParams) =>
+      NO_ERROR({ valid: false }),
+    tx: async (params: AmbientTransactionParams) => ambientLiquidityTx(params),
+  },
   [TransactionFlowType.CANTO_DEX_LP_TX]: {
     validRetry: async (params: CantoDexTransactionParams) =>
       NO_ERROR({ valid: false }),
     tx: async (params: CantoDexTransactionParams) => cantoDexLPTx(params),
   },
-  [TransactionFlowType.CLM_CLAIM_REWARDS]: {
-    validRetry: async (params: CLMClaimRewardsTxParams) =>
+  [TransactionFlowType.CLAIM_LP_REWARDS_TX]: {
+    validRetry: async (params: ClaimDexRewardsParams) =>
       NO_ERROR({ valid: true }),
-    tx: async (params: CLMClaimRewardsTxParams) => clmClaimRewardsTx(params),
+    tx: async (params: ClaimDexRewardsParams) => claimDexRewardsComboTx(params),
   },
   [TransactionFlowType.CLM_CTOKEN_TX]: {
     validRetry: async (params: CTokenLendingTransactionParams) =>

@@ -13,6 +13,7 @@ import {
 } from "./interfaces/ambientPoolTxTypes";
 import {
   NEW_ERROR,
+  NO_ERROR,
   NewTransactionFlow,
   ReturnWithError,
   ValidationReturn,
@@ -23,6 +24,9 @@ import {
 } from "@/utils/ambient/liquidity.utils";
 import { validateInputTokenAmount } from "@/utils/validation.utils";
 import { createNewAmbientTxFlow } from "./helpers/createAmbientFlow";
+import { queryUserAmbientRewards } from "./helpers/ambientApi";
+import { CLMClaimRewardsTxParams } from "@/hooks/lending/interfaces/lendingTxTypes";
+import { TransactionFlowType } from "@/config/transactions/txMap";
 
 export default function useAmbientPools(
   params: AmbientHookInputParams,
@@ -35,13 +39,22 @@ export default function useAmbientPools(
   ///
 
   // use query for all ambient pool data
-  const { data: allPools, isLoading } = useQuery(
+  const { data: ambient, isLoading } = useQuery(
     ["ambient pools", params.chainId, params.userEthAddress],
-    async (): Promise<AmbientPool[]> => {
-      return (
-        (await getAllAmbientPoolsData(params.chainId, params.userEthAddress))
-          .data ?? []
-      );
+    async (): Promise<{ pools: AmbientPool[]; rewards: string }> => {
+      return {
+        pools:
+          (await getAllAmbientPoolsData(params.chainId, params.userEthAddress))
+            .data ?? [],
+        rewards: params.userEthAddress
+          ? (
+              await queryUserAmbientRewards(
+                params.chainId,
+                params.userEthAddress
+              )
+            ).data ?? "0"
+          : "0",
+      };
     },
     {
       onSuccess: (response) => {
@@ -57,11 +70,11 @@ export default function useAmbientPools(
   // get balances of all underlying tokens
   const underlyingTokenBalances = useTokenBalances(
     params.chainId,
-    getUniqueUnderlyingTokensFromPairs(allPools ?? []),
+    getUniqueUnderlyingTokensFromPairs(ambient?.pools ?? []),
     params.userEthAddress
   );
 
-  const poolsWithBalances = allPools?.map((pool) => {
+  const poolsWithBalances = ambient?.pools?.map((pool) => {
     // look for balances
     const baseBalance = underlyingTokenBalances[pool.base.address];
     const quoteBalance = underlyingTokenBalances[pool.quote.address];
@@ -157,7 +170,7 @@ export default function useAmbientPools(
     }
   }
 
-  // tx flow creator
+  // tx flow creators
   function createNewPoolFlow(
     params: AmbientTransactionParams
   ): ReturnWithError<NewTransactionFlow> {
@@ -168,12 +181,27 @@ export default function useAmbientPools(
     return createNewAmbientTxFlow(params);
   }
 
+  function createNewClaimRewardsFlow(
+    params: CLMClaimRewardsTxParams
+  ): ReturnWithError<NewTransactionFlow> {
+    return NO_ERROR({
+      title: "Claim Rewards",
+      icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+      txType: TransactionFlowType.CLAIM_LP_REWARDS_TX,
+      params: {
+        ambientParams: params,
+      },
+    });
+  }
+
   return {
     isLoading,
+    rewards: ambient?.rewards ?? "0",
     ambientPools: poolsWithBalances ?? [],
     transaction: {
       validateParams: validateTxParams,
       createNewPoolFlow,
+      createNewClaimRewardsFlow,
     },
   };
 }

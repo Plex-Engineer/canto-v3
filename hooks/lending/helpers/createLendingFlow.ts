@@ -26,7 +26,9 @@ export function createNewClaimCLMRewardsFlow(
   return NO_ERROR({
     title: "Claim Rewards",
     icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
-    txType: TransactionFlowType.CLM_CLAIM_REWARDS,
-    params: params,
+    txType: TransactionFlowType.CLAIM_LP_REWARDS_TX,
+    params: {
+      clmParams: params,
+    },
   });
 }
