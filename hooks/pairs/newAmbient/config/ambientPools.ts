@@ -20,6 +20,7 @@ const MAINNET_AMBIENT_POOLS: BaseAmbientPool[] = [
         "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/cNote.svg",
       name: "Collateral Note",
       symbol: "cNote",
+      isCToken: true,
     },
     poolIdx: 36000,
     address:

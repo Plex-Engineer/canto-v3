@@ -126,7 +126,7 @@ export const GeneralAmbientPairRow = ({
     <Spacer width="10px" />
     <Text>{pool.symbol}</Text>
   </div>,
-  <Text key={pool.symbol + "apr"}>{formatPercent(pool.totals.apr)}</Text>,
+  <AprBlock key={"apr"} pool={pool} />,
   <Text key={pool.address + "tvl"}>
     {displayAmount(pool.totals.noteTvl, 18, {
       precision: 2,
@@ -188,7 +188,7 @@ export const UserAmbientPairRow = ({
       <Spacer width="10px" />
       <Text>{pool.symbol}</Text>
     </div>,
-    <Text key={pool.symbol + "apr"}>{formatPercent(pool.totals.apr)}</Text>,
+    <AprBlock key={"apr"} pool={pool} />,
     <Text key={pool.symbol + "pool share"}>
       {formatPercent(divideBalances(value, pool.totals.noteTvl))}
     </Text>,
@@ -216,4 +216,44 @@ export const UserAmbientPairRow = ({
       </Button>
     </div>,
   ];
+};
+
+const AprBlock = ({ pool }: { pool: AmbientPool }) => {
+  const baseApr = pool.totals.apr.base;
+  const quoteApr = pool.totals.apr.quote;
+  const totalApr =
+    Number(pool.totals.apr.poolApr) +
+    (baseApr ? Number(baseApr.supply) + Number(baseApr.dist) : 0) +
+    (quoteApr ? Number(quoteApr.supply) + Number(quoteApr.dist) : 0);
+
+  return (
+    <Container key={"popkey1"} direction="row" gap={10}>
+      <Text key={pool.address + "apr"}>{totalApr.toFixed(2)}%</Text>
+      <InfoPop>
+        <ul>
+          <li>pool incentive: {Number(pool.totals.apr.poolApr).toFixed(2)}%</li>
+          {baseApr && (
+            <>
+              <li>
+                {pool.base.symbol} supply apr: {baseApr.supply}%
+              </li>
+              <li>
+                {pool.base.symbol} dist apr: {baseApr.dist}%
+              </li>
+            </>
+          )}
+          {quoteApr && (
+            <>
+              <li>
+                {pool.quote.symbol} supply apr: {quoteApr.supply}%
+              </li>
+              <li>
+                {pool.quote.symbol} dist apr: {quoteApr.dist}%
+              </li>
+            </>
+          )}
+        </ul>
+      </InfoPop>
+    </Container>
+  );
 };
