@@ -26,6 +26,7 @@ import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
 import BigNumber from "bignumber.js";
 import { addTokenBalances } from "@/utils/tokens/tokenMath.utils";
+import SVGComponent from "./components/svgComponent";
 
 export default function Page() {
   const { txStore, signer, chainId } = useCantoSigner();
@@ -168,6 +169,8 @@ export default function Page() {
           )}
         />
       </Container>
+      <SVGComponent />
+
       <Spacer height="30px" />
       {userCantoDexPairs.length + userAmbientPools.length > 0 && (
         <Table
