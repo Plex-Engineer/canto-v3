@@ -103,6 +103,7 @@ const Bridging = (props: BridgeProps) => {
     isCosmosNetwork(props.hook.selections.toNetwork)
       ? {
           cosmosAddress: {
+            chainId: props.hook.selections.toNetwork.chainId,
             addressPrefix: props.hook.selections.toNetwork.addressPrefix,
             currentAddress: props.hook.addresses.getReceiver() ?? "",
             setAddress: (address: string) =>
@@ -346,22 +347,29 @@ const Bridging = (props: BridgeProps) => {
                             ? props.hook.selections.token.symbol
                             : props.hook.selections.token.name,
                       }
-                    : ({
+                    : {
                         name: "Select Token",
                         icon: "loader.svg",
                         id: "",
-                      } as Item)
+                      }
                 }
-                items={
-                  props.hook.allOptions.tokens.map((token) => ({
+                items={props.hook.allOptions.tokens
+                  .map((token) => ({
                     ...token,
                     name: token.name.length > 24 ? token.symbol : token.name,
                     secondary: displayAmount(
                       token.balance ?? "0",
                       token.decimals
                     ),
-                  })) ?? []
-                }
+                  }))
+                  .sort((a, b) => {
+                    if (Number(a.secondary) === Number(b.secondary)) {
+                      return b.name.toLowerCase() > a.name.toLowerCase()
+                        ? -1
+                        : 1;
+                    }
+                    return Number(a.secondary) > Number(b.secondary) ? -1 : 1;
+                  })}
                 onChange={(tokenId) => props.hook.setState("token", tokenId)}
               />
               <Container width="100%">

@@ -6,6 +6,9 @@ import Image from "next/image";
 import React, { ReactNode } from "react";
 import styles from "../bridge.module.scss";
 import PopUp from "@/components/popup/popup";
+import { connectToKeplr } from "@/utils/keplr/connectKeplr";
+import { formatError } from "@/utils/formatting.utils";
+import InfoPop from "@/components/infopop/infopop";
 
 interface Props {
   imgUrl: string;
@@ -27,6 +30,7 @@ interface Props {
     onConfirm: () => void;
   };
   cosmosAddress?: {
+    chainId: string;
     addressPrefix: string;
     currentAddress: string;
     setAddress: (address: string) => void;
@@ -34,6 +38,7 @@ interface Props {
   extraDetails?: ReactNode;
 }
 const ConfirmationModal = (props: Props) => {
+  const [keplrError, setKeplrError] = React.useState<string>("");
   return (
     <div className={styles["confirmation-container"]}>
       <Text size="lg" font="proto_mono">
@@ -144,9 +149,55 @@ const ConfirmationModal = (props: Props) => {
             onChange={function (e: React.ChangeEvent<HTMLInputElement>): void {
               props.cosmosAddress?.setAddress(e.target.value);
             }}
+            height={"md"}
           />
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingTop: "5px",
+            }}
+          >
+            <Text size="xx-sm" color="var(--extra-failure-color, #ff0000)">
+              {keplrError}
+            </Text>
+            <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
+              <Text
+                size="xx-sm"
+                weight="bold"
+                style={{
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                  paddingTop: "3px",
+                }}
+              >
+                <a
+                  onClick={async () => {
+                    const { data, error } = await connectToKeplr(
+                      props.cosmosAddress?.chainId ?? ""
+                    );
+                    if (error) {
+                      setKeplrError(formatError(error.message));
+                    } else {
+                      setKeplrError("");
+                      props.cosmosAddress?.setAddress(data.address);
+                    }
+                  }}
+                >
+                  Connect to Keplr
+                </a>
+              </Text>
+              <InfoPop>
+                <Text size="xx-sm">
+                  {`manually enter your ${props.toNetwork} address or click "Connect to Keplr"`}
+                </Text>
+              </InfoPop>
+            </div>
+          </div>
         </Container>
       )}
+
       <Button
         width={"fill"}
         onClick={() => {
