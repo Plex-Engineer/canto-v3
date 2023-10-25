@@ -11,6 +11,7 @@ import { BaseError } from "viem";
 import { TransactionReceipt } from "web3";
 import { asyncCallWithTimeout } from "../async.utils";
 import { newContractInstance } from "./helpers.utils";
+import { percentOfAmount } from "../tokens/tokenMath.utils";
 
 /**
  * @notice performs evm transaction
@@ -46,6 +47,20 @@ export async function performEVMTransaction(
         signer: newSigner,
       });
     if (contractError) throw contractError;
+
+    // estimate gas so that metamask can show gas fee
+    const gasEstimate = await contractInstance.methods[tx.method](
+      ...(tx.params as [])
+    ).estimateGas({
+      from: newSigner.account.address,
+      value: tx.value,
+    });
+    // make sure gas is at least base limit (21,000), then over estimate by 50%
+    const { data: gasLimit, error: gasError } = percentOfAmount(
+      gasEstimate < 21000 ? "21000" : gasEstimate.toString(),
+      150
+    );
+    if (gasError) throw gasError;
     // if user doesn't sign in 30 seconds, throw timeout error
     const { data: transaction, error: timeoutError } =
       await asyncCallWithTimeout<TransactionReceipt>(
@@ -53,6 +68,7 @@ export async function performEVMTransaction(
           await contractInstance.methods[tx.method](...(tx.params as [])).send({
             from: newSigner.account.address,
             value: tx.value,
+            gas: gasLimit,
           }),
         90000
       );
