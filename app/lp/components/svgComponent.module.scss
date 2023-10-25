@@ -1,8 +1,18 @@
 .circle {
   fill: #fff;
-  transition: fill 0.1s ease-out;
+  transition: fill 0.1s ease-in-out, stroke-width 0.1s ease-in-out,
+    r 0.1s ease-in-out;
+  r: 10;
 
   &:hover {
-    fill: #000;
+    fill: var(--extra-success-color);
+    stroke-width: 3px;
+    r: 20;
+  }
+
+  &:active {
+    fill: var(--extra-failure-color);
+    stroke-width: 3px;
+    r: 18;
   }
 }
