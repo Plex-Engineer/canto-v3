@@ -15,7 +15,8 @@ import { createApprovalTxs } from "@/utils/evm/erc20.utils";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import { CERC20_ABI, COMPTROLLER_ABI } from "@/config/abis";
-import { getCantoCoreAddress } from "@/config/consts/addresses";
+import { MAX_UINT256, getCantoCoreAddress } from "@/config/consts/addresses";
+import { greaterThan } from "@/utils/tokens/tokenMath.utils";
 
 export async function cTokenLendingTx(
   params: CTokenLendingTransactionParams
@@ -92,33 +93,49 @@ export async function cTokenLendingTx(
     params.cToken.underlying.symbol,
     displayAmount(params.amount, params.cToken.underlying.decimals)
   );
-  // check to see if tx is withdrawing entire balance
-  if (
-    params.txType === CTokenLendingTxTypes.WITHDRAW &&
-    params.cToken.userDetails.supplyBalanceInUnderlying === params.amount
-  ) {
-    // push special withdraw all function, passing in the cToken balance instead
-    txList.push(
-      _withdrawAllCTokenTx(
-        params.chainId,
-        params.cToken.address,
-        params.cToken.userDetails.balanceOfCToken,
-        txDescription
-      )
-    );
-  } else {
-    // push normal clm tx using underlying balance
-    txList.push(
-      _lendingCTokenTx(
-        params.txType,
-        params.chainId,
-        params.cToken.address,
-        isCanto,
-        params.amount,
-        txDescription
-      )
-    );
+
+  // check if max was clicked
+  if (params.max) {
+    // check to see if tx is withdrawing entire balance
+    if (
+      params.txType === CTokenLendingTxTypes.WITHDRAW &&
+      params.cToken.userDetails.supplyBalanceInUnderlying === params.amount
+    ) {
+      // push special withdraw all function, passing in the cToken balance instead
+      txList.push(
+        _withdrawAllCTokenTx(
+          params.chainId,
+          params.cToken.address,
+          params.cToken.userDetails.balanceOfCToken,
+          txDescription
+        )
+      );
+      return NO_ERROR({ transactions: txList });
+    }
+    // check to see if repaying entire balance
+    if (
+      params.txType === CTokenLendingTxTypes.REPAY &&
+      greaterThan(
+        params.cToken.userDetails.balanceOfUnderlying,
+        params.cToken.userDetails.borrowBalance
+      ).data
+    ) {
+      // change amount to max uint
+      params.amount = MAX_UINT256;
+    }
   }
+
+  // push normal clm tx using underlying balance
+  txList.push(
+    _lendingCTokenTx(
+      params.txType,
+      params.chainId,
+      params.cToken.address,
+      isCanto,
+      params.amount,
+      txDescription
+    )
+  );
 
   // user should enable token as collateral if supplying and token has collateral factor
   if (

@@ -10,7 +10,7 @@ interface Props {
   IconUrl: string;
   title: string;
   symbol: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>, max: boolean) => void;
   decimals: number;
   value: string;
   max: string;
@@ -102,13 +102,16 @@ const Amount = (props: Props) => {
         <span
           className={styles.max}
           onClick={() => {
-            props.onChange({
-              target: {
-                value: formatBalance(props.max, props.decimals, {
-                  precision: props.decimals,
-                }),
-              },
-            } as any);
+            props.onChange(
+              {
+                target: {
+                  value: formatBalance(props.max, props.decimals, {
+                    precision: props.decimals,
+                  }),
+                },
+              } as any,
+              true
+            );
           }}
         >
           <Text size="xx-sm" weight="bold">
@@ -124,7 +127,7 @@ const Amount = (props: Props) => {
         onChange={(e) => {
           e.target.value = decommify(e.target.value);
           if (e.target.value === "" || e.target.value.match(/^\d*\.?\d*$/)) {
-            props.onChange(e);
+            props.onChange(e, false);
           }
         }}
         className={styles.input}
