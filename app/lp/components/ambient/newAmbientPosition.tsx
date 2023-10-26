@@ -16,6 +16,10 @@ import Button from "@/components/button/button";
 import Toggle from "@/components/toggle";
 import { useState } from "react";
 import ToggleGroup from "@/components/ToggleGroup/ToggleGroup";
+import {
+  ALL_TICK_KEYS,
+  TickRangeKey,
+} from "@/hooks/pairs/newAmbient/liquidityControllers/defaultParams";
 
 interface NewPositionModalProps {
   pool: AmbientPool;
@@ -29,8 +33,15 @@ export const NewAmbientPositionModal = ({
   const positionManager = useNewAmbientPositionManager(pool);
   const positionValidation = positionManager.txParams.validateParams();
 
+  // modal options
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("Default");
+  const [selectedOption, setSelectedOption] = useState<TickRangeKey>("DEFAULT");
+
+  function setDefaultParams(tickKey: TickRangeKey) {
+    setSelectedOption(tickKey);
+    positionManager.setters.setDefaultParams(tickKey);
+  }
+
   return (
     <Container width={showAdvanced ? "64rem" : "32rem"}>
       <Container direction="row" gap={20}>
@@ -130,9 +141,11 @@ export const NewAmbientPositionModal = ({
           <Spacer height="8px" />
           <Container direction="row" gap={20}>
             <ToggleGroup
-              options={["Default", "Narrow", "Wide"]}
+              options={ALL_TICK_KEYS}
               selected={selectedOption}
-              setSelected={setSelectedOption}
+              setSelected={(option) => {
+                setDefaultParams(option as TickRangeKey);
+              }}
             />
             <Container
               direction="row"
@@ -168,12 +181,11 @@ export const NewAmbientPositionModal = ({
                     height={"sm"}
                     type="number"
                     value={positionManager.options.minRangePrice}
-                    onChange={(e) => {
-                      positionManager.setters.setRangePrice(
-                        e.target.value,
-                        true
-                      );
-                    }}
+                    onChange={(e) =>
+                      positionManager.setters.setRangePrice({
+                        min: e.target.value,
+                      })
+                    }
                   />
                 </Container>
               }
@@ -195,12 +207,11 @@ export const NewAmbientPositionModal = ({
                     height={"sm"}
                     type="number"
                     value={positionManager.options.maxRangePrice}
-                    onChange={(e) => {
-                      positionManager.setters.setRangePrice(
-                        e.target.value,
-                        false
-                      );
-                    }}
+                    onChange={(e) =>
+                      positionManager.setters.setRangePrice({
+                        max: e.target.value,
+                      })
+                    }
                   />
                 </Container>
               }

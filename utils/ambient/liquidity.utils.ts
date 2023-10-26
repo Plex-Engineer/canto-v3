@@ -34,7 +34,8 @@ export function getConcQuoteTokensFromBaseTokens(
   if (
     !amount ||
     Number(amount) === 0 ||
-    Number(currentPrice) < Number(minPrice)
+    Number(currentPrice) < Number(minPrice) ||
+    minPrice === maxPrice
   ) {
     return "0";
   }
@@ -77,7 +78,8 @@ export function getConcBaseTokensFromQuoteTokens(
   if (
     !amount ||
     Number(amount) === 0 ||
-    Number(currentPrice) > Number(maxPrice)
+    Number(currentPrice) > Number(maxPrice) ||
+    minPrice === maxPrice
   ) {
     return "0";
   }
