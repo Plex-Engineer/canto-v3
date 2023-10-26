@@ -73,7 +73,7 @@ const NavBar = () => {
         >
           <Text>LP</Text>
         </Link>
-        {/* <Link
+        <Link
           href="/governance"
           className={clsx(
             styles["nav-link"],
@@ -81,7 +81,7 @@ const NavBar = () => {
           )}
         >
           <Text>Governance</Text>
-        </Link> */}
+        </Link>
       </div>
       <div className={styles["btn-grp"]}>
         <div className={styles.activity}>
