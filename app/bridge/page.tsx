@@ -52,7 +52,7 @@ export default function BridgePage() {
     async function getKeplrInfoForBridge() {
       const network = bridgeIn.selections.fromNetwork;
       if (!network || !isCosmosNetwork(network)) return;
-      const keplrClient = await connectToKeplr(network);
+      const keplrClient = await connectToKeplr(network.chainId);
       bridgeIn.setState("cosmosAddress", keplrClient.data?.address);
     }
     getKeplrInfoForBridge();

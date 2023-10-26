@@ -227,6 +227,7 @@ async function removeLiquidityFlow(
       txType: CTokenLendingTxTypes.WITHDRAW,
       cToken: params.pair.clmData,
       amount: unstakeAmount,
+      max: true,
     });
     if (withdrawError) {
       return NEW_ERROR("removeLiquidityFlow: " + errMsg(withdrawError));
@@ -360,6 +361,7 @@ export async function stakeLPFlow(
       : CTokenLendingTxTypes.WITHDRAW,
     cToken: params.cLPToken,
     amount: stakeAmount,
+    max: true,
   });
 }
 

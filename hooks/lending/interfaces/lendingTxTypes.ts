@@ -15,6 +15,7 @@ export interface CTokenLendingTransactionParams {
   txType: CTokenLendingTxTypes;
   cToken: CTokenWithUserData;
   amount: string;
+  max: boolean; // for repay and withdraw, if all tokens should be repaid/withdrawn
 }
 
 export interface CLMClaimRewardsTxParams {

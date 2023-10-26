@@ -16,6 +16,7 @@ export const CANTO_DATA_API_ENDPOINTS = {
   allValidators: "/v1/staking/validators",
   stakingApr: "/v1/staking/apr",
   allCTokens: "/v1/lending/cTokens",
+  singleCToken: (address: string) => `/v1/lending/cToken/${address}`,
   allPairs: "/v1/dex/pairs",
 };
 /**
@@ -39,6 +40,9 @@ export async function getCantoApiData<T>(
     return NEW_ERROR("getCantoApiData: " + errMsg(error));
   }
   // parse results string
-  const parsedResults = JSON.parse(data.results) as T;
+  const parsedResults =
+    typeof data.results === "string"
+      ? (JSON.parse(data.results) as T)
+      : data.results;
   return NO_ERROR(parsedResults);
 }

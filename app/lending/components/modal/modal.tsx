@@ -27,11 +27,16 @@ interface Props {
   cToken: CTokenWithUserData | null;
   position: UserLMPosition;
   transaction: {
-    performTx: (amount: string, txType: CTokenLendingTxTypes) => void;
     validateAmount: (
       amount: string,
-      txType: CTokenLendingTxTypes
+      txType: CTokenLendingTxTypes,
+      max: boolean
     ) => ValidationReturn;
+    performTx: (
+      amount: string,
+      txType: CTokenLendingTxTypes,
+      max: boolean
+    ) => void;
   };
 }
 
@@ -128,16 +133,31 @@ export const LendingModal = (props: Props) => {
     transaction: {
       validateAmount: (
         amount: string,
-        txType: CTokenLendingTxTypes
+        txType: CTokenLendingTxTypes,
+        max: boolean
       ) => ValidationReturn;
-      performTx: (amount: string, txType: CTokenLendingTxTypes) => void;
+      performTx: (
+        amount: string,
+        txType: CTokenLendingTxTypes,
+        max: boolean
+      ) => void;
     }
   ) {
+    const [maxClicked, setMaxClicked] = useState(false);
     const [amount, setAmount] = useState("");
     const bnAmount = (
       convertToBigNumber(amount, cToken.underlying.decimals).data ?? "0"
     ).toString();
-    const amountCheck = transaction.validateAmount(bnAmount, actionType);
+
+    // tx params
+    const txParams: [string, CTokenLendingTxTypes, boolean] = [
+      bnAmount,
+      actionType,
+      maxClicked,
+    ];
+
+    // check amount
+    const amountCheck = transaction.validateAmount(...txParams);
 
     // limits
     const needLimit =
@@ -176,7 +196,8 @@ export const LendingModal = (props: Props) => {
         <Amount
           decimals={cToken.underlying.decimals}
           value={amount}
-          onChange={(val) => {
+          onChange={(val, wasMax) => {
+            wasMax ? setMaxClicked(true) : setMaxClicked(false);
             setAmount(val.target.value);
           }}
           IconUrl={cToken.underlying.logoURI}
@@ -206,7 +227,7 @@ export const LendingModal = (props: Props) => {
           <Button
             width={"fill"}
             disabled={!amountCheck.isValid}
-            onClick={() => transaction.performTx(bnAmount, actionType)}
+            onClick={() => transaction.performTx(...txParams)}
           >
             CONFIRM
           </Button>

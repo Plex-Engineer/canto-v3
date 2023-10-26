@@ -19,12 +19,11 @@ import {
   isCantoDexPair,
 } from "@/hooks/pairs/lpCombo/interfaces.ts/pairTypes";
 import { AmbientModal } from "./components/ambientLPModal";
-import { convertToBigNumber, displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/tokenBalances.utils";
 import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
-import BigNumber from "bignumber.js";
 import { addTokenBalances } from "@/utils/tokens/tokenMath.utils";
 import SVGComponent from "./components/svgComponent";
 

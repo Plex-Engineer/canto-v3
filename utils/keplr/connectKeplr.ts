@@ -3,34 +3,40 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-  CosmosNetwork,
 } from "@/config/interfaces";
 import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
+import { getNetworkInfoFromChainId, isCosmosNetwork } from "../networks.utils";
 
 /**
  * @notice connects to keplr and returns client and address
- * @param {CosmosNetwork} cosmosNetwork cosmos network to connect to
+ * @param {string} cosmosChainId cosmos chain id to connect to
  * @returns {PromiseWithError<{client: SigningStargateClient, address: string}>} client and address or error
  */
 export async function connectToKeplr(
-  cosmosNetwork: CosmosNetwork
+  cosmosChainId: string
 ): PromiseWithError<{ client: SigningStargateClient; address: string }> {
   if (!window.keplr) {
     return NEW_ERROR("connectToKeplr: keplr not installed");
   }
   try {
-    await window.keplr.enable(cosmosNetwork.chainId);
-    const offlineSigner = window.keplr.getOfflineSigner(cosmosNetwork.chainId);
+    // get network and make sure it's cosmos
+    const { data: network, error } = getNetworkInfoFromChainId(cosmosChainId);
+    if (error) throw error;
+    if (!isCosmosNetwork(network)) throw Error("invalid cosmos network");
+
+    // try to connect
+    await window.keplr.enable(network.chainId);
+    const offlineSigner = window.keplr.getOfflineSigner(network.chainId);
     const accounts = await offlineSigner.getAccounts();
     if (!accounts.length) {
       return NEW_ERROR("connectToKeplr: no accounts found");
     }
     const client = await SigningStargateClient.connectWithSigner(
-      cosmosNetwork.rpcUrl,
+      network.rpcUrl,
       offlineSigner,
       {
         gasPrice: GasPrice.fromString(
-          "300000" + cosmosNetwork.nativeCurrency.baseName
+          "300000" + network.nativeCurrency.baseName
         ),
       }
     );
