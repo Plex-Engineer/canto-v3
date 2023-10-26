@@ -15,7 +15,6 @@ interface Props {
   addresses: {
     from: string | null;
     to: string | null;
-    name: string | null;
   };
   token?: {
     name: string;
@@ -30,6 +29,7 @@ interface Props {
     onConfirm: () => void;
   };
   cosmosAddress?: {
+    addressName?: string; // for eth via gravity bridge
     chainId: string;
     addressPrefix: string;
     currentAddress: string;
@@ -38,6 +38,7 @@ interface Props {
   extraDetails?: ReactNode;
 }
 const ConfirmationModal = (props: Props) => {
+  console.log(props);
   const [keplrError, setKeplrError] = React.useState<string>("");
   return (
     <div className={styles["confirmation-container"]}>
@@ -48,8 +49,11 @@ const ConfirmationModal = (props: Props) => {
       <Image src={props.imgUrl} alt={"props"} width={60} height={60} />
 
       <Text size="md" font="proto_mono">
-        Bridge {props.token?.name} {props.type}{" "}
-        {props.type == "in" ? "from" : "to"} {props.addresses?.name}
+        {`Bridge ${props.token?.name} ${props.type} ${
+          props.type === "in"
+            ? "from " + props.fromNetwork
+            : "to " + props.toNetwork
+        }`}
       </Text>
       {props.extraDetails && (
         <Container
@@ -113,7 +117,8 @@ const ConfirmationModal = (props: Props) => {
                 content={<Text size="sm">{props.addresses.to}</Text>}
               >
                 <Text size="sm">
-                  {props.toNetwork + " : "}
+                  {(props.cosmosAddress?.addressName ?? props.toNetwork) +
+                    " : "}
                   {props.addresses.to
                     ? props.addresses.to?.slice(0, 6) +
                       "..." +
@@ -123,7 +128,7 @@ const ConfirmationModal = (props: Props) => {
               </PopUp>
             ) : (
               <Text size="sm">
-                {props.toNetwork + " : "}
+                {(props.cosmosAddress?.addressName ?? props.toNetwork) + " : "}
                 {props.addresses.to
                   ? props.addresses.to?.slice(0, 6) +
                     "..." +
@@ -190,7 +195,9 @@ const ConfirmationModal = (props: Props) => {
               </Text>
               <InfoPop>
                 <Text size="xx-sm">
-                  {`manually enter your ${props.toNetwork} address or click "Connect to Keplr"`}
+                  {`manually enter your ${
+                    props.cosmosAddress?.addressName ?? props.toNetwork
+                  } address or click "Connect to Keplr"`}
                 </Text>
               </InfoPop>
             </div>
