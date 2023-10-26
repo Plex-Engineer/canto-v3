@@ -105,13 +105,16 @@ export async function getAllAmbientPoolsData(
         userPositions: userPosArray,
         totals: {
           noteTvl: tvl,
-          apr: ambientAPR("550000000000000000", tvl, cantoPrice ?? "0"),
+          apr: {
+            poolApr: ambientAPR("550000000000000000", tvl, cantoPrice ?? "0"),
+          },
         },
       };
     })
   );
 }
 
+// will be formatted
 function ambientAPR(
   cantoPerBlock: string,
   tvlNote: string,
@@ -126,5 +129,5 @@ function ambientAPR(
     .multipliedBy(cantoPerBlock)
     .multipliedBy(priceCanto)
     .dividedBy(tvlNote);
-  return apr.toString();
+  return apr.multipliedBy(100).toString();
 }

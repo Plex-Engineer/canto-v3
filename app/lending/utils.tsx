@@ -33,10 +33,15 @@ interface LendingComboReturn {
     };
   };
   transaction: {
-    performTx: (amount: string, txType: CTokenLendingTxTypes) => void;
+    performTx: (
+      amount: string,
+      txType: CTokenLendingTxTypes,
+      max: boolean
+    ) => void;
     validateParams: (
       amount: string,
-      txType: CTokenLendingTxTypes
+      txType: CTokenLendingTxTypes,
+      max: boolean
     ) => ValidationReturn;
   };
   selection: {
@@ -121,7 +126,11 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
   }, [chainId, cNote?.underlying.address]);
 
   // transaction functions
-  function lendingTx(amount: string, txType: CTokenLendingTxTypes) {
+  function lendingTx(
+    amount: string,
+    txType: CTokenLendingTxTypes,
+    max: boolean
+  ) {
     if (!selection.selectedCToken || !signer) return;
     const { data, error } = transaction.createNewLendingFlow({
       chainId: signer.chain.id,
@@ -129,6 +138,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
       cToken: selection.selectedCToken,
       amount,
       txType,
+      max,
     });
     if (error) {
       console.log(error);
@@ -142,7 +152,8 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
   }
   const validateParams = (
     amount: string,
-    txType: CTokenLendingTxTypes
+    txType: CTokenLendingTxTypes,
+    max: boolean
   ): ValidationReturn => {
     if (!selection.selectedCToken || !signer) return { isValid: false };
     return transaction.validateParams({
@@ -151,6 +162,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
       cToken: selection.selectedCToken,
       amount,
       txType,
+      max,
     });
   };
 

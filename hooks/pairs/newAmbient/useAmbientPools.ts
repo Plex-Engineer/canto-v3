@@ -27,6 +27,9 @@ import { createNewAmbientTxFlow } from "./helpers/createAmbientFlow";
 import { queryUserAmbientRewards } from "./helpers/ambientApi";
 import { CLMClaimRewardsTxParams } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { TransactionFlowType } from "@/config/transactions/txMap";
+import { useEffect, useState } from "react";
+import { CANTO_DATA_API_ENDPOINTS, getCantoApiData } from "@/config/api";
+import { CToken } from "@/hooks/lending/interfaces/tokens";
 
 export default function useAmbientPools(
   params: AmbientHookInputParams,
@@ -67,6 +70,55 @@ export default function useAmbientPools(
     }
   );
 
+  // some ambient tokens may have underlying apr from the lending market, so we need to get those
+  // do not need to use entire cTokens array, just the ones that are in the ambient pools
+  type AprMap = {
+    [key: string]: {
+      distApr: string;
+      supplyApr: string;
+    };
+  };
+  const [ambientTokenAprs, setAmbientTokenAprs] = useState<AprMap>({});
+  // only run this once whenever pool length changes
+  useEffect(() => {
+    async function getCTokenAprs() {
+      if (!ambient?.pools.length) {
+        setAmbientTokenAprs({});
+        return;
+      }
+      const aprMap: AprMap = {};
+      const cTokenAddresses: string[] = [];
+      for (const pool of ambient?.pools ?? []) {
+        if (pool.base.isCToken) {
+          cTokenAddresses.push(pool.base.address);
+        }
+        if (pool.quote.isCToken) {
+          cTokenAddresses.push(pool.quote.address);
+        }
+      }
+      const cTokenData = await Promise.all(
+        cTokenAddresses.map((cTokenAddress) =>
+          getCantoApiData<CToken>(
+            params.chainId,
+            CANTO_DATA_API_ENDPOINTS.singleCToken(cTokenAddress)
+          )
+        )
+      );
+      for (const cToken of cTokenData) {
+        if (cToken.error) {
+          console.log(cToken.error);
+          continue;
+        }
+        aprMap[cToken.data.address] = {
+          distApr: cToken.data.distApy,
+          supplyApr: cToken.data.supplyApy,
+        };
+      }
+      setAmbientTokenAprs(aprMap);
+    }
+    getCTokenAprs();
+  }, [ambient?.pools.length, params.chainId]);
+
   // get balances of all underlying tokens
   const underlyingTokenBalances = useTokenBalances(
     params.chainId,
@@ -74,22 +126,45 @@ export default function useAmbientPools(
     params.userEthAddress
   );
 
-  const poolsWithBalances = ambient?.pools?.map((pool) => {
-    // look for balances
-    const baseBalance = underlyingTokenBalances[pool.base.address];
-    const quoteBalance = underlyingTokenBalances[pool.quote.address];
-    return {
-      ...pool,
-      base: {
-        ...pool.base,
-        balance: baseBalance ?? "0",
-      },
-      quote: {
-        ...pool.quote,
-        balance: quoteBalance ?? "0",
-      },
-    };
-  });
+  const poolsWithBalances: AmbientPool[] =
+    ambient?.pools?.map((pool) => {
+      // look for balances
+      const baseBalance = underlyingTokenBalances[pool.base.address];
+      const quoteBalance = underlyingTokenBalances[pool.quote.address];
+      // look for aprs
+      const baseAprs = ambientTokenAprs[pool.base.address];
+      const quoteAprs = ambientTokenAprs[pool.quote.address];
+      const aprObj = {
+        poolApr: pool.totals.apr.poolApr,
+        base: !baseAprs
+          ? undefined
+          : {
+              dist: baseAprs.distApr,
+              supply: baseAprs.supplyApr,
+            },
+        quote: !quoteAprs
+          ? undefined
+          : {
+              dist: quoteAprs.distApr,
+              supply: quoteAprs.supplyApr,
+            },
+      };
+      return {
+        ...pool,
+        base: {
+          ...pool.base,
+          balance: baseBalance ?? "0",
+        },
+        quote: {
+          ...pool.quote,
+          balance: quoteBalance ?? "0",
+        },
+        totals: {
+          ...pool.totals,
+          apr: aprObj,
+        },
+      };
+    }) ?? [];
 
   ///
   /// EXTERNAL FUNCTIONS
@@ -197,7 +272,7 @@ export default function useAmbientPools(
   return {
     isLoading,
     rewards: ambient?.rewards ?? "0",
-    ambientPools: poolsWithBalances ?? [],
+    ambientPools: poolsWithBalances,
     transaction: {
       validateParams: validateTxParams,
       createNewPoolFlow,

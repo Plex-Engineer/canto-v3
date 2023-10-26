@@ -23,6 +23,7 @@ import { GetWalletClientResult } from "wagmi/actions";
 import { maxBridgeAmountInUnderlying } from "@/hooks/bridge/helpers/amounts";
 import { BaseNetwork } from "@/config/interfaces";
 import { validateInputTokenAmount } from "@/utils/validation.utils";
+import { ETHEREUM_VIA_GRAVITY_BRIDGE } from "@/config/networks";
 
 interface BridgeProps {
   hook: BridgeHookReturn;
@@ -103,6 +104,12 @@ const Bridging = (props: BridgeProps) => {
     isCosmosNetwork(props.hook.selections.toNetwork)
       ? {
           cosmosAddress: {
+            addressName:
+              props.hook.selections.toNetwork.id ===
+              ETHEREUM_VIA_GRAVITY_BRIDGE.id
+                ? "Gravity Bridge"
+                : undefined,
+            chainId: props.hook.selections.toNetwork.chainId,
             addressPrefix: props.hook.selections.toNetwork.addressPrefix,
             currentAddress: props.hook.addresses.getReceiver() ?? "",
             setAddress: (address: string) =>
@@ -145,10 +152,6 @@ const Bridging = (props: BridgeProps) => {
           addresses={{
             from: props.hook.addresses.getSender(),
             to: props.hook.addresses.getReceiver(),
-            name:
-              props.hook.direction === "in"
-                ? networkName(props.hook.selections.fromNetwork)
-                : networkName(props.hook.selections.toNetwork),
           }}
           fromNetwork={networkName(props.hook.selections.fromNetwork)}
           toNetwork={networkName(props.hook.selections.toNetwork)}
@@ -170,7 +173,7 @@ const Bridging = (props: BridgeProps) => {
           }}
           extraDetails={
             props.hook.selections.toNetwork?.id ===
-            "ethereum-via-gravity-bridge" ? (
+            ETHEREUM_VIA_GRAVITY_BRIDGE.id ? (
               <Text size="x-sm">
                 To bridge your tokens to Ethereum through Gravity Bridge, first
                 ensure that you have an IBC wallet like Keplr.
@@ -346,22 +349,29 @@ const Bridging = (props: BridgeProps) => {
                             ? props.hook.selections.token.symbol
                             : props.hook.selections.token.name,
                       }
-                    : ({
+                    : {
                         name: "Select Token",
                         icon: "loader.svg",
                         id: "",
-                      } as Item)
+                      }
                 }
-                items={
-                  props.hook.allOptions.tokens.map((token) => ({
+                items={props.hook.allOptions.tokens
+                  .map((token) => ({
                     ...token,
                     name: token.name.length > 24 ? token.symbol : token.name,
                     secondary: displayAmount(
                       token.balance ?? "0",
                       token.decimals
                     ),
-                  })) ?? []
-                }
+                  }))
+                  .sort((a, b) => {
+                    if (Number(a.secondary) === Number(b.secondary)) {
+                      return b.name.toLowerCase() > a.name.toLowerCase()
+                        ? -1
+                        : 1;
+                    }
+                    return Number(a.secondary) > Number(b.secondary) ? -1 : 1;
+                  })}
                 onChange={(tokenId) => props.hook.setState("token", tokenId)}
               />
               <Container width="100%">
