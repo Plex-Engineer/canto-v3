@@ -189,7 +189,7 @@ const PositionList = ({
                   ),
                   18
                 )}{" "}
-                <Icon icon={{ url: "tokens/note.svg", size: 16 }} />
+                <Icon icon={{ url: "tokens/note.svg", size: 16 }} themed />
               </Text>
             </Container>
           </Container>

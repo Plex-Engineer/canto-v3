@@ -15,6 +15,7 @@ import Input from "@/components/input/input";
 import Button from "@/components/button/button";
 import Toggle from "@/components/toggle";
 import { useState } from "react";
+import ToggleGroup from "@/components/ToggleGroup/ToggleGroup";
 
 interface NewPositionModalProps {
   pool: AmbientPool;
@@ -29,6 +30,7 @@ export const NewAmbientPositionModal = ({
   const positionValidation = positionManager.txParams.validateParams();
 
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [selectedOption, setSelectedOption] = useState("Default");
   return (
     <Container width={showAdvanced ? "64rem" : "32rem"}>
       <Container direction="row" gap={20}>
@@ -126,18 +128,25 @@ export const NewAmbientPositionModal = ({
             weekly epochs.
           </Text>
           <Spacer height="8px" />
-          <Container
-            direction="row"
-            gap={10}
-            center={{
-              horizontal: true,
-              vertical: true,
-            }}
-          >
-            <Text theme="secondary-dark" size="x-sm">
-              Advanced
-            </Text>{" "}
-            <Toggle value={showAdvanced} onChange={setShowAdvanced} />
+          <Container direction="row" gap={20}>
+            <ToggleGroup
+              options={["Default", "Narrow", "Wide"]}
+              selected={selectedOption}
+              setSelected={setSelectedOption}
+            />
+            <Container
+              direction="row"
+              gap={10}
+              center={{
+                horizontal: true,
+                vertical: true,
+              }}
+            >
+              <Text theme="secondary-dark" size="x-sm">
+                Advanced
+              </Text>{" "}
+              <Toggle value={showAdvanced} onChange={setShowAdvanced} />
+            </Container>
           </Container>
           <Spacer height="8px" />
 
