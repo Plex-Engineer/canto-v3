@@ -13,6 +13,8 @@ import PopUp from "@/components/popup/popup";
 import { formatPercent } from "@/utils/formatting.utils";
 import Input from "@/components/input/input";
 import Button from "@/components/button/button";
+import Toggle from "@/components/toggle";
+import { useState } from "react";
 
 interface NewPositionModalProps {
   pool: AmbientPool;
@@ -25,8 +27,10 @@ export const NewAmbientPositionModal = ({
   const { base: baseToken, quote: quoteToken } = pool;
   const positionManager = useNewAmbientPositionManager(pool);
   const positionValidation = positionManager.txParams.validateParams();
+
+  const [showAdvanced, setShowAdvanced] = useState(false);
   return (
-    <Container>
+    <Container width={showAdvanced ? "64rem" : "32rem"}>
       <div className={styles.iconTitle}>
         <Icon icon={{ url: pool.logoURI, size: 60 }} />
         <Text size="lg" font="proto_mono">
@@ -189,6 +193,10 @@ export const NewAmbientPositionModal = ({
             </Container>
           }
         />
+        <Container>
+          <Toggle value={showAdvanced} onChange={setShowAdvanced} />
+        </Container>
+
         <ModalItem
           name="Max Execution Price: "
           value={
@@ -234,6 +242,7 @@ export const NewAmbientPositionModal = ({
       >
         Add Concentrated Liquidity
       </Button>
+      <Spacer height="30px" />
     </Container>
   );
 };
