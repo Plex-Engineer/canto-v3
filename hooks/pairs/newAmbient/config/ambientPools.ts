@@ -25,7 +25,7 @@ const MAINNET_AMBIENT_POOLS: BaseAmbientPool[] = [
     poolIdx: 36000,
     address:
       "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd-0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
-    symbol: "cNoteUSDCLP",
+    symbol: "cNOTE / USDC",
     logoURI:
       "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/LP/cNoteUSDCLP.svg",
     stable: true,

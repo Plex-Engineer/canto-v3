@@ -80,7 +80,7 @@ export async function ibcInKeplr(
   }
   // check if we can obtain the keplr client
   const { data: keplrClient, error: clientError } = await connectToKeplr(
-    cosmosNetwork
+    cosmosNetwork.chainId
   );
   if (clientError) {
     return NEW_ERROR("ibcInKeplr::" + clientError.message);

@@ -12,7 +12,7 @@ import styles from "./cantoDex.module.scss";
 import Amount from "@/components/amount/amount";
 import Tabs from "@/components/tabs/tabs";
 import { ModalItem } from "@/app/lending/components/modal/modal";
-import { greaterThan, percentOfAmount } from "@/utils/tokens/tokenMath.utils";
+import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
 import Slider from "@/components/slider/slider";
 import clsx from "clsx";
 import PopUp from "@/components/popup/popup";
