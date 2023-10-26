@@ -1,0 +1,40 @@
+.container {
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--border-stroke-color, #b3b3b3);
+  background: var(--card-background-color, #c1c1c1);
+  display: flex;
+  position: relative;
+}
+
+.bg {
+  display: block;
+  height: calc(100% - 2px);
+  background: var(--primary-90-color, #c1c1c1);
+  position: absolute;
+  top: 1px;
+  margin: 0 1.5px;
+  left: 0;
+  transition: left 0.3s ease-in-out;
+}
+
+.option {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+  cursor: pointer;
+  p {
+    color: var(--text-dark-30-color) !important;
+  }
+}
+
+.selected {
+  //   background: var(--primary-color, #000);
+  p {
+    transition: color 0.3s ease-in-out;
+
+    color: var(--text-light-color, #fff) !important;
+  }
+}

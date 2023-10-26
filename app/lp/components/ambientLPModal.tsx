@@ -52,7 +52,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
   };
 
   return (
-    <Container className={styles.container} width="32rem">
+    <Container className={styles.container}>
       <div>
         <Container
           direction="row"
@@ -189,7 +189,7 @@ const PositionList = ({
                   ),
                   18
                 )}{" "}
-                <Icon icon={{ url: "tokens/note.svg", size: 16 }} />
+                <Icon icon={{ url: "tokens/note.svg", size: 16 }} themed />
               </Text>
             </Container>
           </Container>
