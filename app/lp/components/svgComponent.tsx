@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styles from "./svgComponent.module.scss";
-import Text from "@/components/text";
 
 interface Props {
   currentPrice: string;
-  setPrice: (min: string, max: string) => void;
+  setPrice: (prices: { min?: string; max?: string }) => void;
   minPrice: string;
   maxPrice: string;
 
@@ -38,122 +37,54 @@ const SVGComponent = (props: Props) => {
     range: 0,
   });
 
-  function setRange(min: number, max: number) {
-    // set internal range
-    setSelectedRange({
-      min,
-      max,
-      range: max - min,
-    });
-    // set price on the parent component
-    props.setPrice(
-      convertGraphValueToValue(min, props.axis.x, size.width).toFixed(4),
-      convertGraphValueToValue(max, props.axis.x, size.width).toFixed(4)
-    );
-  }
-
-  function convertPointsToSvgPath(
-    axis: { x: { min: number; max: number } },
-    points: { x: number; y: number }[],
-    svgSize: { width: number; height: number }
-  ): string {
-    // sort the points and remove negative y values
-    const sortedPoints = points
-      .sort((a, b) => a.x - b.x)
-      .map((point) => ({ x: point.x, y: point.y < 0 ? 0 : point.y }));
-    // find the points within the axis as well as the points directly before and after axis
-    const firstIndex = sortedPoints.findIndex((point) => point.x >= axis.x.min);
-    const lastIndex = sortedPoints.findIndex((point) => point.x >= axis.x.max);
-    const pointsWithinAxis = sortedPoints.slice(
-      firstIndex,
-      lastIndex !== -1 ? lastIndex : undefined
-    );
-
-    // if no points within axis, return empty string before doing any operations
-    if (pointsWithinAxis.length === 0) return "";
-
-    // find the min and max y values
-    const yMin = Math.min(...pointsWithinAxis.map((point) => point.y));
-    const yMax = Math.max(...pointsWithinAxis.map((point) => point.y));
-
-    // initialize path string
-    let path = "";
-
-    // add first points to graph (before axis or zero)
-    if (firstIndex === 0) {
-      // no points before axis, create vertical line staight down to zero and to the beginning of the graph
-      path += `0,${svgSize.height}, ${convertValueToGraphValue(
-        pointsWithinAxis[0].x,
-        axis.x,
-        svgSize.width
-      )},${svgSize.height} `;
-    } else if (firstIndex > 0) {
-      // there is a point before the axis, connect this point to the beginning of the graph, but from zero
-      const slope =
-        (pointsWithinAxis[0].y - sortedPoints[firstIndex - 1].y) /
-        (pointsWithinAxis[0].x - sortedPoints[firstIndex - 1].x);
-      const pointAtAxis =
-        pointsWithinAxis[0].y - slope * (pointsWithinAxis[0].x - axis.x.min);
-      path += `0,${svgSize.height}, 0,${convertValueToGraphValue(
-        pointAtAxis,
-        axis.x,
-        svgSize.width
-      )} `;
-    }
-
-    for (const point of pointsWithinAxis) {
-      // get correct graph value for x and y to go into svg graph
-      const x = convertValueToGraphValue(point.x, axis.x, svgSize.width);
-      const y = convertValueToGraphValue(
-        point.y,
-        {
-          min: yMin,
-          max: yMax,
-        },
-        svgSize.height
-      );
-
-      // invert y to get graph flipped
-      path += `${x},${svgSize.height - y} `;
-    }
-
-    // add last points to graph (after axis or zero)
-    if (lastIndex === -1) {
-      // no points after axis, create vertical line staight down to zero and to the end of the graph
-      path += `${convertValueToGraphValue(
-        pointsWithinAxis[pointsWithinAxis.length - 1].x,
-        axis.x,
-        svgSize.width
-      )}, ${svgSize.height}, ${svgSize.width},${svgSize.height} `;
-    } else {
-      // there is a point after the axis, connect this point to the end of the graph, but from zero
-      const slope =
-        (sortedPoints[lastIndex].y -
-          pointsWithinAxis[pointsWithinAxis.length - 1].y) /
-        (sortedPoints[lastIndex].x -
-          pointsWithinAxis[pointsWithinAxis.length - 1].x);
-      const pointAtAxis =
-        pointsWithinAxis[pointsWithinAxis.length - 1].y +
-        slope * (axis.x.max - pointsWithinAxis[pointsWithinAxis.length - 1].x);
-      path += `${svgSize.width},${convertValueToGraphValue(
-        pointAtAxis,
-        axis.x,
-        svgSize.width
-      )} ${svgSize.width},${svgSize.height} `;
-    }
-
-    return path;
-  }
-
   React.useEffect(() => {
     if (!leftLine.current) return;
     if (!rightLine.current) return;
 
-    groupDrag(leftLine.current, -5);
-    groupDrag(rightLine.current, 5);
+    groupDrag(leftLine.current, -5, true);
+    groupDrag(rightLine.current, 5, false);
   }, []);
 
-  function groupDrag(group: any, offsetX: number) {
+  React.useEffect(() => {
+    if (!leftLine.current) return;
+    if (!rightLine.current) return;
+    // get svgPoint from prices and set lines
+    const svgMin = convertValueToGraphValue(
+      Number(props.minPrice),
+      props.axis.x,
+      size.width
+    );
+    moveRangeLine(leftLine.current, svgMin, 0);
+    const svgMax = convertValueToGraphValue(
+      Number(props.maxPrice),
+      props.axis.x,
+      size.width
+    );
+    moveRangeLine(rightLine.current, svgMax, 0);
+  }, [props.minPrice, props.maxPrice]);
+
+  function setPrice() {
+    function getTranslateX(element: any) {
+      var style = window.getComputedStyle(element);
+      var matrix = new WebKitCSSMatrix(style.transform);
+      //   console.log("translateX: ", matrix.m41);
+      return matrix.m41;
+    }
+    const xMin = getTranslateX(leftLine.current);
+    const xMax = getTranslateX(rightLine.current);
+
+    props.setPrice({
+      min: convertGraphValueToValue(xMin, props.axis.x, size.width).toFixed(4),
+      max: convertGraphValueToValue(xMax, props.axis.x, size.width).toFixed(4),
+    });
+  }
+
+  function moveRangeLine(group: any, svgPoint: number, offsetX: number) {
+    group.setAttribute("transform", `translate(${svgPoint - offsetX},20)`);
+    moveSelectedRangeBox();
+  }
+
+  function groupDrag(group: any, offsetX: number, isMinLine: boolean) {
     const offset: any = {
       x: 0,
       y: 0,
@@ -169,14 +100,16 @@ const SVGComponent = (props: Props) => {
       const svgP = pt.matrixTransform(
         group.ownerSVGElement.getScreenCTM()?.inverse()
       );
+      moveRangeLine(group, svgP.x, offsetX);
+      setPrice();
 
-      //   move svg group
-      group.setAttribute(
-        "transform",
-        // `translateX(${svgP.x - offset.x})`
-        `translate(${svgP.x - offsetX},20)`
-      );
-      moveSelectedRangeBox();
+      // //   move svg group
+      // group.setAttribute(
+      //   "transform",
+      //   // `translateX(${svgP.x - offset.x})`
+      //   `translate(${svgP.x - offsetX},20)`
+      // );
+      // moveSelectedRangeBox();
     };
 
     const onMouseUp = () => {
@@ -185,15 +118,15 @@ const SVGComponent = (props: Props) => {
     };
 
     const onMouseDown = (e: MouseEvent) => {
-      const pt = group.ownerSVGElement?.createSVGPoint();
-      if (!pt) return;
-      pt.x = e.clientX;
-      pt.y = e.clientY;
-      const svgP = pt.matrixTransform(
-        group.ownerSVGElement.getScreenCTM()?.inverse()
-      );
-      //  offset = mouse position - group translate position
-      offset.x = svgP.x - Number(group.getAttribute("translateX"));
+      // const pt = group.ownerSVGElement?.createSVGPoint();
+      // if (!pt) return;
+      // pt.x = e.clientX;
+      // pt.y = e.clientY;
+      // const svgP = pt.matrixTransform(
+      //   group.ownerSVGElement.getScreenCTM()?.inverse()
+      // );
+      // //  offset = mouse position - group translate position
+      // offset.x = svgP.x - Number(group.getAttribute("translateX"));
 
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
@@ -214,20 +147,14 @@ const SVGComponent = (props: Props) => {
       return matrix.m41;
     }
 
-    const x = getTranslateX(leftLine.current);
-    const boxSize = getTranslateX(rightLine.current) - x;
+    const xMin = getTranslateX(leftLine.current);
+    const xMax = getTranslateX(rightLine.current);
 
     setSelectedRange({
-      min: x,
-      max: x + boxSize,
-      range: boxSize,
+      min: xMin,
+      max: xMax,
+      range: xMax - xMin,
     });
-    convertGraphValueToValue(x, props.axis.x, size.width);
-    // set price on the parent component
-    props.setPrice(
-      convertGraphValueToValue(x, props.axis.x, size.width).toFixed(4),
-      convertGraphValueToValue(x + boxSize, props.axis.x, size.width).toFixed(4)
-    );
   }
 
   return (
@@ -279,8 +206,8 @@ const SVGComponent = (props: Props) => {
               <text
                 x={-40 + 30 / 2}
                 y={-30 + 14 / 2}
-                dominant-baseline="middle"
-                text-anchor="middle"
+                dominantBaseline="middle"
+                textAnchor="middle"
               >
                 {convertGraphValueToValue(
                   selectedRange.min,
@@ -314,8 +241,8 @@ const SVGComponent = (props: Props) => {
               <text
                 x={10 + 30 / 2}
                 y={-30 + 14 / 2}
-                dominant-baseline="middle"
-                text-anchor="middle"
+                dominantBaseline="middle"
+                textAnchor="middle"
               >
                 {convertGraphValueToValue(
                   selectedRange.max,
@@ -348,6 +275,98 @@ function convertGraphValueToValue(
   axisLength: number
 ): number {
   return (graphValue / axisLength) * (axis.max - axis.min) + axis.min;
+}
+function convertPointsToSvgPath(
+  axis: { x: { min: number; max: number } },
+  points: { x: number; y: number }[],
+  svgSize: { width: number; height: number }
+): string {
+  // sort the points and remove negative y values
+  const sortedPoints = points
+    .sort((a, b) => a.x - b.x)
+    .map((point) => ({ x: point.x, y: point.y < 0 ? 0 : point.y }));
+  // find the points within the axis as well as the points directly before and after axis
+  const firstIndex = sortedPoints.findIndex((point) => point.x >= axis.x.min);
+  const lastIndex = sortedPoints.findIndex((point) => point.x >= axis.x.max);
+  const pointsWithinAxis = sortedPoints.slice(
+    firstIndex,
+    lastIndex !== -1 ? lastIndex : undefined
+  );
+
+  // if no points within axis, return empty string before doing any operations
+  if (pointsWithinAxis.length === 0) return "";
+
+  // find the min and max y values
+  const yMin = Math.min(...pointsWithinAxis.map((point) => point.y));
+  const yMax = Math.max(...pointsWithinAxis.map((point) => point.y));
+
+  // initialize path string
+  let path = "";
+
+  // add first points to graph (before axis or zero)
+  if (firstIndex === 0) {
+    // no points before axis, create vertical line staight down to zero and to the beginning of the graph
+    path += `0,${svgSize.height}, ${convertValueToGraphValue(
+      pointsWithinAxis[0].x,
+      axis.x,
+      svgSize.width
+    )},${svgSize.height} `;
+  } else if (firstIndex > 0) {
+    // there is a point before the axis, connect this point to the beginning of the graph, but from zero
+    const slope =
+      (pointsWithinAxis[0].y - sortedPoints[firstIndex - 1].y) /
+      (pointsWithinAxis[0].x - sortedPoints[firstIndex - 1].x);
+    const pointAtAxis =
+      pointsWithinAxis[0].y - slope * (pointsWithinAxis[0].x - axis.x.min);
+    path += `0,${svgSize.height}, 0,${convertValueToGraphValue(
+      pointAtAxis,
+      axis.x,
+      svgSize.width
+    )} `;
+  }
+
+  for (const point of pointsWithinAxis) {
+    // get correct graph value for x and y to go into svg graph
+    const x = convertValueToGraphValue(point.x, axis.x, svgSize.width);
+    const y = convertValueToGraphValue(
+      point.y,
+      {
+        min: yMin,
+        max: yMax,
+      },
+      svgSize.height
+    );
+
+    // invert y to get graph flipped
+    path += `${x},${svgSize.height - y} `;
+  }
+
+  // add last points to graph (after axis or zero)
+  if (lastIndex === -1) {
+    // no points after axis, create vertical line staight down to zero and to the end of the graph
+    path += `${convertValueToGraphValue(
+      pointsWithinAxis[pointsWithinAxis.length - 1].x,
+      axis.x,
+      svgSize.width
+    )}, ${svgSize.height}, ${svgSize.width},${svgSize.height} `;
+  } else {
+    // there is a point after the axis, connect this point to the end of the graph, but from zero
+    const slope =
+      (sortedPoints[lastIndex].y -
+        pointsWithinAxis[pointsWithinAxis.length - 1].y) /
+      (sortedPoints[lastIndex].x -
+        pointsWithinAxis[pointsWithinAxis.length - 1].x);
+    const pointAtAxis =
+      pointsWithinAxis[pointsWithinAxis.length - 1].y +
+      slope * (axis.x.max - pointsWithinAxis[pointsWithinAxis.length - 1].x);
+    path += `${svgSize.width},${convertValueToGraphValue(
+      pointAtAxis,
+      axis.x,
+      svgSize.width
+    )} ${svgSize.width},${svgSize.height} `;
+  }
+
+  return path;
 }
 
 export default SVGComponent;

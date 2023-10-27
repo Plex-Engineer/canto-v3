@@ -259,8 +259,8 @@ export const NewAmbientPositionModal = ({
                 currentPrice={formatBalance(pool.stats.lastPriceSwap, -12)}
                 minPrice={positionManager.options.minRangePrice}
                 maxPrice={positionManager.options.maxRangePrice}
-                setPrice={(min, max) =>
-                  positionManager.setters.setRangePrice({ min, max })
+                setPrice={(prices) =>
+                  positionManager.setters.setRangePrice(prices)
                 }
               />
             </div>
