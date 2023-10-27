@@ -20,13 +20,13 @@ const SVGComponent = ({ points }: Props) => {
   const selectedRangeBox = React.useRef<any>(null);
 
   const [selectedRange, setSelectedRange] = React.useState<{
-    x: number;
-    y: number;
-    size: number;
+    min: number;
+    max: number;
+    range: number;
   }>({
-    y: 0,
-    x: 0,
-    size: 0,
+    max: 0,
+    min: 0,
+    range: 0,
   });
 
   function convertToPath(
@@ -144,106 +144,14 @@ const SVGComponent = ({ points }: Props) => {
     }
 
     const x = getTranslateX(leftLine.current);
-    const y = 0;
     const size = getTranslateX(rightLine.current) - x;
 
     setSelectedRange({
-      x,
-      y,
-      size,
+      min: x,
+      max: x + size,
+      range: size,
     });
   }
-
-  //   function lineDrag(line: any) {
-  //     const offset = {
-  //       x: 0,
-  //       y: 0,
-  //     };
-  //     // move line svg with mouse when dragged on x axis
-  //     const onMouseMove = (e: MouseEvent) => {
-  //       //   convert global mouse position to svg coordinates
-  //       const pt = line.ownerSVGElement?.createSVGPoint();
-  //       if (!pt) return;
-  //       pt.x = e.clientX;
-  //       pt.y = e.clientY;
-  //       const svgP = pt.matrixTransform(
-  //         line.ownerSVGElement.getScreenCTM()?.inverse()
-  //       );
-
-  //       //   move svg line
-  //       line.setAttribute("x1", `${svgP.x - offset.x}`);
-  //       line.setAttribute("x2", `${svgP.x - offset.x}`);
-  //     };
-
-  //     const onMouseUp = () => {
-  //       document.removeEventListener("mousemove", onMouseMove);
-  //       document.removeEventListener("mouseup", onMouseUp);
-  //     };
-
-  //     const onMouseDown = (e: MouseEvent) => {
-  //       const pt = line.ownerSVGElement?.createSVGPoint();
-  //       if (!pt) return;
-  //       pt.x = e.clientX;
-  //       pt.y = e.clientY;
-  //       const svgP = pt.matrixTransform(
-  //         line.ownerSVGElement.getScreenCTM()?.inverse()
-  //       );
-  //       //  offset = mouse position - line position
-  //       offset.x = svgP.x - Number(line.getAttribute("x1"));
-  //       //   offset.y = svgP.y - Number(line.getAttribute("cy"));
-  //       document.addEventListener("mousemove", onMouseMove);
-  //       document.addEventListener("mouseup", onMouseUp);
-  //     };
-
-  //     line.addEventListener("mousedown", onMouseDown);
-  //   }
-
-  //   function circleDrag() {
-  //     if (!ref.current) return;
-
-  //     const circle = ref.current;
-  //     const offset = {
-  //       x: 0,
-  //       y: 0,
-  //     };
-  //     // move circle svg with mouse when dragged
-  //     const onMouseMove = (e: MouseEvent) => {
-  //       //   convert global mouse position to svg coordinates
-  //       const pt = circle.ownerSVGElement?.createSVGPoint();
-  //       if (!pt) return;
-  //       pt.x = e.clientX;
-  //       pt.y = e.clientY;
-  //       const svgP = pt.matrixTransform(
-  //         circle.ownerSVGElement.getScreenCTM()?.inverse()
-  //       );
-
-  //       //   move svg circle
-  //       circle.setAttribute("cx", `${svgP.x - offset.x}`);
-  //       circle.setAttribute("cy", `${svgP.y - offset.y}`);
-  //     };
-
-  //     const onMouseUp = () => {
-  //       document.removeEventListener("mousemove", onMouseMove);
-  //       document.removeEventListener("mouseup", onMouseUp);
-  //     };
-
-  //     const onMouseDown = (e: MouseEvent) => {
-  //       const pt = circle.ownerSVGElement?.createSVGPoint();
-  //       if (!pt) return;
-  //       pt.x = e.clientX;
-  //       pt.y = e.clientY;
-  //       const svgP = pt.matrixTransform(
-  //         circle.ownerSVGElement.getScreenCTM()?.inverse()
-  //       );
-  //       //  offset = mouse position - circle position
-  //       offset.x = svgP.x - Number(circle.getAttribute("cx"));
-  //       //   offset.y = svgP.y - Number(circle.getAttribute("cy"));
-  //       document.addEventListener("mousemove", onMouseMove);
-  //       document.addEventListener("mouseup", onMouseUp);
-  //     };
-
-  //     circle.addEventListener("mousedown", onMouseDown);
-  //   }
 
   return (
     <>
@@ -254,7 +162,7 @@ const SVGComponent = ({ points }: Props) => {
         }}
       >
         <Text size="sm">
-          Selected Range : {selectedRange.size.toFixed(0) + "%"}
+          Selected Range : {selectedRange.range.toFixed(0) + "%"}
         </Text>
       </div>
       <div
@@ -264,6 +172,7 @@ const SVGComponent = ({ points }: Props) => {
         }}
       >
         <svg viewBox="0 0 200 100" className={styles.svg}>
+          {/* graph points */}
           <polyline
             points={convertToPath(points)}
             stroke="black"
@@ -271,18 +180,16 @@ const SVGComponent = ({ points }: Props) => {
             strokeWidth="1"
             className={styles.polyline}
           />
-          <view id="two" viewBox="100 0 100 100" />
 
-          {/* <rect x="40" y="-14" width="40" height="128" fill="#06FC9933" /> */}
           <rect
-            x={selectedRange.x}
-            y={selectedRange.y}
-            width={selectedRange.size}
-            height="128"
+            x={selectedRange.min}
+            y={-20}
+            width={selectedRange.range}
+            height="140"
             fill="#06FC9933"
             ref={selectedRangeBox}
           />
-
+          {/* min range slider */}
           <g transform="translate(40,20)" ref={leftLine}>
             <line
               x1="0"
@@ -308,10 +215,11 @@ const SVGComponent = ({ points }: Props) => {
                 dominant-baseline="middle"
                 text-anchor="middle"
               >
-                {selectedRange.x.toFixed(0) + "%"}
+                {selectedRange.min.toFixed(0) + "%"}
               </text>
             </g>
           </g>
+          {/* max range slider */}
           <g transform="translate(80,20)" ref={rightLine}>
             <line
               x1="0"
@@ -338,7 +246,7 @@ const SVGComponent = ({ points }: Props) => {
                 dominant-baseline="middle"
                 text-anchor="middle"
               >
-                {(selectedRange.size + selectedRange.x).toFixed(0) + "%"}
+                {(selectedRange.range + selectedRange.min).toFixed(0) + "%"}
               </text>
             </g>
           </g>
