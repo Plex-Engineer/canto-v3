@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AmbientPool } from "../interfaces/ambientPools";
 import {
+  TickRangeKey,
   UserAddConcentratedLiquidityOptions,
   defaultAddConcentratedLiquidtyParams,
 } from "./defaultParams";
@@ -32,8 +33,10 @@ export default function useNewAmbientPositionManager(pool: AmbientPool) {
   /** EXTERNAL STATE WITH USER OPTIONS */
   const [userInputs, setUserInputs] =
     useState<UserAddConcentratedLiquidityOptions>(
-      defaultAddConcentratedLiquidtyParams(pool)
+      defaultAddConcentratedLiquidtyParams(pool, "DEFAULT")
     );
+
+  /** INTERNAL FUNCTIONS */
 
   // partial state setter for external state
   function setState(newState: Partial<UserAddConcentratedLiquidityOptions>) {
@@ -52,6 +55,11 @@ export default function useNewAmbientPositionManager(pool: AmbientPool) {
   }
 
   /** USER UPDATE FUNCTIONS */
+
+  // function to set range to one of the default options
+  function setDefaultParams(range: TickRangeKey) {
+    setState(defaultAddConcentratedLiquidtyParams(pool, range));
+  }
 
   // function to set execution price (will not update any other values)
   function setUserExecutionPrice(price: string, isMin: boolean) {
@@ -82,11 +90,11 @@ export default function useNewAmbientPositionManager(pool: AmbientPool) {
   }
 
   // accepts user input for price and sets new amounts from price
-  function setUserRangePrice(price: string, isMin: boolean) {
+  function setUserRangePrice(prices: { min?: string; max?: string }) {
     // get new amount from prices
     const lastUpdateBase = userInputs.lastUpdated === "base";
-    const minPrice = isMin ? price : userInputs.minRangePrice;
-    const maxPrice = isMin ? userInputs.maxRangePrice : price;
+    const minPrice = prices.min ?? userInputs.minRangePrice;
+    const maxPrice = prices.max ?? userInputs.maxRangePrice;
     const newWeiPrices = getWeiRangePrices(minPrice, maxPrice);
     // amount
     const amount = getDisplayTokenAmountFromRange(
@@ -158,11 +166,11 @@ export default function useNewAmbientPositionManager(pool: AmbientPool) {
         "Maximum execution price is less than current price"
       );
     }
-    if (Number(txParams.minPriceWei) > Number(txParams.maxPriceWei)) {
+    if (Number(txParams.minPriceWei) >= Number(txParams.maxPriceWei)) {
       return invalidParams("Minimum execution price is greater than maximum");
     }
     // ticks
-    if (txParams.lowerTick > txParams.upperTick) {
+    if (txParams.lowerTick >= txParams.upperTick) {
       return invalidParams("Lower price is greater than upper price");
     }
     if (txParams.lowerTick > currentTick || txParams.upperTick < currentTick) {
@@ -217,6 +225,7 @@ export default function useNewAmbientPositionManager(pool: AmbientPool) {
       setExecutionPrice: setUserExecutionPrice,
       setAmount: setUserAmount,
       setRangePrice: setUserRangePrice,
+      setDefaultParams,
     },
     txParams: {
       validateParams,

@@ -14,10 +14,16 @@ import { formatPercent } from "@/utils/formatting.utils";
 import Input from "@/components/input/input";
 import Button from "@/components/button/button";
 import Toggle from "@/components/toggle";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ToggleGroup from "@/components/ToggleGroup/ToggleGroup";
 import Price from "@/components/price/price";
 import SVGComponent from "../svgComponent";
+import {
+  ALL_TICK_KEYS,
+  TickRangeKey,
+} from "@/hooks/pairs/newAmbient/liquidityControllers/defaultParams";
+import { queryAmbientPoolLiquidityCurve } from "@/hooks/pairs/newAmbient/helpers/ambientApi";
+import { convertLiquidityCurveToGraph } from "@/utils/ambient/graphing.utils";
 
 interface NewPositionModalProps {
   pool: AmbientPool;
@@ -31,8 +37,31 @@ export const NewAmbientPositionModal = ({
   const positionManager = useNewAmbientPositionManager(pool);
   const positionValidation = positionManager.txParams.validateParams();
 
+  // modal options
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("Default");
+  const [selectedOption, setSelectedOption] = useState<TickRangeKey>("DEFAULT");
+  function setDefaultParams(tickKey: TickRangeKey) {
+    setSelectedOption(tickKey);
+    positionManager.setters.setDefaultParams(tickKey);
+  }
+  // liquidity graph
+  const [graphPoints, setGraphPoints] = useState<{ x: string; y: number }[]>(
+    []
+  );
+  useEffect(() => {
+    async function getGraph() {
+      const { data: curve, error } = await queryAmbientPoolLiquidityCurve(
+        pool.base.chainId,
+        pool.base.address,
+        pool.quote.address,
+        pool.poolIdx
+      );
+      if (error) console.log(error);
+      setGraphPoints(convertLiquidityCurveToGraph(pool, curve));
+    }
+    getGraph();
+  }, [pool]);
+
   return (
     <Container width={showAdvanced ? "64rem" : "32rem"}>
       <Container direction="row" gap={20}>
@@ -154,7 +183,6 @@ export const NewAmbientPositionModal = ({
             below is selected for optimal rewards. Rewards will be released in
             weekly epochs.
           </Text>
-
           <Spacer height="8px" />
 
           {!showAdvanced && (
@@ -176,12 +204,11 @@ export const NewAmbientPositionModal = ({
                       height={"sm"}
                       type="number"
                       value={positionManager.options.minRangePrice}
-                      onChange={(e) => {
-                        positionManager.setters.setRangePrice(
-                          e.target.value,
-                          true
-                        );
-                      }}
+                      onChange={(e) =>
+                        positionManager.setters.setRangePrice({
+                          min: e.target.value,
+                        })
+                      }
                     />
                   </Container>
                 }
@@ -203,97 +230,34 @@ export const NewAmbientPositionModal = ({
                       height={"sm"}
                       type="number"
                       value={positionManager.options.maxRangePrice}
-                      onChange={(e) => {
-                        positionManager.setters.setRangePrice(
-                          e.target.value,
-                          false
-                        );
-                      }}
-                    />
-                  </Container>
-                }
-              />
-              <ModalItem
-                name="Min Execution Price: "
-                value={
-                  <Container
-                    center={{
-                      vertical: true,
-                    }}
-                    gap={10}
-                    direction="row"
-                    style={{
-                      width: "100px",
-                    }}
-                  >
-                    <Input
-                      height={"sm"}
-                      type="number"
-                      value={positionManager.options.minExecutionPrice}
-                      onChange={(e) => {
-                        positionManager.setters.setExecutionPrice(
-                          e.target.value,
-                          true
-                        );
-                      }}
-                    />
-                  </Container>
-                }
-              />
-
-              <ModalItem
-                name="Max Execution Price: "
-                value={
-                  <Container
-                    center={{
-                      vertical: true,
-                    }}
-                    gap={10}
-                    direction="row"
-                    style={{
-                      width: "100px",
-                    }}
-                  >
-                    <Input
-                      height={"sm"}
-                      type="number"
-                      value={positionManager.options.maxExecutionPrice}
-                      onChange={(e) => {
-                        positionManager.setters.setExecutionPrice(
-                          e.target.value,
-                          false
-                        );
-                      }}
+                      onChange={(e) =>
+                        positionManager.setters.setRangePrice({
+                          max: e.target.value,
+                        })
+                      }
                     />
                   </Container>
                 }
               />
             </Container>
           )}
-          <Spacer height="8px" />
-          <Text
-            style={{
-              opacity: !positionValidation.isValid ? 1 : 0,
-              color: "var(--extra-failure-color, #ff0000)",
-            }}
-            size="x-sm"
-          >
-            {positionValidation.errorMessage}
-          </Text>
         </Container>
+
         {showAdvanced && (
           <Container className={styles.advancedContainer}>
             <Text>Set Price Range</Text>
 
             <Spacer height="8px" />
             <div className={styles.priceRanger}>
-              <SVGComponent />
+              <SVGComponent points={graphPoints} />
             </div>
             <Spacer height="8px" />
             <ToggleGroup
-              options={["Default", "Narrow", "Wide", "Custom"]}
+              options={ALL_TICK_KEYS}
               selected={selectedOption}
-              setSelected={setSelectedOption}
+              setSelected={(tickKey) =>
+                setDefaultParams(tickKey as TickRangeKey)
+              }
             />
             <Spacer height="16px" />
             <Container direction="row">
@@ -301,7 +265,7 @@ export const NewAmbientPositionModal = ({
                 title="Min Range Price"
                 price={positionManager.options.minRangePrice}
                 onPriceChange={(price) => {
-                  positionManager.setters.setRangePrice(price, true);
+                  positionManager.setters.setRangePrice({ min: price });
                 }}
                 description={pool.base.symbol + " per " + pool.quote.symbol}
               />
@@ -310,7 +274,7 @@ export const NewAmbientPositionModal = ({
                 title="Max Range Price"
                 price={positionManager.options.maxRangePrice}
                 onPriceChange={(price) => {
-                  positionManager.setters.setRangePrice(price, false);
+                  positionManager.setters.setRangePrice({ max: price });
                 }}
                 description={pool.base.symbol + " per " + pool.quote.symbol}
               />
