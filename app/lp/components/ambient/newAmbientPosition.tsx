@@ -7,7 +7,7 @@ import useNewAmbientPositionManager from "@/hooks/pairs/newAmbient/liquidityCont
 import Container from "@/components/container/container";
 import Amount from "@/components/amount/amount";
 import Spacer from "@/components/layout/spacer";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount, formatBalance } from "@/utils/tokenBalances.utils";
 import { ModalItem } from "@/app/lending/components/modal/modal";
 import PopUp from "@/components/popup/popup";
 import { formatPercent } from "@/utils/formatting.utils";
@@ -246,10 +246,22 @@ export const NewAmbientPositionModal = ({
         {showAdvanced && (
           <Container className={styles.advancedContainer}>
             <Text>Set Price Range</Text>
-
             <Spacer height="8px" />
             <div className={styles.priceRanger}>
-              <SVGComponent points={graphPoints} />
+              <SVGComponent
+                points={graphPoints}
+                currentPrice={formatBalance(pool.stats.lastPriceSwap, -12)}
+                min={{
+                  value: positionManager.options.minRangePrice,
+                  onChange: (value) =>
+                    positionManager.setters.setRangePrice({ min: value }),
+                }}
+                max={{
+                  value: positionManager.options.maxRangePrice,
+                  onChange: (value) =>
+                    positionManager.setters.setRangePrice({ max: value }),
+                }}
+              />
             </div>
             <Spacer height="8px" />
             <ToggleGroup

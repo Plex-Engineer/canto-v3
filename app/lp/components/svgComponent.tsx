@@ -4,6 +4,15 @@ import Text from "@/components/text";
 
 interface Props {
   points: { x: string; y: number }[];
+  currentPrice: string;
+  min: {
+    value: string;
+    onChange: (value: string) => void;
+  };
+  max: {
+    value: string;
+    onChange: (value: string) => void;
+  };
 }
 const SVGComponent = ({ points }: Props) => {
   const leftLine = React.useRef<any>(null);
