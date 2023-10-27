@@ -16,6 +16,7 @@ import Button from "@/components/button/button";
 import Toggle from "@/components/toggle";
 import { useState } from "react";
 import ToggleGroup from "@/components/ToggleGroup/ToggleGroup";
+import Price from "@/components/price/price";
 
 interface NewPositionModalProps {
   pool: AmbientPool;
@@ -35,6 +36,31 @@ export const NewAmbientPositionModal = ({
     <Container width={showAdvanced ? "64rem" : "32rem"}>
       <Container direction="row" gap={20}>
         <Container>
+          <Container
+            direction="row"
+            gap={"auto"}
+            center={{
+              horizontal: true,
+              vertical: true,
+            }}
+            width="100%"
+          >
+            <Text size="lg">Deposit Amounts</Text>
+            <Container
+              direction="row"
+              center={{
+                horizontal: true,
+                vertical: true,
+              }}
+              gap={10}
+            >
+              <Text theme="secondary-dark" size="x-sm">
+                Advanced
+              </Text>{" "}
+              <Toggle value={showAdvanced} onChange={setShowAdvanced} />
+            </Container>
+          </Container>
+          <Spacer height="10px" />
           <div className={styles.iconTitle}>
             <Icon icon={{ url: pool.logoURI, size: 60 }} />
             <Text size="lg" font="proto_mono">
@@ -42,7 +68,7 @@ export const NewAmbientPositionModal = ({
             </Text>
           </div>
 
-          <Spacer height="4px" />
+          <Spacer height="10px" />
           <Amount
             decimals={baseToken.decimals}
             value={positionManager.options.amountBase}
@@ -54,7 +80,7 @@ export const NewAmbientPositionModal = ({
             max={baseToken.balance ?? "0"}
             symbol={baseToken.symbol}
           />
-          <Spacer height="10px" />
+          <Spacer height="12px" />
           <Amount
             decimals={quoteToken.decimals}
             value={positionManager.options.amountQuote}
@@ -66,7 +92,7 @@ export const NewAmbientPositionModal = ({
             max={quoteToken.balance ?? "0"}
             symbol={quoteToken.symbol}
           />
-          <Spacer height="10px" />
+          <Spacer height="20px" />
           <Container className={styles.card}>
             <ModalItem
               name="Current Price"
@@ -127,27 +153,7 @@ export const NewAmbientPositionModal = ({
             below is selected for optimal rewards. Rewards will be released in
             weekly epochs.
           </Text>
-          <Spacer height="8px" />
-          <Container direction="row" gap={20}>
-            <ToggleGroup
-              options={["Default", "Narrow", "Wide"]}
-              selected={selectedOption}
-              setSelected={setSelectedOption}
-            />
-            <Container
-              direction="row"
-              gap={10}
-              center={{
-                horizontal: true,
-                vertical: true,
-              }}
-            >
-              <Text theme="secondary-dark" size="x-sm">
-                Advanced
-              </Text>{" "}
-              <Toggle value={showAdvanced} onChange={setShowAdvanced} />
-            </Container>
-          </Container>
+
           <Spacer height="8px" />
 
           <Container className={styles.card}>
@@ -261,6 +267,7 @@ export const NewAmbientPositionModal = ({
               }
             />
           </Container>
+          <Spacer height="8px" />
           <Text
             style={{
               opacity: !positionValidation.isValid ? 1 : 0,
@@ -274,22 +281,35 @@ export const NewAmbientPositionModal = ({
         {showAdvanced && (
           <Container className={styles.advancedContainer}>
             <Text>Set Price Range</Text>
-            <Text size="x-sm">
-              Current Price :{" "}
-              {displayAmount(
-                pool.stats.lastPriceSwap.toString(),
-                pool.base.decimals - pool.quote.decimals,
-                {
-                  precision: 3,
-                }
-              ) +
-                " " +
-                pool.base.symbol +
-                " = 1 " +
-                pool.quote.symbol}
-            </Text>
+
             <Spacer height="8px" />
             <div className={styles.priceRanger}></div>
+            <Spacer height="8px" />
+            <ToggleGroup
+              options={["Default", "Narrow", "Wide", "Custom"]}
+              selected={selectedOption}
+              setSelected={setSelectedOption}
+            />
+            <Spacer height="16px" />
+            <Container direction="row">
+              <Price
+                title="Min Range Price"
+                price={positionManager.options.minRangePrice}
+                onPriceChange={(price) => {
+                  positionManager.setters.setRangePrice(price, true);
+                }}
+                description={pool.base.symbol + " per " + pool.quote.symbol}
+              />
+              <Spacer width="32px" />
+              <Price
+                title="Max Range Price"
+                price={positionManager.options.maxRangePrice}
+                onPriceChange={(price) => {
+                  positionManager.setters.setRangePrice(price, false);
+                }}
+                description={pool.base.symbol + " per " + pool.quote.symbol}
+              />
+            </Container>
           </Container>
         )}
       </Container>

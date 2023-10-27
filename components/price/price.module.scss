@@ -3,4 +3,42 @@
   border: 1px solid #c1c1c1;
   background: #d9d9d9;
   display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  gap: 10px;
+  cursor: text;
+
+  &:hover:not(.focused) {
+    outline: 1px solid rgba(var(--dark-color), 0.8);
+    background-color: rgba(var(--dark-color), 0.08);
+  }
+}
+
+.focused {
+  outline: 2px solid rgba(var(--dark-color), 0.8);
+  background-color: rgba(var(--dark-color), 0.08);
+}
+
+.input {
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  text-align: right;
+  font-family: var(--rm-mono);
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 130%; /* 31.2px */
+  letter-spacing: -0.96px;
+  color: var(--primary-90-color, #222);
+  text-align: center;
+  &:focus {
+    outline: none;
+  }
+  &::placeholder {
+    color: var(--text-dark-40-color, rgba(17, 17, 17, 0.4));
+  }
 }
