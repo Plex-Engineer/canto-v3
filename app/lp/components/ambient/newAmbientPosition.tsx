@@ -45,7 +45,7 @@ export const NewAmbientPositionModal = ({
     positionManager.setters.setDefaultParams(tickKey);
   }
   // liquidity graph
-  const [graphPoints, setGraphPoints] = useState<{ x: string; y: number }[]>(
+  const [graphPoints, setGraphPoints] = useState<{ x: number; y: number }[]>(
     []
   );
   useEffect(() => {
@@ -251,22 +251,17 @@ export const NewAmbientPositionModal = ({
               <SVGComponent
                 axis={{
                   x: {
-                    min: 0.995,
-                    max: 1.005,
+                    min: 0.988,
+                    max: 1.01,
                   },
                 }}
                 points={graphPoints}
                 currentPrice={formatBalance(pool.stats.lastPriceSwap, -12)}
-                min={{
-                  value: positionManager.options.minRangePrice,
-                  onChange: (value) =>
-                    positionManager.setters.setRangePrice({ min: value }),
-                }}
-                max={{
-                  value: positionManager.options.maxRangePrice,
-                  onChange: (value) =>
-                    positionManager.setters.setRangePrice({ max: value }),
-                }}
+                minPrice={positionManager.options.minRangePrice}
+                maxPrice={positionManager.options.maxRangePrice}
+                setPrice={(min, max) =>
+                  positionManager.setters.setRangePrice({ min, max })
+                }
               />
             </div>
             <Spacer height="8px" />

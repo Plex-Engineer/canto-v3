@@ -3,24 +3,27 @@ import styles from "./svgComponent.module.scss";
 import Text from "@/components/text";
 
 interface Props {
-  points: { x: string; y: number }[];
+  currentPrice: string;
+  setPrice: (min: string, max: string) => void;
+  minPrice: string;
+  maxPrice: string;
+
+  points: { x: number; y: number }[];
+  // axis range
   axis: {
     x: {
       min: number;
       max: number;
     };
   };
-  currentPrice: string;
-  min: {
-    value: string;
-    onChange: (value: string) => void;
-  };
-  max: {
-    value: string;
-    onChange: (value: string) => void;
-  };
 }
-const SVGComponent = ({ points, axis }: Props) => {
+const SVGComponent = (props: Props) => {
+  // get svg sizing from props or default
+  const size = {
+    height: 114,
+    width: 200,
+  };
+
   const leftLine = React.useRef<any>(null);
   const rightLine = React.useRef<any>(null);
   const selectedRangeBox = React.useRef<any>(null);
@@ -34,99 +37,112 @@ const SVGComponent = ({ points, axis }: Props) => {
     min: 0,
     range: 0,
   });
-  // converts x,y points to svg path
-  function convertToPath(
-    points: {
-      x: string;
-      y: number;
-    }[]
-  ) {
-    // ex path="20,20 40,25 60,40"
-    // clamp y values between 0 and 100
-    // use x values length to determine how many points to show
 
-    let path = "";
-    const xLength = points.length;
-    const xSpace = 100 / xLength;
-
-    // convert y values to 0-100% range
-    const yValues = points.map((point) => point.y);
-    const yMin = Math.min(...yValues);
-    const yMax = Math.max(...yValues);
-    const yRange = yMax - yMin;
-
-    for (let i = 0; i < xLength; i++) {
-      const y = points[i].y;
-
-      let yClamped = 100 - ((yMax - y) / yRange) * 100;
-      // invert yClamped value
-      yClamped = 100 - yClamped;
-
-      path += `${xSpace * (i + 1)},${yClamped} `;
-    }
-    // convert these percentages to svg coordinates
-
-    const svgWidth = 200;
-    const svgHeight = 114;
-    const svgPath = path
-      .split(" ")
-      .map((point) => {
-        const [x, y] = point.split(",");
-        return `${(svgWidth * Number(x)) / 100},${
-          (svgHeight * Number(y)) / 100
-        }`;
-      })
-      .join(" ");
-    return svgPath;
+  function setRange(min: number, max: number) {
+    // set internal range
+    setSelectedRange({
+      min,
+      max,
+      range: max - min,
+    });
+    // set price on the parent component
+    props.setPrice(
+      convertGraphValueToValue(min, props.axis.x, size.width).toFixed(4),
+      convertGraphValueToValue(max, props.axis.x, size.width).toFixed(4)
+    );
   }
 
-  //   converts x,y points with range to svg path
-  function convertToPathWithRange(
-    range: { min: number; max: number },
-    points: { x: string; y: number }[]
-  ) {
-    // the x is price would have the range 0 to any dollar value
-    // the x will provide points for the graph and the range will provide the min and max values for the range slider
+  function convertPointsToSvgPath(
+    axis: { x: { min: number; max: number } },
+    points: { x: number; y: number }[],
+    svgSize: { width: number; height: number }
+  ): string {
+    // sort the points and remove negative y values
+    const sortedPoints = points
+      .sort((a, b) => a.x - b.x)
+      .map((point) => ({ x: point.x, y: point.y < 0 ? 0 : point.y }));
+    // find the points within the axis as well as the points directly before and after axis
+    const firstIndex = sortedPoints.findIndex((point) => point.x >= axis.x.min);
+    const lastIndex = sortedPoints.findIndex((point) => point.x >= axis.x.max);
+    const pointsWithinAxis = sortedPoints.slice(
+      firstIndex,
+      lastIndex !== -1 ? lastIndex : undefined
+    );
 
+    // if no points within axis, return empty string before doing any operations
+    if (pointsWithinAxis.length === 0) return "";
+
+    // find the min and max y values
+    const yMin = Math.min(...pointsWithinAxis.map((point) => point.y));
+    const yMax = Math.max(...pointsWithinAxis.map((point) => point.y));
+
+    // initialize path string
     let path = "";
 
-    // plot x values on range provided
-    const xValues = points.map((point) => Number(point.x));
-    const xMin = Math.min(...xValues);
-    const xMax = Math.max(...xValues);
-    const xRange = xMax - xMin;
-
-    // convert y values to 0-100% range
-    const yValues = points.map((point) => point.y);
-    const yMin = Math.min(...yValues);
-    const yMax = Math.max(...yValues);
-    const yRange = yMax - yMin;
-
-    for (let i = 0; i < xValues.length; i++) {
-      const x = xValues[i];
-      const y = points[i].y;
-
-      let xClamped = ((x - xMin) / xRange) * 100;
-      let yClamped = 100 - ((yMax - y) / yRange) * 100;
-      // invert yClamped value
-      yClamped = 100 - yClamped;
-
-      path += `${xClamped},${yClamped} `;
+    // add first points to graph (before axis or zero)
+    if (firstIndex === 0) {
+      // no points before axis, create vertical line staight down to zero and to the beginning of the graph
+      path += `0,${svgSize.height}, ${convertValueToGraphValue(
+        pointsWithinAxis[0].x,
+        axis.x,
+        svgSize.width
+      )},${svgSize.height} `;
+    } else if (firstIndex > 0) {
+      // there is a point before the axis, connect this point to the beginning of the graph, but from zero
+      const slope =
+        (pointsWithinAxis[0].y - sortedPoints[firstIndex - 1].y) /
+        (pointsWithinAxis[0].x - sortedPoints[firstIndex - 1].x);
+      const pointAtAxis =
+        pointsWithinAxis[0].y - slope * (pointsWithinAxis[0].x - axis.x.min);
+      path += `0,${svgSize.height}, 0,${convertValueToGraphValue(
+        pointAtAxis,
+        axis.x,
+        svgSize.width
+      )} `;
     }
 
-    // convert these percentages to svg coordinates
-    const svgWidth = 200;
-    const svgHeight = 114;
-    const svgPath = path
-      .split(" ")
-      .map((point) => {
-        const [x, y] = point.split(",");
-        return `${(svgWidth * Number(x)) / 100},${
-          (svgHeight * Number(y)) / 100
-        }`;
-      })
-      .join(" ");
-    return svgPath;
+    for (const point of pointsWithinAxis) {
+      // get correct graph value for x and y to go into svg graph
+      const x = convertValueToGraphValue(point.x, axis.x, svgSize.width);
+      const y = convertValueToGraphValue(
+        point.y,
+        {
+          min: yMin,
+          max: yMax,
+        },
+        svgSize.height
+      );
+
+      // invert y to get graph flipped
+      path += `${x},${svgSize.height - y} `;
+    }
+
+    // add last points to graph (after axis or zero)
+    if (lastIndex === -1) {
+      // no points after axis, create vertical line staight down to zero and to the end of the graph
+      path += `${convertValueToGraphValue(
+        pointsWithinAxis[pointsWithinAxis.length - 1].x,
+        axis.x,
+        svgSize.width
+      )}, ${svgSize.height}, ${svgSize.width},${svgSize.height} `;
+    } else {
+      // there is a point after the axis, connect this point to the end of the graph, but from zero
+      const slope =
+        (sortedPoints[lastIndex].y -
+          pointsWithinAxis[pointsWithinAxis.length - 1].y) /
+        (sortedPoints[lastIndex].x -
+          pointsWithinAxis[pointsWithinAxis.length - 1].x);
+      const pointAtAxis =
+        pointsWithinAxis[pointsWithinAxis.length - 1].y +
+        slope * (axis.x.max - pointsWithinAxis[pointsWithinAxis.length - 1].x);
+      path += `${svgSize.width},${convertValueToGraphValue(
+        pointAtAxis,
+        axis.x,
+        svgSize.width
+      )} ${svgSize.width},${svgSize.height} `;
+    }
+
+    return path;
   }
 
   React.useEffect(() => {
@@ -199,27 +215,23 @@ const SVGComponent = ({ points, axis }: Props) => {
     }
 
     const x = getTranslateX(leftLine.current);
-    const size = getTranslateX(rightLine.current) - x;
+    const boxSize = getTranslateX(rightLine.current) - x;
 
     setSelectedRange({
       min: x,
-      max: x + size,
-      range: size,
+      max: x + boxSize,
+      range: boxSize,
     });
+    convertGraphValueToValue(x, props.axis.x, size.width);
+    // set price on the parent component
+    props.setPrice(
+      convertGraphValueToValue(x, props.axis.x, size.width).toFixed(4),
+      convertGraphValueToValue(x + boxSize, props.axis.x, size.width).toFixed(4)
+    );
   }
 
   return (
     <>
-      <div
-        style={{
-          position: "absolute",
-          transform: `translate(170px,-30px)`,
-        }}
-      >
-        <Text size="sm">
-          Selected Range : {selectedRange.range.toFixed(0) + "%"}
-        </Text>
-      </div>
       <div
         style={{
           width: "100%",
@@ -229,31 +241,7 @@ const SVGComponent = ({ points, axis }: Props) => {
         <svg viewBox="0 0 200 100" className={styles.svg}>
           {/* graph points */}
           <polyline
-            points={convertToPathWithRange(
-              {
-                min: axis.x.min,
-                max: axis.x.max,
-              },
-              [
-                {
-                  x: axis.x.min.toString(),
-                  y: 0,
-                },
-                {
-                  x: points[0].x,
-                  y: 0,
-                },
-                ...points,
-                {
-                  x: points[points.length - 1].x,
-                  y: 0,
-                },
-                {
-                  x: axis.x.max.toString(),
-                  y: 0,
-                },
-              ]
-            )}
+            points={convertPointsToSvgPath(props.axis, props.points, size)}
             stroke="black"
             fill="none"
             strokeWidth="1"
@@ -294,10 +282,11 @@ const SVGComponent = ({ points, axis }: Props) => {
                 dominant-baseline="middle"
                 text-anchor="middle"
               >
-                {(
-                  (axis.x.max - axis.x.min) * (selectedRange.min / 200) +
-                  axis.x.min
-                ).toFixed(3)}
+                {convertGraphValueToValue(
+                  selectedRange.min,
+                  props.axis.x,
+                  size.width
+                ).toFixed(4)}
               </text>
             </g>
           </g>
@@ -328,7 +317,11 @@ const SVGComponent = ({ points, axis }: Props) => {
                 dominant-baseline="middle"
                 text-anchor="middle"
               >
-                {(selectedRange.range + selectedRange.min).toFixed(0) + "%"}
+                {convertGraphValueToValue(
+                  selectedRange.max,
+                  props.axis.x,
+                  size.width
+                ).toFixed(4)}
               </text>
             </g>
           </g>
@@ -337,5 +330,24 @@ const SVGComponent = ({ points, axis }: Props) => {
     </>
   );
 };
+
+///
+/// Helper functions for graph
+///
+
+function convertValueToGraphValue(
+  value: number,
+  axis: { min: number; max: number },
+  axisLength: number
+): number {
+  return ((value - axis.min) / (axis.max - axis.min)) * axisLength;
+}
+function convertGraphValueToValue(
+  graphValue: number,
+  axis: { min: number; max: number },
+  axisLength: number
+): number {
+  return (graphValue / axisLength) * (axis.max - axis.min) + axis.min;
+}
 
 export default SVGComponent;
