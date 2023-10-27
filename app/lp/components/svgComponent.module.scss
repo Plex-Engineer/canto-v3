@@ -27,4 +27,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+  text {
+    font-family: var(--rm-mono);
+    font-size: 8px;
+  }
 }
