@@ -82,13 +82,27 @@ const SVGComponent = () => {
 
     for (let i = 0; i < xLength; i++) {
       const y = points[i].y;
+
       let yClamped = 100 - ((yMax - y) / yRange) * 100;
       // invert yClamped value
       yClamped = 100 - yClamped;
 
       path += `${xSpace * (i + 1)},${yClamped} `;
     }
-    return path;
+    // convert these percentages to svg coordinates
+
+    const svgWidth = 200;
+    const svgHeight = 114;
+    const svgPath = path
+      .split(" ")
+      .map((point) => {
+        const [x, y] = point.split(",");
+        return `${(svgWidth * Number(x)) / 100},${
+          (svgHeight * Number(y)) / 100
+        }`;
+      })
+      .join(" ");
+    return svgPath;
   }
 
   React.useEffect(() => {
@@ -140,12 +154,11 @@ const SVGComponent = () => {
   return (
     <div
       style={{
-        backgroundColor: "red",
-        width: "400px",
-        height: "400px",
+        width: "100%",
+        height: "100%",
       }}
     >
-      <svg viewBox="0 0 100 100">
+      <svg viewBox="0 0 200 100" className={styles.svg}>
         {/* <rect
           x="10"
           y="10"
@@ -172,9 +185,10 @@ const SVGComponent = () => {
 
         <polyline
           points={convertToPath(points)}
-          stroke="blue"
+          stroke="black"
           fill="none"
           strokeWidth="1"
+          className={styles.polyline}
         />
       </svg>
     </div>

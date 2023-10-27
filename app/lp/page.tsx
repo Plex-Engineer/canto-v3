@@ -168,7 +168,7 @@ export default function Page() {
           )}
         />
       </Container>
-      <SVGComponent />
+      {/* <SVGComponent /> */}
 
       <Spacer height="30px" />
       {userCantoDexPairs.length + userAmbientPools.length > 0 && (

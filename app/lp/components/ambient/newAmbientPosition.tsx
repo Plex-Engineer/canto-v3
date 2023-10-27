@@ -17,6 +17,7 @@ import Toggle from "@/components/toggle";
 import { useState } from "react";
 import ToggleGroup from "@/components/ToggleGroup/ToggleGroup";
 import Price from "@/components/price/price";
+import SVGComponent from "../svgComponent";
 
 interface NewPositionModalProps {
   pool: AmbientPool;
@@ -156,117 +157,119 @@ export const NewAmbientPositionModal = ({
 
           <Spacer height="8px" />
 
-          <Container className={styles.card}>
-            <ModalItem
-              name="Min Range Price: "
-              value={
-                <Container
-                  center={{
-                    vertical: true,
-                  }}
-                  gap={10}
-                  direction="row"
-                  style={{
-                    width: "100px",
-                  }}
-                >
-                  <Input
-                    height={"sm"}
-                    type="number"
-                    value={positionManager.options.minRangePrice}
-                    onChange={(e) => {
-                      positionManager.setters.setRangePrice(
-                        e.target.value,
-                        true
-                      );
+          {!showAdvanced && (
+            <Container className={styles.card}>
+              <ModalItem
+                name="Min Range Price: "
+                value={
+                  <Container
+                    center={{
+                      vertical: true,
                     }}
-                  />
-                </Container>
-              }
-            />
-            <ModalItem
-              name="Max Range Price: "
-              value={
-                <Container
-                  center={{
-                    vertical: true,
-                  }}
-                  gap={10}
-                  direction="row"
-                  style={{
-                    width: "100px",
-                  }}
-                >
-                  <Input
-                    height={"sm"}
-                    type="number"
-                    value={positionManager.options.maxRangePrice}
-                    onChange={(e) => {
-                      positionManager.setters.setRangePrice(
-                        e.target.value,
-                        false
-                      );
+                    gap={10}
+                    direction="row"
+                    style={{
+                      width: "100px",
                     }}
-                  />
-                </Container>
-              }
-            />
-            <ModalItem
-              name="Min Execution Price: "
-              value={
-                <Container
-                  center={{
-                    vertical: true,
-                  }}
-                  gap={10}
-                  direction="row"
-                  style={{
-                    width: "100px",
-                  }}
-                >
-                  <Input
-                    height={"sm"}
-                    type="number"
-                    value={positionManager.options.minExecutionPrice}
-                    onChange={(e) => {
-                      positionManager.setters.setExecutionPrice(
-                        e.target.value,
-                        true
-                      );
+                  >
+                    <Input
+                      height={"sm"}
+                      type="number"
+                      value={positionManager.options.minRangePrice}
+                      onChange={(e) => {
+                        positionManager.setters.setRangePrice(
+                          e.target.value,
+                          true
+                        );
+                      }}
+                    />
+                  </Container>
+                }
+              />
+              <ModalItem
+                name="Max Range Price: "
+                value={
+                  <Container
+                    center={{
+                      vertical: true,
                     }}
-                  />
-                </Container>
-              }
-            />
+                    gap={10}
+                    direction="row"
+                    style={{
+                      width: "100px",
+                    }}
+                  >
+                    <Input
+                      height={"sm"}
+                      type="number"
+                      value={positionManager.options.maxRangePrice}
+                      onChange={(e) => {
+                        positionManager.setters.setRangePrice(
+                          e.target.value,
+                          false
+                        );
+                      }}
+                    />
+                  </Container>
+                }
+              />
+              <ModalItem
+                name="Min Execution Price: "
+                value={
+                  <Container
+                    center={{
+                      vertical: true,
+                    }}
+                    gap={10}
+                    direction="row"
+                    style={{
+                      width: "100px",
+                    }}
+                  >
+                    <Input
+                      height={"sm"}
+                      type="number"
+                      value={positionManager.options.minExecutionPrice}
+                      onChange={(e) => {
+                        positionManager.setters.setExecutionPrice(
+                          e.target.value,
+                          true
+                        );
+                      }}
+                    />
+                  </Container>
+                }
+              />
 
-            <ModalItem
-              name="Max Execution Price: "
-              value={
-                <Container
-                  center={{
-                    vertical: true,
-                  }}
-                  gap={10}
-                  direction="row"
-                  style={{
-                    width: "100px",
-                  }}
-                >
-                  <Input
-                    height={"sm"}
-                    type="number"
-                    value={positionManager.options.maxExecutionPrice}
-                    onChange={(e) => {
-                      positionManager.setters.setExecutionPrice(
-                        e.target.value,
-                        false
-                      );
+              <ModalItem
+                name="Max Execution Price: "
+                value={
+                  <Container
+                    center={{
+                      vertical: true,
                     }}
-                  />
-                </Container>
-              }
-            />
-          </Container>
+                    gap={10}
+                    direction="row"
+                    style={{
+                      width: "100px",
+                    }}
+                  >
+                    <Input
+                      height={"sm"}
+                      type="number"
+                      value={positionManager.options.maxExecutionPrice}
+                      onChange={(e) => {
+                        positionManager.setters.setExecutionPrice(
+                          e.target.value,
+                          false
+                        );
+                      }}
+                    />
+                  </Container>
+                }
+              />
+            </Container>
+          )}
           <Spacer height="8px" />
           <Text
             style={{
@@ -283,7 +286,9 @@ export const NewAmbientPositionModal = ({
             <Text>Set Price Range</Text>
 
             <Spacer height="8px" />
-            <div className={styles.priceRanger}></div>
+            <div className={styles.priceRanger}>
+              <SVGComponent />
+            </div>
             <Spacer height="8px" />
             <ToggleGroup
               options={["Default", "Narrow", "Wide", "Custom"]}
