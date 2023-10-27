@@ -249,6 +249,12 @@ export const NewAmbientPositionModal = ({
             <Spacer height="8px" />
             <div className={styles.priceRanger}>
               <SVGComponent
+                axis={{
+                  x: {
+                    min: 0.995,
+                    max: 1.005,
+                  },
+                }}
                 points={graphPoints}
                 currentPrice={formatBalance(pool.stats.lastPriceSwap, -12)}
                 min={{

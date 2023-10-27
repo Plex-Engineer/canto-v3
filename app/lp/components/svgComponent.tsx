@@ -4,6 +4,12 @@ import Text from "@/components/text";
 
 interface Props {
   points: { x: string; y: number }[];
+  axis: {
+    x: {
+      min: number;
+      max: number;
+    };
+  };
   currentPrice: string;
   min: {
     value: string;
@@ -14,7 +20,7 @@ interface Props {
     onChange: (value: string) => void;
   };
 }
-const SVGComponent = ({ points }: Props) => {
+const SVGComponent = ({ points, axis }: Props) => {
   const leftLine = React.useRef<any>(null);
   const rightLine = React.useRef<any>(null);
   const selectedRangeBox = React.useRef<any>(null);
@@ -28,7 +34,7 @@ const SVGComponent = ({ points }: Props) => {
     min: 0,
     range: 0,
   });
-
+  // converts x,y points to svg path
   function convertToPath(
     points: {
       x: string;
@@ -60,6 +66,55 @@ const SVGComponent = ({ points }: Props) => {
     }
     // convert these percentages to svg coordinates
 
+    const svgWidth = 200;
+    const svgHeight = 114;
+    const svgPath = path
+      .split(" ")
+      .map((point) => {
+        const [x, y] = point.split(",");
+        return `${(svgWidth * Number(x)) / 100},${
+          (svgHeight * Number(y)) / 100
+        }`;
+      })
+      .join(" ");
+    return svgPath;
+  }
+
+  //   converts x,y points with range to svg path
+  function convertToPathWithRange(
+    range: { min: number; max: number },
+    points: { x: string; y: number }[]
+  ) {
+    // the x is price would have the range 0 to any dollar value
+    // the x will provide points for the graph and the range will provide the min and max values for the range slider
+
+    let path = "";
+
+    // plot x values on range provided
+    const xValues = points.map((point) => Number(point.x));
+    const xMin = Math.min(...xValues);
+    const xMax = Math.max(...xValues);
+    const xRange = xMax - xMin;
+
+    // convert y values to 0-100% range
+    const yValues = points.map((point) => point.y);
+    const yMin = Math.min(...yValues);
+    const yMax = Math.max(...yValues);
+    const yRange = yMax - yMin;
+
+    for (let i = 0; i < xValues.length; i++) {
+      const x = xValues[i];
+      const y = points[i].y;
+
+      let xClamped = ((x - xMin) / xRange) * 100;
+      let yClamped = 100 - ((yMax - y) / yRange) * 100;
+      // invert yClamped value
+      yClamped = 100 - yClamped;
+
+      path += `${xClamped},${yClamped} `;
+    }
+
+    // convert these percentages to svg coordinates
     const svgWidth = 200;
     const svgHeight = 114;
     const svgPath = path
@@ -174,7 +229,31 @@ const SVGComponent = ({ points }: Props) => {
         <svg viewBox="0 0 200 100" className={styles.svg}>
           {/* graph points */}
           <polyline
-            points={convertToPath(points)}
+            points={convertToPathWithRange(
+              {
+                min: axis.x.min,
+                max: axis.x.max,
+              },
+              [
+                {
+                  x: axis.x.min.toString(),
+                  y: 0,
+                },
+                {
+                  x: points[0].x,
+                  y: 0,
+                },
+                ...points,
+                {
+                  x: points[points.length - 1].x,
+                  y: 0,
+                },
+                {
+                  x: axis.x.max.toString(),
+                  y: 0,
+                },
+              ]
+            )}
             stroke="black"
             fill="none"
             strokeWidth="1"
@@ -215,7 +294,10 @@ const SVGComponent = ({ points }: Props) => {
                 dominant-baseline="middle"
                 text-anchor="middle"
               >
-                {selectedRange.min.toFixed(0) + "%"}
+                {(
+                  (axis.x.max - axis.x.min) * (selectedRange.min / 200) +
+                  axis.x.min
+                ).toFixed(3)}
               </text>
             </g>
           </g>
