@@ -25,17 +25,17 @@ const SVGComponent = (props: Props) => {
 
   const leftLine = React.useRef<any>(null);
   const rightLine = React.useRef<any>(null);
-  const selectedRangeBox = React.useRef<any>(null);
+  // const selectedRangeBox = React.useRef<any>(null);
 
-  const [selectedRange, setSelectedRange] = React.useState<{
-    min: number;
-    max: number;
-    range: number;
-  }>({
-    max: 0,
-    min: 0,
-    range: 0,
-  });
+  // const [selectedRange, setSelectedRange] = React.useState<{
+  //   min: number;
+  //   max: number;
+  //   range: number;
+  // }>({
+  //   max: 0,
+  //   min: 0,
+  //   range: 0,
+  // });
 
   React.useEffect(() => {
     if (!leftLine.current) return;
@@ -81,7 +81,7 @@ const SVGComponent = (props: Props) => {
 
   function moveRangeLine(group: any, svgPoint: number, offsetX: number) {
     group.setAttribute("transform", `translate(${svgPoint - offsetX},20)`);
-    moveSelectedRangeBox();
+    // moveSelectedRangeBox();
   }
 
   function groupDrag(group: any, offsetX: number, isMinLine: boolean) {
@@ -135,27 +135,51 @@ const SVGComponent = (props: Props) => {
     group.addEventListener("mousedown", onMouseDown);
   }
 
-  function moveSelectedRangeBox() {
-    if (!selectedRangeBox.current) return;
-    if (!leftLine.current) return;
-    if (!rightLine.current) return;
+  // function moveSelectedRangeBox() {
+  //   if (!selectedRangeBox.current) return;
+  //   if (!leftLine.current) return;
+  //   if (!rightLine.current) return;
 
+  //   function getTranslateX(element: any) {
+  //     var style = window.getComputedStyle(element);
+  //     var matrix = new WebKitCSSMatrix(style.transform);
+  //     //   console.log("translateX: ", matrix.m41);
+  //     return matrix.m41;
+  //   }
+
+  //   const xMin = getTranslateX(leftLine.current);
+  //   const xMax = getTranslateX(rightLine.current);
+
+  //   setSelectedRange({
+  //     min: xMin,
+  //     max: xMax,
+  //     range: xMax - xMin,
+  //   });
+  // }
+
+  const RectangleComponent = () => {
+    // if (!selectedRangeBox.current) return null;
+    if (!leftLine.current) return null;
+    if (!rightLine.current) return null;
     function getTranslateX(element: any) {
       var style = window.getComputedStyle(element);
       var matrix = new WebKitCSSMatrix(style.transform);
       //   console.log("translateX: ", matrix.m41);
       return matrix.m41;
     }
-
     const xMin = getTranslateX(leftLine.current);
     const xMax = getTranslateX(rightLine.current);
 
-    setSelectedRange({
-      min: xMin,
-      max: xMax,
-      range: xMax - xMin,
-    });
-  }
+    return (
+      <rect
+        x={xMin}
+        y={-20}
+        width={xMax - xMin}
+        height="140"
+        fill="#06FC9933"
+      />
+    );
+  };
 
   return (
     <>
@@ -174,15 +198,15 @@ const SVGComponent = (props: Props) => {
             strokeWidth="1"
             className={styles.polyline}
           />
-
-          <rect
+          <RectangleComponent />
+          {/* <rect
             x={selectedRange.min}
             y={-20}
             width={selectedRange.range}
             height="140"
             fill="#06FC9933"
             ref={selectedRangeBox}
-          />
+          /> */}
           {/* min range slider */}
           <g transform="translate(40,20)" ref={leftLine}>
             <line
@@ -209,11 +233,7 @@ const SVGComponent = (props: Props) => {
                 dominantBaseline="middle"
                 textAnchor="middle"
               >
-                {convertGraphValueToValue(
-                  selectedRange.min,
-                  props.axis.x,
-                  size.width
-                ).toFixed(4)}
+                {props.minPrice}
               </text>
             </g>
           </g>
@@ -244,11 +264,7 @@ const SVGComponent = (props: Props) => {
                 dominantBaseline="middle"
                 textAnchor="middle"
               >
-                {convertGraphValueToValue(
-                  selectedRange.max,
-                  props.axis.x,
-                  size.width
-                ).toFixed(4)}
+                {props.maxPrice}
               </text>
             </g>
           </g>
