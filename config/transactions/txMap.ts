@@ -10,6 +10,8 @@ import {
   validateBridgeInRetryParams,
   validateBridgeOutRetryParams,
 } from "@/hooks/bridge/transactions/bridge";
+import { ProposalVoteTxParams } from "@/hooks/gov/interfaces/voteTxParams";
+import { proposalVoteTx } from "@/hooks/gov/transactions/vote";
 import { CTokenLendingTransactionParams } from "@/hooks/lending/interfaces/lendingTxTypes";
 import {
   cTokenLendingTx,
@@ -38,6 +40,7 @@ export enum TransactionFlowType {
   CLAIM_LP_REWARDS_TX = "CLAIM_LP_REWARDS_TX",
   CLM_CTOKEN_TX = "CLM_CTOKEN_TX",
   STAKE_LP_TX = "STAKE_LP_TX",
+  VOTE_TX = "VOTE_TX"
 }
 
 export const TRANSACTION_FLOW_MAP: {
@@ -83,5 +86,10 @@ export const TRANSACTION_FLOW_MAP: {
   [TransactionFlowType.STAKE_LP_TX]: {
     validRetry: async (params: StakeLPParams) => NO_ERROR({ valid: false }),
     tx: async (params: StakeLPParams) => stakeLPFlow(params),
+  },
+  [TransactionFlowType.VOTE_TX]: {
+    validRetry: async (params: ProposalVoteTxParams) =>
+      NO_ERROR({ valid: false }),
+    tx: async (params: ProposalVoteTxParams) => proposalVoteTx(params),
   },
 };
