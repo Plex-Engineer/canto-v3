@@ -25,17 +25,6 @@ const SVGComponent = (props: Props) => {
 
   const leftLine = React.useRef<any>(null);
   const rightLine = React.useRef<any>(null);
-  // const selectedRangeBox = React.useRef<any>(null);
-
-  // const [selectedRange, setSelectedRange] = React.useState<{
-  //   min: number;
-  //   max: number;
-  //   range: number;
-  // }>({
-  //   max: 0,
-  //   min: 0,
-  //   range: 0,
-  // });
 
   React.useEffect(() => {
     if (!leftLine.current) return;
@@ -54,34 +43,51 @@ const SVGComponent = (props: Props) => {
       props.axis.x,
       size.width
     );
-    moveRangeLine(leftLine.current, svgMin, 0);
+    moveRangeLine(leftLine.current, svgMin, 0, true);
     const svgMax = convertValueToGraphValue(
       Number(props.maxPrice),
       props.axis.x,
       size.width
     );
-    moveRangeLine(rightLine.current, svgMax, 0);
+    moveRangeLine(rightLine.current, svgMax, 0, false);
   }, [props.minPrice, props.maxPrice]);
 
-  function setPrice() {
+  const sliderPositions = () => {
     function getTranslateX(element: any) {
       var style = window.getComputedStyle(element);
       var matrix = new WebKitCSSMatrix(style.transform);
       //   console.log("translateX: ", matrix.m41);
       return matrix.m41;
     }
+    // make sure lines exist
+    const emptyPosition = { xMin: 0, xMax: 0 };
+    if (!leftLine.current) return emptyPosition;
+    if (!rightLine.current) return emptyPosition;
+
     const xMin = getTranslateX(leftLine.current);
     const xMax = getTranslateX(rightLine.current);
+    return { xMin, xMax };
+  };
 
+  function setPrice() {
+    const { xMin, xMax } = sliderPositions();
     props.setPrice({
       min: convertGraphValueToValue(xMin, props.axis.x, size.width).toFixed(4),
       max: convertGraphValueToValue(xMax, props.axis.x, size.width).toFixed(4),
     });
   }
 
-  function moveRangeLine(group: any, svgPoint: number, offsetX: number) {
+  function moveRangeLine(
+    group: any,
+    svgPoint: number,
+    offsetX: number,
+    isMinLine: boolean
+  ) {
+    const { xMin, xMax } = sliderPositions();
+    // don't let sliders cross
+    if (isMinLine && svgPoint >= xMax + offsetX) return;
+    if (!isMinLine && svgPoint <= xMin + offsetX) return;
     group.setAttribute("transform", `translate(${svgPoint - offsetX},20)`);
-    // moveSelectedRangeBox();
   }
 
   function groupDrag(group: any, offsetX: number, isMinLine: boolean) {
@@ -100,7 +106,7 @@ const SVGComponent = (props: Props) => {
       const svgP = pt.matrixTransform(
         group.ownerSVGElement.getScreenCTM()?.inverse()
       );
-      moveRangeLine(group, svgP.x, offsetX);
+      moveRangeLine(group, svgP.x, offsetX, isMinLine);
       setPrice();
 
       // //   move svg group
@@ -135,41 +141,8 @@ const SVGComponent = (props: Props) => {
     group.addEventListener("mousedown", onMouseDown);
   }
 
-  // function moveSelectedRangeBox() {
-  //   if (!selectedRangeBox.current) return;
-  //   if (!leftLine.current) return;
-  //   if (!rightLine.current) return;
-
-  //   function getTranslateX(element: any) {
-  //     var style = window.getComputedStyle(element);
-  //     var matrix = new WebKitCSSMatrix(style.transform);
-  //     //   console.log("translateX: ", matrix.m41);
-  //     return matrix.m41;
-  //   }
-
-  //   const xMin = getTranslateX(leftLine.current);
-  //   const xMax = getTranslateX(rightLine.current);
-
-  //   setSelectedRange({
-  //     min: xMin,
-  //     max: xMax,
-  //     range: xMax - xMin,
-  //   });
-  // }
-
   const RectangleComponent = () => {
-    // if (!selectedRangeBox.current) return null;
-    if (!leftLine.current) return null;
-    if (!rightLine.current) return null;
-    function getTranslateX(element: any) {
-      var style = window.getComputedStyle(element);
-      var matrix = new WebKitCSSMatrix(style.transform);
-      //   console.log("translateX: ", matrix.m41);
-      return matrix.m41;
-    }
-    const xMin = getTranslateX(leftLine.current);
-    const xMax = getTranslateX(rightLine.current);
-
+    const { xMin, xMax } = sliderPositions();
     return (
       <rect
         x={xMin}
