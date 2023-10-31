@@ -17,7 +17,7 @@ import Toggle from "@/components/toggle";
 import { useEffect, useState } from "react";
 import ToggleGroup from "@/components/ToggleGroup/ToggleGroup";
 import Price from "@/components/price/price";
-import SVGComponent from "../svgComponent";
+import SVGLiquidityGraph from "../svgComponent";
 import {
   ALL_TICK_KEYS,
   TickRangeKey,
@@ -65,6 +65,23 @@ export const NewAmbientPositionModal = ({
     min: 0.988,
     max: 1.01,
   });
+
+  function setPriceRange(price: { min?: string; max?: string }) {
+    positionManager.setters.setRangePrice(price);
+    setSelectedOption("CUSTOM");
+    if (price.min && Number(price.min) < xAxis.min) {
+      setXAxis((prev) => ({
+        min: Number(price.min) - 0.001,
+        max: prev.max,
+      }));
+    }
+    if (price.max && Number(price.max) > xAxis.max) {
+      setXAxis((prev) => ({
+        min: prev.min,
+        max: Number(price.max) + 0.001,
+      }));
+    }
+  }
 
   return (
     <Container width={showAdvanced ? "64rem" : "32rem"}>
@@ -209,7 +226,7 @@ export const NewAmbientPositionModal = ({
                       type="number"
                       value={positionManager.options.minRangePrice}
                       onChange={(e) =>
-                        positionManager.setters.setRangePrice({
+                        setPriceRange({
                           min: e.target.value,
                         })
                       }
@@ -235,7 +252,7 @@ export const NewAmbientPositionModal = ({
                       type="number"
                       value={positionManager.options.maxRangePrice}
                       onChange={(e) =>
-                        positionManager.setters.setRangePrice({
+                        setPriceRange({
                           max: e.target.value,
                         })
                       }
@@ -252,30 +269,39 @@ export const NewAmbientPositionModal = ({
             <Text>Set Price Range</Text>
             <Spacer height="8px" />
             <Button
-              onClick={() => {
+              onClick={() =>
                 setXAxis((prev) => ({
                   min: prev.min - 0.0001,
                   max: prev.max + 0.0001,
-                }));
-                setSelectedOption("CUSTOM");
-              }}
+                }))
+              }
             >
               Zoom Out
             </Button>
             <Button
-              onClick={() => {
+              onClick={() =>
                 setXAxis((prev) => ({
                   min: prev.min + 0.0001,
                   max: prev.max - 0.0001,
-                }));
-                setSelectedOption("CUSTOM");
-              }}
+                }))
+              }
             >
               Zoom In
             </Button>
+            <Button
+              onClick={() => {
+                setXAxis({
+                  min: 0.988,
+                  max: 1.01,
+                });
+                setDefaultParams("DEFAULT");
+              }}
+            >
+              RESET
+            </Button>
 
             <div className={styles.priceRanger}>
-              <SVGComponent
+              <SVGLiquidityGraph
                 axis={{
                   x: xAxis,
                 }}
@@ -283,10 +309,7 @@ export const NewAmbientPositionModal = ({
                 currentPrice={formatBalance(pool.stats.lastPriceSwap, -12)}
                 minPrice={positionManager.options.minRangePrice}
                 maxPrice={positionManager.options.maxRangePrice}
-                setPrice={(prices) => {
-                  positionManager.setters.setRangePrice(prices);
-                  setSelectedOption("CUSTOM");
-                }}
+                setPrice={(prices) => setPriceRange(prices)}
               />
             </div>
             <Spacer height="8px" />
@@ -302,20 +325,14 @@ export const NewAmbientPositionModal = ({
               <Price
                 title="Min Range Price"
                 price={positionManager.options.minRangePrice}
-                onPriceChange={(price) => {
-                  positionManager.setters.setRangePrice({ min: price });
-                  setSelectedOption("CUSTOM");
-                }}
+                onPriceChange={(price) => setPriceRange({ min: price })}
                 description={pool.base.symbol + " per " + pool.quote.symbol}
               />
               <Spacer width="32px" />
               <Price
                 title="Max Range Price"
                 price={positionManager.options.maxRangePrice}
-                onPriceChange={(price) => {
-                  positionManager.setters.setRangePrice({ max: price });
-                  setSelectedOption("CUSTOM");
-                }}
+                onPriceChange={(price) => setPriceRange({ max: price })}
                 description={pool.base.symbol + " per " + pool.quote.symbol}
               />
             </Container>

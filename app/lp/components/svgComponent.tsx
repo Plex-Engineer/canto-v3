@@ -21,7 +21,7 @@ const size = {
   width: 200,
 };
 
-const SVGComponent = ({
+const SVGLiquidityGraph = ({
   currentPrice,
   setPrice,
   minPrice,
@@ -52,9 +52,18 @@ const SVGComponent = ({
 
   // will set the slider positions based on drag
   function moveRangeLine(svgPoint: number, isLeftLine: boolean) {
+    // don't do anything if refs don't exist
+    if (!leftLine.current) return;
+    if (!rightLine.current) return;
+    // can't use state to get positions, since this function is used in event listeners
+    function getTranslateX(element: any) {
+      const style = window.getComputedStyle(element);
+      const matrix = new WebKitCSSMatrix(style.transform);
+      return matrix.m41;
+    }
     // don't let sliders cross
-    if (isLeftLine && svgPoint >= rightPosition) return;
-    if (!isLeftLine && svgPoint <= leftPosition) return;
+    if (isLeftLine && svgPoint >= getTranslateX(rightLine.current)) return;
+    if (!isLeftLine && svgPoint <= getTranslateX(leftLine.current)) return;
     // set correct line position
     if (isLeftLine) setLeftPosition(svgPoint);
     else setRightPosition(svgPoint);
@@ -118,13 +127,13 @@ const SVGComponent = ({
     );
     moveRangeLine(svgMax, false);
   }
-  // useEffect for setting the slider positions when the price changes from the parent
+  // useEffect for setting the slider positions when the price or zoom changes from the parent
   React.useEffect(() => {
     // only sync if mouse is up (don't want to override user dragging)
     !mouseDown && syncSlidersFromParent();
-  }, [minPrice, maxPrice]);
+  }, [minPrice, maxPrice, axis.x.min, axis.x.max]);
 
-  // called to update the price in the parent (only on drag and zoom)
+  // called to update the price in the parent (only on drag)
   function syncPriceInParent() {
     setPrice({
       min: convertGraphValueToValue(leftPosition, axis.x, size.width).toFixed(
@@ -135,17 +144,11 @@ const SVGComponent = ({
       ),
     });
   }
-
   // useEffect for syncing the prices on slider drag
   React.useEffect(() => {
     // only sync price if mouse is down
     mouseDown && syncPriceInParent();
   }, [leftPosition, rightPosition]);
-
-  // useEffect for syncing the prices on zoom
-  useEffect(() => {
-    syncPriceInParent();
-  }, [axis.x.min, axis.x.max]);
 
   return (
     <>
@@ -492,4 +495,4 @@ function estimateYFromX(
   return pointBefore.y + slope * (x - pointBefore.x);
 }
 
-export default SVGComponent;
+export default SVGLiquidityGraph;
