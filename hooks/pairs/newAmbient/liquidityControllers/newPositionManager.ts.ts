@@ -3,7 +3,7 @@ import { AmbientPool } from "../interfaces/ambientPools";
 import {
   TickRangeKey,
   UserAddConcentratedLiquidityOptions,
-  defaultAddConcentratedLiquidtyParams,
+  defaultPriceRangeFormatted,
 } from "./defaultParams";
 import BigNumber from "bignumber.js";
 import {
@@ -31,10 +31,20 @@ import { ValidationReturn } from "@/config/interfaces";
 
 export default function useNewAmbientPositionManager(pool: AmbientPool) {
   /** EXTERNAL STATE WITH USER OPTIONS */
+  const initialState = (): UserAddConcentratedLiquidityOptions => {
+    const priceRange = defaultPriceRangeFormatted(pool, "DEFAULT");
+    return {
+      amountBase: "",
+      amountQuote: "",
+      lastUpdated: "base",
+      minRangePrice: priceRange.minPriceFormatted,
+      maxRangePrice: priceRange.maxPriceFormatted,
+      minExecutionPrice: priceRange.minPriceFormatted,
+      maxExecutionPrice: priceRange.maxPriceFormatted,
+    };
+  };
   const [userInputs, setUserInputs] =
-    useState<UserAddConcentratedLiquidityOptions>(
-      defaultAddConcentratedLiquidtyParams(pool, "DEFAULT")
-    );
+    useState<UserAddConcentratedLiquidityOptions>(initialState());
 
   /** INTERNAL FUNCTIONS */
 
@@ -58,7 +68,13 @@ export default function useNewAmbientPositionManager(pool: AmbientPool) {
 
   // function to set range to one of the default options
   function setDefaultParams(range: TickRangeKey) {
-    setState(defaultAddConcentratedLiquidtyParams(pool, range));
+    // make sure custom is not selected
+    if (range === "CUSTOM") return;
+    const priceRange = defaultPriceRangeFormatted(pool, range);
+    setUserRangePrice({
+      min: priceRange.minPriceFormatted,
+      max: priceRange.maxPriceFormatted,
+    });
   }
 
   // function to set execution price (will not update any other values)

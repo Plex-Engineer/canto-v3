@@ -12,6 +12,7 @@ const DEFAULT_CONC_LIQ_TICK_RANGES = {
   DEFAULT: 75,
   NARROW: 60,
   WIDE: 100,
+  CUSTOM: 0,
 } as const;
 // type for the keys
 export type TickRangeKey = keyof typeof DEFAULT_CONC_LIQ_TICK_RANGES;
@@ -31,10 +32,11 @@ export interface UserAddConcentratedLiquidityOptions {
   maxExecutionPrice: string;
 }
 
-export const defaultAddConcentratedLiquidtyParams = (
+// default price range from pool and tick key
+export const defaultPriceRangeFormatted = (
   pool: AmbientPool,
   tickRange: TickRangeKey
-): UserAddConcentratedLiquidityOptions => {
+) => {
   // get current price
   const midpointPrice = pool.stats.lastPriceSwap;
   const midpointTick = getTickFromPrice(midpointPrice);
@@ -53,12 +55,7 @@ export const defaultAddConcentratedLiquidtyParams = (
     { precision: 5 }
   );
   return {
-    amountBase: "",
-    amountQuote: "",
-    lastUpdated: "base",
-    minRangePrice: minPriceFormatted,
-    maxRangePrice: maxPriceFormatted,
-    minExecutionPrice: minPriceFormatted,
-    maxExecutionPrice: maxPriceFormatted,
+    minPriceFormatted,
+    maxPriceFormatted,
   };
 };

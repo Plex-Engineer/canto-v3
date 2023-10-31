@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styles from "./svgComponent.module.scss";
 
 type Point = { x: number; y: number };
@@ -15,35 +15,33 @@ interface Props {
     x: Axis;
   };
 }
-const SVGComponent = (props: Props) => {
-  // get svg sizing from props or default
-  const size = {
-    height: 114,
-    width: 200,
-  };
 
-  // sliders
+const size = {
+  height: 114,
+  width: 200,
+};
+
+const SVGComponent = ({
+  currentPrice,
+  setPrice,
+  minPrice,
+  maxPrice,
+  points,
+  axis,
+}: Props) => {
+  // sliders and state for slider positions (state for position allows for faster rerendering)
   const leftLine = React.useRef<any>(null);
+  const [leftPosition, setLeftPosition] = React.useState<number>(
+    convertValueToGraphValue(Number(minPrice), axis.x, size.width)
+  );
   const rightLine = React.useRef<any>(null);
+  const [rightPosition, setRightPosition] = React.useState<number>(
+    convertValueToGraphValue(Number(maxPrice), axis.x, size.width)
+  );
+  // variable to keep track of if the mouse is down
+  const [mouseDown, setMouseDown] = React.useState<boolean>(false);
 
-  // get slider positions in terms of svg x-axis
-  const sliderPositions = () => {
-    function getTranslateX(element: any) {
-      var style = window.getComputedStyle(element);
-      var matrix = new WebKitCSSMatrix(style.transform);
-      //   console.log("translateX: ", matrix.m41);
-      return matrix.m41;
-    }
-    // make sure lines exist
-    const emptyPosition = { xMin: 0, xMax: 0 };
-    if (!leftLine.current) return emptyPosition;
-    if (!rightLine.current) return emptyPosition;
-
-    const xMin = getTranslateX(leftLine.current);
-    const xMax = getTranslateX(rightLine.current);
-    return { xMin, xMax };
-  };
-
+  // initialize slider drags
   React.useEffect(() => {
     if (!leftLine.current) return;
     if (!rightLine.current) return;
@@ -52,52 +50,17 @@ const SVGComponent = (props: Props) => {
     groupDrag(rightLine.current, 5, false);
   }, []);
 
-  // React.useEffect(() => {
-  //   if (!leftLine.current) return;
-  //   if (!rightLine.current) return;
-  //   // get svgPoint from prices and set lines
-  //   const svgMin = convertValueToGraphValue(
-  //     Number(props.minPrice),
-  //     props.axis.x,
-  //     size.width
-  //   );
-  //   moveRangeLine(leftLine.current, svgMin, 0, true);
-  //   const svgMax = convertValueToGraphValue(
-  //     Number(props.maxPrice),
-  //     props.axis.x,
-  //     size.width
-  //   );
-  //   moveRangeLine(rightLine.current, svgMax, 0, false);
-  // }, [props.minPrice, props.maxPrice]);
-
-  function setPrice() {
-    const { xMin, xMax } = sliderPositions();
-    props.setPrice({
-      min: convertGraphValueToValue(xMin, props.axis.x, size.width).toFixed(4),
-      max: convertGraphValueToValue(xMax, props.axis.x, size.width).toFixed(4),
-    });
-  }
-
-  function moveRangeLine(
-    group: any,
-    svgPoint: number,
-    offsetX: number,
-    isMinLine: boolean
-  ) {
-    const { xMin, xMax } = sliderPositions();
-    const newPoint = svgPoint - offsetX;
+  // will set the slider positions based on drag
+  function moveRangeLine(svgPoint: number, isLeftLine: boolean) {
     // don't let sliders cross
-    if (isMinLine && newPoint >= xMax) return;
-    if (!isMinLine && newPoint <= xMin) return;
-    group.setAttribute("transform", `translate(${newPoint},20)`);
+    if (isLeftLine && svgPoint >= rightPosition) return;
+    if (!isLeftLine && svgPoint <= leftPosition) return;
+    // set correct line position
+    if (isLeftLine) setLeftPosition(svgPoint);
+    else setRightPosition(svgPoint);
   }
 
   function groupDrag(group: any, offsetX: number, isMinLine: boolean) {
-    const offset: any = {
-      x: 0,
-      y: 0,
-    };
-
     // move group svg with mouse when dragged
     const onMouseMove = (e: MouseEvent) => {
       //   convert global mouse position to svg coordinates
@@ -108,54 +71,81 @@ const SVGComponent = (props: Props) => {
       const svgP = pt.matrixTransform(
         group.ownerSVGElement.getScreenCTM()?.inverse()
       );
-      moveRangeLine(group, svgP.x, offsetX, isMinLine);
-      setPrice();
+      // set positions of line
+      const newPoint = svgP.x - offsetX;
+      moveRangeLine(newPoint, isMinLine);
     };
 
+    // remove event listeners when mouse is up
     const onMouseUp = () => {
+      setMouseDown(false);
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("mouseup", onMouseUp);
     };
-
-    const onMouseDown = (e: MouseEvent) => {
-      // const pt = group.ownerSVGElement?.createSVGPoint();
-      // if (!pt) return;
-      // pt.x = e.clientX;
-      // pt.y = e.clientY;
-      // const svgP = pt.matrixTransform(
-      //   group.ownerSVGElement.getScreenCTM()?.inverse()
-      // );
-      // //  offset = mouse position - group translate position
-      // offset.x = svgP.x - Number(group.getAttribute("translateX"));
-
+    // add event listeners when mouse is down
+    const onMouseDown = () => {
+      setMouseDown(true);
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     };
-
+    // add event listener for mouse down
     group.addEventListener("mousedown", onMouseDown);
   }
 
-  const RectangleComponent = () => {
-    const { xMin, xMax } = sliderPositions();
-    return (
-      <rect
-        x={xMin}
-        y={-20}
-        width={xMax - xMin}
-        height="140"
-        fill="#06FC9933"
-      />
-    );
-  };
-
   const paths = () => {
-    // base filled path on slider positions, then convert to price (should be the same as props.minPrice and props.maxPrice)
-    const { xMin, xMax } = sliderPositions();
-    return convertPointsToSvgPath(props.axis, props.points, size, {
-      minX: convertGraphValueToValue(xMin, props.axis.x, size.width),
-      maxX: convertGraphValueToValue(xMax, props.axis.x, size.width),
+    return convertPointsToSvgPath(axis, points, size, {
+      minX: convertGraphValueToValue(leftPosition, axis.x, size.width),
+      maxX: convertGraphValueToValue(rightPosition, axis.x, size.width),
     });
   };
+
+  ///
+  /// USE EFFECTS FOR STATE CHANGES
+  ///
+
+  // called to update the sliders from parent price change
+  function syncSlidersFromParent() {
+    const svgMin = convertValueToGraphValue(
+      Number(minPrice),
+      axis.x,
+      size.width
+    );
+    moveRangeLine(svgMin, true);
+    const svgMax = convertValueToGraphValue(
+      Number(maxPrice),
+      axis.x,
+      size.width
+    );
+    moveRangeLine(svgMax, false);
+  }
+  // useEffect for setting the slider positions when the price changes from the parent
+  React.useEffect(() => {
+    // only sync if mouse is up (don't want to override user dragging)
+    !mouseDown && syncSlidersFromParent();
+  }, [minPrice, maxPrice]);
+
+  // called to update the price in the parent (only on drag and zoom)
+  function syncPriceInParent() {
+    setPrice({
+      min: convertGraphValueToValue(leftPosition, axis.x, size.width).toFixed(
+        4
+      ),
+      max: convertGraphValueToValue(rightPosition, axis.x, size.width).toFixed(
+        4
+      ),
+    });
+  }
+
+  // useEffect for syncing the prices on slider drag
+  React.useEffect(() => {
+    // only sync price if mouse is down
+    mouseDown && syncPriceInParent();
+  }, [leftPosition, rightPosition]);
+
+  // useEffect for syncing the prices on zoom
+  useEffect(() => {
+    syncPriceInParent();
+  }, [axis.x.min, axis.x.max]);
 
   return (
     <>
@@ -181,24 +171,22 @@ const SVGComponent = (props: Props) => {
             opacity={1}
             strokeWidth="1"
           />
-          <RectangleComponent />
-          {/* <rect
-            x={selectedRange.min}
+          <rect
+            x={leftPosition}
             y={-20}
-            width={selectedRange.range}
+            width={rightPosition - leftPosition}
             height="140"
             fill="#06FC9933"
-            ref={selectedRangeBox}
-          /> */}
+          />
           {/* min range slider */}
-          <g transform="translate(40,20)" ref={leftLine}>
+          <g transform={`translate(${leftPosition},20)`} ref={leftLine}>
             <line
               x1="0"
               y1="-40"
               x2="0"
               y2="120"
               stroke="black"
-              ref={rightLine}
+              ref={leftLine}
             />
             <rect
               width="8"
@@ -223,12 +211,34 @@ const SVGComponent = (props: Props) => {
                 dominantBaseline="middle"
                 textAnchor="middle"
               >
-                {props.minPrice}
+                {convertGraphValueToValue(
+                  leftPosition,
+                  axis.x,
+                  size.width
+                ).toFixed(4)}
               </text>
             </g>
           </g>
+          {/* current price line */}
+          <line
+            x1={convertValueToGraphValue(
+              Number(currentPrice),
+              axis.x,
+              size.width
+            )}
+            y1="-40"
+            x2={convertValueToGraphValue(
+              Number(currentPrice),
+              axis.x,
+              size.width
+            )}
+            y2="120"
+            stroke="black"
+            strokeWidth="1"
+            strokeDasharray={"2,2"}
+          />
           {/* max range slider */}
-          <g transform="translate(80,20)" ref={rightLine}>
+          <g transform={`translate(${rightPosition},20)`} ref={rightLine}>
             <line
               x1="0"
               y1="-40"
@@ -261,7 +271,11 @@ const SVGComponent = (props: Props) => {
                 dominantBaseline="middle"
                 textAnchor="middle"
               >
-                {props.maxPrice}
+                {convertGraphValueToValue(
+                  rightPosition,
+                  axis.x,
+                  size.width
+                ).toFixed(4)}
               </text>
             </g>
           </g>

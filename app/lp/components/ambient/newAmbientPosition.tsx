@@ -61,6 +61,10 @@ export const NewAmbientPositionModal = ({
     }
     getGraph();
   }, [pool]);
+  const [xAxis, setXAxis] = useState({
+    min: 0.988,
+    max: 1.01,
+  });
 
   return (
     <Container width={showAdvanced ? "64rem" : "32rem"}>
@@ -247,21 +251,42 @@ export const NewAmbientPositionModal = ({
           <Container className={styles.advancedContainer}>
             <Text>Set Price Range</Text>
             <Spacer height="8px" />
+            <Button
+              onClick={() => {
+                setXAxis((prev) => ({
+                  min: prev.min - 0.0001,
+                  max: prev.max + 0.0001,
+                }));
+                setSelectedOption("CUSTOM");
+              }}
+            >
+              Zoom Out
+            </Button>
+            <Button
+              onClick={() => {
+                setXAxis((prev) => ({
+                  min: prev.min + 0.0001,
+                  max: prev.max - 0.0001,
+                }));
+                setSelectedOption("CUSTOM");
+              }}
+            >
+              Zoom In
+            </Button>
+
             <div className={styles.priceRanger}>
               <SVGComponent
                 axis={{
-                  x: {
-                    min: 0.988,
-                    max: 1.01,
-                  },
+                  x: xAxis,
                 }}
                 points={graphPoints}
                 currentPrice={formatBalance(pool.stats.lastPriceSwap, -12)}
                 minPrice={positionManager.options.minRangePrice}
                 maxPrice={positionManager.options.maxRangePrice}
-                setPrice={(prices) =>
-                  positionManager.setters.setRangePrice(prices)
-                }
+                setPrice={(prices) => {
+                  positionManager.setters.setRangePrice(prices);
+                  setSelectedOption("CUSTOM");
+                }}
               />
             </div>
             <Spacer height="8px" />
@@ -279,6 +304,7 @@ export const NewAmbientPositionModal = ({
                 price={positionManager.options.minRangePrice}
                 onPriceChange={(price) => {
                   positionManager.setters.setRangePrice({ min: price });
+                  setSelectedOption("CUSTOM");
                 }}
                 description={pool.base.symbol + " per " + pool.quote.symbol}
               />
@@ -288,6 +314,7 @@ export const NewAmbientPositionModal = ({
                 price={positionManager.options.maxRangePrice}
                 onPriceChange={(price) => {
                   positionManager.setters.setRangePrice({ max: price });
+                  setSelectedOption("CUSTOM");
                 }}
                 description={pool.base.symbol + " per " + pool.quote.symbol}
               />
