@@ -110,8 +110,8 @@ export default function useAmbientPools(
           continue;
         }
         aprMap[cToken.data.address] = {
-          distApr: cToken.data.distApy,
-          supplyApr: cToken.data.supplyApy,
+          distApr: (Number(cToken.data.distApy) / 2).toString(),
+          supplyApr: (Number(cToken.data.supplyApy) / 2).toString(),
         };
       }
       setAmbientTokenAprs(aprMap);
