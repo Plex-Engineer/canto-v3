@@ -50,6 +50,26 @@
                 ]
             },
             {
+                "id": "0xE936c358efA4d34c065DfbE37A778A965c192B1B",
+                "chainId": 7700,
+                "address": "0xE936c358efA4d34c065DfbE37A778A965c192B1B",
+                "name": "Note",
+                "symbol": "NOTE",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/note.svg",
+                "isOFT": true,
+                "isOFTProxy": true,
+                "oftUnderlyingAddress": "0x4e71A2E537B7f9D9413D3991D37958c0b5e1e503",
+                "bridgeMethods": [
+                    {
+                        "chainId": "eth-mainnet",
+                        "methods": [
+                            "2"
+                        ]
+                    }
+                ]
+            },
+            {
                 "id": "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
                 "chainId": 7700,
                 "address": "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",

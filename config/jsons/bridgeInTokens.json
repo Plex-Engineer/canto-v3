@@ -85,6 +85,20 @@
                 "bridgeMethods": [
                     "2"
                 ]
+            },
+            {
+                "id": "0xE936c358efA4d34c065DfbE37A778A965c192B1B",
+                "chainId": 1,
+                "address": "0xE936c358efA4d34c065DfbE37A778A965c192B1B",
+                "name": "Note",
+                "symbol": "NOTE",
+                "decimals": 18,
+                "icon": "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/note.svg",
+                "isOFT": true,
+                "isOFTProxy": false,
+                "bridgeMethods": [
+                    "2"
+                ]
             }
         ],
         "akashnet-2": [
