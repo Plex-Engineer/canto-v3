@@ -14,7 +14,7 @@ import { formatPercent } from "@/utils/formatting.utils";
 import Input from "@/components/input/input";
 import Button from "@/components/button/button";
 import Toggle from "@/components/toggle";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ToggleGroup from "@/components/ToggleGroup/ToggleGroup";
 import Price from "@/components/price/price";
 import SVGLiquidityGraph from "../svgComponent";
@@ -24,6 +24,7 @@ import {
 } from "@/hooks/pairs/newAmbient/liquidityControllers/defaultParams";
 import { queryAmbientPoolLiquidityCurve } from "@/hooks/pairs/newAmbient/helpers/ambientApi";
 import { convertLiquidityCurveToGraph } from "@/utils/ambient/graphing.utils";
+import ButtonHold from "@/components/button/pressAndHold";
 
 interface NewPositionModalProps {
   pool: AmbientPool;
@@ -268,26 +269,28 @@ export const NewAmbientPositionModal = ({
           <Container className={styles.advancedContainer}>
             <Text>Set Price Range</Text>
             <Spacer height="8px" />
-            <Button
-              onClick={() =>
+            <ButtonHold
+              onHold={() =>
                 setXAxis((prev) => ({
                   min: prev.min - 0.0001,
                   max: prev.max + 0.0001,
                 }))
               }
+              interval={50}
             >
               Zoom Out
-            </Button>
-            <Button
-              onClick={() =>
+            </ButtonHold>
+            <ButtonHold
+              onHold={() =>
                 setXAxis((prev) => ({
                   min: prev.min + 0.0001,
                   max: prev.max - 0.0001,
                 }))
               }
+              interval={50}
             >
-              Zoom In
-            </Button>
+              Zoom In{" "}
+            </ButtonHold>
             <Button
               onClick={() => {
                 setXAxis({
