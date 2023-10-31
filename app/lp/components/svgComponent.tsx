@@ -22,35 +22,11 @@ const SVGComponent = (props: Props) => {
     width: 200,
   };
 
+  // sliders
   const leftLine = React.useRef<any>(null);
   const rightLine = React.useRef<any>(null);
 
-  React.useEffect(() => {
-    if (!leftLine.current) return;
-    if (!rightLine.current) return;
-
-    groupDrag(leftLine.current, -5, true);
-    groupDrag(rightLine.current, 5, false);
-  }, []);
-
-  React.useEffect(() => {
-    if (!leftLine.current) return;
-    if (!rightLine.current) return;
-    // get svgPoint from prices and set lines
-    const svgMin = convertValueToGraphValue(
-      Number(props.minPrice),
-      props.axis.x,
-      size.width
-    );
-    moveRangeLine(leftLine.current, svgMin, 0, true);
-    const svgMax = convertValueToGraphValue(
-      Number(props.maxPrice),
-      props.axis.x,
-      size.width
-    );
-    moveRangeLine(rightLine.current, svgMax, 0, false);
-  }, [props.minPrice, props.maxPrice]);
-
+  // get slider positions in terms of svg x-axis
   const sliderPositions = () => {
     function getTranslateX(element: any) {
       var style = window.getComputedStyle(element);
@@ -67,6 +43,32 @@ const SVGComponent = (props: Props) => {
     const xMax = getTranslateX(rightLine.current);
     return { xMin, xMax };
   };
+
+  React.useEffect(() => {
+    if (!leftLine.current) return;
+    if (!rightLine.current) return;
+
+    groupDrag(leftLine.current, -5, true);
+    groupDrag(rightLine.current, 5, false);
+  }, []);
+
+  // React.useEffect(() => {
+  //   if (!leftLine.current) return;
+  //   if (!rightLine.current) return;
+  //   // get svgPoint from prices and set lines
+  //   const svgMin = convertValueToGraphValue(
+  //     Number(props.minPrice),
+  //     props.axis.x,
+  //     size.width
+  //   );
+  //   moveRangeLine(leftLine.current, svgMin, 0, true);
+  //   const svgMax = convertValueToGraphValue(
+  //     Number(props.maxPrice),
+  //     props.axis.x,
+  //     size.width
+  //   );
+  //   moveRangeLine(rightLine.current, svgMax, 0, false);
+  // }, [props.minPrice, props.maxPrice]);
 
   function setPrice() {
     const { xMin, xMax } = sliderPositions();
@@ -146,10 +148,14 @@ const SVGComponent = (props: Props) => {
     );
   };
 
-  const paths = convertPointsToSvgPath(props.axis, props.points, size, {
-    minX: Number(props.minPrice),
-    maxX: Number(props.maxPrice),
-  });
+  const paths = () => {
+    // base filled path on slider positions, then convert to price (should be the same as props.minPrice and props.maxPrice)
+    const { xMin, xMax } = sliderPositions();
+    return convertPointsToSvgPath(props.axis, props.points, size, {
+      minX: convertGraphValueToValue(xMin, props.axis.x, size.width),
+      maxX: convertGraphValueToValue(xMax, props.axis.x, size.width),
+    });
+  };
 
   return (
     <>
@@ -162,18 +168,18 @@ const SVGComponent = (props: Props) => {
         <svg viewBox="0 0 200 100" className={styles.svg}>
           {/* graph points */}
           <polyline
-            points={paths.mainPath}
+            points={paths().mainPath}
             stroke="black"
             fill="#999"
             strokeWidth="1"
             width={"2"}
           />
           <polyline
-            points={paths.filledPath}
+            points={paths().filledPath}
             stroke="black"
             fill="#08ff14"
             opacity={1}
-            strokeWidth="2"
+            strokeWidth="1"
           />
           <RectangleComponent />
           {/* <rect
