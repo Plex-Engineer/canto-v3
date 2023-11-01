@@ -3,6 +3,7 @@ import Filter from '../Filter/Filter';
 import styles from './ProposalTable.module.scss';
 import { Proposal } from '@/hooks/gov/interfaces/proposal';
 import { formatDate, formatProposalStatus, formatProposalType } from '@/utils/gov/formatData';
+import Text from '@/components/text';
 
 
 interface TableProps {
@@ -10,7 +11,7 @@ interface TableProps {
 }
 
 const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
-  const [filteredProposals, setFilteredProposals] = React.useState<Proposal[]>(proposals);
+  
 
   const handleFilterChange = (filter: string) => {
     if (filter === 'All') {
@@ -33,6 +34,8 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
       <div>Proposals Not Available Yet</div>
     );
   }
+  const [filteredProposals, setFilteredProposals] = React.useState<Proposal[]>(proposals);
+  console.log(filteredProposals.length);
   function test(index: number):string{
     let s = '';
     for(var i=0;i<(index%20);i++){
@@ -43,29 +46,32 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
   return (
     <div className={styles.tableContainer}>
       <Filter onFilterChange={handleFilterChange} currentFilter='All' />
-      <table className={styles.table}>
+      {filteredProposals.length==0 ? <div><div className={styles.table}>No Proposals available</div></div> : 
+        <table className={styles.table}>
         <thead>
           <tr key='proposalTableHeader'>
-            <th className={styles.tableHeader}>ID</th>
-            <th className={styles.tableHeader}>Title</th>
-            <th className={styles.tableHeader}>Status</th>
-            <th className={styles.tableHeader}>Type</th>
-            <th className={styles.tableHeader}>Voting Date</th>
+            <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>ID</Text></th>
+            <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Title</Text></th>
+            <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Status</Text></th>
+            <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Type</Text></th>
+            <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Voting Date</Text></th>
           </tr>
         </thead>
         <tbody>
           {filteredProposals.map((proposal,index) => (
             <tr className={styles.row} key={proposal.proposal_id}>
               {/* <div>PROPOSALS</div> */}
-              <td className={styles.tableData}>{proposal.proposal_id}</td>
-              <td className={styles.tableTitleColumn}>PROPOSAL TITLE</td>
-              <td className={styles.tableData}>{formatProposalStatus(proposal.status)}</td>
-              <td className={styles.tableData}>{formatProposalType(proposal.type_url)}</td>
-              <td className={styles.tableData}>{formatDate(proposal.voting_end_time)}</td>
+              <td className={styles.tableData}><Text font="proto_mono" >{proposal.proposal_id}</Text></td>
+              <td className={styles.tableTitleColumn}><Text font="proto_mono" >PROPOSAL TITLE</Text></td>
+              <td className={styles.tableData}><Text font="proto_mono" >{formatProposalStatus(proposal.status)}</Text></td>
+              <td className={styles.tableData}><Text font="proto_mono" >{formatProposalType(proposal.type_url)}</Text></td>
+              <td className={styles.tableData}><Text font="proto_mono" >{formatDate(proposal.voting_end_time)}</Text></td>
             </tr>
           ))}
         </tbody>
-      </table>
+      </table>     
+      }
+      
     </div>
   );
 };
