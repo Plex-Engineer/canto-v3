@@ -1,11 +1,19 @@
 .filterContainer {
+    width: 50%; /* Rightmost half of the page */
     float: right;
-    margin: 1rem;
+    text-align: right;
+    height: 10%;
+  }
   
-    select {
-      padding: 0.5rem;
-      border-radius: 4px;
-      cursor: pointer;
+  .button {
+    padding: 8px 16px;
+    margin-left: 10px;
+    border: none;
+    cursor: pointer;
+    opacity: 0.6; /* Unselected buttons are not as bright */
+  
+    &.selected {
+      opacity: 1; /* Selected button is bright */
     }
   }
   

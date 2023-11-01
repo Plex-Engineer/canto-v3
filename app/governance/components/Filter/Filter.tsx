@@ -1,19 +1,25 @@
 import React from 'react';
-import './Filter.module.scss';
+import styles from './Filter.module.scss';
 
 interface FilterProps {
   onFilterChange: (filter: string) => void;
+  currentFilter: string;
 }
 
-const Filter: React.FC<FilterProps> = ({ onFilterChange }) => {
+const Filter: React.FC<FilterProps> = ({ onFilterChange, currentFilter }) => {
+  const filters = ['All', 'Active','Rejected', 'Passed'];
+
   return (
-    <div className="filterContainer">
-      <select onChange={(e) => onFilterChange(e.target.value)}>
-        <option value="All">All</option>
-        <option value="Rejected">Rejected</option>
-        <option value="Passed">Passed</option>
-        {/* Add other filter options as needed */}
-      </select>
+    <div className={styles.filterContainer}>
+      {filters.map(filter => (
+        <button
+          key={filter}
+          className={`${styles.button} ${currentFilter === filter ? styles.selected : ''}`}
+          onClick={() => onFilterChange(filter)}
+        >
+          {filter}
+        </button>
+      ))}
     </div>
   );
 };

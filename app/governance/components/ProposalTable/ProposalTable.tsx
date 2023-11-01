@@ -2,6 +2,7 @@ import React from 'react';
 import Filter from '../Filter/Filter';
 import styles from './ProposalTable.module.scss';
 import { Proposal } from '@/hooks/gov/interfaces/proposal';
+import { formatDate, formatProposalStatus, formatProposalType } from '@/utils/gov/formatData';
 
 
 interface TableProps {
@@ -15,32 +16,53 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
     if (filter === 'All') {
       setFilteredProposals(proposals);
     } else {
-      setFilteredProposals(proposals.filter(proposal => proposal.status === filter));
+      if(filter==='Passed'){
+        setFilteredProposals(proposals.filter(proposal => proposal.status === 'PROPOSAL_STATUS_PASSED'));
+      }
+      if(filter==='Rejected'){
+        setFilteredProposals(proposals.filter(proposal => proposal.status === 'PROPOSAL_STATUS_REJECTED'));
+      }
+      if(filter==='Active'){
+        setFilteredProposals(proposals.filter(proposal => proposal.status === 'PROPOSAL_STATUS_VOTING_PERIOD'));
+      }
+      
     }
   };
-
+  if(proposals.length==0){
+    return (
+      <div>Proposals Not Available Yet</div>
+    );
+  }
+  function test(index: number):string{
+    let s = '';
+    for(var i=0;i<(index%20);i++){
+      s = s + 'Test Ts ';
+    }
+    return s;
+  }
   return (
     <div className={styles.tableContainer}>
-      <Filter onFilterChange={handleFilterChange} />
-      <table>
+      <Filter onFilterChange={handleFilterChange} currentFilter='All' />
+      <table className={styles.table}>
         <thead>
-          <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Status</th>
-            <th>Type</th>
-            <th>Voting Date</th>
+          <tr key='proposalTableHeader'>
+            <th className={styles.tableHeader}>ID</th>
+            <th className={styles.tableHeader}>Title</th>
+            <th className={styles.tableHeader}>Status</th>
+            <th className={styles.tableHeader}>Type</th>
+            <th className={styles.tableHeader}>Voting Date</th>
           </tr>
         </thead>
         <tbody>
-          {proposals.map(proposal => (
-            <div className={styles.id} key={proposal.proposal_id}>
-            <div className={styles.id}>{proposal.proposal_id}</div>
-            <div className={styles.title}>Proposal Title</div>
-            <div className={styles.status}>{proposal.status}</div>
-            <div className={styles.type}>{proposal.type_url}</div>
-            <div className="column votingDate">{proposal.voting_end_time}</div>
-          </div>
+          {filteredProposals.map((proposal,index) => (
+            <tr className={styles.row} key={proposal.proposal_id}>
+              {/* <div>PROPOSALS</div> */}
+              <td className={styles.tableData}>{proposal.proposal_id}</td>
+              <td className={styles.tableTitleColumn}>PROPOSAL TITLE</td>
+              <td className={styles.tableData}>{formatProposalStatus(proposal.status)}</td>
+              <td className={styles.tableData}>{formatProposalType(proposal.type_url)}</td>
+              <td className={styles.tableData}>{formatDate(proposal.voting_end_time)}</td>
+            </tr>
           ))}
         </tbody>
       </table>

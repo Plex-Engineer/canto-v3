@@ -9,9 +9,13 @@ import useProposals from "@/hooks/gov/useProposals";
 import { Proposals } from "./Proposals";
 import ProposalTable from "./components/ProposalTable/ProposalTable";
 import Table from "@/components/table/table";
-
+import styles from './gov.module.scss';
 export default function GovernancePage() {
   const { proposals } = useProposals({ chainId: 7700 });
+
+  
+  const sorted_proposals = proposals.sort((a: Proposal, b: Proposal) => b.proposal_id - a.proposal_id);
+
 
   const [activeTab, setActiveTab] = useState("All");
 
@@ -41,25 +45,24 @@ export default function GovernancePage() {
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
-  const TableProps = {
-    title: "Proposal Title",
-    headers: ["ID", "Status"],
-    columns: 2,
-    data: [["1","Passed"],["2","Failed"]]
-  }
+  // let data = [];
+  // for(var i=0;i<proposals.length;i++){
+  //   data.push([proposals[i]['proposal_id'],'PROPOSAL_TITLE',proposals[i]['status'],proposals[i]['type_url'],proposals[i]['voting_end_time']]);
+  // }
+  // const TableProps = {
+  //   title: "Governance",
+  //   headers: ["ID","Title", "Status","Type","VotingDate"],
+  //   columns: 5,
+  //   data: data
+  // }
 
   return (
     <div>
-      <Tabs
-        tabs={[
-          {
-            title: "ALL",
-            content: (
-
-              <Container>
-                <Table title={TableProps.title} headers={TableProps.headers} columns={2} data={TableProps.data}></Table>
-                {/* <ProposalTable proposals={proposals}></ProposalTable> */}
-                <Proposals
+      <div className={styles.container}>
+                <ProposalTable proposals={sorted_proposals}></ProposalTable>
+                {/* <Table title={TableProps.title} headers={TableProps.headers} columns={5} data={TableProps.data}></Table> */}
+                
+                {/* <Proposals
                   proposalsList={proposals}
                   type=""
                   onProposalClick={handleProposalClick}
@@ -70,8 +73,16 @@ export default function GovernancePage() {
                     onClose={handleModalClose}
                     isOpen={isModalOpen}
                   ></ProposalModal>
-                )}
-              </Container>
+                )} */}
+      </div>
+      {/* <Tabs
+        tabs={[
+          {
+            title: "ALL",
+            content: (
+
+              <div>Hi</div>
+                
             ),
             onClick: () => switchActiveTab("All"),
           },
@@ -107,7 +118,7 @@ export default function GovernancePage() {
             onClick: () => switchActiveTab("Rejected"),
           },
         ]}
-      />
+      /> */}
     </div>
   );
 }
