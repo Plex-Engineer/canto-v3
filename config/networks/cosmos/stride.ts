@@ -10,7 +10,7 @@ const strideBlockExplorer = "https://www.mintscan.io/stride";
 export const STRIDE: CosmosNetwork = {
   id: "stride-1",
   chainId: "stride-1",
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/stride/images/strd.svg",
+  icon: "/icons/strd.svg",
   name: "Stride",
   isTestChain: false,
   rpcUrl: "https://stride-rpc.polkachu.com/",

@@ -10,7 +10,7 @@ const comdexBlockExplorer = "https://www.mintscan.io/comdex";
 export const COMDEX: CosmosNetwork = {
   id: "comdex-1",
   chainId: "comdex-1",
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/comdex/images/cmdx.svg",
+  icon: "/icons/cmdx.svg",
   name: "Comdex",
   isTestChain: false,
   rpcUrl: "https://rpc.comdex.one",

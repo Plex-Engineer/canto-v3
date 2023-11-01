@@ -10,7 +10,7 @@ const evmosBlockExplorer = "https://www.mintscan.io/evmos";
 export const EVMOS: CosmosNetwork = {
   id: "evmos_9001-2",
   chainId: "evmos_9001-2",
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/evmos/images/evmos.svg",
+  icon: "/icons/evmos.svg",
   name: "Evmos",
   isTestChain: false,
   rpcUrl: "https://evmos.kingnodes.com",

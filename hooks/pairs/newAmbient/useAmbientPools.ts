@@ -261,7 +261,7 @@ export default function useAmbientPools(
   ): ReturnWithError<NewTransactionFlow> {
     return NO_ERROR({
       title: "Claim Rewards",
-      icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+      icon: "/icons/canto.svg",
       txType: TransactionFlowType.CLAIM_LP_REWARDS_TX,
       params: {
         ambientParams: params,

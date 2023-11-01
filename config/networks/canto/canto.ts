@@ -15,7 +15,7 @@ const cantoMainBlockExplorerEVM = "https://tuber.build";
 // canto will have an EVM and COSMOS chain data
 const cantoMainnetBaseInfo = {
   name: "Canto",
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+  icon: "/icons/canto.svg",
   isTestChain: false,
   rpcUrl: "https://mainnode.plexnode.org:8545",
   nativeCurrency: {
@@ -57,7 +57,7 @@ export const CANTO_MAINNET_COSMOS: CosmosNetwork = {
 // Testnet
 const cantoTestnetBaseInfo = {
   name: "Canto Testnet",
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+  icon: "/icons/canto.svg",
   isTestChain: true,
   rpcUrl: "https://canto-testnet.plexnode.wtf",
   nativeCurrency: {

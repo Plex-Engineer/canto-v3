@@ -10,7 +10,7 @@ const cosmosHubBlockExplorer = "https://www.mintscan.io/cosmos";
 export const COSMOS_HUB: CosmosNetwork = {
   id: "cosmoshub-4",
   chainId: "cosmoshub-4",
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
+  icon: "/icons/atom.svg",
   name: "Cosmos Hub",
   isTestChain: false,
   rpcUrl: "https://rpc-cosmoshub.blockapsis.com",
