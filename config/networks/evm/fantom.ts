@@ -6,7 +6,7 @@ const fantomScanUrl = "https://ftmscan.com";
 export const FANTOM_TESTNET: EVMNetwork = {
   id: "fantom-testnet",
   chainId: 4002,
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/fantom/images/ftm.svg",
+  icon: "/icons/ftm.svg",
   name: "Fantom Testnet",
   isTestChain: true,
   rpcUrl: "https://rpc.testnet.fantom.network",

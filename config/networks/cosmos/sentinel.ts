@@ -10,7 +10,7 @@ const sentinelBlockExplorer = "https://www.mintscan.io/sentinel";
 export const SENTINEL: CosmosNetwork = {
   id: "sentinelhub-2",
   chainId: "sentinelhub-2",
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/sentinel/images/dvpn.svg",
+  icon: "/icons/dvpn.svg",
   name: "Sentinel",
   isTestChain: false,
   rpcUrl: "https://rpc-sentinel-ia.cosmosia.notional.ventures/",

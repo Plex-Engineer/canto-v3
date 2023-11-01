@@ -10,7 +10,7 @@ const akashBlockExplorer = "https://www.mintscan.io/akash";
 export const AKASH: CosmosNetwork = {
   id: "akashnet-2",
   chainId: "akashnet-2",
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/akash/images/akt.svg",
+  icon: "/icons/akt.svg",
   name: "Akash",
   isTestChain: false,
   rpcUrl: "https://akash-rpc.polkachu.com",

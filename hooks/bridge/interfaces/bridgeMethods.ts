@@ -15,12 +15,12 @@ type BridgeMethodInfo = {
 const BRIDGE_METHOD_INFO: BridgeMethodInfo = {
   [BridgingMethod.GRAVITY_BRIDGE]: {
     name: "Gravity Bridge",
-    icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/gravitybridge/images/grav.svg",
+    icon: "/icons/grav.svg",
     id: "bridge-gravity",
   },
   [BridgingMethod.IBC]: {
     name: "IBC",
-    icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
+    icon: "/icons/atom.svg",
     id: "bridge-ibc",
   },
   [BridgingMethod.LAYER_ZERO]: {

@@ -6,7 +6,7 @@ const optimismBlockExplorer = "https://goerli-optimism.etherscan.io";
 export const OPTIMISM_TESTNET: EVMNetwork = {
   id: "optimism-testnet",
   chainId: 420,
-  icon: "https://raw.githubusercontent.com/ethereum-optimism/brand-kit/main/assets/svg/Profile-Logo.svg",
+  icon: "/icons/op.svg",
   name: "Optimism Testnet",
   isTestChain: true,
   rpcUrl: "https://goerli.optimism.io",

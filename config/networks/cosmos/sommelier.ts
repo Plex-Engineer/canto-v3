@@ -10,7 +10,7 @@ const sommelierBlockExplorer = "https://www.mintscan.io/sommelier";
 export const SOMMELIER: CosmosNetwork = {
   id: "sommelier-3",
   chainId: "sommelier-3",
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/sommelier/images/somm.svg",
+  icon: "/icons/somm.svg",
   name: "Sommelier",
   isTestChain: false,
   rpcUrl: "https://sommelier-rpc.lavenderfive.com",

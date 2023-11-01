@@ -235,7 +235,7 @@ const Bridging = (props: BridgeProps) => {
                     {
                       main: {
                         name: "Cosmos Networks",
-                        icon: "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/32%402x/color/atom%402x.png",
+                        icon: "/icons/atom.svg",
                         id: "",
                       },
                       items: props.hook.allOptions.networks.filter(

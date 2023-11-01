@@ -10,7 +10,7 @@ const injectiveBlockExplorer = "https://www.mintscan.io/injective";
 export const INJECTIVE: CosmosNetwork = {
   id: "injective-1",
   chainId: "injective-1",
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/injective/images/inj.svg",
+  icon: "/icons/inj.svg",
   name: "Injective",
   isTestChain: false,
   rpcUrl: "https://injective-rpc.polkachu.com",
