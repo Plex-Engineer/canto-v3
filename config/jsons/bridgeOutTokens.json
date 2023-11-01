@@ -34,7 +34,7 @@
         "name": "cNote",
         "symbol": "cNOTE",
         "decimals": 18,
-        "icon": "/icons/cnote.svg",
+        "icon": "/icons/cNote.svg",
         "isOFT": true,
         "isOFTProxy": true,
         "oftUnderlyingAddress": "0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
