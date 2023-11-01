@@ -8,9 +8,11 @@ interface FilterProps {
 
 const Filter: React.FC<FilterProps> = ({ onFilterChange, currentFilter }) => {
   const filters = ['All', 'Active','Rejected', 'Passed'];
+  
 
   return (
     <div className={styles.filterContainer}>
+      <div >
       {filters.map(filter => (
         <button
           key={filter}
@@ -20,6 +22,7 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, currentFilter }) => {
           {filter}
         </button>
       ))}
+      </div>
     </div>
   );
 };

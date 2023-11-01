@@ -10,6 +10,8 @@ import { Proposals } from "./Proposals";
 import ProposalTable from "./components/ProposalTable/ProposalTable";
 import Table from "@/components/table/table";
 import styles from './gov.module.scss';
+import Text from "@/components/text";
+import Spacer from "@/components/layout/spacer";
 export default function GovernancePage() {
   const { proposals } = useProposals({ chainId: 7700 });
 
@@ -59,6 +61,11 @@ export default function GovernancePage() {
   return (
     <div>
       <div className={styles.container}>
+      <Text size="x-lg" font="proto_mono" className={styles.title}>
+        Governance
+      </Text>
+      <Spacer height="20px" />
+                
                 <ProposalTable proposals={sorted_proposals}></ProposalTable>
                 {/* <Table title={TableProps.title} headers={TableProps.headers} columns={5} data={TableProps.data}></Table> */}
                 
@@ -75,50 +82,6 @@ export default function GovernancePage() {
                   ></ProposalModal>
                 )} */}
       </div>
-      {/* <Tabs
-        tabs={[
-          {
-            title: "ALL",
-            content: (
-
-              <div>Hi</div>
-                
-            ),
-            onClick: () => switchActiveTab("All"),
-          },
-          {
-            title: "ACTIVE",
-            content: (
-              <Container>
-                <Proposals
-                  proposalsList={activeProposals}
-                  type="Active"
-                  onProposalClick={handleProposalClick}
-                ></Proposals>
-                {isModalOpen && selectedProposal && (
-                  <ProposalModal
-                    proposal={selectedProposal}
-                    onClose={handleModalClose}
-                    isOpen={isModalOpen}
-                  ></ProposalModal>
-                )}
-              </Container>
-            ),
-            onClick: () => switchActiveTab("Active"),
-          },
-          {
-            title: "REJECTED",
-            content: (
-              <Proposals
-                proposalsList={rejectedProposals}
-                type="Rejected"
-                onProposalClick={handleProposalClick}
-              ></Proposals>
-            ),
-            onClick: () => switchActiveTab("Rejected"),
-          },
-        ]}
-      /> */}
     </div>
   );
 }

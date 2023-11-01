@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Filter from '../Filter/Filter';
 import styles from './ProposalTable.module.scss';
 import { Proposal } from '@/hooks/gov/interfaces/proposal';
 import { formatDate, formatProposalStatus, formatProposalType } from '@/utils/gov/formatData';
 import Text from '@/components/text';
+import Button from '@/components/button/button';
 
 
 interface TableProps {
@@ -11,9 +12,45 @@ interface TableProps {
 }
 
 const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
+
   
+  
+  const [currentFilter, setCurrentFilter] = useState('All');
+  const [filteredProposals, setFilteredProposals] = React.useState<Proposal[]>(proposals);
+
+  const pageSize = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(Math.ceil(filteredProposals.length / pageSize));
+
+  useEffect(() => {
+    setTotalPages(Math.ceil(filteredProposals.length / pageSize));
+  }, [filteredProposals.length, pageSize]);
+
+  const paginatedProposals = filteredProposals.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  useEffect(() => {
+    handleFilterChange(currentFilter);
+    setCurrentPage(1);
+  }, [proposals, currentFilter]);
 
   const handleFilterChange = (filter: string) => {
+    
+    setCurrentFilter(filter);
     if (filter === 'All') {
       setFilteredProposals(proposals);
     } else {
@@ -28,25 +65,17 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
       }
       
     }
+    
+    //setTotalPages(Math.ceil(filteredProposals.length / pageSize));
   };
-  if(proposals.length==0){
-    return (
-      <div>Proposals Not Available Yet</div>
-    );
-  }
-  const [filteredProposals, setFilteredProposals] = React.useState<Proposal[]>(proposals);
-  console.log(filteredProposals.length);
-  function test(index: number):string{
-    let s = '';
-    for(var i=0;i<(index%20);i++){
-      s = s + 'Test Ts ';
-    }
-    return s;
+  
+  if (!proposals || proposals.length==0) {
+    return <div>Loading Proposals...</div>;
   }
   return (
     <div className={styles.tableContainer}>
-      <Filter onFilterChange={handleFilterChange} currentFilter='All' />
-      {filteredProposals.length==0 ? <div><div className={styles.table}>No Proposals available</div></div> : 
+      <Filter onFilterChange={handleFilterChange} currentFilter={currentFilter} />
+      {(filteredProposals.length==0 || !filteredProposals) ? <table className={styles.table}><div className={styles.noProposalContainer}><div className={styles.emptyProposals}>No Proposals available</div></div></table> : 
         <table className={styles.table}>
         <thead>
           <tr key='proposalTableHeader'>
@@ -58,7 +87,7 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
           </tr>
         </thead>
         <tbody>
-          {filteredProposals.map((proposal,index) => (
+          {paginatedProposals.map((proposal,index) => (
             <tr className={styles.row} key={proposal.proposal_id}>
               {/* <div>PROPOSALS</div> */}
               <td className={styles.tableData}><Text font="proto_mono" >{proposal.proposal_id}</Text></td>
@@ -69,8 +98,16 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
             </tr>
           ))}
         </tbody>
-      </table>     
+      </table>    
       }
+      <div className={styles.paginationContainer}>
+        <Button onClick={handlePrevious} disabled={currentPage === 1}>
+          Previous
+        </Button>
+        <Button onClick={handleNext} disabled={currentPage === totalPages}>
+          Next
+        </Button>
+      </div>
       
     </div>
   );

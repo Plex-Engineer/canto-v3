@@ -1,9 +1,9 @@
 .tableContainer {
     width: 96%;
-   //overflow-x: auto;
-    //margin-top: 2rem;
     background: lighten(#C1C1C1, 20%) !important;
     //color: blue !important;
+    // display: flex;
+    // flex-direction: column !important;
     margin: 0 auto;
     padding: 10px;
     //z-index: 1;
@@ -14,7 +14,6 @@
       width: 100%;
       border-collapse: collapse;
       border-spacing: 0;
-      //color: gray;
       border: 1px solid #e0e0e0;
       
       //margin: 0 auto;
@@ -35,7 +34,7 @@
         //white-space: normal;
         //word-wrap: break-word;
         //overflow: hidden;
-        //max-height: 40px; /* or any height you prefer */
+        //max-height: 40px; 
         //vertical-align: top; //
       
       }
@@ -44,7 +43,7 @@
         text-align: left;
         border-bottom: 1px solid #e0e0e0;
         box-sizing: border-box;
-        width: 30% !important; /* or any width you prefer */
+        width: 30% !important; 
         //display: block ;
         overflow-wrap: break-word ;
       }
@@ -121,3 +120,24 @@
   z-index: 1; // Ensure the row appears above the others
 }
 
+.emptyProposals{
+  padding: 20px;
+}
+.noProposalsContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  width: 100%;
+  
+}
+
+.paginationContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin: 20px 20px 20px 20px;
+}
