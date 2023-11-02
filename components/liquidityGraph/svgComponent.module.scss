@@ -14,12 +14,15 @@
 }
 
 .graph {
-  fill: black;
+  //   fill: #555;
+  fill: var(--graph-fill);
 }
 
 .graph-filled {
   //   fill: #292929;
-  fill: var(--canto-color);
+  fill: var(--graph-filled);
+
+  //   fill: var(--canto-color);
 }
 
 .graph-overlay {
@@ -27,7 +30,7 @@
 }
 
 .current-price-line {
-  stroke: white;
+  stroke: var(--primary-light-color);
   stroke-width: 0.5px;
   stroke-dasharray: 2px;
 }

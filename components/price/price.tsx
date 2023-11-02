@@ -36,7 +36,7 @@ const Price = (props: Props) => {
         value={props.price}
         onChange={(e) => props.onPriceChange(e.target.value)}
       />
-      <Text size="xx-sm" theme="secondary-dark">
+      <Text size="sm" theme="secondary-dark">
         {props.description}
       </Text>
     </div>
