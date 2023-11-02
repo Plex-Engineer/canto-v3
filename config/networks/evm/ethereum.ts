@@ -7,7 +7,7 @@ const goerliBlockExplorer = "https://goerli.etherscan.io";
 export const ETH_MAINNET: EVMNetwork = {
   id: "eth-mainnet",
   chainId: 1,
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/eth-white.svg",
+  icon: "/icons/eth.svg",
   name: "Ethereum",
   isTestChain: false,
   rpcUrl:
@@ -29,7 +29,7 @@ export const ETH_MAINNET: EVMNetwork = {
 export const GOERLI_TESTNET: EVMNetwork = {
   id: "goerli-testnet",
   chainId: 5,
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/ethereum/images/eth-white.svg",
+  icon: "/icons/eth.svg",
   name: "Goerli Testnet",
   isTestChain: true,
   rpcUrl: "https://rpc.ankr.com/eth_goerli",

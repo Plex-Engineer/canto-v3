@@ -43,7 +43,9 @@ export const UserCantoDexPairRow = ({
 
       <Text>{pair.symbol}</Text>
     </div>,
-    <Text key={pair.address + "apr"}>{pair.clmData?.distApy + "%"}</Text>,
+    <Text key={pair.address + "apr"}>
+      {(pair.clmData?.distApy ?? "0.00") + "%"}
+    </Text>,
 
     <Text key={pair.address + "share"}>{formatPercent(userPoolShare)}</Text>,
     <Text key={pair.address + "value"}>
@@ -91,7 +93,9 @@ export const GeneralCantoDexPairRow = ({
     <Spacer width="10px" />
     <Text>{pair.symbol}</Text>
   </div>,
-  <Text key={pair.address + "apr"}>{pair.clmData?.distApy + "%"}</Text>,
+  <Text key={pair.address + "apr"}>
+    {(pair.clmData?.distApy ?? "0.00") + "%"}
+  </Text>,
 
   <Text key={pair.address + "tvl"}>
     {displayAmount(pair.tvl, 18, {

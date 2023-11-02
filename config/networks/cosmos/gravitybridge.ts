@@ -10,7 +10,7 @@ const gravityBridgeBlockExplorer = "https://www.mintscan.io/gravity-bridge";
 export const GRAVITY_BRIDGE: CosmosNetwork = {
   id: "gravity-bridge-3",
   chainId: "gravity-bridge-3",
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/gravitybridge/images/grav.svg",
+  icon: "/icons/grav.svg",
   name: "Gravity Bridge",
   isTestChain: false,
   rpcUrl: "https://gravitychain.io:26657",

@@ -10,7 +10,7 @@ const persistenceBlockExplorer = "https://www.mintscan.io/persistence";
 export const PERSISTENCE: CosmosNetwork = {
   id: "core-1",
   chainId: "core-1",
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/persistence/images/xprt.svg",
+  icon: "/icons/xprt.svg",
   name: "Persistence",
   isTestChain: false,
   rpcUrl: "https://rpc.core.persistence.one",

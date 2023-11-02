@@ -6,7 +6,7 @@ const polygonScanUrl = "https://mumbai.polygonscan.com";
 export const MUMBAI_TESTNET: EVMNetwork = {
   id: "mumbai-testnet",
   chainId: 80001,
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/_non-cosmos/polygon/images/matic-purple.svg",
+  icon: "/icons/matic.svg",
   name: "Mumbai Testnet",
   isTestChain: true,
   rpcUrl: "https://rpc-mumbai.maticvigil.com",

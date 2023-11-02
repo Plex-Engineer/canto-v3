@@ -10,7 +10,7 @@ const osmosisBlockExplorer = "https://www.mintscan.io/osmosis";
 export const OSMOSIS: CosmosNetwork = {
   id: "osmosis-1",
   chainId: "osmosis-1",
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg",
+  icon: "/icons/osmo.svg",
   name: "Osmosis",
   isTestChain: false,
   rpcUrl: "https://rpc.osmosis.zone",
