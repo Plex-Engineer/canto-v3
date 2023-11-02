@@ -33,5 +33,11 @@
 }
 
 .handle {
-  fill: #c1c1c1;
+  cursor: pointer;
+
+  &:hover {
+    path {
+      fill: lighten(black, 70);
+    }
+  }
 }

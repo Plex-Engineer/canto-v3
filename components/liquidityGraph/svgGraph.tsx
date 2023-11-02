@@ -290,14 +290,7 @@ const SVGLiquidityGraph = ({
               stroke="black"
               ref={rightLine}
             />
-            <rect
-              width="8"
-              height="20"
-              x=".5"
-              y="-34"
-              style={{ cursor: "pointer" }}
-              className={styles.handle}
-            />
+
             <svg
               width="8"
               height="22"
@@ -306,6 +299,7 @@ const SVGLiquidityGraph = ({
               y="-34"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              className={styles.handle}
             >
               <path
                 d="M15 4.00001C15 1.79087 13.2091 0 11 0H0V38.8235H11C13.2091 38.8235 15 37.0327 15 34.8235V4.00001Z"
