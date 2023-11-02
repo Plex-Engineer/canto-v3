@@ -1,6 +1,4 @@
-.table {
-  //   grid-template-rows: 2rem 60px 1fr;
-
+.tableCard {
   max-width: 1200px;
   min-width: 400px;
   width: 100%;
@@ -10,45 +8,27 @@
   background: var(--card-sub-surface-color, #dfdfdf);
   box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
 }
-.grid {
-  display: grid;
-}
+
 .title {
   display: flex;
   align-items: center;
 }
+
+.table {
+  width: 100%;
+  table-layout: auto;
+  border-collapse: collapse;
+}
+
 .header {
   height: 60px !important;
-  border-bottom: 1px solid var(--border-stroke-color);
 }
 
 .row {
-  display: grid;
-  width: 100%;
-  grid-template-columns: repeat(var(--table-columns), 1fr);
   height: 90px;
-  transition: all 0.1s ease-in;
 
   &:not(.header) {
-    // cursor: pointer;
     border: 1px solid var(--border-stroke-color);
-    border-top: none;
-  }
-
-  > * {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-
-    //   &:last-child {
-    //     grid-column: span 1;
-    //   }
-
-    &:first-child {
-      grid-column: span 2;
-    }
   }
 }
 
@@ -57,17 +37,7 @@
 }
 
 .cell {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: fit-content;
+  // block-size: fit-content;
   text-align: center;
-
-  //   &:last-child {
-  //     grid-column: span 1;
-  //   }
-
-  &:first-child {
-    grid-column: span 2;
-  }
 }

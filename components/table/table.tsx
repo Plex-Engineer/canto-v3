@@ -5,7 +5,6 @@ interface Props {
   headers: string[];
   columns: number;
   data?: any[][];
-  processedData?: any[];
 }
 
 function formatTitle(title: string) {
@@ -16,55 +15,36 @@ function formatTitle(title: string) {
 
 const Table = (props: Props) => {
   return (
-    <div
-      className={styles.table}
-      style={
-        {
-          "--table-columns": props.columns,
-        } as React.CSSProperties
-      }
-    >
+    <div className={styles.tableCard}>
       <div className={styles.title}>
         <Text font="proto_mono" size="lg">
           {props.title}
         </Text>
       </div>
-      <section className={styles.grid}>
-        <div className={styles.row + " " + styles.header}>
-          {props.headers.map((header, index) => {
-            return (
-              <div key={index} className={styles.cell}>
-                <Text theme="secondary-dark" size="sm">
-                  {formatTitle(header)}
-                </Text>
-              </div>
-            );
-          })}
-        </div>
-        {props.processedData &&
-          props.processedData.map((row, index) => {
-            return (
-              <div key={index} className={styles.row}>
-                {row}
-              </div>
-            );
-          })}
-
-        {props.data &&
-          props.data.map((row, index) => {
-            return (
-              <div key={index} className={styles.row}>
-                {row.map((cell, index) => {
-                  return (
-                    <div key={index} className={styles.cell}>
-                      {cell}
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })}
-      </section>
+      <table className={styles.table}>
+        <tr className={styles.row + " " + styles.header}>
+          {props.headers.map((header, index) => (
+            <td
+              key={index}
+              className={styles.cell}
+              style={{ padding: "0 35px" }}
+            >
+              <Text theme="secondary-dark" size="sm">
+                {formatTitle(header)}
+              </Text>
+            </td>
+          ))}
+        </tr>
+        {props.data?.map((row, index) => (
+          <tr key={index} className={styles.row}>
+            {row.map((cell, index) => (
+              <td key={index} className={styles.cell}>
+                {cell}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </table>
     </div>
   );
 };
