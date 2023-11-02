@@ -20,7 +20,7 @@ export const CTokenRow = ({
     gap={10}
     style={{
       padding: "0 16px",
-      width: "200px",
+      width: "220px",
     }}
     center={{
       vertical: true,
