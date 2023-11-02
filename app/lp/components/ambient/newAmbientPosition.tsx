@@ -14,17 +14,16 @@ import { formatPercent } from "@/utils/formatting.utils";
 import Input from "@/components/input/input";
 import Button from "@/components/button/button";
 import Toggle from "@/components/toggle";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import ToggleGroup from "@/components/ToggleGroup/ToggleGroup";
 import Price from "@/components/price/price";
-import SVGLiquidityGraph from "../svgComponent";
 import {
   ALL_TICK_KEYS,
   TickRangeKey,
 } from "@/hooks/pairs/newAmbient/liquidityControllers/defaultParams";
 import { queryAmbientPoolLiquidityCurve } from "@/hooks/pairs/newAmbient/helpers/ambientApi";
 import { convertLiquidityCurveToGraph } from "@/utils/ambient/graphing.utils";
-import ButtonHold from "@/components/button/pressAndHold";
+import AmbientLiquidityGraph from "@/components/liquidityGraph/ambientLiquidityGraph";
 
 interface NewPositionModalProps {
   pool: AmbientPool;
@@ -62,26 +61,11 @@ export const NewAmbientPositionModal = ({
     }
     getGraph();
   }, [pool]);
-  const [xAxis, setXAxis] = useState({
-    min: 0.988,
-    max: 1.01,
-  });
 
+  // set to custom price range
   function setPriceRange(price: { min?: string; max?: string }) {
     positionManager.setters.setRangePrice(price);
     setSelectedOption("CUSTOM");
-    if (price.min && Number(price.min) < xAxis.min) {
-      setXAxis((prev) => ({
-        min: Number(price.min) - 0.001,
-        max: prev.max,
-      }));
-    }
-    if (price.max && Number(price.max) > xAxis.max) {
-      setXAxis((prev) => ({
-        min: prev.min,
-        max: Number(price.max) + 0.001,
-      }));
-    }
   }
 
   return (
@@ -269,52 +253,18 @@ export const NewAmbientPositionModal = ({
           <Container className={styles.advancedContainer}>
             <Text>Set Price Range</Text>
             <Spacer height="8px" />
-            <ButtonHold
-              onHold={() =>
-                setXAxis((prev) => ({
-                  min: prev.min - 0.0001,
-                  max: prev.max + 0.0001,
-                }))
-              }
-              interval={50}
-            >
-              Zoom Out
-            </ButtonHold>
-            <ButtonHold
-              onHold={() =>
-                setXAxis((prev) => ({
-                  min: prev.min + 0.0001,
-                  max: prev.max - 0.0001,
-                }))
-              }
-              interval={50}
-            >
-              Zoom In{" "}
-            </ButtonHold>
-            <Button
-              onClick={() => {
-                setXAxis({
-                  min: 0.988,
-                  max: 1.01,
-                });
-                setDefaultParams("DEFAULT");
-              }}
-            >
-              RESET
-            </Button>
 
-            <div className={styles.priceRanger}>
-              <SVGLiquidityGraph
-                axis={{
-                  x: xAxis,
-                }}
-                points={graphPoints}
-                currentPrice={formatBalance(pool.stats.lastPriceSwap, -12)}
-                minPrice={positionManager.options.minRangePrice}
-                maxPrice={positionManager.options.maxRangePrice}
-                setPrice={(prices) => setPriceRange(prices)}
-              />
-            </div>
+            <AmbientLiquidityGraph
+              points={graphPoints}
+              currentPrice={formatBalance(
+                pool.stats.lastPriceSwap,
+                pool.base.decimals - pool.quote.decimals
+              )}
+              minPrice={positionManager.options.minRangePrice}
+              maxPrice={positionManager.options.maxRangePrice}
+              setPrice={setPriceRange}
+            />
+
             <Spacer height="8px" />
             <ToggleGroup
               options={ALL_TICK_KEYS}

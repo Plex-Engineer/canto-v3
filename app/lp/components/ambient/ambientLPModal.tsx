@@ -7,7 +7,7 @@ import Container from "@/components/container/container";
 import { ValidationReturn } from "@/config/interfaces";
 import Icon from "@/components/icon/icon";
 import Text from "@/components/text";
-import styles from "./cantoDex.module.scss";
+import styles from "../cantoDex.module.scss";
 import {
   AmbientPool,
   AmbientUserPosition,
@@ -16,8 +16,8 @@ import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/am
 import { getPriceFromTick } from "@/utils/ambient/ambientMath.utils";
 import { concLiquidityNoteValue } from "@/utils/ambient/liquidity.utils";
 import BigNumber from "bignumber.js";
-import { NewAmbientPositionModal } from "./ambient/newAmbientPosition";
-import { ManageAmbientPosition } from "./ambient/managePosition";
+import { NewAmbientPositionModal } from "./newAmbientPosition";
+import { ManageAmbientPosition } from "./managePosition";
 
 interface AmbientModalProps {
   pool: AmbientPool;

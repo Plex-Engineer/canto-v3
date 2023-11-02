@@ -1,19 +1,20 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styles from "./svgComponent.module.scss";
 
 type Point = { x: number; y: number };
 type Axis = { min: number; max: number };
 interface Props {
-  currentPrice: string;
-  setPrice: (prices: { min?: string; max?: string }) => void;
-  minPrice: string;
-  maxPrice: string;
-
   points: Point[];
   // axis range
   axis: {
     x: Axis;
   };
+  // for shading region under curve
+  currentXValue: number;
+  minXValue: number;
+  maxXValue: number;
+  // for setting outside values
+  setValues?: (values: { min?: number; max?: number }) => void;
 }
 
 const size = {
@@ -22,22 +23,23 @@ const size = {
 };
 
 const SVGLiquidityGraph = ({
-  currentPrice,
-  setPrice,
-  minPrice,
-  maxPrice,
   points,
   axis,
+  currentXValue,
+  minXValue,
+  maxXValue,
+  setValues,
 }: Props) => {
   // sliders and state for slider positions (state for position allows for faster rerendering)
   const leftLine = React.useRef<any>(null);
   const [leftPosition, setLeftPosition] = React.useState<number>(
-    convertValueToGraphValue(Number(minPrice), axis.x, size.width)
+    convertValueToGraphValue(minXValue, axis.x, size.width)
   );
   const rightLine = React.useRef<any>(null);
   const [rightPosition, setRightPosition] = React.useState<number>(
-    convertValueToGraphValue(Number(maxPrice), axis.x, size.width)
+    convertValueToGraphValue(maxXValue, axis.x, size.width)
   );
+  const rectangleRef = React.useRef<any>(null);
   // variable to keep track of if the mouse is down
   const [mouseDown, setMouseDown] = React.useState<boolean>(false);
 
@@ -45,10 +47,74 @@ const SVGLiquidityGraph = ({
   React.useEffect(() => {
     if (!leftLine.current) return;
     if (!rightLine.current) return;
-
-    groupDrag(leftLine.current, -5, true);
-    groupDrag(rightLine.current, 5, false);
+    sliderDrag(leftLine.current, -5, true);
+    sliderDrag(rightLine.current, 5, false);
+    if (!rectangleRef.current) return;
+    boxDrag(rectangleRef.current);
   }, []);
+
+  function getMouseSvgPoint(
+    element: any,
+    e: MouseEvent
+  ): { x: number; y: number } | undefined {
+    // convert global mouse position to svg coordinates
+    const pt = element.ownerSVGElement?.createSVGPoint();
+    if (!pt) return;
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const svgP = pt.matrixTransform(
+      element.ownerSVGElement.getScreenCTM()?.inverse()
+    );
+    return svgP;
+  }
+  function getElementSvgPoint(element: any): number {
+    const style = window.getComputedStyle(element);
+    const matrix = new WebKitCSSMatrix(style.transform);
+    return matrix.m41;
+  }
+
+  function sliderDrag(element: any, offsetX: number, isMinLine: boolean) {
+    onElementDrag(element, {
+      onDown: () => setMouseDown(true),
+      onUp: () => setMouseDown(false),
+      onMove: (e: MouseEvent) => {
+        // get svg point
+        const svgP = getMouseSvgPoint(element, e);
+        if (!svgP) return;
+        // set positions of line
+        const newPoint = svgP.x - offsetX;
+        moveRangeLine(newPoint, isMinLine);
+      },
+    });
+  }
+
+  function boxDrag(element: any) {
+    // track where the user first clicked on the box and where the sliders currently are
+    let startingClickPoint: number;
+    let startingLeftPosition: number;
+    let startingRightPosition: number;
+    onElementDrag(element, {
+      onDown: (e) => {
+        setMouseDown(true);
+        const svgP = getMouseSvgPoint(element, e);
+        if (!svgP) return;
+        startingClickPoint = svgP.x;
+        startingLeftPosition = getElementSvgPoint(leftLine.current);
+        startingRightPosition = getElementSvgPoint(rightLine.current);
+      },
+      onUp: () => setMouseDown(false),
+      onMove: (e: MouseEvent) => {
+        // see how far the mouse has moved from the starting point
+        const svgP = getMouseSvgPoint(element, e);
+        if (!svgP) return;
+        const offset = svgP.x - startingClickPoint;
+
+        // must move the range lines by the same amount
+        moveRangeLine(startingLeftPosition + offset, true);
+        moveRangeLine(startingRightPosition + offset, false);
+      },
+    });
+  }
 
   // will set the slider positions based on drag
   function moveRangeLine(svgPoint: number, isLeftLine: boolean) {
@@ -56,99 +122,55 @@ const SVGLiquidityGraph = ({
     if (!leftLine.current) return;
     if (!rightLine.current) return;
     // can't use state to get positions, since this function is used in event listeners
-    function getTranslateX(element: any) {
-      const style = window.getComputedStyle(element);
-      const matrix = new WebKitCSSMatrix(style.transform);
-      return matrix.m41;
-    }
+
     // don't let sliders cross
-    if (isLeftLine && svgPoint >= getTranslateX(rightLine.current)) return;
-    if (!isLeftLine && svgPoint <= getTranslateX(leftLine.current)) return;
+    if (isLeftLine && svgPoint >= getElementSvgPoint(rightLine.current)) return;
+    if (!isLeftLine && svgPoint <= getElementSvgPoint(leftLine.current)) return;
     // set correct line position
     if (isLeftLine) setLeftPosition(svgPoint);
     else setRightPosition(svgPoint);
   }
 
-  function groupDrag(group: any, offsetX: number, isMinLine: boolean) {
-    // move group svg with mouse when dragged
-    const onMouseMove = (e: MouseEvent) => {
-      //   convert global mouse position to svg coordinates
-      const pt = group.ownerSVGElement?.createSVGPoint();
-      if (!pt) return;
-      pt.x = e.clientX;
-      pt.y = e.clientY;
-      const svgP = pt.matrixTransform(
-        group.ownerSVGElement.getScreenCTM()?.inverse()
-      );
-      // set positions of line
-      const newPoint = svgP.x - offsetX;
-      moveRangeLine(newPoint, isMinLine);
-    };
+  ///
+  /// USE EFFECTS FOR STATE CHANGES
+  ///
 
-    // remove event listeners when mouse is up
-    const onMouseUp = () => {
-      setMouseDown(false);
-      document.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseup", onMouseUp);
-    };
-    // add event listeners when mouse is down
-    const onMouseDown = () => {
-      setMouseDown(true);
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp);
-    };
-    // add event listener for mouse down
-    group.addEventListener("mousedown", onMouseDown);
+  // called to update the sliders from parent min/max changes change
+  function syncSlidersFromParent() {
+    const svgMin = convertValueToGraphValue(minXValue, axis.x, size.width);
+    moveRangeLine(svgMin, true);
+    const svgMax = convertValueToGraphValue(maxXValue, axis.x, size.width);
+    moveRangeLine(svgMax, false);
   }
+  // useEffect for setting the slider positions when the min/max or zoom changes from the parent
+  React.useEffect(() => {
+    // only sync if mouse is up (don't want to override user dragging)
+    !mouseDown && syncSlidersFromParent();
+  }, [minXValue, maxXValue, axis.x.min, axis.x.max]);
 
+  // called to update the values in the parent (only on drag)
+  function syncValuesInParent() {
+    setValues &&
+      setValues({
+        min: convertGraphValueToValue(leftPosition, axis.x, size.width),
+        max: convertGraphValueToValue(rightPosition, axis.x, size.width),
+      });
+  }
+  // useEffect for syncing the values on slider drag
+  React.useEffect(() => {
+    // only sync values if mouse is down
+    mouseDown && syncValuesInParent();
+  }, [leftPosition, rightPosition]);
+
+  ///
+  /// PATHS ON GRAPH
+  ///
   const paths = () => {
     return convertPointsToSvgPath(axis, points, size, {
       minX: convertGraphValueToValue(leftPosition, axis.x, size.width),
       maxX: convertGraphValueToValue(rightPosition, axis.x, size.width),
     });
   };
-
-  ///
-  /// USE EFFECTS FOR STATE CHANGES
-  ///
-
-  // called to update the sliders from parent price change
-  function syncSlidersFromParent() {
-    const svgMin = convertValueToGraphValue(
-      Number(minPrice),
-      axis.x,
-      size.width
-    );
-    moveRangeLine(svgMin, true);
-    const svgMax = convertValueToGraphValue(
-      Number(maxPrice),
-      axis.x,
-      size.width
-    );
-    moveRangeLine(svgMax, false);
-  }
-  // useEffect for setting the slider positions when the price or zoom changes from the parent
-  React.useEffect(() => {
-    // only sync if mouse is up (don't want to override user dragging)
-    !mouseDown && syncSlidersFromParent();
-  }, [minPrice, maxPrice, axis.x.min, axis.x.max]);
-
-  // called to update the price in the parent (only on drag)
-  function syncPriceInParent() {
-    setPrice({
-      min: convertGraphValueToValue(leftPosition, axis.x, size.width).toFixed(
-        4
-      ),
-      max: convertGraphValueToValue(rightPosition, axis.x, size.width).toFixed(
-        4
-      ),
-    });
-  }
-  // useEffect for syncing the prices on slider drag
-  React.useEffect(() => {
-    // only sync price if mouse is down
-    mouseDown && syncPriceInParent();
-  }, [leftPosition, rightPosition]);
 
   return (
     <>
@@ -180,6 +202,8 @@ const SVGLiquidityGraph = ({
             width={rightPosition - leftPosition}
             height="140"
             fill="#06FC9933"
+            ref={rectangleRef}
+            style={{ cursor: "pointer" }}
           />
           {/* min range slider */}
           <g transform={`translate(${leftPosition},20)`} ref={leftLine}>
@@ -224,17 +248,9 @@ const SVGLiquidityGraph = ({
           </g>
           {/* current price line */}
           <line
-            x1={convertValueToGraphValue(
-              Number(currentPrice),
-              axis.x,
-              size.width
-            )}
+            x1={convertValueToGraphValue(currentXValue, axis.x, size.width)}
             y1="-40"
-            x2={convertValueToGraphValue(
-              Number(currentPrice),
-              axis.x,
-              size.width
-            )}
+            x2={convertValueToGraphValue(currentXValue, axis.x, size.width)}
             y2="120"
             stroke="black"
             strokeWidth="1"
@@ -291,6 +307,35 @@ const SVGLiquidityGraph = ({
 ///
 /// Helper functions for graph
 ///
+
+function onElementDrag(
+  element: any,
+  callbacks: {
+    onMove: (e: MouseEvent) => void;
+    onUp?: (e: MouseEvent) => void;
+    onDown?: (e: MouseEvent) => void;
+  }
+) {
+  // callback for when mouse is moved
+  const onMouseMove = (e: MouseEvent) => callbacks.onMove(e);
+
+  const onMouseUp = (e: MouseEvent) => {
+    // callback for when mouse is up
+    callbacks.onUp && callbacks.onUp(e);
+    // remove event listeners when mouse is up
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
+  };
+  const onMouseDown = (e: MouseEvent) => {
+    // callback for when mouse is down
+    callbacks.onDown && callbacks.onDown(e);
+    // add event listeners when mouse is down
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  };
+  // add event listener for mouse down
+  element.addEventListener("mousedown", onMouseDown);
+}
 
 function convertValueToGraphValue(
   value: number,
