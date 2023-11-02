@@ -10,7 +10,7 @@ const quicksilverBlockExplorer = "https://www.mintscan.io/quicksilver";
 export const QUICKSILVER: CosmosNetwork = {
   id: "quicksilver-2",
   chainId: "quicksilver-2",
-  icon: "/icons/qck.png",
+  icon: "/icons/qck.svg",
   name: "Quicksilver",
   isTestChain: false,
   rpcUrl: "https://rpc.quicksilver.zone:443",

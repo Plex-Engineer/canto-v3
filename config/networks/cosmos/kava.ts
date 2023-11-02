@@ -10,7 +10,7 @@ const kavaBlockExplorer = "https://www.mintscan.io/kava";
 export const KAVA: CosmosNetwork = {
   id: "kava_2222-10",
   chainId: "kava_2222-10",
-  icon: "/icons/kava.png",
+  icon: "/icons/kava.svg",
   name: "Kava",
   isTestChain: false,
   rpcUrl: "https://rpc.data.kava.io",
