@@ -24,6 +24,7 @@ import {
 import { queryAmbientPoolLiquidityCurve } from "@/hooks/pairs/newAmbient/helpers/ambientApi";
 import { convertLiquidityCurveToGraph } from "@/utils/ambient/graphing.utils";
 import AmbientLiquidityGraph from "@/components/liquidityGraph/ambientLiquidityGraph";
+import { divideBalances } from "@/utils/tokens/tokenMath.utils";
 
 interface NewPositionModalProps {
   pool: AmbientPool;
@@ -67,6 +68,9 @@ export const NewAmbientPositionModal = ({
     positionManager.setters.setRangePrice(price);
     setSelectedOption("CUSTOM");
   }
+
+  const percentDiff = (currentPrice: number, selectedPrice: number) =>
+    formatPercent(((selectedPrice - currentPrice) / currentPrice).toString());
 
   return (
     <Container width={showAdvanced ? "64rem" : "32rem"}>
@@ -279,14 +283,30 @@ export const NewAmbientPositionModal = ({
                 title="Min Range Price"
                 price={positionManager.options.minRangePrice}
                 onPriceChange={(price) => setPriceRange({ min: price })}
-                description={pool.base.symbol + " per " + pool.quote.symbol}
+                description={percentDiff(
+                  Number(
+                    formatBalance(
+                      pool.stats.lastPriceSwap,
+                      pool.base.decimals - pool.quote.decimals
+                    )
+                  ),
+                  Number(positionManager.options.minRangePrice ?? "0")
+                )}
               />
               <Spacer width="32px" />
               <Price
                 title="Max Range Price"
                 price={positionManager.options.maxRangePrice}
                 onPriceChange={(price) => setPriceRange({ max: price })}
-                description={pool.base.symbol + " per " + pool.quote.symbol}
+                description={percentDiff(
+                  Number(
+                    formatBalance(
+                      pool.stats.lastPriceSwap,
+                      pool.base.decimals - pool.quote.decimals
+                    )
+                  ),
+                  Number(positionManager.options.maxRangePrice ?? "0")
+                )}
               />
             </Container>
           </Container>
