@@ -183,26 +183,26 @@ const SVGLiquidityGraph = ({
         <svg viewBox="0 0 200 100" className={styles.svg}>
           {/* graph points */}
           <polyline
+            className={styles.graph}
             points={paths().mainPath}
             stroke="black"
-            fill="#999"
-            strokeWidth="1"
+            strokeWidth="0"
             width={"2"}
           />
           <polyline
+            className={styles["graph-filled"]}
             points={paths().filledPath}
             stroke="black"
-            fill="#08ff14"
             opacity={1}
-            strokeWidth="1"
+            strokeWidth="0"
           />
           <rect
             x={leftPosition}
             y={-20}
             width={rightPosition - leftPosition}
             height="140"
-            fill="#06FC9933"
             ref={rectangleRef}
+            className={styles["graph-overlay"]}
             style={{ cursor: "pointer" }}
           />
           {/* min range slider */}
@@ -215,15 +215,35 @@ const SVGLiquidityGraph = ({
               stroke="black"
               ref={leftLine}
             />
-            <rect
+
+            <svg
               width="8"
-              height="20"
-              fill="green"
+              height="22"
+              viewBox="0 0 15 39"
               x="-8.5"
-              y="-30"
-              style={{ cursor: "pointer" }}
-            />
-            <g>
+              y="-34"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className={styles.handle}
+            >
+              <path
+                d="M0 4.00001C0 1.79087 1.79086 0 4 0H15V38.8235H4C1.79086 38.8235 0 37.0327 0 34.8235V4.00001Z"
+                fill="#C1C1C1"
+              />
+              <path
+                d="M5 11.9117L5 26.9117"
+                stroke="#111111"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M10 11.9117L10 26.9117"
+                stroke="#111111"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+            {/* <g>
               <rect
                 x={-40}
                 y={-30}
@@ -232,11 +252,13 @@ const SVGLiquidityGraph = ({
                 fill="#22222239"
                 rx={1}
               />
+
               <text
                 x={-40 + 30 / 2}
                 y={-30 + 14 / 2}
                 dominantBaseline="middle"
                 textAnchor="middle"
+                className={styles.text}
               >
                 {convertGraphValueToValue(
                   leftPosition,
@@ -244,16 +266,17 @@ const SVGLiquidityGraph = ({
                   size.width
                 ).toFixed(4)}
               </text>
-            </g>
+            </g> */}
           </g>
           {/* current price line */}
           <line
+            className={styles["current-price-line"]}
             x1={convertValueToGraphValue(currentXValue, axis.x, size.width)}
             y1="-40"
             x2={convertValueToGraphValue(currentXValue, axis.x, size.width)}
             y2="120"
             stroke="black"
-            strokeWidth="1"
+            strokeWidth=".5"
             strokeDasharray={"2,2"}
           />
           {/* max range slider */}
@@ -263,32 +286,62 @@ const SVGLiquidityGraph = ({
               y1="-40"
               x2="0"
               y2="120"
+              strokeWidth={"1"}
               stroke="black"
               ref={rightLine}
             />
             <rect
               width="8"
               height="20"
-              fill="green"
               x=".5"
-              y="-30"
+              y="-34"
               style={{ cursor: "pointer" }}
+              className={styles.handle}
             />
+            <svg
+              width="8"
+              height="22"
+              viewBox="0 0 15 39"
+              x=".5"
+              y="-34"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15 4.00001C15 1.79087 13.2091 0 11 0H0V38.8235H11C13.2091 38.8235 15 37.0327 15 34.8235V4.00001Z"
+                fill="#C1C1C1"
+              />
+              <path
+                d="M10 11.9117L10 26.9117"
+                stroke="#111111"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M5 11.9117L5 26.9117"
+                stroke="#111111"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
 
-            <g>
+            {/* <g>
               <rect
                 x={10}
                 y={-30}
-                width={30}
+                width={3}
                 height={14}
-                fill="#22222239"
+                fill="#64646439"
                 rx={1}
               />
+
               <text
                 x={10 + 30 / 2}
                 y={-30 + 14 / 2}
                 dominantBaseline="middle"
                 textAnchor="middle"
+                fontSize={10}
+                className={styles.text}
               >
                 {convertGraphValueToValue(
                   rightPosition,
@@ -296,7 +349,7 @@ const SVGLiquidityGraph = ({
                   size.width
                 ).toFixed(4)}
               </text>
-            </g>
+            </g> */}
           </g>
         </svg>
       </div>

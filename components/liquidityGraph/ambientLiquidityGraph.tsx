@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import styles from "./ambientLiquidityGraph.module.scss";
 import ButtonHold from "../button/pressAndHold";
 import Button from "../button/button";
+import Container from "../container/container";
+import Spacer from "../layout/spacer";
+import Text from "../text";
 
 interface Props {
   points: { x: number; y: number }[];
@@ -62,30 +65,43 @@ const AmbientLiquidityGraph = ({
     });
   }, [minPrice, maxPrice]);
   return (
-    <>
-      <ButtonHold
-        onHold={() =>
-          setXAxis((prev) => ({
-            min: prev.min - 0.0001,
-            max: prev.max + 0.0001,
-          }))
-        }
-        interval={50}
-      >
-        Zoom Out
-      </ButtonHold>
-      <ButtonHold
-        onHold={() =>
-          setXAxis((prev) => ({
-            min: prev.min + 0.0001,
-            max: prev.max - 0.0001,
-          }))
-        }
-        interval={50}
-      >
-        Zoom In{" "}
-      </ButtonHold>
-      <Button onClick={() => setXAxis(initialXAxis(points))}>RESET</Button>
+    <Container gap={10}>
+      <Container direction="row" gap={"auto"} width="100%">
+        <Text>Set Price Range</Text>
+        <Spacer height="8px" />
+        <Container direction="row">
+          <ButtonHold
+            color="secondary"
+            onHold={() =>
+              setXAxis((prev) => ({
+                min: prev.min - 0.0001,
+                max: prev.max + 0.0001,
+              }))
+            }
+            interval={50}
+          >
+            -
+          </ButtonHold>
+          <ButtonHold
+            color="secondary"
+            onHold={() =>
+              setXAxis((prev) => ({
+                min: prev.min + 0.0001,
+                max: prev.max - 0.0001,
+              }))
+            }
+            interval={50}
+          >
+            +
+          </ButtonHold>
+          <Button
+            color="secondary"
+            onClick={() => setXAxis(initialXAxis(points))}
+          >
+            RESET
+          </Button>
+        </Container>
+      </Container>
       <div className={styles.priceRanger}>
         <SVGLiquidityGraph
           points={points}
@@ -103,7 +119,7 @@ const AmbientLiquidityGraph = ({
           }
         />
       </div>
-    </>
+    </Container>
   );
 };
 

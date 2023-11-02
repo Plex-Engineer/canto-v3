@@ -12,3 +12,26 @@
     user-select: none;
   }
 }
+
+.graph {
+  fill: black;
+}
+
+.graph-filled {
+  //   fill: #292929;
+  fill: var(--canto-color);
+}
+
+.graph-overlay {
+  fill: #48484833;
+}
+
+.current-price-line {
+  stroke: white;
+  stroke-width: 0.5px;
+  stroke-dasharray: 2px;
+}
+
+.handle {
+  fill: #c1c1c1;
+}

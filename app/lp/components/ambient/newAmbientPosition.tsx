@@ -255,9 +255,6 @@ export const NewAmbientPositionModal = ({
 
         {showAdvanced && (
           <Container className={styles.advancedContainer}>
-            <Text>Set Price Range</Text>
-            <Spacer height="8px" />
-
             <AmbientLiquidityGraph
               points={graphPoints}
               currentPrice={formatBalance(
