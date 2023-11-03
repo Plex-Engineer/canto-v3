@@ -38,7 +38,6 @@ interface Props {
   extraDetails?: ReactNode;
 }
 const ConfirmationModal = (props: Props) => {
-  console.log(props);
   const [keplrError, setKeplrError] = React.useState<string>("");
   return (
     <div className={styles["confirmation-container"]}>
