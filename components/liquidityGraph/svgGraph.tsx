@@ -1,5 +1,7 @@
 import React from "react";
 import styles from "./svgComponent.module.scss";
+import Container from "../container/container";
+import Text from "../text";
 
 type Point = { x: number; y: number };
 type Axis = { min: number; max: number };
@@ -203,7 +205,6 @@ const SVGLiquidityGraph = ({
             height="140"
             ref={rectangleRef}
             className={styles["graph-overlay"]}
-            style={{ cursor: "pointer" }}
           />
           {/* min range slider */}
           <g transform={`translate(${leftPosition},20)`} ref={leftLine}>
@@ -344,6 +345,74 @@ const SVGLiquidityGraph = ({
                 ).toFixed(4)}
               </text>
             </g> */}
+          </g>
+
+          {/* x axis plotting */}
+        </svg>
+        <svg viewBox="0 0 200 10" className={styles.svgAxis}>
+          <g>
+            <text
+              x={0}
+              y={0}
+              dominantBaseline="middle"
+              textAnchor="start"
+              fontSize={10}
+              className={styles.text}
+            >
+              {axis.x.min.toFixed(4)}
+            </text>
+            <text
+              x={size.width / 4}
+              y={0}
+              dominantBaseline="middle"
+              textAnchor="middle"
+              fontSize={10}
+              className={styles.text}
+            >
+              {convertGraphValueToValue(
+                size.width / 4,
+                axis.x,
+                size.width
+              ).toFixed(4)}
+            </text>
+            <text
+              x={size.width / 2}
+              y={0}
+              dominantBaseline="middle"
+              textAnchor="middle"
+              fontSize={10}
+              className={styles.text}
+            >
+              {convertGraphValueToValue(
+                size.width / 2,
+                axis.x,
+                size.width
+              ).toFixed(4)}
+            </text>
+            <text
+              x={(size.width * 3) / 4}
+              y={0}
+              dominantBaseline="middle"
+              textAnchor="middle"
+              fontSize={10}
+              className={styles.text}
+            >
+              {convertGraphValueToValue(
+                (size.width * 3) / 4,
+                axis.x,
+                size.width
+              ).toFixed(4)}
+            </text>
+            <text
+              x={size.width}
+              y={0}
+              dominantBaseline="middle"
+              textAnchor="end"
+              fontSize={10}
+              className={styles.text}
+            >
+              {axis.x.max.toFixed(4)}
+            </text>
           </g>
         </svg>
       </div>

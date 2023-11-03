@@ -266,7 +266,7 @@ export const NewAmbientPositionModal = ({
               setPrice={setPriceRange}
             />
 
-            <Spacer height="8px" />
+            <Spacer height="30px" />
             <ToggleGroup
               options={ALL_TICK_KEYS}
               selected={selectedOption}
