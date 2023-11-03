@@ -3,7 +3,7 @@
 import styles from "./lending.module.scss";
 import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
-import Table from "@/components/teable/table";
+import Table from "@/components/table/table";
 
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import { useLendingCombo } from "./utils";

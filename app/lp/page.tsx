@@ -172,17 +172,14 @@ export default function Page() {
         <Table
           title="Your Pairs"
           headers={[
-            "Pair",
-            "APR",
-            "Pool Share",
-            "Value",
-            // "# LP Tokens",
-            // "# Staked",
-            "Rewards",
-            "Edit",
+            { value: "Pair", ratio: 2 },
+            { value: "APR", ratio: 1 },
+            { value: "Pool Share", ratio: 1 },
+            { value: "Value", ratio: 1 },
+            { value: "Rewards", ratio: 1 },
+            { value: "Edit", ratio: 1 },
           ]}
-          columns={7}
-          data={[
+          content={[
             ...userAmbientPools.map((pool) =>
               UserAmbientPairRow({
                 pool,
@@ -206,9 +203,14 @@ export default function Page() {
       <Spacer height="40px" />
       <Table
         title="All Pairs"
-        headers={["Pair", "APR", "TVL", "Type", "action"]}
-        columns={6}
-        data={[
+        headers={[
+          { value: "Pair", ratio: 2 },
+          { value: "APR", ratio: 1 },
+          { value: "TVL", ratio: 1 },
+          { value: "Type", ratio: 1 },
+          { value: "Action", ratio: 1 },
+        ]}
+        content={[
           ...ambientPools.map((pool) =>
             GeneralAmbientPairRow({
               pool,

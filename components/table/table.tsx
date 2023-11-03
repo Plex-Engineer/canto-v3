@@ -1,50 +1,67 @@
 import Text from "../text";
 import styles from "./table.module.scss";
+
 interface Props {
   title?: string;
-  headers: string[];
-  columns: number;
-  data?: any[][];
+  headers: {
+    value: string;
+    ratio: number;
+  }[];
+  content: React.ReactNode[][];
 }
-
-function formatTitle(title: string) {
-  return title
-    .replace(/_/g, " ")
-    .replace(/\w\S*/g, (w) => w.replace(/^\w/, (c) => c.toUpperCase()));
-}
-
 const Table = (props: Props) => {
   return (
-    <div className={styles.tableCard}>
+    <div className={styles.container}>
       <div className={styles.title}>
         <Text font="proto_mono" size="lg">
           {props.title}
         </Text>
       </div>
-      <table className={styles.table}>
-        <tr className={styles.row + " " + styles.header}>
-          {props.headers.map((header, index) => (
-            <td
-              key={index}
-              className={styles.cell}
-              style={{ padding: "0 35px" }}
-            >
-              <Text theme="secondary-dark" size="sm">
-                {formatTitle(header)}
-              </Text>
-            </td>
-          ))}
-        </tr>
-        {props.data?.map((row, index) => (
-          <tr key={index} className={styles.row}>
-            {row.map((cell, index) => (
-              <td key={index} className={styles.cell}>
-                {cell}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </table>
+      <div className={styles.table}>
+        <div
+          className={styles.header}
+          style={{
+            gridTemplateColumns: props.headers
+              .map((header) => {
+                return `${header.ratio}fr`;
+              })
+              .join(" "),
+          }}
+        >
+          {props.headers.map((header, index) => {
+            return (
+              <div key={index} className={styles.cell}>
+                {header.value}
+              </div>
+            );
+          })}
+        </div>
+        <div className={styles.content}>
+          {props.content.map((row, index) => {
+            return (
+              <div
+                key={index}
+                className={styles.row}
+                style={{
+                  gridTemplateColumns: props.headers
+                    .map((header) => {
+                      return `${header.ratio}fr`;
+                    })
+                    .join(" "),
+                }}
+              >
+                {row.map((cell, index) => {
+                  return (
+                    <div key={index} className={styles.cell}>
+                      {cell}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };

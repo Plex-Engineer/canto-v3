@@ -1,4 +1,4 @@
-.tableCard {
+.container {
   max-width: 1200px;
   min-width: 400px;
   width: 100%;
@@ -9,35 +9,39 @@
   box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
 }
 
-.title {
-  display: flex;
-  align-items: center;
-}
-
 .table {
-  width: 100%;
-  table-layout: auto;
-  border-collapse: collapse;
+  display: grid;
+  grid-template-rows: 50px 1fr;
 }
 
 .header {
-  height: 60px !important;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-bottom: 1px solid var(--border-stroke-color);
 }
 
+.content {
+  display: grid;
+}
 .row {
-  height: 90px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  height: 80px;
 
   &:not(.header) {
+    // cursor: pointer;
     border: 1px solid var(--border-stroke-color);
+    border-top: none;
+  }
+  &:not(.header):hover {
+    background: rgba(var(--dark-color), 0.1);
   }
 }
 
-.row:hover:not(.header) {
-  background: rgba(var(--dark-color), 0.1);
-}
-
 .cell {
-  width: fit-content;
-  // block-size: fit-content;
+  font-family: var(--proto-mono);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-align: center;
 }

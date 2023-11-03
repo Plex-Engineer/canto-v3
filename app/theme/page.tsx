@@ -2,7 +2,7 @@ import Button from "@/components/button/button";
 import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
-import Table from "@/components/teable/table";
+import Table from "@/components/table/table";
 import Text from "@/components/text";
 import Toggle from "@/components/toggle";
 
