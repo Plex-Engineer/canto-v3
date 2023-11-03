@@ -234,14 +234,14 @@ const SVGLiquidityGraph = ({
               <path
                 d="M5 11.9117L5 26.9117"
                 stroke="#111111"
-                stroke-width="2"
-                stroke-linecap="round"
+                strokeWidth="2"
+                strokeLinecap="round"
               />
               <path
                 d="M10 11.9117L10 26.9117"
                 stroke="#111111"
-                stroke-width="2"
-                stroke-linecap="round"
+                strokeWidth="2"
+                strokeLinecap="round"
               />
             </svg>
             {/* <g>
@@ -309,14 +309,14 @@ const SVGLiquidityGraph = ({
               <path
                 d="M10 11.9117L10 26.9117"
                 stroke="#111111"
-                stroke-width="2"
-                stroke-linecap="round"
+                strokeWidth="2"
+                strokeLinecap="round"
               />
               <path
                 d="M5 11.9117L5 26.9117"
                 stroke="#111111"
-                stroke-width="2"
-                stroke-linecap="round"
+                strokeWidth="2"
+                strokeLinecap="round"
               />
             </svg>
 
@@ -349,7 +349,16 @@ const SVGLiquidityGraph = ({
 
           {/* x axis plotting */}
         </svg>
-        <svg viewBox="0 0 200 10" className={styles.svgAxis}>
+        <svg
+          viewBox="0 0 200 10"
+          className={styles.svgAxis}
+          onMouseMove={(e) => {
+            // pan graph if mouse is down
+            // if (!mouseDown) return;
+
+            console.log("mouse move", e.movementX);
+          }}
+        >
           <g>
             <text
               x={0}
