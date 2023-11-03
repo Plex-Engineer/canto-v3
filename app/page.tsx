@@ -1,9 +1,7 @@
 "use client";
 
 import Container from "@/components/container/container";
-import Text from "@/components/text";
 import styles from "./home.module.scss";
-import EcoTile from "../components/ecoTile/ecoTile";
 import Icon from "@/components/icon/icon";
 import Button from "@/components/button/button";
 import Link from "next/link";

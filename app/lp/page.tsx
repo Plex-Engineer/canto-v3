@@ -18,7 +18,7 @@ import {
   isAmbientPool,
   isCantoDexPair,
 } from "@/hooks/pairs/lpCombo/interfaces.ts/pairTypes";
-import { AmbientModal } from "./components/ambientLPModal";
+import { AmbientModal } from "./components/ambient/ambientLPModal";
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
@@ -133,7 +133,11 @@ export default function Page() {
   //main content
   return (
     <div className={styles.container}>
-      <Modal open={selectedPair !== null} onClose={() => setPair(null)}>
+      <Modal
+        open={selectedPair !== null}
+        onClose={() => setPair(null)}
+        closeOnOverlayClick={false}
+      >
         {selectedPair && isCantoDexPair(selectedPair) && (
           <CantoDexLPModal
             pair={selectedPair}
@@ -167,6 +171,8 @@ export default function Page() {
           )}
         />
       </Container>
+      {/* <SVGComponent /> */}
+
       <Spacer height="30px" />
       {userCantoDexPairs.length + userAmbientPools.length > 0 && (
         <Table
