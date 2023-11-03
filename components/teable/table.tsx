@@ -1,0 +1,69 @@
+import Text from "../text";
+import styles from "./table.module.scss";
+
+interface Props {
+  title?: string;
+  headers: {
+    value: string;
+    ratio: number;
+  }[];
+  content: React.ReactNode[][];
+}
+const Table = (props: Props) => {
+  return (
+    <div className={styles.container}>
+      <div className={styles.title}>
+        <Text font="proto_mono" size="lg">
+          {props.title}
+        </Text>
+      </div>
+      <div className={styles.table}>
+        <div
+          className={styles.header}
+          style={{
+            gridTemplateColumns: props.headers
+              .map((header) => {
+                return `${header.ratio}fr`;
+              })
+              .join(" "),
+          }}
+        >
+          {props.headers.map((header, index) => {
+            return (
+              <div key={index} className={styles.cell}>
+                {header.value}
+              </div>
+            );
+          })}
+        </div>
+        <div className={styles.content}>
+          {props.content.map((row, index) => {
+            return (
+              <div
+                key={index}
+                className={styles.row}
+                style={{
+                  gridTemplateColumns: props.headers
+                    .map((header) => {
+                      return `${header.ratio}fr`;
+                    })
+                    .join(" "),
+                }}
+              >
+                {row.map((cell, index) => {
+                  return (
+                    <div key={index} className={styles.cell}>
+                      {cell}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Table;

@@ -1,0 +1,46 @@
+.container {
+  max-width: 1200px;
+  min-width: 400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px;
+  border-radius: var(--border-radius);
+  background: var(--card-sub-surface-color, #dfdfdf);
+  box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
+}
+
+.table {
+  display: grid;
+  grid-template-rows: 50px 1fr;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-bottom: 1px solid var(--border-stroke-color);
+}
+
+.content {
+  display: grid;
+}
+.row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  height: 80px;
+
+  &:not(.header) {
+    // cursor: pointer;
+    border: 1px solid var(--border-stroke-color);
+    border-top: none;
+  }
+  &:not(.header):hover {
+    background: rgba(var(--dark-color), 0.1);
+  }
+}
+
+.cell {
+  font-family: var(--proto-mono);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
