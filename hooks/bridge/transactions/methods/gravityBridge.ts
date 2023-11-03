@@ -104,14 +104,15 @@ export async function bridgeInGravity(
           "Access-Control-Request-Headers": "Content-Type, Authorization",
           "Access-Control-Allow-Origin": "true",
         },
-        mode: "no-cors",
         body: JSON.stringify({
           cantoAddress: cantoReceiver,
           hexAddress: ethSender,
         }),
       });
       if (botError) {
-        return NEW_ERROR("bridgeInGravity::" + "pubKey: pub key error");
+        return NEW_ERROR(
+          "bridgeInGravity::" + "pubKey: pub key error " + errMsg(botError)
+        );
       }
     }
 
