@@ -25,6 +25,7 @@ export default function useProposals(
         "/v1/gov/proposals"
       );
       if (error) throw error;
+      //const proposalData = JSON.parse(proposals);
       return proposals;
     },
     {
