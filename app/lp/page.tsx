@@ -182,26 +182,24 @@ export default function Page() {
             "Edit",
           ]}
           columns={7}
-          processedData={[
-            ...userAmbientPools.map((pool) => (
-              <UserAmbientPairRow
-                key={pool.symbol}
-                pool={pool}
-                onManage={(poolAddress) => {
+          data={[
+            ...userAmbientPools.map((pool) =>
+              UserAmbientPairRow({
+                pool,
+                onManage: (poolAddress) => {
                   setPair(poolAddress);
-                }}
-                rewards={ambient.rewards}
-              />
-            )),
-            ...userCantoDexPairs.map((pair) => (
-              <UserCantoDexPairRow
-                key={pair.symbol}
-                pair={pair}
-                onManage={(pairAddress) => {
+                },
+                rewards: ambient.rewards,
+              })
+            ),
+            ...userCantoDexPairs.map((pair) =>
+              UserCantoDexPairRow({
+                pair,
+                onManage: (pairAddress) => {
                   setPair(pairAddress);
-                }}
-              />
-            )),
+                },
+              })
+            ),
           ]}
         />
       )}
@@ -210,23 +208,19 @@ export default function Page() {
         title="All Pairs"
         headers={["Pair", "APR", "TVL", "Type", "action"]}
         columns={6}
-        processedData={[
-          ...ambientPools.map((pool) => (
-            <GeneralAmbientPairRow
-              key={pool.symbol}
-              pool={pool}
-              onAddLiquidity={(poolAddress) => setPair(poolAddress)}
-            />
-          )),
-          ...sortedPairs.map((pair) => (
-            <GeneralCantoDexPairRow
-              key={pair.symbol}
-              pair={pair}
-              onAddLiquidity={(pairAddress) => {
-                setPair(pairAddress);
-              }}
-            />
-          )),
+        data={[
+          ...ambientPools.map((pool) =>
+            GeneralAmbientPairRow({
+              pool,
+              onAddLiquidity: (poolAddress) => setPair(poolAddress),
+            })
+          ),
+          ...sortedPairs.map((pair) =>
+            GeneralCantoDexPairRow({
+              pair,
+              onAddLiquidity: (pairAddress) => setPair(pairAddress),
+            })
+          ),
         ]}
       />
       <Spacer height="40px" />

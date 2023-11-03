@@ -21,6 +21,7 @@ interface LendingComboReturn {
   cTokens: {
     cNote: CTokenWithUserData | undefined;
     rwas: CTokenWithUserData[];
+    stableCoins: CTokenWithUserData[];
   };
   isLoading: boolean;
   clmPosition: {
@@ -75,6 +76,11 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
   const rwaAddressList = getCTokensFromType(chainId, "rwas");
   const rwas = cTokens.filter((cToken) =>
     listIncludesAddress(rwaAddressList ?? [], cToken.address)
+  );
+
+  const stableCoinAddressList = getCTokensFromType(chainId, "stableCoins");
+  const stableCoins = cTokens.filter((cToken) =>
+    listIncludesAddress(stableCoinAddressList ?? [], cToken.address)
   );
 
   // relevant user position data to show in UI
@@ -170,6 +176,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     cTokens: {
       cNote,
       rwas,
+      stableCoins,
     },
     isLoading,
     clmPosition: {
