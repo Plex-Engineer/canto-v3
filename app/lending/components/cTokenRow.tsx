@@ -53,6 +53,7 @@ export const CTokenRow = ({
   <Container
     key={cToken.name + "Manage"}
     direction="row"
+    gap={10}
     center={{ horizontal: true }}
   >
     {onSupply && (

@@ -3,7 +3,7 @@
 import styles from "./lending.module.scss";
 import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
-import Table from "@/components/table/table";
+import Table from "@/components/teable/table";
 
 import { displayAmount } from "@/utils/tokenBalances.utils";
 import { useLendingCombo } from "./utils";
@@ -240,17 +240,16 @@ const CTokenTable = ({
         </Container>
       ) : cTokens.length > 0 ? (
         <Table
-          columns={7}
           title={title}
           headers={[
-            "Asset",
-            "APR",
-            "Wallet Balance",
-            "Supplied Amount",
-            "Collateral Factor",
-            "Manage",
+            { value: "Asset", ratio: 2 },
+            { value: "APR", ratio: 1 },
+            { value: "Wallet Balance", ratio: 1 },
+            { value: "Supplied Amount", ratio: 1 },
+            { value: "Collateral Factor", ratio: 1 },
+            { value: "Manage", ratio: 2 },
           ]}
-          data={[
+          content={[
             ...cTokens.map((cToken) =>
               CTokenRow({
                 cToken,
