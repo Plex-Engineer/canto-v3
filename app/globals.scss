@@ -38,10 +38,14 @@ a {
 }
 
 .light {
+  --graph-fill: #868686;
+  --graph-filled: #141414;
   --anim-bg-color: #dddddd;
   --canto-color: var(--extra-success-color, #06fc99);
   --dark-color: 17, 17, 17;
   --light-color: 255, 255, 255;
+  --lighten-color: white;
+  --darken-color: black;
   --primary-dark-color: #222;
   --primary-light-color: #eee;
   --text-only-dark: #212121;
@@ -140,8 +144,12 @@ a {
 }
 
 .dark {
+  --graph-fill: #969696;
+  //   --graph-filled: #dcdcdc;
+  --graph-filled: #06fc99;
   --temp-bg-brightness: 0.24;
-
+  --lighten-color: black;
+  --darken-color: white;
   --anim-bg-color: #1b4633;
   --canto-color: #06fc99;
   --light-color: 17, 17, 17;

@@ -15,7 +15,7 @@ import Input from "@/components/input/input";
 import Button from "@/components/button/button";
 import Toggle from "@/components/toggle";
 import { useEffect, useState } from "react";
-import ToggleGroup from "@/components/ToggleGroup/ToggleGroup";
+import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import Price from "@/components/price/price";
 import {
   ALL_TICK_KEYS,
@@ -255,9 +255,6 @@ export const NewAmbientPositionModal = ({
 
         {showAdvanced && (
           <Container className={styles.advancedContainer}>
-            <Text>Set Price Range</Text>
-            <Spacer height="8px" />
-
             <AmbientLiquidityGraph
               points={graphPoints}
               currentPrice={formatBalance(
@@ -269,7 +266,7 @@ export const NewAmbientPositionModal = ({
               setPrice={setPriceRange}
             />
 
-            <Spacer height="8px" />
+            <Spacer height="30px" />
             <ToggleGroup
               options={ALL_TICK_KEYS}
               selected={selectedOption}

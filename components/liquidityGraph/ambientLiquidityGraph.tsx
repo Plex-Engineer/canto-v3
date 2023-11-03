@@ -3,6 +3,10 @@ import { useEffect, useState } from "react";
 import styles from "./ambientLiquidityGraph.module.scss";
 import ButtonHold from "../button/pressAndHold";
 import Button from "../button/button";
+import Container from "../container/container";
+import Spacer from "../layout/spacer";
+import Text from "../text";
+import Icon from "../icon/icon";
 
 interface Props {
   points: { x: number; y: number }[];
@@ -62,30 +66,58 @@ const AmbientLiquidityGraph = ({
     });
   }, [minPrice, maxPrice]);
   return (
-    <>
-      <ButtonHold
-        onHold={() =>
-          setXAxis((prev) => ({
-            min: prev.min - 0.0001,
-            max: prev.max + 0.0001,
-          }))
-        }
-        interval={50}
-      >
-        Zoom Out
-      </ButtonHold>
-      <ButtonHold
-        onHold={() =>
-          setXAxis((prev) => ({
-            min: prev.min + 0.0001,
-            max: prev.max - 0.0001,
-          }))
-        }
-        interval={50}
-      >
-        Zoom In{" "}
-      </ButtonHold>
-      <Button onClick={() => setXAxis(initialXAxis(points))}>RESET</Button>
+    <Container gap={10}>
+      <Container direction="row" gap={"auto"} width="100%">
+        <Text>Set Price Range</Text>
+        <Spacer height="8px" />
+        <Container direction="row" gap={4}>
+          <ButtonHold
+            color="secondary"
+            height={"small"}
+            width={20}
+            onHold={() =>
+              setXAxis((prev) => ({
+                min: prev.min - 0.0001,
+                max: prev.max + 0.0001,
+              }))
+            }
+            interval={50}
+          >
+            <Icon
+              themed
+              icon={{ url: "/zoom-out.svg", size: { width: 24, height: 24 } }}
+            />
+          </ButtonHold>
+          <ButtonHold
+            height={"small"}
+            width={20}
+            color="secondary"
+            onHold={() =>
+              setXAxis((prev) => ({
+                min: prev.min + 0.0001,
+                max: prev.max - 0.0001,
+              }))
+            }
+            interval={50}
+          >
+            <Icon
+              themed
+              icon={{ url: "/zoom-in.svg", size: { width: 24, height: 24 } }}
+            />
+          </ButtonHold>
+          <Button
+            height={"small"}
+            width={20}
+            color="secondary"
+            onClick={() => setXAxis(initialXAxis(points))}
+          >
+            <Icon
+              themed
+              icon={{ url: "/reset.svg", size: { width: 28, height: 28 } }}
+            />
+          </Button>
+        </Container>
+      </Container>
       <div className={styles.priceRanger}>
         <SVGLiquidityGraph
           points={points}
@@ -103,7 +135,7 @@ const AmbientLiquidityGraph = ({
           }
         />
       </div>
-    </>
+    </Container>
   );
 };
 

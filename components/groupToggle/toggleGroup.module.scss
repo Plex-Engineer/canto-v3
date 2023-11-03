@@ -10,7 +10,7 @@
 .bg {
   display: block;
   height: calc(100% - 2px);
-  background: var(--primary-90-color, #c1c1c1);
+  background: rgba(var(--dark-color), 0.9);
   position: absolute;
   top: 1px;
   margin: 0 1.5px;
@@ -26,7 +26,7 @@
   z-index: 1;
   cursor: pointer;
   p {
-    color: var(--text-dark-30-color) !important;
+    color: rgba(var(--dark-color), 0.3) !important;
   }
 }
 

@@ -12,3 +12,52 @@
     user-select: none;
   }
 }
+
+.svgAxis {
+  width: 100%;
+  height: 40px;
+  margin-top: 6px;
+  //   transform: translateY(20px);
+  text {
+    font-family: var(--rm-mono);
+    font-size: 6px;
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
+.graph {
+  //   fill: #555;
+  fill: var(--graph-fill);
+}
+
+.graph-filled {
+  //   fill: #292929;
+  fill: var(--graph-filled);
+
+  //   fill: var(--canto-color);
+}
+
+.graph-overlay {
+  fill: #48484833;
+  cursor: grab;
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.current-price-line {
+  stroke: var(--primary-light-color);
+  stroke-width: 0.5px;
+  stroke-dasharray: 2px;
+}
+
+.handle {
+  cursor: pointer;
+
+  &:hover {
+    path {
+      fill: lighten(black, 70);
+    }
+  }
+}
