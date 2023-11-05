@@ -1,12 +1,42 @@
+// export function formatDate(voting_end_time: string): string {
+//     const date = new Date(voting_end_time);
+    
+//     const day = String(date.getUTCDate()).padStart(2, '0');
+//     const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+//     const year = String(date.getUTCFullYear()).slice(-2);
+
+//     return `${day}/${month}/${year}`;
+// }
 export function formatDate(voting_end_time: string): string {
     const date = new Date(voting_end_time);
-    
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const year = String(date.getUTCFullYear()).slice(-2);
 
-    return `${day}/${month}/${year}`;
+    const day = date.getDate();
+    const month = date.toLocaleString('default', { month: 'short' });
+    const year = date.getFullYear() % 100;
+
+    const dayWithOrdinal = addOrdinalIndicator(day);
+
+    return `${dayWithOrdinal} ${month},${year}`;
 }
+
+// Function to add ordinal indicator (st, nd, rd, or th) to a number
+function addOrdinalIndicator(day: number): string {
+    if (day >= 11 && day <= 13) {
+        return `${day}th`;
+    }
+    switch (day % 10) {
+        case 1:
+            return `${day}st`;
+        case 2:
+            return `${day}nd`;
+        case 3:
+            return `${day}rd`;
+        default:
+            return `${day}th`;
+    }
+}
+
+
 const proposalTypes = {
     '/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal': 'Software Upgrade',
     '/cosmos.params.v1beta1.ParameterChangeProposal': 'Parameter Change',

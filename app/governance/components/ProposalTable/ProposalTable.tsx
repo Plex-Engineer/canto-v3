@@ -25,7 +25,7 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
   useEffect(() => {
     setTotalPages(Math.ceil(filteredProposals.length / pageSize));
   }, [filteredProposals.length, pageSize]);
-
+  console.log(totalPages);
   const paginatedProposals = filteredProposals.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
@@ -42,11 +42,11 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
       setCurrentPage(currentPage + 1);
     }
   };
-
+ // console.log(paginatedProposals);
   useEffect(() => {
     handleFilterChange(currentFilter);
     setCurrentPage(1);
-  }, [proposals, currentFilter]);
+  }, [proposals,currentFilter]);
 
   const handleFilterChange = (filter: string) => {
     
@@ -75,7 +75,7 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
   return (
     <div className={styles.tableContainer}>
       <Filter onFilterChange={handleFilterChange} currentFilter={currentFilter} />
-      {(filteredProposals.length==0 || !filteredProposals) ? <table className={styles.table}><div className={styles.noProposalContainer}><div className={styles.emptyProposals}>No Proposals available</div></div></table> : 
+      {(filteredProposals.length==0 || !filteredProposals) ? <div className={styles.table}><div className={styles.noProposalContainer}><div className={styles.emptyProposals}>No Proposals available</div></div></div> : 
         <table className={styles.table}>
         <thead>
           <tr key='proposalTableHeader'>

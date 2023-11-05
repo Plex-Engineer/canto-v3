@@ -1,6 +1,6 @@
 .tableContainer {
     width: 96%;
-    background: lighten(#C1C1C1, 20%) !important;
+    background: var(--card-sub-surface-color, #dfdfdf);
     //color: blue !important;
     // display: flex;
     // flex-direction: column !important;
@@ -14,19 +14,20 @@
       width: 100%;
       border-collapse: collapse;
       border-spacing: 0;
-      border: 1px solid #e0e0e0;
+      //border: 1px solid #e0e0e0;
       
       //margin: 0 auto;
       .tableHeader{
         padding: 0.5rem;
         text-align: left;
-        border-bottom: 1px solid #e0e0e0;
+        border-top: 1px solid var(--border-stroke-color, #b3b3b3);
+        border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
         box-sizing: border-box;
       }
       .tableData{
         padding: 0.5rem;
         text-align: left;
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
         box-sizing: border-box;
         font-size: 16;
         font-family: 'Proto Mono';
@@ -41,7 +42,7 @@
       .tableTitleColumn {
         padding: 0.5rem;
         text-align: left;
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
         box-sizing: border-box;
         width: 30% !important; 
         //display: block ;
@@ -77,6 +78,8 @@
   height: 90px;
   transition: all 0.3s ease; // Smooth transition for hover effects
   position: relative; // Ensure the z-index works correctly
+  border-left: 1px solid var(--border-stroke-color, #b3b3b3);
+  border-right: 1px solid var(--border-stroke-color, #b3b3b3);
   //transition: all 0.1s ease-in;
 
   // &:not(.header) {
@@ -115,7 +118,7 @@
   
 }
 .row:hover {
-  background-color: #e0e0e0; // Change to your preferred shade of gray
+  background-color: var(--border-stroke-color, #b3b3b3); // Change to your preferred shade of gray
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); // Add a subtle shadow
   z-index: 1; // Ensure the row appears above the others
 }
@@ -123,12 +126,16 @@
 .emptyProposals{
   padding: 20px;
 }
-.noProposalsContainer {
+.noProposalContainer {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-top: 20%;
+  text-align: center;
   flex-grow: 1;
-  width: 100%;
+  width: 40%;
+  color: green;
   
 }
 
@@ -140,4 +147,5 @@
   margin-left: 20px;
   margin-right: 20px;
   margin: 20px 20px 20px 20px;
+
 }

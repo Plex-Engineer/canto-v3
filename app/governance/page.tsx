@@ -12,8 +12,10 @@ import Table from "@/components/table/table";
 import styles from './gov.module.scss';
 import Text from "@/components/text";
 import Spacer from "@/components/layout/spacer";
+import Button from "@/components/button/button";
 export default function GovernancePage() {
   const { proposals } = useProposals({ chainId: 7700 });
+  
 
   
   const sorted_proposals = proposals.sort((a: Proposal, b: Proposal) => b.proposal_id - a.proposal_id);
@@ -59,11 +61,17 @@ export default function GovernancePage() {
   // }
 
   return (
-    <div>
       <div className={styles.container}>
+      <div className={styles.pageHeader}>
       <Text size="x-lg" font="proto_mono" className={styles.title}>
         Governance
       </Text>
+      <Text className={styles.stakingText} opacity={0.4}>
+            Stake your $CANTO to participate in governance
+      </Text>
+      <Button width={300}>Go to Staking</Button>
+      </div>
+      
       <Spacer height="20px" />
                 
                 <ProposalTable proposals={sorted_proposals}></ProposalTable>
@@ -82,6 +90,5 @@ export default function GovernancePage() {
                   ></ProposalModal>
                 )} */}
       </div>
-    </div>
   );
 }
