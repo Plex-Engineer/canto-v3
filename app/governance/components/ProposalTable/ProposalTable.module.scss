@@ -1,11 +1,12 @@
 .tableContainer {
+  //display: flex;
     width: 96%;
     background: var(--card-sub-surface-color, #dfdfdf);
     //color: blue !important;
     // display: flex;
     // flex-direction: column !important;
-    margin: 0 auto;
-    padding: 10px;
+    //margin: 0 auto;
+    //padding: 10px;
     //z-index: 1;
     box-shadow: 8px 8px rgba(17, 17, 17, 0.15) !important;
    
@@ -48,6 +49,28 @@
         //display: block ;
         overflow-wrap: break-word ;
       }
+    }
+    .paginationContainer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 20px 20px 20px 20px;
+    }
+
+    .emptyProposals{
+      padding: 20px;
+    }
+    .noProposalContainer {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20%;
+      text-align: center;
+      flex-grow: 1;
+      //width: 40%;
+      //color: green;
+      
     }
   }
 
@@ -123,29 +146,6 @@
   z-index: 1; // Ensure the row appears above the others
 }
 
-.emptyProposals{
-  padding: 20px;
-}
-.noProposalContainer {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20%;
-  text-align: center;
-  flex-grow: 1;
-  width: 40%;
-  color: green;
-  
-}
 
-.paginationContainer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-  margin-left: 20px;
-  margin-right: 20px;
-  margin: 20px 20px 20px 20px;
 
-}
+

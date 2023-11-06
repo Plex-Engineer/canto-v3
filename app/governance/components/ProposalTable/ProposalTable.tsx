@@ -75,7 +75,7 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
   return (
     <div className={styles.tableContainer}>
       <Filter onFilterChange={handleFilterChange} currentFilter={currentFilter} />
-      {(filteredProposals.length==0 || !filteredProposals) ? <div className={styles.table}><div className={styles.noProposalContainer}><div className={styles.emptyProposals}>No Proposals available</div></div></div> : 
+      {(filteredProposals.length==0 || !filteredProposals) ? <div className={styles.table}><div className={styles.noProposalContainer}>No {currentFilter} Proposals Available</div></div> : 
         <table className={styles.table}>
         <thead>
           <tr key='proposalTableHeader'>
