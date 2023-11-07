@@ -24,7 +24,6 @@ import {
 import { queryAmbientPoolLiquidityCurve } from "@/hooks/pairs/newAmbient/helpers/ambientApi";
 import { convertLiquidityCurveToGraph } from "@/utils/ambient/graphing.utils";
 import AmbientLiquidityGraph from "@/components/liquidityGraph/ambientLiquidityGraph";
-import { divideBalances } from "@/utils/tokens/tokenMath.utils";
 
 interface NewPositionModalProps {
   pool: AmbientPool;
@@ -37,6 +36,7 @@ export const NewAmbientPositionModal = ({
   const { base: baseToken, quote: quoteToken } = pool;
   const positionManager = useNewAmbientPositionManager(pool);
   const positionValidation = positionManager.txParams.validateParams();
+  // console.log(positionValidation)
 
   // modal options
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -317,6 +317,7 @@ export const NewAmbientPositionModal = ({
       >
         Add Concentrated Liquidity
       </Button>
+      <Text>{positionValidation.errorMessage}</Text>
       <Spacer height="30px" />
     </Container>
   );
