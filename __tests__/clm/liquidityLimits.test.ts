@@ -4,7 +4,7 @@ import {
   cTokenBorrowLimit,
   cTokenWithdrawLimit,
   maxAmountForLendingTx,
-} from "@/utils/clm";
+} from "@/utils/clm/limits.utils";
 
 describe("liquidity limits tests", () => {
   it("calculate max borrow limit in underlying", async () => {

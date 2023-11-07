@@ -1,9 +1,8 @@
+import { isERC20Token, isIBCToken } from "@/utils/tokens/tokenTypes.utils";
 import {
   isBridgeInToken,
   isBridgeOutToken,
-  isERC20Token,
-  isIBCToken,
-} from "@/utils/tokens";
+} from "@/utils/tokens/bridgeTokens.utils";
 
 describe("token interface tests", () => {
   it("test ERC20 objects", () => {
