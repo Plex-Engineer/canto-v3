@@ -24,8 +24,8 @@ export const CTokenRow = ({
     }}
     center={{
       vertical: true,
-      horizontal: true,
     }}
+    width="100%"
   >
     <Icon icon={{ url: cToken.underlying.logoURI, size: 30 }} />
     <Text theme="primary-dark" key={cToken.name + cToken.name}>

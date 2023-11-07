@@ -108,7 +108,6 @@ export default function LendingPage() {
           </div>
 
           <CTokenTable
-            title="Stable Coins"
             isLoading={isLoading}
             stableTokens={stableCoins.sort((a, b) =>
               a.underlying.symbol.localeCompare(b.underlying.symbol)
@@ -212,7 +211,7 @@ const CTokenTable = ({
   onSupply,
   onBorrow,
 }: {
-  title: string;
+  title?: string;
   isLoading: boolean;
   stableTokens: CTokenWithUserData[];
   rwas: CTokenWithUserData[];
