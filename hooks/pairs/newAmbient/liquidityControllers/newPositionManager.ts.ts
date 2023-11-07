@@ -163,10 +163,10 @@ export default function useNewAmbientPositionManager(pool: AmbientPool) {
         )
       : txParams.amount;
     if (Number(baseAmount) > Number(pool.base.balance)) {
-      return invalidParams("Insufficient base balance");
+      return invalidParams(`Insufficient ${pool.base.symbol} balance`);
     }
     if (Number(quoteAmount) > Number(pool.quote.balance)) {
-      return invalidParams("Insufficient quote balance");
+      return invalidParams(`Insufficient ${pool.quote.symbol} balance`);
     }
     // execution prices
     if (txParams.minPriceWei === "0" || txParams.maxPriceWei === "0") {
@@ -188,11 +188,6 @@ export default function useNewAmbientPositionManager(pool: AmbientPool) {
     // ticks
     if (txParams.lowerTick >= txParams.upperTick) {
       return invalidParams("Lower price is greater than upper price");
-    }
-    if (txParams.lowerTick > currentTick || txParams.upperTick < currentTick) {
-      return invalidParams(
-        "Current price is not within range. Please update range"
-      );
     }
     return {
       isValid: true,

@@ -36,7 +36,6 @@ export const NewAmbientPositionModal = ({
   const { base: baseToken, quote: quoteToken } = pool;
   const positionManager = useNewAmbientPositionManager(pool);
   const positionValidation = positionManager.txParams.validateParams();
-  // console.log(positionValidation)
 
   // modal options
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -259,7 +258,8 @@ export const NewAmbientPositionModal = ({
               points={graphPoints}
               currentPrice={formatBalance(
                 pool.stats.lastPriceSwap,
-                pool.base.decimals - pool.quote.decimals
+                pool.base.decimals - pool.quote.decimals,
+                { precision: 10 }
               )}
               minPrice={positionManager.options.minRangePrice}
               maxPrice={positionManager.options.maxRangePrice}
@@ -284,7 +284,8 @@ export const NewAmbientPositionModal = ({
                   Number(
                     formatBalance(
                       pool.stats.lastPriceSwap,
-                      pool.base.decimals - pool.quote.decimals
+                      pool.base.decimals - pool.quote.decimals,
+                      { precision: 10 }
                     )
                   ),
                   Number(positionManager.options.minRangePrice ?? "0")
@@ -299,7 +300,8 @@ export const NewAmbientPositionModal = ({
                   Number(
                     formatBalance(
                       pool.stats.lastPriceSwap,
-                      pool.base.decimals - pool.quote.decimals
+                      pool.base.decimals - pool.quote.decimals,
+                      { precision: 10 }
                     )
                   ),
                   Number(positionManager.options.maxRangePrice ?? "0")
@@ -309,7 +311,10 @@ export const NewAmbientPositionModal = ({
           </Container>
         )}
       </Container>
-      <Spacer height="30px" />
+      <Spacer height="15px" />
+      <span className={styles["error-message"]}>
+        {positionValidation.errorMessage}
+      </span>
       <Button
         disabled={!positionValidation.isValid}
         width={"fill"}
@@ -317,7 +322,6 @@ export const NewAmbientPositionModal = ({
       >
         Add Concentrated Liquidity
       </Button>
-      <Text>{positionValidation.errorMessage}</Text>
       <Spacer height="30px" />
     </Container>
   );

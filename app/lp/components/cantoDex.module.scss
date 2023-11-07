@@ -105,3 +105,14 @@
 .advancedContainer {
   width: 100%;
 }
+
+.error-message {
+  color: var(--extra-failure-color, #ff0000);
+  font-size: 13px;
+  font-style: normal;
+  font-family: var(--rm-mono);
+  line-height: 140%; /* 16.8px */
+  letter-spacing: -0.48px;
+  text-align: justify;
+  transition: all 0.1s ease-in-out;
+}
