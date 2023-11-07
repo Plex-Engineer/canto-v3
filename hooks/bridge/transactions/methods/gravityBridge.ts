@@ -25,12 +25,12 @@ import {
   checkPubKeyCosmos,
   ethToCantoAddress,
   isValidEthAddress,
-} from "@/utils/address.utils";
-import { tryFetch } from "@/utils/async.utils";
-import { getCantoBalance } from "@/utils/cosmos/cosmosBalance.utils";
+} from "@/utils/address";
+import { tryFetch } from "@/utils/async";
+import { getCantoBalance } from "@/utils/cosmos";
 import { createMsgsSend } from "@/utils/cosmos/transactions/messages/messageSend";
-import { createApprovalTxs, getTokenBalance } from "@/utils/evm/erc20.utils";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { createApprovalTxs, getTokenBalance } from "@/utils/tokens";
+import { displayAmount } from "@/utils/formatting";
 import BigNumber from "bignumber.js";
 import {
   BridgingMethod,

@@ -8,7 +8,7 @@ import {
   convertToBigNumber,
   displayAmount,
   formatBalance,
-} from "@/utils/tokenBalances.utils";
+} from "@/utils/formatting";
 import { useEffect, useState } from "react";
 import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";
@@ -18,11 +18,11 @@ import Image from "next/image";
 import Modal from "@/components/modal/modal";
 import ConfirmationModal from "./components/confirmationModal";
 import { BridgingMethod } from "@/hooks/bridge/interfaces/bridgeMethods";
-import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks.utils";
+import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks";
 import { GetWalletClientResult } from "wagmi/actions";
 import { maxBridgeAmountInUnderlying } from "@/hooks/bridge/helpers/amounts";
 import { BaseNetwork } from "@/config/interfaces";
-import { validateInputTokenAmount } from "@/utils/validation.utils";
+import { validateInputTokenAmount } from "@/utils/math";
 import { ETHEREUM_VIA_GRAVITY_BRIDGE } from "@/config/networks";
 
 interface BridgeProps {

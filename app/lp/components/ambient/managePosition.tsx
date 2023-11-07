@@ -9,18 +9,17 @@ import Icon from "@/components/icon/icon";
 import Text from "@/components/text";
 import AmbientPositionManager from "@/hooks/pairs/newAmbient/liquidityControllers/managePosition";
 import { useState } from "react";
-import { getPriceFromTick } from "@/utils/ambient/ambientMath.utils";
+import { getPriceFromTick } from "@/utils/ambient";
 import Container from "@/components/container/container";
 import Spacer from "@/components/layout/spacer";
 import clsx from "clsx";
 import Slider from "@/components/slider/slider";
 import Input from "@/components/input/input";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount, formatPercent } from "@/utils/formatting";
 import { ModalItem } from "@/app/lending/components/modal/modal";
 import Button from "@/components/button/button";
 import Amount from "@/components/amount/amount";
 import PopUp from "@/components/popup/popup";
-import { formatPercent } from "@/utils/formatting.utils";
 
 interface ManagePostionProps {
   pool: AmbientPool;

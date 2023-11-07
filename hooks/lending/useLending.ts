@@ -1,9 +1,6 @@
 import { useQuery } from "react-query";
 import { CTokenWithUserData } from "./interfaces/tokens";
-import {
-  CTokenLendingTransactionParams,
-  CTokenLendingTxTypes,
-} from "./interfaces/lendingTxTypes";
+import { CTokenLendingTransactionParams } from "./interfaces/lendingTxTypes";
 import {
   NEW_ERROR,
   NewTransactionFlow,
@@ -16,10 +13,10 @@ import {
 } from "./interfaces/hookParams";
 import { UserLMPosition } from "./interfaces/userPositions";
 import { useEffect, useState } from "react";
-import { lendingTxParamCheck } from "@/utils/clm/txParamCheck.utils";
+import { lendingTxParamCheck } from "@/utils/clm";
 import { getAllUserCLMData } from "./helpers/userClmData";
 import { createNewCTokenLendingFlow } from "./helpers/createLendingFlow";
-import { areEqualAddresses } from "@/utils/address.utils";
+import { areEqualAddresses } from "@/utils/address";
 import { getCTokenAddressesFromChainId } from "./config/cTokenAddresses";
 
 /**

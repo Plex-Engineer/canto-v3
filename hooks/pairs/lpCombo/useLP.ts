@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { areEqualAddresses } from "@/utils/address.utils";
+import { areEqualAddresses } from "@/utils/address";
 import {
   NEW_ERROR,
   NO_ERROR,

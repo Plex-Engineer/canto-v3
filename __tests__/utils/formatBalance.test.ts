@@ -1,4 +1,4 @@
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { formatBalance } from "@/utils/formatting";
 
 describe("formatBalance tests", () => {
   it("should format balance with no options", () => {

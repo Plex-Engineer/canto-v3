@@ -2,17 +2,16 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
-  errMsg,
   UserTokenBalances,
   Transaction,
   TransactionDescription,
   ERC20Token,
 } from "@/config/interfaces";
-import BigNumber from "bignumber.js";
-import { newContractInstance } from "./helpers.utils";
-import { ERC20_ABI } from "@/config/abis";
 import { fetchBalance, multicall } from "wagmi/actions";
+import BigNumber from "bignumber.js";
+import { ERC20_ABI } from "@/config/abis";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
+import { newContractInstance } from "../evm";
 
 /**
  * @notice gets all token balances from ethereum chain
@@ -64,7 +63,7 @@ export async function getEVMTokenBalanceList(
     );
     return NO_ERROR(balances);
   } catch (err) {
-    return NEW_ERROR("getTokenBalanceList::" + errMsg(err));
+    return NEW_ERROR("getTokenBalanceList", err);
   }
 }
 
@@ -88,7 +87,7 @@ export async function getTokenBalance(
     const balance = await tokenContract.methods.balanceOf(account).call();
     return NO_ERROR(new BigNumber(balance as string));
   } catch (err) {
-    return NEW_ERROR("getTokenBalance::" + errMsg(err));
+    return NEW_ERROR("getTokenBalance", err);
   }
 }
 
@@ -120,7 +119,7 @@ async function checkTokenAllowance(
       new BigNumber(allowance as string).isGreaterThanOrEqualTo(amount)
     );
   } catch (err) {
-    return NEW_ERROR("checkTokenAllowance::" + errMsg(err));
+    return NEW_ERROR("checkTokenAllowance", err);
   }
 }
 

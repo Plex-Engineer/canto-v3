@@ -3,7 +3,7 @@ import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
 import Text from "@/components/text";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/formatting";
 
 export const CTokenRow = ({
   cToken,

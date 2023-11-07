@@ -43,23 +43,3 @@ export function formatSecondsToMinutes(seconds: number): string {
     return seconds.toString() + " seconds";
   }
 }
-
-/**
- * @notice Formats an error message to be more readable
- * @param {string} errorMsg Error message to format
- * @returns {string} Formatted error message
- */
-export function formatError(errorMsg: string): string {
-  // errors will look like "functionName::functionName: error message"
-  const split = errorMsg.split(":");
-  return "Error:" + split[split.length - 1];
-}
-
-/**
- * @notice Formats a number into a percentage
- * @param {string} percent percentage to format
- * @returns {string} Formatted percentage
- */
-export function formatPercent(percent: string): string {
-  return (parseFloat(percent) * 100).toFixed(2) + "%";
-}

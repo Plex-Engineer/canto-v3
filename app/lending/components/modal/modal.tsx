@@ -3,7 +3,7 @@ import Button from "@/components/button/button";
 import Text from "@/components/text";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import { maxAmountForLendingTx } from "@/utils/clm/limits.utils";
+import { maxAmountForLendingTx } from "@/utils/clm";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 import styles from "./modal.module.scss";
 import Tabs from "@/components/tabs/tabs";
@@ -13,15 +13,15 @@ import {
   convertToBigNumber,
   displayAmount,
   formatBalance,
-} from "@/utils/tokenBalances.utils";
+} from "@/utils/formatting";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import React, { useState } from "react";
 import { ValidationReturn } from "@/config/interfaces";
 import Amount from "@/components/amount/amount";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
-import { areEqualAddresses } from "@/utils/address.utils";
-import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
+import { areEqualAddresses } from "@/utils/address";
+import { convertTokenAmountToNote } from "@/utils/math";
 interface Props {
   isSupplyModal: boolean;
   cToken: CTokenWithUserData | null;

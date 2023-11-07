@@ -1,5 +1,5 @@
 import { BridgeToken } from "../interfaces/tokens";
-import { isOFTToken } from "@/utils/tokens/tokens.utils";
+import { isOFTToken } from "@/utils/tokens";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
 import { estimateOFTSendGasFee } from "../transactions/methods/layerZero";
 import BigNumber from "bignumber.js";

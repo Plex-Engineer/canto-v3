@@ -6,14 +6,13 @@ import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
-import { concLiquidityNoteValue } from "@/utils/ambient/liquidity.utils";
-import { formatPercent } from "@/utils/formatting.utils";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { concLiquidityNoteValue } from "@/utils/ambient";
+import { formatPercent, displayAmount } from "@/utils/formatting";
 import {
   addTokenBalances,
   convertTokenAmountToNote,
   divideBalances,
-} from "@/utils/tokens/tokenMath.utils";
+} from "@/utils/math";
 import BigNumber from "bignumber.js";
 
 export const UserCantoDexPairRow = ({

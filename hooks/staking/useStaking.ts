@@ -1,4 +1,4 @@
-import { tryFetch } from "@/utils/async.utils";
+import { tryFetch } from "@/utils/async";
 import { useEffect, useState } from "react";
 import { Validator } from "./interfaces.ts/validators";
 // import { CANTO_DATA_API } from "@/config/api";

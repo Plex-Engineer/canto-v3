@@ -6,11 +6,11 @@ import Tabs from "@/components/tabs/tabs";
 import styles from "./bridge.module.scss";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
-import { connectToKeplr } from "@/utils/keplr/connectKeplr";
+import { connectToKeplr } from "@/utils/keplr";
 import {
   getNetworkInfoFromChainId,
   isCosmosNetwork,
-} from "@/utils/networks.utils";
+} from "@/utils/networks";
 import Bridging from "./bridging";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";

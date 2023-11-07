@@ -1,6 +1,6 @@
 import { ERC20Token } from "@/config/interfaces";
 import { ZERO_ADDRESS, getCantoCoreAddress } from "@/config/consts/addresses";
-import { areEqualAddresses } from "@/utils/address.utils";
+import { areEqualAddresses } from "@/utils/address";
 import { CantoDexPair } from "../interfaces/pairs";
 
 /**

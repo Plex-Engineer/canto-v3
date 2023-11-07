@@ -5,7 +5,7 @@ import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
 
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount, formatPercent } from "@/utils/formatting";
 import { useLendingCombo } from "./utils";
 import Text from "@/components/text";
 import Container from "@/components/container/container";
@@ -17,11 +17,7 @@ import { LendingModal } from "./components/modal/modal";
 import { CTokenRow } from "./components/cTokenRow";
 import { useState } from "react";
 import Spacer from "@/components/layout/spacer";
-import {
-  addTokenBalances,
-  divideBalances,
-} from "@/utils/tokens/tokenMath.utils";
-import { formatPercent } from "@/utils/formatting.utils";
+import { addTokenBalances, divideBalances } from "@/utils/math";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 
 enum CLMModalTypes {

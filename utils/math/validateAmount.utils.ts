@@ -1,5 +1,5 @@
 import { ValidationReturn } from "@/config/interfaces";
-import { convertToBigNumber, formatBalance } from "./tokenBalances.utils";
+import { convertToBigNumber, formatBalance } from "@/utils/formatting";
 
 /**
  * Validate input token amount

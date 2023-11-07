@@ -2,7 +2,7 @@ import { maxAmountForLendingTx } from "./limits.utils";
 import { CTokenLendingTransactionParams } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { ValidationReturn } from "@/config/interfaces";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
-import { validateInputTokenAmount } from "../validation.utils";
+import { validateInputTokenAmount } from "../math";
 
 /**
  * @notice Checks if tx params are valid for lending tx

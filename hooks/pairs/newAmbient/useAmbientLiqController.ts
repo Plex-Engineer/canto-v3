@@ -1,14 +1,12 @@
 import {
   getPriceFromTick,
   getTickFromPrice,
-} from "@/utils/ambient/ambientMath.utils";
-import { AmbientPool, AmbientUserPosition } from "./interfaces/ambientPools";
-import { useState } from "react";
-import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
-import {
   getConcBaseTokensFromQuoteTokens,
   getConcQuoteTokensFromBaseTokens,
-} from "@/utils/ambient/liquidity.utils";
+} from "@/utils/ambient";
+import { AmbientPool, AmbientUserPosition } from "./interfaces/ambientPools";
+import { useState } from "react";
+import { convertToBigNumber, formatBalance } from "@/utils/formatting";
 import BigNumber from "bignumber.js";
 
 interface AddConcLiqParams {

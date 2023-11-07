@@ -3,7 +3,6 @@ import {
   NO_ERROR,
   PromiseWithError,
   ReturnWithError,
-  errMsg,
 } from "@/config/interfaces";
 import * as NETWORKS from "@/config/networks";
 import { GetWalletClientResult } from "wagmi/actions";
@@ -50,7 +49,7 @@ export function newContractInstance<T extends ContractAbi>(
   }
 ): ReturnWithError<Contract<T>> {
   const rpc = getRpcUrlFromChainId(chainId);
-  if (rpc.error) return NEW_ERROR("newContractInstance::" + errMsg(rpc.error));
+  if (rpc.error) return NEW_ERROR("newContractInstance", rpc.error);
   if (options?.signer) {
     return NO_ERROR(
       new Contract(abi, address, {
@@ -71,7 +70,7 @@ export async function getEVMTimestamp(
   chainId: number
 ): PromiseWithError<number> {
   const { data: rpcUrl, error: rpcError } = getRpcUrlFromChainId(chainId);
-  if (rpcError) return NEW_ERROR("getEVMTimestamp::" + errMsg(rpcError));
+  if (rpcError) return NEW_ERROR("getEVMTimestamp", rpcError);
   const provider = getProviderWithoutSigner(rpcUrl);
   const blockNumber = await provider.eth.getBlockNumber();
   const block = await provider.eth.getBlock(blockNumber);

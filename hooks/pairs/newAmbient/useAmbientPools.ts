@@ -21,8 +21,8 @@ import {
 import {
   getConcBaseTokensFromQuoteTokens,
   getConcQuoteTokensFromBaseTokens,
-} from "@/utils/ambient/liquidity.utils";
-import { validateInputTokenAmount } from "@/utils/validation.utils";
+} from "@/utils/ambient";
+import { validateInputTokenAmount } from "@/utils/math";
 import { createNewAmbientTxFlow } from "./helpers/createAmbientFlow";
 import { queryUserAmbientRewards } from "./helpers/ambientApi";
 import { CLMClaimRewardsTxParams } from "@/hooks/lending/interfaces/lendingTxTypes";

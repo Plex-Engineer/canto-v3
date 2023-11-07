@@ -18,11 +18,10 @@ import {
   ReturnWithError,
   ValidationReturn,
 } from "@/config/interfaces";
-import { areEqualAddresses } from "@/utils/address.utils";
-import { validateInputTokenAmount } from "@/utils/validation.utils";
+import { areEqualAddresses } from "@/utils/address";
+import { validateInputTokenAmount, addTokenBalances } from "@/utils/math";
 import { createNewCantoDexTxFLow } from "./helpers/createPairsFlow";
 import { createNewClaimCLMRewardsFlow } from "@/hooks/lending/helpers/createLendingFlow";
-import { addTokenBalances } from "@/utils/tokens/tokenMath.utils";
 
 export default function useCantoDex(
   params: CantoDexHookInputParams,

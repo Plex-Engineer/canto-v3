@@ -12,21 +12,21 @@ import {
   AmbientTransactionParams,
   AmbientTxType,
 } from "../interfaces/ambientPoolTxTypes";
-import { convertToQ64RootPrice } from "@/utils/ambient/ambientMath.utils";
-import { getAmbientAddress } from "../config/addresses";
 import {
+  convertToQ64RootPrice,
   getConcBaseTokensFromQuoteTokens,
   getConcQuoteTokensFromBaseTokens,
   roundLiquidityForAmbientTx,
-} from "@/utils/ambient/liquidity.utils";
-import { createApprovalTxs } from "@/utils/evm/erc20.utils";
+} from "@/utils/ambient";
+import { getAmbientAddress } from "../config/addresses";
+import { createApprovalTxs } from "@/utils/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
 import { AMBIENT_REWARD_LEDGER_ABI, CROC_SWAP_DEX_ABI } from "@/config/abis";
 import { eth } from "web3";
-import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
+import { percentOfAmount } from "@/utils/math";
 import { CLMClaimRewardsTxParams } from "@/hooks/lending/interfaces/lendingTxTypes";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/formatting";
 
 export async function ambientLiquidityTx(
   params: AmbientTransactionParams

@@ -1,7 +1,7 @@
 "use client";
 import Button from "@/components/button/button";
 import Spacer from "@/components/layout/spacer";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/formatting";
 import { useState } from "react";
 import Container from "@/components/container/container";
 import { ValidationReturn } from "@/config/interfaces";
@@ -13,8 +13,7 @@ import {
   AmbientUserPosition,
 } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
 import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
-import { getPriceFromTick } from "@/utils/ambient/ambientMath.utils";
-import { concLiquidityNoteValue } from "@/utils/ambient/liquidity.utils";
+import { getPriceFromTick, concLiquidityNoteValue } from "@/utils/ambient";
 import BigNumber from "bignumber.js";
 import { NewAmbientPositionModal } from "./newAmbientPosition";
 import { ManageAmbientPosition } from "./managePosition";

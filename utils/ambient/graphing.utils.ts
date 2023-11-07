@@ -1,7 +1,7 @@
 import { LiquidityCurveReturn } from "@/hooks/pairs/newAmbient/helpers/ambientApi";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
-import { displayAmount } from "../tokenBalances.utils";
-import { tickToPrice } from "@crocswap-libs/sdk";
+import { displayAmount } from "../formatting";
+import { getPriceFromTick } from "./ambientMath.utils";
 
 export function convertLiquidityCurveToGraph(
   pool: AmbientPool,
@@ -13,7 +13,7 @@ export function convertLiquidityCurveToGraph(
     points.push({
       x: Number(
         displayAmount(
-          tickToPrice(bump.bumpTick).toString(),
+          getPriceFromTick(bump.bumpTick),
           pool.base.decimals - pool.quote.decimals,
           { precision: 5 }
         )

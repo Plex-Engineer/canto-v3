@@ -5,15 +5,15 @@ import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes"
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 import useLending from "@/hooks/lending/useLending";
-import { listIncludesAddress } from "@/utils/address.utils";
+import { listIncludesAddress } from "@/utils/address";
 import {
   getCirculatingCNote,
   getCirculatingNote,
-} from "@/utils/clm/noteStats.utils";
+} from "@/utils/clm";
 import {
   addTokenBalances,
   convertTokenAmountToNote,
-} from "@/utils/tokens/tokenMath.utils";
+} from "@/utils/math";
 import BigNumber from "bignumber.js";
 import { useEffect, useMemo, useState } from "react";
 

@@ -1,6 +1,6 @@
-import { isCantoChainId } from "@/utils/networks.utils";
-import { NEW_ERROR, NO_ERROR, PromiseWithError, errMsg } from "../interfaces";
-import { tryFetch } from "@/utils/async.utils";
+import { isCantoChainId } from "@/utils/networks";
+import { NEW_ERROR, NO_ERROR, PromiseWithError } from "../interfaces";
+import { tryFetch } from "@/utils/async";
 
 // canto api
 const cantoMainnetDataBaseUrl = process.env.NEXT_PUBLIC_CANTO_MAINNET_API_URL;
@@ -37,7 +37,7 @@ export async function getCantoApiData<T>(
     CANTO_DATA_BASE_URL(chainId) + endpointSuffix
   );
   if (error) {
-    return NEW_ERROR("getCantoApiData: " + errMsg(error));
+    return NEW_ERROR("getCantoApiData", error);
   }
   // parse results string
   const parsedResults =
