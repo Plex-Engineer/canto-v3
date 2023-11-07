@@ -19,12 +19,12 @@ import {
   isCantoDexPair,
 } from "@/hooks/pairs/lpCombo/interfaces.ts/pairTypes";
 import { AmbientModal } from "./components/ambient/ambientLPModal";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/formatting";
 import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
-import { addTokenBalances } from "@/utils/tokens/tokenMath.utils";
+import { addTokenBalances } from "@/utils/math";
 
 export default function Page() {
   const { txStore, signer, chainId } = useCantoSigner();

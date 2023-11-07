@@ -7,10 +7,13 @@ import useNewAmbientPositionManager from "@/hooks/pairs/newAmbient/liquidityCont
 import Container from "@/components/container/container";
 import Amount from "@/components/amount/amount";
 import Spacer from "@/components/layout/spacer";
-import { displayAmount, formatBalance } from "@/utils/tokenBalances.utils";
+import {
+  displayAmount,
+  formatBalance,
+  formatPercent,
+} from "@/utils/formatting";
 import { ModalItem } from "@/app/lending/components/modal/modal";
 import PopUp from "@/components/popup/popup";
-import { formatPercent } from "@/utils/formatting.utils";
 import Input from "@/components/input/input";
 import Button from "@/components/button/button";
 import Toggle from "@/components/toggle";
@@ -22,7 +25,7 @@ import {
   TickRangeKey,
 } from "@/hooks/pairs/newAmbient/liquidityControllers/defaultParams";
 import { queryAmbientPoolLiquidityCurve } from "@/hooks/pairs/newAmbient/helpers/ambientApi";
-import { convertLiquidityCurveToGraph } from "@/utils/ambient/graphing.utils";
+import { convertLiquidityCurveToGraph } from "@/utils/ambient";
 import AmbientLiquidityGraph from "@/components/liquidityGraph/ambientLiquidityGraph";
 
 interface NewPositionModalProps {

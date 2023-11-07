@@ -10,10 +10,10 @@ import {
   addTokenBalances,
   convertTokenAmountToNote,
   percentOfAmount,
-} from "../tokens/tokenMath.utils";
+} from "../math";
 import { getPriceFromTick } from "./ambientMath.utils";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
-import { convertToBigNumber, formatBalance } from "../tokenBalances.utils";
+import { convertToBigNumber, formatBalance } from "../formatting";
 
 /**
  * @notice gets optimal quote tokens from base token amount

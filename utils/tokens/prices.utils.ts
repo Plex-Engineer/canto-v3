@@ -1,12 +1,7 @@
 import { SLINGSHOT_API_URL } from "@/config/api";
-import { tryFetch } from "../async.utils";
+import { tryFetch } from "../async";
 import BigNumber from "bignumber.js";
-import {
-  NEW_ERROR,
-  NO_ERROR,
-  PromiseWithError,
-  errMsg,
-} from "@/config/interfaces";
+import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 
 /**
  * @notice gets the price of a token in USDC
@@ -36,7 +31,7 @@ export async function getTokenPriceInUSDC(
     }
   );
   if (error) {
-    return NEW_ERROR("getTokenPriceInUSDC::" + errMsg(error));
+    return NEW_ERROR("getTokenPriceInUSDC", error);
   }
   return NO_ERROR(new BigNumber(data.estimatedOutput).div(10 ** 6).toString());
 }

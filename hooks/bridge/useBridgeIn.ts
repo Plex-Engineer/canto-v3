@@ -25,13 +25,14 @@ import useAutoSelect from "../helpers/useAutoSelect";
 import { BridgeInToken } from "./interfaces/tokens";
 import { BridgingMethod } from "./interfaces/bridgeMethods";
 import useTokenBalances from "../helpers/useTokenBalances";
-import { isERC20TokenList, isOFTToken } from "@/utils/tokens/tokens.utils";
 import {
+  isERC20TokenList,
+  isOFTToken,
   isBridgeInToken,
   isBridgeInTokenList,
-} from "@/utils/tokens/bridgeTokens.utils";
-import { convertToBigNumber } from "@/utils/tokenBalances.utils";
-import { isValidEthAddress } from "@/utils/address.utils";
+} from "@/utils/tokens";
+import { convertToBigNumber } from "@/utils/formatting";
+import { isValidEthAddress } from "@/utils/address";
 import { createNewBridgeFlow } from "./helpers/createBridgeFlow";
 
 export default function useBridgeIn(

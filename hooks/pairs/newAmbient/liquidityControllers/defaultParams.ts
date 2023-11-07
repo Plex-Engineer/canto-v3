@@ -1,9 +1,9 @@
 import {
   getPriceFromTick,
   getTickFromPrice,
-} from "@/utils/ambient/ambientMath.utils";
+} from "@/utils/ambient";
 import { AmbientPool } from "../interfaces/ambientPools";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { formatBalance } from "@/utils/formatting";
 
 /**
  * DEFAULT PARAMS FOR ADDING LIQUIDITY

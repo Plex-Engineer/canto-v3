@@ -25,11 +25,10 @@ import {
   TEST_BRIDGE_NETWORKS,
 } from "./config/networks";
 import useTokenBalances from "../helpers/useTokenBalances";
-import { isERC20TokenList, isOFTToken } from "@/utils/tokens/tokens.utils";
-import { isBridgeOutToken } from "@/utils/tokens/bridgeTokens.utils";
-import { convertToBigNumber } from "@/utils/tokenBalances.utils";
-import { isValidEthAddress } from "@/utils/address.utils";
-import { isCosmosNetwork } from "@/utils/networks.utils";
+import { isERC20TokenList, isOFTToken, isBridgeOutToken } from "@/utils/tokens";
+import { convertToBigNumber } from "@/utils/formatting";
+import { isValidEthAddress } from "@/utils/address";
+import { isCosmosNetwork } from "@/utils/networks";
 import { createNewBridgeFlow } from "./helpers/createBridgeFlow";
 
 export default function useBridgeOut(

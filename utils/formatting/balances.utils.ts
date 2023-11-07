@@ -1,9 +1,4 @@
-import {
-  NEW_ERROR,
-  NO_ERROR,
-  ReturnWithError,
-  errMsg,
-} from "@/config/interfaces";
+import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
 import BigNumber from "bignumber.js";
 
 /**
@@ -32,7 +27,7 @@ export function convertToBigNumber(
     const convertedAmount = bigNumber.multipliedBy(multiplier);
     return NO_ERROR(convertedAmount);
   } catch (err) {
-    return NEW_ERROR("convertToBigNuber:" + errMsg(err));
+    return NEW_ERROR("convertToBigNuber", err);
   }
 }
 
@@ -99,7 +94,10 @@ export function formatBalance(
     precision ??
     2 - Math.floor(Math.log(formattedAmount.toNumber()) / Math.log(10));
   // make sure tuncation is not negative or greater than decimals
-  truncateAt = Math.max(0, Math.min(truncateAt, decimals < 0 ? truncateAt : decimals));
+  truncateAt = Math.max(
+    0,
+    Math.min(truncateAt, decimals < 0 ? truncateAt : decimals)
+  );
   // convert amount to string
   const stringAmount = formattedAmount.toString();
   // get index of the decimal in the string

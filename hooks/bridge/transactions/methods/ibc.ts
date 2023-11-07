@@ -8,22 +8,21 @@ import {
   CosmosNetwork,
   IBCToken,
 } from "@/config/interfaces";
-import { ethToCantoAddress, isValidEthAddress } from "@/utils/address.utils";
+import { ethToCantoAddress, isValidEthAddress } from "@/utils/address";
 import { createMsgsIBCTransfer } from "@/utils/cosmos/transactions/messages/ibc/ibc";
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
-import { tryFetchMultipleEndpoints } from "@/utils/async.utils";
+import { tryFetchMultipleEndpoints } from "@/utils/async";
 import { _convertERC20Tx } from "./recovery";
-import { isERC20Token } from "@/utils/tokens/tokens.utils";
+import { isERC20Token, getTokenBalance } from "@/utils/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { convertToBigNumber, displayAmount } from "@/utils/tokenBalances.utils";
+import { convertToBigNumber, displayAmount } from "@/utils/formatting";
 import { CANTO_MAINNET_COSMOS } from "@/config/networks";
 import {
   BridgingMethod,
   getBridgeMethodInfo,
 } from "../../interfaces/bridgeMethods";
 import { BridgeTransactionParams } from "../../interfaces/hookParams";
-import { getCosmosTokenBalance } from "@/utils/cosmos/cosmosBalance.utils";
-import { getTokenBalance } from "@/utils/evm/erc20.utils";
+import { getCosmosTokenBalance } from "@/utils/cosmos";
 
 /**
  * @notice creates a list of transactions that need to be made for IBC out of canto

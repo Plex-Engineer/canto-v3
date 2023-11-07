@@ -1,5 +1,5 @@
 import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
-import { convertToBigNumber } from "../tokenBalances.utils";
+import { convertToBigNumber } from "@/utils/formatting";
 import BigNumber from "bignumber.js";
 
 /**

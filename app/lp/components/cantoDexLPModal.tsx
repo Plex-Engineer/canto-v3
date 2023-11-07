@@ -2,10 +2,14 @@
 import Button from "@/components/button/button";
 import Input from "@/components/input/input";
 import Spacer from "@/components/layout/spacer";
-import { convertToBigNumber, displayAmount } from "@/utils/tokenBalances.utils";
+import {
+  convertToBigNumber,
+  displayAmount,
+  formatPercent,
+} from "@/utils/formatting";
 import { useEffect, useState } from "react";
 import Container from "@/components/container/container";
-import { quoteRemoveLiquidity } from "@/utils/evm/pairs.utils";
+import { quoteRemoveLiquidity } from "@/utils/cantoDex";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { ValidationReturn } from "@/config/interfaces";
 import Icon from "@/components/icon/icon";
@@ -26,9 +30,8 @@ import {
   addTokenBalances,
   convertTokenAmountToNote,
   divideBalances,
-} from "@/utils/tokens/tokenMath.utils";
-import { formatPercent } from "@/utils/formatting.utils";
-import { areEqualAddresses } from "@/utils/address.utils";
+} from "@/utils/math";
+import { areEqualAddresses } from "@/utils/address";
 import PopUp from "@/components/popup/popup";
 
 interface ManageCantoDexLPProps {

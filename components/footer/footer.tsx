@@ -4,7 +4,7 @@ import Text from "../text";
 import styles from "./footer.module.scss";
 import FooterButton from "./components/footerButton";
 import { useEffect, useState } from "react";
-import { getTokenPriceInUSDC } from "@/utils/tokens/prices.utils";
+import { getTokenPriceInUSDC } from "@/utils/tokens";
 import { useBlockNumber } from "wagmi";
 import { CANTO_MAINNET_EVM } from "@/config/networks";
 

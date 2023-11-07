@@ -10,16 +10,14 @@ import {
   getConcBaseTokensFromQuoteTokens,
   getConcQuoteTokensFromBaseTokens,
   getDisplayTokenAmountFromRange,
-} from "@/utils/ambient/liquidity.utils";
+  getPriceFromTick,
+  getTickFromPrice,
+} from "@/utils/ambient";
 import {
   AmbientAddConcentratedLiquidityParams,
   AmbientTxType,
 } from "../interfaces/ambientPoolTxTypes";
-import { convertToBigNumber } from "@/utils/tokenBalances.utils";
-import {
-  getPriceFromTick,
-  getTickFromPrice,
-} from "@/utils/ambient/ambientMath.utils";
+import { convertToBigNumber } from "@/utils/formatting";
 import { ValidationReturn } from "@/config/interfaces";
 
 /**

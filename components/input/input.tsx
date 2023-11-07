@@ -3,7 +3,7 @@ import styles from "./input.module.scss";
 import Text from "../text";
 import clsx from "clsx";
 import Button from "../button/button";
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { formatBalance } from "@/utils/formatting";
 
 // if amount is true then add more required props
 type InputProps = {

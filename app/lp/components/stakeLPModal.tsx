@@ -10,7 +10,7 @@ import {
   convertToBigNumber,
   displayAmount,
   formatBalance,
-} from "@/utils/tokenBalances.utils";
+} from "@/utils/formatting";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import { useState } from "react";
@@ -20,7 +20,7 @@ import { CantoDexTxTypes } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes"
 import {
   addTokenBalances,
   convertTokenAmountToNote,
-} from "@/utils/tokens/tokenMath.utils";
+} from "@/utils/math";
 import { ModalItem } from "@/app/lending/components/modal/modal";
 interface Props {
   clpToken: CTokenWithUserData;

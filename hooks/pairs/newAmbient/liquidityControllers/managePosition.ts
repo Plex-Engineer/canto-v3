@@ -3,17 +3,17 @@ import {
   getDisplayTokenAmountFromRange,
   quoteTokenFromConcLiquidity,
   roundLiquidityForAmbientTx,
-} from "@/utils/ambient/liquidity.utils";
+  getPriceFromTick,
+} from "@/utils/ambient";
 import { AmbientPool, AmbientUserPosition } from "../interfaces/ambientPools";
-import { getPriceFromTick } from "@/utils/ambient/ambientMath.utils";
 import {
   AmbientAddConcentratedLiquidityParams,
   AmbientRemoveConcentratedLiquidityParams,
   AmbientTxType,
 } from "../interfaces/ambientPoolTxTypes";
-import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
+import { convertToBigNumber, formatBalance } from "@/utils/formatting";
 import BigNumber from "bignumber.js";
-import { percentOfAmount } from "@/utils/tokens/tokenMath.utils";
+import { percentOfAmount } from "@/utils/math";
 
 // No states needed here, just functions to get the optimal amount of tokens to add/remove
 export default class AmbientPositionManager {

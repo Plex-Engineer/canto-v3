@@ -2,9 +2,8 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
-  errMsg,
 } from "@/config/interfaces/errors";
-import { newContractInstance } from "./helpers.utils";
+import { newContractInstance } from "@/utils/evm";
 import { DEX_REOUTER_ABI } from "@/config/abis";
 
 /**
@@ -53,7 +52,7 @@ export async function quoteAddLiquidity(
       expectedLiquidity: (response.liquidity as number).toString(),
     });
   } catch (err) {
-    return NEW_ERROR("quoteAddLiquidity::" + errMsg(err));
+    return NEW_ERROR("quoteAddLiquidity", err);
   }
 }
 
@@ -83,6 +82,6 @@ export async function quoteRemoveLiquidity(
       expectedToken2: (reponse.amountB as number).toString(),
     });
   } catch (err) {
-    return NEW_ERROR("quoteRemoveLiquidity::" + errMsg(err));
+    return NEW_ERROR("quoteRemoveLiquidity", err);
   }
 }

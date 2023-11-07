@@ -11,12 +11,12 @@ import {
   CTokenLendingTransactionParams,
   CTokenLendingTxTypes,
 } from "../interfaces/lendingTxTypes";
-import { createApprovalTxs } from "@/utils/evm/erc20.utils";
+import { createApprovalTxs } from "@/utils/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/formatting";
 import { CERC20_ABI, COMPTROLLER_ABI } from "@/config/abis";
 import { MAX_UINT256, getCantoCoreAddress } from "@/config/consts/addresses";
-import { greaterThan } from "@/utils/tokens/tokenMath.utils";
+import { greaterThan } from "@/utils/math";
 
 export async function cTokenLendingTx(
   params: CTokenLendingTransactionParams

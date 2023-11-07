@@ -9,7 +9,7 @@ import {
 import { BridgeTransactionParams } from "../interfaces/hookParams";
 import { BridgeToken } from "../interfaces/tokens";
 import { BridgingMethod } from "../interfaces/bridgeMethods";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/formatting";
 import { TransactionFlowType } from "@/config/transactions/txMap";
 
 interface CreateBridgeFlowParams extends CreateBridgeTxParams {

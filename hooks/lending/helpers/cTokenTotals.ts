@@ -1,7 +1,7 @@
 import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
 import { CTokenWithUserData } from "../interfaces/tokens";
 import BigNumber from "bignumber.js";
-import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
+import { convertTokenAmountToNote } from "@/utils/math";
 
 /**
  * @notice Gets total supply, borrow, and rewards from user cTokens

@@ -1,7 +1,7 @@
 import { ERC20Token, UserTokenBalances } from "@/config/interfaces";
 import { useState } from "react";
-import { getEVMTokenBalanceList } from "@/utils/evm/erc20.utils";
-import { getCosmosTokenBalanceList } from "@/utils/cosmos/cosmosBalance.utils";
+import { getEVMTokenBalanceList } from "@/utils/tokens";
+import { getCosmosTokenBalanceList } from "@/utils/cosmos";
 import { useQuery } from "react-query";
 
 /**

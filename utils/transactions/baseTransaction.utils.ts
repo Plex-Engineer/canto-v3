@@ -6,16 +6,11 @@ import {
 } from "@/config/interfaces";
 import {
   GetWalletClientResult,
-  getWalletClient,
-  switchNetwork,
+  waitForTransaction as evmWait,
 } from "wagmi/actions";
-import { performEVMTransaction } from "./evm/performEVMTx";
-import {
-  performCosmosTransactionEIP,
-  waitForCosmosTx,
-} from "./cosmos/transactions/performCosmosTx";
-import { waitForTransaction as evmWait } from "wagmi/actions";
-import { performKeplrTx } from "./keplr/performKeplrTx";
+import { performEVMTransaction } from "../evm/performEVMTx.utils";
+import { performCosmosTransactionEIP, waitForCosmosTx } from "../cosmos";
+import { performKeplrTx } from "../keplr";
 
 /**
  * @notice performs a single transaction
@@ -78,38 +73,4 @@ export async function waitForTransaction(
     default:
       return NEW_ERROR("waitForTransaction: unknown tx type: " + txType);
   }
-}
-
-/**
- * @notice checks if the signer is on the right chain and tries to switch if not
- * @dev for EVM wallets
- * @param {GetWalletClientResult} signer EVM signing wallet client
- * @param {number} chainId chainId signer should be on
- * @returns {PromiseWithError<GetWalletClientResult>} new signer if switch was made or error
- */
-export async function checkOnRightChain(
-  signer: GetWalletClientResult,
-  chainId: number
-): PromiseWithError<GetWalletClientResult> {
-  if (!signer) {
-    return NEW_ERROR("checkOnRightChain: no signer");
-  }
-  if (signer.chain.id !== chainId) {
-    try {
-      // attempt to switch chains
-      const network = await switchNetwork({ chainId });
-      if (!network || network.id !== chainId) {
-        return NEW_ERROR("checkOnRightChain: error switching chains");
-      }
-      const newSigner = await getWalletClient({ chainId });
-      if (!newSigner) {
-        // still some error getting the signer
-        return NEW_ERROR("checkOnRightChain: error switching chains");
-      }
-      return NO_ERROR(newSigner);
-    } catch (error) {
-      return NEW_ERROR("checkOnRightChain: error switching chains");
-    }
-  }
-  return NO_ERROR(signer);
 }

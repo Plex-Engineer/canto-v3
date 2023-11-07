@@ -1,10 +1,4 @@
-import {
-  NEW_ERROR,
-  NO_ERROR,
-  PromiseWithError,
-  ReturnWithError,
-  errMsg,
-} from "@/config/interfaces";
+import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 
 const DEFAULT_HEADER = {
   method: "GET",
@@ -31,7 +25,7 @@ export async function tryFetch<T>(
     const data = await response.json();
     return NO_ERROR<T>(data);
   } catch (err) {
-    return NEW_ERROR("tryFetch::" + errMsg(err));
+    return NEW_ERROR("tryFetch", err);
   }
 }
 
@@ -51,7 +45,7 @@ export async function tryFetchMultipleEndpoints<T>(
       return result;
     }
   }
-  return NEW_ERROR("tryFetchMultipleEndpoints: no endpoints were successful");
+  return NEW_ERROR("tryFetchMultipleEndpoints", "no endpoints were successful");
 }
 
 const MAX_TRIES = 5;
@@ -77,7 +71,8 @@ export async function tryFetchWithRetry<T>(
     await sleep(4000);
   }
   return NEW_ERROR(
-    "tryFetchWithRetry: no response after " + numberOfTries + " tries"
+    "tryFetchWithRetry",
+    "no response after " + numberOfTries + " tries"
   );
 }
 

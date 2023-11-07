@@ -10,8 +10,8 @@ import {
   TxCreatorFunctionReturn,
   errMsg,
 } from "@/config/interfaces";
-import { getTokenBalance } from "@/utils/evm/erc20.utils";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { getTokenBalance } from "@/utils/tokens";
+import { displayAmount } from "@/utils/formatting";
 import { CLMClaimRewardsTxParams } from "../interfaces/lendingTxTypes";
 
 export async function clmClaimRewardsTx(

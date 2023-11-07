@@ -50,7 +50,10 @@ export function getNetworkInfoFromChainId(
       return NO_ERROR(network);
     }
   }
-  return NEW_ERROR("getNetworkInfoFromChainId: Network not found: " + chainId);
+  return NEW_ERROR(
+    "getNetworkInfoFromChainId",
+    "Network not found: " + chainId
+  );
 }
 
 /**
@@ -70,7 +73,7 @@ export function getCosmosAPIEndpoint(
       case NETWORKS.CANTO_TESTNET_EVM.chainId:
         return NO_ERROR(COSMOS_NETWORKS.CANTO_TESTNET_COSMOS.restEndpoint);
       default:
-        return NEW_ERROR("getCosmosAPIEndpoint: Invalid chainId: " + chainId);
+        return NEW_ERROR("getCosmosAPIEndpoint", "Invalid chainId: " + chainId);
     }
   } else {
     for (const [key, network] of Object.entries(COSMOS_NETWORKS)) {
@@ -78,7 +81,7 @@ export function getCosmosAPIEndpoint(
         return NO_ERROR(network.restEndpoint);
       }
     }
-    return NEW_ERROR("getCosmosAPIEndpoint: Network not found: " + chainId);
+    return NEW_ERROR("getCosmosAPIEndpoint", "Network not found: " + chainId);
   }
 }
 
@@ -101,6 +104,6 @@ export function getCosmosChainObject(chainId: number): ReturnWithError<Chain> {
         cosmosChainId: COSMOS_NETWORKS.CANTO_MAINNET_COSMOS.chainId,
       });
     default:
-      return NEW_ERROR("getCosmosChainObject: Invalid chainId:" + chainId);
+      return NEW_ERROR("getCosmosChainObject", "Invalid chainId:" + chainId);
   }
 }

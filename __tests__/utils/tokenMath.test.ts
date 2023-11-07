@@ -1,7 +1,7 @@
 import {
   convertNoteAmountToToken,
   convertTokenAmountToNote,
-} from "@/utils/tokens/tokenMath.utils";
+} from "@/utils/math";
 import BigNumber from "bignumber.js";
 
 describe("test tokenMath", () => {
