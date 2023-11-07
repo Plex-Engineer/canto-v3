@@ -13,7 +13,7 @@ import styles from './gov.module.scss';
 import Text from "@/components/text";
 import Spacer from "@/components/layout/spacer";
 import Button from "@/components/button/button";
-import { convertToProposalType, proposalsData } from "./dummydata";
+
 
 export default function GovernancePage() {
   const { proposals } = useProposals({ chainId: 7700 });

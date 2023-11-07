@@ -65,16 +65,16 @@ export const Proposals = (props: ProposalsListParams) => {
               {hoveredProposal === proposal ? (
                 <>
                   <div>
-                    <h6>YES: {proposal.final_vote.yes}</h6>
+                    <h6>YES: {proposal.final_tally_result.yes}</h6>
                   </div>
                   <div>
-                    <h6>NO: {proposal.final_vote.no}</h6>
+                    <h6>NO: {proposal.final_tally_result.no}</h6>
                   </div>
                   <div>
-                    <h6>ABSTAIN: {proposal.final_vote.abstain}</h6>
+                    <h6>ABSTAIN: {proposal.final_tally_result.abstain}</h6>
                   </div>
                   <div>
-                    <h6>VETO: {proposal.final_vote.no_with_veto}</h6>
+                    <h6>VETO: {proposal.final_tally_result.no_with_veto}</h6>
                   </div>
                 </>
               ) : (
