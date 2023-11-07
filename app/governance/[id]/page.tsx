@@ -1,13 +1,5 @@
-"use client"
-import { usePathname } from 'next/navigation';
+import Text from "@/components/text";
 
-function MyServerComponent() {
-  const pathname = usePathname();
-
-  // Use `pathname` for server-side logic such as fetching data
-  // based on the current path.
-
-  return <div>Current Proposal {pathname}</div>;
+export default function Page({ params }: any) {
+  return <Text>Proposal ID : {params.id}</Text>;
 }
-
-export default MyServerComponent;
