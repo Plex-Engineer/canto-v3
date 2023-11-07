@@ -216,8 +216,8 @@ const CTokenTable = ({
   isLoading: boolean;
   stableTokens: CTokenWithUserData[];
   rwas: CTokenWithUserData[];
-  onSupply?: (address: string) => void;
-  onBorrow?: (address: string) => void;
+  onSupply: (address: string) => void;
+  onBorrow: (address: string) => void;
 }) => {
   return (
     <div className={styles.mainTable}>
@@ -247,17 +247,14 @@ const CTokenTable = ({
             ...rwas.map((cToken) =>
               CTokenRow({
                 cToken,
-                onSupply: onSupply ? () => onSupply(cToken.address) : undefined,
+                onSupply: () => onSupply(cToken.address),
               })
             ),
             ...stableTokens.map((cToken) =>
               CTokenRow({
                 cToken,
-                onSupply: onSupply ? () => onSupply(cToken.address) : undefined,
-                onBorrow:
-                  cToken.underlying.symbol.toUpperCase() != "USYC" && onBorrow
-                    ? () => onBorrow(cToken.address)
-                    : undefined,
+                onSupply: () => onSupply(cToken.address),
+                onBorrow: () => onBorrow(cToken.address),
               })
             ),
           ]}
