@@ -1,6 +1,12 @@
 export interface Proposal {
   proposal_id: number;
-  type_url: string;
+  content: {
+    "@type": string,
+    title: string,
+    description: string,
+    metadata: Object
+  };
+  //type_url: string;
   status: ProposalStatus;
   submit_time: string;
   voting_start_time: string;
@@ -10,7 +16,7 @@ export interface Proposal {
     denom: string;
     amount: string;
   }[];
-  final_vote: {
+  final_tally_result: {
     yes: string;
     abstain: string;
     no: string;

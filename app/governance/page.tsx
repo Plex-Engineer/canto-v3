@@ -16,9 +16,8 @@ import Button from "@/components/button/button";
 import { convertToProposalType, proposalsData } from "./dummydata";
 
 export default function GovernancePage() {
-  //const { proposals } = useProposals({ chainId: 7700 });
-
-  const proposals = proposalsData.map(convertToProposalType);
+  const { proposals } = useProposals({ chainId: 7700 });
+  //console.log(proposals);
   
 
   
