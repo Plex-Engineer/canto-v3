@@ -107,15 +107,6 @@ export default function LendingPage() {
             )}
           </div>
 
-          {/* <CTokenTable
-            title="RWAS"
-            isLoading={isLoading}
-            cTokens={rwas}
-            onSupply={(address) => {
-              setSelectedCToken(address);
-              setCurrentModal(CLMModalTypes.SUPPLY);
-            }}
-          /> */}
           <CTokenTable
             title="Stable Coins"
             isLoading={isLoading}
