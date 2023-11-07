@@ -6,3 +6,7 @@ export interface ProposalHookParams {
 export interface ProposalHookReturn {
   proposals: Proposal[];
 }
+
+export interface ProposalHookReturnSingle{
+  proposal: Proposal | undefined;
+}

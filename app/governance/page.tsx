@@ -14,6 +14,7 @@ import Text from "@/components/text";
 import Spacer from "@/components/layout/spacer";
 import Button from "@/components/button/button";
 import { convertToProposalType, proposalsData } from "./dummydata";
+import Link from "next/link";
 
 export default function GovernancePage() {
   //const { proposals } = useProposals({ chainId: 7700 });
@@ -71,6 +72,8 @@ export default function GovernancePage() {
       Governance
     </Text>
     <Spacer height="20px" />
+    <Link key={3} href={`/governance/${3}`}>
+  </Link>
               
     <ProposalTable proposals={sorted_proposals}></ProposalTable>
               {/* <Table title={TableProps.title} headers={TableProps.headers} columns={5} data={TableProps.data}></Table> */}

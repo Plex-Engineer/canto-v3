@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from 'react';
 import Filter from '../Filter/Filter';
 import styles from './ProposalTable.module.scss';
@@ -5,6 +6,8 @@ import { Proposal } from '@/hooks/gov/interfaces/proposal';
 import { formatDate, formatProposalStatus, formatProposalType } from '@/utils/gov/formatData';
 import Text from '@/components/text';
 import Button from '@/components/button/button';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 
 interface TableProps {
@@ -14,7 +17,7 @@ interface TableProps {
 const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
 
   
-  
+  const router = useRouter();
   const [currentFilter, setCurrentFilter] = useState('All');
   const [filteredProposals, setFilteredProposals] = React.useState<Proposal[]>(proposals);
 
@@ -69,6 +72,14 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
     //setTotalPages(Math.ceil(filteredProposals.length / pageSize));
   };
   
+  const handleRowClick = (proposalId:any) => {
+    // Assuming you have access to the `useRouter` hook here
+    //const router = useRouter();
+  
+    // Navigate to the appropriate page
+    router.push(`/governance/${proposalId}`);
+  };
+  
   if (!proposals || proposals.length==0) {
     return <div>Loading Proposals...</div>;
   }
@@ -88,15 +99,18 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
         </thead>
         <tbody>
           {paginatedProposals.map((proposal,index) => (
-            <tr className={styles.row} key={proposal.proposal_id}>
-              {/* <div>PROPOSALS</div> */}
+          
+            <tr className={styles.row} key={proposal.proposal_id} onClick={()=>handleRowClick(proposal.proposal_id)}
+            style={{ cursor: 'pointer' }}>
               <td className={styles.tableData}><Text font="proto_mono" >{proposal.proposal_id}</Text></td>
               <td className={styles.tableTitleColumn}><Text font="proto_mono" >PROPOSAL TITLE</Text></td>
               <td className={styles.tableData}><Text font="proto_mono" >{formatProposalStatus(proposal.status)}</Text></td>
               <td className={styles.tableData}><Text font="proto_mono" >{formatProposalType(proposal.type_url)}</Text></td>
               <td className={styles.tableData}><Text font="proto_mono" >{formatDate(proposal.voting_end_time)}</Text></td>
             </tr>
+        
           ))}
+          
         </tbody>
       </table>    
       }
@@ -108,6 +122,12 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
           Next
         </Button>
       </div>
+
+      {/* {proposals.map((proposal) => (
+  <Link key={proposal.proposal_id} href={`/governance/${proposal.proposal_id}`}>
+    <div className="proposal-link">Proposal {proposal.proposal_id} </div>
+  </Link>
+))} */}
       
     </div>
   );

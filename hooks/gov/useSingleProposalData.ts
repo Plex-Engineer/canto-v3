@@ -2,27 +2,29 @@ import { useQuery } from "react-query";
 import {
   ProposalHookParams,
   ProposalHookReturn,
+  ProposalHookReturnSingle,
 } from "./interfaces/hookParams";
 import { getCantoApiData } from "@/config/api";
 import { Proposal } from "./interfaces/proposal";
 
-export default function useProposals(
+export default function useSiingleProposalData(
+  proposalId : number,
   params: ProposalHookParams,
   options?: {
     refetchInterval?: number;
   }
-): ProposalHookReturn {
+): ProposalHookReturnSingle {
   ///
   /// INTERNAL HOOKS
   ///
 
   // just need to fetch all proposals for this hook
-  const { data: proposalsData } = useQuery(
+  const { data: proposalData } = useQuery(
     ["proposals", params.chainId],
     async () => {
-      const { data: proposals, error } = await getCantoApiData<Proposal[]>(
+      const { data: proposals, error } = await getCantoApiData<Proposal>(
         params.chainId,
-        "/v1/gov/proposals"
+        "/v1/gov/proposals"+proposalId
       );
       if (error) throw error;
       //const proposalData = JSON.parse(proposals);
@@ -40,6 +42,6 @@ export default function useProposals(
   );
   //const proposals = proposalsData ? JSON.parse(proposalsData) : [];
   return {
-    proposals: proposalsData ?? [],
+    proposal: proposalData,
   };
 }
