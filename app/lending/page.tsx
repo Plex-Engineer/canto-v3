@@ -107,7 +107,7 @@ export default function LendingPage() {
             )}
           </div>
 
-          <CTokenTable
+          {/* <CTokenTable
             title="RWAS"
             isLoading={isLoading}
             cTokens={rwas}
@@ -115,13 +115,14 @@ export default function LendingPage() {
               setSelectedCToken(address);
               setCurrentModal(CLMModalTypes.SUPPLY);
             }}
-          />
+          /> */}
           <CTokenTable
             title="Stable Coins"
             isLoading={isLoading}
-            cTokens={stableCoins.sort((a, b) =>
+            stableTokens={stableCoins.sort((a, b) =>
               a.underlying.symbol.localeCompare(b.underlying.symbol)
             )}
+            rwas={rwas}
             onSupply={(address) => {
               setSelectedCToken(address);
               setCurrentModal(CLMModalTypes.SUPPLY);
@@ -215,13 +216,15 @@ const NoteIcon = () => (
 const CTokenTable = ({
   title,
   isLoading,
-  cTokens,
+  stableTokens,
+  rwas,
   onSupply,
   onBorrow,
 }: {
   title: string;
   isLoading: boolean;
-  cTokens: CTokenWithUserData[];
+  stableTokens: CTokenWithUserData[];
+  rwas: CTokenWithUserData[];
   onSupply?: (address: string) => void;
   onBorrow?: (address: string) => void;
 }) => {
@@ -238,7 +241,7 @@ const CTokenTable = ({
         >
           <LoadingIcon />
         </Container>
-      ) : cTokens.length > 0 ? (
+      ) : stableTokens.length > 0 ? (
         <Table
           title={title}
           headers={[
@@ -250,11 +253,20 @@ const CTokenTable = ({
             { value: "Manage", ratio: 2 },
           ]}
           content={[
-            ...cTokens.map((cToken) =>
+            ...rwas.map((cToken) =>
               CTokenRow({
                 cToken,
                 onSupply: onSupply ? () => onSupply(cToken.address) : undefined,
-                onBorrow: onBorrow ? () => onBorrow(cToken.address) : undefined,
+              })
+            ),
+            ...stableTokens.map((cToken) =>
+              CTokenRow({
+                cToken,
+                onSupply: onSupply ? () => onSupply(cToken.address) : undefined,
+                onBorrow:
+                  cToken.underlying.symbol.toUpperCase() != "USYC" && onBorrow
+                    ? () => onBorrow(cToken.address)
+                    : undefined,
               })
             ),
           ]}
