@@ -7,7 +7,7 @@ import {
 import { getCantoApiData } from "@/config/api";
 import { Proposal } from "./interfaces/proposal";
 
-export default function useSiingleProposalData(
+export default function useSingleProposalData(
   proposalId : number,
   params: ProposalHookParams,
   options?: {
@@ -24,7 +24,7 @@ export default function useSiingleProposalData(
     async () => {
       const { data: proposals, error } = await getCantoApiData<Proposal>(
         params.chainId,
-        "/v1/gov/proposals"+proposalId
+        "/v1/gov/proposals/"+proposalId
       );
       if (error) throw error;
       //const proposalData = JSON.parse(proposals);

@@ -13,13 +13,11 @@ import styles from './gov.module.scss';
 import Text from "@/components/text";
 import Spacer from "@/components/layout/spacer";
 import Button from "@/components/button/button";
-import { convertToProposalType, proposalsData } from "./dummydata";
-import Link from "next/link";
+
 
 export default function GovernancePage() {
-  //const { proposals } = useProposals({ chainId: 7700 });
-
-  const proposals = proposalsData.map(convertToProposalType);
+  const { proposals } = useProposals({ chainId: 7700 });
+  //console.log(proposals);
   
 
   
@@ -68,12 +66,16 @@ export default function GovernancePage() {
   return (
     <div>
     <div className={styles.container}>
-    <Text size="x-lg" font="proto_mono" className={styles.title}>
-      Governance
-    </Text>
+    <div className={styles.header}>
+      <Text font="proto_mono" className={styles.title}>
+        Governance  
+      </Text>
+      <Text size='sm' opacity={0.4} className={styles.middleText}>Stake your $CANTO to participate in governance</Text>
+      <Button >Go to Staking</Button>
+    </div>
+    
     <Spacer height="20px" />
-    <Link key={3} href={`/governance/${3}`}>
-  </Link>
+    
               
     <ProposalTable proposals={sorted_proposals}></ProposalTable>
               {/* <Table title={TableProps.title} headers={TableProps.headers} columns={5} data={TableProps.data}></Table> */}

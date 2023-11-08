@@ -22,9 +22,30 @@
 }
 
 
-.title {
-font-size: 32px !important;
-text-align: left;
-width: 100%;
-max-width: 1500px;
+
+
+.header{
+  display: flex;
+  direction: row !important;
+  justify-content: space-between;
+  width: 100% !important;
+  //align-items: center;
+
+  .title {
+    font-size: 32px !important;
+    text-align: left;
+    width: 50%;
+    //max-width: 50% !important;
+  }
+  .middleText {
+
+     /* This will center the text in its flex container */
+    width: 20% !important;
+    //max-width: 20% !important;
+  }
+  .stakingButton {
+    width: 20% !important;
+    flex: 0 0 auto; /* This will prevent the button from growing and will be sized according to its content */
+  }
+
 }
