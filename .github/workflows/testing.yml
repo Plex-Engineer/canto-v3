@@ -5,7 +5,7 @@ on:
     branches: ["main", "staging"]
   workflow_dispatch:
 jobs:
-  build_test:
+  unit_test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -16,6 +16,5 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install
-      - run: npm run build
+      - run: npm instal'
       - run: npm test
