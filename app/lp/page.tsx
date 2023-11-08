@@ -160,9 +160,8 @@ export default function Page() {
 
       <Container direction="row" gap={"auto"} width="100%">
         <Text size="x-lg" className={styles.title}>
-          LP
+          Pools
         </Text>
-        <Spacer height="30px" />
 
         <Rewards
           onClick={sendClaimRewardsFlow}
@@ -175,44 +174,43 @@ export default function Page() {
           )}
         />
       </Container>
-      {/* <SVGComponent /> */}
-
       <Spacer height="30px" />
-      {userCantoDexPairs.length + userAmbientPools.length > 0 && (
-        <Table
-          title="Your Pairs"
-          headers={[
-            { value: "Pair", ratio: 2 },
-            { value: "APR", ratio: 1 },
-            { value: "Pool Share", ratio: 1 },
-            { value: "Value", ratio: 1 },
-            { value: "Rewards", ratio: 1 },
-            { value: "Edit", ratio: 1 },
-          ]}
-          content={[
-            ...userAmbientPools.map((pool) =>
-              UserAmbientPairRow({
-                pool,
-                onManage: (poolAddress) => {
-                  setPair(poolAddress);
-                },
-                rewards: ambient.rewards,
-              })
-            ),
-            ...userCantoDexPairs.map((pair) =>
-              UserCantoDexPairRow({
-                pair,
-                onManage: (pairAddress) => {
-                  setPair(pairAddress);
-                },
-              })
-            ),
-          ]}
-        />
-      )}
-      <Spacer height="40px" />
 
-      <Spacer height="10px" />
+      {userCantoDexPairs.length + userAmbientPools.length > 0 && (
+        <>
+          <Table
+            title="Your Pairs"
+            headers={[
+              { value: "Pair", ratio: 2 },
+              { value: "APR", ratio: 1 },
+              { value: "Pool Share", ratio: 1 },
+              { value: "Value", ratio: 1 },
+              { value: "Rewards", ratio: 1 },
+              { value: "Edit", ratio: 1 },
+            ]}
+            content={[
+              ...userAmbientPools.map((pool) =>
+                UserAmbientPairRow({
+                  pool,
+                  onManage: (poolAddress) => {
+                    setPair(poolAddress);
+                  },
+                  rewards: ambient.rewards,
+                })
+              ),
+              ...userCantoDexPairs.map((pair) =>
+                UserCantoDexPairRow({
+                  pair,
+                  onManage: (pairAddress) => {
+                    setPair(pairAddress);
+                  },
+                })
+              ),
+            ]}
+          />
+          <Spacer height="40px" />
+        </>
+      )}
 
       <Table
         title="All Pairs"
