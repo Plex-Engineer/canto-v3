@@ -19,6 +19,7 @@ import { useState } from "react";
 import Spacer from "@/components/layout/spacer";
 import { addTokenBalances, divideBalances } from "@/utils/math";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
+import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -30,6 +31,7 @@ export default function LendingPage() {
   const [currentModal, setCurrentModal] = useState<CLMModalTypes>(
     CLMModalTypes.NONE
   );
+
   // get all data from lending combo
   const {
     cTokens,
@@ -214,6 +216,8 @@ const CTokenTable = ({
   onSupply: (address: string) => void;
   onBorrow: (address: string) => void;
 }) => {
+  const [filteredPairs, setFilteredPairs] = useState("StableCoins");
+
   return (
     <div className={styles.mainTable}>
       {isLoading ? (
@@ -230,6 +234,17 @@ const CTokenTable = ({
       ) : stableTokens.length > 0 ? (
         <Table
           title={title}
+          secondary={
+            <Container width="320px">
+              <ToggleGroup
+                options={["RWAs", "StableCoins"]}
+                selected={filteredPairs}
+                setSelected={(value) => {
+                  setFilteredPairs(value);
+                }}
+              />
+            </Container>
+          }
           headers={[
             { value: "Asset", ratio: 2 },
             { value: "APR", ratio: 1 },
@@ -238,21 +253,24 @@ const CTokenTable = ({
             { value: "Collateral Factor", ratio: 1 },
             { value: "Manage", ratio: 2 },
           ]}
-          content={[
-            ...rwas.map((cToken) =>
-              CTokenRow({
-                cToken,
-                onSupply: () => onSupply(cToken.address),
-              })
-            ),
-            ...stableTokens.map((cToken) =>
-              CTokenRow({
-                cToken,
-                onSupply: () => onSupply(cToken.address),
-                onBorrow: () => onBorrow(cToken.address),
-              })
-            ),
-          ]}
+          content={
+            filteredPairs == "RWAs"
+              ? rwas.map((cToken) =>
+                  CTokenRow({
+                    cToken,
+                    onSupply: () => onSupply(cToken.address),
+                  })
+                )
+              : filteredPairs == "StableCoins"
+              ? stableTokens.map((cToken) =>
+                  CTokenRow({
+                    cToken,
+                    onSupply: () => onSupply(cToken.address),
+                    onBorrow: () => onBorrow(cToken.address),
+                  })
+                )
+              : []
+          }
         />
       ) : (
         <Container

@@ -208,7 +208,7 @@ export default function Page() {
               ),
             ]}
           />
-          <Spacer height="40px" />
+          <Spacer height="20px" />
         </>
       )}
 
