@@ -9,6 +9,14 @@
   box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
 }
 
+.title {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  height: 50px;
+}
+
 .table {
   display: grid;
   grid-template-rows: 50px 1fr;

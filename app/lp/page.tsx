@@ -211,22 +211,22 @@ export default function Page() {
         />
       )}
       <Spacer height="40px" />
-      <Container width="100%">
-        <Spacer width="100%" />
-        <Container width="400px">
-          <ToggleGroup
-            options={["all", "stable", "volatile"]}
-            selected={filteredPairs}
-            setSelected={(value) => {
-              setFilteredPairs(value);
-            }}
-          />
-        </Container>
-      </Container>
+
       <Spacer height="10px" />
 
       <Table
         title="All Pairs"
+        secondary={
+          <Container width="400px">
+            <ToggleGroup
+              options={["all", "stable", "volatile"]}
+              selected={filteredPairs}
+              setSelected={(value) => {
+                setFilteredPairs(value);
+              }}
+            />
+          </Container>
+        }
         headers={[
           { value: "Pair", ratio: 2 },
           { value: "APR", ratio: 1 },

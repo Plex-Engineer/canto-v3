@@ -3,6 +3,7 @@ import styles from "./table.module.scss";
 
 interface Props {
   title?: string;
+  secondary?: React.ReactNode;
   headers: {
     value: string;
     ratio: number;
@@ -16,6 +17,7 @@ const Table = (props: Props) => {
         <Text font="proto_mono" size="lg">
           {props.title}
         </Text>
+        {props.secondary}
       </div>
       <div className={styles.table}>
         <div
