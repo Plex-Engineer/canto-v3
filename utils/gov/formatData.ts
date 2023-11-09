@@ -72,5 +72,67 @@ export function formatProposalStatus(status:string): string | undefined{
 export function formatProposalType(type_url: string){
     return (proposalTypes as any)[type_url] || 'Proposal type not found';
 }
+interface FinalTallyResult {
+    yes: string;
+    abstain: string;
+    no: string;
+    no_with_veto: string;
+  }
+  
+  interface VoteData {
+    yesAmount: string,
+    noAmount: string,
+    abstainAmount: string,
+    no_with_vetoAmount: string,
+    yes: string;
+    abstain: string;
+    no: string;
+    no_with_veto: string;
+  }
+
+export function calculateVotePercentages(finalTallyResult: FinalTallyResult): VoteData {
+  // Destructure the vote counts from the object
+  const { yes, abstain, no, no_with_veto } = finalTallyResult;
+  console.log(finalTallyResult);
+
+  const factor = BigInt(1e18);
+  // Convert the vote counts to BigInts
+  const yesVotes = BigInt(yes);
+  const abstainVotes = BigInt(abstain);
+  const noVotes = BigInt(no);
+  const noWithVetoVotes = BigInt(no_with_veto);
+
+  const yesNumber = Number(yesVotes / factor) + Number(yesVotes % factor) / Number(factor);
+  const abstainNumber = Number(abstainVotes / factor) + Number(abstainVotes % factor) / Number(factor);
+  const noNumber = Number(noVotes / factor) + Number(noVotes % factor) / Number(factor);
+  const noWithVetoNumber = Number(noWithVetoVotes / factor) + Number(noWithVetoVotes % factor) / Number(factor);
+
+  console.log(yesNumber);
+  const totalVotesBigInt = yesVotes+noVotes+abstainVotes+noWithVetoVotes;
+  const totalVotes = yesNumber + abstainNumber + noNumber + noWithVetoNumber;
+  
+  // Calculate percentages and format them as strings
+  const yesPercentage = (Number(yesVotes*BigInt(10000) / totalVotesBigInt )/100).toFixed(3);
+  const abstainPercentage = (Number(abstainVotes*BigInt(1000000) / totalVotesBigInt )/10000).toFixed(3);
+  const noPercentage = (Number(noVotes*BigInt(10000) / totalVotesBigInt )/100).toFixed(3);
+  const noWithVetoPercentage = (Number(noWithVetoVotes*BigInt(10000) / totalVotesBigInt )/100).toFixed(3);
+
+  // Convert the vote counts to strings with two decimal places
+  const yesString = yesNumber.toFixed(2);
+  const abstainString = abstainNumber.toFixed(2);
+  const noString = noNumber.toFixed(2);
+  const noWithVetoString = noWithVetoNumber.toFixed(2);
+
+  return {
+    yesAmount: yesString,
+    noAmount: noString,
+    abstainAmount: abstainString,
+    no_with_vetoAmount: noWithVetoString,
+    yes: yesPercentage,
+    abstain: abstainPercentage,
+    no: noPercentage,
+    no_with_veto: noWithVetoPercentage,
+  };
+}
 
 

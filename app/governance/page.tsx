@@ -6,7 +6,6 @@ import Container from "@/components/container/container";
 import { Proposal } from "@/hooks/gov/interfaces/proposal";
 import { ProposalModal } from "./proposalModal";
 import useProposals from "@/hooks/gov/useProposals";
-import { Proposals } from "./Proposals";
 import ProposalTable from "./components/ProposalTable/ProposalTable";
 import Table from "@/components/table/table";
 import styles from './gov.module.scss';

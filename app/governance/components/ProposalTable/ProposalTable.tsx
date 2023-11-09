@@ -103,9 +103,9 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
             <tr className={styles.row} key={proposal.proposal_id} onClick={()=>handleRowClick(proposal.proposal_id)}
             style={{ cursor: 'pointer' }}>
               <td className={styles.tableData}><Text font="proto_mono" >{proposal.proposal_id}</Text></td>
-              <td className={styles.tableTitleColumn}><Text font="proto_mono" >PROPOSAL TITLE</Text></td>
+              <td className={styles.tableTitleColumn}><Text font="proto_mono" >{proposal.content.title}</Text></td>
               <td className={styles.tableData}><Text font="proto_mono" >{formatProposalStatus(proposal.status)}</Text></td>
-              <td className={styles.tableData}><Text font="proto_mono" >PROPOSAL TYPE</Text></td>
+              <td className={styles.tableData}><Text font="proto_mono" >{formatProposalType(proposal.content['@type'])}</Text></td>
               <td className={styles.tableData}><Text font="proto_mono" >{formatDate(proposal.voting_end_time)}</Text></td>
             </tr>
         

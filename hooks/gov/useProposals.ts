@@ -38,9 +38,9 @@ export default function useProposals(
       },
     }
   );
-  
+  //console.log(proposals);
   if(proposals){
-    console.log(JSON.parse(proposals));
+    //console.log(JSON.parse(proposals));
     return {
       proposals: JSON.parse(proposals)["proposals"] ?? [],
     };

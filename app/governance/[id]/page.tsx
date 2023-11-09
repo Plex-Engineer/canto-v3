@@ -2,34 +2,44 @@
 import Text from "@/components/text";
 import styles from './proposalModal.module.scss';
 import useSingleProposalData from "@/hooks/gov/useSingleProposalData";
-import { formatProposalStatus } from "@/utils/gov/formatData";
+import { calculateVotePercentages, formatProposalStatus } from "@/utils/gov/formatData";
 import Icon from "@/components/icon/icon";
 import Button from "@/components/button/button";
+import useProposals from "@/hooks/gov/useProposals";
 
 export default function Page({ params }: any) {
-  const {proposal} = useSingleProposalData(
-    params.id,
+  const {proposals} = useProposals(
     {chainId: 7700}
   )
   //console.log(proposal);
-  if(!proposal){
+  
+  if(!proposals || proposals.length==0){
     return (
-      <div>Loading Proposal Data...</div>
+      <div>Loading Proposals....</div>
     );
   }
+  const proposal = proposals.find((p) => p.proposal_id === params.id);
+
+  if (!proposal) {
+    return <div>No proposal found with the ID {params.id}</div>;
+  }
+
+  const isActive = formatProposalStatus(proposal.status)=='ACTIVE';
+
+  const votesData = calculateVotePercentages(proposal.final_tally_result);
 
   return (
   <div className={styles.proposalContainer}>
     <div className={styles.proposalHeaderContainer}>
         <div className={styles.proposalCard1}>
-          <div style={{borderRight: "1px solid"}}><Text>#{proposal.proposal_id}</Text></div>
-          <div><Text>{formatProposalStatus(proposal.status)}</Text></div>
+          <div style={{borderRight: "1px solid", padding: "10px"}}><Text>#{proposal.proposal_id}</Text></div>
+          <div style={{padding: "10px"}}><Text>{formatProposalStatus(proposal.status)}</Text></div>
         </div>
         <div>
-            <Text font='proto_mono' size="x-lg">Proposal Title</Text>
+            <Text font='proto_mono' size="x-lg">{proposal.content.title}</Text>
         </div>
         <div>
-          <Text opacity={0.4}>Description of proposal. Some random text. User connected a wallet and has a $CANTO in staking</Text>
+          <Text opacity={0.4}>{proposal.content.description}</Text>
         </div>
     </div>
     
@@ -37,15 +47,15 @@ export default function Page({ params }: any) {
       <div className={styles.proposalCardContainer1}>
         <div className={styles.proposalInfoBox}>
           <div className={styles.proposalInfo}>
-            <div><Text font="proto_mono">Type:</Text></div>
+            <div><Text font="proto_mono" opacity={0.3}>Type:</Text></div>
             <div><Text font="proto_mono">Software Updgrade</Text></div>
           </div>
           <div className={styles.proposalInfo}>
-            <div><Text font="proto_mono">Proposer:</Text></div>
+            <div><Text font="proto_mono" opacity={0.3}>Proposer:</Text></div>
             <div><Text font="proto_mono">CANTO18190298...123</Text></div>
           </div>
           <div className={styles.proposalInfo}>
-            <div><Text font="proto_mono">Total Deposit:</Text></div>
+            <div><Text font="proto_mono" opacity={0.3}>Total Deposit:</Text></div>
             <div>
               <Text font="proto_mono">1000 </Text>
             </div>
@@ -53,22 +63,22 @@ export default function Page({ params }: any) {
         </div>
         <div className={styles.proposalInfoBox}>
             <div className={styles.proposalInfo}>
-              <div><Text font="proto_mono">Submit Time:</Text></div>
+              <div><Text font="proto_mono" opacity={0.3}>Submit Time:</Text></div>
               <div><Text font="proto_mono">{proposal.submit_time}</Text></div>
             </div>
             <div className={styles.proposalInfo}>
-              <div><Text font="proto_mono">Voting End Time:</Text></div>
+              <div><Text font="proto_mono" opacity={0.3}>Voting End Time:</Text></div>
               <div><Text font="proto_mono">{proposal.voting_end_time}</Text></div>
             </div>
         </div>
         <div className={styles.proposalInfoBox}>
             <div className={styles.proposalInfo}>
-              <div><Text font="proto_mono">Turnout/ Quorum: </Text></div>
+              <div><Text font="proto_mono" opacity={0.3}>Turnout/ Quorum: </Text></div>
               <div><Text font="proto_mono">38.1% 33.4%</Text></div>
             </div>
             <div className={styles.proposalInfo}>
-              <div><Text font="proto_mono">Proposer: </Text></div>
-              <div><Text font="proto_mono"> CANTO18190298...123</Text></div>
+              <div><Text font="proto_mono" opacity={0.3}>Proposer: </Text></div>
+              <div><Text font="proto_mono">CANTO18190298...123</Text></div>
             </div>
         </div>
       </div>
@@ -76,34 +86,54 @@ export default function Page({ params }: any) {
         <div className={styles.proposalInfoBoxVoting}>
           <div className={styles.proposalInfoRow1}>
             <div className={styles.proposalInfoVoting}>
-              <div><Text font="proto_mono">Yes</Text></div>
-              <div><Text font="proto_mono">56%</Text></div>
-              <div><Text font="proto_mono" opacity={0.4}>99496211</Text></div>
-            </div>
-            <div className={styles.proposalInfoVoting}>
-              <div>
-                <div><Text font="proto_mono">No</Text></div>
-                <div><Text font="proto_mono">18%</Text></div>
+              <div className={styles.votingInfoRow1}>
+                
+                <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "green", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Yes</Text></div></div>
+                <div><Text font="proto_mono">{votesData.yes}%</Text></div>
+              </div>
+              <div className={styles.votingInfoRow2}>
+                <div><Text font="proto_mono" opacity={0.4} size="x-sm">{votesData.yesAmount}</Text></div>
               </div>
               
-              <div><Text font="proto_mono" opacity={0.4}>99496211</Text></div>
+              
+            </div>
+            <div className={styles.proposalInfoVoting}>
+              <div className={styles.votingInfoRow1}>
+                <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "red", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">No</Text></div></div>
+                <div><Text font="proto_mono">{votesData.no}%</Text></div>
+              </div>
+              <div className={styles.votingInfoRow2}>
+                <div><Text font="proto_mono" opacity={0.4} size="x-sm">{votesData.noAmount}</Text></div>
+              </div>
+
             </div>
           </div>
           <div className={styles.proposalInfoRow1}>
             <div className={styles.proposalInfoVoting}>
-              <div><Text font="proto_mono">Veto</Text></div>
-              <div><Text font="proto_mono">25%</Text></div>
-              <div><Text font="proto_mono" opacity={0.4}>99496211</Text></div>
+              <div className={styles.votingInfoRow1}>
+                <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "#4455EF", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Veto</Text></div></div>
+                <div><Text font="proto_mono">{votesData.no_with_veto}%</Text></div>
+              </div>
+              <div className={styles.votingInfoRow2}>
+                <div><Text font="proto_mono" opacity={0.4} size="x-sm">{votesData.no_with_vetoAmount}</Text></div>
+              </div>
+              
+              
             </div>
             <div className={styles.proposalInfoVoting}>
-              <div><Text font="proto_mono">Abstain</Text></div>
-              <div><Text font="proto_mono">1%</Text></div>
-              <div><Text font="proto_mono" opacity={0.4}>99496211</Text></div>
+              <div className={styles.votingInfoRow1}>
+                <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "black" , margin:"10px 5px 0px 10px"}}></div> <div><Text font="proto_mono">Abstain</Text></div></div>
+                <div><Text font="proto_mono">{votesData.abstain}%</Text></div>
+              </div>
+              <div className={styles.votingInfoRow2}>
+                <div><Text font="proto_mono" opacity={0.4} size="x-sm">{votesData.abstainAmount}</Text></div>
+              </div>
             </div>
           </div>  
         </div>
         <div className={styles.VotingButton}>
-          <Button width={300}>Vote</Button>
+          <Button width={300} disabled={!isActive}>Vote</Button>
+          {!isActive && <span className={styles.tooltip}>The Proposal is not Active</span>}
         </div>
       </div>
     </div>

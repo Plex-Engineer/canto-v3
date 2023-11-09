@@ -5,7 +5,7 @@ import {
   ProposalHookReturnSingle,
 } from "./interfaces/hookParams";
 import { getCantoApiData } from "@/config/api";
-import { Proposal } from "./interfaces/proposal";
+import { Proposal, Proposal2 } from "./interfaces/proposal";
 
 export default function useSingleProposalData(
   proposalId : number,
@@ -22,7 +22,7 @@ export default function useSingleProposalData(
   const { data: proposalData } = useQuery(
     ["proposals", params.chainId],
     async () => {
-      const { data: proposals, error } = await getCantoApiData<Proposal>(
+      const { data: proposals, error } = await getCantoApiData<Proposal2>(
         params.chainId,
         "/v1/gov/proposals/"+proposalId
       );
