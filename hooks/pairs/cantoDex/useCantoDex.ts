@@ -42,7 +42,8 @@ export default function useCantoDex(
         CANTO_DATA_API_ENDPOINTS.allPairs
       );
       if (error) throw error;
-      return data;
+      // sort data to make it more predictable
+      return data.sort((a, b) => a.address.localeCompare(b.address));
     },
     {
       onSuccess: (data) => {

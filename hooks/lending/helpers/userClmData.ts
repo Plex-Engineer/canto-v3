@@ -76,5 +76,9 @@ export async function getAllUserCLMData(
     avgApr: positionTotals.avgApr,
   };
 
-  return NO_ERROR({ cTokens: combinedCTokenData, position: userTotalPosition });
+  // sort data to make it predicatble for hooks
+  return NO_ERROR({
+    cTokens: combinedCTokenData.sort((a, b) => (a.symbol > b.symbol ? 1 : -1)),
+    position: userTotalPosition,
+  });
 }

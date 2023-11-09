@@ -1,5 +1,4 @@
 import { ERC20Token, UserTokenBalances } from "@/config/interfaces";
-import { useState } from "react";
 import { getEVMTokenBalanceList } from "@/utils/tokens";
 import { getCosmosTokenBalanceList } from "@/utils/cosmos";
 import { useQuery } from "react-query";
@@ -23,46 +22,49 @@ export default function useTokenBalances(
     refetchInterval?: number;
   }
 ): UserTokenBalances {
-  // state for balances of tokens
-  const [userTokenBalances, setUserTokenBalances] = useState<UserTokenBalances>(
-    {}
-  );
-
-  async function getTokenBalances(): Promise<UserTokenBalances> {
-    // only set balances if there is a user and the chain is an evm chain
-    if (typeof chainId === "number" && userEthAddress) {
-      const { data: balances, error: balancesError } =
-        await getEVMTokenBalanceList(chainId, tokens, userEthAddress);
-      if (balancesError) {
-        throw "useTokenBalances::getTokenBalances::" + balancesError.message;
-      }
-      return balances;
-    } else if (typeof chainId === "string" && userCosmosAddress) {
-      const { data: balances, error: balancesError } =
-        await getCosmosTokenBalanceList(chainId, userCosmosAddress);
-      if (balancesError) {
-        throw "useTokenBalances::getTokenBalances::" + balancesError.message;
-      }
-      return balances;
-    } else {
-      return {};
-    }
-  }
-  useQuery(
+  const { data } = useQuery(
     ["tokenBalances", { chainId, tokens, userEthAddress, userCosmosAddress }],
     async (): Promise<UserTokenBalances> => {
-      return await getTokenBalances();
+      return await getTokenBalances(
+        chainId,
+        tokens,
+        userEthAddress,
+        userCosmosAddress
+      );
     },
     {
-      onSuccess(data) {
-        setUserTokenBalances(data);
-      },
       onError(error) {
         console.log(error);
-        setUserTokenBalances({});
       },
       refetchInterval: options?.refetchInterval || 5000,
+      placeholderData: {},
     }
   );
-  return userTokenBalances;
+  return data ?? {};
+}
+
+async function getTokenBalances(
+  chainId: string | number | undefined,
+  tokens: ERC20Token[],
+  userEthAddress: string | null,
+  userCosmosAddress: string | null
+): Promise<UserTokenBalances> {
+  // only set balances if there is a user and the chain is an evm chain
+  if (typeof chainId === "number" && userEthAddress) {
+    const { data: balances, error: balancesError } =
+      await getEVMTokenBalanceList(chainId, tokens, userEthAddress);
+    if (balancesError) {
+      throw "useTokenBalances::getTokenBalances::" + balancesError.message;
+    }
+    return balances;
+  } else if (typeof chainId === "string" && userCosmosAddress) {
+    const { data: balances, error: balancesError } =
+      await getCosmosTokenBalanceList(chainId, userCosmosAddress);
+    if (balancesError) {
+      throw "useTokenBalances::getTokenBalances::" + balancesError.message;
+    }
+    return balances;
+  } else {
+    return {};
+  }
 }
