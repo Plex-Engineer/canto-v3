@@ -2,7 +2,7 @@
 import Text from "@/components/text";
 import styles from './proposalModal.module.scss';
 import useSingleProposalData from "@/hooks/gov/useSingleProposalData";
-import { calculateVotePercentages, formatProposalStatus } from "@/utils/gov/formatData";
+import { calculateVotePercentages, formatDeposit, formatProposalStatus, formatProposalType, formatTime } from "@/utils/gov/formatData";
 import Icon from "@/components/icon/icon";
 import Button from "@/components/button/button";
 import useProposals from "@/hooks/gov/useProposals";
@@ -11,7 +11,7 @@ export default function Page({ params }: any) {
   const {proposals} = useProposals(
     {chainId: 7700}
   )
-  //console.log(proposal);
+  
   
   if(!proposals || proposals.length==0){
     return (
@@ -23,7 +23,7 @@ export default function Page({ params }: any) {
   if (!proposal) {
     return <div>No proposal found with the ID {params.id}</div>;
   }
-
+  console.log(proposal);
   const isActive = formatProposalStatus(proposal.status)=='ACTIVE';
 
   const votesData = calculateVotePercentages(proposal.final_tally_result);
@@ -48,39 +48,30 @@ export default function Page({ params }: any) {
         <div className={styles.proposalInfoBox}>
           <div className={styles.proposalInfo}>
             <div><Text font="proto_mono" opacity={0.3}>Type:</Text></div>
-            <div><Text font="proto_mono">Software Updgrade</Text></div>
-          </div>
-          <div className={styles.proposalInfo}>
-            <div><Text font="proto_mono" opacity={0.3}>Proposer:</Text></div>
-            <div><Text font="proto_mono">CANTO18190298...123</Text></div>
+            <div><Text font="proto_mono">{formatProposalType(proposal.content["@type"])}</Text></div>
           </div>
           <div className={styles.proposalInfo}>
             <div><Text font="proto_mono" opacity={0.3}>Total Deposit:</Text></div>
             <div>
-              <Text font="proto_mono">1000 </Text>
+              <Text font="proto_mono">{formatDeposit(proposal.total_deposit[0].amount)} </Text>
             </div>
           </div>
+          <div className={styles.proposalInfo}>
+              <div><Text font="proto_mono" opacity={0.3}>Turnout/ Quorum: </Text></div>
+              <div><Text font="proto_mono">38.1% 33.4%</Text></div>
+            </div>
         </div>
         <div className={styles.proposalInfoBox}>
             <div className={styles.proposalInfo}>
               <div><Text font="proto_mono" opacity={0.3}>Submit Time:</Text></div>
-              <div><Text font="proto_mono">{proposal.submit_time}</Text></div>
+              <div><Text font="proto_mono">{formatTime(proposal.submit_time)}</Text></div>
             </div>
             <div className={styles.proposalInfo}>
               <div><Text font="proto_mono" opacity={0.3}>Voting End Time:</Text></div>
-              <div><Text font="proto_mono">{proposal.voting_end_time}</Text></div>
+              <div><Text font="proto_mono">{formatTime(proposal.voting_end_time)}</Text></div>
             </div>
         </div>
-        <div className={styles.proposalInfoBox}>
-            <div className={styles.proposalInfo}>
-              <div><Text font="proto_mono" opacity={0.3}>Turnout/ Quorum: </Text></div>
-              <div><Text font="proto_mono">38.1% 33.4%</Text></div>
-            </div>
-            <div className={styles.proposalInfo}>
-              <div><Text font="proto_mono" opacity={0.3}>Proposer: </Text></div>
-              <div><Text font="proto_mono">CANTO18190298...123</Text></div>
-            </div>
-        </div>
+        
       </div>
       <div className={styles.proposalCardContainer2}>
         <div className={styles.proposalInfoBoxVoting}>
@@ -132,7 +123,7 @@ export default function Page({ params }: any) {
           </div>  
         </div>
         <div className={styles.VotingButton}>
-          <Button width={300} disabled={!isActive}>Vote</Button>
+          <Button width={300}disabled={!isActive}>Vote</Button>
           {!isActive && <span className={styles.tooltip}>The Proposal is not Active</span>}
         </div>
       </div>

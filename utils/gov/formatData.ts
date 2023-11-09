@@ -135,4 +135,30 @@ export function calculateVotePercentages(finalTallyResult: FinalTallyResult): Vo
   };
 }
 
+export function formatDeposit(amount: string): string{
+    const factor = BigInt(1e18);
+  // Convert the vote counts to BigInts
+    const amountBigInt = BigInt(amount);
+
+    return (Number(amountBigInt/factor)+ Number(amountBigInt%factor)/Number(factor)).toFixed(0);
+}
+
+export function formatTime(input: string): string {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const suffixes = ["th", "st", "nd", "rd"];
+  
+    const date = new Date(input);
+    const day = date.getDate();
+    const monthIndex = date.getMonth();
+    const year = date.getFullYear();
+    const hours = date.getHours();
+    const minutes = `0${date.getMinutes()}`.slice(-2);
+    const seconds = `0${date.getSeconds()}`.slice(-2);
+  
+    // Determine the appropriate day suffix
+    const daySuffix = (day % 10 < 4 && day % 100 !== 11 && day % 100 !== 12 && day % 100 !== 13) ? suffixes[day % 10] : suffixes[0];
+  
+    return `${months[monthIndex]} ${day}${daySuffix}, ${year} · ${hours % 12 || 12}:${minutes}:${seconds} ${hours >= 12 ? 'PM' : 'AM'}`;
+  }
+  
 

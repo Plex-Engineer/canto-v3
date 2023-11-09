@@ -34,6 +34,7 @@
         // width: 50% !important;
         //height: 100%;
         width: 50%;
+        height: 80%;
 
         
     }
@@ -45,6 +46,7 @@
         height: 80%;
         width: 50%;
         background-color: var(--card-sub-surface-color, #dfdfdf);
+        box-shadow: 3px 3px 0px rgba(41, 40, 40, 0.2);
         
         // background-color: red;
     }
@@ -53,8 +55,8 @@
         flex-direction: column;
         justify-content: space-between;
         background-color: var(--card-sub-surface-color, #dfdfdf);
-        margin: 0px 20px 20px 20px;
-        height: 20%;
+        margin: 0px 20px 0px 0px;
+        height: 40%;
         box-shadow: 3px 3px 0px rgba(41, 40, 40, 0.2);
         padding: 10px;
         //align-items: center;
@@ -117,9 +119,11 @@
 
     }
     .VotingButton{
-        padding-bottom: 20px;
+        //padding-bottom: 20px;
+        //width: 100%;
         margin: auto;
         align-items: center;
+
         
     }
 
