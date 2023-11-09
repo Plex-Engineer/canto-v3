@@ -45,18 +45,23 @@ export default function useAmbientPools(
   const { data: ambient, isLoading } = useQuery(
     ["ambient pools", params.chainId, params.userEthAddress],
     async (): Promise<{ pools: AmbientPool[]; rewards: string }> => {
+      const pools = await getAllAmbientPoolsData(
+        params.chainId,
+        params.userEthAddress
+      );
+      if (pools.error) throw pools.error;
+      let rewards = "0";
+      if (params.userEthAddress) {
+        const rewardsQuery = await queryUserAmbientRewards(
+          params.chainId,
+          params.userEthAddress
+        );
+        if (rewardsQuery.error) throw rewardsQuery.error;
+        rewards = rewardsQuery.data;
+      }
       return {
-        pools:
-          (await getAllAmbientPoolsData(params.chainId, params.userEthAddress))
-            .data ?? [],
-        rewards: params.userEthAddress
-          ? (
-              await queryUserAmbientRewards(
-                params.chainId,
-                params.userEthAddress
-              )
-            ).data ?? "0"
-          : "0",
+        pools: pools.data,
+        rewards,
       };
     },
     {
@@ -117,7 +122,7 @@ export default function useAmbientPools(
       setAmbientTokenAprs(aprMap);
     }
     getCTokenAprs();
-  }, [ambient?.pools.length, params.chainId]);
+  }, [ambient?.pools, params.chainId]);
 
   // get balances of all underlying tokens
   const underlyingTokenBalances = useTokenBalances(
