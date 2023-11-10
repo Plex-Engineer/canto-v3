@@ -202,6 +202,7 @@ const Bridging = (props: BridgeProps) => {
           style={{
             flexDirection:
               props.hook.direction === "in" ? "column" : "column-reverse",
+            gap: props.hook.direction === "in" ? "12px" : "0px",
           }}
         >
           {/* select network group */}
