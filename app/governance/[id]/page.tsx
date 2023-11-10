@@ -26,7 +26,7 @@ export default function Page({ params }: any) {
   console.log(proposal);
   const isActive = formatProposalStatus(proposal.status)=='ACTIVE';
 
-  const votesData = calculateVotePercentages(proposal.final_tally_result);
+  const votesData = calculateVotePercentages(proposal.final_vote);
 
   return (
   <div className={styles.proposalContainer}>
@@ -36,10 +36,10 @@ export default function Page({ params }: any) {
           <div style={{padding: "10px"}}><Text>{formatProposalStatus(proposal.status)}</Text></div>
         </div>
         <div>
-            <Text font='proto_mono' size="x-lg">{proposal.content.title}</Text>
+            <Text font='proto_mono' size="x-lg">{proposal.title}</Text>
         </div>
         <div>
-          <Text opacity={0.4}>{proposal.content.description}</Text>
+          <Text opacity={0.4}>{proposal.description}</Text>
         </div>
     </div>
     
@@ -48,7 +48,7 @@ export default function Page({ params }: any) {
         <div className={styles.proposalInfoBox}>
           <div className={styles.proposalInfo}>
             <div><Text font="proto_mono" opacity={0.3}>Type:</Text></div>
-            <div><Text font="proto_mono">{formatProposalType(proposal.content["@type"])}</Text></div>
+            <div><Text font="proto_mono">{formatProposalType(proposal.type_url)}</Text></div>
           </div>
           <div className={styles.proposalInfo}>
             <div><Text font="proto_mono" opacity={0.3}>Total Deposit:</Text></div>

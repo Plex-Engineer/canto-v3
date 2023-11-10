@@ -3,7 +3,7 @@ import Tabs from "@/components/tabs/tabs";
 import { useState } from "react";
 
 import Container from "@/components/container/container";
-import { Proposal } from "@/hooks/gov/interfaces/proposal";
+import { NewProposal } from "@/hooks/gov/interfaces/proposal";
 import { ProposalModal } from "./proposalModal";
 import useProposals from "@/hooks/gov/useProposals";
 import ProposalTable from "./components/ProposalTable/ProposalTable";
@@ -20,7 +20,7 @@ export default function GovernancePage() {
   
 
   
-  const sorted_proposals = proposals.sort((a: Proposal, b: Proposal) => b.proposal_id - a.proposal_id);
+  const sorted_proposals = proposals.sort((a: NewProposal, b: NewProposal) => b.proposal_id - a.proposal_id);
 
 
   const [activeTab, setActiveTab] = useState("All");
@@ -30,12 +30,12 @@ export default function GovernancePage() {
   }
 
   const activeProposals = proposals?.filter(
-    (proposal: Proposal) => proposal.status === "PROPOSAL_STATUS_VOTING_PERIOD"
+    (proposal: NewProposal) => proposal.status === "PROPOSAL_STATUS_VOTING_PERIOD"
   );
   const rejectedProposals = proposals?.filter(
-    (proposal: Proposal) => proposal.status === "PROPOSAL_STATUS_REJECTED"
+    (proposal: NewProposal) => proposal.status === "PROPOSAL_STATUS_REJECTED"
   );
-  const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(
+  const [selectedProposal, setSelectedProposal] = useState<NewProposal | null>(
     null
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,7 +43,7 @@ export default function GovernancePage() {
   const proposalsPerPage = 10; // Number of proposals per page
   const totalPages = Math.ceil(proposals?.length / proposalsPerPage);
 
-  const handleProposalClick = (proposal: Proposal) => {
+  const handleProposalClick = (proposal: NewProposal) => {
     setSelectedProposal(proposal);
     setIsModalOpen(true);
   };

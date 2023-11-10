@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Filter from '../Filter/Filter';
 import styles from './ProposalTable.module.scss';
-import { Proposal } from '@/hooks/gov/interfaces/proposal';
+import { NewProposal } from '@/hooks/gov/interfaces/proposal';
 import { formatDate, formatProposalStatus, formatProposalType } from '@/utils/gov/formatData';
 import Text from '@/components/text';
 import Button from '@/components/button/button';
@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 
 
 interface TableProps {
-  proposals: Proposal[];
+  proposals: NewProposal[];
 }
 
 const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
@@ -19,7 +19,7 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
   
   const router = useRouter();
   const [currentFilter, setCurrentFilter] = useState('All');
-  const [filteredProposals, setFilteredProposals] = React.useState<Proposal[]>(proposals);
+  const [filteredProposals, setFilteredProposals] = React.useState<NewProposal[]>(proposals);
 
   const pageSize = 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -103,9 +103,9 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
             <tr className={styles.row} key={proposal.proposal_id} onClick={()=>handleRowClick(proposal.proposal_id)}
             style={{ cursor: 'pointer' }}>
               <td className={styles.tableData}><Text font="proto_mono" >{proposal.proposal_id}</Text></td>
-              <td className={styles.tableTitleColumn}><Text font="proto_mono" >{proposal.content.title}</Text></td>
+              <td className={styles.tableTitleColumn}><Text font="proto_mono" >{proposal.title}</Text></td>
               <td className={styles.tableData}><Text font="proto_mono" >{formatProposalStatus(proposal.status)}</Text></td>
-              <td className={styles.tableData}><Text font="proto_mono" >{formatProposalType(proposal.content['@type'])}</Text></td>
+              <td className={styles.tableData}><Text font="proto_mono" >{formatProposalType(proposal.type_url)}</Text></td>
               <td className={styles.tableData}><Text font="proto_mono" >{formatDate(proposal.voting_end_time)}</Text></td>
             </tr>
         
