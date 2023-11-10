@@ -1,9 +1,10 @@
 .anim {
   animation: spin 1.6s linear infinite;
+  scale: -1 1;
   //12 steps with 30deg snaps
   @keyframes spin {
     0% {
-      transform: -rotate(0deg);
+      transform: rotate(0deg);
     }
     8.332% {
       transform: rotate(-0deg);
