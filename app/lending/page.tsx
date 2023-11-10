@@ -216,7 +216,7 @@ const CTokenTable = ({
   onSupply: (address: string) => void;
   onBorrow: (address: string) => void;
 }) => {
-  const [filteredPairs, setFilteredPairs] = useState("StableCoins");
+  const [filteredPairs, setFilteredPairs] = useState("RWAs");
 
   return (
     <div className={styles.mainTable}>
