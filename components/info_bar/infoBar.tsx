@@ -54,8 +54,18 @@ const InfoBar = ({ values }: Props) => {
           ))}
         </div> */}
       <Text font="proto_mono" color="var(--text-only-light)" size="sm">
-        Welcome to the canto.io Beta - Please report issues using the link in
-        the footer.
+        Welcome to the canto.io Beta - Please report issues by{" "}
+        <a
+          href="https://canto.canny.io/"
+          style={{
+            color: "var(--canto-color)",
+            textDecoration: "underline",
+          }}
+          target="_blank"
+        >
+          clicking here
+        </a>
+        .
       </Text>
       {/* </Marquee> */}
     </div>

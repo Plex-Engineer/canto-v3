@@ -32,7 +32,12 @@ const Footer = () => {
     <div className={styles.container}>
       <div className={styles.links}>
         <FooterLink href="https://docs.canto.io/" text="docs" />
-        <FooterLink href="https://canto.canny.io/" text="report bug" />
+        <FooterLink
+          href="https://discord.com/invite/63GmEXZsVf"
+          text="Discord"
+        />
+        <FooterLink href="https://twitter.com/CantoPublic" text="twitter" />
+        <FooterLink href="https://canto.mirror.xyz/" text="Blog" />
         <FooterButton text="theme" />
       </div>
       <div className={styles.links}>
