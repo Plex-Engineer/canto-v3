@@ -93,7 +93,6 @@ interface FinalTallyResult {
 export function calculateVotePercentages(finalTallyResult: FinalTallyResult): VoteData {
   // Destructure the vote counts from the object
   const { yes, abstain, no, no_with_veto } = finalTallyResult;
-  console.log(finalTallyResult);
 
   const factor = BigInt(1e18);
   // Convert the vote counts to BigInts
@@ -107,9 +106,22 @@ export function calculateVotePercentages(finalTallyResult: FinalTallyResult): Vo
   const noNumber = Number(noVotes / factor) + Number(noVotes % factor) / Number(factor);
   const noWithVetoNumber = Number(noWithVetoVotes / factor) + Number(noWithVetoVotes % factor) / Number(factor);
 
-  console.log(yesNumber);
+  //console.log(yesNumber);
   const totalVotesBigInt = yesVotes+noVotes+abstainVotes+noWithVetoVotes;
   const totalVotes = yesNumber + abstainNumber + noNumber + noWithVetoNumber;
+
+  if(totalVotesBigInt==0n){
+    return {
+        yesAmount: "0",
+        noAmount: "0",
+        abstainAmount: "0",
+        no_with_vetoAmount: "0",
+        yes: "0",
+        abstain: "0",
+        no: "0",
+        no_with_veto: "0",
+      };
+  }
   
   // Calculate percentages and format them as strings
   const yesPercentage = (Number(yesVotes*BigInt(10000) / totalVotesBigInt )/100).toFixed(3);
@@ -158,7 +170,7 @@ export function formatTime(input: string): string {
     // Determine the appropriate day suffix
     const daySuffix = (day % 10 < 4 && day % 100 !== 11 && day % 100 !== 12 && day % 100 !== 13) ? suffixes[day % 10] : suffixes[0];
   
-    return `${months[monthIndex]} ${day}${daySuffix}, ${year} · ${hours % 12 || 12}:${minutes}:${seconds} ${hours >= 12 ? 'PM' : 'AM'}`;
+    return `${months[monthIndex]} ${day}${daySuffix},${year} ${hours % 12 || 12}:${minutes}:${seconds} ${hours >= 12 ? 'PM' : 'AM'}`;
   }
   
 

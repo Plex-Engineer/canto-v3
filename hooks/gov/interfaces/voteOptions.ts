@@ -2,8 +2,7 @@ export enum VoteOption {
   YES = "Yes",
   NO = "No",
   ABSTAIN = "Abstain",
-  VETO = "Veto",
-  NONE = "None",
+  VETO = "Veto"
 }
 /**
  * @notice converts a voting option to a number

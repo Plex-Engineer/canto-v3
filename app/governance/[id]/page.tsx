@@ -6,27 +6,39 @@ import { calculateVotePercentages, formatDeposit, formatProposalStatus, formatPr
 import Icon from "@/components/icon/icon";
 import Button from "@/components/button/button";
 import useProposals from "@/hooks/gov/useProposals";
+import { useState } from "react";
+import { Proposal } from "@/hooks/gov/interfaces/proposal";
+import { ProposalModal } from "../components/VotingModal/VotingModal";
+
+
 
 export default function Page({ params }: any) {
   const {proposals} = useProposals(
     {chainId: 7700}
-  )
-  
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   if(!proposals || proposals.length==0){
     return (
       <div>Loading Proposals....</div>
     );
   }
-  const proposal = proposals.find((p) => p.proposal_id === params.id);
+  const proposal = proposals.find((p) => p.proposal_id === Number(params.id));
 
   if (!proposal) {
     return <div>No proposal found with the ID {params.id}</div>;
   }
-  console.log(proposal);
+  //console.log(proposal);
   const isActive = formatProposalStatus(proposal.status)=='ACTIVE';
 
   const votesData = calculateVotePercentages(proposal.final_vote);
+  const handleProposalClick = (proposal: Proposal) => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
 
   return (
   <div className={styles.proposalContainer}>
@@ -35,7 +47,7 @@ export default function Page({ params }: any) {
           <div style={{borderRight: "1px solid", padding: "10px"}}><Text>#{proposal.proposal_id}</Text></div>
           <div style={{padding: "10px"}}><Text>{formatProposalStatus(proposal.status)}</Text></div>
         </div>
-        <div>
+        <div style={{padding: "10px 0px 10px 0px"}}>
             <Text font='proto_mono' size="x-lg">{proposal.title}</Text>
         </div>
         <div>
@@ -61,12 +73,12 @@ export default function Page({ params }: any) {
               <div><Text font="proto_mono">38.1% 33.4%</Text></div>
             </div>
         </div>
-        <div className={styles.proposalInfoBox}>
-            <div className={styles.proposalInfo}>
+        <div className={styles.proposalInfoBox2}>
+            <div className={styles.proposalInfo2}>
               <div><Text font="proto_mono" opacity={0.3}>Submit Time:</Text></div>
               <div><Text font="proto_mono">{formatTime(proposal.submit_time)}</Text></div>
             </div>
-            <div className={styles.proposalInfo}>
+            <div className={styles.proposalInfo2}>
               <div><Text font="proto_mono" opacity={0.3}>Voting End Time:</Text></div>
               <div><Text font="proto_mono">{formatTime(proposal.voting_end_time)}</Text></div>
             </div>
@@ -123,11 +135,16 @@ export default function Page({ params }: any) {
           </div>  
         </div>
         <div className={styles.VotingButton}>
-          <Button width={300}disabled={!isActive}>Vote</Button>
-          {!isActive && <span className={styles.tooltip}>The Proposal is not Active</span>}
+          <Button width={300}disabled={!isActive} onClick={()=>handleProposalClick(proposal)}>Vote</Button>
+          {/* {!isActive && <span className={styles.tooltip}>The Proposal is not Active</span>} */}
         </div>
       </div>
     </div>
+    {isModalOpen && (
+      <ProposalModal proposal={proposal} onClose={ ()=> {
+        handleModalClose();
+       } } isOpen={true}></ProposalModal>
+      )}
   </div>
   );
   

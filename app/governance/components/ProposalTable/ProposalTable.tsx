@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Filter from '../Filter/Filter';
 import styles from './ProposalTable.module.scss';
-import { NewProposal } from '@/hooks/gov/interfaces/proposal';
+import { Proposal } from '@/hooks/gov/interfaces/proposal';
 import { formatDate, formatProposalStatus, formatProposalType } from '@/utils/gov/formatData';
 import Text from '@/components/text';
 import Button from '@/components/button/button';
@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 
 
 interface TableProps {
-  proposals: NewProposal[];
+  proposals: Proposal[];
 }
 
 const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
@@ -19,7 +19,7 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
   
   const router = useRouter();
   const [currentFilter, setCurrentFilter] = useState('All');
-  const [filteredProposals, setFilteredProposals] = React.useState<NewProposal[]>(proposals);
+  const [filteredProposals, setFilteredProposals] = React.useState<Proposal[]>(proposals);
 
   const pageSize = 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,7 +28,7 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
   useEffect(() => {
     setTotalPages(Math.ceil(filteredProposals.length / pageSize));
   }, [filteredProposals.length, pageSize]);
-  console.log(totalPages);
+  console.log(proposals);
   const paginatedProposals = filteredProposals.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize

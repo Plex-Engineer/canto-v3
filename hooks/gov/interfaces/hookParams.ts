@@ -1,10 +1,10 @@
-import { NewProposal, Proposal, Proposal2 } from "./proposal";
+import { Proposal, Proposal2 } from "./proposal";
 
 export interface ProposalHookParams {
   chainId: number;
 }
 export interface ProposalHookReturn {
-  proposals: NewProposal[];
+  proposals: Proposal[];
 }
 
 export interface ProposalHookReturnSingle{
