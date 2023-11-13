@@ -96,7 +96,6 @@ export async function cTokenLendingTx(
 
   // check if max was clicked
   if (params.max) {
-    console.log("maxmax")
     // check to see if tx is withdrawing entire balance
     if (
       params.txType === CTokenLendingTxTypes.WITHDRAW &&

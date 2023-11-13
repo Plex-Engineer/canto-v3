@@ -150,7 +150,6 @@ export default function useBridgeIn(
         network.id as keyof typeof BRIDGE_IN_TOKEN_LIST.chainTokenList
       ];
 
-    console.log(tokens);
     if (!tokens || tokens.length === 0) {
       throw new Error(
         "useBridgeIn::setNetwork: No tokens available for network: " +
