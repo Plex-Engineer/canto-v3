@@ -1,4 +1,5 @@
 "use client";
+import { useSearchParams } from "next/navigation";
 import Text from "@/components/text";
 import styles from './proposalModal.module.scss';
 import useSingleProposalData from "@/hooks/gov/useSingleProposalData";
@@ -12,7 +13,14 @@ import { ProposalModal } from "../components/VotingModal/VotingModal";
 
 
 
-export default function Page({ params }: any) {
+export default function Page() {
+  const searchParams = useSearchParams();
+
+  const id = searchParams.get('id');
+  console.log(id);
+  const proposalId = Number(id);
+
+  
   const {proposals} = useProposals(
     {chainId: 7700}
   );
@@ -23,10 +31,15 @@ export default function Page({ params }: any) {
       <div>Loading Proposals....</div>
     );
   }
-  const proposal = proposals.find((p) => p.proposal_id === Number(params.id));
+  if(!id){
+    return (
+        <div>Proposal ID is missing</div>
+    )
+  }
+  const proposal = proposals.find((p) => p.proposal_id === Number(proposalId));
 
   if (!proposal) {
-    return <div>No proposal found with the ID {params.id}</div>;
+    return <div>No proposal found with the ID {proposalId}</div>;
   }
   //console.log(proposal);
   const isActive = formatProposalStatus(proposal.status)=='ACTIVE';
@@ -135,7 +148,7 @@ export default function Page({ params }: any) {
           </div>  
         </div>
         <div className={styles.VotingButton}>
-          <Button width={300}disabled={!isActive} onClick={()=>handleProposalClick(proposal)}>Vote</Button>
+          <Button width={300} disabled={!isActive} onClick={()=>handleProposalClick(proposal)}>Vote</Button>
           {/* {!isActive && <span className={styles.tooltip}>The Proposal is not Active</span>} */}
         </div>
       </div>

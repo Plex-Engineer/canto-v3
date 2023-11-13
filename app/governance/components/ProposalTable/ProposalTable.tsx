@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import Filter from '../Filter/Filter';
 import styles from './ProposalTable.module.scss';
 import { Proposal } from '@/hooks/gov/interfaces/proposal';
 import { formatDate, formatProposalStatus, formatProposalType } from '@/utils/gov/formatData';
@@ -8,13 +7,14 @@ import Text from '@/components/text';
 import Button from '@/components/button/button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import ToggleGroup from '../groupToggle/ToggleGroup';
 
 
 interface TableProps {
   proposals: Proposal[];
 }
 
-const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
+const ProposalTable = ({ proposals }:TableProps) => {
 
   
   const router = useRouter();
@@ -28,7 +28,7 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
   useEffect(() => {
     setTotalPages(Math.ceil(filteredProposals.length / pageSize));
   }, [filteredProposals.length, pageSize]);
-  console.log(proposals);
+  //console.log(proposals);
   const paginatedProposals = filteredProposals.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
@@ -77,7 +77,7 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
     //const router = useRouter();
   
     // Navigate to the appropriate page
-    router.push(`/governance/${proposalId}`);
+    router.push(`/governance/proposal?id=${proposalId}`);
   };
   
   if (!proposals || proposals.length==0) {
@@ -85,7 +85,13 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
   }
   return (
     <div className={styles.tableContainer}>
-      <Filter onFilterChange={handleFilterChange} currentFilter={currentFilter} />
+      <div className={styles.toggleGroupContainer}>
+        <div className={styles.toggleGroup}>
+          <ToggleGroup options={["All","Active","Passed","Rejected"]} selected={currentFilter} setSelected={handleFilterChange}></ToggleGroup>
+        </div>
+          
+      </div>
+      {/* <Filter onFilterChange={handleFilterChange} currentFilter={currentFilter} /> */}
       {(filteredProposals.length==0 || !filteredProposals) ? <div className={styles.table}><div className={styles.noProposalContainer}>No {currentFilter} Proposals Available</div></div> : 
         <table className={styles.table}>
         <thead>

@@ -10,7 +10,17 @@
     //z-index: 1;
     box-shadow: 8px 8px rgba(17, 17, 17, 0.15) !important;
    
-  
+    .toggleGroupContainer{
+      padding-bottom: 10px;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      //width: 30%;
+      .toggleGroup{
+        //width: 30%;
+        width: 30%;
+      }
+    }
     .table {
       width: 100%;
       border-collapse: collapse;
