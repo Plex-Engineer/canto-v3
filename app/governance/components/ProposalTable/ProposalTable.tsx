@@ -102,11 +102,11 @@ const ProposalTable: React.FC<TableProps> = ({ proposals }) => {
           
             <tr className={styles.row} key={proposal.proposal_id} onClick={()=>handleRowClick(proposal.proposal_id)}
             style={{ cursor: 'pointer' }}>
-              <td className={styles.tableData}><Text font="proto_mono" >{proposal.proposal_id}</Text></td>
-              <td className={styles.tableTitleColumn}><Text font="proto_mono" >{proposal.title}</Text></td>
-              <td className={styles.tableData}><Text font="proto_mono" >{formatProposalStatus(proposal.status)}</Text></td>
-              <td className={styles.tableData}><Text font="proto_mono" >{formatProposalType(proposal.type_url)}</Text></td>
-              <td className={styles.tableData}><Text font="proto_mono" >{formatDate(proposal.voting_end_time)}</Text></td>
+              <td className={styles.tableData}><Text font="proto_mono" size='sm'>{proposal.proposal_id}</Text></td>
+              <td className={styles.tableTitleColumn}><Text font="proto_mono" size='sm' >{proposal.title}</Text></td>
+              <td className={styles.tableData}><Text font="proto_mono" size='sm'>{formatProposalStatus(proposal.status)}</Text></td>
+              <td className={styles.tableData}><Text font="proto_mono" size='sm'>{formatProposalType(proposal.type_url)}</Text></td>
+              <td className={styles.tableData}><Text font="proto_mono" size='sm'>{formatDate(proposal.voting_end_time)}</Text></td>
             </tr>
         
           ))}

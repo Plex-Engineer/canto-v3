@@ -1,12 +1,12 @@
 .tableContainer {
   //display: flex;
-    width: 96%;
+    width: 100% !important;
     background: var(--card-sub-surface-color, #dfdfdf);
     //color: blue !important;
     // display: flex;
     // flex-direction: column !important;
     //margin: 0 auto;
-    //padding: 10px;
+    padding: 10px;
     //z-index: 1;
     box-shadow: 8px 8px rgba(17, 17, 17, 0.15) !important;
    
@@ -41,7 +41,7 @@
       
       }
       .tableTitleColumn {
-        padding: 0.5rem;
+        padding: 0% 3% 0% 2%;
         text-align: left;
         border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
         box-sizing: border-box;
