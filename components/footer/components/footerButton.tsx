@@ -1,7 +1,8 @@
 "use client";
 
 import Text from "@/components/text";
-import { useEffect, useState } from "react";
+import Rive, { useRive, useStateMachineInput } from "@rive-app/react-canvas";
+import { useCallback, useEffect, useState } from "react";
 
 interface PropLinkButton {
   text: string;
@@ -9,6 +10,30 @@ interface PropLinkButton {
 
 const FooterButton = ({ text }: PropLinkButton) => {
   const [name, setName] = useState("dark");
+
+  const { rive, RiveComponent } = useRive({
+    src: "anims/toggle.riv",
+    artboard: "Toggle",
+    stateMachines: ["toggle"],
+    animations: ["on", "off"],
+
+    autoplay: true,
+    shouldDisableRiveListeners: true,
+  });
+
+  const isToggled = useStateMachineInput(rive, "toggle", "switch");
+
+  const onButtonActivate = useCallback(() => {
+    if (rive && isToggled) {
+      isToggled.value = true;
+    }
+  }, [rive, isToggled]);
+
+  const onButtonDeactivate = useCallback(() => {
+    if (rive && isToggled) {
+      isToggled.value = false;
+    }
+  }, [rive, isToggled]);
 
   function setTheme(themeName: string) {
     themeName =
@@ -29,6 +54,11 @@ const FooterButton = ({ text }: PropLinkButton) => {
     );
   }, []);
 
+  useEffect(() => {
+    if (!document.body.classList.contains("dark")) onButtonDeactivate();
+    else onButtonActivate();
+  }, [onButtonActivate, onButtonDeactivate]);
+
   return (
     <button
       style={{
@@ -39,11 +69,18 @@ const FooterButton = ({ text }: PropLinkButton) => {
         document.body.classList.contains("dark")
           ? setTheme("light")
           : setTheme("dark");
+        if (!document.body.classList.contains("dark")) onButtonDeactivate();
+        else onButtonActivate();
       }}
     >
-      <Text size="x-sm" font="proto_mono">
-        {name + " "} Theme
-      </Text>
+      <RiveComponent
+        height={60}
+        width={60}
+        style={{
+          height: "40px",
+          width: "40px",
+        }}
+      />
     </button>
   );
 };
