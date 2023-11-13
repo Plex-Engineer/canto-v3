@@ -67,7 +67,11 @@ export const NewAmbientPositionModal = ({
 
   // set to custom price range
   function setPriceRange(price: { min?: string; max?: string }) {
-    positionManager.setters.setRangePrice(price);
+    // make sure values are not zero
+    positionManager.setters.setRangePrice({
+      min: Number(price.min) < 0 ? "0" : price.min,
+      max: Number(price.max) < 0 ? "0" : price.max,
+    });
     setSelectedOption("CUSTOM");
   }
 
