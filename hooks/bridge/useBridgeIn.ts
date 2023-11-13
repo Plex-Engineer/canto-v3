@@ -120,6 +120,7 @@ export default function useBridgeIn(
   }
   function getToken(id: string): ReturnWithError<BridgeInToken> {
     const token = state.availableTokens.find((token) => token.id === id);
+
     if (!isBridgeInToken(token)) {
       return NEW_ERROR("useBridgeIn::getToken: invalid token type:" + id);
     }
@@ -148,6 +149,8 @@ export default function useBridgeIn(
       BRIDGE_IN_TOKEN_LIST.chainTokenList[
         network.id as keyof typeof BRIDGE_IN_TOKEN_LIST.chainTokenList
       ];
+
+    console.log(tokens);
     if (!tokens || tokens.length === 0) {
       throw new Error(
         "useBridgeIn::setNetwork: No tokens available for network: " +
