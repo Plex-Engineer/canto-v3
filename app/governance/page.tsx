@@ -20,8 +20,7 @@ export default function GovernancePage() {
 
   const { txStore, signer,chainId } = useCantoSigner();
   const { proposals,isLoading } = useProposals({ chainId: chainId });
-  //console.log(proposals);
-  console.log(isLoading);
+  //console.log(isLoading);
 
   
   const sorted_proposals = proposals.sort((a: Proposal, b: Proposal) => b.proposal_id - a.proposal_id);
@@ -47,25 +46,6 @@ export default function GovernancePage() {
   const proposalsPerPage = 10; // Number of proposals per page
   const totalPages = Math.ceil(proposals?.length / proposalsPerPage);
 
-  const handleProposalClick = (proposal: Proposal) => {
-    setSelectedProposal(proposal);
-    setIsModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
-  // let data = [];
-  // for(var i=0;i<proposals.length;i++){
-  //   data.push([proposals[i]['proposal_id'],'PROPOSAL_TITLE',proposals[i]['status'],proposals[i]['type_url'],proposals[i]['voting_end_time']]);
-  // }
-  // const TableProps = {
-  //   title: "Governance",
-  //   headers: ["ID","Title", "Status","Type","VotingDate"],
-  //   columns: 5,
-  //   data: data
-  // }
-
   return (isLoading ? (<Splash/>): 
     (<div>
     <div className={styles.container}>
@@ -81,20 +61,6 @@ export default function GovernancePage() {
     
               
     <ProposalTable proposals={sorted_proposals}></ProposalTable>
-              {/* <Table title={TableProps.title} headers={TableProps.headers} columns={5} data={TableProps.data}></Table> */}
-              
-              {/* <Proposals
-                proposalsList={proposals}
-                type=""
-                onProposalClick={handleProposalClick}
-              ></Proposals>
-              {isModalOpen && selectedProposal && (
-                <ProposalModal
-                  proposal={selectedProposal}
-                  onClose={handleModalClose}
-                  isOpen={isModalOpen}
-                ></ProposalModal>
-              )} */}
     </div>
   </div>)
   );

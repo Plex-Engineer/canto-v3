@@ -7,7 +7,8 @@ import Text from '@/components/text';
 import Button from '@/components/button/button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import ToggleGroup from '../groupToggle/ToggleGroup';
+import ToggleGroup from '@/components/groupToggle/ToggleGroup';
+
 
 
 interface TableProps {
@@ -81,7 +82,7 @@ const ProposalTable = ({ proposals }:TableProps) => {
   };
   
   if (!proposals || proposals.length==0) {
-    return <div>Loading Proposals...</div>;
+    return <div><Text font="proto_mono">Loading Proposals...</Text></div>;
   }
   return (
     <div className={styles.tableContainer}>
@@ -92,7 +93,7 @@ const ProposalTable = ({ proposals }:TableProps) => {
           
       </div>
       {/* <Filter onFilterChange={handleFilterChange} currentFilter={currentFilter} /> */}
-      {(filteredProposals.length==0 || !filteredProposals) ? <div className={styles.table}><div className={styles.noProposalContainer}>No {currentFilter} Proposals Available</div></div> : 
+      {(filteredProposals.length==0 || !filteredProposals) ? <div className={styles.table}><div className={styles.noProposalContainer}><Text font="proto_mono"> No {currentFilter} Proposals Available </Text></div></div> : 
         <table className={styles.table}>
         <thead>
           <tr key='proposalTableHeader'>
@@ -108,11 +109,11 @@ const ProposalTable = ({ proposals }:TableProps) => {
           
             <tr className={styles.row} key={proposal.proposal_id} onClick={()=>handleRowClick(proposal.proposal_id)}
             style={{ cursor: 'pointer' }}>
-              <td className={styles.tableData}><Text font="proto_mono" size='sm'>{proposal.proposal_id}</Text></td>
-              <td className={styles.tableTitleColumn}><Text font="proto_mono" size='sm' >{proposal.title}</Text></td>
-              <td className={styles.tableData}><Text font="proto_mono" size='sm'>{formatProposalStatus(proposal.status)}</Text></td>
-              <td className={styles.tableData}><Text font="proto_mono" size='sm'>{formatProposalType(proposal.type_url)}</Text></td>
-              <td className={styles.tableData}><Text font="proto_mono" size='sm'>{formatDate(proposal.voting_end_time)}</Text></td>
+              <td className={styles.tableData}><Text font="rm_mono" size='sm'>{proposal.proposal_id}</Text></td>
+              <td className={styles.tableTitleColumn}><Text font="rm_mono" size='sm' >{proposal.title}</Text></td>
+              <td className={styles.tableData}><Text font="rm_mono" size='sm'>{formatProposalStatus(proposal.status)}</Text></td>
+              <td className={styles.tableData}><Text font="rm_mono" size='sm'>{formatProposalType(proposal.type_url)}</Text></td>
+              <td className={styles.tableData}><Text font="rm_mono" size='sm'>{formatDate(proposal.voting_end_time)}</Text></td>
             </tr>
         
           ))}

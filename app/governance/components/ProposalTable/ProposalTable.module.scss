@@ -8,7 +8,7 @@
     //margin: 0 auto;
     padding: 10px;
     //z-index: 1;
-    box-shadow: 8px 8px rgba(17, 17, 17, 0.15) !important;
+    box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
    
     .toggleGroupContainer{
       padding-bottom: 10px;
@@ -151,8 +151,7 @@
   
 }
 .row:hover {
-  background-color: var(--border-stroke-color, #b3b3b3); // Change to your preferred shade of gray
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); // Add a subtle shadow
+  background-color: var(--border-stroke-color, #b3b3b3); 
   z-index: 1; // Ensure the row appears above the others
 }
 

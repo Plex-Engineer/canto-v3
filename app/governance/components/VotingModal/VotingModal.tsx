@@ -10,6 +10,7 @@ import { TransactionFlowType } from "@/config/transactions/txMap";
 import { useState } from "react";
 import styles from './VotingModal.module.scss';
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
+import Text from "@/components/text";
 
 interface ProposalModalParams {
   proposal: Proposal;
@@ -19,10 +20,10 @@ interface ProposalModalParams {
 
 export const ProposalModal = (props: ProposalModalParams) => {
 
-  const { txStore, signer } = useCantoSigner();
+  const { txStore, signer,chainId } = useCantoSigner();
   const [selectedVote, setSelectedVote] = useState<VoteOption | null>(null);
 
-  function castVoteTest(voteOption: VoteOption | null) {
+  function castVote(voteOption: VoteOption | null) {
     if(!voteOption){
       return NEW_ERROR("Please select a vote option");
     }
@@ -32,7 +33,7 @@ export const ProposalModal = (props: ProposalModalParams) => {
       txType: TransactionFlowType.VOTE_TX,
       title: "Vote Tx",
       params: {
-        chainId: signer?.chain.id,
+        chainId: chainId,
         ethAccount: signer?.account.address ?? "",
         proposalId: props.proposal.proposal_id,
         voteOption: voteOption,
@@ -44,12 +45,12 @@ export const ProposalModal = (props: ProposalModalParams) => {
   return (
     <Modal onClose={props.onClose} open={props.isOpen}>
       {props.proposal && (
-        <>
-          <div>
-            <p>Proposal ID: {props.proposal.proposal_id}</p>
+        <div className={styles.votingContainer}>
+          <div className={styles.title}>
+            <Text font="proto_mono" size="lg">Proposal Voting</Text>
           </div>
           <div>
-            <p>Status: {props.proposal.status}</p> 
+            <Text font="proto_mono" size="sm">Vote for Proposal ID: {props.proposal.proposal_id}</Text>
           </div>
           <div className={styles.checkBoxGroup}>
         {Object.values(VoteOption).map((option) => {
@@ -73,7 +74,7 @@ export const ProposalModal = (props: ProposalModalParams) => {
           <Button
             color="primary"
             disabled={(!selectedVote || !signer)}
-            onClick={() => castVoteTest(selectedVote)}
+            onClick={() => castVote(selectedVote)}
           >
             Vote
           </Button>
@@ -85,7 +86,7 @@ export const ProposalModal = (props: ProposalModalParams) => {
       >
         {props.errorMessage}
       </span> */}
-        </>
+        </div>
       )}
     </Modal>
   );

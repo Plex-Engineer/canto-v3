@@ -1,4 +1,5 @@
 "use client";
+
 import { useSearchParams } from "next/navigation";
 import Text from "@/components/text";
 import styles from './proposalModal.module.scss';
@@ -12,34 +13,52 @@ import { Proposal } from "@/hooks/gov/interfaces/proposal";
 import { ProposalModal } from "../components/VotingModal/VotingModal";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Splash from "@/components/splash/splash";
+import { VoteOption } from "@/hooks/gov/interfaces/voteOptions";
+import Image from "next/image";
 
 
 
 export default function Page() {
+
   const searchParams = useSearchParams();
 
   const id = searchParams.get('id');
+
   console.log(id);
+
   const proposalId = Number(id);
 
   const { txStore, signer,chainId } = useCantoSigner();
+
   const { proposals,isLoading } = useProposals({ chainId: chainId });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [selectedVote, setSelectedVote] = useState<VoteOption | null>(null);
+
+  console.log(selectedVote);
   
-  if(!proposals || proposals.length==0){
+  if(isLoading){
+
     return (
-      <div>Loading Proposals....</div>
+      <Splash/>
     );
   }
+  
+  // if(!proposals || proposals.length==0){
+  //   return (
+  //     <div>Loading Proposals....</div>
+  //   );
+  // }
   if(!id){
     return (
-        <div>Proposal ID is missing</div>
-    )
+        <div><Text font="proto_mono">Proposal ID is missing</Text></div>
+    );
   }
   const proposal = proposals.find((p) => p.proposal_id === Number(proposalId));
 
   if (!proposal) {
-    return <div>No proposal found with the ID {proposalId}</div>;
+    return <div><Text font="proto_mono">No proposal found with the ID {proposalId} </Text></div>;
   }
   //console.log(proposal);
   const isActive = formatProposalStatus(proposal.status)=='ACTIVE';
@@ -79,7 +98,24 @@ export default function Page() {
           <div className={styles.proposalInfo}>
             <div><Text font="proto_mono" opacity={0.3}>Total Deposit:</Text></div>
             <div>
-              <Text font="proto_mono">{formatDeposit(proposal.total_deposit[0].amount)} </Text>
+              <Text font="proto_mono">{formatDeposit(proposal.total_deposit[0].amount)} <Image
+            src="/tokens/canto.svg"
+            width={20}
+            height={20}
+            alt="canto"
+            style={{
+              filter: "invert(var(--dark-mode))",
+            }}
+          /></Text>
+              {/* <Icon icon={{
+            url: "networks/canto.svg",
+            size: {
+              width: 50,
+              height: 50,
+            },
+          }}
+          themed></Icon> */}
+          
             </div>
           </div>
           <div className={styles.proposalInfo}>
@@ -102,17 +138,20 @@ export default function Page() {
       <div className={styles.proposalCardContainer2}>
         <div className={styles.proposalInfoBoxVoting}>
           <div className={styles.proposalInfoRow1}>
+          <div className={styles.radioBtn}>
+                    <input
+                  type="radio"
+                  name="voteOption"
+                  value={VoteOption.YES}
+                  checked={selectedVote === VoteOption.YES}
+                  onChange={() => setSelectedVote(VoteOption.YES)}
+                />
+                </div>
             <div className={styles.proposalInfoVoting}>
-            <input
-              type="radio"
-              name="voteOption"
-              value={1}
-              checked={true}
-              onChange={() => {
-
-              }}
-            />
+            
+            
               <div className={styles.votingInfoRow1}>
+              
              
                 <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "green", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Yes</Text></div></div>
                 <div><Text font="proto_mono">{votesData.yes}%</Text></div>
@@ -122,9 +161,21 @@ export default function Page() {
               </div>
               
               
+
             </div>
+            <div className={styles.radioBtn}>
+                    <input
+                  type="radio"
+                  name="voteOption"
+                  value={VoteOption.NO}
+                  checked={selectedVote === VoteOption.NO}
+                  onChange={() => setSelectedVote(VoteOption.NO)}
+                />
+              </div>
             <div className={styles.proposalInfoVoting}>
               <div className={styles.votingInfoRow1}>
+                
+              
                 <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "red", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">No</Text></div></div>
                 <div><Text font="proto_mono">{votesData.no}%</Text></div>
               </div>
@@ -135,6 +186,15 @@ export default function Page() {
             </div>
           </div>
           <div className={styles.proposalInfoRow1}>
+          <div className={styles.radioBtn}>
+                    <input
+                  type="radio"
+                  name="voteOption"
+                  value={VoteOption.VETO}
+                  checked={selectedVote === VoteOption.VETO}
+                  onChange={() => setSelectedVote(VoteOption.VETO)}
+                />
+              </div>
             <div className={styles.proposalInfoVoting}>
               <div className={styles.votingInfoRow1}>
                 <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "#4455EF", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Veto</Text></div></div>
@@ -146,8 +206,18 @@ export default function Page() {
               
               
             </div>
+            <div className={styles.radioBtn}>
+                    <input
+                  type="radio"
+                  name="voteOption"
+                  value={VoteOption.ABSTAIN}
+                  checked={selectedVote === VoteOption.ABSTAIN}
+                  onChange={() => setSelectedVote(VoteOption.ABSTAIN)}
+                />
+              </div>
             <div className={styles.proposalInfoVoting}>
               <div className={styles.votingInfoRow1}>
+            
                 <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "black" , margin:"10px 5px 0px 10px"}}></div> <div><Text font="proto_mono">Abstain</Text></div></div>
                 <div><Text font="proto_mono">{votesData.abstain}%</Text></div>
               </div>
@@ -158,7 +228,7 @@ export default function Page() {
           </div>  
         </div>
         <div className={styles.VotingButton}>
-          <Button width={300} disabled={!isActive} onClick={()=>handleProposalClick(proposal)}>Vote</Button>
+          <Button width={400} disabled={!isActive} onClick={()=>handleProposalClick(proposal)}>Vote</Button>
           {/* {!isActive && <span className={styles.tooltip}>The Proposal is not Active</span>} */}
         </div>
       </div>

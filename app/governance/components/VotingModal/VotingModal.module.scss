@@ -1,4 +1,9 @@
 /* ProposalModal.module.css */
+.votingContainer{
+  padding: 10%;
+  //justify-content: center;
+}
+
 .checkboxGroup {
     display: flex;
     flex-direction: column;
@@ -10,6 +15,7 @@
     align-items: center;
     padding: 5px;
     border-radius: 4px;
+    border: 1px #B3B3B3 solid;
     transition: background-color 0.3s;
     padding: 5%;
     margin: 5%;
