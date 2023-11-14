@@ -54,16 +54,16 @@ const InfoBar = ({ values }: Props) => {
           ))}
         </div> */}
       <Text font="proto_mono" color="var(--text-only-light)" size="sm">
-        Welcome to the canto.io Beta - Please report issues by{" "}
+        For Staking & Governance GO{" "}
         <a
-          href="https://canto.canny.io/"
+          href="https://v2.canto.io/"
           style={{
             color: "var(--canto-color)",
             textDecoration: "underline",
           }}
           target="_blank"
         >
-          clicking here
+          Here
         </a>
         .
       </Text>
