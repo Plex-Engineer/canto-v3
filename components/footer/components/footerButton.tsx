@@ -1,13 +1,13 @@
 "use client";
 
-import Text from "@/components/text";
+import Button from "@/components/button/button";
+import Icon from "@/components/icon/icon";
 import Toggle from "@/components/toggle";
 import Rive, { useRive, useStateMachineInput } from "@rive-app/react-canvas";
 import { useCallback, useEffect, useState } from "react";
 
 const ThemeButton = () => {
   const [name, setName] = useState("dark");
-
   const { rive, RiveComponent } = useRive({
     src: "anims/toggle.riv",
     artboard: "Toggle",
@@ -44,7 +44,8 @@ const ThemeButton = () => {
   useEffect(() => {
     setTheme(localStorage.getItem("theme") as string);
     const themeName = localStorage.getItem("theme");
-
+    const localName =
+      themeName === "dark" || themeName === "light" ? themeName : "dark";
     setName(
       (localStorage.getItem("theme") as string) == "dark" ? "light" : "dark"
     );
@@ -56,36 +57,45 @@ const ThemeButton = () => {
   }, [onButtonActivate, onButtonDeactivate]);
 
   return (
-    // <button
-    //   style={{
-    //     paddingLeft: "1rem",
-    //     height: "100%",
-    //   }}
+    // <Button
+    //   color="secondary"
+    //   width={52}
+    //   padding={0}
     //   onClick={() => {
     //     document.body.classList.contains("dark")
     //       ? setTheme("light")
     //       : setTheme("dark");
+    //     if (!document.body.classList.contains("dark")) onButtonDeactivate();
+    //     else onButtonActivate();
     //   }}
     // >
-    //   {/* <Text size="x-sm" font="proto_mono">
-    //     {name + " "} Theme
-    //   </Text> */}
-
-    // </button>
+    //   <RiveComponent
+    //     height={60}
+    //     width={60}
+    //     style={{
+    //       height: "40px",
+    //       width: "40px",
+    //     }}
+    //   />
+    // </Button>
     <Toggle
-      value={name == "dark"}
-      onChange={() => {
+      scale={1.5}
+      onChange={(value) => {
         document.body.classList.contains("dark")
           ? setTheme("light")
           : setTheme("dark");
         if (!document.body.classList.contains("dark")) onButtonDeactivate();
         else onButtonActivate();
       }}
+      value={name == "dark" ? false : true}
     >
-      <Text size="x-sm" font="proto_mono">
-        {name + " "} Theme
-      </Text>
-    </button>
+      <Icon
+        icon={{
+          url: name == "dark" ? "/sun.svg" : "/moon.svg",
+          size: 21,
+        }}
+      />
+    </Toggle>
   );
 };
 
