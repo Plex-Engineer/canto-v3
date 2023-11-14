@@ -3,10 +3,11 @@ import { styled } from "styled-components";
 
 interface Props {
   value: boolean;
+  children?: React.ReactNode;
   onChange: (value: boolean) => void;
 }
 
-const Toggle = ({ value, onChange }: Props) => {
+const Toggle = ({ value, onChange, children }: Props) => {
   return (
     <Styled
       value={value}
@@ -14,7 +15,7 @@ const Toggle = ({ value, onChange }: Props) => {
         onChange(!value);
       }}
     >
-      <div className="toggle"></div>
+      <div className="toggle">{children}</div>
     </Styled>
   );
 };
@@ -35,7 +36,7 @@ const Styled = styled.div<{ value: boolean }>`
 
   .toggle {
     transition: all 0.2s ease-in-out;
-    left: ${({ value }) => (value ? "calc(100% - 22px)" : "1px")};
+    left: ${({ value }) => (value ? "calc(100% - 23px)" : "1px")};
     top: 50%;
     transform: translateY(-50%);
     height: 90%;

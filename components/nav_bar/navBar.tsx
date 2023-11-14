@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TransactionModal from "../transactions/TxModal";
+import ThemeButton from "../footer/components/footerButton";
 
 const NavBar = () => {
   const currentPath = usePathname();
@@ -84,6 +85,8 @@ const NavBar = () => {
         </Link> */}
       </div>
       <div className={styles["btn-grp"]}>
+        <ThemeButton />
+
         <div className={styles.activity}>
           <TransactionModal />
         </div>

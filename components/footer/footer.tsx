@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Text from "../text";
 import styles from "./footer.module.scss";
-import FooterButton from "./components/footerButton";
+import ThemeButton from "./components/footerButton";
 import { useEffect, useState } from "react";
 import { getTokenPriceInUSDC } from "@/utils/tokens";
 import { useBlockNumber } from "wagmi";
@@ -38,7 +38,7 @@ const Footer = () => {
         />
         <FooterLink href="https://twitter.com/CantoPublic" text="twitter" />
         <FooterLink href="https://canto.mirror.xyz/" text="Blog" />
-        <FooterButton text="theme" />
+        {/* <FooterButton text="theme" /> */}
       </div>
       <div className={styles.links}>
         <StatusText />

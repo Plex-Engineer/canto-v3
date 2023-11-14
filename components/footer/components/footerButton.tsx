@@ -1,13 +1,10 @@
 "use client";
 
 import Text from "@/components/text";
+import Toggle from "@/components/toggle";
 import { useEffect, useState } from "react";
 
-interface PropLinkButton {
-  text: string;
-}
-
-const FooterButton = ({ text }: PropLinkButton) => {
+const ThemeButton = () => {
   const [name, setName] = useState("dark");
 
   function setTheme(themeName: string) {
@@ -22,30 +19,40 @@ const FooterButton = ({ text }: PropLinkButton) => {
   useEffect(() => {
     setTheme(localStorage.getItem("theme") as string);
     const themeName = localStorage.getItem("theme");
-    // const localName =
-    //   themeName === "dark" || themeName === "light" ? themeName : "dark";
+
     setName(
       (localStorage.getItem("theme") as string) == "dark" ? "light" : "dark"
     );
   }, []);
 
   return (
-    <button
-      style={{
-        paddingLeft: "1rem",
-        height: "100%",
-      }}
-      onClick={() => {
+    // <button
+    //   style={{
+    //     paddingLeft: "1rem",
+    //     height: "100%",
+    //   }}
+    //   onClick={() => {
+    //     document.body.classList.contains("dark")
+    //       ? setTheme("light")
+    //       : setTheme("dark");
+    //   }}
+    // >
+    //   {/* <Text size="x-sm" font="proto_mono">
+    //     {name + " "} Theme
+    //   </Text> */}
+
+    // </button>
+    <Toggle
+      value={name == "dark"}
+      onChange={() => {
         document.body.classList.contains("dark")
           ? setTheme("light")
           : setTheme("dark");
       }}
     >
-      <Text size="x-sm" font="proto_mono">
-        {name + " "} Theme
-      </Text>
-    </button>
+      Test
+    </Toggle>
   );
 };
 
-export default FooterButton;
+export default ThemeButton;
