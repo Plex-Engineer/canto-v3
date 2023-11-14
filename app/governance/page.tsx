@@ -12,12 +12,16 @@ import styles from './gov.module.scss';
 import Text from "@/components/text";
 import Spacer from "@/components/layout/spacer";
 import Button from "@/components/button/button";
+import useCantoSigner from "@/hooks/helpers/useCantoSigner";
+import Splash from "@/components/splash/splash";
 
 
 export default function GovernancePage() {
-  const { proposals } = useProposals({ chainId: 7700 });
+
+  const { txStore, signer,chainId } = useCantoSigner();
+  const { proposals,isLoading } = useProposals({ chainId: chainId });
   //console.log(proposals);
-  
+  console.log(isLoading);
 
   
   const sorted_proposals = proposals.sort((a: Proposal, b: Proposal) => b.proposal_id - a.proposal_id);
@@ -62,8 +66,8 @@ export default function GovernancePage() {
   //   data: data
   // }
 
-  return (
-    <div>
+  return (isLoading ? (<Splash/>): 
+    (<div>
     <div className={styles.container}>
     <div className={styles.header}>
       <Text font="proto_mono" className={styles.title}>
@@ -92,6 +96,6 @@ export default function GovernancePage() {
                 ></ProposalModal>
               )} */}
     </div>
-  </div>
+  </div>)
   );
 }

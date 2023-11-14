@@ -13,12 +13,10 @@ export default function useProposals(
     refetchInterval?: number;
   }
 ): ProposalHookReturn {
-  ///
-  /// INTERNAL HOOKS
-  ///
+  
 
   // just need to fetch all proposals for this hook
-  const { data: proposals } = useQuery(
+  const { data: proposals,isLoading } = useQuery(
     ["proposals", params.chainId],
     async () => {
       const { data: proposals, error } = await getCantoApiData<Proposal[]>(
@@ -42,11 +40,13 @@ export default function useProposals(
   if(proposals){
     //console.log(JSON.parse(proposals));
     return {
-      proposals: proposals
+      proposals: proposals,
+      isLoading
     };
   }
   return {
-    proposals :[]
+    proposals :[],
+    isLoading
   }
 
   

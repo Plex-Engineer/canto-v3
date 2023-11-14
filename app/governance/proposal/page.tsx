@@ -10,6 +10,8 @@ import useProposals from "@/hooks/gov/useProposals";
 import { useState } from "react";
 import { Proposal } from "@/hooks/gov/interfaces/proposal";
 import { ProposalModal } from "../components/VotingModal/VotingModal";
+import useCantoSigner from "@/hooks/helpers/useCantoSigner";
+import Splash from "@/components/splash/splash";
 
 
 
@@ -20,10 +22,8 @@ export default function Page() {
   console.log(id);
   const proposalId = Number(id);
 
-  
-  const {proposals} = useProposals(
-    {chainId: 7700}
-  );
+  const { txStore, signer,chainId } = useCantoSigner();
+  const { proposals,isLoading } = useProposals({ chainId: chainId });
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   if(!proposals || proposals.length==0){
@@ -54,7 +54,8 @@ export default function Page() {
   };
 
   return (
-  <div className={styles.proposalContainer}>
+    isLoading ? (<Splash/>):
+  (<div className={styles.proposalContainer}>
     <div className={styles.proposalHeaderContainer}>
         <div className={styles.proposalCard1}>
           <div style={{borderRight: "1px solid", padding: "10px"}}><Text>#{proposal.proposal_id}</Text></div>
@@ -102,8 +103,17 @@ export default function Page() {
         <div className={styles.proposalInfoBoxVoting}>
           <div className={styles.proposalInfoRow1}>
             <div className={styles.proposalInfoVoting}>
+            <input
+              type="radio"
+              name="voteOption"
+              value={1}
+              checked={true}
+              onChange={() => {
+
+              }}
+            />
               <div className={styles.votingInfoRow1}>
-                
+             
                 <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "green", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Yes</Text></div></div>
                 <div><Text font="proto_mono">{votesData.yes}%</Text></div>
               </div>
@@ -158,7 +168,7 @@ export default function Page() {
         handleModalClose();
        } } isOpen={true}></ProposalModal>
       )}
-  </div>
+  </div>)
   );
   
 

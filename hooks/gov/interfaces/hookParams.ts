@@ -4,7 +4,8 @@ export interface ProposalHookParams {
   chainId: number;
 }
 export interface ProposalHookReturn {
-  proposals: Proposal[];
+  proposals: Proposal[],
+  isLoading: boolean
 }
 
 export interface ProposalHookReturnSingle{
