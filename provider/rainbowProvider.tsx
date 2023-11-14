@@ -13,6 +13,7 @@ import { Chain, configureChains, createConfig, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import * as EVM_CHAINS from "@/config/networks/evm";
 import { cantoTheme } from "./util";
+import { useEffect, useState } from "react";
 
 const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
   (network) => {
@@ -83,6 +84,8 @@ interface RainbowProviderProps {
   children: React.ReactNode;
 }
 const CantoWalletProvider = ({ children }: RainbowProviderProps) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   return (
     <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider
@@ -91,7 +94,7 @@ const CantoWalletProvider = ({ children }: RainbowProviderProps) => {
         theme={cantoTheme}
         initialChain={EVM_CHAINS.CANTO_MAINNET_EVM.chainId}
       >
-        {children}
+        {mounted && children}
       </RainbowKitProvider>
     </WagmiConfig>
   );
