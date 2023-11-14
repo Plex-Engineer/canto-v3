@@ -8,7 +8,6 @@ import { clsx } from "clsx";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TransactionModal from "../transactions/TxModal";
 import ThemeButton from "../footer/components/footerButton";
-import Spacer from "../layout/spacer";
 
 const NavBar = () => {
   const currentPath = usePathname();

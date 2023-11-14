@@ -1,5 +1,6 @@
 import "@rainbow-me/rainbowkit/styles.css";
 import {
+  AvatarComponent,
   connectorsForWallets,
   getDefaultWallets,
   RainbowKitProvider,
@@ -14,6 +15,7 @@ import { publicProvider } from "wagmi/providers/public";
 import * as EVM_CHAINS from "@/config/networks/evm";
 import { cantoTheme } from "./util";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
   (network) => {
@@ -80,6 +82,21 @@ const wagmiConfig = createConfig({
   publicClient,
 });
 
+const CustomAvatar: AvatarComponent = () => {
+  return (
+    <Image
+      src="networks/canto.svg"
+      style={{
+        width: "100%",
+        height: "100%",
+      }}
+      width={64}
+      height={64}
+      alt="logo"
+    />
+  );
+};
+
 interface RainbowProviderProps {
   children: React.ReactNode;
 }
@@ -89,6 +106,7 @@ const CantoWalletProvider = ({ children }: RainbowProviderProps) => {
   return (
     <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider
+        avatar={CustomAvatar}
         chains={chains}
         modalSize="wide"
         theme={cantoTheme}
