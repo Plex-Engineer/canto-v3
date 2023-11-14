@@ -26,7 +26,7 @@ import {
 } from "@/hooks/pairs/newAmbient/liquidityControllers/defaultParams";
 import { queryAmbientPoolLiquidityCurve } from "@/hooks/pairs/newAmbient/helpers/ambientApi";
 import { convertLiquidityCurveToGraph } from "@/utils/ambient";
-import AmbientLiquidityGraph from "@/components/liquidityGraph/ambientLiquidityGraph";
+import SVGLiquidityGraph from "@/components/liquidityGraph/svgGraph";
 
 interface NewPositionModalProps {
   pool: AmbientPool;
@@ -67,7 +67,11 @@ export const NewAmbientPositionModal = ({
 
   // set to custom price range
   function setPriceRange(price: { min?: string; max?: string }) {
-    positionManager.setters.setRangePrice(price);
+    // make sure values are not zero
+    positionManager.setters.setRangePrice({
+      min: Number(price.min) < 0 ? "0" : price.min,
+      max: Number(price.max) < 0 ? "0" : price.max,
+    });
     setSelectedOption("CUSTOM");
   }
 
@@ -257,18 +261,39 @@ export const NewAmbientPositionModal = ({
 
         {showAdvanced && (
           <Container className={styles.advancedContainer}>
-            <AmbientLiquidityGraph
-              points={graphPoints}
-              currentPrice={formatBalance(
-                pool.stats.lastPriceSwap,
-                pool.base.decimals - pool.quote.decimals,
-                { precision: 10 }
-              )}
-              minPrice={positionManager.options.minRangePrice}
-              maxPrice={positionManager.options.maxRangePrice}
-              setPrice={setPriceRange}
-            />
-
+            <Container gap={10}>
+              <SVGLiquidityGraph
+                title="Set Price Range"
+                points={graphPoints}
+                options={{
+                  axis: {
+                    x: { min: 0.988, max: 1.02 },
+                  },
+                  boundaries: {
+                    x: {
+                      min: 0,
+                      max: Infinity,
+                    },
+                  },
+                }}
+                parentOptions={{
+                  currentXValue: Number(
+                    formatBalance(
+                      pool.stats.lastPriceSwap,
+                      pool.base.decimals - pool.quote.decimals,
+                      { precision: 10 }
+                    )
+                  ),
+                  minXValue: Number(positionManager.options.minRangePrice),
+                  maxXValue: Number(positionManager.options.maxRangePrice),
+                  setValues: (prices) =>
+                    setPriceRange({
+                      min: prices.min?.toFixed(4),
+                      max: prices.max?.toFixed(4),
+                    }),
+                }}
+              />
+            </Container>
             <Spacer height="30px" />
             <ToggleGroup
               options={ALL_TICK_KEYS}

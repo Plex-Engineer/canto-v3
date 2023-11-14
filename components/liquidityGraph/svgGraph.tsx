@@ -1,199 +1,202 @@
 import React from "react";
 import styles from "./svgComponent.module.scss";
-import Container from "../container/container";
-import Text from "../text";
-
-type Point = { x: number; y: number };
-type Axis = { min: number; max: number };
-interface Props {
-  points: Point[];
-  // axis range
-  axis: {
-    x: Axis;
-  };
-  // for shading region under curve
-  currentXValue: number;
-  minXValue: number;
-  maxXValue: number;
-  // for setting outside values
-  setValues?: (values: { min?: number; max?: number }) => void;
-}
+import { GraphZoom } from "./helpers/graphZoom";
+import { Axis, GraphProps } from "./types";
+import { convertPointsToSvgPath } from "./helpers/polyLineCreator";
+import {
+  convertGraphValueToValue,
+  convertValueToGraphValue,
+  zoomNewAxis,
+} from "./helpers/graphMath";
 
 const size = {
   height: 114,
   width: 200,
 };
 
+// type for elements on the grapg
+type GraphElement = "leftSlider" | "rightSlider" | "box";
+
 const SVGLiquidityGraph = ({
+  title,
   points,
-  axis,
-  currentXValue,
-  minXValue,
-  maxXValue,
-  setValues,
-}: Props) => {
-  // sliders and state for slider positions (state for position allows for faster rerendering)
-  const leftLine = React.useRef<any>(null);
-  const [leftPosition, setLeftPosition] = React.useState<number>(
-    convertValueToGraphValue(minXValue, axis.x, size.width)
+  options,
+  parentOptions,
+}: GraphProps) => {
+  const defaultInternalState = useDefaultInternalState();
+  // get values from parent options of default internal state
+  const { currentXValue, minXValue, maxXValue, setValues } =
+    parentOptions ?? defaultInternalState;
+  // state for axis
+  const [xAxis, setXAxis] = React.useState<Axis>(
+    options?.axis?.x ?? { min: 0, max: 1 }
   );
-  const rightLine = React.useRef<any>(null);
-  const [rightPosition, setRightPosition] = React.useState<number>(
-    convertValueToGraphValue(maxXValue, axis.x, size.width)
+  // positions for sliders based on current axis and values
+  // will always be updated when axis or values change
+  const leftPosition = React.useMemo(
+    () => convertValueToGraphValue(minXValue, xAxis, size.width),
+    [minXValue, xAxis]
   );
-  const rectangleRef = React.useRef<any>(null);
-  // variable to keep track of if the mouse is down
-  const [mouseDown, setMouseDown] = React.useState<boolean>(false);
+  const rightPosition = React.useMemo(
+    () => convertValueToGraphValue(maxXValue, xAxis, size.width),
+    [maxXValue, xAxis]
+  );
 
-  // initialize slider drags
-  React.useEffect(() => {
-    if (!leftLine.current) return;
-    if (!rightLine.current) return;
-    sliderDrag(leftLine.current, -5, true);
-    sliderDrag(rightLine.current, 5, false);
-    if (!rectangleRef.current) return;
-    boxDrag(rectangleRef.current);
-  }, []);
+  // state for current element being dragged
+  const draggingElement = React.useRef<GraphElement | null>(null);
+  // state for where the mouse is when first clicking an element
+  const firstClickedPosition = React.useRef<number>(0);
 
-  function getMouseSvgPoint(
-    element: any,
-    e: MouseEvent
-  ): { x: number; y: number } | undefined {
-    // convert global mouse position to svg coordinates
-    const pt = element.ownerSVGElement?.createSVGPoint();
-    if (!pt) return;
+  // handle mouse movements for dragging on the graph
+  function handleMouseDown(e: any, element: GraphElement) {
+    firstClickedPosition.current = getMouseSVGPoint(e)?.x ?? 0;
+    draggingElement.current = element;
+    document.addEventListener("mousemove", handleMouseMove);
+  }
+  // default mouse up handler any time mouse is up
+  document.addEventListener("mouseup", () => {
+    draggingElement.current = null;
+    document.removeEventListener("mousemove", handleMouseMove);
+  });
+
+  function handleMouseMove(e: MouseEvent) {
+    // get the mouse position in svg coordinates
+    const svgPoint = getMouseSVGPoint(e);
+    if (!svgPoint) return;
+    // get offset from first clicked position
+    const offset = svgPoint.x - firstClickedPosition.current;
+    // get new positions for sliders
+    let newLeftPosition = leftPosition;
+    let newRightPosition = rightPosition;
+    switch (draggingElement.current) {
+      case "leftSlider":
+        newLeftPosition = leftPosition + offset;
+        break;
+      case "rightSlider":
+        newRightPosition = rightPosition + offset;
+        break;
+      case "box":
+        newLeftPosition = leftPosition + offset;
+        newRightPosition = rightPosition + offset;
+        break;
+    }
+    // set the values in the parent (Only place where values are set in parent)
+    const newMin = convertGraphValueToValue(newLeftPosition, xAxis, size.width);
+    const newMax = convertGraphValueToValue(
+      newRightPosition,
+      xAxis,
+      size.width
+    );
+    // make sure min and max are not the same or cross
+    if (newMin >= newMax) return;
+    // get boundaries
+    const boundaries = options?.boundaries?.x;
+    setValues({
+      min: !boundaries || newMin > boundaries.min ? newMin : boundaries.min,
+      max: !boundaries || newMax < boundaries.max ? newMax : boundaries.max,
+    });
+  }
+
+  function getMouseSVGPoint(e: MouseEvent) {
+    const getSvg = () => {
+      const svgElements = document.querySelectorAll("svg");
+      for (const element of svgElements) {
+        if (element.id === "svgGraph") return element;
+      }
+      return null;
+    };
+    const svg = getSvg();
+    if (!svg) return;
+    const pt = svg.createSVGPoint();
     pt.x = e.clientX;
     pt.y = e.clientY;
-    const svgP = pt.matrixTransform(
-      element.ownerSVGElement.getScreenCTM()?.inverse()
+    const svgPoint = pt.matrixTransform(svg.getScreenCTM()?.inverse());
+    return svgPoint;
+  }
+
+  ///
+  /// HANDLE ZOOMING (ZOOM FROM PARENT UPDATE)
+  ///
+
+  // auto zoom in/out
+  function handleAutoZoom(zoomIn: boolean) {
+    // set new axis
+    setXAxis((prev) =>
+      zoomNewAxis(
+        prev,
+        {
+          autoZoom: true,
+          zoomIn,
+          ...(options?.zoom?.amountZoom
+            ? { amountZoom: options.zoom.amountZoom }
+            : { percentZoom: options?.zoom?.percentZoom ?? 0.1 }),
+        },
+        options?.boundaries?.x
+      )
     );
-    return svgP;
-  }
-  function getElementSvgPoint(element: any): number {
-    const style = window.getComputedStyle(element);
-    const matrix = new WebKitCSSMatrix(style.transform);
-    return matrix.m41;
   }
 
-  function sliderDrag(element: any, offsetX: number, isMinLine: boolean) {
-    onElementDrag(element, {
-      onDown: () => setMouseDown(true),
-      onUp: () => setMouseDown(false),
-      onMove: (e: MouseEvent) => {
-        // get svg point
-        const svgP = getMouseSvgPoint(element, e);
-        if (!svgP) return;
-        // set positions of line
-        const newPoint = svgP.x - offsetX;
-        moveRangeLine(newPoint, isMinLine);
-      },
-    });
-  }
-
-  function boxDrag(element: any) {
-    // track where the user first clicked on the box and where the sliders currently are
-    let startingClickPoint: number;
-    let startingLeftPosition: number;
-    let startingRightPosition: number;
-    onElementDrag(element, {
-      onDown: (e) => {
-        setMouseDown(true);
-        const svgP = getMouseSvgPoint(element, e);
-        if (!svgP) return;
-        startingClickPoint = svgP.x;
-        startingLeftPosition = getElementSvgPoint(leftLine.current);
-        startingRightPosition = getElementSvgPoint(rightLine.current);
-      },
-      onUp: () => setMouseDown(false),
-      onMove: (e: MouseEvent) => {
-        // see how far the mouse has moved from the starting point
-        const svgP = getMouseSvgPoint(element, e);
-        if (!svgP) return;
-        const offset = svgP.x - startingClickPoint;
-
-        // must move the range lines by the same amount
-        moveRangeLine(startingLeftPosition + offset, true);
-        moveRangeLine(startingRightPosition + offset, false);
-      },
-    });
-  }
-
-  // will set the slider positions based on drag
-  function moveRangeLine(svgPoint: number, isLeftLine: boolean) {
-    // don't do anything if refs don't exist
-    if (!leftLine.current) return;
-    if (!rightLine.current) return;
-    // can't use state to get positions, since this function is used in event listeners
-
-    // don't let sliders cross
-    if (isLeftLine && svgPoint >= getElementSvgPoint(rightLine.current)) return;
-    if (!isLeftLine && svgPoint <= getElementSvgPoint(leftLine.current)) return;
-    // set correct line position
-    if (isLeftLine) setLeftPosition(svgPoint);
-    else setRightPosition(svgPoint);
-  }
-
-  ///
-  /// USE EFFECTS FOR STATE CHANGES
-  ///
-
-  // called to update the sliders from parent min/max changes change
-  function syncSlidersFromParent() {
-    const svgMin = convertValueToGraphValue(minXValue, axis.x, size.width);
-    moveRangeLine(svgMin, true);
-    const svgMax = convertValueToGraphValue(maxXValue, axis.x, size.width);
-    moveRangeLine(svgMax, false);
-  }
-  // useEffect for setting the slider positions when the min/max or zoom changes from the parent
+  // set new axis if parent values change past boundaries
   React.useEffect(() => {
-    // only sync if mouse is up (don't want to override user dragging)
-    !mouseDown && syncSlidersFromParent();
-  }, [minXValue, maxXValue, axis.x.min, axis.x.max]);
-
-  // called to update the values in the parent (only on drag)
-  function syncValuesInParent() {
-    setValues &&
-      setValues({
-        min: convertGraphValueToValue(leftPosition, axis.x, size.width),
-        max: convertGraphValueToValue(rightPosition, axis.x, size.width),
-      });
-  }
-  // useEffect for syncing the values on slider drag
-  React.useEffect(() => {
-    // only sync values if mouse is down
-    mouseDown && syncValuesInParent();
-  }, [leftPosition, rightPosition]);
+    setXAxis((prev) => {
+      let newMin: number | undefined;
+      let newMax: number | undefined;
+      if (minXValue < prev.min) {
+        newMin = minXValue;
+      }
+      if (maxXValue > prev.max) {
+        newMax = maxXValue;
+      }
+      const newAxis = zoomNewAxis(
+        prev,
+        {
+          autoZoom: false,
+          newMin,
+          newMax,
+        },
+        options?.boundaries?.x
+      );
+      return newAxis;
+    });
+  }, [minXValue, maxXValue, options?.boundaries?.x]);
 
   ///
   /// PATHS ON GRAPH
   ///
-  const paths = () => {
-    return convertPointsToSvgPath(axis, points, size, {
-      minX: convertGraphValueToValue(leftPosition, axis.x, size.width),
-      maxX: convertGraphValueToValue(rightPosition, axis.x, size.width),
+  const paths = React.useMemo(() => {
+    return convertPointsToSvgPath(xAxis, points, size, {
+      minX: convertGraphValueToValue(leftPosition, xAxis, size.width),
+      maxX: convertGraphValueToValue(rightPosition, xAxis, size.width),
     });
-  };
+  }, [xAxis, points, leftPosition, rightPosition]);
 
   return (
     <>
+      <GraphZoom
+        title={title}
+        zoomIn={() => handleAutoZoom(true)}
+        zoomOut={() => handleAutoZoom(false)}
+        reset={() => setXAxis(options?.axis?.x ?? { min: 0, max: 1 })}
+      />
       <div
         style={{
           width: "100%",
           height: "100%",
         }}
+        className={styles.priceRanger}
       >
-        <svg viewBox="0 0 200 100" className={styles.svg}>
+        <svg viewBox="0 0 200 100" className={styles.svg} id="svgGraph">
           {/* graph points */}
           <polyline
             className={styles.graph}
-            points={paths().mainPath}
+            points={paths.mainPath}
             stroke="black"
             strokeWidth="0"
             width={"2"}
           />
           <polyline
             className={styles["graph-filled"]}
-            points={paths().filledPath}
+            points={paths.filledPath}
             stroke="black"
             opacity={1}
             strokeWidth="0"
@@ -203,19 +206,16 @@ const SVGLiquidityGraph = ({
             y={-20}
             width={rightPosition - leftPosition}
             height="140"
-            ref={rectangleRef}
             className={styles["graph-overlay"]}
+            onMouseDown={(e) => handleMouseDown(e, "box")}
           />
           {/* min range slider */}
-          <g transform={`translate(${leftPosition},20)`} ref={leftLine}>
-            <line
-              x1="0"
-              y1="-40"
-              x2="0"
-              y2="120"
-              stroke="black"
-              ref={leftLine}
-            />
+          <g
+            transform={`translate(${leftPosition},20)`}
+            id="leftSlider"
+            onMouseDown={(e) => handleMouseDown(e, "leftSlider")}
+          >
+            <line x1="0" y1="-40" x2="0" y2="120" stroke="black" />
 
             <svg
               width="8"
@@ -244,44 +244,24 @@ const SVGLiquidityGraph = ({
                 strokeLinecap="round"
               />
             </svg>
-            {/* <g>
-              <rect
-                x={-40}
-                y={-30}
-                width={30}
-                height={14}
-                fill="#22222239"
-                rx={1}
-              />
-
-              <text
-                x={-40 + 30 / 2}
-                y={-30 + 14 / 2}
-                dominantBaseline="middle"
-                textAnchor="middle"
-                className={styles.text}
-              >
-                {convertGraphValueToValue(
-                  leftPosition,
-                  axis.x,
-                  size.width
-                ).toFixed(4)}
-              </text>
-            </g> */}
           </g>
           {/* current price line */}
           <line
             className={styles["current-price-line"]}
-            x1={convertValueToGraphValue(currentXValue, axis.x, size.width)}
+            x1={convertValueToGraphValue(currentXValue, xAxis, size.width)}
             y1="-40"
-            x2={convertValueToGraphValue(currentXValue, axis.x, size.width)}
+            x2={convertValueToGraphValue(currentXValue, xAxis, size.width)}
             y2="120"
             stroke="black"
             strokeWidth=".5"
             strokeDasharray={"2,2"}
           />
           {/* max range slider */}
-          <g transform={`translate(${rightPosition},20)`} ref={rightLine}>
+          <g
+            transform={`translate(${rightPosition},20)`}
+            id="rightSlider"
+            onMouseDown={(e) => handleMouseDown(e, "rightSlider")}
+          >
             <line
               x1="0"
               y1="-40"
@@ -289,7 +269,6 @@ const SVGLiquidityGraph = ({
               y2="120"
               strokeWidth={"1"}
               stroke="black"
-              ref={rightLine}
             />
 
             <svg
@@ -321,44 +300,35 @@ const SVGLiquidityGraph = ({
             </svg>
 
             {/* <g>
-              <rect
-                x={10}
-                y={-30}
-                width={3}
-                height={14}
-                fill="#64646439"
-                rx={1}
-              />
-
-              <text
-                x={10 + 30 / 2}
-                y={-30 + 14 / 2}
-                dominantBaseline="middle"
-                textAnchor="middle"
-                fontSize={10}
-                className={styles.text}
-              >
-                {convertGraphValueToValue(
-                  rightPosition,
-                  axis.x,
-                  size.width
-                ).toFixed(4)}
-              </text>
-            </g> */}
+                  <rect
+                    x={10}
+                    y={-30}
+                    width={3}
+                    height={14}
+                    fill="#64646439"
+                    rx={1}
+                  />
+    
+                  <text
+                    x={10 + 30 / 2}
+                    y={-30 + 14 / 2}
+                    dominantBaseline="middle"
+                    textAnchor="middle"
+                    fontSize={10}
+                    className={styles.text}
+                  >
+                    {convertGraphValueToValue(
+                      rightPosition,
+                      axis.x,
+                      size.width
+                    ).toFixed(4)}
+                  </text>
+                </g> */}
           </g>
 
           {/* x axis plotting */}
         </svg>
-        <svg
-          viewBox="0 0 200 10"
-          className={styles.svgAxis}
-          onMouseMove={(e) => {
-            // pan graph if mouse is down
-            // if (!mouseDown) return;
-
-            console.log("mouse move", e.movementX);
-          }}
-        >
+        <svg viewBox="0 0 200 10" className={styles.svgAxis}>
           <g>
             <text
               x={0}
@@ -368,7 +338,7 @@ const SVGLiquidityGraph = ({
               fontSize={10}
               className={styles.text}
             >
-              {axis.x.min.toFixed(4)}
+              {xAxis.min.toFixed(4)}
             </text>
             <text
               x={size.width / 4}
@@ -380,7 +350,7 @@ const SVGLiquidityGraph = ({
             >
               {convertGraphValueToValue(
                 size.width / 4,
-                axis.x,
+                xAxis,
                 size.width
               ).toFixed(4)}
             </text>
@@ -394,7 +364,7 @@ const SVGLiquidityGraph = ({
             >
               {convertGraphValueToValue(
                 size.width / 2,
-                axis.x,
+                xAxis,
                 size.width
               ).toFixed(4)}
             </text>
@@ -408,7 +378,7 @@ const SVGLiquidityGraph = ({
             >
               {convertGraphValueToValue(
                 (size.width * 3) / 4,
-                axis.x,
+                xAxis,
                 size.width
               ).toFixed(4)}
             </text>
@@ -420,7 +390,7 @@ const SVGLiquidityGraph = ({
               fontSize={10}
               className={styles.text}
             >
-              {axis.x.max.toFixed(4)}
+              {xAxis.max.toFixed(4)}
             </text>
           </g>
         </svg>
@@ -429,240 +399,19 @@ const SVGLiquidityGraph = ({
   );
 };
 
-///
-/// Helper functions for graph
-///
-
-function onElementDrag(
-  element: any,
-  callbacks: {
-    onMove: (e: MouseEvent) => void;
-    onUp?: (e: MouseEvent) => void;
-    onDown?: (e: MouseEvent) => void;
-  }
-) {
-  // callback for when mouse is moved
-  const onMouseMove = (e: MouseEvent) => callbacks.onMove(e);
-
-  const onMouseUp = (e: MouseEvent) => {
-    // callback for when mouse is up
-    callbacks.onUp && callbacks.onUp(e);
-    // remove event listeners when mouse is up
-    document.removeEventListener("mousemove", onMouseMove);
-    document.removeEventListener("mouseup", onMouseUp);
-  };
-  const onMouseDown = (e: MouseEvent) => {
-    // callback for when mouse is down
-    callbacks.onDown && callbacks.onDown(e);
-    // add event listeners when mouse is down
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseup", onMouseUp);
-  };
-  // add event listener for mouse down
-  element.addEventListener("mousedown", onMouseDown);
-}
-
-function convertValueToGraphValue(
-  value: number,
-  axis: Axis,
-  axisLength: number
-): number {
-  return ((value - axis.min) / (axis.max - axis.min)) * axisLength;
-}
-function convertGraphValueToValue(
-  graphValue: number,
-  axis: Axis,
-  axisLength: number
-): number {
-  return (graphValue / axisLength) * (axis.max - axis.min) + axis.min;
-}
-function convertPointsToSvgPath(
-  axis: { x: Axis; y?: Axis },
-  points: Point[],
-  svgSize: { width: number; height: number },
-  fillRange?: { minX: number; maxX: number }
-): { mainPath: string; filledPath: string } {
-  // sort the points and remove negative y values
-  const sortedPoints = points
-    .sort((a, b) => a.x - b.x)
-    .map((point) => ({ x: point.x, y: point.y < 0 ? 0 : point.y }));
-
-  // find the points within the axis as well as the points directly before and after axis
-  const firstIndex = sortedPoints.findIndex((point) => point.x >= axis.x.min);
-  const lastIndex = sortedPoints.findIndex((point) => point.x >= axis.x.max);
-  const pointsWithinAxis = sortedPoints.slice(
-    firstIndex,
-    lastIndex !== -1 ? lastIndex : undefined
-  );
-
-  // if no points within axis, return empty string before doing any operations
-  if (pointsWithinAxis.length === 0) return { mainPath: "", filledPath: "" };
-
-  // find the max y value within the axis (create range for y)
-  const yMax = Math.max(...pointsWithinAxis.map((point) => point.y));
-  const yAxis = { min: 0, max: yMax };
-
-  // initialize path strings
-  let mainPath = "";
-  let filledPath = "";
-
-  // will keep track of if we are inside the filled range
-  let inFillRange = false;
-  let preFirstFillPoint = pointsWithinAxis[0];
-  let postFirstFillPoint = pointsWithinAxis[pointsWithinAxis.length - 1];
-  let preLastFillPoint = pointsWithinAxis[0];
-  let postLastFillPoint = pointsWithinAxis[pointsWithinAxis.length - 1];
-
-  // make svg point for each point within x-axis
-  pointsWithinAxis.forEach((point, index) => {
-    // get correct graph value for x and y to go into svg graph
-    const x = convertValueToGraphValue(point.x, axis.x, svgSize.width);
-    const y = convertValueToGraphValue(point.y, yAxis, svgSize.height);
-
-    // invert y to get graph flipped
-    mainPath += `${x},${svgSize.height - y} `;
-
-    // check if inside filled range
-    if (fillRange && point.x >= fillRange.minX && point.x <= fillRange.maxX) {
-      // check if this is the first point in the filled range
-      if (!inFillRange) {
-        inFillRange = true;
-        // get point before and after first filled point
-        preFirstFillPoint = pointsWithinAxis[index - 1] ?? pointsWithinAxis[0];
-        postFirstFillPoint = pointsWithinAxis[index];
-      }
-      filledPath += `${x},${svgSize.height - y} `;
-    } else if (inFillRange) {
-      // we were in the filled range, but now we are not
-      inFillRange = false;
-      // get point before and after last filled point
-      preLastFillPoint = pointsWithinAxis[index - 1] ?? pointsWithinAxis[0];
-      postLastFillPoint = pointsWithinAxis[index];
-    }
+// default state of values if parent not set
+function useDefaultInternalState() {
+  const [values, setValues] = React.useState<{ min: number; max: number }>({
+    min: 0.25,
+    max: 0.75,
   });
-
-  // create endpoints for main path
-  const preFirstPoint =
-    firstIndex > 0 ? sortedPoints[firstIndex - 1] : undefined;
-  const postLastPoint = lastIndex > 0 ? sortedPoints[lastIndex] : undefined;
-
-  const mainEndpoints = createPolyLineEndpoints(
-    preFirstPoint,
-    pointsWithinAxis[0],
-    pointsWithinAxis[pointsWithinAxis.length - 1],
-    postLastPoint,
-    { x: axis.x, y: yAxis },
-    svgSize
-  );
-  // add endpoints to main path
-  mainPath = mainEndpoints.prefix + mainPath + mainEndpoints.suffix;
-
-  // create endpoints for filled path (if path exists)
-  if (fillRange && filledPath !== "") {
-    // get y value of point at min fill range
-    const graphFillMinY =
-      svgSize.height -
-      convertValueToGraphValue(
-        estimateYFromX(fillRange.minX, preFirstFillPoint, postFirstFillPoint),
-        yAxis,
-        svgSize.height
-      );
-    const graphFillMinX = convertValueToGraphValue(
-      fillRange.minX,
-      axis.x,
-      svgSize.width
-    );
-    filledPath =
-      `${graphFillMinX},${svgSize.height} ${graphFillMinX},${graphFillMinY} ` +
-      filledPath;
-
-    // get y value at max fill range
-    const graphFillMaxY =
-      svgSize.height -
-      convertValueToGraphValue(
-        estimateYFromX(fillRange.maxX, preLastFillPoint, postLastFillPoint),
-        yAxis,
-        svgSize.height
-      );
-    const graphFillMaxX = convertValueToGraphValue(
-      fillRange.maxX,
-      axis.x,
-      svgSize.width
-    );
-
-    filledPath =
-      filledPath +
-      `${graphFillMaxX},${graphFillMaxY} ${graphFillMaxX},${svgSize.height} `;
-  }
-
-  return { mainPath, filledPath };
-}
-
-function createPolyLineEndpoints(
-  preFirstPoint: Point | undefined,
-  firstPoint: Point,
-  lastPoint: Point,
-  postLastPoint: Point | undefined,
-  axis: { x: Axis; y: Axis },
-  svgSize: { width: number; height: number }
-): {
-  prefix: string;
-  suffix: string;
-} {
-  let prefix = "";
-  let suffix = "";
-  // add first points to graph (before axis or zero)
-  if (!preFirstPoint) {
-    // no points before axis, create vertical line staight down to zero and to the beginning of the graph
-    prefix += `0,${svgSize.height}, ${convertValueToGraphValue(
-      firstPoint.x,
-      axis.x,
-      svgSize.width
-    )},${svgSize.height} `;
-  } else {
-    // there is a point before the axis, connect this point to the beginning of the graph, but from zero
-    prefix += `0,${svgSize.height}, 0,${
-      svgSize.height -
-      convertValueToGraphValue(
-        estimateYFromX(axis.x.min, preFirstPoint, firstPoint),
-        axis.y,
-        svgSize.height
-      )
-    } `;
-  }
-
-  // add last points to graph (after axis or zero)
-  if (!postLastPoint) {
-    // no points after axis, create vertical line staight down to zero and to the end of the graph
-    suffix += `${convertValueToGraphValue(
-      lastPoint.x,
-      axis.x,
-      svgSize.width
-    )}, ${svgSize.height}, ${svgSize.width},${svgSize.height} `;
-  } else {
-    // there is a point after the axis, connect this point to the end of the graph, but from zero
-    suffix += `${svgSize.width},${
-      svgSize.height -
-      convertValueToGraphValue(
-        estimateYFromX(axis.x.max, lastPoint, postLastPoint),
-        axis.y,
-        svgSize.height
-      )
-    } ${svgSize.width},${svgSize.height} `;
-  }
-  return { prefix, suffix };
-}
-
-// function for getting y value of point on line given x value and two points
-function estimateYFromX(
-  x: number,
-  pointBefore: Point,
-  pointAfter: Point
-): number {
-  // check before division by zero
-  if (pointAfter.x === pointBefore.x) return pointBefore.y;
-  const slope = (pointAfter.y - pointBefore.y) / (pointAfter.x - pointBefore.x);
-  return pointBefore.y + slope * (x - pointBefore.x);
+  const currentXValue = 0.5;
+  return {
+    minXValue: values.min,
+    maxXValue: values.max,
+    currentXValue,
+    setValues,
+  };
 }
 
 export default SVGLiquidityGraph;
