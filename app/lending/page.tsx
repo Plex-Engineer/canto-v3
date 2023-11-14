@@ -237,7 +237,7 @@ const CTokenTable = ({
           secondary={
             <Container width="320px">
               <ToggleGroup
-                options={["RWAs", "StableCoins"]}
+                options={["RWAs", "Stablecoins"]}
                 selected={filteredPairs}
                 setSelected={(value) => {
                   setFilteredPairs(value);
@@ -261,7 +261,7 @@ const CTokenTable = ({
                     onSupply: () => onSupply(cToken.address),
                   })
                 )
-              : filteredPairs == "StableCoins"
+              : filteredPairs == "Stablecoins"
               ? stableTokens.map((cToken) =>
                   CTokenRow({
                     cToken,
