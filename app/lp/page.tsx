@@ -36,7 +36,7 @@ export default function Page() {
     userEthAddress: signer?.account.address ?? "",
   });
   //   all pairs filtered by type
-  const [filteredPairs, setFilteredPairs] = useState("all");
+  const [filteredPairs, setFilteredPairs] = useState<string>("all");
 
   /** CANTO DEX */
   const { pairs: cantoDexPairs } = cantoDex;
@@ -133,7 +133,11 @@ export default function Page() {
   if (isLoading) {
     return <div className={styles.loading}>{""}</div>;
   }
-
+  const pairNames = {
+    all: "All Pairs",
+    stable: "Stable Pairs",
+    volatile: "Volatile Pairs",
+  };
   //main content
   return (
     <div className={styles.container}>
@@ -213,7 +217,8 @@ export default function Page() {
       )}
 
       <Table
-        title="All Pairs"
+        //@ts-ignore
+        title={pairNames[filteredPairs]}
         secondary={
           <Container width="400px">
             <ToggleGroup
