@@ -2,7 +2,6 @@
 import Image from "next/image";
 import Text from "../text";
 import styles from "./footer.module.scss";
-import ThemeButton from "./components/footerButton";
 import { useEffect, useState } from "react";
 import { getTokenPriceInUSDC } from "@/utils/tokens";
 import { useBlockNumber } from "wagmi";
@@ -44,7 +43,7 @@ const Footer = () => {
         <StatusText />
         <Text
           className={styles.item}
-          size="sm"
+          size="x-sm"
           font="proto_mono"
           style={{
             padding: "0 14px",
@@ -64,7 +63,7 @@ const Footer = () => {
         </Text>
         <Text
           className={styles.item}
-          size="sm"
+          size="x-sm"
           font="proto_mono"
           style={{
             padding: "0 14px",
