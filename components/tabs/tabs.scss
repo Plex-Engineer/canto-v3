@@ -91,5 +91,8 @@
 }
 
 .react-tabs__tab-panel--selected {
-  height: calc(100% - 52px);
+  //   background-color: red;
+  background-color: var(--card-sub-surface-color, #dfdfdf);
+
+  height: 100%;
 }
