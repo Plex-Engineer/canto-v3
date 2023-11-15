@@ -31,12 +31,13 @@ export default function Home() {
           <Icon
             style={{
               opacity: 0.5,
+              height: "47vh",
             }}
             icon={{
               url: "/orb.svg",
               size: {
                 width: 800,
-                height: 400,
+                height: 330,
               },
             }}
             themed
