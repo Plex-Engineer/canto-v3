@@ -1,7 +1,6 @@
 .container {
   display: grid;
   grid-template-columns: 80px 1fr 1fr;
-  height: 80px;
   animation: fadeIn 0.5s ease-in-out;
   @keyframes fadeIn {
     from {
