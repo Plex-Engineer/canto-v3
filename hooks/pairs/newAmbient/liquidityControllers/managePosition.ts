@@ -14,6 +14,26 @@ import {
 import { convertToBigNumber, formatBalance } from "@/utils/formatting";
 import BigNumber from "bignumber.js";
 import { percentOfAmount } from "@/utils/math";
+import { Validation } from "@/config/interfaces";
+import {
+  validateAddAmbientConcLiquidityParams,
+  validateExecutionPrices,
+} from "../helpers/validateParams";
+
+// for adding to existing position, the only params we need are amount, isBase, and executon prices
+// ticks already in the price range
+// all props non-wei since coming directly from user inputs, will convert inside this class
+type UserAddToExistingPositionParams = {
+  nonWeiAmount: string;
+  isBase: boolean;
+  nonWeiMinExecutionPrice: string;
+  nonWeiMaxExecutionPrice: string;
+};
+type UserRemoveFromExistingPositionParams = {
+  percentToRemove: number;
+  nonWeiMinExecutionPrice: string;
+  nonWeiMaxExecutionPrice: string;
+};
 
 // No states needed here, just functions to get the optimal amount of tokens to add/remove
 export default class AmbientPositionManager {
@@ -70,29 +90,25 @@ export default class AmbientPositionManager {
       this.pool
     );
   }
-  createAddConcLiquidtyParams(
-    amount: string,
-    isBase: boolean,
-    executionPrice?: {
-      minPriceFormatted?: string;
-      maxPriceFormatted?: string;
-    }
-  ): AmbientAddConcentratedLiquidityParams {
+
+  createAddConcLiquidtyParams({
+    nonWeiAmount,
+    isBase,
+    nonWeiMinExecutionPrice,
+    nonWeiMaxExecutionPrice,
+  }: UserAddToExistingPositionParams): AmbientAddConcentratedLiquidityParams {
     // convert amount to wei
     const amountWei =
       convertToBigNumber(
-        amount,
+        nonWeiAmount,
         isBase ? this.pool.base.decimals : this.pool.quote.decimals
       ).data?.toString() ?? "0";
-    // get execution prices
-    const minPriceWei = executionPrice?.minPriceFormatted
-      ? this.getWeiRangePrice(executionPrice.minPriceFormatted)
-      : getPriceFromTick(this.position.bidTick);
-    const maxPriceWei = executionPrice?.maxPriceFormatted
-      ? this.getWeiRangePrice(executionPrice.maxPriceFormatted)
-      : getPriceFromTick(this.position.askTick);
+    // get execution prices in wei
+    const minPriceWei = this.getWeiRangePrice(nonWeiMinExecutionPrice);
+    const maxPriceWei = this.getWeiRangePrice(nonWeiMaxExecutionPrice);
+
     return {
-      pair: this.pool,
+      pool: this.pool,
       txType: AmbientTxType.ADD_CONC_LIQUIDITY,
       amount: amountWei,
       isAmountBase: isBase,
@@ -101,6 +117,13 @@ export default class AmbientPositionManager {
       minPriceWei,
       maxPriceWei,
     };
+  }
+  validateAddConcLiquidityParams(
+    userParams: UserAddToExistingPositionParams
+  ): Validation {
+    return validateAddAmbientConcLiquidityParams(
+      this.createAddConcLiquidtyParams(userParams)
+    );
   }
 
   /**
@@ -130,27 +153,21 @@ export default class AmbientPositionManager {
     };
   }
 
-  createRemoveConcentratedLiquidtyParams(
-    percentToRemove: number,
-    executionPrice?: {
-      minPriceFormatted?: string;
-      maxPriceFormatted?: string;
-    }
-  ): AmbientRemoveConcentratedLiquidityParams {
+  createRemoveConcentratedLiquidtyParams({
+    percentToRemove,
+    nonWeiMinExecutionPrice,
+    nonWeiMaxExecutionPrice,
+  }: UserRemoveFromExistingPositionParams): AmbientRemoveConcentratedLiquidityParams {
     const liquidityToRemove = percentOfAmount(
       this.position.concLiq,
       percentToRemove
     );
-    // get execution prices
-    const minPriceWei = executionPrice?.minPriceFormatted
-      ? this.getWeiRangePrice(executionPrice.minPriceFormatted)
-      : getPriceFromTick(this.position.bidTick);
-    const maxPriceWei = executionPrice?.maxPriceFormatted
-      ? this.getWeiRangePrice(executionPrice.maxPriceFormatted)
-      : getPriceFromTick(this.position.askTick);
+    // get execution prices in wei
+    const minPriceWei = this.getWeiRangePrice(nonWeiMinExecutionPrice);
+    const maxPriceWei = this.getWeiRangePrice(nonWeiMaxExecutionPrice);
     return {
       txType: AmbientTxType.REMOVE_CONC_LIQUIDITY,
-      pair: this.pool,
+      pool: this.pool,
       liquidity: roundLiquidityForAmbientTx(
         liquidityToRemove.data?.toString() ?? "0"
       ),
@@ -160,5 +177,23 @@ export default class AmbientPositionManager {
       minPriceWei,
       maxPriceWei,
     };
+  }
+
+  validateRemoveConcLiquidityParams(
+    userParams: UserRemoveFromExistingPositionParams
+  ): Validation {
+    // only check is if liquidity is greater than 0 and execution prices are valid
+    if (userParams.percentToRemove <= 0 || userParams.percentToRemove > 100) {
+      return {
+        error: true,
+        reason: "Invalid percent to remove",
+      };
+    }
+    const txParams = this.createRemoveConcentratedLiquidtyParams(userParams);
+    return validateExecutionPrices(
+      txParams.minPriceWei,
+      txParams.maxPriceWei,
+      this.pool.stats.lastPriceSwap
+    );
   }
 }

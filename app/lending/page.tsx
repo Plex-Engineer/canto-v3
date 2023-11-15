@@ -67,7 +67,7 @@ export default function LendingPage() {
             cToken={selectedCToken}
             transaction={{
               performTx: transaction.performTx,
-              validateAmount: transaction.validateParams,
+              validateParams: transaction.validateParams,
             }}
           />
         )}

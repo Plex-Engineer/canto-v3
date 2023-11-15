@@ -3,7 +3,6 @@ import { useCallback, useEffect, useState } from "react";
 import AnimatedBackground from "@/components/animated_background/animatedBackground";
 import Container from "@/components/container/container";
 import Tabs from "@/components/tabs/tabs";
-import styles from "./bridge.module.scss";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
 import { connectToKeplr } from "@/utils/keplr";
