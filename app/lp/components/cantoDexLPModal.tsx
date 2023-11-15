@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import Container from "@/components/container/container";
 import { quoteRemoveLiquidity } from "@/utils/cantoDex";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
-import { ValidationReturn } from "@/config/interfaces";
+import { Validation } from "@/config/interfaces";
 import Icon from "@/components/icon/icon";
 import Text from "@/components/text";
 import {
@@ -37,9 +37,7 @@ import PopUp from "@/components/popup/popup";
 interface ManageCantoDexLPProps {
   pair: CantoDexPairWithUserCTokenData;
   sendTxFlow: (params: Partial<CantoDexTransactionParams>) => void;
-  validateParams: (
-    params: Partial<CantoDexTransactionParams>
-  ) => ValidationReturn;
+  validateParams: (params: Partial<CantoDexTransactionParams>) => Validation;
 }
 export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
   const [modalType, setModalType] = useState<"liquidity" | "stake" | "base">(
@@ -286,7 +284,7 @@ const createRemoveParams = (params: RemoveTxParams) => ({
 // Add and Remove Modals
 interface AddLiquidityProps {
   pair: CantoDexPairWithUserCTokenData;
-  validateParams: (params: AddTxParams) => ValidationReturn;
+  validateParams: (params: AddTxParams) => Validation;
   sendTxFlow: (params: AddTxParams) => void;
 }
 const AddLiquidityModal = ({
@@ -367,14 +365,9 @@ const AddLiquidityModal = ({
         }}
         IconUrl={pair.token1.logoURI}
         title={tokenSymbol(pair.token1)}
+        min="0"
         max={pair.token1.balance ?? "0"}
         symbol={tokenSymbol(pair.token1)}
-        error={
-          !paramCheck.isValid &&
-          Number(valueToken1) !== 0 &&
-          paramCheck.errorMessage?.startsWith(pair.token1.symbol)
-        }
-        errorMessage={paramCheck.errorMessage}
       />
 
       <Spacer height="20px" />
@@ -387,14 +380,9 @@ const AddLiquidityModal = ({
         }}
         IconUrl={pair.token2.logoURI}
         title={tokenSymbol(pair.token2)}
+        min="0"
         max={pair.token2.balance ?? "0"}
         symbol={tokenSymbol(pair.token2)}
-        error={
-          !paramCheck.isValid &&
-          Number(valueToken2) !== 0 &&
-          paramCheck.errorMessage?.startsWith(pair.token2.symbol)
-        }
-        errorMessage={paramCheck.errorMessage}
       />
       <Spacer height="20px" />
       <Container className={styles.card}>
@@ -418,7 +406,6 @@ const AddLiquidityModal = ({
                 value={Number(slippage).toString()}
                 onChange={(e) => setSlippage(Number(e.target.value))}
                 error={Number(slippage) > 100 || Number(slippage) < 0}
-                errorMessage="Slippage must be between 0-100%"
               />
               <Text>%</Text>
             </Container>
@@ -444,7 +431,6 @@ const AddLiquidityModal = ({
                 value={Number(deadline).toString()}
                 onChange={(e) => setDeadline(e.target.value)}
                 error={Number(deadline) <= 0}
-                errorMessage="Deadline must be greater than 0 mins"
               />
               <Text>mins</Text>
             </Container>
@@ -504,12 +490,7 @@ const AddLiquidityModal = ({
       </Container>
 
       <Button
-        disabled={
-          !paramCheck.isValid ||
-          Number(slippage) > 100 ||
-          Number(slippage) < 0 ||
-          Number(deadline) <= 0
-        }
+        disabled={paramCheck.error}
         width={"fill"}
         onClick={() =>
           sendTxFlow({
@@ -526,7 +507,7 @@ const AddLiquidityModal = ({
           })
         }
       >
-        {"Add Liquidity"}
+        {paramCheck.error ? paramCheck.reason : "Add Liquidity"}
       </Button>
       <Spacer height="20px" />
     </Container>
@@ -535,7 +516,7 @@ const AddLiquidityModal = ({
 
 interface RemoveLiquidityProps {
   pair: CantoDexPairWithUserCTokenData;
-  validateParams: (params: RemoveTxParams) => ValidationReturn;
+  validateParams: (params: RemoveTxParams) => Validation;
   sendTxFlow: (params: RemoveTxParams) => void;
 }
 
@@ -613,10 +594,9 @@ const RemoveLiquidityModal = ({
         onChange={(e) => setAmountLP(e.target.value)}
         IconUrl={pair.logoURI}
         title={pair.symbol}
+        min="0"
         max={totalLP}
         symbol={pair.symbol}
-        error={!paramCheck.isValid && Number(amountLP) !== 0}
-        errorMessage={paramCheck.errorMessage}
       />
       <Spacer height="20px" />
       <Container className={styles.card}>
@@ -640,7 +620,6 @@ const RemoveLiquidityModal = ({
                 value={Number(slippage).toString()}
                 onChange={(e) => setSlippage(Number(e.target.value))}
                 error={Number(slippage) > 100 || Number(slippage) < 0}
-                errorMessage="Slippage must be between 0-100%"
               />
               <Text>%</Text>
             </Container>
@@ -666,7 +645,6 @@ const RemoveLiquidityModal = ({
                 value={Number(deadline).toString()}
                 onChange={(e) => setDeadline(e.target.value)}
                 error={Number(deadline) <= 0}
-                errorMessage="Deadline must be greater than 0 mins"
               />
               <Text>mins</Text>
             </Container>
@@ -711,12 +689,7 @@ const RemoveLiquidityModal = ({
       <Spacer height="30px" />
 
       <Button
-        disabled={
-          !paramCheck.isValid ||
-          Number(slippage) > 100 ||
-          Number(slippage) < 0 ||
-          Number(deadline) <= 0
-        }
+        disabled={paramCheck.error}
         width={"fill"}
         onClick={() =>
           sendTxFlow({
@@ -729,7 +702,7 @@ const RemoveLiquidityModal = ({
           })
         }
       >
-        Remove Liquidity
+        {paramCheck.error ? paramCheck.reason : "Remove Liquidity"}
       </Button>
     </div>
   );

@@ -14,7 +14,6 @@ import {
 } from "@/utils/formatting";
 import { ModalItem } from "@/app/lending/components/modal/modal";
 import PopUp from "@/components/popup/popup";
-import Input from "@/components/input/input";
 import Button from "@/components/button/button";
 import Toggle from "@/components/toggle";
 import { useEffect, useState } from "react";
@@ -27,6 +26,7 @@ import {
 import { queryAmbientPoolLiquidityCurve } from "@/hooks/pairs/newAmbient/helpers/ambientApi";
 import { convertLiquidityCurveToGraph } from "@/utils/ambient";
 import SVGLiquidityGraph from "@/components/liquidityGraph/svgGraph";
+import Input from "@/components/input/input";
 
 interface NewPositionModalProps {
   pool: AmbientPool;
@@ -103,7 +103,14 @@ export const NewAmbientPositionModal = ({
               <Text theme="secondary-dark" size="x-sm">
                 Advanced
               </Text>{" "}
-              <Toggle value={showAdvanced} onChange={setShowAdvanced} />
+              <Toggle
+                value={showAdvanced}
+                onChange={(advanced) => {
+                  // reset prices to default
+                  setDefaultParams("DEFAULT");
+                  setShowAdvanced(advanced);
+                }}
+              />
             </Container>
           </Container>
           <Spacer height="10px" />
@@ -123,6 +130,7 @@ export const NewAmbientPositionModal = ({
             }
             IconUrl={baseToken.logoURI}
             title={baseToken.symbol}
+            min="0"
             max={baseToken.balance ?? "0"}
             symbol={baseToken.symbol}
           />
@@ -135,6 +143,7 @@ export const NewAmbientPositionModal = ({
             }
             IconUrl={quoteToken.logoURI}
             title={quoteToken.symbol}
+            min="0"
             max={quoteToken.balance ?? "0"}
             symbol={quoteToken.symbol}
           />
@@ -192,6 +201,60 @@ export const NewAmbientPositionModal = ({
                 </Container>
               }
             />
+            <ModalItem
+              name="Min Execution Price: "
+              value={
+                <Container
+                  center={{
+                    vertical: true,
+                  }}
+                  gap={10}
+                  direction="row"
+                  style={{
+                    width: "100px",
+                  }}
+                >
+                  <Input
+                    height={"sm"}
+                    type="number"
+                    value={positionManager.options.minExecutionPrice}
+                    onChange={(e) =>
+                      positionManager.setters.setExecutionPrice(
+                        e.target.value,
+                        true
+                      )
+                    }
+                  />
+                </Container>
+              }
+            />
+            <ModalItem
+              name="Max Execution Price: "
+              value={
+                <Container
+                  center={{
+                    vertical: true,
+                  }}
+                  gap={10}
+                  direction="row"
+                  style={{
+                    width: "100px",
+                  }}
+                >
+                  <Input
+                    height={"sm"}
+                    type="number"
+                    value={positionManager.options.maxExecutionPrice}
+                    onChange={(e) =>
+                      positionManager.setters.setExecutionPrice(
+                        e.target.value,
+                        false
+                      )
+                    }
+                  />
+                </Container>
+              }
+            />
           </Container>
           <Spacer height="8px" />
           <Text size="x-sm" theme="secondary-dark">
@@ -205,55 +268,11 @@ export const NewAmbientPositionModal = ({
             <Container className={styles.card}>
               <ModalItem
                 name="Min Range Price: "
-                value={
-                  <Container
-                    center={{
-                      vertical: true,
-                    }}
-                    gap={10}
-                    direction="row"
-                    style={{
-                      width: "100px",
-                    }}
-                  >
-                    <Input
-                      height={"sm"}
-                      type="number"
-                      value={positionManager.options.minRangePrice}
-                      onChange={(e) =>
-                        setPriceRange({
-                          min: e.target.value,
-                        })
-                      }
-                    />
-                  </Container>
-                }
+                value={positionManager.options.minRangePrice}
               />
               <ModalItem
                 name="Max Range Price: "
-                value={
-                  <Container
-                    center={{
-                      vertical: true,
-                    }}
-                    gap={10}
-                    direction="row"
-                    style={{
-                      width: "100px",
-                    }}
-                  >
-                    <Input
-                      height={"sm"}
-                      type="number"
-                      value={positionManager.options.maxRangePrice}
-                      onChange={(e) =>
-                        setPriceRange({
-                          max: e.target.value,
-                        })
-                      }
-                    />
-                  </Container>
-                }
+                value={positionManager.options.maxRangePrice}
               />
             </Container>
           )}
@@ -340,15 +359,14 @@ export const NewAmbientPositionModal = ({
         )}
       </Container>
       <Spacer height="15px" />
-      <span className={styles["error-message"]}>
-        {positionValidation.errorMessage}
-      </span>
       <Button
-        disabled={!positionValidation.isValid}
+        disabled={positionValidation.error}
         width={"fill"}
         onClick={() => sendTxFlow(positionManager.txParams.addLiquidity())}
       >
-        Add Concentrated Liquidity
+        {positionValidation.error
+          ? positionValidation.reason
+          : "Add Concentrated Liquidity"}
       </Button>
       <Spacer height="30px" />
     </Container>

@@ -58,9 +58,9 @@ export async function ambientLiquidityTx(
           _removeConcLiquidityTx(
             params.chainId,
             crocDexAddress,
-            params.pair.base.address,
-            params.pair.quote.address,
-            params.pair.poolIdx,
+            params.pool.base.address,
+            params.pool.quote.address,
+            params.pool.poolIdx,
             params.liquidity,
             params.lowerTick,
             params.upperTick,
@@ -127,7 +127,7 @@ async function addConcLiquidityFlow(
     baseAmount = params.amount;
     quoteAmount = getConcQuoteTokensFromBaseTokens(
       params.amount,
-      params.pair.stats.lastPriceSwap.toString(),
+      params.pool.stats.lastPriceSwap.toString(),
       params.minPriceWei,
       params.maxPriceWei
     );
@@ -135,7 +135,7 @@ async function addConcLiquidityFlow(
     quoteAmount = params.amount;
     baseAmount = getConcBaseTokensFromQuoteTokens(
       params.amount,
-      params.pair.stats.lastPriceSwap.toString(),
+      params.pool.stats.lastPriceSwap.toString(),
       params.minPriceWei,
       params.maxPriceWei
     );
@@ -161,12 +161,12 @@ async function addConcLiquidityFlow(
     params.ethAccount,
     [
       {
-        address: params.pair.base.address,
-        symbol: params.pair.base.symbol,
+        address: params.pool.base.address,
+        symbol: params.pool.base.symbol,
       },
       {
-        address: params.pair.quote.address,
-        symbol: params.pair.quote.symbol,
+        address: params.pool.quote.address,
+        symbol: params.pool.quote.symbol,
       },
     ],
     [baseApproval, quoteApproval],
@@ -184,9 +184,9 @@ async function addConcLiquidityFlow(
     _addConcLiquidityTx(
       params.chainId,
       params.crocDexAddress,
-      params.pair.base.address,
-      params.pair.quote.address,
-      params.pair.poolIdx,
+      params.pool.base.address,
+      params.pool.quote.address,
+      params.pool.poolIdx,
       params.isAmountBase ? baseAmount : quoteAmount,
       params.isAmountBase,
       params.lowerTick,

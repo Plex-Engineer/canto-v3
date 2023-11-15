@@ -4,7 +4,6 @@ import Spacer from "@/components/layout/spacer";
 import { displayAmount } from "@/utils/formatting";
 import { useState } from "react";
 import Container from "@/components/container/container";
-import { ValidationReturn } from "@/config/interfaces";
 import Icon from "@/components/icon/icon";
 import Text from "@/components/text";
 import styles from "../cantoDex.module.scss";
@@ -20,9 +19,6 @@ import { ManageAmbientPosition } from "./managePosition";
 
 interface AmbientModalProps {
   pool: AmbientPool;
-  validateParams: (
-    params: Partial<AmbientTransactionParams>
-  ) => ValidationReturn;
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
 }
 

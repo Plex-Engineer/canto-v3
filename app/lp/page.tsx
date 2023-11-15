@@ -2,7 +2,7 @@
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
-import { ValidationReturn } from "@/config/interfaces";
+import { Validation } from "@/config/interfaces";
 import {
   GeneralAmbientPairRow,
   GeneralCantoDexPairRow,
@@ -70,7 +70,7 @@ export default function Page() {
   }
   function canPerformCantoDexTx(
     params: Partial<CantoDexTransactionParams>
-  ): ValidationReturn {
+  ): Validation {
     return cantoDex.transaction.validateParams({
       chainId: chainId,
       ethAccount: signer?.account.address ?? "",
@@ -90,7 +90,7 @@ export default function Page() {
     const { data: flow, error } = ambient.transaction.createNewPoolFlow({
       chainId,
       ethAccount: signer?.account.address ?? "",
-      pair: selectedPair,
+      pool: selectedPair,
       ...params,
     } as AmbientTransactionParams);
     if (error) {
@@ -102,16 +102,6 @@ export default function Page() {
         onSuccessCallback: () => selection.setPair(null),
       });
     }
-  }
-  function canPerformAmbientTx(
-    params: Partial<AmbientTransactionParams>
-  ): ValidationReturn {
-    return ambient.transaction.validateParams({
-      chainId: chainId,
-      ethAccount: signer?.account.address ?? "",
-      pair: selectedPair,
-      ...params,
-    } as AmbientTransactionParams);
   }
 
   /** general selection */
@@ -154,11 +144,7 @@ export default function Page() {
           />
         )}
         {selectedPair && isAmbientPool(selectedPair) && (
-          <AmbientModal
-            pool={selectedPair}
-            validateParams={canPerformAmbientTx}
-            sendTxFlow={sendAmbientTxFlow}
-          />
+          <AmbientModal pool={selectedPair} sendTxFlow={sendAmbientTxFlow} />
         )}
       </Modal>
 

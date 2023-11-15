@@ -3,9 +3,10 @@ import Icon from "../icon/icon";
 import Text from "../text";
 import styles from "./amount.module.scss";
 import Container from "../container/container";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import clsx from "clsx";
 import Spacer from "../layout/spacer";
+import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
 interface Props {
   IconUrl: string;
   title: string;
@@ -13,10 +14,12 @@ interface Props {
   onChange: (e: React.ChangeEvent<HTMLInputElement>, max: boolean) => void;
   decimals: number;
   value: string;
+  min: string;
   max: string;
-  limitName?: string;
-  error?: boolean;
-  errorMessage?: string;
+  limit?: {
+    limitName: string;
+    limit: string;
+  };
 }
 const Amount = (props: Props) => {
   const [focused, setFocused] = useState(false);
@@ -67,12 +70,25 @@ const Amount = (props: Props) => {
     return formatAmount(commify(amount), decimals);
   }
 
+  // deal with error inputs
+  const inputError = useMemo(
+    () =>
+      validateNonWeiUserInputTokenAmount(
+        props.value,
+        props.min,
+        props.max,
+        props.symbol,
+        props.decimals
+      ),
+    [props.value, props.max, props.min, props.decimals, props.symbol]
+  );
+
   return (
     <Container
       direction="row"
       className={clsx(styles.container, {
         [styles.focused]: focused,
-        [styles.error]: props.error,
+        [styles.error]: inputError.error && props.value,
       })}
     >
       <Container
@@ -92,8 +108,8 @@ const Amount = (props: Props) => {
       </Container>
       <Container direction="row" gap={6} className={styles.balance}>
         <Text size="xx-sm" theme="secondary-dark">
-          {props.limitName ? "Limit: " : "Balance: "}
-          {formatBalance(props.max, props.decimals, {
+          {props.limit ? "Limit: " : "Balance: "}
+          {formatBalance(props.limit?.limit ?? props.max, props.decimals, {
             commify: true,
           })}{" "}
           {props.symbol}
@@ -105,9 +121,13 @@ const Amount = (props: Props) => {
             props.onChange(
               {
                 target: {
-                  value: formatBalance(props.max, props.decimals, {
-                    precision: props.decimals,
-                  }),
+                  value: formatBalance(
+                    props.limit?.limit ?? props.max,
+                    props.decimals,
+                    {
+                      precision: props.decimals,
+                    }
+                  ),
                 },
               } as any,
               true
@@ -115,7 +135,7 @@ const Amount = (props: Props) => {
           }}
         >
           <Text size="xx-sm" weight="bold">
-            {`(${props.limitName ?? "max"})`}
+            {`(${props.limit?.limitName ?? "max"})`}
           </Text>
         </span>
       </Container>
@@ -132,7 +152,7 @@ const Amount = (props: Props) => {
         }}
         className={styles.input}
         placeholder="0.0"
-        min="0"
+        min={props.min}
         max={props.max}
         step="any"
         required
@@ -141,10 +161,10 @@ const Amount = (props: Props) => {
       <span
         className={styles["error-message"]}
         style={{
-          opacity: props.error ? 1 : 0,
+          opacity: inputError.error && props.value ? 1 : 0,
         }}
       >
-        {props.errorMessage}
+        {inputError.error ? inputError.reason : ""}
       </span>
     </Container>
   );

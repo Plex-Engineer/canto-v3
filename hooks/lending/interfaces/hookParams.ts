@@ -1,7 +1,7 @@
 import {
   ReturnWithError,
   NewTransactionFlow,
-  ValidationReturn,
+  Validation,
 } from "@/config/interfaces";
 import { CTokenLendingTransactionParams } from "./lendingTxTypes";
 import { CTokenWithUserData } from "./tokens";
@@ -23,9 +23,7 @@ export interface LendingHookReturn {
     setSelectedCToken: (cTokenAddress: string | null) => void;
   };
   transaction: {
-    validateParams: (
-      txParams: CTokenLendingTransactionParams
-    ) => ValidationReturn;
+    validateParams: (txParams: CTokenLendingTransactionParams) => Validation;
     createNewLendingFlow: (
       params: CTokenLendingTransactionParams
     ) => ReturnWithError<NewTransactionFlow>;

@@ -7,10 +7,14 @@ export type ReturnWithError<T> = {
 };
 export type PromiseWithError<T> = Promise<ReturnWithError<T>>;
 
-export type ValidationReturn = {
-  isValid: boolean;
-  errorMessage?: string;
-};
+export type Validation =
+  | {
+      error: true;
+      reason: string;
+    }
+  | {
+      error: false;
+    };
 
 ///
 /// Error handling functions

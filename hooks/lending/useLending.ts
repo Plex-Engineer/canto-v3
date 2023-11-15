@@ -4,7 +4,7 @@ import {
   NEW_ERROR,
   NewTransactionFlow,
   ReturnWithError,
-  ValidationReturn,
+  Validation,
 } from "@/config/interfaces";
 import {
   LendingHookInputParams,
@@ -16,6 +16,7 @@ import { getAllUserCLMData } from "./helpers/userClmData";
 import { createNewCTokenLendingFlow } from "./helpers/createLendingFlow";
 import { areEqualAddresses } from "@/utils/address";
 import { getCTokenAddressesFromChainId } from "./config/cTokenAddresses";
+import { USER_INPUT_ERRORS } from "@/config/consts/errors";
 
 /**
  * @name useLending
@@ -75,19 +76,19 @@ export default function useLending(
   ///
   function validateParams(
     txParams: CTokenLendingTransactionParams
-  ): ValidationReturn {
+  ): Validation {
     // make sure all the info we have is from the eth account
     if (!areEqualAddresses(txParams.ethAccount, params.userEthAddress ?? "")) {
       return {
-        isValid: false,
-        errorMessage: "Transaction not from current account",
+        error: true,
+        reason: USER_INPUT_ERRORS.ACCOUNT_MISMATCH(),
       };
     }
     // make sure user position is available
     if (!clmData?.position) {
       return {
-        isValid: false,
-        errorMessage: "User position not available",
+        error: true,
+        reason: USER_INPUT_ERRORS.PROP_UNAVAILABLE("User position"),
       };
     }
     return lendingTxParamCheck(txParams, clmData.position);
@@ -97,8 +98,8 @@ export default function useLending(
     txParams: CTokenLendingTransactionParams
   ): ReturnWithError<NewTransactionFlow> {
     const validation = validateParams(txParams);
-    if (!validation.isValid)
-      return NEW_ERROR("createNewLendingFlow::" + validation.errorMessage);
+    if (validation.error)
+      return NEW_ERROR("createNewLendingFlow::" + validation.reason);
     return createNewCTokenLendingFlow(txParams);
   }
 

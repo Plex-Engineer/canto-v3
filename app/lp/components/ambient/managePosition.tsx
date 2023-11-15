@@ -102,6 +102,16 @@ const AddLiquidity = ({ positionManager, sendTxFlow }: ManageProps) => {
       getPriceFromTick(positionManager.position.askTick)
     )
   );
+  // pack the params into a single object
+  const userParams = {
+    nonWeiAmount: lastUpdate === "base" ? amountBase : amountQuote,
+    isBase: lastUpdate === "base",
+    nonWeiMinExecutionPrice: minExecutionPrice,
+    nonWeiMaxExecutionPrice: maxExecutionPrice,
+  };
+  const validParams =
+    positionManager.validateAddConcLiquidityParams(userParams);
+
   return (
     <Container>
       <Amount
@@ -116,6 +126,7 @@ const AddLiquidity = ({ positionManager, sendTxFlow }: ManageProps) => {
         }}
         IconUrl={pool.base.logoURI}
         title={pool.base.symbol}
+        min="0"
         max={pool.base.balance ?? "0"}
         symbol={pool.base.symbol}
       />
@@ -133,6 +144,7 @@ const AddLiquidity = ({ positionManager, sendTxFlow }: ManageProps) => {
         IconUrl={pool.quote.logoURI}
         title={pool.quote.symbol}
         max={pool.quote.balance ?? "0"}
+        min="0"
         symbol={pool.quote.symbol}
       />
       <Spacer height="10px" />
@@ -235,22 +247,13 @@ const AddLiquidity = ({ positionManager, sendTxFlow }: ManageProps) => {
       </Container>
       <Spacer height="30px" />
       <Button
-        disabled={Number(amountQuote) === 0 || Number(amountBase) === 0}
+        disabled={validParams.error}
         width={"fill"}
         onClick={() =>
-          sendTxFlow(
-            positionManager.createAddConcLiquidtyParams(
-              lastUpdate === "base" ? amountBase : amountQuote,
-              lastUpdate === "base",
-              {
-                minPriceFormatted: minExecutionPrice,
-                maxPriceFormatted: maxExecutionPrice,
-              }
-            )
-          )
+          sendTxFlow(positionManager.createAddConcLiquidtyParams(userParams))
         }
       >
-        {"Add Liquidity"}
+        {validParams.error ? validParams.reason : "Add Liquidity"}
       </Button>
       <Spacer height="20px" />
     </Container>
@@ -273,6 +276,15 @@ const RemoveLiquidity = ({ positionManager, sendTxFlow }: ManageProps) => {
 
   const expectedTokens =
     positionManager.getExpectedRemovedTokens(percentToRemove);
+
+  // pack the params into a single object
+  const userParams = {
+    percentToRemove,
+    nonWeiMinExecutionPrice: minExecutionPrice,
+    nonWeiMaxExecutionPrice: maxExecutionPrice,
+  };
+  const validParams =
+    positionManager.validateRemoveConcLiquidityParams(userParams);
 
   return (
     <Container>
@@ -371,21 +383,15 @@ const RemoveLiquidity = ({ positionManager, sendTxFlow }: ManageProps) => {
       <Spacer height="80px" />
 
       <Button
-        disabled={Number(percentToRemove) <= 0 || Number(percentToRemove) > 100}
+        disabled={validParams.error}
         width={"fill"}
         onClick={() =>
           sendTxFlow(
-            positionManager.createRemoveConcentratedLiquidtyParams(
-              percentToRemove,
-              {
-                minPriceFormatted: minExecutionPrice,
-                maxPriceFormatted: maxExecutionPrice,
-              }
-            )
+            positionManager.createRemoveConcentratedLiquidtyParams(userParams)
           )
         }
       >
-        Remove Liquidity
+        {validParams.error ? validParams.reason : "Remove Liquidity"}
       </Button>
     </Container>
   );

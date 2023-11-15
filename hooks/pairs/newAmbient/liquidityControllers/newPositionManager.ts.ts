@@ -7,10 +7,7 @@ import {
 } from "./defaultParams";
 import BigNumber from "bignumber.js";
 import {
-  getConcBaseTokensFromQuoteTokens,
-  getConcQuoteTokensFromBaseTokens,
   getDisplayTokenAmountFromRange,
-  getPriceFromTick,
   getTickFromPrice,
 } from "@/utils/ambient";
 import {
@@ -18,7 +15,8 @@ import {
   AmbientTxType,
 } from "../interfaces/ambientPoolTxTypes";
 import { convertToBigNumber } from "@/utils/formatting";
-import { ValidationReturn } from "@/config/interfaces";
+import { Validation } from "@/config/interfaces";
+import { validateAddAmbientConcLiquidityParams } from "../helpers/validateParams";
 
 /**
  * @notice manages the cretion of a new ambient position
@@ -128,68 +126,10 @@ export default function useNewAmbientPositionManager(pool: AmbientPool) {
   }
 
   /** FUNCTION TO CREATE AND VERIFY TX PARAMS */
-
-  // validate params to make sure they are valid (will not check user balances, just price ranges)
-  const invalidParams = (reason: string) => ({
-    isValid: false,
-    errorMessage: reason,
-  });
-  function validateParams(): ValidationReturn {
-    // create the txParams
-    const txParams = createAddConcLiquidityTxParams();
-    // get current price to compare ranges
-    const currentPrice = pool.stats.lastPriceSwap;
-    const currentTick = getTickFromPrice(currentPrice);
-    // amount
-    if (txParams.amount === "0") {
-      return invalidParams("Amount cannot be 0");
-    }
-    const baseAmount = txParams.isAmountBase
-      ? txParams.amount
-      : getConcBaseTokensFromQuoteTokens(
-          txParams.amount,
-          currentPrice,
-          getPriceFromTick(txParams.lowerTick),
-          getPriceFromTick(txParams.upperTick)
-        );
-    const quoteAmount = txParams.isAmountBase
-      ? getConcQuoteTokensFromBaseTokens(
-          txParams.amount,
-          currentPrice,
-          getPriceFromTick(txParams.lowerTick),
-          getPriceFromTick(txParams.upperTick)
-        )
-      : txParams.amount;
-    if (Number(baseAmount) > Number(pool.base.balance)) {
-      return invalidParams(`Insufficient ${pool.base.symbol} balance`);
-    }
-    if (Number(quoteAmount) > Number(pool.quote.balance)) {
-      return invalidParams(`Insufficient ${pool.quote.symbol} balance`);
-    }
-    // execution prices
-    if (txParams.minPriceWei === "0" || txParams.maxPriceWei === "0") {
-      return invalidParams("Execution Price cannot be 0");
-    }
-    if (Number(txParams.minPriceWei) > Number(currentPrice)) {
-      return invalidParams(
-        "Minimum execution price is greater than current price"
-      );
-    }
-    if (Number(txParams.maxPriceWei) < Number(currentPrice)) {
-      return invalidParams(
-        "Maximum execution price is less than current price"
-      );
-    }
-    if (Number(txParams.minPriceWei) >= Number(txParams.maxPriceWei)) {
-      return invalidParams("Minimum execution price is greater than maximum");
-    }
-    // ticks
-    if (txParams.lowerTick >= txParams.upperTick) {
-      return invalidParams("Lower price is greater than upper price");
-    }
-    return {
-      isValid: true,
-    };
+  function validateParams(): Validation {
+    return validateAddAmbientConcLiquidityParams(
+      createAddConcLiquidityTxParams()
+    );
   }
 
   // uses internal state to create all wei values to pass into add liquidity tx
@@ -215,7 +155,7 @@ export default function useNewAmbientPositionManager(pool: AmbientPool) {
     const upperTick = getTickFromPrice(rangePrices.maxPriceWei);
 
     return {
-      pair: pool,
+      pool: pool,
       txType: AmbientTxType.ADD_CONC_LIQUIDITY,
       amount: amountWei,
       isAmountBase: baseAmount,

@@ -1,4 +1,4 @@
-import { ValidationReturn } from "@/config/interfaces";
+import { Validation } from "@/config/interfaces";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { getCTokensFromType } from "@/hooks/lending/config/cTokenAddresses";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
@@ -6,14 +6,8 @@ import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 import useLending from "@/hooks/lending/useLending";
 import { listIncludesAddress } from "@/utils/address";
-import {
-  getCirculatingCNote,
-  getCirculatingNote,
-} from "@/utils/clm";
-import {
-  addTokenBalances,
-  convertTokenAmountToNote,
-} from "@/utils/math";
+import { getCirculatingCNote, getCirculatingNote } from "@/utils/clm";
+import { addTokenBalances, convertTokenAmountToNote } from "@/utils/math";
 import BigNumber from "bignumber.js";
 import { useEffect, useMemo, useState } from "react";
 
@@ -43,7 +37,7 @@ interface LendingComboReturn {
       amount: string,
       txType: CTokenLendingTxTypes,
       max: boolean
-    ) => ValidationReturn;
+    ) => Validation;
   };
   selection: {
     selectedCToken: CTokenWithUserData | undefined;
@@ -160,8 +154,9 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     amount: string,
     txType: CTokenLendingTxTypes,
     max: boolean
-  ): ValidationReturn => {
-    if (!selection.selectedCToken || !signer) return { isValid: false };
+  ): Validation => {
+    if (!selection.selectedCToken || !signer)
+      return { error: true, reason: "No signer" };
     return transaction.validateParams({
       chainId: signer.chain.id,
       ethAccount: signer.account.address,
