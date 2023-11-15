@@ -6,13 +6,21 @@ interface Props {
   children?: React.ReactNode;
   onChange: (value: boolean) => void;
   scale?: number;
+  color?: "primary" | "secondary";
 }
 
-const Toggle = ({ value, onChange, children, scale }: Props) => {
+const Toggle = ({
+  value,
+  onChange,
+  children,
+  scale,
+  color = "primary",
+}: Props) => {
   return (
     <Styled
       value={value}
       scale={scale || 1}
+      color={color}
       onClick={() => {
         onChange(!value);
       }}
@@ -24,7 +32,11 @@ const Toggle = ({ value, onChange, children, scale }: Props) => {
 
 export default Toggle;
 
-const Styled = styled.div<{ value: boolean; scale: number }>`
+const Styled = styled.div<{
+  value: boolean;
+  scale: number;
+  color?: "primary" | "secondary";
+}>`
   display: inline-flex;
   height: 26px;
   width: 50px;
@@ -33,8 +45,12 @@ const Styled = styled.div<{ value: boolean; scale: number }>`
   cursor: pointer;
   scale: ${({ scale }) => scale};
   border: 1px solid
-    ${({ value }) =>
-      !value ? "var(--text-dark-30-color)" : "var(--primary-90-color)"};
+    ${({ value, color }) =>
+      color == "primary"
+        ? !value
+          ? "var(--text-dark-30-color)"
+          : "var(--primary-90-color)"
+        : "var(--card-surface-color)"};
   position: relative;
 
   .toggle {
@@ -45,7 +61,11 @@ const Styled = styled.div<{ value: boolean; scale: number }>`
     height: 90%;
     aspect-ratio: 1;
     position: absolute;
-    background-color: ${({ value }) =>
-      !value ? "var(--text-dark-30-color)" : "var(--primary-90-color)"};
+    background-color: ${({ value, color }) =>
+      color == "primary"
+        ? !value
+          ? "var(--text-dark-30-color)"
+          : "var(--primary-90-color)"
+        : "var(--card-surface-color)"};
   }
 `;

@@ -80,6 +80,7 @@ const ThemeButton = () => {
     // </Button>
     <Toggle
       scale={1.5}
+      color="secondary"
       onChange={(value) => {
         document.body.classList.contains("dark")
           ? setTheme("light")
@@ -90,6 +91,7 @@ const ThemeButton = () => {
       value={name == "dark" ? false : true}
     >
       <Icon
+        themed
         icon={{
           url: name == "dark" ? "/sun.svg" : "/moon.svg",
           size: 21,
