@@ -2,6 +2,7 @@
   display: grid;
   grid-template-columns: 80px 1fr 1fr;
   animation: fadeIn 0.5s ease-in-out;
+  height: 60px;
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -20,7 +21,7 @@
   align-items: center;
 
   img {
-    width: 28px;
+    width: 24px;
   }
 }
 
