@@ -20,7 +20,7 @@ const ProposalTable = ({ proposals }:TableProps) => {
   
   const router = useRouter();
   const [currentFilter, setCurrentFilter] = useState('All');
-  const [filteredProposals, setFilteredProposals] = React.useState<Proposal[]>(proposals);
+  const [filteredProposals, setFilteredProposals] = useState<Proposal[]>(proposals);
 
   const pageSize = 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -110,10 +110,10 @@ const ProposalTable = ({ proposals }:TableProps) => {
             <tr className={styles.row} key={proposal.proposal_id} onClick={()=>handleRowClick(proposal.proposal_id)}
             style={{ cursor: 'pointer' }}>
               <td className={styles.tableData}><Text font="rm_mono" size='sm'>{proposal.proposal_id}</Text></td>
-              <td className={styles.tableTitleColumn}><Text font="rm_mono" size='sm' >{proposal.title}</Text></td>
+              <td className={styles.tableTitleColumn}><Text font="rm_mono" size='sm' className={styles.rowTitle}>{proposal.title}</Text></td>
               <td className={styles.tableData}><Text font="rm_mono" size='sm'>{formatProposalStatus(proposal.status)}</Text></td>
               <td className={styles.tableData}><Text font="rm_mono" size='sm'>{formatProposalType(proposal.type_url)}</Text></td>
-              <td className={styles.tableData}><Text font="rm_mono" size='sm'>{formatDate(proposal.voting_end_time)}</Text></td>
+              <td className={styles.tableData}><Text font="rm_mono" size='sm'>{(new Date(proposal.voting_end_time)).toDateString()}</Text></td>
             </tr>
         
           ))}
@@ -129,12 +129,6 @@ const ProposalTable = ({ proposals }:TableProps) => {
           Next
         </Button>
       </div>
-
-      {/* {proposals.map((proposal) => (
-  <Link key={proposal.proposal_id} href={`/governance/${proposal.proposal_id}`}>
-    <div className="proposal-link">Proposal {proposal.proposal_id} </div>
-  </Link>
-))} */}
       
     </div>
   );

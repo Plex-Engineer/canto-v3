@@ -3,38 +3,57 @@
 import { useSearchParams } from "next/navigation";
 import Text from "@/components/text";
 import styles from './proposalModal.module.scss';
-import useSingleProposalData from "@/hooks/gov/useSingleProposalData";
+//import useSingleProposalData from "@/hooks/gov/useSingleProposalData";
 import { calculateVotePercentages, formatDeposit, formatProposalStatus, formatProposalType, formatTime } from "@/utils/gov/formatData";
 import Icon from "@/components/icon/icon";
 import Button from "@/components/button/button";
 import useProposals from "@/hooks/gov/useProposals";
 import { useState } from "react";
 import { Proposal } from "@/hooks/gov/interfaces/proposal";
-import { ProposalModal } from "../components/VotingModal/VotingModal";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Splash from "@/components/splash/splash";
 import { VoteOption } from "@/hooks/gov/interfaces/voteOptions";
 import Image from "next/image";
+import { NEW_ERROR, NewTransactionFlow } from "@/config/interfaces";
+import { TransactionFlowType } from "@/config/transactions/txMap";
 
 
 
 export default function Page() {
 
+  function castVote(proposalId: number,voteOption: VoteOption | null) {
+    if(!voteOption){
+      return NEW_ERROR("Please select a vote option");
+    }
+    console.log("cast vote test");
+    const newFlow: NewTransactionFlow = {
+      icon: "",
+      txType: TransactionFlowType.VOTE_TX,
+      title: "Vote Tx",
+      params: {
+        chainId: chainId,
+        ethAccount: signer?.account.address ?? "",
+        proposalId: proposalId,
+        voteOption: voteOption,
+      },
+    };
+    txStore?.addNewFlow({ txFlow: newFlow, signer });
+  }
+
   const searchParams = useSearchParams();
-
   const id = searchParams.get('id');
-
-  console.log(id);
-
   const proposalId = Number(id);
 
   const { txStore, signer,chainId } = useCantoSigner();
-
   const { proposals,isLoading } = useProposals({ chainId: chainId });
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [selectedVote, setSelectedVote] = useState<VoteOption | null>(null);
+
+  const [isChecked, setChecked] = useState(false);
+
+  const handleCheck = (voteOption:VoteOption) => {
+      setSelectedVote(voteOption);
+      setChecked(!isChecked);
+  }
 
   console.log(selectedVote);
   
@@ -45,11 +64,6 @@ export default function Page() {
     );
   }
   
-  // if(!proposals || proposals.length==0){
-  //   return (
-  //     <div>Loading Proposals....</div>
-  //   );
-  // }
   if(!id){
     return (
         <div><Text font="proto_mono">Proposal ID is missing</Text></div>
@@ -64,13 +78,8 @@ export default function Page() {
   const isActive = formatProposalStatus(proposal.status)=='ACTIVE';
 
   const votesData = calculateVotePercentages(proposal.final_vote);
-  const handleProposalClick = (proposal: Proposal) => {
-    setIsModalOpen(true);
-  };
+  
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
 
   return (
     isLoading ? (<Splash/>):
@@ -141,11 +150,16 @@ export default function Page() {
           <div className={styles.radioBtn}>
                     <input
                   type="radio"
+                  className="circle"
                   name="voteOption"
                   value={VoteOption.YES}
                   checked={selectedVote === VoteOption.YES}
-                  onChange={() => setSelectedVote(VoteOption.YES)}
+                  onChange={() => handleCheck(VoteOption.YES)}
+                  style={{border: "10px solid green"}}
+                  disabled={!isActive}
+                  // style={{backgroundColor:isChecked ? 'red': 'white'}}
                 />
+                
                 </div>
             <div className={styles.proposalInfoVoting}>
             
@@ -170,7 +184,10 @@ export default function Page() {
                   value={VoteOption.NO}
                   checked={selectedVote === VoteOption.NO}
                   onChange={() => setSelectedVote(VoteOption.NO)}
+                  disabled={!isActive}
                 />
+                
+                
               </div>
             <div className={styles.proposalInfoVoting}>
               <div className={styles.votingInfoRow1}>
@@ -193,6 +210,7 @@ export default function Page() {
                   value={VoteOption.VETO}
                   checked={selectedVote === VoteOption.VETO}
                   onChange={() => setSelectedVote(VoteOption.VETO)}
+                  disabled={!isActive}
                 />
               </div>
             <div className={styles.proposalInfoVoting}>
@@ -213,7 +231,9 @@ export default function Page() {
                   value={VoteOption.ABSTAIN}
                   checked={selectedVote === VoteOption.ABSTAIN}
                   onChange={() => setSelectedVote(VoteOption.ABSTAIN)}
+                  disabled={!isActive}
                 />
+
               </div>
             <div className={styles.proposalInfoVoting}>
               <div className={styles.votingInfoRow1}>
@@ -228,16 +248,11 @@ export default function Page() {
           </div>  
         </div>
         <div className={styles.VotingButton}>
-          <Button width={400} disabled={!isActive} onClick={()=>handleProposalClick(proposal)}>Vote</Button>
+          <Button width={400} disabled={!isActive} onClick={()=>castVote(proposal.proposal_id, selectedVote)}>Vote</Button>
           {/* {!isActive && <span className={styles.tooltip}>The Proposal is not Active</span>} */}
         </div>
       </div>
     </div>
-    {isModalOpen && (
-      <ProposalModal proposal={proposal} onClose={ ()=> {
-        handleModalClose();
-       } } isOpen={true}></ProposalModal>
-      )}
   </div>)
   );
   

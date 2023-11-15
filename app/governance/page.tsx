@@ -1,10 +1,9 @@
 "use client";
-import Tabs from "@/components/tabs/tabs";
+
 import { useState } from "react";
 
 import Container from "@/components/container/container";
 import { Proposal } from "@/hooks/gov/interfaces/proposal";
-import { ProposalModal } from "./components/VotingModal/VotingModal";
 import useProposals from "@/hooks/gov/useProposals";
 import ProposalTable from "./components/ProposalTable/ProposalTable";
 import Table from "@/components/table/table";
@@ -20,28 +19,10 @@ export default function GovernancePage() {
 
   const { txStore, signer,chainId } = useCantoSigner();
   const { proposals,isLoading } = useProposals({ chainId: chainId });
-  //console.log(isLoading);
 
-  
   const sorted_proposals = proposals.sort((a: Proposal, b: Proposal) => b.proposal_id - a.proposal_id);
+  
 
-
-  const [activeTab, setActiveTab] = useState("All");
-
-  function switchActiveTab(activeTab: string) {
-    setActiveTab(activeTab);
-  }
-
-  const activeProposals = proposals?.filter(
-    (proposal: Proposal) => proposal.status === "PROPOSAL_STATUS_VOTING_PERIOD"
-  );
-  const rejectedProposals = proposals?.filter(
-    (proposal: Proposal) => proposal.status === "PROPOSAL_STATUS_REJECTED"
-  );
-  const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(
-    null
-  );
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const proposalsPerPage = 10; // Number of proposals per page
   const totalPages = Math.ceil(proposals?.length / proposalsPerPage);
