@@ -16,12 +16,7 @@ interface Props {
 
 const Tabs = ({ shadows = true, ...props }: Props) => {
   return (
-    <TabsContainer
-      defaultIndex={props.defaultIndex ?? 0}
-      style={{
-        boxShadow: shadows ? "none" : "none",
-      }}
-    >
+    <TabsContainer defaultIndex={props.defaultIndex ?? 0}>
       <TabList>
         {props.tabs.map((tab, index) => (
           <Tab key={index} disabled={tab.isDisabled} onClick={tab.onClick}>

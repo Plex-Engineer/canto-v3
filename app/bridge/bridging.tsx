@@ -412,7 +412,7 @@ const Bridging = (props: BridgeProps) => {
           /> */}
         </div>
 
-        <Spacer height="200px" />
+        <Spacer height="20px" />
         <Button
           width="fill"
           onClick={() => {

@@ -80,16 +80,14 @@ export default function BridgePage() {
         time={20}
       />
       <Container
-        height="100vm"
         layer={1}
-        backgroundColor="background: var(--card-background-color, #C1C1C1)"
         center={{
           horizontal: true,
           vertical: true,
         }}
       >
         <Container
-          height="500px"
+          height="450px"
           width="700px"
           backgroundColor="var(--card-sub-surface-color, #DFDFDF)"
         >
