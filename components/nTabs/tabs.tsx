@@ -13,6 +13,7 @@ interface Props {
     onClick?: () => void;
     content: React.ReactNode;
   }[];
+  height?: string;
   shadows?: boolean;
 }
 const Tabs = (props: Props) => {
@@ -22,6 +23,7 @@ const Tabs = (props: Props) => {
       className={styles.container}
       style={{
         boxShadow: props.shadows ? undefined : "none",
+        height: props.height,
       }}
     >
       <div className={styles.tabs}>
