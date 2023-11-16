@@ -109,8 +109,8 @@ export default function Page() {
             <div>
               <Text font="proto_mono">{formatDeposit(proposal.total_deposit[0].amount)} <Image
             src="/tokens/canto.svg"
-            width={20}
-            height={20}
+            width={16}
+            height={16}
             alt="canto"
             style={{
               filter: "invert(var(--dark-mode))",
