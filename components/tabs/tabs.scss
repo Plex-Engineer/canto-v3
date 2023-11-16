@@ -4,6 +4,8 @@
   border-top: none;
   height: 100%;
   transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
 }
 .react-tabs__tab--disabled {
 }
