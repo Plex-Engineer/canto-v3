@@ -26,3 +26,8 @@ export const USER_INPUT_ERRORS = {
   // UNAVAILABLE
   PROP_UNAVAILABLE: (prop: string) => `${prop} is unavailable`,
 } as const;
+
+export const TX_PARAM_ERRORS = {
+  PARAM_MISSING: (paramName: string) => `${paramName} is missing`,
+  PARAM_INVALID: (paramName: string) => `${paramName} is invalid`,
+};

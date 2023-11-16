@@ -1,22 +1,17 @@
 import { useQuery } from "react-query";
-import { CTokenLendingTransactionParams } from "./interfaces/lendingTxTypes";
-import {
-  NEW_ERROR,
-  NewTransactionFlow,
-  ReturnWithError,
-  Validation,
-} from "@/config/interfaces";
 import {
   LendingHookInputParams,
   LendingHookReturn,
 } from "./interfaces/hookParams";
 import { useState } from "react";
-import { lendingTxParamCheck } from "@/utils/clm";
 import { getAllUserCLMData } from "./helpers/userClmData";
-import { createNewCTokenLendingFlow } from "./helpers/createLendingFlow";
 import { areEqualAddresses } from "@/utils/address";
 import { getCTokenAddressesFromChainId } from "./config/cTokenAddresses";
-import { USER_INPUT_ERRORS } from "@/config/consts/errors";
+import {
+  newCTokenLendingFlow,
+  newClaimCLMRewardsFlow,
+  validateCTokenLendingTxParams,
+} from "@/transactions/lending";
 
 /**
  * @name useLending
@@ -71,38 +66,6 @@ export default function useLending(
     areEqualAddresses(cToken.address, selectedCTokenAddress ?? "")
   );
 
-  ///
-  /// external functions
-  ///
-  function validateParams(
-    txParams: CTokenLendingTransactionParams
-  ): Validation {
-    // make sure all the info we have is from the eth account
-    if (!areEqualAddresses(txParams.ethAccount, params.userEthAddress ?? "")) {
-      return {
-        error: true,
-        reason: USER_INPUT_ERRORS.ACCOUNT_MISMATCH(),
-      };
-    }
-    // make sure user position is available
-    if (!clmData?.position) {
-      return {
-        error: true,
-        reason: USER_INPUT_ERRORS.PROP_UNAVAILABLE("User position"),
-      };
-    }
-    return lendingTxParamCheck(txParams, clmData.position);
-  }
-
-  function createNewLendingFlow(
-    txParams: CTokenLendingTransactionParams
-  ): ReturnWithError<NewTransactionFlow> {
-    const validation = validateParams(txParams);
-    if (validation.error)
-      return NEW_ERROR("createNewLendingFlow::" + validation.reason);
-    return createNewCTokenLendingFlow(txParams);
-  }
-
   return {
     cTokens: clmData?.cTokens ?? [],
     position: clmData?.position ?? {
@@ -119,8 +82,9 @@ export default function useLending(
       setSelectedCToken: setSelectedCTokenAddress,
     },
     transaction: {
-      validateParams,
-      createNewLendingFlow,
+      validateParams: (txParams) => validateCTokenLendingTxParams(txParams),
+      newLendingFlow: (txParams) => newCTokenLendingFlow(txParams),
+      newClaimRewardsFlow: (txParams) => newClaimCLMRewardsFlow(txParams),
     },
   };
 }

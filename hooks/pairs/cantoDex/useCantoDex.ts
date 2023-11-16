@@ -24,7 +24,6 @@ import {
   validateWeiUserInputTokenAmount,
 } from "@/utils/math";
 import { createNewCantoDexTxFLow } from "./helpers/createPairsFlow";
-import { createNewClaimCLMRewardsFlow } from "@/hooks/lending/helpers/createLendingFlow";
 import { USER_INPUT_ERRORS } from "@/config/consts/errors";
 
 export default function useCantoDex(
@@ -67,7 +66,11 @@ export default function useCantoDex(
   );
   // since LP tokens are part of the clm, we need to query the cLP tokens in useLending
   // need the cLP tokens, user position, and transaction functions
-  const { cTokens: cLPTokens, position } = useLending({
+  const {
+    cTokens: cLPTokens,
+    position,
+    transaction: clmTransaction,
+  } = useLending({
     ...params,
     lmType: "lp",
   });
@@ -203,14 +206,6 @@ export default function useCantoDex(
     return createNewCantoDexTxFLow(params);
   }
 
-  function createNewClaimRewardsFlow(): ReturnWithError<NewTransactionFlow> {
-    return createNewClaimCLMRewardsFlow({
-      chainId: params.chainId,
-      ethAccount: params.userEthAddress ?? "",
-      estimatedRewards: position.totalRewards,
-    });
-  }
-
   return {
     isLoading,
     pairs: pairsWithUserCTokens ?? [],
@@ -218,7 +213,12 @@ export default function useCantoDex(
     transaction: {
       validateParams,
       createNewPairsFlow,
-      createClaimRewardsFlow: createNewClaimRewardsFlow,
+      newClaimRewardsFlow: () =>
+        clmTransaction.newClaimRewardsFlow({
+          chainId: params.chainId,
+          ethAccount: params.userEthAddress ?? "",
+          estimatedRewards: position.totalRewards,
+        }),
     },
   };
 }

@@ -21,6 +21,6 @@ export interface CantoDexHookReturn {
     createNewPairsFlow: (
       params: CantoDexTransactionParams
     ) => ReturnWithError<NewTransactionFlow>;
-    createClaimRewardsFlow: () => ReturnWithError<NewTransactionFlow>;
+    newClaimRewardsFlow: () => NewTransactionFlow;
   };
 }

@@ -1,4 +1,5 @@
-import { CTokenWithUserData } from "./tokens";
+import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
+import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 
 export enum CTokenLendingTxTypes {
   SUPPLY = "Supply",
@@ -16,6 +17,7 @@ export interface CTokenLendingTransactionParams {
   cToken: CTokenWithUserData;
   amount: string;
   max: boolean; // for repay and withdraw, if all tokens should be repaid/withdrawn
+  userPosition?: UserLMPosition; // for validation
 }
 
 export interface CLMClaimRewardsTxParams {

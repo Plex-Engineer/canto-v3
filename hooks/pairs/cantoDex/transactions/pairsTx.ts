@@ -8,8 +8,6 @@ import {
   TxCreatorFunctionReturn,
   errMsg,
 } from "@/config/interfaces";
-import { cTokenLendingTx } from "@/hooks/lending/transactions/lending";
-import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { createApprovalTxs, getTokenBalance } from "@/utils/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
@@ -28,6 +26,7 @@ import {
 } from "../interfaces/pairsTxTypes";
 import { displayAmount } from "@/utils/formatting";
 import { getEVMTimestamp } from "@/utils/evm";
+import { CTokenLendingTxTypes, cTokenLendingTx } from "@/transactions/lending";
 
 export async function cantoDexLPTx(
   params: CantoDexTransactionParams

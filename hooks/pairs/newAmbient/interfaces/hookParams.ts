@@ -5,7 +5,7 @@ import {
 } from "@/config/interfaces";
 import { AmbientTransactionParams } from "./ambientPoolTxTypes";
 import { AmbientPool } from "./ambientPools";
-import { CLMClaimRewardsTxParams } from "@/hooks/lending/interfaces/lendingTxTypes";
+import { CLMClaimRewardsTxParams } from "@/transactions/lending";
 
 export interface AmbientHookInputParams {
   chainId: number;

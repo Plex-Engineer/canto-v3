@@ -100,7 +100,7 @@ export async function getTokenBalance(
  * @param {string} amount amount to check allowance for
  * @returns {PromiseWithError<BigNumber>} true if allowance is greater than amount, false otherwise
  */
-async function checkTokenAllowance(
+export async function checkTokenAllowance(
   chainId: number,
   tokenAddress: string,
   account: string,

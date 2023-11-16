@@ -25,8 +25,8 @@ import { ZERO_ADDRESS } from "@/config/consts/addresses";
 import { AMBIENT_REWARD_LEDGER_ABI, CROC_SWAP_DEX_ABI } from "@/config/abis";
 import { eth } from "web3";
 import { percentOfAmount } from "@/utils/math";
-import { CLMClaimRewardsTxParams } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { displayAmount } from "@/utils/formatting";
+import { CLMClaimRewardsTxParams } from "@/transactions/lending";
 
 export async function ambientLiquidityTx(
   params: AmbientTransactionParams

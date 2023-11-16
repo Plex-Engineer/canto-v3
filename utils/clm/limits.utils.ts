@@ -2,8 +2,8 @@ import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
 import { convertNoteAmountToToken, minOf } from "../math";
 import { convertToBigNumber } from "../formatting";
-import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
+import { CTokenLendingTxTypes } from "@/transactions/lending/types";
 
 /**
  * @notice Calculates the maximum amount of tokens that can be borrowed
@@ -37,15 +37,17 @@ export function cTokenBorrowLimit(
 export function cTokenWithdrawLimit(
   cToken: CTokenWithUserData,
   currentLiquidity: string,
+  totalBorrows: string,
   percent: number = 100
 ): ReturnWithError<string> {
   try {
     // make sure we have user data
     if (!cToken.userDetails) throw Error("no user details");
-    // first check if token is collateral (if not, then no limit)
+    // first check if token is collateral or no borrows are present (if not, then no limit)
     if (
       cToken.userDetails?.isCollateral === false ||
-      Number(cToken.collateralFactor) === 0
+      Number(cToken.collateralFactor) === 0 ||
+      Number(totalBorrows) === 0
     ) {
       return NO_ERROR(cToken.userDetails.supplyBalanceInUnderlying);
     }
@@ -90,7 +92,7 @@ export function cTokenWithdrawLimit(
 export function maxAmountForLendingTx(
   txType: CTokenLendingTxTypes,
   cToken: CTokenWithUserData,
-  position: UserLMPosition,
+  position: UserLMPosition | undefined,
   percent: number = 100
 ): string {
   if (!cToken.userDetails) return "0";
@@ -98,14 +100,19 @@ export function maxAmountForLendingTx(
     case CTokenLendingTxTypes.SUPPLY:
       return cToken.userDetails.balanceOfUnderlying ?? "0";
     case CTokenLendingTxTypes.WITHDRAW:
+      // check if position is defined
+      if (!position) return "0";
       const maxAmount = cTokenWithdrawLimit(
         cToken,
         position.liquidity,
+        position.totalBorrow,
         percent
       );
       if (maxAmount.error) return "0";
       return maxAmount.data;
     case CTokenLendingTxTypes.BORROW:
+      // check if position is defined
+      if (!position) return "0";
       const maxBorrow = cTokenBorrowLimit(cToken, position.liquidity, percent);
       if (maxBorrow.error) return "0";
       return maxBorrow.data;

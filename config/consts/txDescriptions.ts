@@ -1,5 +1,5 @@
-import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { CantoDexPair } from "@/hooks/pairs/cantoDex/interfaces/pairs";
+import { CTokenLendingTxTypes } from "@/transactions/lending";
 
 export const TX_DESCRIPTIONS = {
   ADD_LIQUIDITY: (pair: CantoDexPair, amount1: string, amount2: string) => ({

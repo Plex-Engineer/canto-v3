@@ -25,12 +25,12 @@ import {
 import { validateWeiUserInputTokenAmount } from "@/utils/math";
 import { createNewAmbientTxFlow } from "./helpers/createAmbientFlow";
 import { queryUserAmbientRewards } from "./helpers/ambientApi";
-import { CLMClaimRewardsTxParams } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { TransactionFlowType } from "@/config/transactions/txMap";
 import { useEffect, useState } from "react";
 import { CANTO_DATA_API_ENDPOINTS, getCantoApiData } from "@/config/api";
 import { CToken } from "@/hooks/lending/interfaces/tokens";
 import { USER_INPUT_ERRORS } from "@/config/consts/errors";
+import { CLMClaimRewardsTxParams } from "@/transactions/lending";
 
 export default function useAmbientPools(
   params: AmbientHookInputParams,

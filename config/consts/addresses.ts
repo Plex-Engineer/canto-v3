@@ -1,7 +1,8 @@
 import { CANTO_MAINNET_EVM, CANTO_TESTNET_EVM } from "../networks";
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const MAX_UINT256 = "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+export const MAX_UINT256 =
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
 
 export const GRAVITY_BRIDGE_ETH_ADDRESS =
   "0xa4108aA1Ec4967F8b52220a4f7e94A8201F2D906";
@@ -35,6 +36,10 @@ const CANTO_CORE_ADDRESSES = {
   router: {
     mainnet: "0xa252eEE9BDe830Ca4793F054B506587027825a8e",
     testnet: "0x463e7d4DF8fE5fb42D024cb57c77b76e6e74417a",
+  },
+  cCanto: {
+    mainnet: "0xB65Ec550ff356EcA6150F733bA9B954b2e0Ca488",
+    testnet: "0x477eaF5DECf6299EE937954084f0d53EFc57346F",
   },
   wcanto: {
     mainnet: "0x826551890Dc65655a0Aceca109aB11AbDbD7a07B",

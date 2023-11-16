@@ -8,9 +8,8 @@ import {
   TxCreatorFunctionReturn,
   errMsg,
 } from "@/config/interfaces";
-import { CLMClaimRewardsTxParams } from "@/hooks/lending/interfaces/lendingTxTypes";
-import { clmClaimRewardsTx } from "@/hooks/lending/transactions/claimRewards";
 import { claimAmbientRewardsTx } from "../../newAmbient/transactions/ambientTx";
+import { CLMClaimRewardsTxParams, clmClaimRewardsTx } from "@/transactions/lending";
 
 export interface ClaimDexRewardsParams {
   clmParams?: CLMClaimRewardsTxParams;
