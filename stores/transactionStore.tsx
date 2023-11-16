@@ -19,8 +19,8 @@ import {
   TransactionStatus,
   TransactionWithStatus,
   UserTransactionFlowMap,
-} from "@/transactions/interfaces";
-import { TRANSACTION_FLOW_MAP } from "@/transactions/flows";
+  TRANSACTION_FLOW_MAP,
+} from "@/transactions/config";
 
 // only save last 100 flows for each user to save space
 const USER_FLOW_LIMIT = 100;

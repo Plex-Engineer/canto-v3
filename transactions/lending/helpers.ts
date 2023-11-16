@@ -1,5 +1,5 @@
 import { CERC20_ABI, COMPTROLLER_ABI, RESERVOIR_ABI } from "@/config/abis";
-import { Transaction, TransactionDescription } from "../interfaces";
+import { Transaction, TransactionDescription } from "../config";
 import { CTokenLendingTxTypes } from ".";
 
 export const _claimLendingRewardsTx = (

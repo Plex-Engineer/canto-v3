@@ -7,8 +7,11 @@ import {
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { getTokenBalance } from "@/utils/tokens";
 import { displayAmount } from "@/utils/formatting";
-import { Transaction, TxCreatorFunctionReturn } from "../interfaces";
-import { TX_DESCRIPTIONS } from "../flows";
+import {
+  Transaction,
+  TxCreatorFunctionReturn,
+  TX_DESCRIPTIONS,
+} from "../config";
 
 export async function clmClaimRewardsTx(
   txParams: CLMClaimRewardsTxParams

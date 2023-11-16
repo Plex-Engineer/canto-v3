@@ -1,8 +1,7 @@
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 import { checkTokenAllowance } from "@/utils/tokens";
-import { Transaction } from "../interfaces";
+import { Transaction, TX_DESCRIPTIONS } from "../config";
 import { _approveTx } from ".";
-import { TX_DESCRIPTIONS } from "../flows";
 
 /**
  * @notice creates a transaction to approve a token

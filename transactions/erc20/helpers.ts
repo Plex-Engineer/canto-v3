@@ -1,5 +1,5 @@
 import { ERC20_ABI } from "@/config/abis";
-import { Transaction, TransactionDescription } from "../interfaces";
+import { Transaction, TransactionDescription } from "../config";
 
 export const _approveTx = (
   chainId: number,

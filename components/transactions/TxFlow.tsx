@@ -6,8 +6,12 @@ import TxItem from "./TxItem";
 import Spacer from "../layout/spacer";
 import Button from "../button/button";
 import { formatError } from "@/utils/formatting";
-import { TRANSACTION_FLOW_MAP } from "@/transactions/flows";
-import { BridgeStatus, TX_PLACEHOLDER, TransactionFlow } from "@/transactions/interfaces";
+import {
+  BridgeStatus,
+  TX_PLACEHOLDER,
+  TransactionFlow,
+  TRANSACTION_FLOW_MAP,
+} from "@/transactions/config";
 
 interface Props {
   txFlow?: TransactionFlow;

@@ -18,8 +18,11 @@ import { greaterThan, validateWeiUserInputTokenAmount } from "@/utils/math";
 import { MAX_UINT256, getCantoCoreAddress } from "@/config/consts/addresses";
 import { createApprovalTxs } from "../erc20";
 import { displayAmount } from "@/utils/formatting";
-import { Transaction, TxCreatorFunctionReturn } from "../interfaces";
-import { TX_DESCRIPTIONS } from "../flows";
+import {
+  Transaction,
+  TxCreatorFunctionReturn,
+  TX_DESCRIPTIONS,
+} from "../config";
 
 export async function cTokenLendingTx(
   txParams: CTokenLendingTransactionParams
