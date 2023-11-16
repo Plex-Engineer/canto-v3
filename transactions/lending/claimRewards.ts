@@ -1,10 +1,4 @@
-import {
-  NEW_ERROR,
-  NO_ERROR,
-  PromiseWithError,
-  Transaction,
-  TxCreatorFunctionReturn,
-} from "@/config/interfaces";
+import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 import {
   CLMClaimRewardsTxParams,
   _claimLendingRewardsTx,
@@ -12,8 +6,9 @@ import {
 } from ".";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { getTokenBalance } from "@/utils/tokens";
-import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { displayAmount } from "@/utils/formatting";
+import { Transaction, TxCreatorFunctionReturn } from "../interfaces";
+import { TX_DESCRIPTIONS } from "../flows";
 
 export async function clmClaimRewardsTx(
   txParams: CLMClaimRewardsTxParams

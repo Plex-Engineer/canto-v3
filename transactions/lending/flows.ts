@@ -1,6 +1,6 @@
-import { NewTransactionFlow } from "@/config/interfaces";
-import { TransactionFlowType } from "@/config/transactions/txMap";
 import { CLMClaimRewardsTxParams, CTokenLendingTransactionParams } from ".";
+import { TransactionFlowType } from "../flows";
+import { NewTransactionFlow } from "../interfaces";
 
 export const newCTokenLendingFlow = (
   params: CTokenLendingTransactionParams
@@ -16,7 +16,7 @@ export const newClaimCLMRewardsFlow = (
 ): NewTransactionFlow => ({
   title: "Claim Rewards",
   icon: "/icons/canto.svg",
-  txType: TransactionFlowType.CLAIM_LP_REWARDS_TX,
+  txType: TransactionFlowType.CLM_CLAIM_REWARDS_TX,
   params: {
     clmParams: params,
   },

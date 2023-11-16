@@ -2,8 +2,6 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
-  Transaction,
-  TxCreatorFunctionReturn,
   Validation,
 } from "@/config/interfaces";
 import {
@@ -18,9 +16,10 @@ import { areEqualAddresses, isValidEthAddress } from "@/utils/address";
 import { maxAmountForLendingTx } from "@/utils/clm";
 import { greaterThan, validateWeiUserInputTokenAmount } from "@/utils/math";
 import { MAX_UINT256, getCantoCoreAddress } from "@/config/consts/addresses";
-import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { createApprovalTxs } from "../erc20";
 import { displayAmount } from "@/utils/formatting";
+import { Transaction, TxCreatorFunctionReturn } from "../interfaces";
+import { TX_DESCRIPTIONS } from "../flows";
 
 export async function cTokenLendingTx(
   txParams: CTokenLendingTransactionParams

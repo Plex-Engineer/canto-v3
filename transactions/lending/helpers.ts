@@ -1,6 +1,6 @@
-import { Transaction, TransactionDescription } from "@/config/interfaces";
-import { CTokenLendingTxTypes } from ".";
 import { CERC20_ABI, COMPTROLLER_ABI, RESERVOIR_ABI } from "@/config/abis";
+import { Transaction, TransactionDescription } from "../interfaces";
+import { CTokenLendingTxTypes } from ".";
 
 export const _claimLendingRewardsTx = (
   chainId: number,

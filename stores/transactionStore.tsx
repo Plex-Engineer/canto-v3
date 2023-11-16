@@ -3,14 +3,7 @@ import {
   NO_ERROR,
   PromiseWithError,
   errMsg,
-  BridgeStatus,
-  NewTransactionFlow,
-  TransactionFlow,
-  TransactionStatus,
-  TransactionWithStatus,
-  UserTransactionFlowMap,
 } from "@/config/interfaces";
-import { TRANSACTION_FLOW_MAP } from "@/config/transactions/txMap";
 import {
   performSingleTransaction,
   waitForTransaction,
@@ -19,6 +12,15 @@ import { getNetworkInfoFromChainId } from "@/utils/networks";
 import { GetWalletClientResult } from "wagmi/actions";
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
+import {
+  BridgeStatus,
+  NewTransactionFlow,
+  TransactionFlow,
+  TransactionStatus,
+  TransactionWithStatus,
+  UserTransactionFlowMap,
+} from "@/transactions/interfaces";
+import { TRANSACTION_FLOW_MAP } from "@/transactions/flows";
 
 // only save last 100 flows for each user to save space
 const USER_FLOW_LIMIT = 100;
