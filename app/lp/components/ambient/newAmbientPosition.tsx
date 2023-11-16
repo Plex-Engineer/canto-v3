@@ -258,9 +258,9 @@ export const NewAmbientPositionModal = ({
           </Container>
           <Spacer height="8px" />
           <Text size="x-sm" theme="secondary-dark">
-            This is a concentrated liquidity stable pool. The default range
-            below is selected for optimal rewards. Rewards will be released in
-            weekly epochs.
+            This is a concentrated liquidity stable pool. The default range is
+            selected for optimal rewards. Rewards will be released in weekly
+            epochs.
           </Text>
           <Spacer height="8px" />
 
