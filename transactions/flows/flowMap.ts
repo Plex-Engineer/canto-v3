@@ -5,7 +5,7 @@ import {
   cTokenLendingTx,
   clmClaimRewardsTx,
   validateCTokenLendingTxParams,
-} from "../../lending";
+} from "../lending";
 import { TxCreatorFunctionReturn } from "../interfaces";
 
 export enum TransactionFlowType {

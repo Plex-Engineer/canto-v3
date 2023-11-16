@@ -1,11 +1,8 @@
 import { BridgingMethod } from "@/hooks/bridge/interfaces/bridgeMethods";
 import { ContractAbi } from "web3-types";
-import {
-  NewTransactionFlowPlaceholder,
-  TransactionStatus,
-  UnsignedCosmosMessages,
-} from ".";
+import { TransactionStatus, UnsignedCosmosMessages } from ".";
 import { PromiseWithError, ReturnWithError } from "@/config/interfaces/errors";
+import { NewTransactionFlowPlaceholder } from "../flows";
 
 export interface TransactionDescription {
   title: string;

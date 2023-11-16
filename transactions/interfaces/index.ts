@@ -1,4 +1,4 @@
 export * from "./txBase";
 export * from "./txCosmos";
-export * from "./txFlows";
+export * from "./txDescriptions";
 export * from "./txStatus";

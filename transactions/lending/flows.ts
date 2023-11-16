@@ -1,5 +1,5 @@
 import { CLMClaimRewardsTxParams, CTokenLendingTransactionParams } from ".";
-import { NewTransactionFlow, TransactionFlowType } from "../config";
+import { NewTransactionFlow, TransactionFlowType } from "../flows";
 
 export const newCTokenLendingFlow = (
   params: CTokenLendingTransactionParams

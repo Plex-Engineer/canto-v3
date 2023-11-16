@@ -6,12 +6,12 @@ import TxItem from "./TxItem";
 import Spacer from "../layout/spacer";
 import Button from "../button/button";
 import { formatError } from "@/utils/formatting";
+import { BridgeStatus } from "@/transactions/interfaces";
 import {
-  BridgeStatus,
+  TRANSACTION_FLOW_MAP,
   TX_PLACEHOLDER,
   TransactionFlow,
-  TRANSACTION_FLOW_MAP,
-} from "@/transactions/config";
+} from "@/transactions/flows";
 
 interface Props {
   txFlow?: TransactionFlow;

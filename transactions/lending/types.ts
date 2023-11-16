@@ -10,7 +10,7 @@ export enum CTokenLendingTxTypes {
   DECOLLATERALIZE = "Decollateralize",
 }
 
-export interface CTokenLendingTransactionParams {
+export type CTokenLendingTransactionParams = {
   chainId: number;
   ethAccount: string;
   txType: CTokenLendingTxTypes;
@@ -18,10 +18,10 @@ export interface CTokenLendingTransactionParams {
   amount: string;
   max: boolean; // for repay and withdraw, if all tokens should be repaid/withdrawn
   userPosition?: UserLMPosition; // for validation
-}
+};
 
-export interface CLMClaimRewardsTxParams {
+export type CLMClaimRewardsTxParams = {
   chainId: number;
   ethAccount: string;
   estimatedRewards: string; // estimation before distribution of rewards, only used for drip purposes (all rewards will be claimed)
-}
+};

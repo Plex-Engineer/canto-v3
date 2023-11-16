@@ -13,14 +13,16 @@ import { GetWalletClientResult } from "wagmi/actions";
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 import {
-  BridgeStatus,
   NewTransactionFlow,
+  TRANSACTION_FLOW_MAP,
   TransactionFlow,
+  UserTransactionFlowMap,
+} from "@/transactions/flows";
+import {
+  BridgeStatus,
   TransactionStatus,
   TransactionWithStatus,
-  UserTransactionFlowMap,
-  TRANSACTION_FLOW_MAP,
-} from "@/transactions/config";
+} from "@/transactions/interfaces";
 
 // only save last 100 flows for each user to save space
 const USER_FLOW_LIMIT = 100;

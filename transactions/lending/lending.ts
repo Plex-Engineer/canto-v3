@@ -22,7 +22,7 @@ import {
   Transaction,
   TxCreatorFunctionReturn,
   TX_DESCRIPTIONS,
-} from "../config";
+} from "../interfaces";
 
 export async function cTokenLendingTx(
   txParams: CTokenLendingTransactionParams
