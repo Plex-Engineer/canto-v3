@@ -4,7 +4,7 @@ import BoxedBackground from "@/components/boxes_background/boxesBackground";
 export default function StakingPage() {
   return (
     <div>
-      <BoxedBackground />
+      {/* <BoxedBackground /> */}
 
       <h1>Staking Page</h1>
     </div>
