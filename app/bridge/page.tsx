@@ -9,7 +9,7 @@ import { getNetworkInfoFromChainId, isCosmosNetwork } from "@/utils/networks";
 import Bridging from "./bridging";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
-import Tabs from "@/components/nTabs/tabs";
+import Tabs from "@/components/tabs/tabs";
 
 export default function BridgePage() {
   // router info
