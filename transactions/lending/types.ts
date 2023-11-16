@@ -17,7 +17,7 @@ export type CTokenLendingTransactionParams = {
   cToken: CTokenWithUserData;
   amount: string;
   max: boolean; // for repay and withdraw, if all tokens should be repaid/withdrawn
-  userPosition?: UserLMPosition; // for validation
+  userPosition: UserLMPosition; // for validation
 };
 
 export type CLMClaimRewardsTxParams = {

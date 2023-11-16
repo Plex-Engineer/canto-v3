@@ -92,7 +92,7 @@ export function cTokenWithdrawLimit(
 export function maxAmountForLendingTx(
   txType: CTokenLendingTxTypes,
   cToken: CTokenWithUserData,
-  position: UserLMPosition | undefined,
+  position: UserLMPosition,
   percent: number = 100
 ): string {
   if (!cToken.userDetails) return "0";
@@ -100,8 +100,6 @@ export function maxAmountForLendingTx(
     case CTokenLendingTxTypes.SUPPLY:
       return cToken.userDetails.balanceOfUnderlying ?? "0";
     case CTokenLendingTxTypes.WITHDRAW:
-      // check if position is defined
-      if (!position) return "0";
       const maxAmount = cTokenWithdrawLimit(
         cToken,
         position.liquidity,
@@ -111,8 +109,6 @@ export function maxAmountForLendingTx(
       if (maxAmount.error) return "0";
       return maxAmount.data;
     case CTokenLendingTxTypes.BORROW:
-      // check if position is defined
-      if (!position) return "0";
       const maxBorrow = cTokenBorrowLimit(cToken, position.liquidity, percent);
       if (maxBorrow.error) return "0";
       return maxBorrow.data;
