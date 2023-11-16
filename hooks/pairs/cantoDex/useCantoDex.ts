@@ -16,13 +16,16 @@ import {
   NEW_ERROR,
   NewTransactionFlow,
   ReturnWithError,
-  ValidationReturn,
+  Validation,
 } from "@/config/interfaces";
-import { areEqualAddresses } from "@/utils/address.utils";
-import { validateInputTokenAmount } from "@/utils/validation.utils";
+import { areEqualAddresses } from "@/utils/address";
+import {
+  addTokenBalances,
+  validateWeiUserInputTokenAmount,
+} from "@/utils/math";
 import { createNewCantoDexTxFLow } from "./helpers/createPairsFlow";
 import { createNewClaimCLMRewardsFlow } from "@/hooks/lending/helpers/createLendingFlow";
-import { addTokenBalances } from "@/utils/tokens/tokenMath.utils";
+import { USER_INPUT_ERRORS } from "@/config/consts/errors";
 
 export default function useCantoDex(
   params: CantoDexHookInputParams,
@@ -43,7 +46,8 @@ export default function useCantoDex(
         CANTO_DATA_API_ENDPOINTS.allPairs
       );
       if (error) throw error;
-      return data;
+      // sort data to make it more predictable
+      return data.sort((a, b) => a.address.localeCompare(b.address));
     },
     {
       onSuccess: (data) => {
@@ -97,20 +101,18 @@ export default function useCantoDex(
   /// external functions
   ///
 
-  function validateParams(
-    txParams: CantoDexTransactionParams
-  ): ValidationReturn {
+  function validateParams(txParams: CantoDexTransactionParams): Validation {
     // make sure user eth address is the same
     if (!areEqualAddresses(params.userEthAddress ?? "", txParams.ethAccount)) {
       return {
-        isValid: false,
-        errorMessage: "user eth address is not the same",
+        error: true,
+        reason: USER_INPUT_ERRORS.ACCOUNT_MISMATCH(),
       };
     }
     if (!txParams.pair.clmData?.userDetails) {
       return {
-        isValid: false,
-        errorMessage: "pair clm data not found",
+        error: true,
+        reason: USER_INPUT_ERRORS.PROP_UNAVAILABLE("userDetails"),
       };
     }
     // save user details to variable to stop repetition
@@ -119,38 +121,47 @@ export default function useCantoDex(
     // make sure balances are good depending on tx type
     switch (txParams.txType) {
       case CantoDexTxTypes.ADD_LIQUIDITY: {
+        // check slippage and deadline
+        if (Number(txParams.slippage) < 0 || Number(txParams.slippage) > 100) {
+          return { error: true, reason: USER_INPUT_ERRORS.SLIPPAGE_ERROR() };
+        }
+        if (Number(txParams.deadline) <= 0) {
+          return { error: true, reason: USER_INPUT_ERRORS.DEADLINE_ERROR() };
+        }
         const token1 = pair.token1;
         const token2 = pair.token2;
         // each token value must be less than or equal to their balance
         const [token1Check, token2Check] = [
-          validateInputTokenAmount(
+          validateWeiUserInputTokenAmount(
             txParams.amounts.amount1,
+            "1",
             token1.balance ?? "0",
             token1.symbol,
             token1.decimals
           ),
-          validateInputTokenAmount(
+          validateWeiUserInputTokenAmount(
             txParams.amounts.amount2,
+            "1",
             token2.balance ?? "0",
             token2.symbol,
             token2.decimals
           ),
         ];
-        const prefixError = !token1Check.isValid
-          ? token1.symbol
-          : token2.symbol;
-        return {
-          isValid: token1Check.isValid && token2Check.isValid,
-          errorMessage:
-            prefixError +
-            " " +
-            (token1Check.errorMessage || token2Check.errorMessage),
-        };
+        if (token1Check.error) return token1Check;
+        return token2Check;
       }
       case CantoDexTxTypes.REMOVE_LIQUIDITY:
+        // check slippage and deadline
+        if (Number(txParams.slippage) < 0 || Number(txParams.slippage) > 100) {
+          return { error: true, reason: USER_INPUT_ERRORS.SLIPPAGE_ERROR() };
+        }
+        if (Number(txParams.deadline) <= 0) {
+          return { error: true, reason: USER_INPUT_ERRORS.DEADLINE_ERROR() };
+        }
         // if unstaking first, check supplyBalance, otherwise check balanceOfUnderlying
-        return validateInputTokenAmount(
+        return validateWeiUserInputTokenAmount(
           txParams.amountLP,
+          "1",
           addTokenBalances(
             userDetails.supplyBalanceInUnderlying,
             userDetails.balanceOfUnderlying
@@ -159,23 +170,25 @@ export default function useCantoDex(
           pair.decimals
         );
       case CantoDexTxTypes.STAKE:
-        return validateInputTokenAmount(
+        return validateWeiUserInputTokenAmount(
           txParams.amountLP,
+          "1",
           userDetails.balanceOfUnderlying,
           pair.symbol,
           pair.decimals
         );
       case CantoDexTxTypes.UNSTAKE:
-        return validateInputTokenAmount(
+        return validateWeiUserInputTokenAmount(
           txParams.amountLP,
+          "1",
           userDetails.supplyBalanceInUnderlying,
           pair.symbol,
           pair.decimals
         );
       default:
         return {
-          isValid: false,
-          errorMessage: "tx type not found",
+          error: true,
+          reason: "tx type not found",
         };
     }
   }
@@ -185,8 +198,8 @@ export default function useCantoDex(
   ): ReturnWithError<NewTransactionFlow> {
     // validate params
     const validation = validateParams(params);
-    if (!validation.isValid)
-      return NEW_ERROR("createNewPairsFlow::" + validation.errorMessage);
+    if (validation.error)
+      return NEW_ERROR("createNewPairsFlow::" + validation.reason);
     return createNewCantoDexTxFLow(params);
   }
 

@@ -8,7 +8,7 @@ import {
   dateToMomentsAgo,
   formatError,
   formatSecondsToMinutes,
-} from "@/utils/formatting.utils";
+} from "@/utils/formatting";
 import StatusIcon from "../icon/statusIcon";
 import { useQuery } from "react-query";
 import { getBridgeStatus } from "@/hooks/bridge/transactions/bridgeTxStatus";

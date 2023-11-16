@@ -13,9 +13,18 @@ interface Props {
   title?: string;
   width?: string;
   height?: string;
+  closeOnOverlayClick?: boolean;
 }
 
-const Modal = ({ onClose, children, title, width, height, open }: Props) => {
+const Modal = ({
+  onClose,
+  children,
+  title,
+  width,
+  height,
+  open,
+  closeOnOverlayClick = true,
+}: Props) => {
   const ref = React.useRef<HTMLDivElement>(null);
 
   const { lockScroll, unlockScroll } = useScrollLock();
@@ -37,7 +46,11 @@ const Modal = ({ onClose, children, title, width, height, open }: Props) => {
   }, [open, lockScroll, unlockScroll]);
 
   const modalContent = (
-    <div className={styles.overlay} onClick={handleClose} ref={ref}>
+    <div
+      className={styles.overlay}
+      onClick={closeOnOverlayClick ? handleClose : undefined}
+      ref={ref}
+    >
       <div
         onClick={(e) => {
           e.stopPropagation();

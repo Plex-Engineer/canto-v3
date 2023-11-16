@@ -11,7 +11,7 @@ import {
 } from "@/config/interfaces";
 import Button from "../button/button";
 import { TRANSACTION_FLOW_MAP } from "@/config/transactions/txMap";
-import { formatError } from "@/utils/formatting.utils";
+import { formatError } from "@/utils/formatting";
 
 interface Props {
   txFlow?: TransactionFlow;

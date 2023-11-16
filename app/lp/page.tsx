@@ -2,7 +2,7 @@
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
-import { ValidationReturn } from "@/config/interfaces";
+import { Validation } from "@/config/interfaces";
 import {
   GeneralAmbientPairRow,
   GeneralCantoDexPairRow,
@@ -18,13 +18,15 @@ import {
   isAmbientPool,
   isCantoDexPair,
 } from "@/hooks/pairs/lpCombo/interfaces.ts/pairTypes";
-import { AmbientModal } from "./components/ambientLPModal";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { AmbientModal } from "./components/ambient/ambientLPModal";
+import { displayAmount } from "@/utils/formatting";
 import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
-import { addTokenBalances } from "@/utils/tokens/tokenMath.utils";
+import { addTokenBalances } from "@/utils/math";
+import ToggleGroup from "@/components/groupToggle/ToggleGroup";
+import { useState } from "react";
 
 export default function Page() {
   const { txStore, signer, chainId } = useCantoSigner();
@@ -33,6 +35,8 @@ export default function Page() {
     chainId,
     userEthAddress: signer?.account.address ?? "",
   });
+  //   all pairs filtered by type
+  const [filteredPairs, setFilteredPairs] = useState<string>("all");
 
   /** CANTO DEX */
   const { pairs: cantoDexPairs } = cantoDex;
@@ -66,7 +70,7 @@ export default function Page() {
   }
   function canPerformCantoDexTx(
     params: Partial<CantoDexTransactionParams>
-  ): ValidationReturn {
+  ): Validation {
     return cantoDex.transaction.validateParams({
       chainId: chainId,
       ethAccount: signer?.account.address ?? "",
@@ -86,7 +90,7 @@ export default function Page() {
     const { data: flow, error } = ambient.transaction.createNewPoolFlow({
       chainId,
       ethAccount: signer?.account.address ?? "",
-      pair: selectedPair,
+      pool: selectedPair,
       ...params,
     } as AmbientTransactionParams);
     if (error) {
@@ -98,16 +102,6 @@ export default function Page() {
         onSuccessCallback: () => selection.setPair(null),
       });
     }
-  }
-  function canPerformAmbientTx(
-    params: Partial<AmbientTransactionParams>
-  ): ValidationReturn {
-    return ambient.transaction.validateParams({
-      chainId: chainId,
-      ethAccount: signer?.account.address ?? "",
-      pair: selectedPair,
-      ...params,
-    } as AmbientTransactionParams);
   }
 
   /** general selection */
@@ -129,11 +123,19 @@ export default function Page() {
   if (isLoading) {
     return <div className={styles.loading}>{""}</div>;
   }
-
+  const pairNames = {
+    all: "All Pairs",
+    stable: "Stable Pairs",
+    volatile: "Volatile Pairs",
+  };
   //main content
   return (
     <div className={styles.container}>
-      <Modal open={selectedPair !== null} onClose={() => setPair(null)}>
+      <Modal
+        open={selectedPair !== null}
+        onClose={() => setPair(null)}
+        closeOnOverlayClick={false}
+      >
         {selectedPair && isCantoDexPair(selectedPair) && (
           <CantoDexLPModal
             pair={selectedPair}
@@ -142,19 +144,14 @@ export default function Page() {
           />
         )}
         {selectedPair && isAmbientPool(selectedPair) && (
-          <AmbientModal
-            pool={selectedPair}
-            validateParams={canPerformAmbientTx}
-            sendTxFlow={sendAmbientTxFlow}
-          />
+          <AmbientModal pool={selectedPair} sendTxFlow={sendAmbientTxFlow} />
         )}
       </Modal>
 
       <Container direction="row" gap={"auto"} width="100%">
         <Text size="x-lg" className={styles.title}>
-          LP
+          Pools
         </Text>
-        <Spacer height="30px" />
 
         <Rewards
           onClick={sendClaimRewardsFlow}
@@ -168,65 +165,91 @@ export default function Page() {
         />
       </Container>
       <Spacer height="30px" />
+
       {userCantoDexPairs.length + userAmbientPools.length > 0 && (
-        <Table
-          title="Your Pairs"
-          headers={[
-            "Pair",
-            "APR",
-            "Pool Share",
-            "Value",
-            // "# LP Tokens",
-            // "# Staked",
-            "Rewards",
-            "Edit",
-          ]}
-          columns={7}
-          processedData={[
-            ...userAmbientPools.map((pool) => (
-              <UserAmbientPairRow
-                key={pool.symbol}
-                pool={pool}
-                onManage={(poolAddress) => {
-                  setPair(poolAddress);
-                }}
-                rewards={ambient.rewards}
-              />
-            )),
-            ...userCantoDexPairs.map((pair) => (
-              <UserCantoDexPairRow
-                key={pair.symbol}
-                pair={pair}
-                onManage={(pairAddress) => {
-                  setPair(pairAddress);
-                }}
-              />
-            )),
-          ]}
-        />
+        <>
+          <Table
+            title="Your Pairs"
+            headers={[
+              { value: "Pair", ratio: 2 },
+              { value: "APR", ratio: 1 },
+              { value: "Pool Share", ratio: 1 },
+              { value: "Value", ratio: 1 },
+              { value: "Rewards", ratio: 1 },
+              { value: "Edit", ratio: 1 },
+            ]}
+            content={[
+              ...userAmbientPools.map((pool) =>
+                UserAmbientPairRow({
+                  pool,
+                  onManage: (poolAddress) => {
+                    setPair(poolAddress);
+                  },
+                  rewards: ambient.rewards,
+                })
+              ),
+              ...userCantoDexPairs.map((pair) =>
+                UserCantoDexPairRow({
+                  pair,
+                  onManage: (pairAddress) => {
+                    setPair(pairAddress);
+                  },
+                })
+              ),
+            ]}
+          />
+          <Spacer height="20px" />
+        </>
       )}
-      <Spacer height="40px" />
+
       <Table
-        title="All Pairs"
-        headers={["Pair", "APR", "TVL", "Type", "action"]}
-        columns={6}
-        processedData={[
-          ...ambientPools.map((pool) => (
-            <GeneralAmbientPairRow
-              key={pool.symbol}
-              pool={pool}
-              onAddLiquidity={(poolAddress) => setPair(poolAddress)}
-            />
-          )),
-          ...sortedPairs.map((pair) => (
-            <GeneralCantoDexPairRow
-              key={pair.symbol}
-              pair={pair}
-              onAddLiquidity={(pairAddress) => {
-                setPair(pairAddress);
+        //@ts-ignore
+        title={pairNames[filteredPairs]}
+        secondary={
+          <Container width="400px">
+            <ToggleGroup
+              options={["all", "stable", "volatile"]}
+              selected={filteredPairs}
+              setSelected={(value) => {
+                setFilteredPairs(value);
               }}
             />
-          )),
+          </Container>
+        }
+        headers={[
+          { value: "Pair", ratio: 2 },
+          { value: "APR", ratio: 1 },
+          { value: "TVL", ratio: 1 },
+          { value: "Type", ratio: 1 },
+          { value: "Action", ratio: 1 },
+        ]}
+        content={[
+          ...ambientPools
+            .filter(
+              (pool) =>
+                filteredPairs === "all" ||
+                (filteredPairs === "stable" && pool.stable) ||
+                (filteredPairs === "volatile" && !pool.stable)
+            )
+            .map((pool) =>
+              GeneralAmbientPairRow({
+                pool,
+                onAddLiquidity: (poolAddress) => setPair(poolAddress),
+              })
+            ),
+          ...sortedPairs
+            .filter(
+              (pair) =>
+                filteredPairs === "all" ||
+                (filteredPairs === "stable" && pair.stable) ||
+                (filteredPairs === "volatile" && !pair.stable)
+            )
+            .map((pair) =>
+              GeneralCantoDexPairRow({
+                pair,
+                onAddLiquidity: (pairAddress) => setPair(pairAddress),
+              })
+            ),
         ]}
       />
       <Spacer height="40px" />

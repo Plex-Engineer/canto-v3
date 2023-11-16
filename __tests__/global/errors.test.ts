@@ -1,4 +1,4 @@
-import { NO_ERROR, NEW_ERROR, errMsg } from "../../config/interfaces";
+import { NO_ERROR, NEW_ERROR, errMsg } from "@/config/interfaces";
 
 describe("error interface tests", () => {
   it("should return a ReturnWithError object with no error", async () => {

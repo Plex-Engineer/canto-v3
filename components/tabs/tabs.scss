@@ -4,15 +4,6 @@
   border-top: none;
   height: 100%;
   transition: all 0.3s;
-  box-shadow: 4px 4px 0px 0px rgba(17, 17, 17, 0.15);
-
-  &:hover {
-    box-shadow: 4px 4px 0px 0px rgba(17, 17, 17, 0.25);
-  }
-
-  &:active {
-    box-shadow: 2px 2px 0px 0px rgba(17, 17, 17, 0.3);
-  }
 }
 .react-tabs__tab--disabled {
 }
@@ -85,11 +76,20 @@
 }
 
 .react-tabs__tab-panel {
-  display: flex;
-  //   justify-content: center;
-  //   align-items: center;
 }
 
 .react-tabs__tab-panel--selected {
-  height: calc(100% - 52px);
+  display: flex;
+  //   background-color: red;
+  background-color: var(--card-sub-surface-color, #dfdfdf);
+  box-shadow: 4px 4px 0px 0px rgba(17, 17, 17, 0.15);
+
+  &:hover {
+    box-shadow: 4px 4px 0px 0px rgba(17, 17, 17, 0.25);
+  }
+
+  &:active {
+    box-shadow: 2px 2px 0px 0px rgba(17, 17, 17, 0.3);
+  }
+  height: 100%;
 }

@@ -14,7 +14,7 @@ interface Props {
   shadows?: boolean;
 }
 
-const Tabs = (props: Props) => {
+const Tabs = ({ shadows = true, ...props }: Props) => {
   return (
     <TabsContainer defaultIndex={props.defaultIndex ?? 0}>
       <TabList>

@@ -1,59 +1,57 @@
 import Text from "../text";
 import styles from "./table.module.scss";
+
 interface Props {
   title?: string;
-  headers: string[];
-  columns: number;
-  data?: any[][];
-  processedData?: any[];
+  secondary?: React.ReactNode;
+  headers: {
+    value: string;
+    ratio: number;
+  }[];
+  content: React.ReactNode[][];
 }
-
-function formatTitle(title: string) {
-  return title
-    .replace(/_/g, " ")
-    .replace(/\w\S*/g, (w) => w.replace(/^\w/, (c) => c.toUpperCase()));
-}
-
 const Table = (props: Props) => {
   return (
-    <div
-      className={styles.table}
-      style={
-        {
-          "--table-columns": props.columns,
-        } as React.CSSProperties
-      }
-    >
+    <div className={styles.container}>
       <div className={styles.title}>
         <Text font="proto_mono" size="lg">
           {props.title}
         </Text>
+        {props.secondary}
       </div>
-      <section className={styles.grid}>
-        <div className={styles.row + " " + styles.header}>
+      <div className={styles.table}>
+        <div
+          className={styles.header}
+          style={{
+            gridTemplateColumns: props.headers
+              .map((header) => {
+                return `${header.ratio}fr`;
+              })
+              .join(" "),
+          }}
+        >
           {props.headers.map((header, index) => {
             return (
               <div key={index} className={styles.cell}>
-                <Text theme="secondary-dark" size="sm">
-                  {formatTitle(header)}
-                </Text>
+                {header.value}
               </div>
             );
           })}
         </div>
-        {props.processedData &&
-          props.processedData.map((row, index) => {
+        <div className={styles.content}>
+          {props.content.map((row, index) => {
             return (
-              <div key={index} className={styles.row}>
-                {row}
-              </div>
-            );
-          })}
-
-        {props.data &&
-          props.data.map((row, index) => {
-            return (
-              <div key={index} className={styles.row}>
+              <div
+                key={index}
+                className={styles.row}
+                style={{
+                  gridTemplateColumns: props.headers
+                    .map((header) => {
+                      return `${header.ratio}fr`;
+                    })
+                    .join(" "),
+                }}
+              >
                 {row.map((cell, index) => {
                   return (
                     <div key={index} className={styles.cell}>
@@ -64,7 +62,8 @@ const Table = (props: Props) => {
               </div>
             );
           })}
-      </section>
+        </div>
+      </div>
     </div>
   );
 };

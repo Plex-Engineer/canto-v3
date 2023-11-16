@@ -6,8 +6,8 @@ import Image from "next/image";
 import React, { ReactNode } from "react";
 import styles from "../bridge.module.scss";
 import PopUp from "@/components/popup/popup";
-import { connectToKeplr } from "@/utils/keplr/connectKeplr";
-import { formatError } from "@/utils/formatting.utils";
+import { connectToKeplr } from "@/utils/keplr";
+import { formatError } from "@/utils/formatting";
 import InfoPop from "@/components/infopop/infopop";
 
 interface Props {

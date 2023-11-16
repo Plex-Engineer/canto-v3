@@ -10,8 +10,10 @@ import {
   addTokenBalances,
   convertTokenAmountToNote,
   percentOfAmount,
-} from "../tokens/tokenMath.utils";
+} from "../math";
 import { getPriceFromTick } from "./ambientMath.utils";
+import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
+import { convertToBigNumber, formatBalance } from "../formatting";
 
 /**
  * @notice gets optimal quote tokens from base token amount
@@ -32,7 +34,8 @@ export function getConcQuoteTokensFromBaseTokens(
   if (
     !amount ||
     Number(amount) === 0 ||
-    Number(currentPrice) < Number(minPrice)
+    Number(currentPrice) < Number(minPrice) ||
+    minPrice === maxPrice
   ) {
     return "0";
   }
@@ -75,7 +78,8 @@ export function getConcBaseTokensFromQuoteTokens(
   if (
     !amount ||
     Number(amount) === 0 ||
-    Number(currentPrice) > Number(maxPrice)
+    Number(currentPrice) > Number(maxPrice) ||
+    minPrice === maxPrice
   ) {
     return "0";
   }
@@ -205,4 +209,63 @@ export function concLiquidityNoteValue(
  */
 export function roundLiquidityForAmbientTx(liq: string): string {
   return roundForConcLiq(BigNumber.from(liq)).toString();
+}
+
+/**
+ * @notice gets display token amount from price
+ * @param nonWeiAmount amount of tokens
+ * @param isBase is base token
+ * @param minPriceWei minimum price wei
+ * @param maxPriceWei maximum price wei
+ * @param pool ambient pool
+ * @param precision precision of display amount
+ * @returns token amount formatted for display
+ */
+export function getDisplayTokenAmountFromRange(
+  nonWeiAmount: string,
+  isBase: boolean,
+  minPriceWei: string,
+  maxPriceWei: string,
+  pool: AmbientPool
+): string {
+  // first check value before performing operations
+  if (
+    nonWeiAmount === "" ||
+    isNaN(Number(nonWeiAmount)) ||
+    !minPriceWei ||
+    !maxPriceWei
+  ) {
+    return "0";
+  }
+  // convert to wei
+  const weiAmount =
+    convertToBigNumber(
+      nonWeiAmount,
+      isBase ? pool.base.decimals : pool.quote.decimals
+    ).data?.toString() ?? "0";
+
+  // get estimates
+  if (isBase) {
+    // get quote estimate
+    const quoteEstimateWei = getConcQuoteTokensFromBaseTokens(
+      weiAmount,
+      pool.stats.lastPriceSwap,
+      minPriceWei,
+      maxPriceWei
+    );
+    return formatBalance(quoteEstimateWei, pool.quote.decimals, {
+      precision: pool.quote.decimals,
+    });
+  } else {
+    // get base estimate
+    const baseEstimateWei = getConcBaseTokensFromQuoteTokens(
+      weiAmount,
+      pool.stats.lastPriceSwap,
+      minPriceWei,
+      maxPriceWei
+    );
+    return formatBalance(baseEstimateWei, pool.base.decimals, {
+      precision: pool.base.decimals,
+    });
+  }
 }

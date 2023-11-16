@@ -25,13 +25,14 @@ import useAutoSelect from "../helpers/useAutoSelect";
 import { BridgeInToken } from "./interfaces/tokens";
 import { BridgingMethod } from "./interfaces/bridgeMethods";
 import useTokenBalances from "../helpers/useTokenBalances";
-import { isERC20TokenList, isOFTToken } from "@/utils/tokens/tokens.utils";
 import {
+  isERC20TokenList,
+  isOFTToken,
   isBridgeInToken,
   isBridgeInTokenList,
-} from "@/utils/tokens/bridgeTokens.utils";
-import { convertToBigNumber } from "@/utils/tokenBalances.utils";
-import { isValidEthAddress } from "@/utils/address.utils";
+} from "@/utils/tokens";
+import { convertToBigNumber } from "@/utils/formatting";
+import { isValidEthAddress } from "@/utils/address";
 import { createNewBridgeFlow } from "./helpers/createBridgeFlow";
 
 export default function useBridgeIn(
@@ -119,6 +120,7 @@ export default function useBridgeIn(
   }
   function getToken(id: string): ReturnWithError<BridgeInToken> {
     const token = state.availableTokens.find((token) => token.id === id);
+
     if (!isBridgeInToken(token)) {
       return NEW_ERROR("useBridgeIn::getToken: invalid token type:" + id);
     }
@@ -147,6 +149,7 @@ export default function useBridgeIn(
       BRIDGE_IN_TOKEN_LIST.chainTokenList[
         network.id as keyof typeof BRIDGE_IN_TOKEN_LIST.chainTokenList
       ];
+
     if (!tokens || tokens.length === 0) {
       throw new Error(
         "useBridgeIn::setNetwork: No tokens available for network: " +

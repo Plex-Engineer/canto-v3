@@ -1,5 +1,6 @@
 import "@rainbow-me/rainbowkit/styles.css";
 import {
+  AvatarComponent,
   connectorsForWallets,
   getDefaultWallets,
   RainbowKitProvider,
@@ -13,6 +14,8 @@ import { Chain, configureChains, createConfig, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import * as EVM_CHAINS from "@/config/networks/evm";
 import { cantoTheme } from "./util";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
   (network) => {
@@ -61,37 +64,55 @@ const { connectors } = getDefaultWallets({
   chains,
 });
 
-const specificConnectors = connectorsForWallets([
-  {
-    groupName: "Recommended",
-    wallets: [
-      injectedWallet({
-        chains,
-      }),
-    ],
-  },
-]);
+// const specificConnectors = connectorsForWallets([
+//   {
+//     groupName: "Recommended",
+//     wallets: [
+//       injectedWallet({
+//         chains,
+//       }),
+//     ],
+//   },
+// ]);
 
 const wagmiConfig = createConfig({
   autoConnect: true,
-  //   connectors,
-  connectors: specificConnectors,
+  connectors,
+  // connectors: specificConnectors,
   publicClient,
 });
+
+const CustomAvatar: AvatarComponent = () => {
+  return (
+    <Image
+      src="networks/canto.svg"
+      style={{
+        width: "100%",
+        height: "100%",
+      }}
+      width={64}
+      height={64}
+      alt="logo"
+    />
+  );
+};
 
 interface RainbowProviderProps {
   children: React.ReactNode;
 }
 const CantoWalletProvider = ({ children }: RainbowProviderProps) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   return (
     <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider
+        avatar={CustomAvatar}
         chains={chains}
         modalSize="wide"
         theme={cantoTheme}
         initialChain={EVM_CHAINS.CANTO_MAINNET_EVM.chainId}
       >
-        {children}
+        {mounted && children}
       </RainbowKitProvider>
     </WagmiConfig>
   );

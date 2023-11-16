@@ -3,15 +3,14 @@ import {
   NO_ERROR,
   PromiseWithError,
   ReturnWithError,
-  errMsg,
   CosmosTxContext,
   EIP712FeeObject,
   Fee,
   Sender,
   UnsignedCosmosMessages,
 } from "@/config/interfaces";
-import { tryFetch } from "@/utils/async.utils";
-import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
+import { tryFetch } from "@/utils/async";
+import { getCosmosAPIEndpoint } from "@/utils/networks";
 import {
   generateMessageWithMultipleTransactions,
   createEIP712,
@@ -45,19 +44,24 @@ export async function getCosmosAccount(
   cosmosAddress: string,
   chainId: string | number
 ): PromiseWithError<CosmosAccountReturn> {
-  const { data: apiEndpoint, error: apiEndpointError } =
-    getCosmosAPIEndpoint(chainId);
-  if (apiEndpointError) {
-    return NEW_ERROR("getCosmosAccount::" + apiEndpointError.message);
+  try {
+    // get api endpoint
+    const { data: apiEndpoint, error: apiEndpointError } =
+      getCosmosAPIEndpoint(chainId);
+    if (apiEndpointError) throw apiEndpointError;
+
+    // get account data
+    const { data: result, error: fetchError } =
+      await tryFetch<CosmosAccountReturn>(
+        apiEndpoint + `/cosmos/auth/v1beta1/accounts/${cosmosAddress}`
+      );
+    if (fetchError) throw fetchError;
+
+    // return account data
+    return NO_ERROR(result);
+  } catch (err) {
+    return NEW_ERROR("getCosmosAccount", err);
   }
-  const { data: result, error: fetchError } =
-    await tryFetch<CosmosAccountReturn>(
-      apiEndpoint + `/cosmos/auth/v1beta1/accounts/${cosmosAddress}`
-    );
-  if (fetchError) {
-    return NEW_ERROR("getCosmosAccount::" + fetchError.message);
-  }
-  return NO_ERROR(result);
 }
 
 /**
@@ -112,7 +116,7 @@ export async function signAndBroadcastCosmosTransaction(
           ])
         );
       } catch (err) {
-        return NEW_ERROR("signAndBroadcastCosmosTransaction: " + errMsg(err));
+        return NEW_ERROR("signAndBroadcastCosmosTransaction", err);
       }
     }
 
@@ -166,12 +170,13 @@ export async function signAndBroadcastCosmosTransaction(
 
     if (broadcastPost.error) {
       return NEW_ERROR(
-        "signAndBroadcastCosmosTransaction: " + errMsg(broadcastPost.error)
+        "signAndBroadcastCosmosTransaction",
+        broadcastPost.error
       );
     }
     return NO_ERROR(broadcastPost.data);
   } catch (err) {
-    return NEW_ERROR("signAndBroadcastCosmosTransaction: " + errMsg(err));
+    return NEW_ERROR("signAndBroadcastCosmosTransaction", err);
   }
 }
 
@@ -211,7 +216,7 @@ export async function getSenderObj(
 ): PromiseWithError<Sender> {
   const cosmosAccount = await getCosmosAccount(senderCosmosAddress, chainid);
   if (cosmosAccount.error) {
-    return NEW_ERROR("getSenderObj::" + errMsg(cosmosAccount.error));
+    return NEW_ERROR("getSenderObj", cosmosAccount.error);
   }
   return reformatSender(cosmosAccount.data, eip712);
 }
@@ -230,7 +235,7 @@ function reformatSender(
   const baseAccount = accountData.account.base_account;
   if (baseAccount.pub_key == null && !eip712) {
     // if used for eip712, the pubk key can be null, since we will create one before the tx
-    return NEW_ERROR("reformatSender: no public key on account");
+    return NEW_ERROR("reformatSender", "no public key on account");
   }
   return NO_ERROR({
     accountAddress: baseAccount.address,

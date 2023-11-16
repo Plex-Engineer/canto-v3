@@ -5,7 +5,7 @@ import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
 
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount, formatPercent } from "@/utils/formatting";
 import { useLendingCombo } from "./utils";
 import Text from "@/components/text";
 import Container from "@/components/container/container";
@@ -17,11 +17,9 @@ import { LendingModal } from "./components/modal/modal";
 import { CTokenRow } from "./components/cTokenRow";
 import { useState } from "react";
 import Spacer from "@/components/layout/spacer";
-import {
-  addTokenBalances,
-  divideBalances,
-} from "@/utils/tokens/tokenMath.utils";
-import { formatPercent } from "@/utils/formatting.utils";
+import { addTokenBalances, divideBalances } from "@/utils/math";
+import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
+import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -33,6 +31,7 @@ export default function LendingPage() {
   const [currentModal, setCurrentModal] = useState<CLMModalTypes>(
     CLMModalTypes.NONE
   );
+
   // get all data from lending combo
   const {
     cTokens,
@@ -46,7 +45,7 @@ export default function LendingPage() {
       setCurrentModal(CLMModalTypes.NONE);
     },
   });
-  const { cNote, rwas } = cTokens;
+  const { cNote, rwas, stableCoins } = cTokens;
   const { selectedCToken, setSelectedCToken } = selection;
 
   return (
@@ -68,7 +67,7 @@ export default function LendingPage() {
             cToken={selectedCToken}
             transaction={{
               performTx: transaction.performTx,
-              validateAmount: transaction.validateParams,
+              validateParams: transaction.validateParams,
             }}
           />
         )}
@@ -105,56 +104,23 @@ export default function LendingPage() {
               <Text>No Supply Tokens Found</Text>
             )}
           </div>
-          <div className={styles.mainTable}>
-            {isLoading ? (
-              <Container
-                width="1000px"
-                height="200px"
-                center={{
-                  horizontal: true,
-                  vertical: true,
-                }}
-              >
-                <LoadingIcon />
-              </Container>
-            ) : rwas.length > 0 ? (
-              <Table
-                columns={7}
-                title="RWAS"
-                headers={[
-                  "Asset",
-                  "APR",
-                  "Wallet Balance",
-                  "Supplied Amount",
-                  "Collateral Factor",
-                  "",
-                ]}
-                data={[
-                  ...rwas.map((cToken) =>
-                    CTokenRow({
-                      cToken,
-                      onClick: () => {
-                        setSelectedCToken(cToken.address);
-                        setCurrentModal(CLMModalTypes.SUPPLY);
-                      },
-                    })
-                  ),
-                ]}
-              />
-            ) : (
-              <Container
-                width="1000px"
-                height="200px"
-                center={{
-                  horizontal: true,
-                  vertical: true,
-                }}
-                backgroundColor="var(--card-sub-surface-color)"
-              >
-                <Text theme="secondary-dark">No RWAS tokens available</Text>
-              </Container>
+
+          <CTokenTable
+            isLoading={isLoading}
+            stableTokens={stableCoins.sort((a, b) =>
+              a.underlying.symbol.localeCompare(b.underlying.symbol)
             )}
-          </div>
+            rwas={rwas}
+            onSupply={(address) => {
+              setSelectedCToken(address);
+              setCurrentModal(CLMModalTypes.SUPPLY);
+            }}
+            onBorrow={(address) => {
+              setSelectedCToken(address);
+              setCurrentModal(CLMModalTypes.BORROW);
+            }}
+          />
+          <Spacer height="20px" />
         </Container>
 
         <Container gap={20}>
@@ -234,3 +200,91 @@ export default function LendingPage() {
 const NoteIcon = () => (
   <Icon themed icon={{ url: "/tokens/note.svg", size: 20 }} />
 );
+
+const CTokenTable = ({
+  title,
+  isLoading,
+  stableTokens,
+  rwas,
+  onSupply,
+  onBorrow,
+}: {
+  title?: string;
+  isLoading: boolean;
+  stableTokens: CTokenWithUserData[];
+  rwas: CTokenWithUserData[];
+  onSupply: (address: string) => void;
+  onBorrow: (address: string) => void;
+}) => {
+  const [filteredPairs, setFilteredPairs] = useState("RWAs");
+
+  return (
+    <div className={styles.mainTable}>
+      {isLoading ? (
+        <Container
+          width="1000px"
+          height="200px"
+          center={{
+            horizontal: true,
+            vertical: true,
+          }}
+        >
+          <LoadingIcon />
+        </Container>
+      ) : stableTokens.length > 0 ? (
+        <Table
+          title={title}
+          secondary={
+            <Container width="320px">
+              <ToggleGroup
+                options={["RWAs", "Stablecoins"]}
+                selected={filteredPairs}
+                setSelected={(value) => {
+                  setFilteredPairs(value);
+                }}
+              />
+            </Container>
+          }
+          headers={[
+            { value: "Asset", ratio: 2 },
+            { value: "APR", ratio: 1 },
+            { value: "Wallet Balance", ratio: 1 },
+            { value: "Supplied Amount", ratio: 1 },
+            { value: "Collateral Factor", ratio: 1 },
+            { value: "Manage", ratio: 2 },
+          ]}
+          content={
+            filteredPairs == "RWAs"
+              ? rwas.map((cToken) =>
+                  CTokenRow({
+                    cToken,
+                    onSupply: () => onSupply(cToken.address),
+                  })
+                )
+              : filteredPairs == "Stablecoins"
+              ? stableTokens.map((cToken) =>
+                  CTokenRow({
+                    cToken,
+                    onSupply: () => onSupply(cToken.address),
+                    onBorrow: () => onBorrow(cToken.address),
+                  })
+                )
+              : []
+          }
+        />
+      ) : (
+        <Container
+          width="1000px"
+          height="200px"
+          center={{
+            horizontal: true,
+            vertical: true,
+          }}
+          backgroundColor="var(--card-sub-surface-color)"
+        >
+          <Text theme="secondary-dark">No {title} tokens available</Text>
+        </Container>
+      )}
+    </div>
+  );
+};

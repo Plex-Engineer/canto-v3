@@ -1,7 +1,7 @@
 import {
   NewTransactionFlow,
   ReturnWithError,
-  ValidationReturn,
+  Validation,
 } from "@/config/interfaces";
 import { AmbientTransactionParams } from "./ambientPoolTxTypes";
 import { AmbientPool } from "./ambientPools";
@@ -16,7 +16,7 @@ export interface AmbientHookReturn {
   ambientPools: AmbientPool[];
   rewards: string;
   transaction: {
-    validateParams: (txParams: AmbientTransactionParams) => ValidationReturn;
+    validateParams: (txParams: AmbientTransactionParams) => Validation;
     createNewPoolFlow: (
       params: AmbientTransactionParams
     ) => ReturnWithError<NewTransactionFlow>;

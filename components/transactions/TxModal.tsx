@@ -10,7 +10,7 @@ import Spacer from "../layout/spacer";
 import clsx from "clsx";
 import StatusIcon from "../icon/statusIcon";
 import Splash from "../splash/splash";
-import { dateToMomentsAgo } from "@/utils/formatting.utils";
+import { dateToMomentsAgo } from "@/utils/formatting";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 
 const TransactionModal = () => {

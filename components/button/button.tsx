@@ -1,7 +1,7 @@
 import styles from "./button.module.scss";
 import Image from "next/image";
 
-interface Props {
+export interface ButtonProps {
   onClick?: () => void;
   height?: "small" | "medium" | "large" | number;
   width?: "contain" | "fill" | number;
@@ -19,9 +19,10 @@ interface Props {
   isLoading?: boolean;
   disabled?: boolean;
   shadow?: "small" | "medium" | "none";
+  buttonProps?: JSX.IntrinsicElements["button"];
 }
 
-const Button = (props: Props) => {
+const Button = (props: ButtonProps) => {
   const getHeight = () => {
     switch (props.height) {
       case "small":
@@ -160,6 +161,7 @@ const Button = (props: Props) => {
         boxShadow: getShadow(),
         flexDirection: props.icon?.position == "right" ? "row-reverse" : "row",
       }}
+      {...props.buttonProps}
     >
       {props.icon && (
         <Image

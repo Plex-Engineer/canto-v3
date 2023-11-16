@@ -4,9 +4,9 @@ import {
   PromiseWithError,
   ReturnWithError,
 } from "@/config/interfaces";
-import { ethToCantoAddress } from "@/utils/address.utils";
-import { tryFetch } from "@/utils/async.utils";
-import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
+import { ethToCantoAddress } from "@/utils/address";
+import { tryFetch } from "@/utils/async";
+import { getCosmosAPIEndpoint } from "@/utils/networks";
 
 interface IBCTransaction {
   chainId: number;

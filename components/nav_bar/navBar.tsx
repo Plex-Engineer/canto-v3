@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TransactionModal from "../transactions/TxModal";
+import ThemeButton from "../footer/components/footerButton";
 
 const NavBar = () => {
   const currentPath = usePathname();
@@ -17,8 +18,8 @@ const NavBar = () => {
         <Link href="/">
           <Image
             src="/tokens/canto.svg"
-            width={50}
-            height={50}
+            width={40}
+            height={40}
             alt="canto"
             style={{
               filter: "invert(var(--dark-mode))",
@@ -28,15 +29,6 @@ const NavBar = () => {
       </div>
 
       <div className={styles["nav-links"]}>
-        {/* <Link
-          href="/"
-          className={clsx(
-            styles["nav-link"],
-            currentPath == "/" && styles.active
-          )}
-        >
-          <Text>Home</Text>
-        </Link> */}
         <Link
           href="/bridge"
           className={clsx(
@@ -44,7 +36,7 @@ const NavBar = () => {
             currentPath == "/bridge" && styles.active
           )}
         >
-          <Text>Bridge</Text>
+          <Text size="sm">Bridge</Text>
         </Link>
         {/* <Link
           href="/staking"
@@ -62,7 +54,7 @@ const NavBar = () => {
             currentPath == "/lending" && styles.active
           )}
         >
-          <Text>Lending</Text>
+          <Text size="sm">Lending</Text>
         </Link>
         <Link
           href="/lp"
@@ -71,7 +63,7 @@ const NavBar = () => {
             currentPath == "/lp" && styles.active
           )}
         >
-          <Text>LP</Text>
+          <Text size="sm">Pools</Text>
         </Link>
         {/* <Link
           href="/governance"
@@ -84,6 +76,9 @@ const NavBar = () => {
         </Link> */}
       </div>
       <div className={styles["btn-grp"]}>
+        <div className={styles.theme}>
+          <ThemeButton />
+        </div>
         <div className={styles.activity}>
           <TransactionModal />
         </div>
