@@ -365,7 +365,7 @@ const AddLiquidityModal = ({
         }}
         IconUrl={pair.token1.logoURI}
         title={tokenSymbol(pair.token1)}
-        min="0"
+        min="1"
         max={pair.token1.balance ?? "0"}
         symbol={tokenSymbol(pair.token1)}
       />
@@ -380,7 +380,7 @@ const AddLiquidityModal = ({
         }}
         IconUrl={pair.token2.logoURI}
         title={tokenSymbol(pair.token2)}
-        min="0"
+        min="1"
         max={pair.token2.balance ?? "0"}
         symbol={tokenSymbol(pair.token2)}
       />
@@ -594,7 +594,7 @@ const RemoveLiquidityModal = ({
         onChange={(e) => setAmountLP(e.target.value)}
         IconUrl={pair.logoURI}
         title={pair.symbol}
-        min="0"
+        min="1"
         max={totalLP}
         symbol={pair.symbol}
       />

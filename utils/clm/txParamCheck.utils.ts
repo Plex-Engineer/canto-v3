@@ -23,7 +23,7 @@ export function lendingTxParamCheck(
   );
   return validateWeiUserInputTokenAmount(
     txParams.amount,
-    "0",
+    "1",
     maxAmount,
     txParams.cToken.underlying.symbol,
     txParams.cToken.underlying.decimals

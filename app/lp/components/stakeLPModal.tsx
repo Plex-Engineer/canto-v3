@@ -112,7 +112,7 @@ export const StakeLPModal = (props: Props) => {
           }}
           IconUrl={cLPToken.underlying.logoURI}
           title={cLPToken.underlying.symbol}
-          min="0"
+          min="1"
           max={maxAmount}
           symbol={cLPToken.underlying.symbol}
         />

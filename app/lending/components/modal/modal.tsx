@@ -197,7 +197,7 @@ export const LendingModal = (props: Props) => {
           IconUrl={cToken.underlying.logoURI}
           title={cToken.underlying.symbol}
           max={maxAmount}
-          min="0"
+          min="1"
           symbol={cToken.underlying.symbol}
           {...limitProps}
         />

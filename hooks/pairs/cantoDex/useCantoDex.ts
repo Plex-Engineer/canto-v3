@@ -134,14 +134,14 @@ export default function useCantoDex(
         const [token1Check, token2Check] = [
           validateWeiUserInputTokenAmount(
             txParams.amounts.amount1,
-            "0",
+            "1",
             token1.balance ?? "0",
             token1.symbol,
             token1.decimals
           ),
           validateWeiUserInputTokenAmount(
             txParams.amounts.amount2,
-            "0",
+            "1",
             token2.balance ?? "0",
             token2.symbol,
             token2.decimals
@@ -161,7 +161,7 @@ export default function useCantoDex(
         // if unstaking first, check supplyBalance, otherwise check balanceOfUnderlying
         return validateWeiUserInputTokenAmount(
           txParams.amountLP,
-          "0",
+          "1",
           addTokenBalances(
             userDetails.supplyBalanceInUnderlying,
             userDetails.balanceOfUnderlying
@@ -172,7 +172,7 @@ export default function useCantoDex(
       case CantoDexTxTypes.STAKE:
         return validateWeiUserInputTokenAmount(
           txParams.amountLP,
-          "0",
+          "1",
           userDetails.balanceOfUnderlying,
           pair.symbol,
           pair.decimals
@@ -180,7 +180,7 @@ export default function useCantoDex(
       case CantoDexTxTypes.UNSTAKE:
         return validateWeiUserInputTokenAmount(
           txParams.amountLP,
-          "0",
+          "1",
           userDetails.supplyBalanceInUnderlying,
           pair.symbol,
           pair.decimals
