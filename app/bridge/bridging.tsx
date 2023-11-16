@@ -46,7 +46,7 @@ const Bridging = (props: BridgeProps) => {
   // validate user input amount
   const amountCheck = validateWeiUserInputTokenAmount(
     amountAsBigNumberString,
-    "0",
+    "1",
     maxBridgeAmount,
     props.hook.selections.token?.symbol ?? "",
     props.hook.selections.token?.decimals ?? 0
