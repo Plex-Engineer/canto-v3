@@ -78,13 +78,7 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
             {
               title: "Add",
               content: (
-                <Container width="100%" margin="sm">
-                  <div className={styles.iconTitle}>
-                    <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
-                    <Text size="lg" font="proto_mono">
-                      {props.pair.symbol}
-                    </Text>
-                  </div>
+                <Container width="100%">
                   <AddLiquidityModal
                     pair={props.pair}
                     validateParams={(params) =>
@@ -108,13 +102,7 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
                   )
                 ) === 0,
               content: (
-                <Container width="100%">
-                  <div className={styles.iconTitle}>
-                    <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
-                    <Text size="lg" font="proto_mono">
-                      {props.pair.symbol}
-                    </Text>
-                  </div>
+                <Container width="100%" padding="sm">
                   <RemoveLiquidityModal
                     pair={props.pair}
                     validateParams={(params) =>
@@ -348,7 +336,13 @@ const AddLiquidityModal = ({
   };
 
   return (
-    <Container width="calc(100% - 32px)">
+    <Container margin="sm">
+      <div className={styles.iconTitle}>
+        <Icon icon={{ url: pair.logoURI, size: 60 }} />
+        <Text size="lg" font="proto_mono">
+          {pair.symbol}
+        </Text>
+      </div>
       <Spacer height="10px" />
       <Amount
         decimals={pair.token1.decimals}
@@ -596,137 +590,145 @@ const RemoveLiquidityModal = ({
       : token.symbol;
   };
   return (
-    <Container
-      width="100%"
-      center={{
-        horizontal: true,
-      }}
-    >
-      <Spacer height="10px" />
-      <Amount
-        value={amountLP}
-        decimals={pair.decimals}
-        onChange={(e) => setAmountLP(e.target.value)}
-        IconUrl={pair.logoURI}
-        title={pair.symbol}
-        max={totalLP}
-        symbol={pair.symbol}
-        error={!paramCheck.isValid && Number(amountLP) !== 0}
-        errorMessage={paramCheck.errorMessage}
-      />
-      <Spacer height="20px" />
-      <Container className={styles.card}>
-        <ModalItem
-          name="Slippage"
-          value={
-            <Container
-              center={{
-                vertical: true,
-              }}
-              gap={40}
-              direction="row"
-              style={{
-                width: "120px",
-              }}
-            >
-              <Input
-                height={"sm"}
-                type="number"
-                placeholder={Number(slippage).toString()}
-                value={Number(slippage).toString()}
-                onChange={(e) => setSlippage(Number(e.target.value))}
-                error={Number(slippage) > 100 || Number(slippage) < 0}
-                errorMessage="Slippage must be between 0-100%"
-              />
-              <Text>%</Text>
-            </Container>
-          }
-        />
-        <ModalItem
-          name="Deadline"
-          value={
-            <Container
-              center={{
-                vertical: true,
-              }}
-              gap={10}
-              direction="row"
-              style={{
-                width: "120px",
-              }}
-            >
-              <Input
-                height={"sm"}
-                type="number"
-                placeholder={Number(deadline).toString()}
-                value={Number(deadline).toString()}
-                onChange={(e) => setDeadline(e.target.value)}
-                error={Number(deadline) <= 0}
-                errorMessage="Deadline must be greater than 0 mins"
-              />
-              <Text>mins</Text>
-            </Container>
-          }
-        />
-      </Container>
-      <Spacer height="6px" />
-
-      <Text
-        font="proto_mono"
-        size="xx-sm"
-        style={{
-          marginLeft: "16px",
+    <Container margin="sm">
+      <div className={styles.iconTitle}>
+        <Icon icon={{ url: pair.logoURI, size: 60 }} />
+        <Text size="lg" font="proto_mono">
+          {pair.symbol}
+        </Text>
+      </div>
+      <Container
+        width="100%"
+        center={{
+          horizontal: true,
         }}
       >
-        Expected Tokens
-      </Text>
-      <Spacer height="6px" />
+        <Spacer height="10px" />
+        <Amount
+          value={amountLP}
+          decimals={pair.decimals}
+          onChange={(e) => setAmountLP(e.target.value)}
+          IconUrl={pair.logoURI}
+          title={pair.symbol}
+          max={totalLP}
+          symbol={pair.symbol}
+          error={!paramCheck.isValid && Number(amountLP) !== 0}
+          errorMessage={paramCheck.errorMessage}
+        />
+        <Spacer height="20px" />
+        <Container className={styles.card}>
+          <ModalItem
+            name="Slippage"
+            value={
+              <Container
+                center={{
+                  vertical: true,
+                }}
+                gap={40}
+                direction="row"
+                style={{
+                  width: "120px",
+                }}
+              >
+                <Input
+                  height={"sm"}
+                  type="number"
+                  placeholder={Number(slippage).toString()}
+                  value={Number(slippage).toString()}
+                  onChange={(e) => setSlippage(Number(e.target.value))}
+                  error={Number(slippage) > 100 || Number(slippage) < 0}
+                  errorMessage="Slippage must be between 0-100%"
+                />
+                <Text>%</Text>
+              </Container>
+            }
+          />
+          <ModalItem
+            name="Deadline"
+            value={
+              <Container
+                center={{
+                  vertical: true,
+                }}
+                gap={10}
+                direction="row"
+                style={{
+                  width: "120px",
+                }}
+              >
+                <Input
+                  height={"sm"}
+                  type="number"
+                  placeholder={Number(deadline).toString()}
+                  value={Number(deadline).toString()}
+                  onChange={(e) => setDeadline(e.target.value)}
+                  error={Number(deadline) <= 0}
+                  errorMessage="Deadline must be greater than 0 mins"
+                />
+                <Text>mins</Text>
+              </Container>
+            }
+          />
+        </Container>
+        <Spacer height="6px" />
 
-      <Container className={styles.card}>
-        <ModalItem
-          name={tokenSymbol(pair.token1)}
-          value={displayAmount(
-            expectedTokens.expectedToken1,
-            pair.token1.decimals,
-            {
-              symbol: tokenSymbol(pair.token1),
-            }
-          )}
-        />
-        <ModalItem
-          name={tokenSymbol(pair.token2)}
-          value={displayAmount(
-            expectedTokens.expectedToken2,
-            pair.token2.decimals,
-            {
-              symbol: tokenSymbol(pair.token2),
-            }
-          )}
-        />
+        <Text
+          font="proto_mono"
+          size="xx-sm"
+          style={{
+            marginLeft: "16px",
+          }}
+        >
+          Expected Tokens
+        </Text>
+        <Spacer height="6px" />
+
+        <Container className={styles.card}>
+          <ModalItem
+            name={tokenSymbol(pair.token1)}
+            value={displayAmount(
+              expectedTokens.expectedToken1,
+              pair.token1.decimals,
+              {
+                symbol: tokenSymbol(pair.token1),
+              }
+            )}
+          />
+          <ModalItem
+            name={tokenSymbol(pair.token2)}
+            value={displayAmount(
+              expectedTokens.expectedToken2,
+              pair.token2.decimals,
+              {
+                symbol: tokenSymbol(pair.token2),
+              }
+            )}
+          />
+        </Container>
+        <Spacer height="30px" />
+
+        <Button
+          disabled={
+            !paramCheck.isValid ||
+            Number(slippage) > 100 ||
+            Number(slippage) < 0 ||
+            Number(deadline) <= 0
+          }
+          width={"fill"}
+          onClick={() =>
+            sendTxFlow({
+              pair,
+              amountLP: (
+                convertToBigNumber(amountLP, pair.decimals).data ?? "0"
+              ).toString(),
+              deadline,
+              slippage,
+            })
+          }
+        >
+          Remove Liquidity
+        </Button>
       </Container>
-      <Spacer height="30px" />
-
-      <Button
-        disabled={
-          !paramCheck.isValid ||
-          Number(slippage) > 100 ||
-          Number(slippage) < 0 ||
-          Number(deadline) <= 0
-        }
-        width={"fill"}
-        onClick={() =>
-          sendTxFlow({
-            pair,
-            amountLP: (
-              convertToBigNumber(amountLP, pair.decimals).data ?? "0"
-            ).toString(),
-            deadline,
-            slippage,
-          })
-        }
-      >
-        Remove Liquidity
-      </Button>
     </Container>
   );
 };
