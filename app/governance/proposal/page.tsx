@@ -16,6 +16,8 @@ import { VoteOption } from "@/hooks/gov/interfaces/voteOptions";
 import Image from "next/image";
 import { NEW_ERROR, NewTransactionFlow } from "@/config/interfaces";
 import { TransactionFlowType } from "@/config/transactions/txMap";
+import { formatBalance } from "@/utils/formatting/balances.utils";
+import Container from "@/components/container/container";
 
 
 
@@ -171,8 +173,25 @@ export default function Page() {
                 <div><Text font="proto_mono">{votesData.yes}%</Text></div>
               </div>
               <div className={styles.votingInfoRow2}>
-                <div><Text font="proto_mono" opacity={0.4} size="x-sm">{votesData.yesAmount}</Text></div>
-              </div>
+                    <Container
+                        direction="row"
+                        gap={6}
+                        center={{
+                          vertical: true,
+                        }}
+                      >
+                        <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.yesAmount, 2, {
+                          commify: true,
+                        })}</Text>
+                        <Icon
+                          icon={{
+                            url: "./tokens/canto.svg",
+                            size: 16,
+                          }}
+                        />
+
+                      </Container>
+                </div>
               
               
 
@@ -197,7 +216,24 @@ export default function Page() {
                 <div><Text font="proto_mono">{votesData.no}%</Text></div>
               </div>
               <div className={styles.votingInfoRow2}>
-                <div><Text font="proto_mono" opacity={0.4} size="x-sm">{votesData.noAmount}</Text></div>
+              <Container
+                        direction="row"
+                        gap={6}
+                        center={{
+                          vertical: true,
+                        }}
+                      >
+                        <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.noAmount, 2, {
+                          commify: true,
+                        })}</Text>
+                        <Icon
+                          icon={{
+                            url: "./tokens/canto.svg",
+                            size: 16,
+                          }}
+                        />
+
+                      </Container>
               </div>
 
             </div>
@@ -213,13 +249,30 @@ export default function Page() {
                   disabled={!isActive}
                 />
               </div>}
-            <div className={styles.proposalInfoVoting}>
+            <div className={styles.proposalInfoVoting} >
               <div className={styles.votingInfoRow1}>
                 <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "#4455EF", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Veto</Text></div></div>
                 <div><Text font="proto_mono">{votesData.no_with_veto}%</Text></div>
               </div>
               <div className={styles.votingInfoRow2}>
-                <div><Text font="proto_mono" opacity={0.4} size="x-sm">{votesData.no_with_vetoAmount}</Text></div>
+              <Container
+                        direction="row"
+                        gap={6}
+                        center={{
+                          vertical: true,
+                        }}
+                      >
+                        <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.no_with_vetoAmount, 2, {
+                          commify: true,
+                        })}</Text>
+                        <Icon
+                          icon={{
+                            url: "./tokens/canto.svg",
+                            size: 16,
+                          }}
+                        />
+
+                      </Container>
               </div>
               
               
@@ -242,7 +295,24 @@ export default function Page() {
                 <div><Text font="proto_mono">{votesData.abstain}%</Text></div>
               </div>
               <div className={styles.votingInfoRow2}>
-                <div><Text font="proto_mono" opacity={0.4} size="x-sm">{votesData.abstainAmount}</Text></div>
+              <Container
+                        direction="row"
+                        gap={6}
+                        center={{
+                          vertical: true,
+                        }}
+                      >
+                        <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.abstainAmount, 2, {
+                          commify: true,
+                        })}</Text>
+                        <Icon
+                          icon={{
+                            url: "./tokens/canto.svg",
+                            size: 16,
+                          }}
+                        />
+
+                      </Container>
               </div>
             </div>
           </div>  
