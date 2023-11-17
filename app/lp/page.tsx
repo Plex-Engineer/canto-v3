@@ -10,7 +10,7 @@ import {
   UserCantoDexPairRow,
 } from "./components/pairRow";
 import Text from "@/components/text";
-import { CantoDexLPModal } from "./components/cantoDexLPModal";
+import { CantoDexLPModal } from "./components/dexModals/cantoDexLPModal";
 import styles from "./lp.module.scss";
 import useLP from "@/hooks/pairs/lpCombo/useLP";
 import {
