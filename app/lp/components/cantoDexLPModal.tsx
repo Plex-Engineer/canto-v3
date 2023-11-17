@@ -9,13 +9,12 @@ import {
 } from "@/utils/formatting";
 import { useEffect, useState } from "react";
 import Container from "@/components/container/container";
-import { quoteRemoveLiquidity } from "@/utils/cantoDex";
+import { getOptimalValueBFormatted, quoteRemoveLiquidity } from "@/utils/cantoDex";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { Validation } from "@/config/interfaces";
 import Icon from "@/components/icon/icon";
 import Text from "@/components/text";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
-import { getOptimalValueBFormatted } from "@/hooks/pairs/cantoDex/helpers/addLiquidityValues";
 import styles from "./cantoDex.module.scss";
 import Amount from "@/components/amount/amount";
 import Tabs from "@/components/tabs/tabs";
