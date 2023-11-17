@@ -10,7 +10,7 @@ const crescentBlockExplorer = "https://www.mintscan.io/crescent";
 export const CRESCENT: CosmosNetwork = {
   id: "crescent-1",
   chainId: "crescent-1",
-  icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/crescent/images/cre.svg",
+  icon: "/icons/cre.svg",
   name: "Crescent",
   isTestChain: false,
   rpcUrl: "https://mainnet.crescent.network:26657",

@@ -5,10 +5,10 @@ import InfoBar from "@/components/info_bar/infoBar";
 import Footer from "@/components/footer/footer";
 import NavBar from "@/components/nav_bar/navBar";
 import CantoWalletProvider from "@/provider/rainbowProvider";
-import { QueryClient, QueryClientProvider } from "react-query";
 import localFont from "next/font/local";
 import DesktopOnly from "@/components/desktop-only/desktop-only";
 import { Metadata } from "next";
+import { ReactQueryClientProvider } from "@/provider/reactQueryProvider";
 
 const rm_mono = localFont({
   src: "../fonts/rm-mono-regular.ttf",
@@ -55,7 +55,7 @@ export default function RootLayout({
         property="og:description"
         content="canto is a layer-1 blockchain built to deliver on the promise of defi. as a post-traditional financial movement, canto enables accessibility, transparency, and freedom for new systems. driven by a loosely organized collective of chain-native builders, canto provides a new commons powered by free public infrastructure_"
       />
-      <meta property="og:image" content="https://beta.canto.io/meta.png" />
+      <meta property="og:image" content="https://beta.canto.io/meta.jpg" />
 
       {/* <!-- Twitter --> */}
       <meta property="twitter:card" content="summary_large_image" />
@@ -65,7 +65,7 @@ export default function RootLayout({
         property="twitter:description"
         content="canto is a layer-1 blockchain built to deliver on the promise of defi. as a post-traditional financial movement, canto enables accessibility, transparency, and freedom for new systems. driven by a loosely organized collective of chain-native builders, canto provides a new commons powered by free public infrastructure_"
       />
-      <meta property="twitter:image" content="https://beta.canto.io/meta.png" />
+      <meta property="twitter:image" content="https://beta.canto.io/meta.jpg" />
 
       <body
         className={"dark"}
@@ -78,7 +78,7 @@ export default function RootLayout({
       >
         <DesktopOnly />
         <CantoWalletProvider>
-          <QueryClientProvider client={new QueryClient()}>
+          <ReactQueryClientProvider>
             <div className="body">
               <InfoBar
                 values={[
@@ -113,7 +113,7 @@ export default function RootLayout({
               <div id="modal-root"></div>
               <Footer />
             </div>
-          </QueryClientProvider>
+          </ReactQueryClientProvider>
         </CantoWalletProvider>
       </body>
     </html>

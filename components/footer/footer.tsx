@@ -4,7 +4,7 @@ import Text from "../text";
 import styles from "./footer.module.scss";
 import FooterButton from "./components/footerButton";
 import { useEffect, useState } from "react";
-import { getTokenPriceInUSDC } from "@/utils/tokens/prices.utils";
+import { getTokenPriceInUSDC } from "@/utils/tokens";
 import { useBlockNumber } from "wagmi";
 import { CANTO_MAINNET_EVM } from "@/config/networks";
 
@@ -31,11 +31,13 @@ const Footer = () => {
   return (
     <div className={styles.container}>
       <div className={styles.links}>
-        <FooterLink href="https://canto.mirror.xyz/" text="about" />
         <FooterLink href="https://docs.canto.io/" text="docs" />
-        <FooterLink href="https://canto.build/" text="commons" />
-        <FooterLink href="https://canto.canny.io/" text="report bug" />
-        {/* <FooterLink href="https://v2.canto.io/" text="canto v2" /> */}
+        <FooterLink
+          href="https://discord.com/invite/63GmEXZsVf"
+          text="Discord"
+        />
+        <FooterLink href="https://twitter.com/CantoPublic" text="twitter" />
+        <FooterLink href="https://canto.mirror.xyz/" text="Blog" />
         <FooterButton text="theme" />
       </div>
       <div className={styles.links}>

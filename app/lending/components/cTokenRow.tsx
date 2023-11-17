@@ -1,17 +1,18 @@
 import Button from "@/components/button/button";
 import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
-import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/formatting";
 
 export const CTokenRow = ({
   cToken,
-  onClick,
+  onBorrow,
+  onSupply,
 }: {
   cToken: CTokenWithUserData;
-  onClick: () => void;
+  onSupply?: () => void;
+  onBorrow?: () => void;
 }) => [
   <Container
     key={cToken.address}
@@ -19,14 +20,14 @@ export const CTokenRow = ({
     gap={10}
     style={{
       padding: "0 16px",
+      width: "220px",
     }}
     center={{
       vertical: true,
-      horizontal: true,
     }}
+    width="100%"
   >
     <Icon icon={{ url: cToken.underlying.logoURI, size: 30 }} />
-    {/* <Spacer width="10px" /> */}
     <Text theme="primary-dark" key={cToken.name + cToken.name}>
       {cToken.underlying.name}
     </Text>
@@ -49,13 +50,29 @@ export const CTokenRow = ({
   <Text theme="primary-dark" key={cToken.name + "cToken.CF"}>
     {displayAmount(cToken.collateralFactor, 16) + "%"}
   </Text>,
-  <Container key={cToken.name + "Manage"} direction="row">
-    <Button
-      key={cToken.name + "cToken.supply"}
-      color="secondary"
-      onClick={onClick}
-    >
-      Manage
-    </Button>
+  <Container
+    key={cToken.name + "Manage"}
+    direction="row"
+    gap={10}
+    center={{ horizontal: true }}
+  >
+    {onSupply && (
+      <Button
+        key={cToken.name + "cToken.onSupply"}
+        color="secondary"
+        onClick={onSupply}
+      >
+        Supply
+      </Button>
+    )}
+    {onBorrow && (
+      <Button
+        key={cToken.name + "cToken.onBorrow"}
+        color="secondary"
+        onClick={onBorrow}
+      >
+        Borrow
+      </Button>
+    )}
   </Container>,
 ];

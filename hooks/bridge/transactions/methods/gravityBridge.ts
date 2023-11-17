@@ -25,12 +25,12 @@ import {
   checkPubKeyCosmos,
   ethToCantoAddress,
   isValidEthAddress,
-} from "@/utils/address.utils";
-import { tryFetch } from "@/utils/async.utils";
-import { getCantoBalance } from "@/utils/cosmos/cosmosBalance.utils";
+} from "@/utils/address";
+import { tryFetch } from "@/utils/async";
+import { getCantoBalance } from "@/utils/cosmos";
 import { createMsgsSend } from "@/utils/cosmos/transactions/messages/messageSend";
-import { createApprovalTxs, getTokenBalance } from "@/utils/evm/erc20.utils";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { createApprovalTxs, getTokenBalance } from "@/utils/tokens";
+import { displayAmount } from "@/utils/formatting";
 import BigNumber from "bignumber.js";
 import {
   BridgingMethod,
@@ -104,14 +104,15 @@ export async function bridgeInGravity(
           "Access-Control-Request-Headers": "Content-Type, Authorization",
           "Access-Control-Allow-Origin": "true",
         },
-        mode: "no-cors",
         body: JSON.stringify({
           cantoAddress: cantoReceiver,
           hexAddress: ethSender,
         }),
       });
       if (botError) {
-        return NEW_ERROR("bridgeInGravity::" + "pubKey: pub key error");
+        return NEW_ERROR(
+          "bridgeInGravity::" + "pubKey: pub key error " + errMsg(botError)
+        );
       }
     }
 

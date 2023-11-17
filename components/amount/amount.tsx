@@ -1,4 +1,4 @@
-import { formatBalance } from "@/utils/tokenBalances.utils";
+import { formatBalance } from "@/utils/formatting";
 import Icon from "../icon/icon";
 import Text from "../text";
 import styles from "./amount.module.scss";

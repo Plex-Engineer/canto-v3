@@ -1,7 +1,7 @@
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { CantoDexPair } from "../interfaces/pairs";
-import { quoteAddLiquidity } from "@/utils/evm/pairs.utils";
-import { convertToBigNumber, formatBalance } from "@/utils/tokenBalances.utils";
+import { quoteAddLiquidity } from "@/utils/cantoDex";
+import { convertToBigNumber, formatBalance } from "@/utils/formatting";
 import {
   NEW_ERROR,
   NO_ERROR,

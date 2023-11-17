@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { areEqualAddresses } from "@/utils/address.utils";
+import { areEqualAddresses } from "@/utils/address";
 import {
   NEW_ERROR,
   NO_ERROR,
@@ -75,7 +75,7 @@ export default function useLP(props: UseLPProps): UseLPReturn {
     }
     return NO_ERROR({
       title: "Claim Rewards",
-      icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+      icon: "/icons/canto.svg",
       txType: TransactionFlowType.CLAIM_LP_REWARDS_TX,
       params,
     });

@@ -15,7 +15,7 @@ const Rewards = (props: Props) => {
       <div>
         <Text
           font="proto_mono"
-          size="x-lg"
+          size="lg"
           style={{
             color: "#000",
           }}
@@ -34,7 +34,7 @@ const Rewards = (props: Props) => {
             font="proto_mono"
             size="x-lg"
             style={{
-              fontSize: "42px",
+              fontSize: "36px",
               color: "#000",
             }}
           >

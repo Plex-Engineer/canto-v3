@@ -10,24 +10,24 @@ import {
 } from "@/config/interfaces";
 import { cTokenLendingTx } from "@/hooks/lending/transactions/lending";
 import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
-import { createApprovalTxs, getTokenBalance } from "@/utils/evm/erc20.utils";
+import { createApprovalTxs, getTokenBalance } from "@/utils/tokens";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
-import { areEqualAddresses } from "@/utils/address.utils";
+import { areEqualAddresses } from "@/utils/address";
 import {
   greaterThan,
   percentOfAmount,
   subtractTokenBalances,
-} from "@/utils/tokens/tokenMath.utils";
-import { quoteRemoveLiquidity } from "@/utils/evm/pairs.utils";
+} from "@/utils/math";
+import { quoteRemoveLiquidity } from "@/utils/cantoDex";
 import { TransactionFlowType } from "@/config/transactions/txMap";
 import {
   CantoDexTransactionParams,
   CantoDexTxTypes,
   StakeLPParams,
 } from "../interfaces/pairsTxTypes";
-import { displayAmount } from "@/utils/tokenBalances.utils";
-import { getEVMTimestamp } from "@/utils/evm/helpers.utils";
+import { displayAmount } from "@/utils/formatting";
+import { getEVMTimestamp } from "@/utils/evm";
 
 export async function cantoDexLPTx(
   params: CantoDexTransactionParams

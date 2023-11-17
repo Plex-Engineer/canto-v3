@@ -9,25 +9,24 @@ import {
   TransactionStatus,
   OFTToken,
 } from "@/config/interfaces";
-import { isValidEthAddress } from "@/utils/address.utils";
+import { isValidEthAddress } from "@/utils/address";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
 import { encodePacked } from "web3-utils";
 import BigNumber from "bignumber.js";
 import Web3 from "web3";
 import { OFT_ABI } from "@/config/abis";
-import { newContractInstance } from "@/utils/evm/helpers.utils";
-import { createApprovalTxs, getTokenBalance } from "@/utils/evm/erc20.utils";
+import { newContractInstance } from "@/utils/evm";
+import { createApprovalTxs, getTokenBalance, isOFTToken } from "@/utils/tokens";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/formatting";
 import {
   BridgingMethod,
   getBridgeMethodInfo,
 } from "../../interfaces/bridgeMethods";
 import { getMessagesBySrcTxHash } from "@layerzerolabs/scan-client";
-import { getNetworkInfoFromChainId } from "@/utils/networks.utils";
+import { getNetworkInfoFromChainId } from "@/utils/networks";
 import { BridgeTransactionParams } from "../../interfaces/hookParams";
-import { isOFTToken } from "@/utils/tokens/tokens.utils";
 import { fetchBalance } from "wagmi/actions";
 
 /**

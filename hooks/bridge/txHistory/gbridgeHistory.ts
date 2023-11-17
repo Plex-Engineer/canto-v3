@@ -7,9 +7,9 @@ import {
   PromiseWithError,
   errMsg,
 } from "@/config/interfaces";
-import { tryFetch } from "@/utils/async.utils";
-import { newContractInstance } from "@/utils/evm/helpers.utils";
-import { areEqualAddresses } from "@/utils/address.utils";
+import { tryFetch } from "@/utils/async";
+import { newContractInstance } from "@/utils/evm";
+import { areEqualAddresses } from "@/utils/address";
 
 export interface UserGBridgeInHistory {
   completed: SendToCosmosEvent[];

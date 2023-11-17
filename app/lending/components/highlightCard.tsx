@@ -4,7 +4,7 @@ import Image from "next/image";
 import Item from "./item";
 import Icon from "@/components/icon/icon";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/formatting";
 import Text from "@/components/text";
 import InfoPop from "@/components/infopop/infopop";
 import PopUp from "@/components/popup/popup";

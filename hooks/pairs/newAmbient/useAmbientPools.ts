@@ -21,8 +21,8 @@ import {
 import {
   getConcBaseTokensFromQuoteTokens,
   getConcQuoteTokensFromBaseTokens,
-} from "@/utils/ambient/liquidity.utils";
-import { validateInputTokenAmount } from "@/utils/validation.utils";
+} from "@/utils/ambient";
+import { validateInputTokenAmount } from "@/utils/math";
 import { createNewAmbientTxFlow } from "./helpers/createAmbientFlow";
 import { queryUserAmbientRewards } from "./helpers/ambientApi";
 import { CLMClaimRewardsTxParams } from "@/hooks/lending/interfaces/lendingTxTypes";
@@ -45,18 +45,23 @@ export default function useAmbientPools(
   const { data: ambient, isLoading } = useQuery(
     ["ambient pools", params.chainId, params.userEthAddress],
     async (): Promise<{ pools: AmbientPool[]; rewards: string }> => {
+      const pools = await getAllAmbientPoolsData(
+        params.chainId,
+        params.userEthAddress
+      );
+      if (pools.error) throw pools.error;
+      let rewards = "0";
+      if (params.userEthAddress) {
+        const rewardsQuery = await queryUserAmbientRewards(
+          params.chainId,
+          params.userEthAddress
+        );
+        if (rewardsQuery.error) throw rewardsQuery.error;
+        rewards = rewardsQuery.data;
+      }
       return {
-        pools:
-          (await getAllAmbientPoolsData(params.chainId, params.userEthAddress))
-            .data ?? [],
-        rewards: params.userEthAddress
-          ? (
-              await queryUserAmbientRewards(
-                params.chainId,
-                params.userEthAddress
-              )
-            ).data ?? "0"
-          : "0",
+        pools: pools.data,
+        rewards,
       };
     },
     {
@@ -110,14 +115,14 @@ export default function useAmbientPools(
           continue;
         }
         aprMap[cToken.data.address] = {
-          distApr: cToken.data.distApy,
-          supplyApr: cToken.data.supplyApy,
+          distApr: (Number(cToken.data.distApy) / 2).toString(),
+          supplyApr: (Number(cToken.data.supplyApy) / 2).toString(),
         };
       }
       setAmbientTokenAprs(aprMap);
     }
     getCTokenAprs();
-  }, [ambient?.pools.length, params.chainId]);
+  }, [ambient?.pools, params.chainId]);
 
   // get balances of all underlying tokens
   const underlyingTokenBalances = useTokenBalances(
@@ -261,7 +266,7 @@ export default function useAmbientPools(
   ): ReturnWithError<NewTransactionFlow> {
     return NO_ERROR({
       title: "Claim Rewards",
-      icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+      icon: "/icons/canto.svg",
       txType: TransactionFlowType.CLAIM_LP_REWARDS_TX,
       params: {
         ambientParams: params,

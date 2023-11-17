@@ -4,7 +4,7 @@ import {
   getNetworkInfoFromChainId,
   isCosmosNetwork,
   isEVMNetwork,
-} from "@/utils/networks.utils";
+} from "@/utils/networks";
 import * as NETWORKS from "@/config/networks";
 
 describe("networks interface tests", () => {

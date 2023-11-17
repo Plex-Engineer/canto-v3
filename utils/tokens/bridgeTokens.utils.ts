@@ -3,7 +3,7 @@ import {
   BridgeOutToken,
   BridgeToken,
 } from "@/hooks/bridge/interfaces/tokens";
-import { isERC20Token, isIBCToken } from "./tokens.utils";
+import { isERC20Token, isIBCToken } from "./tokenTypes.utils";
 
 ///
 /// Functions to check token objects for type (type guarding)

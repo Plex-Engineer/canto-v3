@@ -14,8 +14,8 @@ import { TRANSACTION_FLOW_MAP } from "@/config/transactions/txMap";
 import {
   performSingleTransaction,
   waitForTransaction,
-} from "@/utils/baseTransaction.utils";
-import { getNetworkInfoFromChainId } from "@/utils/networks.utils";
+} from "@/utils/transactions";
+import { getNetworkInfoFromChainId } from "@/utils/networks";
 import { GetWalletClientResult } from "wagmi/actions";
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";

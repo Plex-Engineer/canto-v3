@@ -6,16 +6,14 @@ import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
-import { concLiquidityNoteValue } from "@/utils/ambient/liquidity.utils";
-import { formatPercent } from "@/utils/formatting.utils";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { concLiquidityNoteValue } from "@/utils/ambient";
+import { formatPercent, displayAmount } from "@/utils/formatting";
 import {
   addTokenBalances,
   convertTokenAmountToNote,
   divideBalances,
-} from "@/utils/tokens/tokenMath.utils";
+} from "@/utils/math";
 import BigNumber from "bignumber.js";
-import Image from "next/image";
 
 export const UserCantoDexPairRow = ({
   pair,
@@ -37,13 +35,26 @@ export const UserCantoDexPairRow = ({
   if (error) return [];
   const userPoolShare = divideBalances(totalUserLpTokens, pair.totalSupply);
   return [
-    <div key={pair.address + "symbol"}>
-      <Image src={pair.logoURI} width={54} height={54} alt="logo" />
-      <Spacer width="10px" />
-
-      <Text>{pair.symbol}</Text>
-    </div>,
-    <Text key={pair.address + "apr"}>{pair.clmData?.distApy + "%"}</Text>,
+    <Container
+      key={pair.address}
+      direction="row"
+      gap={10}
+      style={{
+        padding: "0 16px",
+      }}
+      center={{
+        vertical: true,
+        horizontal: true,
+      }}
+    >
+      <Icon icon={{ url: pair.logoURI, size: 54 }} />
+      <Text theme="primary-dark" key={pair.address + "symbol"}>
+        {pair.symbol}
+      </Text>
+    </Container>,
+    <Text key={pair.address + "apr"}>
+      {(pair.clmData?.distApy ?? "0.00") + "%"}
+    </Text>,
 
     <Text key={pair.address + "share"}>{formatPercent(userPoolShare)}</Text>,
     <Text key={pair.address + "value"}>
@@ -71,11 +82,15 @@ export const UserCantoDexPairRow = ({
     <Text key={pair.address + "rewards"}>
       {displayAmount(pair.clmData?.userDetails?.rewards ?? "0", 18)}
     </Text>,
-    <div key={pair.address + "edit"}>
+    <Container
+      key={pair.address + "edit"}
+      direction="row"
+      center={{ horizontal: true }}
+    >
       <Button onClick={() => onManage(pair.address)} color="secondary">
         Manage LP
       </Button>
-    </div>,
+    </Container>,
   ];
 };
 
@@ -86,12 +101,26 @@ export const GeneralCantoDexPairRow = ({
   pair: CantoDexPairWithUserCTokenData;
   onAddLiquidity: (pairAddress: string) => void;
 }) => [
-  <div key={pair.address + "symbol"}>
-    <Image src={pair.logoURI} width={54} height={54} alt="logo" />
-    <Spacer width="10px" />
-    <Text>{pair.symbol}</Text>
-  </div>,
-  <Text key={pair.address + "apr"}>{pair.clmData?.distApy + "%"}</Text>,
+  <Container
+    key={pair.address}
+    direction="row"
+    gap={10}
+    style={{
+      padding: "0 16px",
+    }}
+    center={{
+      vertical: true,
+      horizontal: true,
+    }}
+  >
+    <Icon icon={{ url: pair.logoURI, size: 54 }} />
+    <Text theme="primary-dark" key={pair.address + "symbol"}>
+      {pair.symbol}
+    </Text>
+  </Container>,
+  <Text key={pair.address + "apr"}>
+    {(pair.clmData?.distApy ?? "0.00") + "%"}
+  </Text>,
 
   <Text key={pair.address + "tvl"}>
     {displayAmount(pair.tvl, 18, {
@@ -109,9 +138,13 @@ export const GeneralCantoDexPairRow = ({
   <Text key={pair.address + "type"}>
     {pair.stable ? "Stable" : "Volatile"}
   </Text>,
-  <div key={pair.address + "edit"}>
+  <Container
+    key={pair.address + "edit"}
+    direction="row"
+    center={{ horizontal: true }}
+  >
     <Button onClick={() => onAddLiquidity(pair.address)}>Add LP</Button>
-  </div>,
+  </Container>,
 ];
 
 export const GeneralAmbientPairRow = ({
@@ -121,11 +154,23 @@ export const GeneralAmbientPairRow = ({
   pool: AmbientPool;
   onAddLiquidity: (poolAddress: string) => void;
 }) => [
-  <div key={pool.address + "symbol"}>
-    <Image src={pool.logoURI} width={54} height={54} alt="logo" />
-    <Spacer width="10px" />
-    <Text>{pool.symbol}</Text>
-  </div>,
+  <Container
+    key={pool.address}
+    direction="row"
+    gap={10}
+    style={{
+      padding: "0 16px",
+    }}
+    center={{
+      vertical: true,
+      horizontal: true,
+    }}
+  >
+    <Icon icon={{ url: pool.logoURI, size: 54 }} />
+    <Text theme="primary-dark" key={pool.address + "symbol"}>
+      {pool.symbol}
+    </Text>
+  </Container>,
   <AprBlock key={"apr"} pool={pool} />,
   <Text key={pool.address + "tvl"}>
     {displayAmount(pool.totals.noteTvl, 18, {
@@ -161,11 +206,11 @@ export const GeneralAmbientPairRow = ({
       </Text>
     </InfoPop>
   </Container>,
-  <div key={"action"}>
+  <Container key={"action"} direction="row" center={{ horizontal: true }}>
     <Button key={"action item"} onClick={() => onAddLiquidity(pool.address)}>
       Add LP
     </Button>
-  </div>,
+  </Container>,
 ];
 
 export const UserAmbientPairRow = ({
@@ -191,11 +236,23 @@ export const UserAmbientPairRow = ({
     );
   }, "0");
   return [
-    <div key={pool.address + "symbol"}>
-      <Image src={pool.logoURI} width={54} height={54} alt="logo" />
-      <Spacer width="10px" />
-      <Text>{pool.symbol}</Text>
-    </div>,
+    <Container
+      key={pool.address}
+      direction="row"
+      gap={10}
+      style={{
+        padding: "0 16px",
+      }}
+      center={{
+        vertical: true,
+        horizontal: true,
+      }}
+    >
+      <Icon icon={{ url: pool.logoURI, size: 54 }} />
+      <Text theme="primary-dark" key={pool.address + "symbol"}>
+        {pool.symbol}
+      </Text>
+    </Container>,
     <AprBlock key={"apr"} pool={pool} />,
     <Text key={pool.symbol + "pool share"}>
       {formatPercent(divideBalances(value, pool.totals.noteTvl))}
@@ -214,7 +271,7 @@ export const UserAmbientPairRow = ({
     <Text key={pool.symbol + "rewards"}>
       {displayAmount(rewards ?? "0", 18)}
     </Text>,
-    <div key={"action"}>
+    <Container key={"action"} direction="row" center={{ horizontal: true }}>
       <Button
         color="secondary"
         key={"action item"}
@@ -222,7 +279,7 @@ export const UserAmbientPairRow = ({
       >
         Manage LP
       </Button>
-    </div>,
+    </Container>,
   ];
 };
 

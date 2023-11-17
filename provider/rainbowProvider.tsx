@@ -61,21 +61,21 @@ const { connectors } = getDefaultWallets({
   chains,
 });
 
-const specificConnectors = connectorsForWallets([
-  {
-    groupName: "Recommended",
-    wallets: [
-      injectedWallet({
-        chains,
-      }),
-    ],
-  },
-]);
+// const specificConnectors = connectorsForWallets([
+//   {
+//     groupName: "Recommended",
+//     wallets: [
+//       injectedWallet({
+//         chains,
+//       }),
+//     ],
+//   },
+// ]);
 
 const wagmiConfig = createConfig({
   autoConnect: true,
-  //   connectors,
-  connectors: specificConnectors,
+  connectors,
+  // connectors: specificConnectors,
   publicClient,
 });
 

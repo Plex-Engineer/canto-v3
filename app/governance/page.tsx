@@ -42,6 +42,7 @@ export default function GovernancePage() {
     
               
     <ProposalTable proposals={sorted_proposals}></ProposalTable>
+    <Spacer height="40px" />
     </div>
   </div>)
   );

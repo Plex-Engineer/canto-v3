@@ -5,15 +5,15 @@ import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes"
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 import useLending from "@/hooks/lending/useLending";
-import { listIncludesAddress } from "@/utils/address.utils";
+import { listIncludesAddress } from "@/utils/address";
 import {
   getCirculatingCNote,
   getCirculatingNote,
-} from "@/utils/clm/noteStats.utils";
+} from "@/utils/clm";
 import {
   addTokenBalances,
   convertTokenAmountToNote,
-} from "@/utils/tokens/tokenMath.utils";
+} from "@/utils/math";
 import BigNumber from "bignumber.js";
 import { useEffect, useMemo, useState } from "react";
 
@@ -21,6 +21,7 @@ interface LendingComboReturn {
   cTokens: {
     cNote: CTokenWithUserData | undefined;
     rwas: CTokenWithUserData[];
+    stableCoins: CTokenWithUserData[];
   };
   isLoading: boolean;
   clmPosition: {
@@ -75,6 +76,11 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
   const rwaAddressList = getCTokensFromType(chainId, "rwas");
   const rwas = cTokens.filter((cToken) =>
     listIncludesAddress(rwaAddressList ?? [], cToken.address)
+  );
+
+  const stableCoinAddressList = getCTokensFromType(chainId, "stableCoins");
+  const stableCoins = cTokens.filter((cToken) =>
+    listIncludesAddress(stableCoinAddressList ?? [], cToken.address)
   );
 
   // relevant user position data to show in UI
@@ -170,6 +176,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     cTokens: {
       cNote,
       rwas,
+      stableCoins,
     },
     isLoading,
     clmPosition: {

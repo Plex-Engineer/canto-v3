@@ -12,7 +12,7 @@ import {
   getNetworkInfoFromChainId,
   isCosmosNetwork,
   isEVMNetwork,
-} from "@/utils/networks.utils";
+} from "@/utils/networks";
 import {
   bridgeInGravity,
   validateGBridgeInRetryParams,
@@ -27,7 +27,7 @@ import {
   isERC20Token,
   isIBCToken,
   isOFTToken,
-} from "@/utils/tokens/tokens.utils";
+} from "@/utils/tokens";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging into canto

@@ -71,7 +71,7 @@ const NavBar = () => {
             currentPath == "/lp" && styles.active
           )}
         >
-          <Text>LP</Text>
+          <Text>Pools</Text>
         </Link>
         <Link
           href="/governance"

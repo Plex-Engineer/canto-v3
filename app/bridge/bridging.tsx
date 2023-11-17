@@ -8,7 +8,7 @@ import {
   convertToBigNumber,
   displayAmount,
   formatBalance,
-} from "@/utils/tokenBalances.utils";
+} from "@/utils/formatting";
 import { useEffect, useState } from "react";
 import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";
@@ -18,11 +18,12 @@ import Image from "next/image";
 import Modal from "@/components/modal/modal";
 import ConfirmationModal from "./components/confirmationModal";
 import { BridgingMethod } from "@/hooks/bridge/interfaces/bridgeMethods";
-import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks.utils";
+import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks";
 import { GetWalletClientResult } from "wagmi/actions";
 import { maxBridgeAmountInUnderlying } from "@/hooks/bridge/helpers/amounts";
 import { BaseNetwork } from "@/config/interfaces";
-import { validateInputTokenAmount } from "@/utils/validation.utils";
+import { validateInputTokenAmount } from "@/utils/math";
+import { ETHEREUM_VIA_GRAVITY_BRIDGE } from "@/config/networks";
 
 interface BridgeProps {
   hook: BridgeHookReturn;
@@ -103,6 +104,11 @@ const Bridging = (props: BridgeProps) => {
     isCosmosNetwork(props.hook.selections.toNetwork)
       ? {
           cosmosAddress: {
+            addressName:
+              props.hook.selections.toNetwork.id ===
+              ETHEREUM_VIA_GRAVITY_BRIDGE.id
+                ? "Gravity Bridge"
+                : undefined,
             chainId: props.hook.selections.toNetwork.chainId,
             addressPrefix: props.hook.selections.toNetwork.addressPrefix,
             currentAddress: props.hook.addresses.getReceiver() ?? "",
@@ -146,10 +152,6 @@ const Bridging = (props: BridgeProps) => {
           addresses={{
             from: props.hook.addresses.getSender(),
             to: props.hook.addresses.getReceiver(),
-            name:
-              props.hook.direction === "in"
-                ? networkName(props.hook.selections.fromNetwork)
-                : networkName(props.hook.selections.toNetwork),
           }}
           fromNetwork={networkName(props.hook.selections.fromNetwork)}
           toNetwork={networkName(props.hook.selections.toNetwork)}
@@ -171,7 +173,7 @@ const Bridging = (props: BridgeProps) => {
           }}
           extraDetails={
             props.hook.selections.toNetwork?.id ===
-            "ethereum-via-gravity-bridge" ? (
+            ETHEREUM_VIA_GRAVITY_BRIDGE.id ? (
               <Text size="x-sm">
                 To bridge your tokens to Ethereum through Gravity Bridge, first
                 ensure that you have an IBC wallet like Keplr.
@@ -200,6 +202,7 @@ const Bridging = (props: BridgeProps) => {
           style={{
             flexDirection:
               props.hook.direction === "in" ? "column" : "column-reverse",
+            gap: props.hook.direction === "in" ? "12px" : "0px",
           }}
         >
           {/* select network group */}
@@ -233,7 +236,7 @@ const Bridging = (props: BridgeProps) => {
                     {
                       main: {
                         name: "Cosmos Networks",
-                        icon: "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/32%402x/color/atom%402x.png",
+                        icon: "/icons/atom.svg",
                         id: "",
                       },
                       items: props.hook.allOptions.networks.filter(

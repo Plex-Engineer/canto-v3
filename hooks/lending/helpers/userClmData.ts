@@ -8,7 +8,7 @@ import { CToken, CTokenWithUserData } from "../interfaces/tokens";
 import { UserLMPosition } from "../interfaces/userPositions";
 import { getUserCLMLensData } from "./clmLens";
 import { getLMTotalsFromCTokens } from "./cTokenTotals";
-import { areEqualAddresses, listIncludesAddress } from "@/utils/address.utils";
+import { areEqualAddresses, listIncludesAddress } from "@/utils/address";
 import { getCantoApiData } from "@/config/api/canto-api";
 import { CANTO_DATA_API_ENDPOINTS } from "@/config/api";
 
@@ -76,5 +76,9 @@ export async function getAllUserCLMData(
     avgApr: positionTotals.avgApr,
   };
 
-  return NO_ERROR({ cTokens: combinedCTokenData, position: userTotalPosition });
+  // sort data to make it predicatble for hooks
+  return NO_ERROR({
+    cTokens: combinedCTokenData.sort((a, b) => (a.symbol > b.symbol ? 1 : -1)),
+    position: userTotalPosition,
+  });
 }

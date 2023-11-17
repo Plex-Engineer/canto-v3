@@ -3,7 +3,6 @@
   grid-template-columns: 80px 1fr 1fr;
   height: 80px;
   animation: fadeIn 0.5s ease-in-out;
-  //   background-color: red;
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -92,7 +91,7 @@
     display: block;
     position: absolute;
     width: 10px;
-    transform: translate(40%, -100%) scale(1, 1);
+    transform: translate(20%, -80%) scale(1, 1);
     height: 10px;
     border-right: 2px solid var(--primary-dark-color);
     border-top: 2px solid var(--primary-dark-color);
@@ -104,7 +103,7 @@
     content: "";
     display: block;
     width: 10px;
-    transform: translate(-40%, 110%) scale(1, 1);
+    transform: translate(-20%, 90%) scale(1, 1);
     height: 10px;
     border-left: 2px solid var(--primary-dark-color);
     border-bottom: 2px solid var(--primary-dark-color);

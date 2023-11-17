@@ -13,11 +13,11 @@ import {
   SigningStargateClient,
 } from "@cosmjs/stargate";
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
-import { checkPubKeyETH, ethToCantoAddress } from "@/utils/address.utils";
+import { checkPubKeyETH, ethToCantoAddress } from "@/utils/address";
 import { CANTO_MAINNET_COSMOS, EVMOS, INJECTIVE } from "@/config/networks";
 import { getBlockTimestamp, getIBCData } from "../methods/ibc";
-import { getCosmosAPIEndpoint } from "@/utils/networks.utils";
-import { connectToKeplr } from "@/utils/keplr/connectKeplr";
+import { getCosmosAPIEndpoint } from "@/utils/networks";
+import { connectToKeplr } from "@/utils/keplr";
 // import {
 //   ChainRestAuthApi,
 //   ChainRestTendermintApi,
@@ -42,17 +42,17 @@ import {
   generatePostBodyBroadcast,
   getSenderObj,
 } from "@/utils/cosmos/transactions/helpers.utils";
-import { tryFetch } from "@/utils/async.utils";
+import { tryFetch } from "@/utils/async";
 import Long from "long";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
-import { displayAmount } from "@/utils/tokenBalances.utils";
+import { displayAmount } from "@/utils/formatting";
 import {
   BridgingMethod,
   getBridgeMethodInfo,
 } from "../../interfaces/bridgeMethods";
 import { BridgeTransactionParams } from "../../interfaces/hookParams";
-import { getCosmosTokenBalance } from "@/utils/cosmos/cosmosBalance.utils";
-import { isIBCToken } from "@/utils/tokens/tokens.utils";
+import { getCosmosTokenBalance } from "@/utils/cosmos";
+import { isIBCToken } from "@/utils/tokens";
 import BigNumber from "bignumber.js";
 
 /**
