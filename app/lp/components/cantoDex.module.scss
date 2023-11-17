@@ -1,8 +1,12 @@
 .container {
   display: flex;
-  max-height: 40rem;
-  height: 100vh;
-  min-width: 32rem;
+  height: 40rem;
+}
+
+.baseContainer {
+  display: flex;
+  height: 40rem;
+  padding: 1rem;
 }
 
 .scroll-view {
@@ -10,20 +14,17 @@
   overflow-y: auto;
   scroll-behavior: smooth;
   flex-grow: 1;
-  //   border-top: 1px solid var(--border-stroke-color);
-  //   border-bottom: 1px solid var(--border-stroke-color);
   padding: 1px;
-  &::-webkit-scrollbar {
-    width: 0px;
-    background: transparent;
-  }
+  //   &::-webkit-scrollbar {
+  //     width: 0px;
+  //     background: transparent;
+  //   }
 }
 
 .inner {
   display: flex;
   height: calc(100% - 22px);
   flex-direction: column;
-  margin: 0px -16px -16px -16px;
 }
 .items-list {
   display: flex;
@@ -32,6 +33,7 @@
   transition: transform 0.5s ease-out;
   background-color: var(--card-sub-surface-color);
 }
+
 .iconTitle {
   width: 100%;
   display: flex;

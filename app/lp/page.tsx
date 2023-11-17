@@ -142,6 +142,7 @@ export default function Page() {
   return (
     <div className={styles.container}>
       <Modal
+        padded={false}
         open={selectedPair !== null}
         onClose={() => setPair(null)}
         closeOnOverlayClick={false}

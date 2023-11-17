@@ -50,13 +50,12 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
     <Container className={styles.container}>
       <Container
         direction="row"
-        height="50px"
+        height="70px"
         center={{
           vertical: true,
         }}
         style={{
           cursor: "pointer",
-          marginTop: "-14px",
         }}
         onClick={() => setModalType("base")}
       >
@@ -72,12 +71,8 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
           Liquidity
         </Text>
       </Container>
-      <div
-        style={{
-          margin: "0  -16px -16px -16px",
-          height: "39rem",
-        }}
-      >
+
+      <div className={styles["scroll-view"]}>
         <Tabs
           tabs={[
             {
@@ -113,7 +108,7 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
                   )
                 ) === 0,
               content: (
-                <Container width="100%" margin="sm">
+                <Container width="100%">
                   <div className={styles.iconTitle}>
                     <Icon icon={{ url: props.pair.logoURI, size: 60 }} />
                     <Text size="lg" font="proto_mono">
@@ -156,7 +151,7 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
     );
 
     return (
-      <Container className={styles.container}>
+      <Container className={styles.baseContainer}>
         <Container gap={40} padding="md">
           <div className={styles.iconTitle}>
             <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
@@ -601,7 +596,12 @@ const RemoveLiquidityModal = ({
       : token.symbol;
   };
   return (
-    <Container width="calc(100% - 50px)">
+    <Container
+      width="100%"
+      center={{
+        horizontal: true,
+      }}
+    >
       <Spacer height="10px" />
       <Amount
         value={amountLP}
