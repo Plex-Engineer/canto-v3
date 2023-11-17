@@ -2,8 +2,7 @@
 import Button from "@/components/button/button";
 import Text from "@/components/text";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import styles from "./modal.module.scss";
-import Tabs from "@/components/tabs/tabs";
+import styles from "./stakeModal.module.scss";
 import Image from "next/image";
 import Container from "@/components/container/container";
 import {
@@ -17,11 +16,9 @@ import { useState } from "react";
 import { ValidationReturn } from "@/config/interfaces";
 import Amount from "@/components/amount/amount";
 import { CantoDexTxTypes } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
-import {
-  addTokenBalances,
-  convertTokenAmountToNote,
-} from "@/utils/math";
+import { addTokenBalances, convertTokenAmountToNote } from "@/utils/math";
 import { ModalItem } from "@/app/lending/components/modal/modal";
+import Tabs from "@/components/tabs/tabs";
 interface Props {
   clpToken: CTokenWithUserData;
   onBack: () => void;
@@ -144,6 +141,7 @@ export const StakeLPModal = (props: Props) => {
       <div
         style={{
           height: "100%",
+          background: "Red",
         }}
       >
         <Container
@@ -171,28 +169,27 @@ export const StakeLPModal = (props: Props) => {
             Stake
           </Text>
         </Container>
-        <div>
-          <Tabs
-            tabs={[
-              {
-                title: "Stake",
-                content: Content(
-                  props.clpToken,
-                  props.transaction,
-                  CantoDexTxTypes.STAKE
-                ),
-              },
-              {
-                title: "Unstake",
-                content: Content(
-                  props.clpToken,
-                  props.transaction,
-                  CantoDexTxTypes.UNSTAKE
-                ),
-              },
-            ]}
-          />
-        </div>
+        <Tabs
+          height="100%"
+          tabs={[
+            {
+              title: "Stake",
+              content: Content(
+                props.clpToken,
+                props.transaction,
+                CantoDexTxTypes.STAKE
+              ),
+            },
+            {
+              title: "Unstake",
+              content: Content(
+                props.clpToken,
+                props.transaction,
+                CantoDexTxTypes.UNSTAKE
+              ),
+            },
+          ]}
+        />
       </div>
     </div>
   );

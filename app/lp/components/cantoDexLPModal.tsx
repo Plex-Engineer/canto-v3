@@ -47,11 +47,7 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
   );
 
   const Liquidity = () => (
-    <div
-      style={{
-        height: "100%",
-      }}
-    >
+    <Container className={styles.container}>
       <Container
         direction="row"
         height="50px"
@@ -139,7 +135,7 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
           ]}
         />
       </div>
-    </div>
+    </Container>
   );
 
   const Base = () => {
@@ -160,58 +156,61 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
     );
 
     return (
-      <Container gap={40} padding="md">
-        <div className={styles.iconTitle}>
-          <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
-          <Text size="lg" font="proto_mono">
-            {props.pair.symbol}
-          </Text>
-        </div>
-        <Container className={styles.card} padding="md" width="100%">
-          <ModalItem
-            name="Position Value"
-            value={displayAmount(positionValue?.toString() ?? "0", 18)}
-            note
-          />
-          <ModalItem
-            name="Total # of LP Tokens"
-            value={displayAmount(totalLP, props.pair.decimals)}
-          />
-          <ModalItem
-            name="Staked LP Tokens"
-            value={displayAmount(
-              props.pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0",
-              props.pair.decimals
-            )}
-          />
-          <ModalItem
-            name="Unstaked LP Tokens"
-            value={displayAmount(
-              props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
-              props.pair.decimals
-            )}
-          />
-        </Container>
-        <Container className={styles.card} padding="md" width="100%">
-          <ModalItem
-            name="Pool Liquidity"
-            value={displayAmount(props.pair.tvl, 18)}
-            note
-          />
-          <ModalItem name="Pool Share" value={formatPercent(poolShare)} />
-        </Container>
+      <Container className={styles.container}>
+        <Container gap={40} padding="md">
+          <div className={styles.iconTitle}>
+            <Icon icon={{ url: props.pair.logoURI, size: 100 }} />
+            <Text size="lg" font="proto_mono">
+              {props.pair.symbol}
+            </Text>
+          </div>
+          <Container className={styles.card} padding="md" width="100%">
+            <ModalItem
+              name="Position Value"
+              value={displayAmount(positionValue?.toString() ?? "0", 18)}
+              note
+            />
+            <ModalItem
+              name="Total # of LP Tokens"
+              value={displayAmount(totalLP, props.pair.decimals)}
+            />
+            <ModalItem
+              name="Staked LP Tokens"
+              value={displayAmount(
+                props.pair.clmData?.userDetails?.supplyBalanceInUnderlying ??
+                  "0",
+                props.pair.decimals
+              )}
+            />
+            <ModalItem
+              name="Unstaked LP Tokens"
+              value={displayAmount(
+                props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+                props.pair.decimals
+              )}
+            />
+          </Container>
+          <Container className={styles.card} padding="md" width="100%">
+            <ModalItem
+              name="Pool Liquidity"
+              value={displayAmount(props.pair.tvl, 18)}
+              note
+            />
+            <ModalItem name="Pool Share" value={formatPercent(poolShare)} />
+          </Container>
 
-        <Container gap={20} direction="row">
-          <Button width="fill" onClick={() => setModalType("liquidity")}>
-            Manage LP
-          </Button>
-          <Button
-            disabled={Number(totalLP) === 0}
-            width="fill"
-            onClick={() => setModalType("stake")}
-          >
-            Manage Stake
-          </Button>
+          <Container gap={20} direction="row">
+            <Button width="fill" onClick={() => setModalType("liquidity")}>
+              Manage LP
+            </Button>
+            <Button
+              disabled={Number(totalLP) === 0}
+              width="fill"
+              onClick={() => setModalType("stake")}
+            >
+              Manage Stake
+            </Button>
+          </Container>
         </Container>
       </Container>
     );
@@ -241,11 +240,8 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
     ),
     base: Base(),
   }[modalType];
-  return (
-    <Container className={styles.container} width="28rem">
-      {modals}
-    </Container>
-  );
+
+  return <div>{modals}</div>;
 };
 
 // Functions to create correct parameters for transactions (add/remove liquidity)
@@ -357,7 +353,7 @@ const AddLiquidityModal = ({
   };
 
   return (
-    <Container>
+    <Container width="calc(100% - 32px)">
       <Spacer height="10px" />
       <Amount
         decimals={pair.token1.decimals}
@@ -605,7 +601,7 @@ const RemoveLiquidityModal = ({
       : token.symbol;
   };
   return (
-    <div>
+    <Container width="calc(100% - 50px)">
       <Spacer height="10px" />
       <Amount
         value={amountLP}
@@ -731,6 +727,6 @@ const RemoveLiquidityModal = ({
       >
         Remove Liquidity
       </Button>
-    </div>
+    </Container>
   );
 };
