@@ -147,7 +147,7 @@ export default function Page() {
       <div className={styles.proposalCardContainer2}>
         <div className={styles.proposalInfoBoxVoting}>
           <div className={styles.proposalInfoRow1}>
-          <div className={styles.radioBtn}>
+          { isActive && <div className={styles.radioBtn}>
                     <input
                   type="radio"
                   className="circle"
@@ -160,14 +160,14 @@ export default function Page() {
                   // style={{backgroundColor:isChecked ? 'red': 'white'}}
                 />
                 
-                </div>
+                </div>}
             <div className={styles.proposalInfoVoting}>
             
             
               <div className={styles.votingInfoRow1}>
               
              
-                <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "green", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Yes</Text></div></div>
+                <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "#06FC99", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Yes</Text></div></div>
                 <div><Text font="proto_mono">{votesData.yes}%</Text></div>
               </div>
               <div className={styles.votingInfoRow2}>
@@ -177,7 +177,7 @@ export default function Page() {
               
 
             </div>
-            <div className={styles.radioBtn}>
+            { isActive && <div className={styles.radioBtn}>
                     <input
                   type="radio"
                   name="voteOption"
@@ -188,12 +188,12 @@ export default function Page() {
                 />
                 
                 
-              </div>
+              </div>}
             <div className={styles.proposalInfoVoting}>
               <div className={styles.votingInfoRow1}>
                 
               
-                <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "red", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">No</Text></div></div>
+                <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "#FC5151", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">No</Text></div></div>
                 <div><Text font="proto_mono">{votesData.no}%</Text></div>
               </div>
               <div className={styles.votingInfoRow2}>
@@ -203,7 +203,7 @@ export default function Page() {
             </div>
           </div>
           <div className={styles.proposalInfoRow1}>
-          <div className={styles.radioBtn}>
+          { isActive && <div className={styles.radioBtn}>
                     <input
                   type="radio"
                   name="voteOption"
@@ -212,7 +212,7 @@ export default function Page() {
                   onChange={() => setSelectedVote(VoteOption.VETO)}
                   disabled={!isActive}
                 />
-              </div>
+              </div>}
             <div className={styles.proposalInfoVoting}>
               <div className={styles.votingInfoRow1}>
                 <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "#4455EF", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Veto</Text></div></div>
@@ -224,7 +224,7 @@ export default function Page() {
               
               
             </div>
-            <div className={styles.radioBtn}>
+            { isActive && <div className={styles.radioBtn}>
                     <input
                   type="radio"
                   name="voteOption"
@@ -234,7 +234,7 @@ export default function Page() {
                   disabled={!isActive}
                 />
 
-              </div>
+              </div>}
             <div className={styles.proposalInfoVoting}>
               <div className={styles.votingInfoRow1}>
             

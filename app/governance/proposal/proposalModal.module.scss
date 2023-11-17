@@ -116,7 +116,7 @@
             flex-direction: row !important;
             justify-content: space-between;
             height: 45%;
-            margin: 15px 30px 0px 10px;
+            margin: 15px 30px 0px 30px;
             //padding: 10px 10px 0px 10px;
             .radioBtn{
                 //color: green;
@@ -156,16 +156,16 @@
                 //margin: 0px 10px 0px 10px;
             }
             .radioBtn input[type='radio'][value="Yes"]:checked:after{
-                background-color: green;
+                background-color: #06FC99;
             }
             .radioBtn input[type='radio'][value="No"]:checked:after{
-                background-color: red;
+                background-color: #FC5151;
             }
             .radioBtn input[type='radio'][value="Veto"]:checked:after{
-                background-color: blue;
+                background-color: #4455EF;
             }
             .radioBtn input[type='radio'][value="Abstain"]:checked:after{
-                background-color: gray;
+                background-color: rgb(67, 64, 64);
             }
 
             
