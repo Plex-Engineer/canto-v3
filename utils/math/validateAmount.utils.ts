@@ -1,4 +1,4 @@
-import { USER_INPUT_ERRORS } from "@/config/consts/errors";
+import { TX_PARAM_ERRORS } from "@/config/consts/errors";
 import { Validation } from "@/config/interfaces";
 import { convertToBigNumber, formatBalance } from "@/utils/formatting";
 
@@ -22,18 +22,18 @@ export function validateWeiUserInputTokenAmount(
   const { data: bnAmount, error: bnError } = convertToBigNumber(amountWei);
   if (bnError) {
     // user input is not a number
-    return { error: true, reason: USER_INPUT_ERRORS.INVALID_INPUT() };
+    return { error: true, reason: TX_PARAM_ERRORS.AMOUNT_NOT_A_NUMBER() };
   }
   /** Check if max is zero */
   if (Number(maxAmountWei) === 0) {
-    return { error: true, reason: USER_INPUT_ERRORS.NO_TOKEN_BALANCE() };
+    return { error: true, reason: TX_PARAM_ERRORS.NO_TOKEN_BALANCE() };
   }
 
   /** Check if input is too large */
   if (bnAmount.gt(maxAmountWei)) {
     return {
       error: true,
-      reason: USER_INPUT_ERRORS.AMOUNT_TOO_HIGH(
+      reason: TX_PARAM_ERRORS.AMOUNT_TOO_HIGH(
         formatBalance(maxAmountWei, tokenDecimals, {
           commify: true,
         }),
@@ -46,7 +46,7 @@ export function validateWeiUserInputTokenAmount(
   if (bnAmount.lt(minAmountWei)) {
     return {
       error: true,
-      reason: USER_INPUT_ERRORS.AMOUNT_TOO_LOW(
+      reason: TX_PARAM_ERRORS.AMOUNT_TOO_LOW(
         formatBalance(minAmountWei, tokenDecimals, {
           commify: true,
         }),
@@ -81,7 +81,7 @@ export function validateNonWeiUserInputTokenAmount(
   );
   if (bnError) {
     // user input is not a number
-    return { error: true, reason: USER_INPUT_ERRORS.INVALID_INPUT() };
+    return { error: true, reason: TX_PARAM_ERRORS.AMOUNT_NOT_A_NUMBER() };
   }
   /** Use wei in validateWeiUserInputTokenAmount*/
   return validateWeiUserInputTokenAmount(

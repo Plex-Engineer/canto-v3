@@ -15,11 +15,19 @@ import {
 } from "../interfaces";
 import { CLMClaimRewardsTxParams } from ".";
 import { _claimLendingRewardsTx, _dripComptrollerTx } from "./txCreators";
+import { isValidEthAddress } from "@/utils/address";
+import { TX_PARAM_ERRORS } from "@/config/consts/errors";
 
 export async function clmClaimRewardsTx(
   txParams: CLMClaimRewardsTxParams
 ): PromiseWithError<TxCreatorFunctionReturn> {
   try {
+    // validate params
+    const { data: validation, error: validationError } =
+      validateClmClaimRewardsRetryTx(txParams);
+    if (validationError) throw validationError;
+    if (validation.error) throw new Error(validation.reason);
+
     // get all addresses for tx
     const [wcantoAddress, comptrollerAddress, reservoirAddress] = [
       getCantoCoreAddress(txParams.chainId, "wcanto"),
@@ -74,7 +82,14 @@ export async function clmClaimRewardsTx(
 
 // nothing to validate for claming rewards retry
 export function validateClmClaimRewardsRetryTx(
-  _txParams: CLMClaimRewardsTxParams
+  txParams: CLMClaimRewardsTxParams
 ): ReturnWithError<Validation> {
+  /** check eth account */
+  if (!isValidEthAddress(txParams.ethAccount)) {
+    return NO_ERROR({
+      error: true,
+      reason: TX_PARAM_ERRORS.PARAM_INVALID("ethAccount"),
+    });
+  }
   return NO_ERROR({ error: false });
 }

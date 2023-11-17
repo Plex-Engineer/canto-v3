@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { AmbientPool } from "../interfaces/ambientPools";
 import {
   TickRangeKey,
   UserAddConcentratedLiquidityOptions,
@@ -10,13 +9,12 @@ import {
   getDisplayTokenAmountFromRange,
   getTickFromPrice,
 } from "@/utils/ambient";
+import { convertToBigNumber } from "@/utils/formatting";
+import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
 import {
   AmbientAddConcentratedLiquidityParams,
   AmbientTxType,
-} from "../interfaces/ambientPoolTxTypes";
-import { convertToBigNumber } from "@/utils/formatting";
-import { Validation } from "@/config/interfaces";
-import { validateAddAmbientConcLiquidityParams } from "../helpers/validateParams";
+} from "@/transactions/pairs/ambient";
 
 /**
  * @notice manages the cretion of a new ambient position
@@ -25,7 +23,7 @@ import { validateAddAmbientConcLiquidityParams } from "../helpers/validateParams
  * @returns position manager
  */
 
-export default function useNewAmbientPositionManager(pool: AmbientPool) {
+export function useNewAmbientPositionManager(pool: AmbientPool) {
   /** EXTERNAL STATE WITH USER OPTIONS */
   const initialState = (): UserAddConcentratedLiquidityOptions => {
     const priceRange = defaultPriceRangeFormatted(pool, "DEFAULT");
@@ -125,13 +123,6 @@ export default function useNewAmbientPositionManager(pool: AmbientPool) {
     });
   }
 
-  /** FUNCTION TO CREATE AND VERIFY TX PARAMS */
-  function validateParams(): Validation {
-    return validateAddAmbientConcLiquidityParams(
-      createAddConcLiquidityTxParams()
-    );
-  }
-
   // uses internal state to create all wei values to pass into add liquidity tx
   function createAddConcLiquidityTxParams(): AmbientAddConcentratedLiquidityParams {
     // convert everything into wei
@@ -161,8 +152,8 @@ export default function useNewAmbientPositionManager(pool: AmbientPool) {
       isAmountBase: baseAmount,
       upperTick,
       lowerTick,
-      minPriceWei: executionPrices.minPriceWei,
-      maxPriceWei: executionPrices.maxPriceWei,
+      minExecPriceWei: executionPrices.minPriceWei,
+      maxExecPriceWei: executionPrices.maxPriceWei,
     };
   }
 
@@ -177,7 +168,6 @@ export default function useNewAmbientPositionManager(pool: AmbientPool) {
       setDefaultParams,
     },
     txParams: {
-      validateParams,
       addLiquidity: createAddConcLiquidityTxParams,
     },
   };

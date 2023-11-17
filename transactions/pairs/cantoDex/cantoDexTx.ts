@@ -10,7 +10,7 @@ import {
   Transaction,
   TxCreatorFunctionReturn,
 } from "@/transactions/interfaces";
-import { TX_PARAM_ERRORS, USER_INPUT_ERRORS } from "@/config/consts/errors";
+import { TX_PARAM_ERRORS } from "@/config/consts/errors";
 import {
   addTokenBalances,
   greaterThan,
@@ -20,7 +20,7 @@ import {
 } from "@/utils/math";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { createApprovalTxs } from "@/transactions/erc20";
-import { areEqualAddresses } from "@/utils/address";
+import { areEqualAddresses, isValidEthAddress } from "@/utils/address";
 import { getEVMTimestamp } from "@/utils/evm";
 import {
   _addCantoDexLiquidityTx,
@@ -58,6 +58,13 @@ export async function cantoDexLPTx(
 export function validateCantoDexLPTxParams(
   txParams: CantoDexTransactionParams
 ): Validation {
+  // validate eth account
+  if (!isValidEthAddress(txParams.ethAccount)) {
+    return {
+      error: true,
+      reason: TX_PARAM_ERRORS.PARAM_INVALID("Eth Account"),
+    };
+  }
   // make sure pair has user details
   if (!txParams.pair.clmData?.userDetails)
     return {
@@ -72,10 +79,10 @@ export function validateCantoDexLPTxParams(
     case CantoDexTxTypes.ADD_LIQUIDITY: {
       // check slippage and deadline
       if (Number(txParams.slippage) < 0 || Number(txParams.slippage) > 100) {
-        return { error: true, reason: USER_INPUT_ERRORS.SLIPPAGE_ERROR() };
+        return { error: true, reason: TX_PARAM_ERRORS.SLIPPAGE() };
       }
       if (Number(txParams.deadline) <= 0) {
-        return { error: true, reason: USER_INPUT_ERRORS.DEADLINE_ERROR() };
+        return { error: true, reason: TX_PARAM_ERRORS.DEADLINE() };
       }
       // get tokens
       const token1 = pair.token1;
@@ -103,10 +110,10 @@ export function validateCantoDexLPTxParams(
     case CantoDexTxTypes.REMOVE_LIQUIDITY: {
       // check slippage and deadline
       if (Number(txParams.slippage) < 0 || Number(txParams.slippage) > 100) {
-        return { error: true, reason: USER_INPUT_ERRORS.SLIPPAGE_ERROR() };
+        return { error: true, reason: TX_PARAM_ERRORS.SLIPPAGE() };
       }
       if (Number(txParams.deadline) <= 0) {
-        return { error: true, reason: USER_INPUT_ERRORS.DEADLINE_ERROR() };
+        return { error: true, reason: TX_PARAM_ERRORS.DEADLINE() };
       }
       // add supply balance and underlying to make sure LP balance is enough
       return validateWeiUserInputTokenAmount(
@@ -386,6 +393,11 @@ export async function stakeCantoDexLPTx(
 ): PromiseWithError<TxCreatorFunctionReturn> {
   try {
     /** check params */
+    
+    // validate params
+    const validation = validateCantoDexLPTxParams(txParams);
+    if (validation.error) throw new Error(validation.reason);
+
     if (!txParams.pair.clmData)
       throw new Error(TX_PARAM_ERRORS.PARAM_MISSING("Pair CLM Data"));
     /** get stake amount depending on txType*/

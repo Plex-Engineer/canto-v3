@@ -1,8 +1,5 @@
-import {
-  getPriceFromTick,
-  getTickFromPrice,
-} from "@/utils/ambient";
-import { AmbientPool } from "../interfaces/ambientPools";
+import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
+import { getPriceFromTick, getTickFromPrice } from "..";
 import { formatBalance } from "@/utils/formatting";
 
 /**

@@ -1,4 +1,4 @@
-import { AmbientPool } from "./ambientPools";
+import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
 
 export enum AmbientTxType {
   ADD_CONC_LIQUIDITY = "Add concentrated liquidity",
@@ -17,8 +17,8 @@ type BaseConcLiqParams = {
   pool: AmbientPool;
   lowerTick: number;
   upperTick: number;
-  minPriceWei: string;
-  maxPriceWei: string;
+  minExecPriceWei: string;
+  maxExecPriceWei: string;
 };
 export type AmbientAddConcentratedLiquidityParams = BaseConcLiqParams & {
   txType: AmbientTxType.ADD_CONC_LIQUIDITY;
@@ -30,4 +30,10 @@ export type AmbientRemoveConcentratedLiquidityParams = BaseConcLiqParams & {
   txType: AmbientTxType.REMOVE_CONC_LIQUIDITY;
   liquidity: string;
   positionId: string;
+};
+
+export type AmbientClaimRewardsTxParams = {
+  chainId: number;
+  ethAccount: string;
+  estimatedRewards: string; // estimation before distribution of rewards, only used for drip purposes (all rewards will be claimed)
 };
