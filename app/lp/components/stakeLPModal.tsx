@@ -17,6 +17,8 @@ import Amount from "@/components/amount/amount";
 import { CantoDexTxTypes } from "@/transactions/pairs/cantoDex";
 import { addTokenBalances, convertTokenAmountToNote } from "@/utils/math";
 import { ModalItem } from "@/app/lending/components/modal/modal";
+import { Validation } from "@/config/interfaces";
+import Tabs from "@/components/tabs/tabs";
 interface Props {
   clpToken: CTokenWithUserData;
   onBack: () => void;
