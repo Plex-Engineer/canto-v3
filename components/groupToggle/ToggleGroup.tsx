@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import Text from "@/components/text";
-=======
 import Text from "../text";
->>>>>>> staging
 import styles from "./toggleGroup.module.scss";
 
 interface Props {

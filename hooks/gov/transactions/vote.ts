@@ -7,12 +7,13 @@ import {
   TxCreatorFunctionReturn,
   errMsg,
 } from "@/config/interfaces";
-import { ethToCantoAddress } from "@/utils/address.utils";
+
 import { createMsgsVote } from "@/utils/cosmos/transactions/messages/voting/vote";
 //import { createMsgsVote } from "@/utils/cosmos/transactions/messages/voting/vote";
 import { voteOptionToNumber } from "../interfaces/voteOptions";
 import { ProposalVoteTxParams } from "../interfaces/voteTxParams";
 import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
+import { ethToCantoAddress } from "@/utils/address/conversion.utils";
 
 export async function proposalVoteTx(
   params: ProposalVoteTxParams
