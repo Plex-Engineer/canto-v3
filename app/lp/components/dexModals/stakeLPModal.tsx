@@ -137,59 +137,75 @@ export const StakeLPModal = (props: Props) => {
   }
   return (
     <div className={styles.container}>
-      <div
-        style={{
-          height: "100%",
-          background: "Red",
+      {/* <Container
+        direction="row"
+        height="50px"
+        center={{
+          vertical: true,
         }}
+        style={{
+          paddingLeft: "10px",
+          cursor: "pointer",
+        }}
+        onClick={props.onBack}
       >
-        <Container
-          direction="row"
-          height="50px"
-          center={{
-            vertical: true,
-          }}
+        <div
           style={{
-            padding: "0 16px",
-            cursor: "pointer",
-            marginTop: "-14px",
+            rotate: "90deg",
+            marginRight: "6px",
           }}
-          onClick={props.onBack}
         >
-          <div
-            style={{
-              rotate: "90deg",
-              marginRight: "6px",
-            }}
-          >
-            <Icon icon={{ url: "./dropdown.svg", size: 24 }} />
-          </div>
-          <Text font="proto_mono" size="lg">
-            Stake
-          </Text>
-        </Container>
-        <Tabs
-          height="100%"
-          tabs={[
-            {
-              title: "Stake",
-              content: Content(
-                props.clpToken,
-                props.transaction,
-                CantoDexTxTypes.STAKE
-              ),
-            },
-            {
-              title: "Unstake",
-              content: Content(
-                props.clpToken,
-                props.transaction,
-                CantoDexTxTypes.UNSTAKE
-              ),
-            },
-          ]}
-        />
-      </div>
+          <Icon icon={{ url: "./dropdown.svg", size: 24 }} />
+        </div>
+        <Text font="proto_mono" size="lg">
+          Stake
+        </Text>
+      </Container> */}
+      <Container
+        direction="row"
+        height="60px"
+        center={{
+          vertical: true,
+        }}
+        style={{
+          cursor: "pointer",
+          paddingLeft: "10px",
+        }}
+        onClick={props.onBack}
+      >
+        <div
+          style={{
+            rotate: "90deg",
+            marginRight: "6px",
+          }}
+        >
+          <Icon icon={{ url: "./dropdown.svg", size: 24 }} themed />
+        </div>
+        <Text font="proto_mono" size="lg">
+          Stake
+        </Text>
+      </Container>
+      <Tabs
+        height="100%"
+        tabs={[
+          {
+            title: "Stake",
+            content: Content(
+              props.clpToken,
+              props.transaction,
+              CantoDexTxTypes.STAKE
+            ),
+          },
+          {
+            title: "Unstake",
+            content: Content(
+              props.clpToken,
+              props.transaction,
+              CantoDexTxTypes.UNSTAKE
+            ),
+          },
+        ]}
+      />
     </div>
   );
 };
