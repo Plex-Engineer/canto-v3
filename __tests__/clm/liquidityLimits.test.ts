@@ -102,7 +102,6 @@ describe("liquidity limits tests", () => {
           price: "1000000000000000000",
         },
         currentLiquidity: "0", // shouldn't matter
-        totalBorrows: "10000000000000000001000000000000000000", // shouldn't matter
         percent: 100,
         expected: "1000000000000000000", // supply balance
         error: false,
@@ -119,7 +118,6 @@ describe("liquidity limits tests", () => {
           price: "1",
         },
         currentLiquidity: "0", // shouldn't matter
-        totalBorrows: "10000000000000000001000000000000000000", // shouldn't matter
         percent: 2,
         expected: "1000000000000000000", // supply balance
         error: false,
@@ -135,7 +133,6 @@ describe("liquidity limits tests", () => {
           price: "1",
         },
         currentLiquidity: "0", // shouldn't matter
-        totalBorrows: "10000000000000000001000000000000000000", // shouldn't matter
         percent: 2,
         expected: "1000000000000000000", // supply balance
         error: false,
@@ -152,7 +149,6 @@ describe("liquidity limits tests", () => {
           price: "1000000000000000000",
         },
         currentLiquidity: "500000000000000000", // should be half of the supply balance
-        totalBorrows: "10000000000000000001000000000000000000", // shouldn't matter
         percent: 100,
         expected: "1000000000000000000", // supply balance
         error: false,
@@ -169,7 +165,6 @@ describe("liquidity limits tests", () => {
           price: "1000000000000000000",
         },
         currentLiquidity: "500000000000000000", // should be half of the supply balance
-        totalBorrows: "1",
         percent: 80,
         expected: "800000000000000000",
         error: false,
@@ -185,7 +180,6 @@ describe("liquidity limits tests", () => {
           price: "1000000000000000000",
         },
         currentLiquidity: "0",
-        totalBorrows: "1",
         percent: 100,
         expected: "0",
         error: false,
@@ -201,7 +195,6 @@ describe("liquidity limits tests", () => {
           price: "1000000000000000000",
         },
         currentLiquidity: "250000000000000000",
-        totalBorrows: "1",
         percent: 100,
         expected: "500000000000000000",
         error: false,
@@ -218,7 +211,6 @@ describe("liquidity limits tests", () => {
           price: "1000000000000000000000000000000",
         },
         currentLiquidity: "500000000000000000",
-        totalBorrows: "0",
         percent: 100,
         expected: "1000000", // supply balance
         error: false,
@@ -234,7 +226,6 @@ describe("liquidity limits tests", () => {
           price: "0",
         },
         currentLiquidity: "500000000000000000",
-        totalBorrows: "1",
         percent: 100,
         expected: "1000000", // supply balance
         error: true,
@@ -246,7 +237,6 @@ describe("liquidity limits tests", () => {
           price: "1000000000000000000",
         },
         currentLiquidity: "500000000000000000",
-        totalBorrows: "1",
         percent: 100,
         expected: "1000000", // supply balance
         error: true,
@@ -257,7 +247,6 @@ describe("liquidity limits tests", () => {
         cTokenWithdrawLimit(
           p.cToken,
           p.currentLiquidity,
-          p.totalBorrows,
           p.percent
         );
       if (p.error) {

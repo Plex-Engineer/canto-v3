@@ -5,7 +5,7 @@ import {
   CTokenLendingTransactionParams,
   cTokenLendingTx,
   clmClaimRewardsTx,
-  validateCTokenLendingTxParams,
+  validateCTokenLendingRetryTxParams,
 } from "../lending";
 import {
   CantoDexTransactionParams,
@@ -66,7 +66,7 @@ export const TRANSACTION_FLOW_MAP: {
   //   },
   [TransactionFlowType.CLM_CTOKEN_TX]: {
     validRetry: async (params: CTokenLendingTransactionParams) =>
-      NO_ERROR(validateCTokenLendingTxParams(params)),
+      validateCTokenLendingRetryTxParams(params),
     tx: async (params: CTokenLendingTransactionParams) =>
       cTokenLendingTx(params),
   },

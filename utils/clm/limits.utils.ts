@@ -37,7 +37,6 @@ export function cTokenBorrowLimit(
 export function cTokenWithdrawLimit(
   cToken: CTokenWithUserData,
   currentLiquidity: string,
-  totalBorrows: string,
   percent: number = 100
 ): ReturnWithError<string> {
   try {
@@ -46,8 +45,7 @@ export function cTokenWithdrawLimit(
     // first check if token is collateral or no borrows are present (if not, then no limit)
     if (
       cToken.userDetails?.isCollateral === false ||
-      Number(cToken.collateralFactor) === 0 ||
-      Number(totalBorrows) === 0
+      Number(cToken.collateralFactor) === 0
     ) {
       return NO_ERROR(cToken.userDetails.supplyBalanceInUnderlying);
     }
@@ -103,7 +101,6 @@ export function maxAmountForLendingTx(
       const maxAmount = cTokenWithdrawLimit(
         cToken,
         position.liquidity,
-        position.totalBorrow,
         percent
       );
       if (maxAmount.error) return "0";

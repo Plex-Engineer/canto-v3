@@ -22,6 +22,7 @@ import {
   TxCreatorFunctionReturn,
   TX_DESCRIPTIONS,
 } from "../interfaces";
+import { getAllUserCLMData } from "@/hooks/lending/helpers/userClmData";
 
 export async function cTokenLendingTx(
   txParams: CTokenLendingTransactionParams
@@ -184,6 +185,7 @@ export async function cTokenLendingTx(
   }
 }
 
+// validates parameters for tx
 export function validateCTokenLendingTxParams(
   txParams: CTokenLendingTransactionParams
 ): Validation {
@@ -215,5 +217,27 @@ export function validateCTokenLendingTxParams(
     maxAmount,
     txParams.cToken.underlying.symbol,
     txParams.cToken.underlying.decimals
+  );
+}
+
+// validates parameters for retry tx
+export async function validateCTokenLendingRetryTxParams(
+  txParams: CTokenLendingTransactionParams
+): PromiseWithError<Validation> {
+  // position may not be the same as the one in the store, so we need to validate it
+  const { data: currentPosition, error } = await getAllUserCLMData(
+    txParams.ethAccount,
+    txParams.chainId,
+    []
+  );
+  if (error || !currentPosition.position) {
+    return NEW_ERROR("validateCTokenLendingRetryTxParams", error);
+  }
+  // validate with new position
+  return NO_ERROR(
+    validateCTokenLendingTxParams({
+      ...txParams,
+      userPosition: currentPosition.position,
+    })
   );
 }

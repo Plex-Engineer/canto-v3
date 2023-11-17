@@ -162,11 +162,13 @@ export const LendingModal = (props: Props) => {
     // limits
     const maxAmount = maxAmountForLendingTx(actionType, cToken, position, 100);
     const limitAmount = maxAmountForLendingTx(actionType, cToken, position, 90);
+    // if withdrawing and nothing is borrowed no need for limit
     const needLimit =
       actionType === CTokenLendingTxTypes.BORROW ||
       (actionType === CTokenLendingTxTypes.WITHDRAW &&
         Number(limitAmount) <
-          Number(cToken.userDetails?.supplyBalanceInUnderlying));
+          Number(cToken.userDetails?.supplyBalanceInUnderlying) &&
+        Number(position.totalBorrow) !== 0);
     const limitProps = needLimit
       ? { limit: { limit: limitAmount, limitName: "90% limit" } }
       : {};
