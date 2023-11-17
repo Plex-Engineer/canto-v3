@@ -6,6 +6,7 @@ import {
   cTokenLendingTx,
   clmClaimRewardsTx,
   validateCTokenLendingRetryTxParams,
+  validateClmClaimRewardsRetryTx,
 } from "../lending";
 import {
   CantoDexTransactionParams,
@@ -30,8 +31,8 @@ export enum TransactionFlowType {
 
 export const TRANSACTION_FLOW_MAP: {
   [key in TransactionFlowType]: {
-    validRetry: (...params: any[]) => PromiseWithError<Validation>;
     tx: (...params: any[]) => PromiseWithError<TxCreatorFunctionReturn>;
+    validRetry: (...params: any[]) => PromiseWithError<Validation>;
   };
 } = {
   //   [TransactionFlowType.BRIDGE_IN]: {
@@ -50,14 +51,14 @@ export const TRANSACTION_FLOW_MAP: {
   //     tx: async (params: AmbientTransactionParams) => ambientLiquidityTx(params),
   //   },
   [TransactionFlowType.CANTO_DEX_LP_TX]: {
+    tx: async (params: CantoDexTransactionParams) => cantoDexLPTx(params),
     validRetry: async (params: CantoDexTransactionParams) =>
       NO_ERROR(validateCantoDexLPTxParams(params)),
-    tx: async (params: CantoDexTransactionParams) => cantoDexLPTx(params),
   },
   [TransactionFlowType.CANTO_DEX_STAKE_LP_TX]: {
+    tx: async (params: CantoDexTransactionParams) => stakeCantoDexLPTx(params),
     validRetry: async (params: CantoDexTransactionParams) =>
       NO_ERROR(validateCantoDexLPTxParams(params)),
-    tx: async (params: CantoDexTransactionParams) => stakeCantoDexLPTx(params),
   },
   //   [TransactionFlowType.CLAIM_LP_REWARDS_TX]: {
   //     validRetry: async (params: ClaimDexRewardsParams) =>
@@ -65,14 +66,14 @@ export const TRANSACTION_FLOW_MAP: {
   //     tx: async (params: ClaimDexRewardsParams) => claimDexRewardsComboTx(params),
   //   },
   [TransactionFlowType.CLM_CTOKEN_TX]: {
-    validRetry: async (params: CTokenLendingTransactionParams) =>
-      validateCTokenLendingRetryTxParams(params),
     tx: async (params: CTokenLendingTransactionParams) =>
       cTokenLendingTx(params),
+    validRetry: async (params: CTokenLendingTransactionParams) =>
+      validateCTokenLendingRetryTxParams(params),
   },
   [TransactionFlowType.CLM_CLAIM_REWARDS_TX]: {
-    validRetry: async (_params: CLMClaimRewardsTxParams) =>
-      NO_ERROR({ error: false }),
     tx: async (params: CLMClaimRewardsTxParams) => clmClaimRewardsTx(params),
+    validRetry: async (params: CLMClaimRewardsTxParams) =>
+      validateClmClaimRewardsRetryTx(params),
   },
 };

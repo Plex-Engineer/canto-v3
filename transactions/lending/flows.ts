@@ -13,7 +13,7 @@ export const newCTokenLendingFlow = (
 export const newClaimCLMRewardsFlow = (
   txParams: CLMClaimRewardsTxParams
 ): NewTransactionFlow => ({
-  title: "Claim Rewards",
+  title: "Claim CLM Rewards",
   icon: "/icons/canto.svg",
   txType: TransactionFlowType.CLM_CLAIM_REWARDS_TX,
   params: {

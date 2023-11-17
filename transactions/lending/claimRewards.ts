@@ -1,4 +1,10 @@
-import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
+import {
+  NEW_ERROR,
+  NO_ERROR,
+  PromiseWithError,
+  ReturnWithError,
+  Validation,
+} from "@/config/interfaces";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { getTokenBalance } from "@/utils/tokens";
 import { displayAmount } from "@/utils/formatting";
@@ -64,4 +70,11 @@ export async function clmClaimRewardsTx(
   } catch (err) {
     return NEW_ERROR("clmClaimRewardsTx", err);
   }
+}
+
+// nothing to validate for claming rewards retry
+export function validateClmClaimRewardsRetryTx(
+  _txParams: CLMClaimRewardsTxParams
+): ReturnWithError<Validation> {
+  return NO_ERROR({ error: false });
 }
