@@ -12,7 +12,6 @@ import {
 import Text from "@/components/text";
 import { CantoDexLPModal } from "./components/cantoDexLPModal";
 import styles from "./lp.module.scss";
-import { CantoDexTransactionParams } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
 import useLP from "@/hooks/pairs/lpCombo/useLP";
 import {
   isAmbientPool,
@@ -27,6 +26,7 @@ import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/am
 import { addTokenBalances } from "@/utils/math";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import { useState } from "react";
+import { CantoDexTransactionParams } from "@/transactions/pairs/cantoDex";
 
 export default function Page() {
   const { txStore, signer, chainId } = useCantoSigner();
@@ -52,21 +52,17 @@ export default function Page() {
 
   // transactions
   function sendCantoDexTxFlow(params: Partial<CantoDexTransactionParams>) {
-    const { data: flow, error } = cantoDex.transaction.createNewPairsFlow({
+    const flow = cantoDex.transaction.newCantoDexLPFlow({
       chainId,
       ethAccount: signer?.account.address ?? "",
       pair: selectedPair,
       ...params,
     } as CantoDexTransactionParams);
-    if (error) {
-      console.log(error);
-    } else {
-      txStore?.addNewFlow({
-        txFlow: flow,
-        signer: signer,
-        onSuccessCallback: () => selection.setPair(null),
-      });
-    }
+    txStore?.addNewFlow({
+      txFlow: flow,
+      signer: signer,
+      onSuccessCallback: () => selection.setPair(null),
+    });
   }
   function canPerformCantoDexTx(
     params: Partial<CantoDexTransactionParams>

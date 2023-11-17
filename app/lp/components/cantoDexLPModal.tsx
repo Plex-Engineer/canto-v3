@@ -14,10 +14,6 @@ import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { Validation } from "@/config/interfaces";
 import Icon from "@/components/icon/icon";
 import Text from "@/components/text";
-import {
-  CantoDexTransactionParams,
-  CantoDexTxTypes,
-} from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { getOptimalValueBFormatted } from "@/hooks/pairs/cantoDex/helpers/addLiquidityValues";
 import styles from "./cantoDex.module.scss";
@@ -33,6 +29,7 @@ import {
 } from "@/utils/math";
 import { areEqualAddresses } from "@/utils/address";
 import PopUp from "@/components/popup/popup";
+import { CantoDexTransactionParams, CantoDexTxTypes } from "@/transactions/pairs/cantoDex";
 
 interface ManageCantoDexLPProps {
   pair: CantoDexPairWithUserCTokenData;

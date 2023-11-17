@@ -4,10 +4,6 @@ import {
   PromiseWithError,
   errMsg,
 } from "@/config/interfaces";
-import {
-  performSingleTransaction,
-  waitForTransaction,
-} from "@/utils/transactions";
 import { getNetworkInfoFromChainId } from "@/utils/networks";
 import { GetWalletClientResult } from "wagmi/actions";
 import { create } from "zustand";
@@ -23,6 +19,7 @@ import {
   TransactionStatus,
   TransactionWithStatus,
 } from "@/transactions/interfaces";
+import { signTransaction, waitForTransaction } from "@/transactions/signTx";
 
 // only save last 100 flows for each user to save space
 const USER_FLOW_LIMIT = 100;
@@ -303,8 +300,10 @@ const useTransactionStore = create<TransactionStore>()(
               timestamp: undefined,
             });
             // request signature and receive txHash once signed
-            const { data: txHash, error: txError } =
-              await performSingleTransaction(tx.tx, signer);
+            const { data: txHash, error: txError } = await signTransaction(
+              tx.tx,
+              signer
+            );
             // if error with signature, set status and throw error
             if (txError) {
               throw txError;

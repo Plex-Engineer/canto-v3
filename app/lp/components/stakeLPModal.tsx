@@ -15,7 +15,7 @@ import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import { useState } from "react";
 import Amount from "@/components/amount/amount";
-import { CantoDexTxTypes } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
+import { CantoDexTxTypes } from "@/transactions/pairs/cantoDex";
 import { addTokenBalances, convertTokenAmountToNote } from "@/utils/math";
 import { ModalItem } from "@/app/lending/components/modal/modal";
 import { Validation } from "@/config/interfaces";

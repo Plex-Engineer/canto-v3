@@ -1,4 +1,5 @@
 import { NO_ERROR, PromiseWithError, Validation } from "@/config/interfaces";
+import { TxCreatorFunctionReturn } from "../interfaces";
 import {
   CLMClaimRewardsTxParams,
   CTokenLendingTransactionParams,
@@ -6,7 +7,12 @@ import {
   clmClaimRewardsTx,
   validateCTokenLendingTxParams,
 } from "../lending";
-import { TxCreatorFunctionReturn } from "../interfaces";
+import {
+  CantoDexTransactionParams,
+  cantoDexLPTx,
+  stakeCantoDexLPTx,
+  validateCantoDexLPTxParams,
+} from "../pairs/cantoDex";
 
 export enum TransactionFlowType {
   //   // Bridge
@@ -14,8 +20,8 @@ export enum TransactionFlowType {
   //   BRIDGE_OUT = "BRIDGE_OUT",
   //   // LP
   //   AMBIENT_LIQUIDITY_TX = "AMBIENT_LIQUIDITY_TX",
-  //   CANTO_DEX_LP_TX = "CANTO_DEX_LP_TX",
-  //   STAKE_LP_TX = "STAKE_LP_TX",
+  CANTO_DEX_LP_TX = "CANTO_DEX_LP_TX",
+  CANTO_DEX_STAKE_LP_TX = "STAKE_LP_TX",
   //   CLAIM_LP_REWARDS_TX = "CLAIM_LP_REWARDS_TX",
   // CLM
   CLM_CTOKEN_TX = "CLM_CTOKEN_TX",
@@ -43,15 +49,16 @@ export const TRANSACTION_FLOW_MAP: {
   //       NO_ERROR({ valid: false }),
   //     tx: async (params: AmbientTransactionParams) => ambientLiquidityTx(params),
   //   },
-  //   [TransactionFlowType.CANTO_DEX_LP_TX]: {
-  //     validRetry: async (params: CantoDexTransactionParams) =>
-  //       NO_ERROR({ valid: false }),
-  //     tx: async (params: CantoDexTransactionParams) => cantoDexLPTx(params),
-  //   },
-  //   [TransactionFlowType.STAKE_LP_TX]: {
-  //     validRetry: async (params: StakeLPParams) => NO_ERROR({ valid: false }),
-  //     tx: async (params: StakeLPParams) => stakeLPFlow(params),
-  //   },
+  [TransactionFlowType.CANTO_DEX_LP_TX]: {
+    validRetry: async (params: CantoDexTransactionParams) =>
+      NO_ERROR(validateCantoDexLPTxParams(params)),
+    tx: async (params: CantoDexTransactionParams) => cantoDexLPTx(params),
+  },
+  [TransactionFlowType.CANTO_DEX_STAKE_LP_TX]: {
+    validRetry: async (params: CantoDexTransactionParams) =>
+      NO_ERROR(validateCantoDexLPTxParams(params)),
+    tx: async (params: CantoDexTransactionParams) => stakeCantoDexLPTx(params),
+  },
   //   [TransactionFlowType.CLAIM_LP_REWARDS_TX]: {
   //     validRetry: async (params: ClaimDexRewardsParams) =>
   //       NO_ERROR({ valid: true }),

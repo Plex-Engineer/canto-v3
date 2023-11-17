@@ -31,3 +31,10 @@ export const TX_PARAM_ERRORS = {
   PARAM_MISSING: (paramName: string) => `${paramName} is missing`,
   PARAM_INVALID: (paramName: string) => `${paramName} is invalid`,
 };
+export const TX_SIGN_ERRORS = {
+  INCORRECT_TX_TYPE: (txType: string) => `Incorrect tx type ${txType}`,
+  INVALID_CHAIN_ID: (chainId: string | number) => `Invalid chainId ${chainId}`,
+  INCORRECT_CHAIN: () => "Incorrect chain",
+  SWITCH_CHAIN_ERROR: () => "Error switching chains",
+  MISSING_SIGNER: () => "No signer",
+};

@@ -1,42 +1,36 @@
 import {
-  NEW_ERROR,
-  NO_ERROR,
-  PromiseWithError,
-  Transaction,
-} from "@/config/interfaces";
-import {
   GetWalletClientResult,
   waitForTransaction as evmWait,
 } from "wagmi/actions";
-import { performEVMTransaction } from "../evm/performEVMTx.utils";
-import { performCosmosTransactionEIP, waitForCosmosTx } from "../cosmos";
-import { performKeplrTx } from "../keplr";
+import { Transaction } from "../interfaces";
+import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
+import { signEVMTransaction } from "./evm";
+import { signKeplrTx } from "./keplr";
+import { performCosmosTransactionEIP, waitForCosmosTx } from "@/utils/cosmos";
 
 /**
- * @notice performs a single transaction
+ * @notice signs a single
  * @dev will know if EVM or COSMOS tx to perform
  * @param {Transaction} tx transaction to perform
  * @param {GetWalletClientResult} signer signer to perform tx with
  * @returns {PromiseWithError<string>} txHash of transaction or error
  */
-export async function performSingleTransaction(
+export async function signTransaction(
   tx: Transaction,
   signer: GetWalletClientResult
 ): PromiseWithError<string> {
   switch (tx.type) {
     case "EVM":
       // perform evm tx
-      return await performEVMTransaction(tx, signer);
+      return await signEVMTransaction(tx, signer);
     case "COSMOS":
       // perform cosmos tx
       return await performCosmosTransactionEIP(tx, signer);
     case "KEPLR":
       // perform keplr tx
-      return await performKeplrTx(tx);
+      return await signKeplrTx(tx);
     default:
-      return NEW_ERROR(
-        "useTransactionStore::performSingleTransaction: unknown tx type"
-      );
+      return NEW_ERROR("signTransaction::unknown tx type");
   }
 }
 

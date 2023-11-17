@@ -1,5 +1,4 @@
-import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import { CantoDexPairWithUserCTokenData } from "./pairs";
+import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 
 export enum CantoDexTxTypes {
   ADD_LIQUIDITY = "Add Liquidity",
@@ -7,7 +6,6 @@ export enum CantoDexTxTypes {
   REMOVE_LIQUIDITY = "Remove Liquidity",
   UNSTAKE = "Unstake",
 }
-
 export type CantoDexTransactionParams = {
   chainId: number;
   ethAccount: string;
@@ -25,22 +23,12 @@ export type CantoDexTransactionParams = {
     }
   | {
       txType: CantoDexTxTypes.ADD_LIQUIDITY;
-      amounts: AddLiquidityTxAmounts;
+      amounts: {
+        amount1: string;
+        amount2: string;
+      };
       stake: boolean;
       slippage: number;
       deadline: string;
     }
 );
-
-export interface StakeLPParams {
-  chainId: number;
-  ethAccount: string;
-  cLPToken: CTokenWithUserData;
-  stake: boolean;
-  amount?: string;
-}
-
-interface AddLiquidityTxAmounts {
-  amount1: string;
-  amount2: string;
-}

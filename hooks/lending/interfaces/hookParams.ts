@@ -1,4 +1,3 @@
-import { NewTransactionFlow, Validation } from "@/config/interfaces";
 import { CTokenWithUserData } from "./tokens";
 import { UserLMPosition } from "./userPositions";
 import { LendingMarketType } from "../config/cTokenAddresses";
@@ -6,6 +5,8 @@ import {
   CLMClaimRewardsTxParams,
   CTokenLendingTransactionParams,
 } from "@/transactions/lending";
+import { Validation } from "@/config/interfaces";
+import { NewTransactionFlow } from "@/transactions/flows";
 
 export interface LendingHookInputParams {
   chainId: number;

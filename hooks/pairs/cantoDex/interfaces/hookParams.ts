@@ -1,11 +1,8 @@
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
-import {
-  NewTransactionFlow,
-  ReturnWithError,
-  Validation,
-} from "@/config/interfaces";
 import { CantoDexPairWithUserCTokenData } from "./pairs";
-import { CantoDexTransactionParams } from "./pairsTxTypes";
+import { CantoDexTransactionParams } from "@/transactions/pairs/cantoDex";
+import { Validation } from "@/config/interfaces";
+import { NewTransactionFlow } from "@/transactions/flows";
 
 export interface CantoDexHookInputParams {
   chainId: number;
@@ -18,9 +15,9 @@ export interface CantoDexHookReturn {
   position: UserLMPosition;
   transaction: {
     validateParams: (txParams: CantoDexTransactionParams) => Validation;
-    createNewPairsFlow: (
+    newCantoDexLPFlow: (
       params: CantoDexTransactionParams
-    ) => ReturnWithError<NewTransactionFlow>;
+    ) => NewTransactionFlow;
     newClaimRewardsFlow: () => NewTransactionFlow;
   };
 }

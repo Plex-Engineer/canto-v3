@@ -4,13 +4,12 @@ import {
   PromiseWithError,
   Validation,
 } from "@/config/interfaces";
+import { CTokenLendingTransactionParams, CTokenLendingTxTypes } from ".";
 import {
-  CTokenLendingTransactionParams,
-  CTokenLendingTxTypes,
   _collateralizeTx,
   _lendingCTokenTx,
   _withdrawAllCTokenTx,
-} from ".";
+} from "./txCreators";
 import { TX_PARAM_ERRORS } from "@/config/consts/errors";
 import { areEqualAddresses, isValidEthAddress } from "@/utils/address";
 import { maxAmountForLendingTx } from "@/utils/clm";
