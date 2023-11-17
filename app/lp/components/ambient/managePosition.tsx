@@ -1,4 +1,5 @@
-import styles from "../cantoDex.module.scss";
+import styles from "../dexModals/cantoDex.module.scss";
+
 import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
 import {
   AmbientPool,

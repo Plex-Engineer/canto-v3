@@ -44,6 +44,7 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
         }}
         style={{
           cursor: "pointer",
+          paddingLeft: "10px",
         }}
         onClick={() => setModalType("base")}
       >

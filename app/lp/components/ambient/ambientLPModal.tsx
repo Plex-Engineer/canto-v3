@@ -6,7 +6,7 @@ import { useState } from "react";
 import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
 import Text from "@/components/text";
-import styles from "../cantoDex.module.scss";
+import styles from "../dexModals/cantoDex.module.scss";
 import {
   AmbientPool,
   AmbientUserPosition,
