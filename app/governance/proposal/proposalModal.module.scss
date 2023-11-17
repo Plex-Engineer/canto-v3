@@ -100,8 +100,8 @@
         .proposalInfoVoting{
         
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            flex-direction: row;
+            //justify-content: space-between;
             flex-wrap: nowrap;
             border: 1px solid var(--border-stroke-color, #B3B3B3);
             border-radius: 5px ;
@@ -188,7 +188,8 @@
         .votingInfoRow1{
             display: flex;
             flex-direction: row;
-            justify-content: space-between;
+            align-items: center;
+            width: 50%;
             .circle {
                 width: 7px; /* Small circle size */
                 height: 7px; /* Small circle size */
@@ -199,8 +200,17 @@
               }
         }
         .votingInfoRow2{
+            .infoRow1First{
+                display: flex;
+                flex-direction: row;
+                height: 50%;
+                justify-content: flex-end;
+                width: 100%;
+            }
+            
+            width: 50%;
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             justify-content: right;
             align-items: center;
         }

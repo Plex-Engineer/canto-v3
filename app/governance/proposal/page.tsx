@@ -147,8 +147,8 @@ export default function Page() {
         
       </div>
       <div className={styles.proposalCardContainer2}>
-        <div className={styles.proposalInfoBoxVoting}>
-          <div className={styles.proposalInfoRow1}>
+       <div className={styles.proposalInfoBoxVoting}>
+        <div className={styles.proposalInfoRow1}>
           { isActive && <div className={styles.radioBtn}>
                     <input
                   type="radio"
@@ -170,28 +170,31 @@ export default function Page() {
               
              
                 <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "#06FC99", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Yes</Text></div></div>
-                <div><Text font="proto_mono">{votesData.yes}%</Text></div>
+                
               </div>
               <div className={styles.votingInfoRow2}>
-                    <Container
-                        direction="row"
-                        gap={6}
-                        center={{
-                          vertical: true,
-                        }}
-                      >
-                        <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.yesAmount, 2, {
-                          commify: true,
-                        })}</Text>
-                        <Icon
-                          icon={{
-                            url: "./tokens/canto.svg",
-                            size: 16,
-                          }}
-                        />
+                  <div className={styles.infoRow1First}><Text font="proto_mono">{votesData.yes}%</Text></div>
+                  <div className={styles.infoRow1First}>
+                        <Container
+                            direction="row"
+                            gap={6}
+                            center={{
+                              vertical: true,
+                            }}
+                          >
+                            <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.yesAmount, 2, {
+                              commify: true,
+                            })}</Text>
+                            <Icon
+                              icon={{
+                                url: "./tokens/canto.svg",
+                                size: 16,
+                              }}
+                            />
 
-                      </Container>
-                </div>
+                          </Container>
+                    </div>
+              </div>
               
               
 
@@ -208,37 +211,46 @@ export default function Page() {
                 
                 
               </div>}
-            <div className={styles.proposalInfoVoting}>
-              <div className={styles.votingInfoRow1}>
-                
               
-                <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "#FC5151", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">No</Text></div></div>
-                <div><Text font="proto_mono">{votesData.no}%</Text></div>
-              </div>
-              <div className={styles.votingInfoRow2}>
-              <Container
-                        direction="row"
-                        gap={6}
-                        center={{
-                          vertical: true,
-                        }}
-                      >
-                        <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.noAmount, 2, {
-                          commify: true,
-                        })}</Text>
-                        <Icon
-                          icon={{
-                            url: "./tokens/canto.svg",
-                            size: 16,
+          <div className={styles.proposalInfoVoting}>
+            
+            
+            <div className={styles.votingInfoRow1}>
+            
+           
+              <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "#FC5151", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">No</Text></div></div>
+              
+            </div>
+            <div className={styles.votingInfoRow2}>
+                <div className={styles.infoRow1First}><Text font="proto_mono">{votesData.no}%</Text></div>
+                <div className={styles.infoRow1First}>
+                      <Container
+                          direction="row"
+                          gap={6}
+                          center={{
+                            vertical: true,
                           }}
-                        />
+                        >
+                          <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.noAmount, 2, {
+                            commify: true,
+                          })}</Text>
+                          <Icon
+                            icon={{
+                              url: "./tokens/canto.svg",
+                              size: 16,
+                            }}
+                          />
 
-                      </Container>
-              </div>
-
+                        </Container>
+                  </div>
             </div>
           </div>
-          <div className={styles.proposalInfoRow1}>
+
+        </div>
+            
+            
+
+        <div className={styles.proposalInfoRow1}>
           { isActive && <div className={styles.radioBtn}>
                     <input
                   type="radio"
@@ -249,34 +261,40 @@ export default function Page() {
                   disabled={!isActive}
                 />
               </div>}
-            <div className={styles.proposalInfoVoting} >
-              <div className={styles.votingInfoRow1}>
-                <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "#4455EF", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Veto</Text></div></div>
-                <div><Text font="proto_mono">{votesData.no_with_veto}%</Text></div>
-              </div>
-              <div className={styles.votingInfoRow2}>
-              <Container
-                        direction="row"
-                        gap={6}
-                        center={{
-                          vertical: true,
-                        }}
-                      >
-                        <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.no_with_vetoAmount, 2, {
-                          commify: true,
-                        })}</Text>
-                        <Icon
-                          icon={{
-                            url: "./tokens/canto.svg",
-                            size: 16,
-                          }}
-                        />
 
-                      </Container>
-              </div>
-              
+          <div className={styles.proposalInfoVoting}>
+            
+            
+            <div className={styles.votingInfoRow1}>
+            
+           
+              <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "#4455EF", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Veto</Text></div></div>
               
             </div>
+            <div className={styles.votingInfoRow2}>
+                <div className={styles.infoRow1First}><Text font="proto_mono">{votesData.no_with_veto}%</Text></div>
+                <div className={styles.infoRow1First}>
+                      <Container
+                          direction="row"
+                          gap={6}
+                          center={{
+                            vertical: true,
+                          }}
+                        >
+                          <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.no_with_vetoAmount, 2, {
+                            commify: true,
+                          })}</Text>
+                          <Icon
+                            icon={{
+                              url: "./tokens/canto.svg",
+                              size: 16,
+                            }}
+                          />
+
+                        </Container>
+                  </div>
+            </div>
+          </div>
             { isActive && <div className={styles.radioBtn}>
                     <input
                   type="radio"
@@ -288,34 +306,42 @@ export default function Page() {
                 />
 
               </div>}
-            <div className={styles.proposalInfoVoting}>
-              <div className={styles.votingInfoRow1}>
+          <div className={styles.proposalInfoVoting}>
             
-                <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "black" , margin:"10px 5px 0px 10px"}}></div> <div><Text font="proto_mono">Abstain</Text></div></div>
-                <div><Text font="proto_mono">{votesData.abstain}%</Text></div>
-              </div>
-              <div className={styles.votingInfoRow2}>
-              <Container
-                        direction="row"
-                        gap={6}
-                        center={{
-                          vertical: true,
-                        }}
-                      >
-                        <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.abstainAmount, 2, {
-                          commify: true,
-                        })}</Text>
-                        <Icon
-                          icon={{
-                            url: "./tokens/canto.svg",
-                            size: 16,
-                          }}
-                        />
-
-                      </Container>
-              </div>
+            
+            <div className={styles.votingInfoRow1}>
+            
+           
+              <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "rgb(67, 64, 64)", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Abstain</Text></div></div>
+              
             </div>
-          </div>  
+            <div className={styles.votingInfoRow2}>
+                <div className={styles.infoRow1First}><Text font="proto_mono">{votesData.abstain}%</Text></div>
+                <div className={styles.infoRow1Second}>
+                      <Container
+                          direction="row"
+                          gap={6}
+                          center={{
+                            vertical: true,
+                          }}
+                        >
+                          <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.abstainAmount, 2, {
+                            commify: true,
+                          })}</Text>
+                          <Icon
+                            icon={{
+                              url: "./tokens/canto.svg",
+                              size: 16,
+                            }}
+                          />
+
+                        </Container>
+                  </div>
+            </div>
+          </div>
+            
+            
+        </div>
         </div>
         <div className={styles.VotingButton}>
           <Button width={400} disabled={!isActive} onClick={()=>castVote(proposal.proposal_id, selectedVote)}>Vote</Button>

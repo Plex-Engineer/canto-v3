@@ -124,10 +124,10 @@ export function calculateVotePercentages(finalTallyResult: FinalTallyResult): Vo
   }
   
   // Calculate percentages and format them as strings
-  const yesPercentage = (Number(yesVotes*BigInt(10000) / totalVotesBigInt )/100).toFixed(3);
-  const abstainPercentage = (Number(abstainVotes*BigInt(1000000) / totalVotesBigInt )/10000).toFixed(3);
-  const noPercentage = (Number(noVotes*BigInt(10000) / totalVotesBigInt )/100).toFixed(3);
-  const noWithVetoPercentage = (Number(noWithVetoVotes*BigInt(10000) / totalVotesBigInt )/100).toFixed(3);
+  const yesPercentage = (Number(yesVotes*BigInt(10000) / totalVotesBigInt )/100).toFixed(2);
+  const abstainPercentage = (Number(abstainVotes*BigInt(1000000) / totalVotesBigInt )/10000).toFixed(2);
+  const noPercentage = (Number(noVotes*BigInt(10000) / totalVotesBigInt )/100).toFixed(2);
+  const noWithVetoPercentage = (Number(noWithVetoVotes*BigInt(10000) / totalVotesBigInt )/100).toFixed(2);
 
   // Convert the vote counts to strings with two decimal places
   const yesString = yesNumber.toFixed(2);
