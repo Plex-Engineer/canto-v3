@@ -4,14 +4,14 @@ import Image from "next/image";
 import Text from "../text";
 import TxItem from "./TxItem";
 import Spacer from "../layout/spacer";
+import Button from "../button/button";
+import { formatError } from "@/utils/formatting";
+import { BridgeStatus } from "@/transactions/interfaces";
 import {
-  BridgeStatus,
+  TRANSACTION_FLOW_MAP,
   TX_PLACEHOLDER,
   TransactionFlow,
-} from "@/config/interfaces";
-import Button from "../button/button";
-import { TRANSACTION_FLOW_MAP } from "@/config/transactions/txMap";
-import { formatError } from "@/utils/formatting";
+} from "@/transactions/flows";
 
 interface Props {
   txFlow?: TransactionFlow;
@@ -29,12 +29,16 @@ const TxFlow = (props: Props) => {
     async function checkRetryParams() {
       if (props.txFlow?.status === "ERROR") {
         // check if we can retry
-        const { data } = await TRANSACTION_FLOW_MAP[
+        const { data, error } = await TRANSACTION_FLOW_MAP[
           props.txFlow.txType
         ].validRetry(props.txFlow.params);
-        if (data) {
-          setCanRetry({ valid: data.valid, error: data.error });
+        if (error) {
+          setCanRetry({ valid: false, error: error.message });
         }
+        setCanRetry({
+          valid: !data.error,
+          error: data.error ? data.reason : undefined,
+        });
       }
     }
     checkRetryParams();

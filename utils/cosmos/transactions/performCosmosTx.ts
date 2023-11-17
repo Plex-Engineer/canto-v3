@@ -11,8 +11,8 @@ import {
 } from "./helpers.utils";
 import { ethToCantoAddress } from "@/utils/address";
 import { tryFetchWithRetry } from "@/utils/async";
-import { checkOnRightChain } from "@/utils/evm";
 import { getCosmosAPIEndpoint, getCosmosChainObject } from "@/utils/networks";
+import { checkOnRightChain } from "@/transactions/signTx/evm";
 
 /**
  * @notice performs a cosmos transaction through metamask EIP712

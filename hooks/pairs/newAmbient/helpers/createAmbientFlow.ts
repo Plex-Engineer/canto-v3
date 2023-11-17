@@ -10,8 +10,8 @@ export function createNewAmbientTxFlow(
   params: AmbientTransactionParams
 ): ReturnWithError<NewTransactionFlow> {
   return NO_ERROR({
-    title: `${params.txType} ${params.pair.symbol}`,
-    icon: params.pair.logoURI,
+    title: `${params.txType} ${params.pool.symbol}`,
+    icon: params.pool.logoURI,
     txType: TransactionFlowType.AMBIENT_LIQUIDITY_TX,
     params: params,
   });

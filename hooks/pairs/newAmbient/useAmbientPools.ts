@@ -16,20 +16,21 @@ import {
   NO_ERROR,
   NewTransactionFlow,
   ReturnWithError,
-  ValidationReturn,
+  Validation,
 } from "@/config/interfaces";
 import {
   getConcBaseTokensFromQuoteTokens,
   getConcQuoteTokensFromBaseTokens,
 } from "@/utils/ambient";
-import { validateInputTokenAmount } from "@/utils/math";
+import { validateWeiUserInputTokenAmount } from "@/utils/math";
 import { createNewAmbientTxFlow } from "./helpers/createAmbientFlow";
 import { queryUserAmbientRewards } from "./helpers/ambientApi";
-import { CLMClaimRewardsTxParams } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { TransactionFlowType } from "@/config/transactions/txMap";
 import { useEffect, useState } from "react";
 import { CANTO_DATA_API_ENDPOINTS, getCantoApiData } from "@/config/api";
 import { CToken } from "@/hooks/lending/interfaces/tokens";
+import { USER_INPUT_ERRORS } from "@/config/consts/errors";
+import { CLMClaimRewardsTxParams } from "@/transactions/lending";
 
 export default function useAmbientPools(
   params: AmbientHookInputParams,
@@ -176,21 +177,19 @@ export default function useAmbientPools(
   ///
 
   // transaction validation
-  function validateTxParams(
-    txParams: AmbientTransactionParams
-  ): ValidationReturn {
+  function validateTxParams(txParams: AmbientTransactionParams): Validation {
     switch (txParams.txType) {
       case AmbientTxType.ADD_CONC_LIQUIDITY: {
         // check that balances are good for each token
-        const base = txParams.pair.base;
-        const quote = txParams.pair.quote;
+        const base = txParams.pool.base;
+        const quote = txParams.pool.quote;
         let baseAmount;
         let quoteAmount;
         if (txParams.isAmountBase) {
           baseAmount = txParams.amount;
           quoteAmount = getConcQuoteTokensFromBaseTokens(
             baseAmount,
-            txParams.pair.stats.lastPriceSwap.toString(),
+            txParams.pool.stats.lastPriceSwap.toString(),
             txParams.minPriceWei,
             txParams.maxPriceWei
           );
@@ -198,54 +197,52 @@ export default function useAmbientPools(
           quoteAmount = txParams.amount;
           baseAmount = getConcBaseTokensFromQuoteTokens(
             quoteAmount,
-            txParams.pair.stats.lastPriceSwap.toString(),
+            txParams.pool.stats.lastPriceSwap.toString(),
             txParams.minPriceWei,
             txParams.maxPriceWei
           );
         }
-        const baseCheck = validateInputTokenAmount(
+        const baseCheck = validateWeiUserInputTokenAmount(
           baseAmount,
+          "0",
           base.balance ?? "0",
           base.symbol,
           base.decimals
         );
-        const quoteCheck = validateInputTokenAmount(
+        if (baseCheck.error) return baseCheck;
+        const quoteCheck = validateWeiUserInputTokenAmount(
           quoteAmount,
+          "0",
           quote.balance ?? "0",
           quote.symbol,
           quote.decimals
         );
-        const prefixError = !baseCheck.isValid ? base.symbol : quote.symbol;
-        return {
-          isValid: baseCheck.isValid && quoteCheck.isValid,
-          errorMessage:
-            prefixError +
-            " " +
-            (baseCheck.errorMessage || quoteCheck.errorMessage),
-        };
+        return quoteCheck;
       }
       case AmbientTxType.REMOVE_CONC_LIQUIDITY: {
         // get position
-        const position = txParams.pair.userPositions.find(
+        const position = txParams.pool.userPositions.find(
           (pos) => pos.positionId === txParams.positionId
         );
         if (!position) {
           return {
-            isValid: false,
-            errorMessage: "position not found",
+            error: true,
+            reason: USER_INPUT_ERRORS.PROP_UNAVAILABLE("Position"),
           };
         }
         // check enough liquidity there
-        return validateInputTokenAmount(
+        return validateWeiUserInputTokenAmount(
           txParams.liquidity,
+          "0",
           position.concLiq.toString(),
-          txParams.pair.symbol
+          txParams.pool.symbol,
+          0
         );
       }
       default:
         return {
-          isValid: false,
-          errorMessage: "tx type not found",
+          error: true,
+          reason: "tx type not found",
         };
     }
   }
@@ -255,8 +252,8 @@ export default function useAmbientPools(
     params: AmbientTransactionParams
   ): ReturnWithError<NewTransactionFlow> {
     const validation = validateTxParams(params);
-    if (!validation.isValid) {
-      return NEW_ERROR("createNewPoolFlow::" + validation.errorMessage);
+    if (validation.error) {
+      return NEW_ERROR("createNewPoolFlow::" + validation.reason);
     }
     return createNewAmbientTxFlow(params);
   }

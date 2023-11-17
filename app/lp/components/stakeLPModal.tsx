@@ -13,12 +13,10 @@ import {
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import { useState } from "react";
-import { ValidationReturn } from "@/config/interfaces";
 import Amount from "@/components/amount/amount";
-import { CantoDexTxTypes } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
+import { CantoDexTxTypes } from "@/transactions/pairs/cantoDex";
 import { addTokenBalances, convertTokenAmountToNote } from "@/utils/math";
 import { ModalItem } from "@/app/lending/components/modal/modal";
-import Tabs from "@/components/tabs/tabs";
 interface Props {
   clpToken: CTokenWithUserData;
   onBack: () => void;
@@ -30,7 +28,7 @@ interface Props {
     validateAmount: (
       amount: string,
       txType: CantoDexTxTypes.STAKE | CantoDexTxTypes.UNSTAKE
-    ) => ValidationReturn;
+    ) => Validation;
   };
 }
 
@@ -75,7 +73,7 @@ export const StakeLPModal = (props: Props) => {
       validateAmount: (
         amount: string,
         txType: CantoDexTxTypes.STAKE | CantoDexTxTypes.UNSTAKE
-      ) => ValidationReturn;
+      ) => Validation;
     },
     txType: CantoDexTxTypes.STAKE | CantoDexTxTypes.UNSTAKE
   ) {
@@ -112,10 +110,9 @@ export const StakeLPModal = (props: Props) => {
           }}
           IconUrl={cLPToken.underlying.logoURI}
           title={cLPToken.underlying.symbol}
+          min="1"
           max={maxAmount}
           symbol={cLPToken.underlying.symbol}
-          error={!amountCheck.isValid && Number(amount) !== 0}
-          errorMessage={amountCheck.errorMessage}
         />
         <Spacer height="40px" />
         <CLMInfo cToken={cLPToken} />
@@ -127,7 +124,7 @@ export const StakeLPModal = (props: Props) => {
           <Spacer height="20px" />
           <Button
             width={"fill"}
-            disabled={!amountCheck.isValid}
+            disabled={amountCheck.error}
             onClick={() => transaction.performTx(bnAmount, txType)}
           >
             CONFIRM

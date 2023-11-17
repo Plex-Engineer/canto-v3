@@ -22,7 +22,7 @@ import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks";
 import { GetWalletClientResult } from "wagmi/actions";
 import { maxBridgeAmountInUnderlying } from "@/hooks/bridge/helpers/amounts";
 import { BaseNetwork } from "@/config/interfaces";
-import { validateInputTokenAmount } from "@/utils/math";
+import { validateWeiUserInputTokenAmount } from "@/utils/math";
 import { ETHEREUM_VIA_GRAVITY_BRIDGE } from "@/config/networks";
 
 interface BridgeProps {
@@ -44,11 +44,12 @@ const Bridging = (props: BridgeProps) => {
   ).toString();
 
   // validate user input amount
-  const amountCheck = validateInputTokenAmount(
+  const amountCheck = validateWeiUserInputTokenAmount(
     amountAsBigNumberString,
+    "1",
     maxBridgeAmount,
     props.hook.selections.token?.symbol ?? "",
-    props.hook.selections.token?.decimals
+    props.hook.selections.token?.decimals ?? 0
   );
 
   useEffect(() => {
@@ -386,8 +387,8 @@ const Bridging = (props: BridgeProps) => {
                     setAmount(val.target.value);
                   }}
                   className={styles["input"]}
-                  error={!amountCheck.isValid && Number(amount) !== 0}
-                  errorMessage={amountCheck.errorMessage}
+                  error={amountCheck.error && Number(amount) !== 0}
+                  errorMessage={amountCheck.error ? amountCheck.reason : ""}
                 />
               </Container>
             </Container>
@@ -417,7 +418,7 @@ const Bridging = (props: BridgeProps) => {
           onClick={() => {
             setIsConfirmationModalOpen(true);
           }}
-          disabled={!amountCheck.isValid}
+          disabled={amountCheck.error}
         >
           {props.hook.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
         </Button>

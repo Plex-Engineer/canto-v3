@@ -13,7 +13,8 @@ export type AmbientTransactionParams = {
 );
 
 type BaseConcLiqParams = {
-  pair: AmbientPool;
+  txType: AmbientTxType;
+  pool: AmbientPool;
   lowerTick: number;
   upperTick: number;
   minPriceWei: string;

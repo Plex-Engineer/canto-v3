@@ -2,7 +2,7 @@
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
-import { ValidationReturn } from "@/config/interfaces";
+import { Validation } from "@/config/interfaces";
 import {
   GeneralAmbientPairRow,
   GeneralCantoDexPairRow,
@@ -12,7 +12,6 @@ import {
 import Text from "@/components/text";
 import { CantoDexLPModal } from "./components/cantoDexLPModal";
 import styles from "./lp.module.scss";
-import { CantoDexTransactionParams } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
 import useLP from "@/hooks/pairs/lpCombo/useLP";
 import {
   isAmbientPool,
@@ -27,6 +26,7 @@ import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/am
 import { addTokenBalances } from "@/utils/math";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import { useState } from "react";
+import { CantoDexTransactionParams } from "@/transactions/pairs/cantoDex";
 
 export default function Page() {
   const { txStore, signer, chainId } = useCantoSigner();
@@ -52,25 +52,21 @@ export default function Page() {
 
   // transactions
   function sendCantoDexTxFlow(params: Partial<CantoDexTransactionParams>) {
-    const { data: flow, error } = cantoDex.transaction.createNewPairsFlow({
+    const flow = cantoDex.transaction.newCantoDexLPFlow({
       chainId,
       ethAccount: signer?.account.address ?? "",
       pair: selectedPair,
       ...params,
     } as CantoDexTransactionParams);
-    if (error) {
-      console.log(error);
-    } else {
-      txStore?.addNewFlow({
-        txFlow: flow,
-        signer: signer,
-        onSuccessCallback: () => selection.setPair(null),
-      });
-    }
+    txStore?.addNewFlow({
+      txFlow: flow,
+      signer: signer,
+      onSuccessCallback: () => selection.setPair(null),
+    });
   }
   function canPerformCantoDexTx(
     params: Partial<CantoDexTransactionParams>
-  ): ValidationReturn {
+  ): Validation {
     return cantoDex.transaction.validateParams({
       chainId: chainId,
       ethAccount: signer?.account.address ?? "",
@@ -90,7 +86,7 @@ export default function Page() {
     const { data: flow, error } = ambient.transaction.createNewPoolFlow({
       chainId,
       ethAccount: signer?.account.address ?? "",
-      pair: selectedPair,
+      pool: selectedPair,
       ...params,
     } as AmbientTransactionParams);
     if (error) {
@@ -102,16 +98,6 @@ export default function Page() {
         onSuccessCallback: () => selection.setPair(null),
       });
     }
-  }
-  function canPerformAmbientTx(
-    params: Partial<AmbientTransactionParams>
-  ): ValidationReturn {
-    return ambient.transaction.validateParams({
-      chainId: chainId,
-      ethAccount: signer?.account.address ?? "",
-      pair: selectedPair,
-      ...params,
-    } as AmbientTransactionParams);
   }
 
   /** general selection */
@@ -155,11 +141,7 @@ export default function Page() {
           />
         )}
         {selectedPair && isAmbientPool(selectedPair) && (
-          <AmbientModal
-            pool={selectedPair}
-            validateParams={canPerformAmbientTx}
-            sendTxFlow={sendAmbientTxFlow}
-          />
+          <AmbientModal pool={selectedPair} sendTxFlow={sendAmbientTxFlow} />
         )}
       </Modal>
 

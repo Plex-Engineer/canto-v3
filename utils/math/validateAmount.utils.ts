@@ -1,54 +1,94 @@
-import { ValidationReturn } from "@/config/interfaces";
+import { USER_INPUT_ERRORS } from "@/config/consts/errors";
+import { Validation } from "@/config/interfaces";
 import { convertToBigNumber, formatBalance } from "@/utils/formatting";
 
 /**
- * Validate input token amount
- * @param inputAmount input amount of token in big number format
- * @param maxAmount maximum amount of token in big number format
+ * @description Validate wei input token amount
+ * @param amountWei input amount of token in wei
+ * @param minAmountWei minimum amount of token in wei
+ * @param maxAmountWei maximum amount of token in wei
+ * @param tokenSymbol symbol of token
  * @param tokenDecimals amount of decimals in token
- * @returns {isValid: boolean, error: string}
+ * @returns {Validation}
  */
-export function validateInputTokenAmount(
-  inputAmount: string,
-  maxAmount: string,
+export function validateWeiUserInputTokenAmount(
+  amountWei: string,
+  minAmountWei: string,
+  maxAmountWei: string,
   tokenSymbol: string,
-  tokenDecimals: number = 0
-): ValidationReturn {
-  /** Try to convert input to big number */
-  const { data: bnInputAmount, error: bnError } =
-    convertToBigNumber(inputAmount);
+  tokenDecimals: number
+): Validation {
+  /** Try to convert input to big number no decimals */
+  const { data: bnAmount, error: bnError } = convertToBigNumber(amountWei);
   if (bnError) {
-    // most likely is not a number
-    return { isValid: false, errorMessage: "invalid amount" };
+    // user input is not a number
+    return { error: true, reason: USER_INPUT_ERRORS.INVALID_INPUT() };
   }
-
   /** Check if max is zero */
-  if (Number(maxAmount) === 0) {
-    return { isValid: false, errorMessage: "You have 0 balance" };
+  if (Number(maxAmountWei) === 0) {
+    return { error: true, reason: USER_INPUT_ERRORS.NO_TOKEN_BALANCE() };
   }
 
   /** Check if input is too large */
-  if (bnInputAmount.gt(maxAmount)) {
+  if (bnAmount.gt(maxAmountWei)) {
     return {
-      isValid: false,
-      errorMessage: `Amount must be less than ${formatBalance(
-        maxAmount,
-        tokenDecimals,
-        { commify: true, symbol: tokenSymbol }
-      )}`,
+      error: true,
+      reason: USER_INPUT_ERRORS.AMOUNT_TOO_HIGH(
+        formatBalance(maxAmountWei, tokenDecimals, {
+          commify: true,
+        }),
+        tokenSymbol
+      ),
     };
   }
 
   /** Check if amount is too small */
-  const minAmount = formatBalance("1", tokenDecimals, {
-    precision: tokenDecimals,
-  });
-  if (bnInputAmount.lt(minAmount)) {
+  if (bnAmount.lt(minAmountWei)) {
     return {
-      isValid: false,
-      errorMessage: `Amount must be greater than ${minAmount} ${tokenSymbol}`,
+      error: true,
+      reason: USER_INPUT_ERRORS.AMOUNT_TOO_LOW(
+        formatBalance(minAmountWei, tokenDecimals, {
+          commify: true,
+        }),
+        tokenSymbol
+      ),
     };
   }
   /** All checks passed */
-  return { isValid: true };
+  return { error: false };
+}
+
+/**
+ * @description Validate user input token amount
+ * @param userInputAmount input amount of token in NON wei (will convert in this function)
+ * @param minAmount minimum amount of token in wei
+ * @param maxAmount maximum amount of token in wei
+ * @param tokenSymbol symbol of token
+ * @param tokenDecimals amount of decimals in token
+ * @returns {Validation}
+ */
+export function validateNonWeiUserInputTokenAmount(
+  userInputAmount: string,
+  minAmount: string,
+  maxAmount: string,
+  tokenSymbol: string,
+  tokenDecimals: number
+): Validation {
+  /** Try to convert input to big number */
+  const { data: bnInputAmount, error: bnError } = convertToBigNumber(
+    userInputAmount,
+    tokenDecimals
+  );
+  if (bnError) {
+    // user input is not a number
+    return { error: true, reason: USER_INPUT_ERRORS.INVALID_INPUT() };
+  }
+  /** Use wei in validateWeiUserInputTokenAmount*/
+  return validateWeiUserInputTokenAmount(
+    bnInputAmount.toString(),
+    minAmount,
+    maxAmount,
+    tokenSymbol,
+    tokenDecimals
+  );
 }

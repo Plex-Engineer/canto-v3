@@ -1,35 +1,33 @@
 import {
-  NEW_ERROR,
-  NO_ERROR,
-  PromiseWithError,
-  Transaction,
-} from "@/config/interfaces";
-import {
   GetWalletClientResult,
   getWalletClient,
   switchNetwork,
 } from "wagmi/actions";
+import { Transaction } from "../interfaces";
+import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
+import { TX_SIGN_ERRORS } from "@/config/consts/errors";
+import { newContractInstance } from "@/utils/evm";
+import { percentOfAmount } from "@/utils/math";
+import { asyncCallWithTimeout } from "@/utils/async";
 import { BaseError } from "viem";
 import { TransactionReceipt } from "web3";
-import { asyncCallWithTimeout } from "../async";
-import { newContractInstance } from "./contracts.utils";
-import { percentOfAmount } from "../math";
 
 /**
- * @notice performs evm transaction
+ * @notice signs evm transaction
  * @param {Transaction} tx transaction to perform
  * @param {GetWalletClientResult} signer signer to sign transaction with
  * @returns {PromiseWithError<string>} txHash of transaction or error
  */
-export async function performEVMTransaction(
+export async function signEVMTransaction(
   tx: Transaction,
   signer?: GetWalletClientResult
 ): PromiseWithError<`0x${string}`> {
   try {
-    if (tx.type !== "EVM") throw Error("not evm tx");
-    if (!signer) throw Error("no signer");
+    if (tx.type !== "EVM")
+      throw Error(TX_SIGN_ERRORS.INCORRECT_TX_TYPE(tx.type));
+    if (!signer) throw Error(TX_SIGN_ERRORS.MISSING_SIGNER());
     if (typeof tx.chainId !== "number")
-      throw Error("invalid chainId: " + tx.chainId);
+      throw Error(TX_SIGN_ERRORS.INVALID_CHAIN_ID(tx.chainId));
 
     const { data: newSigner, error: chainError } = await checkOnRightChain(
       signer,
@@ -73,31 +71,10 @@ export async function performEVMTransaction(
       throw new Error("performEVMTransaction: no tx hash");
 
     return NO_ERROR(transaction.transactionHash as `0x${string}`);
-
-    // // try to sign tx
-    // try {
-    //   const contractCall = {
-    //     address: tx.target as `0x${string}`,
-    //     abi: tx.abi,
-    //     functionName: tx.method,
-    //     args: tx.params,
-    //     value: BigInt(tx.value),
-    //     chainId: tx.chainId,
-    //     account: newSigner.account.address,
-    //   };
-    //   const { hash } = await writeContract(contractCall);
-    //   return NO_ERROR(hash);
-    // } catch (err) {
-    //   if (err instanceof BaseError) {
-    //     console.log(err.shortMessage);
-    //     return NEW_ERROR("performEVMTransaction: " + err.shortMessage);
-    //   }
-    //   return NEW_ERROR("performEVMTransaction: " + errMsg(err));
-    // }
   } catch (err) {
     if (err instanceof BaseError) {
       console.log(err.shortMessage);
-      return NEW_ERROR("performEVMTransaction", err.shortMessage);
+      return NEW_ERROR("performEVMTransaction::" + err.shortMessage);
     }
     return NEW_ERROR("performEVMTransaction", err);
   }
@@ -114,25 +91,19 @@ export async function checkOnRightChain(
   signer: GetWalletClientResult,
   chainId: number
 ): PromiseWithError<GetWalletClientResult> {
-  if (!signer) {
-    return NEW_ERROR("checkOnRightChain: no signer");
-  }
-  if (signer.chain.id !== chainId) {
-    try {
-      // attempt to switch chains
+  try {
+    if (!signer) throw new Error(TX_SIGN_ERRORS.MISSING_SIGNER());
+    if (signer.chain.id !== chainId) {
       const network = await switchNetwork({ chainId });
       if (!network || network.id !== chainId) {
-        return NEW_ERROR("checkOnRightChain: error switching chains");
+        throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
       }
       const newSigner = await getWalletClient({ chainId });
-      if (!newSigner) {
-        // still some error getting the signer
-        return NEW_ERROR("checkOnRightChain: error switching chains");
-      }
+      if (!newSigner) throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
       return NO_ERROR(newSigner);
-    } catch (error) {
-      return NEW_ERROR("checkOnRightChain: error switching chains");
     }
+    return NO_ERROR(signer);
+  } catch (err) {
+    return NEW_ERROR("checkOnRightChain", err);
   }
-  return NO_ERROR(signer);
 }
