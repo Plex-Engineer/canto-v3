@@ -47,72 +47,74 @@ export const AmbientModal = (props: AmbientModalProps) => {
   };
 
   return (
-    <Container className={styles.container}>
-      <div>
-        <Container
-          direction="row"
-          height="24px"
-          center={{
-            vertical: true,
-          }}
+    <Container className={styles.ambientContainer}>
+      <Container
+        direction="row"
+        height="70px"
+        center={{
+          vertical: true,
+        }}
+        style={{
+          cursor: "pointer",
+          padding: "12px",
+          paddingLeft: "16px",
+        }}
+        onClick={() => {
+          setSelectedPosition(null);
+        }}
+      >
+        {selectedPosition !== null && (
+          <div
+            style={{
+              rotate: "90deg",
+              marginRight: "6px",
+            }}
+          >
+            <Icon icon={{ url: "./dropdown.svg", size: 24 }} themed />
+          </div>
+        )}
+        <Text font="proto_mono" size="lg">
+          {title()}
+        </Text>
+      </Container>
+      {/* <Spacer height="14px" /> */}
+      <div className={styles["scroll-view"]}>
+        <div
           style={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            setSelectedPosition(null);
+            padding: "1rem",
           }}
         >
-          {selectedPosition !== null && (
-            <div
-              style={{
-                rotate: "90deg",
-                marginRight: "6px",
-              }}
-            >
-              <Icon icon={{ url: "./dropdown.svg", size: 24 }} themed />
-            </div>
+          {modalState === "list" && (
+            <Container>
+              <div className={styles.iconTitle}>
+                <Icon icon={{ url: props.pool.logoURI, size: 60 }} />
+                <Text size="lg" font="proto_mono">
+                  {props.pool.symbol}
+                </Text>
+              </div>
+              <PositionList
+                pool={props.pool}
+                positions={props.pool.userPositions}
+                setSelectedPosition={setSelectedPosition}
+              />
+            </Container>
           )}
-          <Text font="proto_mono" size="lg">
-            {title()}
-          </Text>
-        </Container>
-        <Spacer height="14px" />
-      </div>
-      <div className={styles.inner}>
-        {modalState === "list" && (
-          <Container height="calc(100% - 0px)">
-            <div className={styles.iconTitle}>
-              <Icon icon={{ url: props.pool.logoURI, size: 60 }} />
-              <Text size="lg" font="proto_mono">
-                {props.pool.symbol}
-              </Text>
-            </div>
-            <PositionList
+          {modalState === "new" && (
+            <Container width="100%" className={styles["scroll-view"]}>
+              <NewAmbientPositionModal
+                pool={props.pool}
+                sendTxFlow={props.sendTxFlow}
+              />
+            </Container>
+          )}
+          {modalState === "manage" && (
+            <ManageAmbientPosition
               pool={props.pool}
-              positions={props.pool.userPositions}
-              setSelectedPosition={setSelectedPosition}
-            />
-          </Container>
-        )}
-        {modalState === "new" && (
-          <Container
-            width="100%"
-            className={styles["scroll-view"]}
-            style={{ padding: "0 1rem" }}
-          >
-            <NewAmbientPositionModal
-              pool={props.pool}
+              position={selectedPosition as AmbientUserPosition}
               sendTxFlow={props.sendTxFlow}
             />
-          </Container>
-        )}
-        {modalState === "manage" && (
-          <ManageAmbientPosition
-            pool={props.pool}
-            position={selectedPosition as AmbientUserPosition}
-            sendTxFlow={props.sendTxFlow}
-          />
-        )}
+          )}
+        </div>
       </div>
     </Container>
   );

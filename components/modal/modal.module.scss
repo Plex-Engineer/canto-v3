@@ -75,6 +75,7 @@
   background-color: var(--card-sub-surface-color);
   box-shadow: 5px 5px 0 0px rgba(0, 0, 0, 0.1);
   display: flex;
+  min-width: 32rem;
   flex-direction: column;
 
   border-radius: var(--border-radius, 0px);

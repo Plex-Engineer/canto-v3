@@ -3,6 +3,12 @@
   height: 40rem;
 }
 
+.ambientContainer {
+  display: flex;
+  height: 40rem;
+  width: fit-content;
+}
+
 .baseContainer {
   display: flex;
   height: 40rem;
@@ -13,19 +19,9 @@
   overflow-x: hidden;
   overflow-y: auto;
   scroll-behavior: smooth;
-  flex-grow: 1;
   padding: 1px;
-  //   &::-webkit-scrollbar {
-  //     width: 0px;
-  //     background: transparent;
-  //   }
 }
 
-.inner {
-  display: flex;
-  height: calc(100% - 22px);
-  flex-direction: column;
-}
 .items-list {
   display: flex;
   flex-direction: column;

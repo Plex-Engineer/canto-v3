@@ -128,10 +128,11 @@ export default function Page() {
   return (
     <div className={styles.container}>
       <Modal
+        width="min-content"
         padded={false}
         open={selectedPair !== null}
         onClose={() => setPair(null)}
-        closeOnOverlayClick={false}
+        closeOnOverlayClick={true}
       >
         {selectedPair && isCantoDexPair(selectedPair) && (
           <CantoDexLPModal
