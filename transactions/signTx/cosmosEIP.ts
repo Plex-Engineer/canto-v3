@@ -1,66 +1,85 @@
+import { GetWalletClientResult } from "wagmi/actions";
 import {
-  NEW_ERROR,
-  NO_ERROR,
-  PromiseWithError,
-  ReturnWithError,
   CosmosTxContext,
   EIP712FeeObject,
   Fee,
-  Sender,
+  Transaction,
   UnsignedCosmosMessages,
-} from "@/config/interfaces";
-import { tryFetch } from "@/utils/async";
-import { getCosmosAPIEndpoint } from "@/utils/networks";
-import {
-  generateMessageWithMultipleTransactions,
-  createEIP712,
-} from "@evmos/eip712";
+} from "../interfaces";
+import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
+import { checkOnRightChain } from "./evm";
+import { ethToCantoAddress } from "@/utils/address";
+import { getCosmosAPIEndpoint, getCosmosChainObject } from "@/utils/networks";
+import { getCantoSenderObj } from "@/utils/cosmos";
 import { createTransactionWithMultipleMessages } from "@evmos/proto";
 import {
   createTxRawEIP712,
   signatureToWeb3Extension,
 } from "@evmos/transactions";
 import { signatureToPubkey } from "@hanchon/signature-to-pubkey";
+import {
+  generateMessageWithMultipleTransactions,
+  createEIP712,
+} from "@evmos/eip712";
+import { tryFetch, tryFetchWithRetry } from "@/utils/async";
 
-interface CosmosAccountReturn {
-  account: {
-    base_account: {
-      account_number: number;
-      sequence: number;
-      address: string;
-      pub_key: {
-        key: string;
-      } | null;
-    };
-  };
-}
-/**
- * @notice gets account data from cosmos
- * @param {string} cosmosAddress cosmos address to get account for
- * @param {string | number} chainId chainId of chain
- * @returns {PromiseWithError<CosmosAccountReturn>} account data or error
- */
-export async function getCosmosAccount(
-  cosmosAddress: string,
-  chainId: string | number
-): PromiseWithError<CosmosAccountReturn> {
+export async function signCosmosEIPTx(
+  tx: Transaction,
+  signer?: GetWalletClientResult
+): PromiseWithError<string> {
   try {
-    // get api endpoint
-    const { data: apiEndpoint, error: apiEndpointError } =
-      getCosmosAPIEndpoint(chainId);
-    if (apiEndpointError) throw apiEndpointError;
+    if (tx.type !== "COSMOS") throw Error("not cosmos tx");
+    if (!signer) throw Error("no signer");
+    if (typeof tx.chainId !== "number")
+      throw Error("invalid chainId: " + tx.chainId);
 
-    // get account data
-    const { data: result, error: fetchError } =
-      await tryFetch<CosmosAccountReturn>(
-        apiEndpoint + `/cosmos/auth/v1beta1/accounts/${cosmosAddress}`
+    /** switch chains if neccessary */
+    const { data: newSigner, error: chainError } = await checkOnRightChain(
+      signer,
+      tx.chainId
+    );
+    if (chainError || !newSigner) throw chainError;
+
+    /** tx context */
+
+    /** canto address */
+    const { data: cantoAddress, error: ethToCantoError } =
+      await ethToCantoAddress(newSigner.account.address);
+    if (ethToCantoError) throw ethToCantoError;
+
+    /** chain object */
+    const { data: chainObj, error: chainObjError } = getCosmosChainObject(
+      tx.chainId
+    );
+    if (chainObjError) throw chainObjError;
+
+    /** sender object */
+    const { data: senderObj, error: senderObjError } = await getCantoSenderObj(
+      cantoAddress,
+      tx.chainId
+    );
+    if (senderObjError) throw senderObjError;
+
+    /** create and sign transaction */
+    const { data: txData, error: txError } =
+      await signAndBroadcastCosmosTransaction(
+        {
+          chain: chainObj,
+          sender: senderObj,
+          fee: tx.msg.fee,
+          memo: "signed with metamask",
+          ethAddress: newSigner.account.address,
+        },
+        tx.msg
       );
-    if (fetchError) throw fetchError;
+    if (txError) throw txError;
 
-    // return account data
-    return NO_ERROR(result);
+    /** check if transaction was successful */
+    if (txData.tx_response.code !== 0) throw Error(txData.tx_response.raw_log);
+
+    return NO_ERROR(txData.tx_response.txhash);
   } catch (err) {
-    return NEW_ERROR("getCosmosAccount", err);
+    return NEW_ERROR("signCosmosEIPTx", err);
   }
 }
 
@@ -70,7 +89,7 @@ export async function getCosmosAccount(
  * @param {UnsignedCosmosMessages} tx unsigned tx to sign and broadcast
  * @returns {PromiseWithError<any>} return data of broadcast or error
  */
-export async function signAndBroadcastCosmosTransaction(
+async function signAndBroadcastCosmosTransaction(
   context: CosmosTxContext,
   tx: UnsignedCosmosMessages
 ): PromiseWithError<any> {
@@ -203,49 +222,6 @@ export function generatePostBodyBroadcast(
 }
 
 /**
- * @notice gets sender object from cosmos
- * @param {string} senderCosmosAddress sender of tx
- * @param {string | number} chainid chainId for tx
- * @param {boolean} eip712 whether or not to use eip712 (will allow null public key)
- * @returns {PromiseWithError<Sender>} Sender object or error
- */
-export async function getSenderObj(
-  senderCosmosAddress: string,
-  chainid: string | number,
-  eip712: boolean = false
-): PromiseWithError<Sender> {
-  const cosmosAccount = await getCosmosAccount(senderCosmosAddress, chainid);
-  if (cosmosAccount.error) {
-    return NEW_ERROR("getSenderObj", cosmosAccount.error);
-  }
-  return reformatSender(cosmosAccount.data, eip712);
-}
-
-/**
- * @notice reformats cosmos account data into sender object
- * @dev will fail if no public key is present on the account (will not create one for the user)
- * @param {CosmosAccountReturn} accountData account data from cosmos
- * @param {boolean} eip712 whether or not to use eip712 (will allow null public key)
- * @returns {ReturnWithError<Sender>} formatted sender object or error
- */
-function reformatSender(
-  accountData: CosmosAccountReturn,
-  eip712: boolean
-): ReturnWithError<Sender> {
-  const baseAccount = accountData.account.base_account;
-  if (baseAccount.pub_key == null && !eip712) {
-    // if used for eip712, the pubk key can be null, since we will create one before the tx
-    return NEW_ERROR("reformatSender", "no public key on account");
-  }
-  return NO_ERROR({
-    accountAddress: baseAccount.address,
-    sequence: baseAccount.sequence,
-    accountNumber: baseAccount.account_number,
-    pubkey: baseAccount.pub_key?.key,
-  });
-}
-
-/**
  * @notice creates a fee object for EIP712
  * @param {Fee} fee fee object
  * @param {string} feePayer sender of tx
@@ -262,4 +238,31 @@ function generateFeeObj(fee: Fee, feePayer: string): EIP712FeeObject {
     gas: fee.gas,
     feePayer,
   };
+}
+
+export async function waitForCosmosTx(
+  chainId: string | number,
+  txHash: string
+): PromiseWithError<{
+  status: string;
+  error: any;
+}> {
+  const { data: endpoint, error: endpointError } =
+    getCosmosAPIEndpoint(chainId);
+  if (endpointError) {
+    return NEW_ERROR("waitForTransaction", endpointError);
+  }
+  const { data: response, error: fetchError } = await tryFetchWithRetry<{
+    tx_response: {
+      code: number;
+      raw_log: string;
+    };
+  }>(endpoint + "/cosmos/tx/v1beta1/txs/" + txHash, 5);
+  if (fetchError) {
+    return NEW_ERROR("waitForTransaction", fetchError);
+  }
+  return NO_ERROR({
+    status: response.tx_response.code === 0 ? "success" : "fail",
+    error: response.tx_response.raw_log,
+  });
 }

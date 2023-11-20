@@ -1,22 +1,15 @@
 import {
-  NEW_ERROR,
-  NO_ERROR,
-  PromiseWithError,
-  errMsg,
-  Transaction,
-  CosmosNetwork,
-  IBCToken,
-} from "@/config/interfaces";
-import {
   coin,
   DeliverTxResponse,
   SigningStargateClient,
 } from "@cosmjs/stargate";
 import IBC_CHANNELS from "@/config/jsons/ibcChannels.json";
-import { checkPubKeyETH, ethToCantoAddress } from "@/utils/address";
-import { CANTO_MAINNET_COSMOS, EVMOS, INJECTIVE } from "@/config/networks";
-import { getBlockTimestamp, getIBCData } from "../methods/ibc";
-import { getCosmosAPIEndpoint } from "@/utils/networks";
+import {
+  CANTO_MAINNET_COSMOS,
+  CANTO_MAINNET_EVM,
+  EVMOS,
+  INJECTIVE,
+} from "@/config/networks";
 import { connectToKeplr } from "@/utils/keplr";
 // import {
 //   ChainRestAuthApi,
@@ -37,131 +30,135 @@ import {
   createTransactionWithMultipleMessages,
   createTxRaw,
 } from "@evmos/proto";
-import { createMsgsIBCTransfer } from "@/utils/cosmos/transactions/messages/ibc/ibc";
-import {
-  generatePostBodyBroadcast,
-  getSenderObj,
-} from "@/utils/cosmos/transactions/helpers.utils";
 import { tryFetch } from "@/utils/async";
 import Long from "long";
-import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
 import { displayAmount } from "@/utils/formatting";
-import {
-  BridgingMethod,
-  getBridgeMethodInfo,
-} from "../../interfaces/bridgeMethods";
-import { BridgeTransactionParams } from "../../interfaces/hookParams";
-import { getCosmosTokenBalance } from "@/utils/cosmos";
 import { isIBCToken } from "@/utils/tokens";
-import BigNumber from "bignumber.js";
+import { TX_PARAM_ERRORS } from "@/config/consts/errors";
+import { validateWeiUserInputTokenAmount } from "@/utils/math";
+import {
+  Transaction,
+  TX_DESCRIPTIONS,
+  TxCreatorFunctionReturn,
+} from "@/transactions/interfaces";
+import {
+  CosmosNetwork,
+  IBCToken,
+  NEW_ERROR,
+  NO_ERROR,
+  PromiseWithError,
+  Validation,
+} from "@/config/interfaces";
+import {
+  getCosmosAPIEndpoint,
+  getNetworkInfoFromChainId,
+  isCosmosNetwork,
+} from "@/utils/networks";
+import { checkCantoPubKey, ethToCantoAddress } from "@/utils/address";
+import { generateCantoPublicKeyWithTx } from "@/transactions/cosmos/publicKey";
+import { getBlockTimestamp, getIBCData } from "./helpers";
+import { createMsgsIBCTransfer } from "@/transactions/cosmos/messages/ibc/ibc";
+import { BridgingMethod, getBridgeMethodInfo } from "..";
+import { getCantoSenderObj } from "@/utils/cosmos";
+import { generatePostBodyBroadcast } from "@/transactions/signTx/cosmosEIP";
 
+type IBCInParams = {
+  senderCosmosAddress: string;
+  cantoEthReceiverAddress: string;
+  fromNetworkChainId: string;
+  token: IBCToken;
+  amount: string;
+};
 /**
  * @notice creates a list of transactions that need to be made for IBC in to canto using keplr
  * @dev will try to connect to keplr if not already done so
- * @param {CosmosNetwork} cosmosNetwork network to ibc from
- * @param {string} cosmosSender cosmos address to send from
- * @param {string} ethReceiver eth address to send to on canto
- * @param {IBCToken} ibcToken token to send
- * @param {string} amount amount to send
- * @returns {PromiseWithError<Transaction[]>} list of transactions to make or error
+ * @param {IBCInParams} txParams parameters for bridging in with keplr
+ * @returns {PromiseWithError<TxCreatorFunctionReturn>} list of transactions to make or error
  */
 export async function ibcInKeplr(
-  cosmosNetwork: CosmosNetwork,
-  cosmosSender: string,
-  ethReceiver: string,
-  ibcToken: IBCToken,
-  amount: string
-): PromiseWithError<Transaction[]> {
-  // make sure token chainId is correct
-  if (ibcToken.chainId.toString() !== cosmosNetwork.chainId) {
-    return NEW_ERROR(
-      "ibcInKeplr: token chain id does not match from network chain id"
-    );
-  }
-  // check if we can obtain the keplr client
-  const { data: keplrClient, error: clientError } = await connectToKeplr(
-    cosmosNetwork.chainId
-  );
-  if (clientError) {
-    return NEW_ERROR("ibcInKeplr::" + clientError.message);
-  }
-  // check that client has the same address as the cosmosSender
-  if (keplrClient.address !== cosmosSender) {
-    return NEW_ERROR(
-      "ibcInKeplr: keplr address does not match cosmos sender: " +
-        keplrClient.address +
-        " != " +
-        cosmosSender
-    );
-  }
+  txParams: IBCInParams
+): PromiseWithError<TxCreatorFunctionReturn> {
+  try {
+    /** validate params */
+    const validation = validateKeplrIBCParams(txParams);
+    if (validation.error) throw new Error(validation.reason);
 
-  // make parameter checks
-  const { data: hasPubKey, error: checkPubKeyError } = await checkPubKeyETH(
-    ethReceiver,
-    CANTO_MAINNET_COSMOS.chainId
-  );
-  if (checkPubKeyError) {
-    return NEW_ERROR("ibcInKeplr::" + checkPubKeyError.message);
-  }
-  if (!hasPubKey) {
-    return NEW_ERROR(
-      "ibcInKeplr: no public key found for eth address: " + ethReceiver
+    /** get cosmos network data */
+    const { data: cosmosNetwork, error: networkError } =
+      getNetworkInfoFromChainId(txParams.fromNetworkChainId);
+    if (networkError) throw networkError;
+    if (!isCosmosNetwork(cosmosNetwork)) throw new Error("invalid network");
+
+    /** get keplr client */
+    const { data: keplrClient, error: clientError } = await connectToKeplr(
+      cosmosNetwork.chainId
     );
-  }
+    if (clientError) throw clientError;
+    if (keplrClient.address !== txParams.senderCosmosAddress)
+      throw new Error("invalid keplr address");
 
-  // get canto address from ethReceiver
-  const { data: cantoReceiver, error: ethToCantoError } =
-    await ethToCantoAddress(ethReceiver);
-  if (ethToCantoError) {
-    return NEW_ERROR("ibcInKeplr::" + ethToCantoError.message);
-  }
+    /** create tx list */
+    const txList: Transaction[] = [];
 
-  /** Make check for specific chains (injective, evmos) */
-  if (cosmosNetwork.chainId === INJECTIVE.chainId) {
-    return NEW_ERROR("ibcInKeplr: injective not supported yet");
-    // return await injectiveIBCIn(
-    //   cosmosNetwork,
-    //   cosmosSender,
-    //   cantoReceiver,
-    //   ibcToken,
-    //   amount
-    // );
-  }
-  /** call this after getting timestamp information */
-  if (cosmosNetwork.chainId === EVMOS.chainId) {
-    return await evmosIBCIn(
-      cosmosNetwork,
-      cosmosSender,
+    /** get canto receiver */
+    const { data: cantoReceiver, error: ethToCantoError } =
+      await ethToCantoAddress(txParams.cantoEthReceiverAddress);
+    if (ethToCantoError) throw ethToCantoError;
+
+    /** check public key */
+    const { data: hasPubKey, error: checkPubKeyError } = await checkCantoPubKey(
       cantoReceiver,
-      ibcToken,
-      amount
+      CANTO_MAINNET_COSMOS.chainId
     );
-  }
+    if (checkPubKeyError || !hasPubKey) {
+      // create public key on EVM
+      const { data: pubKeyTxs, error: pubKeyError } =
+        await generateCantoPublicKeyWithTx(
+          CANTO_MAINNET_EVM.chainId,
+          txParams.cantoEthReceiverAddress,
+          cantoReceiver
+        );
+      if (pubKeyError) throw pubKeyError;
+      txList.push(...pubKeyTxs);
+    }
 
-  // get the channel number from the network
-  const ibcChannel =
-    IBC_CHANNELS[cosmosNetwork.id as keyof typeof IBC_CHANNELS];
+    /** specific chain check */
+    if (cosmosNetwork.chainId === INJECTIVE.chainId)
+      throw new Error("injective not supported yet");
+    if (cosmosNetwork.chainId === EVMOS.chainId) {
+      const { data: evmosTxs, error: evmosError } = await evmosIBCIn(
+        cosmosNetwork,
+        txParams.senderCosmosAddress,
+        cantoReceiver,
+        txParams.token,
+        txParams.amount
+      );
+      if (evmosError) throw evmosError;
+      txList.push(...evmosTxs);
 
-  // check if chennel was found
-  if (!ibcChannel || !ibcChannel.toCanto) {
-    return NEW_ERROR("ibcInKeplr: invalid channel id: " + cosmosNetwork.id);
-  }
+      /** return here */
+      return NO_ERROR({ transactions: txList });
+    }
 
-  // get block timeout timestamp
-  const { data: blockTimestamp, error: timestampError } =
-    await getBlockTimestamp(
-      getCosmosAPIEndpoint(CANTO_MAINNET_COSMOS.chainId).data
-    );
-  if (timestampError) {
-    return NEW_ERROR("ibcInKeplr::" + timestampError.message);
-  }
+    /** get ibc data */
+    const ibcChannel =
+      IBC_CHANNELS[cosmosNetwork.id as keyof typeof IBC_CHANNELS];
+    if (!ibcChannel || !ibcChannel.toCanto)
+      throw new Error("invalid channel id: " + cosmosNetwork.id);
 
-  return NO_ERROR([
-    {
+    /** timeout */
+    const { data: blockTimestamp, error: timestampError } =
+      await getBlockTimestamp(
+        getCosmosAPIEndpoint(CANTO_MAINNET_COSMOS.chainId).data
+      );
+    if (timestampError) throw timestampError;
+
+    /** create tx */
+    txList.push({
       chainId: cosmosNetwork.chainId,
       description: TX_DESCRIPTIONS.BRIDGE(
-        ibcToken.symbol,
-        displayAmount(amount, ibcToken.decimals),
+        txParams.token.symbol,
+        displayAmount(txParams.amount, txParams.token.decimals),
         cosmosNetwork.name,
         CANTO_MAINNET_COSMOS.name,
         getBridgeMethodInfo(BridgingMethod.IBC).name
@@ -169,10 +166,10 @@ export async function ibcInKeplr(
       type: "KEPLR",
       tx: async () => {
         return await signAndBroadcastIBCKeplr(keplrClient.client, {
-          cosmosAccount: cosmosSender,
+          cosmosAccount: txParams.senderCosmosAddress,
           cantoReceiver: cantoReceiver,
-          amount: amount,
-          denom: ibcToken.nativeName,
+          amount: txParams.amount,
+          denom: txParams.token.nativeName,
           channelToCanto: ibcChannel.toCanto,
           timeoutTimestamp: Number(blockTimestamp),
           memo: "ibcInKeplr",
@@ -184,8 +181,13 @@ export async function ibcInKeplr(
         }
         return NO_ERROR(txResponse.transactionHash);
       },
-    },
-  ]);
+    });
+
+    /** return here */
+    return NO_ERROR({ transactions: txList });
+  } catch (err) {
+    return NEW_ERROR("ibcInKeplr", err);
+  }
 }
 
 interface IBCKeplrParams {
@@ -221,7 +223,7 @@ async function signAndBroadcastIBCKeplr(
     );
     return NO_ERROR(ibcResponse);
   } catch (err) {
-    return NEW_ERROR("signAndBroadcastIBCKeplr::" + errMsg(err));
+    return NEW_ERROR("signAndBroadcastIBCKeplr", err);
   }
 }
 
@@ -414,8 +416,8 @@ async function evmosIBCIn(
     memo: "",
   });
 
-  // get context
-  const { data: senderObj, error: senderObjError } = await getSenderObj(
+  // get context (use canto sender since evmos has same props)
+  const { data: senderObj, error: senderObjError } = await getCantoSenderObj(
     evmosAddress,
     evmosNetwork.chainId
   );
@@ -488,7 +490,7 @@ async function evmosIBCIn(
       }
       return NO_ERROR(broadcastPost.tx_response);
     } catch (err) {
-      return NEW_ERROR("evmosIBCIn::signAndBroadcast::" + errMsg(err));
+      return NEW_ERROR("evmosIBCIn::signAndBroadcast", err);
     }
   }
   return NO_ERROR([
@@ -514,33 +516,22 @@ async function evmosIBCIn(
 }
 
 /**
- * @notice validates the parameters for retrying bridging in through IBC keplr
- * @param {BridgeTransactionParams} params parameters for bridging in
- * @returns {PromiseWithError<{valid: boolean, error?: string}>} whether the parameters are valid or not
+ * @notice validates the parameters  bridging in through IBC keplr
+ * @param {IBCInParams} txParams parameters for bridging in
+ * @returns {Validation} whether the parameters are valid or not
  */
-export async function validateKeplrIBCRetryParams(
-  params: BridgeTransactionParams
-): PromiseWithError<{
-  valid: boolean;
-  error?: string;
-}> {
-  if (!isIBCToken(params.token.data)) {
-    return NEW_ERROR(
-      "validateKeplrIBCRetryParams: IBC only works for IBC tokens"
-    );
+export function validateKeplrIBCParams(txParams: IBCInParams): Validation {
+  if (!isIBCToken(txParams.token)) {
+    return {
+      error: true,
+      reason: TX_PARAM_ERRORS.PARAM_INVALID("token"),
+    };
   }
-  // get token balance for user
-  const { data: userTokenBalance, error: userTokenBalanceError } =
-    await getCosmosTokenBalance(
-      params.from.chainId,
-      params.from.account,
-      params.token.data.nativeName
-    );
-  if (userTokenBalanceError) {
-    return NEW_ERROR("validateKeplrIBCRetryParams::" + userTokenBalanceError);
-  }
-  if (BigNumber(userTokenBalance).lt(params.token.amount)) {
-    return NO_ERROR({ valid: false, error: "insufficient funds" });
-  }
-  return NO_ERROR({ valid: true });
+  return validateWeiUserInputTokenAmount(
+    txParams.amount,
+    "1",
+    txParams.token.balance ?? "0",
+    txParams.token.symbol,
+    txParams.token.decimals
+  );
 }

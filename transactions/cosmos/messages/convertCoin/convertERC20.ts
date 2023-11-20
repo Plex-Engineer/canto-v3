@@ -2,7 +2,7 @@ import {
   CosmosNativeMessage,
   EIP712Message,
   UnsignedCosmosMessages,
-} from "@/config/interfaces";
+} from "@/transactions/interfaces";
 import { CONVERT_FEE } from "@/config/consts/fees";
 import { generateCosmosEIPTypes } from "../base";
 import { MsgConvertERC20 } from "@buf/evmos_evmos.bufbuild_es/evmos/erc20/v1/tx_pb.js";

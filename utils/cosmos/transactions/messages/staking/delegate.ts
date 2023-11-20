@@ -2,14 +2,14 @@ import {
   CosmosNativeMessage,
   EIP712Message,
   UnsignedCosmosMessages,
-} from "@/config/interfaces";
+} from "@/transactions/interfaces";
 import {
   MsgDelegate,
   MsgUndelegate,
 } from "@buf/cosmos_cosmos-sdk.bufbuild_es/cosmos/staking/v1beta1/tx_pb.js";
 import { Coin } from "@buf/cosmos_cosmos-sdk.bufbuild_es/cosmos/base/v1beta1/coin_pb";
 import { DELEGATE_FEE, UNDELEGATE_FEE } from "@/config/consts/fees";
-import { generateCosmosEIPTypes } from "../base";
+import { generateCosmosEIPTypes } from "@/transactions/cosmos/messages/base";
 
 ///
 /// Will work for delegation and undelegation

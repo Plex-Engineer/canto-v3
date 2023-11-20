@@ -21,11 +21,11 @@ import {
   claimDexRewardsComboTx,
   validateClaimDexRewardsComboTxParams,
 } from "@/hooks/pairs/lpCombo/transactions/claimRewards";
+import { cantoBridgeTx, validateCantoBridgeTxParams } from "../bridge";
 
 export enum TransactionFlowType {
   //   // Bridge
-  //   BRIDGE_IN = "BRIDGE_IN",
-  //   BRIDGE_OUT = "BRIDGE_OUT",
+  BRIDGE = "BRIDGE",
   // LP
   AMBIENT_LIQUIDITY_TX = "AMBIENT_LIQUIDITY_TX",
   AMBIENT_CLAIM_REWARDS_TX = "AMBIENT_CLAIM_REWARDS_TX",
@@ -43,16 +43,10 @@ export const TRANSACTION_FLOW_MAP: {
     validRetry: (...params: any[]) => PromiseWithError<Validation>;
   };
 } = {
-  //   [TransactionFlowType.BRIDGE_IN]: {
-  //     validRetry: async (params: BridgeTransactionParams) =>
-  //       validateBridgeInRetryParams(params),
-  //     tx: async (params: BridgeTransactionParams) => bridgeInTx(params),
-  //   },
-  //   [TransactionFlowType.BRIDGE_OUT]: {
-  //     validRetry: async (params: BridgeTransactionParams) =>
-  //       validateBridgeOutRetryParams(params),
-  //     tx: async (params: BridgeTransactionParams) => bridgeOutTx(params),
-  //   },
+  [TransactionFlowType.BRIDGE]: {
+    tx: async (params) => cantoBridgeTx(params),
+    validRetry: async (params) => NO_ERROR(validateCantoBridgeTxParams(params)),
+  },
   [TransactionFlowType.AMBIENT_LIQUIDITY_TX]: {
     tx: async (params) => ambientLiquidityTx(params),
     validRetry: async (params) =>

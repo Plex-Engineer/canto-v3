@@ -1,3 +1,12 @@
+import { BridgeToken } from "@/hooks/bridge/interfaces/tokens";
+
+export type BridgeTransactionParams = {
+  method: BridgingMethod | null;
+  from: { chainId: string | number; account: string };
+  to: { chainId: string | number; account: string };
+  token: { data: BridgeToken; amount: string };
+};
+
 export enum BridgingMethod {
   GRAVITY_BRIDGE = "0",
   IBC = "1",

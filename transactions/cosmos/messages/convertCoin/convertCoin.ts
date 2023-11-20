@@ -1,12 +1,12 @@
 import { MsgConvertCoin } from "@buf/evmos_evmos.bufbuild_es/evmos/erc20/v1/tx_pb.js";
 import { Coin } from "@buf/cosmos_cosmos-sdk.bufbuild_es/cosmos/base/v1beta1/coin_pb";
+import { generateCosmosEIPTypes } from "../base";
+import { CONVERT_FEE } from "@/config/consts/fees";
 import {
   CosmosNativeMessage,
   EIP712Message,
   UnsignedCosmosMessages,
-} from "@/config/interfaces";
-import { generateCosmosEIPTypes } from "../base";
-import { CONVERT_FEE } from "@/config/consts/fees";
+} from "@/transactions/interfaces";
 
 ///
 /// Convert native token on Canto to ERC20 token
