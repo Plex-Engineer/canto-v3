@@ -48,32 +48,39 @@ export const ManageAmbientPosition = ({
         {
           title: "Add",
           content: (
-            <Container
-              width="100%"
-              margin="sm"
-              className={styles["scroll-view"]}
-            >
-              <PoolHeader />
-              <AddLiquidity
-                positionManager={positionManager}
-                sendTxFlow={sendTxFlow}
-              />
+            <Container width="100%" className={styles["scroll-view"]}>
+              <Container
+                gap={16}
+                style={{
+                  padding: "0 16px",
+                }}
+              >
+                <PoolHeader />
+                <AddLiquidity
+                  positionManager={positionManager}
+                  sendTxFlow={sendTxFlow}
+                />
+              </Container>
             </Container>
           ),
         },
         {
           title: "Remove",
           content: (
-            <Container
-              width="100%"
-              margin="sm"
-              className={styles["scroll-view"]}
-            >
-              <PoolHeader />
-              <RemoveLiquidity
-                positionManager={positionManager}
-                sendTxFlow={sendTxFlow}
-              />
+            <Container width="100%" className={styles["scroll-view"]}>
+              <Container
+                gap={16}
+                style={{
+                  padding: "0 16px",
+                }}
+              >
+                <PoolHeader />
+                <RemoveLiquidity
+                  positionManager={positionManager}
+                  sendTxFlow={sendTxFlow}
+                />
+              </Container>
+              <Spacer height="20px" />
             </Container>
           ),
         },
@@ -246,7 +253,7 @@ const AddLiquidity = ({ positionManager, sendTxFlow }: ManageProps) => {
           }
         />
       </Container>
-      <Spacer height="30px" />
+      <Spacer height="20px" />
       <Button
         disabled={validParams.error}
         width={"fill"}
@@ -381,7 +388,7 @@ const RemoveLiquidity = ({ positionManager, sendTxFlow }: ManageProps) => {
           }
         />
       </Container>
-      <Spacer height="80px" />
+      <Spacer height="20px" />
 
       <Button
         disabled={validParams.error}

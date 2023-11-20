@@ -77,44 +77,49 @@ export const AmbientModal = (props: AmbientModalProps) => {
           {title()}
         </Text>
       </Container>
-      {/* <Spacer height="14px" /> */}
       <div className={styles["scroll-view"]}>
-        <div
-          style={{
-            padding: "1rem",
-          }}
-        >
-          {modalState === "list" && (
-            <Container>
-              <div className={styles.iconTitle}>
-                <Icon icon={{ url: props.pool.logoURI, size: 60 }} />
-                <Text size="lg" font="proto_mono">
-                  {props.pool.symbol}
-                </Text>
-              </div>
-              <PositionList
-                pool={props.pool}
-                positions={props.pool.userPositions}
-                setSelectedPosition={setSelectedPosition}
-              />
-            </Container>
-          )}
-          {modalState === "new" && (
-            <Container width="100%" className={styles["scroll-view"]}>
-              <NewAmbientPositionModal
-                pool={props.pool}
-                sendTxFlow={props.sendTxFlow}
-              />
-            </Container>
-          )}
-          {modalState === "manage" && (
-            <ManageAmbientPosition
+        {modalState === "list" && (
+          <Container
+            width="100%"
+            height="33rem"
+            style={{
+              padding: "12px",
+            }}
+          >
+            <div className={styles.iconTitle}>
+              <Icon icon={{ url: props.pool.logoURI, size: 60 }} />
+              <Text size="lg" font="proto_mono">
+                {props.pool.symbol}
+              </Text>
+            </div>
+            <PositionList
               pool={props.pool}
-              position={selectedPosition as AmbientUserPosition}
+              positions={props.pool.userPositions}
+              setSelectedPosition={setSelectedPosition}
+            />
+          </Container>
+        )}
+        {modalState === "new" && (
+          <Container
+            width="100%"
+            className={styles["scroll-view"]}
+            style={{
+              padding: "0 16px",
+            }}
+          >
+            <NewAmbientPositionModal
+              pool={props.pool}
               sendTxFlow={props.sendTxFlow}
             />
-          )}
-        </div>
+          </Container>
+        )}
+        {modalState === "manage" && (
+          <ManageAmbientPosition
+            pool={props.pool}
+            position={selectedPosition as AmbientUserPosition}
+            sendTxFlow={props.sendTxFlow}
+          />
+        )}
       </div>
     </Container>
   );
@@ -132,8 +137,14 @@ const PositionList = ({
   setSelectedPosition,
 }: PositionListProps) => (
   <>
-    <div className={styles["scroll-view"]}>
-      <Container margin="md" gap={20} className={styles["items-list"]}>
+    <div
+      className={styles["scroll-view"]}
+      style={{
+        height: "100%",
+      }}
+    >
+      <Spacer height="20px" />
+      <Container gap={20} className={styles["items-list"]}>
         {positions.map((item, idx) => (
           <Container
             key={idx}
@@ -193,19 +204,14 @@ const PositionList = ({
         ))}
       </Container>
     </div>
-    <div
-      style={{
-        margin: "1rem",
+    <Spacer height="20px" />
+    <Button
+      width={"fill"}
+      onClick={() => {
+        setSelectedPosition("new");
       }}
     >
-      <Button
-        width={"fill"}
-        onClick={() => {
-          setSelectedPosition("new");
-        }}
-      >
-        New Position
-      </Button>
-    </div>
+      New Position
+    </Button>
   </>
 );

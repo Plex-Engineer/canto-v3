@@ -6,7 +6,6 @@
 .ambientContainer {
   display: flex;
   height: 40rem;
-  width: fit-content;
 }
 
 .baseContainer {
@@ -43,9 +42,11 @@
   background: var(--card-surface-color, #f1f1f1);
   padding: 1rem;
   gap: 10px;
-  /* old */
-  box-shadow: -3px -3px 0px 0px rgba(17, 17, 17, 0.2) inset,
-    2px 2px 0px 0px rgba(255, 255, 255, 0.4) inset;
+  //   /* old */
+  //   box-shadow: -3px -3px 0px 0px rgba(17, 17, 17, 0.2) inset,
+  //     2px 2px 0px 0px rgba(255, 255, 255, 0.4) inset;
+  box-shadow: -2px -2px 0px 0px rgba(17, 17, 17, 0.2) inset,
+    2px 2px 0px 0px rgba(255, 255, 255, 0.2) inset;
 }
 
 .infoPop {
