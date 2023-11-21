@@ -60,7 +60,7 @@ import { getBlockTimestamp, getIBCData } from "./helpers";
 import { createMsgsIBCTransfer } from "@/transactions/cosmos/messages/ibc/ibc";
 import { BridgingMethod, getBridgeMethodInfo } from "..";
 import { getCantoSenderObj } from "@/utils/cosmos";
-import { generatePostBodyBroadcast } from "@/transactions/signTx/cosmosEIP";
+import { generatePostBodyBroadcast } from "@/transactions/signTx/cosmosEIP/signCosmosEIP";
 
 type IBCInParams = {
   senderCosmosAddress: string;

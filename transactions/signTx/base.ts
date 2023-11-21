@@ -6,7 +6,7 @@ import { Transaction } from "../interfaces";
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 import { signEVMTransaction } from "./evm";
 import { signKeplrTx } from "./keplr";
-import { signCosmosEIPTx, waitForCosmosTx } from "./cosmosEIP";
+import { signCosmosEIPTx, waitForCosmosTx } from "./cosmosEIP/signCosmosEIP";
 
 /**
  * @notice signs a single

@@ -5,12 +5,10 @@ import {
   Fee,
   Transaction,
   UnsignedCosmosMessages,
-} from "../interfaces";
+} from "../../interfaces";
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
-import { checkOnRightChain } from "./evm";
-import { ethToCantoAddress } from "@/utils/address";
-import { getCosmosAPIEndpoint, getCosmosChainObject } from "@/utils/networks";
-import { getCantoSenderObj } from "@/utils/cosmos";
+import { checkOnRightChain } from "../evm";
+import { getCosmosAPIEndpoint } from "@/utils/networks";
 import { createTransactionWithMultipleMessages } from "@evmos/proto";
 import {
   createTxRawEIP712,
@@ -22,6 +20,7 @@ import {
   createEIP712,
 } from "@evmos/eip712";
 import { tryFetch, tryFetchWithRetry } from "@/utils/async";
+import { generateCantoEIP712TxContext } from "./txContext";
 
 export async function signCosmosEIPTx(
   tx: Transaction,
@@ -42,30 +41,16 @@ export async function signCosmosEIPTx(
 
     /** tx context */
 
-    /** canto address */
-    const { data: cantoAddress, error: ethToCantoError } =
-      await ethToCantoAddress(newSigner.account.address);
-    if (ethToCantoError) throw ethToCantoError;
-
-    /** chain object */
-    const { data: chainObj, error: chainObjError } = getCosmosChainObject(
-      tx.chainId
-    );
-    if (chainObjError) throw chainObjError;
-
-    /** sender object */
-    const { data: senderObj, error: senderObjError } = await getCantoSenderObj(
-      cantoAddress,
-      tx.chainId
-    );
-    if (senderObjError) throw senderObjError;
+    const { data: txContext, error: contextError } =
+      await generateCantoEIP712TxContext(tx.chainId, newSigner.account.address);
+    if (contextError) throw contextError;
 
     /** create and sign transaction */
     const { data: txData, error: txError } =
       await signAndBroadcastCosmosTransaction(
         {
-          chain: chainObj,
-          sender: senderObj,
+          chain: txContext.chainObj,
+          sender: txContext.senderObj,
           fee: tx.msg.fee,
           memo: "signed with metamask",
           ethAddress: newSigner.account.address,
