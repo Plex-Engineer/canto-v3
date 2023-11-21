@@ -41,7 +41,7 @@ export const RWARow = ({
     )}
   </Text>,
   <Text theme="primary-dark" key={cRwa.name + "cToken.supplyApy"}>
-    {cRwa.supplyApy + "%"}
+    {Number(cRwa.supplyApy).toFixed(2) + "%"}
   </Text>,
   <Text theme="primary-dark" key={cRwa.name + "cToken.ubalance"}>
     {displayAmount(
@@ -94,15 +94,24 @@ export const StableCoinRow = ({
     }
     center={{
       vertical: true,
+      horizontal: true,
     }}
     width="100%"
   >
     <Icon icon={{ url: cStableCoin.underlying.logoURI, size: 30 }} />
-    <Text theme="primary-dark" key={cStableCoin.name + cStableCoin.name}>
+    <Text
+      size="sm"
+      theme="primary-dark"
+      key={cStableCoin.name + cStableCoin.name}
+    >
       {cStableCoin.underlying.symbol}
     </Text>
   </Container>,
-  <Text theme="primary-dark" key={cStableCoin.name + "cToken.balance"}>
+  <Text
+    size="sm"
+    theme="primary-dark"
+    key={cStableCoin.name + "cToken.balance"}
+  >
     {displayAmount(
       cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
       cStableCoin.underlying.decimals
@@ -117,8 +126,14 @@ export const StableCoinRow = ({
       vertical: true,
     }}
   >
-    <Text theme="primary-dark" key={cStableCoin.name + "cToken.supplyApy"}>
-      {`${Number(cStableCoin.supplyApy) + Number(cStableCoin.distApy)}%`}
+    <Text
+      size="sm"
+      theme="primary-dark"
+      key={cStableCoin.name + "cToken.supplyApy"}
+    >
+      {`${(Number(cStableCoin.supplyApy) + Number(cStableCoin.distApy)).toFixed(
+        2
+      )}%`}
     </Text>
     <InfoPop>
       <Container gap={6}>
@@ -127,7 +142,7 @@ export const StableCoinRow = ({
             supply apr:
           </Text>
           <Text font="proto_mono" size="x-sm">
-            {`${Number(cStableCoin.supplyApy)}%`}
+            {`${Number(cStableCoin.supplyApy).toFixed(2)}%`}
           </Text>
         </Container>
         <Container gap={"auto"} direction="row">
@@ -135,31 +150,47 @@ export const StableCoinRow = ({
             distribution apr:
           </Text>
           <Text font="proto_mono" size="x-sm">
-            {`${Number(cStableCoin.distApy)}%`}
+            {`${Number(cStableCoin.distApy).toFixed(2)}%`}
           </Text>
         </Container>
       </Container>
     </InfoPop>
   </Container>,
-  <Text theme="primary-dark" key={cStableCoin.name + "cToken.ubalance"}>
+  <Text
+    size="sm"
+    theme="primary-dark"
+    key={cStableCoin.name + "cToken.ubalance"}
+  >
     {displayAmount(
       cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
       cStableCoin.underlying.decimals
     )}
   </Text>,
-  <Text theme="primary-dark" key={cStableCoin.name + "cToken.CF"}>
+  <Text size="sm" theme="primary-dark" key={cStableCoin.name + "cToken.CF"}>
     {displayAmount(cStableCoin.collateralFactor, 16) + "%"}
   </Text>,
-  <Text theme="primary-dark" key={cStableCoin.name + "cToken.borrowApr"}>
-    {cStableCoin.borrowApy + "%"}
+  <Text
+    size="sm"
+    theme="primary-dark"
+    key={cStableCoin.name + "cToken.borrowApr"}
+  >
+    {Number(cStableCoin.borrowApy).toFixed(2) + "%"}
   </Text>,
-  <Text theme="primary-dark" key={cStableCoin.name + "cToken.borrowAmount"}>
+  <Text
+    size="sm"
+    theme="primary-dark"
+    key={cStableCoin.name + "cToken.borrowAmount"}
+  >
     {displayAmount(
       cStableCoin.userDetails?.borrowBalance ?? "0",
       cStableCoin.decimals
     )}
   </Text>,
-  <Text theme="primary-dark" key={cStableCoin.name + "cToken.liquidity"}>
+  <Text
+    size="sm"
+    theme="primary-dark"
+    key={cStableCoin.name + "cToken.liquidity"}
+  >
     {displayAmount(cStableCoin.cash, cStableCoin.decimals)}
   </Text>,
   <Container
@@ -170,6 +201,9 @@ export const StableCoinRow = ({
   >
     {onSupply && (
       <Button
+        height="small"
+        width={75}
+        fontSize={"sm"}
         key={cStableCoin.name + "cToken.onSupply"}
         color="secondary"
         onClick={onSupply}
@@ -179,6 +213,9 @@ export const StableCoinRow = ({
     )}
     {onBorrow && (
       <Button
+        height="small"
+        width={75}
+        fontSize={"sm"}
         key={cStableCoin.name + "cToken.onBorrow"}
         color="secondary"
         onClick={onBorrow}

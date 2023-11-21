@@ -221,21 +221,21 @@ const CTokenTable = ({
     filteredPairs === "RWAs"
       ? [
           { value: "Asset", ratio: 1 },
-          { value: "Wallet Balance", ratio: 1 },
+          { value: "Balance", ratio: 1 },
           { value: "APR", ratio: 1 },
-          { value: "Supplied Amount", ratio: 1 },
+          { value: "Supplied", ratio: 1 },
           { value: "Collateral Factor", ratio: 1 },
           { value: "Liquidity", ratio: 1 },
           { value: "Manage", ratio: 1 },
         ]
       : [
           { value: "Asset", ratio: 1 },
-          { value: "Wallet Balance", ratio: 1 },
-          { value: "Supply APR", ratio: 1 },
-          { value: "Supplied Amount", ratio: 1 },
+          { value: "Balance", ratio: 1 },
+          { value: "Supply \b APR", ratio: 1 },
+          { value: "Supplied", ratio: 1 },
           { value: "Collateral Factor", ratio: 1 },
-          { value: "Borrow APR", ratio: 1 },
-          { value: "Borrowed Amount", ratio: 1 },
+          { value: "Borrow \b APR", ratio: 1 },
+          { value: "Borrowed", ratio: 1 },
           { value: "Liquidity", ratio: 1 },
           { value: "Manage", ratio: 2 },
         ];
@@ -256,6 +256,7 @@ const CTokenTable = ({
       ) : stableTokens.length > 0 ? (
         <Table
           title={title}
+          textSize={filteredPairs === "Stablecoins" ? "14px" : ""}
           secondary={
             <Container width="320px">
               <ToggleGroup
