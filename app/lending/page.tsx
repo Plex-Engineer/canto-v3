@@ -14,7 +14,7 @@ import OutlineCard from "./components/outlineCard";
 import Item from "./components/item";
 import LoadingIcon from "@/components/loader/loading";
 import { LendingModal } from "./components/modal/modal";
-import { CTokenRow } from "./components/cTokenRow";
+import { RWARow, StableCoinRow } from "./components/cTokenRow";
 import { useState } from "react";
 import Spacer from "@/components/layout/spacer";
 import { addTokenBalances, divideBalances } from "@/utils/math";
@@ -217,6 +217,28 @@ const CTokenTable = ({
   onBorrow: (address: string) => void;
 }) => {
   const [filteredPairs, setFilteredPairs] = useState("RWAs");
+  const headers =
+    filteredPairs === "RWAs"
+      ? [
+          { value: "Asset", ratio: 1 },
+          { value: "Wallet Balance", ratio: 1 },
+          { value: "APR", ratio: 1 },
+          { value: "Supplied Amount", ratio: 1 },
+          { value: "Collateral Factor", ratio: 1 },
+          { value: "Liquidity", ratio: 1 },
+          { value: "Manage", ratio: 1 },
+        ]
+      : [
+          { value: "Asset", ratio: 1 },
+          { value: "Wallet Balance", ratio: 1 },
+          { value: "Supply APR", ratio: 1 },
+          { value: "Supplied Amount", ratio: 1 },
+          { value: "Collateral Factor", ratio: 1 },
+          { value: "Borrow APR", ratio: 1 },
+          { value: "Borrowed Amount", ratio: 1 },
+          { value: "Liquidity", ratio: 1 },
+          { value: "Manage", ratio: 2 },
+        ];
 
   return (
     <div className={styles.mainTable}>
@@ -245,28 +267,21 @@ const CTokenTable = ({
               />
             </Container>
           }
-          headers={[
-            { value: "Asset", ratio: 2 },
-            { value: "APR", ratio: 1 },
-            { value: "Wallet Balance", ratio: 1 },
-            { value: "Supplied Amount", ratio: 1 },
-            { value: "Collateral Factor", ratio: 1 },
-            { value: "Manage", ratio: 2 },
-          ]}
+          headers={headers}
           content={
             filteredPairs == "RWAs"
-              ? rwas.map((cToken) =>
-                  CTokenRow({
-                    cToken,
-                    onSupply: () => onSupply(cToken.address),
+              ? rwas.map((cRwa) =>
+                  RWARow({
+                    cRwa,
+                    onSupply: () => onSupply(cRwa.address),
                   })
                 )
               : filteredPairs == "Stablecoins"
-              ? stableTokens.map((cToken) =>
-                  CTokenRow({
-                    cToken,
-                    onSupply: () => onSupply(cToken.address),
-                    onBorrow: () => onBorrow(cToken.address),
+              ? stableTokens.map((cStableCoin) =>
+                  StableCoinRow({
+                    cStableCoin,
+                    onSupply: () => onSupply(cStableCoin.address),
+                    onBorrow: () => onBorrow(cStableCoin.address),
                   })
                 )
               : []
