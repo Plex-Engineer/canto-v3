@@ -9,10 +9,11 @@ interface Props {
     ratio: number;
   }[];
   content: React.ReactNode[][];
+  textSize?: string;
 }
 const Table = (props: Props) => {
   return (
-    <div className={styles.container}>
+    <div className={styles.container} style={{fontSize: props.textSize}}>
       <div className={styles.title}>
         <Text font="proto_mono" size="lg">
           {props.title}
