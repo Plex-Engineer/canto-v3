@@ -7,30 +7,15 @@ import { AmbientPool } from "./interfaces/ambientPools";
 import { getAllAmbientPoolsData } from "./helpers/getAmbientPoolsData";
 import useTokenBalances from "@/hooks/helpers/useTokenBalances";
 import { getUniqueUnderlyingTokensFromPairs } from "./helpers/underlyingTokens";
-import {
-  AmbientTransactionParams,
-  AmbientTxType,
-} from "./interfaces/ambientPoolTxTypes";
-import {
-  NEW_ERROR,
-  NO_ERROR,
-  NewTransactionFlow,
-  ReturnWithError,
-  Validation,
-} from "@/config/interfaces";
-import {
-  getConcBaseTokensFromQuoteTokens,
-  getConcQuoteTokensFromBaseTokens,
-} from "@/utils/ambient";
-import { validateWeiUserInputTokenAmount } from "@/utils/math";
-import { createNewAmbientTxFlow } from "./helpers/createAmbientFlow";
 import { queryUserAmbientRewards } from "./helpers/ambientApi";
-import { TransactionFlowType } from "@/config/transactions/txMap";
 import { useEffect, useState } from "react";
 import { CANTO_DATA_API_ENDPOINTS, getCantoApiData } from "@/config/api";
 import { CToken } from "@/hooks/lending/interfaces/tokens";
-import { USER_INPUT_ERRORS } from "@/config/consts/errors";
-import { CLMClaimRewardsTxParams } from "@/transactions/lending";
+import {
+  newAmbientClaimRewardsTxFlow,
+  newAmbientLPTxFlow,
+  validateAmbientLiquidityTxParams,
+} from "@/transactions/pairs/ambient";
 
 export default function useAmbientPools(
   params: AmbientHookInputParams,
@@ -172,113 +157,15 @@ export default function useAmbientPools(
       };
     }) ?? [];
 
-  ///
-  /// EXTERNAL FUNCTIONS
-  ///
-
-  // transaction validation
-  function validateTxParams(txParams: AmbientTransactionParams): Validation {
-    switch (txParams.txType) {
-      case AmbientTxType.ADD_CONC_LIQUIDITY: {
-        // check that balances are good for each token
-        const base = txParams.pool.base;
-        const quote = txParams.pool.quote;
-        let baseAmount;
-        let quoteAmount;
-        if (txParams.isAmountBase) {
-          baseAmount = txParams.amount;
-          quoteAmount = getConcQuoteTokensFromBaseTokens(
-            baseAmount,
-            txParams.pool.stats.lastPriceSwap.toString(),
-            txParams.minPriceWei,
-            txParams.maxPriceWei
-          );
-        } else {
-          quoteAmount = txParams.amount;
-          baseAmount = getConcBaseTokensFromQuoteTokens(
-            quoteAmount,
-            txParams.pool.stats.lastPriceSwap.toString(),
-            txParams.minPriceWei,
-            txParams.maxPriceWei
-          );
-        }
-        const baseCheck = validateWeiUserInputTokenAmount(
-          baseAmount,
-          "0",
-          base.balance ?? "0",
-          base.symbol,
-          base.decimals
-        );
-        if (baseCheck.error) return baseCheck;
-        const quoteCheck = validateWeiUserInputTokenAmount(
-          quoteAmount,
-          "0",
-          quote.balance ?? "0",
-          quote.symbol,
-          quote.decimals
-        );
-        return quoteCheck;
-      }
-      case AmbientTxType.REMOVE_CONC_LIQUIDITY: {
-        // get position
-        const position = txParams.pool.userPositions.find(
-          (pos) => pos.positionId === txParams.positionId
-        );
-        if (!position) {
-          return {
-            error: true,
-            reason: USER_INPUT_ERRORS.PROP_UNAVAILABLE("Position"),
-          };
-        }
-        // check enough liquidity there
-        return validateWeiUserInputTokenAmount(
-          txParams.liquidity,
-          "0",
-          position.concLiq.toString(),
-          txParams.pool.symbol,
-          0
-        );
-      }
-      default:
-        return {
-          error: true,
-          reason: "tx type not found",
-        };
-    }
-  }
-
-  // tx flow creators
-  function createNewPoolFlow(
-    params: AmbientTransactionParams
-  ): ReturnWithError<NewTransactionFlow> {
-    const validation = validateTxParams(params);
-    if (validation.error) {
-      return NEW_ERROR("createNewPoolFlow::" + validation.reason);
-    }
-    return createNewAmbientTxFlow(params);
-  }
-
-  function createNewClaimRewardsFlow(
-    params: CLMClaimRewardsTxParams
-  ): ReturnWithError<NewTransactionFlow> {
-    return NO_ERROR({
-      title: "Claim Rewards",
-      icon: "/icons/canto.svg",
-      txType: TransactionFlowType.CLAIM_LP_REWARDS_TX,
-      params: {
-        ambientParams: params,
-      },
-    });
-  }
-
   return {
     isLoading,
     rewards: ambient?.rewards ?? "0",
     ambientPools: poolsWithBalances,
     transaction: {
-      validateParams: validateTxParams,
-      createNewPoolFlow,
-      createNewClaimRewardsFlow,
+      validateParams: (txParams) => validateAmbientLiquidityTxParams(txParams),
+      newAmbientPoolTxFlow: (txParams) => newAmbientLPTxFlow(txParams),
+      newAmbientClaimRewardsFlow: (txParams) =>
+        newAmbientClaimRewardsTxFlow(txParams),
     },
   };
 }

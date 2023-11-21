@@ -6,7 +6,7 @@ import { Transaction } from "../interfaces";
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 import { signEVMTransaction } from "./evm";
 import { signKeplrTx } from "./keplr";
-import { performCosmosTransactionEIP, waitForCosmosTx } from "@/utils/cosmos";
+import { signCosmosEIPTx, waitForCosmosTx } from "./cosmosEIP";
 
 /**
  * @notice signs a single
@@ -25,7 +25,7 @@ export async function signTransaction(
       return await signEVMTransaction(tx, signer);
     case "COSMOS":
       // perform cosmos tx
-      return await performCosmosTransactionEIP(tx, signer);
+      return await signCosmosEIPTx(tx, signer);
     case "KEPLR":
       // perform keplr tx
       return await signKeplrTx(tx);

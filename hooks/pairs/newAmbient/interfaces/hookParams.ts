@@ -1,11 +1,10 @@
 import {
-  NewTransactionFlow,
-  ReturnWithError,
-  Validation,
-} from "@/config/interfaces";
-import { AmbientTransactionParams } from "./ambientPoolTxTypes";
+  AmbientClaimRewardsTxParams,
+  AmbientTransactionParams,
+} from "@/transactions/pairs/ambient";
 import { AmbientPool } from "./ambientPools";
-import { CLMClaimRewardsTxParams } from "@/transactions/lending";
+import { Validation } from "@/config/interfaces";
+import { NewTransactionFlow } from "@/transactions/flows";
 
 export interface AmbientHookInputParams {
   chainId: number;
@@ -17,11 +16,11 @@ export interface AmbientHookReturn {
   rewards: string;
   transaction: {
     validateParams: (txParams: AmbientTransactionParams) => Validation;
-    createNewPoolFlow: (
-      params: AmbientTransactionParams
-    ) => ReturnWithError<NewTransactionFlow>;
-    createNewClaimRewardsFlow: (
-      txParams: CLMClaimRewardsTxParams
-    ) => ReturnWithError<NewTransactionFlow>;
+    newAmbientPoolTxFlow: (
+      txParams: AmbientTransactionParams
+    ) => NewTransactionFlow;
+    newAmbientClaimRewardsFlow: (
+      txParams: AmbientClaimRewardsTxParams
+    ) => NewTransactionFlow;
   };
 }

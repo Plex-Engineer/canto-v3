@@ -9,9 +9,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   ReturnWithError,
-  errMsg,
   BaseNetwork,
-  NewTransactionFlow,
   ERC20Token,
 } from "@/config/interfaces";
 import {
@@ -23,7 +21,6 @@ import {
 } from "./interfaces/hookParams";
 import useAutoSelect from "../helpers/useAutoSelect";
 import { BridgeInToken } from "./interfaces/tokens";
-import { BridgingMethod } from "./interfaces/bridgeMethods";
 import useTokenBalances from "../helpers/useTokenBalances";
 import {
   isERC20TokenList,
@@ -31,9 +28,13 @@ import {
   isBridgeInToken,
   isBridgeInTokenList,
 } from "@/utils/tokens";
-import { convertToBigNumber } from "@/utils/formatting";
 import { isValidEthAddress } from "@/utils/address";
-import { createNewBridgeFlow } from "./helpers/createBridgeFlow";
+import {
+  BridgeTransactionParams,
+  BridgingMethod,
+  newCantoBridgeFlow,
+  validateCantoBridgeTxParams,
+} from "@/transactions/bridge";
 
 export default function useBridgeIn(
   props: BridgeHookInputParams
@@ -290,42 +291,23 @@ export default function useBridgeIn(
     }
   }
 
-  // will tell the parent if bridging params look good to bridge
-  function canBridge(params: BridgeHookTxParams): ReturnWithError<boolean> {
-    // check if we can create valid params
-    const { error: bridgeParamsError } = createBridgeInTxFlow(params);
-    if (bridgeParamsError) {
-      return NEW_ERROR("useBridgeIn::canBridge::" + errMsg(bridgeParamsError));
-    }
-    // simple amount check, does not account for gas
-    const { data: userAmount, error: bigNumberError } = convertToBigNumber(
-      params.amount
-    );
-    if (bigNumberError) {
-      return NEW_ERROR("useBridgeIn::canBridge::" + bigNumberError.message);
-    }
-    const tokenBalance = getToken(state.selectedToken?.id ?? "").data?.balance;
-    if (!tokenBalance) {
-      return NEW_ERROR("useBridgeIn::canBridge: no token balance");
-    }
-    return NO_ERROR(userAmount.lte(tokenBalance) && userAmount.gt(0));
-  }
-
-  // will return a new transaction flow object that we can pass into the transaction store
-  function createBridgeInTxFlow(
+  const bridgeTxParams = (
     params: BridgeHookTxParams
-  ): ReturnWithError<NewTransactionFlow> {
-    return createNewBridgeFlow({
-      bridgeIn: true,
-      token: getToken(state.selectedToken?.id ?? "").data,
-      fromNetwork: state.fromNetwork,
-      toNetwork: state.toNetwork,
-      method: state.selectedMethod,
-      sender: getSender(),
-      receiver: getReceiver(),
+  ): BridgeTransactionParams => ({
+    method: state.selectedMethod,
+    from: {
+      chainId: state.fromNetwork?.chainId ?? "",
+      account: getSender() ?? "",
+    },
+    to: {
+      chainId: state.toNetwork?.chainId ?? "",
+      account: getReceiver() ?? "",
+    },
+    token: {
+      data: getToken(state.selectedToken?.id ?? "").data,
       amount: params.amount,
-    });
-  }
+    },
+  });
 
   return {
     direction: "in",
@@ -350,8 +332,9 @@ export default function useBridgeIn(
     },
     setState: generalSetter,
     bridge: {
-      createNewBridgeFlow: createBridgeInTxFlow,
-      canBridge,
+      validateParams: (params) =>
+        validateCantoBridgeTxParams(bridgeTxParams(params)),
+      newBridgeFlow: (params) => newCantoBridgeFlow(bridgeTxParams(params)),
     },
   };
 }

@@ -1,6 +1,5 @@
 import styles from "../dexModals/cantoDex.module.scss";
 
-import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
 import {
   AmbientPool,
   AmbientUserPosition,
@@ -8,7 +7,6 @@ import {
 import Tabs from "@/components/tabs/tabs";
 import Icon from "@/components/icon/icon";
 import Text from "@/components/text";
-import AmbientPositionManager from "@/hooks/pairs/newAmbient/liquidityControllers/managePosition";
 import { useState } from "react";
 import { getPriceFromTick } from "@/utils/ambient";
 import Container from "@/components/container/container";
@@ -21,16 +19,21 @@ import { ModalItem } from "@/app/lending/components/modal/modal";
 import Button from "@/components/button/button";
 import Amount from "@/components/amount/amount";
 import PopUp from "@/components/popup/popup";
+import { Validation } from "@/config/interfaces";
+import { AmbientTransactionParams } from "@/transactions/pairs/ambient";
+import { AmbientPositionManager } from "@/utils/ambient/liquidityControllers";
 
 interface ManagePostionProps {
   pool: AmbientPool;
   position: AmbientUserPosition;
+  verifyParams: (params: Partial<AmbientTransactionParams>) => Validation;
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
 }
 export const ManageAmbientPosition = ({
   pool,
   position,
   sendTxFlow,
+  verifyParams,
 }: ManagePostionProps) => {
   const positionManager = new AmbientPositionManager(pool, position);
 
@@ -59,6 +62,7 @@ export const ManageAmbientPosition = ({
                 <AddLiquidity
                   positionManager={positionManager}
                   sendTxFlow={sendTxFlow}
+                  verifyParams={verifyParams}
                 />
               </Container>
             </Container>
@@ -78,6 +82,7 @@ export const ManageAmbientPosition = ({
                 <RemoveLiquidity
                   positionManager={positionManager}
                   sendTxFlow={sendTxFlow}
+                  verifyParams={verifyParams}
                 />
               </Container>
               <Spacer height="20px" />
@@ -92,9 +97,14 @@ export const ManageAmbientPosition = ({
 interface ManageProps {
   positionManager: AmbientPositionManager;
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
+  verifyParams: (params: Partial<AmbientTransactionParams>) => Validation;
 }
 
-const AddLiquidity = ({ positionManager, sendTxFlow }: ManageProps) => {
+const AddLiquidity = ({
+  positionManager,
+  sendTxFlow,
+  verifyParams,
+}: ManageProps) => {
   const { pool } = positionManager;
   const [amountBase, setAmountBase] = useState("");
   const [amountQuote, setAmountQuote] = useState("");
@@ -117,8 +127,9 @@ const AddLiquidity = ({ positionManager, sendTxFlow }: ManageProps) => {
     nonWeiMinExecutionPrice: minExecutionPrice,
     nonWeiMaxExecutionPrice: maxExecutionPrice,
   };
-  const validParams =
-    positionManager.validateAddConcLiquidityParams(userParams);
+  const validParams = verifyParams(
+    positionManager.createAddConcLiquidtyParams(userParams)
+  );
 
   return (
     <Container>
@@ -268,7 +279,11 @@ const AddLiquidity = ({ positionManager, sendTxFlow }: ManageProps) => {
   );
 };
 
-const RemoveLiquidity = ({ positionManager, sendTxFlow }: ManageProps) => {
+const RemoveLiquidity = ({
+  positionManager,
+  sendTxFlow,
+  verifyParams,
+}: ManageProps) => {
   const { pool } = positionManager;
   const [percentToRemove, setPercentToRemove] = useState(0);
   const [minExecutionPrice, setMinExecutionPrice] = useState(
@@ -291,8 +306,9 @@ const RemoveLiquidity = ({ positionManager, sendTxFlow }: ManageProps) => {
     nonWeiMinExecutionPrice: minExecutionPrice,
     nonWeiMaxExecutionPrice: maxExecutionPrice,
   };
-  const validParams =
-    positionManager.validateRemoveConcLiquidityParams(userParams);
+  const validParams = verifyParams(
+    positionManager.createRemoveConcentratedLiquidtyParams(userParams)
+  );
 
   return (
     <Container>

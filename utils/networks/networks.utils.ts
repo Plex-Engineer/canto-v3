@@ -5,10 +5,29 @@ import {
   BaseNetwork,
   CosmosNetwork,
   EVMNetwork,
-  Chain,
 } from "@/config/interfaces";
 import * as NETWORKS from "@/config/networks";
 import * as COSMOS_NETWORKS from "@/config/networks/cosmos";
+import { Chain } from "@/transactions/interfaces";
+
+// will get correct cosmos canto chain from evm or cosmos chain id
+export function getCantoCosmosNetwork(
+  chainId: number | string
+): CosmosNetwork | null {
+  if (
+    chainId === NETWORKS.CANTO_MAINNET_EVM.chainId ||
+    chainId === NETWORKS.CANTO_MAINNET_COSMOS.chainId
+  ) {
+    return COSMOS_NETWORKS.CANTO_MAINNET_COSMOS;
+  } else if (
+    chainId === NETWORKS.CANTO_TESTNET_EVM.chainId ||
+    chainId === NETWORKS.CANTO_TESTNET_COSMOS.chainId
+  ) {
+    return COSMOS_NETWORKS.CANTO_TESTNET_COSMOS;
+  } else {
+    return null;
+  }
+}
 
 export function isCantoChainId(chainId: number): boolean {
   return (

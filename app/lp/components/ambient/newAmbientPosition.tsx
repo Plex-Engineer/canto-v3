@@ -1,9 +1,7 @@
 import styles from "../dexModals/cantoDex.module.scss";
-import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
 import Text from "@/components/text";
 import Icon from "@/components/icon/icon";
-import useNewAmbientPositionManager from "@/hooks/pairs/newAmbient/liquidityControllers/newPositionManager.ts";
 import Container from "@/components/container/container";
 import Amount from "@/components/amount/amount";
 import Spacer from "@/components/layout/spacer";
@@ -19,26 +17,33 @@ import Toggle from "@/components/toggle";
 import { useEffect, useState } from "react";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import Price from "@/components/price/price";
-import {
-  ALL_TICK_KEYS,
-  TickRangeKey,
-} from "@/hooks/pairs/newAmbient/liquidityControllers/defaultParams";
 import { queryAmbientPoolLiquidityCurve } from "@/hooks/pairs/newAmbient/helpers/ambientApi";
 import { convertLiquidityCurveToGraph } from "@/utils/ambient";
 import SVGLiquidityGraph from "@/components/liquidityGraph/svgGraph";
 import Input from "@/components/input/input";
+import { AmbientTransactionParams } from "@/transactions/pairs/ambient";
+import {
+  ALL_TICK_KEYS,
+  TickRangeKey,
+  useNewAmbientPositionManager,
+} from "@/utils/ambient/liquidityControllers";
+import { Validation } from "@/config/interfaces";
 
 interface NewPositionModalProps {
   pool: AmbientPool;
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
+  verifyParams: (params: Partial<AmbientTransactionParams>) => Validation;
 }
 export const NewAmbientPositionModal = ({
   pool,
   sendTxFlow,
+  verifyParams,
 }: NewPositionModalProps) => {
   const { base: baseToken, quote: quoteToken } = pool;
   const positionManager = useNewAmbientPositionManager(pool);
-  const positionValidation = positionManager.txParams.validateParams();
+  const positionValidation = verifyParams(
+    positionManager.txParams.addLiquidity()
+  );
 
   // modal options
   const [showAdvanced, setShowAdvanced] = useState(false);

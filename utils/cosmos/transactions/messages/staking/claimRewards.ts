@@ -1,10 +1,10 @@
 import { CLAIM_STAKING_REWARD_FEE } from "@/config/consts/fees";
+import { generateCosmosEIPTypes } from "@/transactions/cosmos/messages/base";
 import {
   CosmosNativeMessage,
   EIP712Message,
   UnsignedCosmosMessages,
-} from "@/config/interfaces";
-import { generateCosmosEIPTypes } from "../base";
+} from "@/transactions/interfaces";
 import { MsgWithdrawDelegatorReward } from "@buf/cosmos_cosmos-sdk.bufbuild_es/cosmos/distribution/v1beta1/tx_pb.js";
 
 const MSG_WITHDRAW_DELEGATOR_REWARD_TYPES = {

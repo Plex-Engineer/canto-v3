@@ -11,15 +11,17 @@ import {
   AmbientPool,
   AmbientUserPosition,
 } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
-import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
 import { getPriceFromTick, concLiquidityNoteValue } from "@/utils/ambient";
 import BigNumber from "bignumber.js";
 import { NewAmbientPositionModal } from "./newAmbientPosition";
 import { ManageAmbientPosition } from "./managePosition";
+import { AmbientTransactionParams } from "@/transactions/pairs/ambient";
+import { Validation } from "@/config/interfaces";
 
 interface AmbientModalProps {
   pool: AmbientPool;
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
+  verifyParams: (params: Partial<AmbientTransactionParams>) => Validation;
 }
 
 export const AmbientModal = (props: AmbientModalProps) => {
@@ -110,6 +112,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
             <NewAmbientPositionModal
               pool={props.pool}
               sendTxFlow={props.sendTxFlow}
+              verifyParams={props.verifyParams}
             />
           </Container>
         )}
@@ -118,6 +121,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
             pool={props.pool}
             position={selectedPosition as AmbientUserPosition}
             sendTxFlow={props.sendTxFlow}
+            verifyParams={props.verifyParams}
           />
         )}
       </div>
