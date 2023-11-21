@@ -6,6 +6,7 @@ import Icon from "@/components/icon/icon";
 import Button from "@/components/button/button";
 import Link from "next/link";
 import Glitch from "@/components/glitch/glitch";
+import { gravityBridgeOutTx } from "@/transactions/bridge/gravityBridge/gravityBridgeOut";
 
 export default function Home() {
   return (
@@ -52,6 +53,7 @@ export default function Home() {
         >
           <Link href="/bridge">
             <Button width={280}>Bridge To Canto</Button>
+            <Button onClick={gravityBridgeOutTx}>GBRIDGE TEST</Button>
           </Link>
           {/* <a href="#ecosystem">
             {" "}
