@@ -73,7 +73,6 @@ const Bridging = (props: BridgeProps) => {
     hook.selections.token?.id,
     hook.selections.toNetwork?.id,
     hook.selections.token?.balance,
-    hook.selections.token,
   ]);
 
   // transaction that will do the bridging
