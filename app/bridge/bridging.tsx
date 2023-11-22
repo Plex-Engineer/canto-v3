@@ -34,74 +34,66 @@ const Bridging = (props: BridgeProps) => {
     bridge,
   } = useBridgeCombo(props.type);
 
+  const { fromNetwork, toNetwork, token } = bridge.selections;
   return (
     <>
-      <Modal
+      <ConfirmationModal
         open={isConfirmationModalOpen}
-        width="30rem"
-        height="min-content"
         onClose={() => {
           setIsConfirmationModalOpen(false);
         }}
-      >
-        <ConfirmationModal
-          {...cosmosProps}
-          token={{
-            name: bridge.selections.token?.symbol ?? "",
-            url: bridge.selections.token?.icon ?? "",
-          }}
-          imgUrl={
-            bridge.direction === "in"
-              ? bridge.selections.fromNetwork?.icon ?? ""
-              : bridge.selections.toNetwork?.icon ?? ""
-          }
-          addresses={{
-            from: bridge.addresses.getSender(),
-            to: bridge.addresses.getReceiver(),
-          }}
-          fromNetwork={networkName(bridge.selections.fromNetwork)}
-          toNetwork={networkName(bridge.selections.toNetwork)}
-          type={bridge.direction}
-          amount={formatBalance(
-            amountAsBigNumberString,
-            bridge.selections.token?.decimals ?? 0,
-            {
-              symbol: bridge.selections.token?.symbol,
-              precision: bridge.selections.token?.decimals,
-              commify: true,
-            }
-          )}
-          confirmation={{
-            onConfirm: () => {
-              bridgeTx();
-            },
-            canConfirm: !canBridge.error,
-          }}
-          extraDetails={
-            bridge.selections.toNetwork?.id ===
-            ETHEREUM_VIA_GRAVITY_BRIDGE.id ? (
-              <Text size="x-sm">
-                To bridge your tokens to Ethereum through Gravity Bridge, first
-                ensure that you have an IBC wallet like Keplr.
-                <br />
-                <br />
-                Next, enter your Gravity Bridge address (from Keplr) below and
-                confirm.
-                <br />
-                <br />
-                Once completed, you can transfer your tokens from Gravity Bridge
-                to Ethereum using the{" "}
-                <a
-                  style={{ textDecoration: "underline" }}
-                  href="https://bridge.blockscape.network/"
-                >
-                  Gravity Bridge Portal
-                </a>
-              </Text>
-            ) : undefined
-          }
-        />
-      </Modal>
+        {...cosmosProps}
+        token={{
+          name: token?.symbol ?? "",
+          url: token?.icon ?? "",
+        }}
+        imgUrl={
+          bridge.direction === "in"
+            ? fromNetwork?.icon ?? ""
+            : toNetwork?.icon ?? ""
+        }
+        addresses={{
+          from: bridge.addresses.getSender(),
+          to: bridge.addresses.getReceiver(),
+        }}
+        fromNetwork={networkName(fromNetwork)}
+        toNetwork={networkName(toNetwork)}
+        type={bridge.direction}
+        amount={formatBalance(amountAsBigNumberString, token?.decimals ?? 0, {
+          symbol: token?.symbol,
+          precision: token?.decimals,
+          commify: true,
+        })}
+        confirmation={{
+          onConfirm: () => {
+            bridgeTx();
+          },
+          canConfirm: !canBridge.error,
+        }}
+        extraDetails={
+          toNetwork?.id === ETHEREUM_VIA_GRAVITY_BRIDGE.id ? (
+            <Text size="x-sm">
+              To bridge your tokens to Ethereum through Gravity Bridge, first
+              ensure that you have an IBC wallet like Keplr.
+              <br />
+              <br />
+              Next, enter your Gravity Bridge address (from Keplr) below and
+              confirm.
+              <br />
+              <br />
+              Once completed, you can transfer your tokens from Gravity Bridge
+              to Ethereum using the{" "}
+              <a
+                style={{ textDecoration: "underline" }}
+                href="https://bridge.blockscape.network/"
+              >
+                Gravity Bridge Portal
+              </a>
+            </Text>
+          ) : undefined
+        }
+      />
+
       <section className={styles.container}>
         <div
           className={styles["network-selection"]}
@@ -124,7 +116,7 @@ const Bridging = (props: BridgeProps) => {
                   }}
                   title="SELECT FROM NETWORK"
                   activeItem={
-                    bridge.selections.fromNetwork ?? {
+                    fromNetwork ?? {
                       name: "Select network",
                       icon: "loader.svg",
                       id: "",
@@ -172,13 +164,13 @@ const Bridging = (props: BridgeProps) => {
                   </Text>
                   <div className={styles.token}>
                     <Image
-                      src={bridge.selections.fromNetwork?.icon ?? "loader.svg"}
-                      alt={bridge.selections.fromNetwork?.name ?? "loading"}
+                      src={fromNetwork?.icon ?? "loader.svg"}
+                      alt={fromNetwork?.name ?? "loading"}
                       width={30}
                       height={30}
                     />
                     <Text size="md" font="proto_mono">
-                      {bridge.selections.fromNetwork?.name}
+                      {fromNetwork?.name}
                     </Text>
                   </div>
                 </div>
@@ -193,7 +185,7 @@ const Bridging = (props: BridgeProps) => {
                 }}
                 title="SELECT TO NETWORK"
                 activeItem={
-                  bridge.selections.toNetwork ?? {
+                  toNetwork ?? {
                     name: "Select network",
                     icon: "loader.svg",
                     id: "",
@@ -222,13 +214,13 @@ const Bridging = (props: BridgeProps) => {
 
                 <div className={styles.token}>
                   <Image
-                    src={bridge.selections.toNetwork?.icon ?? "loader.svg"}
-                    alt={bridge.selections.toNetwork?.name ?? "loading"}
+                    src={toNetwork?.icon ?? "loader.svg"}
+                    alt={toNetwork?.name ?? "loading"}
                     width={30}
                     height={30}
                   />
                   <Text size="md" font="proto_mono">
-                    {bridge.selections.toNetwork?.name}
+                    {toNetwork?.name}
                   </Text>
                 </div>
               </div>
@@ -243,13 +235,11 @@ const Bridging = (props: BridgeProps) => {
               <Selector
                 title="SELECT TOKEN"
                 activeItem={
-                  bridge.selections.token
+                  token
                     ? {
-                        ...bridge.selections.token,
+                        ...token,
                         name:
-                          bridge.selections.token.name.length > 24
-                            ? bridge.selections.token.symbol
-                            : bridge.selections.token.name,
+                          token.name.length > 24 ? token.symbol : token.name,
                       }
                     : {
                         name: "Select Token",
@@ -281,7 +271,7 @@ const Bridging = (props: BridgeProps) => {
                   type="amount"
                   height={64}
                   balance={maxBridgeAmount}
-                  decimals={bridge.selections.token?.decimals ?? 0}
+                  decimals={token?.decimals ?? 0}
                   placeholder="0.0"
                   value={amount}
                   onChange={(val) => {
@@ -298,9 +288,9 @@ const Bridging = (props: BridgeProps) => {
           <Selector
             title="SELECT METHOD"
             activeItem={{
-              name: getBridgeMethodInfo(bridge.selections.method).name,
-              id: bridge.selections.method ?? "0",
-              icon: getBridgeMethodInfo(bridge.selections.method).icon,
+              name: getBridgeMethodInfo(method).name,
+              id: method ?? "0",
+              icon: getBridgeMethodInfo(method).icon,
             }}
             items={hook.allOptions.methods.map((method) => ({
               name: getBridgeMethodInfo(method).name,
