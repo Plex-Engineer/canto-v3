@@ -6,6 +6,10 @@ import { getNetworkInfoFromChainId, isCosmosNetwork } from "@/utils/networks";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
+// this code sets the signer address, and the addresses for the bridge in and bridge out
+// it also gets the network info from the chain id
+// and sets the testnet to true if the network is a testnet
+
 export default function useBridgeCombo() {
   // router info
   const pathName = usePathname();

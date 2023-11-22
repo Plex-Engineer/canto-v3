@@ -30,17 +30,19 @@ import useBridgeCombo from "./util";
 
 interface BridgeProps {
   type: "in" | "out";
-  params: {
-    signer: GetWalletClientResult | undefined;
-    transactionStore?: TransactionStore;
-  };
 }
 const Bridging = (props: BridgeProps) => {
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
   const [maxBridgeAmount, setMaxBridgeAmount] = useState<string>("0");
 
-  const { bridgeIn, bridgeOut } = useBridgeCombo();
+  const {
+    bridgeIn,
+    bridgeOut,
+    signer,
+    txStore: transactionStore,
+  } = useBridgeCombo();
+
   const hook = props.type === "in" ? bridgeIn : bridgeOut;
   // big number amount
   const amountAsBigNumberString = (
@@ -81,9 +83,9 @@ const Bridging = (props: BridgeProps) => {
       amount: amountAsBigNumberString,
     });
     // add flow to store
-    props.params.transactionStore?.addNewFlow({
+    transactionStore?.addNewFlow({
       txFlow: flow,
-      signer: props.params.signer,
+      signer: signer,
       onSuccessCallback: () => setIsConfirmationModalOpen(false),
     });
   }

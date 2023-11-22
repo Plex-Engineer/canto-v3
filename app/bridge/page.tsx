@@ -1,28 +1,13 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
 import AnimatedBackground from "@/components/animated_background/animatedBackground";
 import Container from "@/components/container/container";
-import useBridgeIn from "@/hooks/bridge/useBridgeIn";
-import useBridgeOut from "@/hooks/bridge/useBridgeOut";
-import { connectToKeplr } from "@/utils/keplr";
-import { getNetworkInfoFromChainId, isCosmosNetwork } from "@/utils/networks";
 import Bridging from "./bridging";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Tabs from "@/components/tabs/tabs";
 import useBridgeCombo from "./util";
 
 export default function BridgePage() {
-  const {
-    bridgeDirection,
-    bridgeIn,
-    bridgeOut,
-    txStore,
-    signer,
-    router,
-    pathName,
-    createQueryString,
-  } = useBridgeCombo();
+  const { bridgeDirection, router, pathName, createQueryString } =
+    useBridgeCombo();
 
   return (
     <>
@@ -49,15 +34,7 @@ export default function BridgePage() {
             tabs={[
               {
                 title: "BRIDGE IN",
-                content: (
-                  <Bridging
-                    type="in"
-                    params={{
-                      signer: signer,
-                      transactionStore: txStore,
-                    }}
-                  />
-                ),
+                content: <Bridging key={"bridge-in"} type="in" />,
                 onClick: () =>
                   router.push(
                     pathName + "?" + createQueryString("direction", "in")
@@ -65,15 +42,7 @@ export default function BridgePage() {
               },
               {
                 title: "BRIDGE OUT",
-                content: (
-                  <Bridging
-                    type="out"
-                    params={{
-                      signer: signer,
-                      transactionStore: txStore,
-                    }}
-                  />
-                ),
+                content: <Bridging key={"bridge-out"} type="out" />,
                 onClick: () =>
                   router.push(
                     pathName + "?" + createQueryString("direction", "out")
