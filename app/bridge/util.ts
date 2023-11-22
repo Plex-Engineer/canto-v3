@@ -47,7 +47,7 @@ export default function useBridgeCombo() {
       bridgeIn.setState("cosmosAddress", keplrClient.data?.address);
     }
     getKeplrInfoForBridge();
-  }, [bridgeIn, bridgeIn.selections.fromNetwork]);
+  }, [bridgeIn.selections.fromNetwork]);
 
   useEffect(() => {
     const { data: network, error } = getNetworkInfoFromChainId(
@@ -64,7 +64,7 @@ export default function useBridgeCombo() {
     // set the signer address
     bridgeIn.setState("ethAddress", signer?.account.address);
     bridgeOut.setState("ethAddress", signer?.account.address);
-  }, [bridgeIn, bridgeOut, signer?.account.address]);
+  }, [signer?.account.address]);
 
   return {
     // router info
