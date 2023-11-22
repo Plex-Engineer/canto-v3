@@ -1,3 +1,5 @@
+import styled from "styled-components";
+
 interface Props {
   font?: "rm_mono" | "proto_mono";
   weight?: "normal" | "bold";
@@ -14,7 +16,7 @@ interface Props {
   className?: string;
 }
 
-const sizes = {
+const sizes: Record<string, number> = {
   "xx-sm": 12,
   "x-sm": 14,
   sm: 16,
@@ -24,11 +26,21 @@ const sizes = {
   title: 32,
 };
 
-const themes = {
+const themes: Record<string, string> = {
   "primary-light": "var(--text-light-color)",
   "primary-dark": "var(--text-dark-color)",
   "secondary-light": "var(--card-subtle-color, #CACACA)",
   "secondary-dark": "var(--text-dark-40-color)",
+};
+
+const semamtics: Record<string, string> = {
+  title: "h1",
+  "x-lg": "h2",
+  lg: "h3",
+  md: "p",
+  sm: "h4",
+  "x-sm": "h5",
+  "xx-sm": "h6",
 };
 
 const Text = ({
@@ -43,23 +55,39 @@ const Text = ({
   className,
 }: Props) => {
   return (
-    <p
+    <Styled
+      as={semamtics[size ?? "md"]}
+      font={font}
+      color={color}
+      kTheme={theme}
+      opacity={opacity}
+      weight={weight}
+      size={size}
       className={className}
-      style={{
-        fontFamily:
-          font == "proto_mono" ? "var(--proto-mono)" : "var(--rm-mono)",
-        opacity: opacity ?? 1,
-        fontWeight: weight,
-        fontSize: sizes[size ?? "md"],
-        lineHeight: "140%",
-        letterSpacing: "-0.32px",
-        color: color == null ? themes[theme ?? "primary-dark"] : color,
-        ...style,
-      }}
+      style={style}
     >
       {children}
-    </p>
+    </Styled>
   );
 };
+
+const Styled = styled.p<{
+  font?: string;
+  color?: string;
+  kTheme?: string;
+  opacity?: number;
+  weight?: string;
+  size?: "xx-sm" | "x-sm" | "sm" | "md" | "lg" | "x-lg" | "title";
+}>`
+  font-family: ${({ font: kFont }) =>
+    kFont == "proto_mono" ? "var(--proto-mono)" : "var(--rm-mono)"};
+  opacity: ${({ opacity }) => opacity ?? 1};
+  font-weight: ${({ weight }) => weight};
+  font-size: ${({ size }) => sizes[size ?? "md"] + "px"};
+  line-height: 140%;
+  letter-spacing: -0.32px;
+  color: ${({ kTheme, color }) =>
+    color == null ? themes[kTheme ?? "primary-dark"] : color};
+`;
 
 export default Text;

@@ -31,14 +31,13 @@ const Tabs = (props: Props) => {
           <button
             key={index}
             onClick={() => {
-              console.log("clicked");
               setActiveTab(index);
               tab.onClick && tab.onClick();
             }}
             disabled={tab.isDisabled}
             className={clsx(styles.tab, activeTab === index && styles.active)}
           >
-            <Text font="proto_mono" size="sm">
+            <Text font="proto_mono" size="sm" theme="primary-dark">
               {tab.title}
             </Text>
           </button>
