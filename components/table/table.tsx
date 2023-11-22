@@ -5,7 +5,7 @@ interface Props {
   title?: string;
   secondary?: React.ReactNode;
   headers: {
-    value: string;
+    value: string | React.ReactNode;
     ratio: number;
   }[];
   content: React.ReactNode[][];
@@ -13,7 +13,7 @@ interface Props {
 }
 const Table = (props: Props) => {
   return (
-    <div className={styles.container} style={{fontSize: props.textSize}}>
+    <div className={styles.container} style={{ fontSize: props.textSize }}>
       <div className={styles.title}>
         <Text font="proto_mono" size="lg">
           {props.title}

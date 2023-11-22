@@ -231,9 +231,25 @@ const CTokenTable = ({
       : [
           { value: "Asset", ratio: 1 },
           { value: "Balance", ratio: 1 },
-          { value: `(Supply)  APR`, ratio: 1 },
+          {
+            value: (
+              <span>
+                Supply
+                <br /> APR
+              </span>
+            ),
+            ratio: 1,
+          },
           { value: "Supplied", ratio: 1 },
-          { value: "(Borrow) APR", ratio: 1 },
+          {
+            value: (
+              <span>
+                Borrow
+                <br /> APR
+              </span>
+            ),
+            ratio: 1,
+          },
           { value: "Borrowed", ratio: 1 },
           { value: "Liquidity", ratio: 1 },
           { value: "Manage", ratio: 2 },
