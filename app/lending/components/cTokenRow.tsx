@@ -166,9 +166,9 @@ export const StableCoinRow = ({
       cStableCoin.underlying.decimals
     )}
   </Text>,
-  <Text size="sm" theme="primary-dark" key={cStableCoin.name + "cToken.CF"}>
-    {displayAmount(cStableCoin.collateralFactor, 16) + "%"}
-  </Text>,
+  //   <Text size="sm" theme="primary-dark" key={cStableCoin.name + "cToken.CF"}>
+  //     {displayAmount(cStableCoin.collateralFactor, 16) + "%"}
+  //   </Text>,
   <Text
     size="sm"
     theme="primary-dark"
