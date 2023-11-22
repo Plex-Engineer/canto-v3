@@ -36,8 +36,10 @@ export async function cantoDexLPTx(
   txParams: CantoDexTransactionParams
 ): PromiseWithError<TxCreatorFunctionReturn> {
   try {
+    console.log(txParams);
     // validate params
     const validation = validateCantoDexLPTxParams(txParams);
+    console.log("tx validation", validation);
     if (validation.error) throw new Error(validation.reason);
 
     switch (txParams.txType) {
@@ -288,7 +290,7 @@ async function removeLiquidity(
       txParams.pair.clmData.userDetails.balanceOfUnderlying
     );
 
-    if (greaterThan(unstakeAmount, "0")) {
+    if (greaterThan(unstakeAmount, "0").data) {
       // make sure user has enough to unstake
       if (
         greaterThan(
@@ -394,7 +396,7 @@ export async function stakeCantoDexLPTx(
 ): PromiseWithError<TxCreatorFunctionReturn> {
   try {
     /** check params */
-    
+
     // validate params
     const validation = validateCantoDexLPTxParams(txParams);
     if (validation.error) throw new Error(validation.reason);
