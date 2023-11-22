@@ -4,7 +4,7 @@ import { Chain, Sender } from "@/transactions/interfaces";
 import { ethToCantoAddress } from "@/utils/address";
 import { getCantoSenderObj, getGravitySenderObj } from "@/utils/cosmos";
 import { getCosmosChainObject, isCantoChainId } from "@/utils/networks";
-import { ethToGravity } from "@gravity-bridge/address-converter";
+// import { ethToGravity } from "@gravity-bridge/address-converter";
 
 type Context = {
   chainObj: Chain;
@@ -17,7 +17,7 @@ export async function generateCosmosEIP712TxContext(
   if (isCantoChainId(chainId)) {
     return generateCantoEIP712TxContext(chainId, ethAddress);
   } else if (chainId === GRAVITY_BRIGDE_EVM.chainId) {
-    return generateGravityEIP712TxContext(ethAddress);
+    return NEW_ERROR("invalid chain id for eip712 context");
   } else {
     return NEW_ERROR("invalid chain id for eip712 context");
   }
@@ -55,30 +55,30 @@ async function generateCantoEIP712TxContext(
   }
 }
 
-async function generateGravityEIP712TxContext(
-  ethAddress: string
-): PromiseWithError<Context> {
-  try {
-    /** convert eth address to gravity address */
-    const gravityAddress = ethToGravity(ethAddress);
+// async function generateGravityEIP712TxContext(
+//   ethAddress: string
+// ): PromiseWithError<Context> {
+//   try {
+//     /** convert eth address to gravity address */
+//     const gravityAddress = ethToGravity(ethAddress);
 
-    /** chain obj */
-    const chainObj = {
-      chainId: GRAVITY_BRIGDE_EVM.chainId,
-      cosmosChainId: GRAVITY_BRIDGE.chainId,
-    };
+//     /** chain obj */
+//     const chainObj = {
+//       chainId: GRAVITY_BRIGDE_EVM.chainId,
+//       cosmosChainId: GRAVITY_BRIDGE.chainId,
+//     };
 
-    /** sender obj */
-    const { data: senderObj, error: senderObjError } =
-      await getGravitySenderObj(gravityAddress);
-    if (senderObjError) throw senderObjError;
+//     /** sender obj */
+//     const { data: senderObj, error: senderObjError } =
+//       await getGravitySenderObj(gravityAddress);
+//     if (senderObjError) throw senderObjError;
 
-    /** return context */
-    return NO_ERROR({
-      chainObj,
-      senderObj,
-    });
-  } catch (err) {
-    return NEW_ERROR("generateGravityEIP712TxContext", err);
-  }
-}
+//     /** return context */
+//     return NO_ERROR({
+//       chainObj,
+//       senderObj,
+//     });
+//   } catch (err) {
+//     return NEW_ERROR("generateGravityEIP712TxContext", err);
+//   }
+// }
