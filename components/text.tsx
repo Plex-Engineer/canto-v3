@@ -57,7 +57,7 @@ const Text = ({
 }: Props) => {
   return (
     <Styled
-      //   as={semantics[size ?? "md"]}
+      as={semantics[size ?? "md"]}
       color={color}
       $ktheme={theme}
       opacity={opacity}
