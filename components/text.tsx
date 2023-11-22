@@ -57,13 +57,13 @@ const Text = ({
   return (
     <Styled
       as={semantics[size ?? "md"]}
-      font={font}
       color={color}
       kTheme={theme}
       opacity={opacity}
       weight={weight}
       size={size}
       className={className}
+      kFont={font}
       style={style}
     >
       {children}
@@ -72,14 +72,14 @@ const Text = ({
 };
 
 const Styled = styled.p<{
-  font?: string;
+  kFont?: string;
   color?: string;
   kTheme?: string;
   opacity?: number;
   weight?: string;
   size?: "xx-sm" | "x-sm" | "sm" | "md" | "lg" | "x-lg" | "title";
 }>`
-  font-family: ${({ font: kFont }) =>
+  font-family: ${({ kFont }) =>
     kFont == "proto_mono" ? "var(--proto-mono)" : "var(--rm-mono)"};
   opacity: ${({ opacity }) => opacity ?? 1};
   font-weight: ${({ weight }) => weight};
