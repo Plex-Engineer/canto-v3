@@ -7,8 +7,8 @@ import NavBar from "@/components/nav_bar/navBar";
 import CantoWalletProvider from "@/provider/rainbowProvider";
 import localFont from "next/font/local";
 import DesktopOnly from "@/components/desktop-only/desktop-only";
-import { Metadata } from "next";
 import { ReactQueryClientProvider } from "@/provider/reactQueryProvider";
+import StyledComponentsRegistry from "../lib/registry";
 
 const rm_mono = localFont({
   src: "../fonts/rm-mono-regular.ttf",
@@ -77,44 +77,46 @@ export default function RootLayout({
         }
       >
         <DesktopOnly />
-        <CantoWalletProvider>
-          <ReactQueryClientProvider>
-            <div className="body">
-              <InfoBar
-                values={[
-                  {
-                    name: "contracts w/ CSR enabled:",
-                    value: "$1,210.56",
-                    change: "+2% $23.4",
-                    isPositive: true,
-                  },
-                  {
-                    name: "CANTO price:",
-                    value: "$1,210.56",
-                    change: "+22%",
-                    isPositive: true,
-                  },
-                  {
-                    name: "TVL:",
-                    value: "$1,210.56",
-                    change: "-1.2%",
-                    isPositive: false,
-                  },
-                  {
-                    name: "Market Cap:",
-                    value: "$1,435,438.56",
-                    change: "-34.2%",
-                    isPositive: false,
-                  },
-                ]}
-              />
-              <NavBar />
-              {children}
-              <div id="modal-root"></div>
-              <Footer />
-            </div>
-          </ReactQueryClientProvider>
-        </CantoWalletProvider>
+        <StyledComponentsRegistry>
+          <CantoWalletProvider>
+            <ReactQueryClientProvider>
+              <div className="body">
+                <InfoBar
+                  values={[
+                    {
+                      name: "contracts w/ CSR enabled:",
+                      value: "$1,210.56",
+                      change: "+2% $23.4",
+                      isPositive: true,
+                    },
+                    {
+                      name: "CANTO price:",
+                      value: "$1,210.56",
+                      change: "+22%",
+                      isPositive: true,
+                    },
+                    {
+                      name: "TVL:",
+                      value: "$1,210.56",
+                      change: "-1.2%",
+                      isPositive: false,
+                    },
+                    {
+                      name: "Market Cap:",
+                      value: "$1,435,438.56",
+                      change: "-34.2%",
+                      isPositive: false,
+                    },
+                  ]}
+                />
+                <NavBar />
+                {children}
+                <div id="modal-root"></div>
+                <Footer />
+              </div>
+            </ReactQueryClientProvider>
+          </CantoWalletProvider>
+        </StyledComponentsRegistry>
       </body>
     </html>
   );
