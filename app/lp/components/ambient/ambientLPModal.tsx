@@ -6,20 +6,22 @@ import { useState } from "react";
 import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
 import Text from "@/components/text";
-import styles from "../cantoDex.module.scss";
+import styles from "../dexModals/cantoDex.module.scss";
 import {
   AmbientPool,
   AmbientUserPosition,
 } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
-import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
 import { getPriceFromTick, concLiquidityNoteValue } from "@/utils/ambient";
 import BigNumber from "bignumber.js";
 import { NewAmbientPositionModal } from "./newAmbientPosition";
 import { ManageAmbientPosition } from "./managePosition";
+import { AmbientTransactionParams } from "@/transactions/pairs/ambient";
+import { Validation } from "@/config/interfaces";
 
 interface AmbientModalProps {
   pool: AmbientPool;
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
+  verifyParams: (params: Partial<AmbientTransactionParams>) => Validation;
 }
 
 export const AmbientModal = (props: AmbientModalProps) => {
@@ -47,40 +49,45 @@ export const AmbientModal = (props: AmbientModalProps) => {
   };
 
   return (
-    <Container className={styles.container}>
-      <div>
-        <Container
-          direction="row"
-          height="24px"
-          center={{
-            vertical: true,
-          }}
-          style={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            setSelectedPosition(null);
-          }}
-        >
-          {selectedPosition !== null && (
-            <div
-              style={{
-                rotate: "90deg",
-                marginRight: "6px",
-              }}
-            >
-              <Icon icon={{ url: "./dropdown.svg", size: 24 }} themed />
-            </div>
-          )}
-          <Text font="proto_mono" size="lg">
-            {title()}
-          </Text>
-        </Container>
-        <Spacer height="14px" />
-      </div>
-      <div className={styles.inner}>
+    <Container className={styles.ambientContainer}>
+      <Container
+        direction="row"
+        height="70px"
+        center={{
+          vertical: true,
+        }}
+        style={{
+          cursor: "pointer",
+          padding: "12px",
+          paddingLeft: "16px",
+        }}
+        onClick={() => {
+          setSelectedPosition(null);
+        }}
+      >
+        {selectedPosition !== null && (
+          <div
+            style={{
+              rotate: "90deg",
+              marginRight: "6px",
+            }}
+          >
+            <Icon icon={{ url: "./dropdown.svg", size: 24 }} themed />
+          </div>
+        )}
+        <Text font="proto_mono" size="lg">
+          {title()}
+        </Text>
+      </Container>
+      <div className={styles["scroll-view"]}>
         {modalState === "list" && (
-          <Container height="calc(100% - 0px)">
+          <Container
+            width="100%"
+            height="33rem"
+            style={{
+              padding: "12px",
+            }}
+          >
             <div className={styles.iconTitle}>
               <Icon icon={{ url: props.pool.logoURI, size: 60 }} />
               <Text size="lg" font="proto_mono">
@@ -98,11 +105,14 @@ export const AmbientModal = (props: AmbientModalProps) => {
           <Container
             width="100%"
             className={styles["scroll-view"]}
-            style={{ padding: "0 1rem" }}
+            style={{
+              padding: "0 16px",
+            }}
           >
             <NewAmbientPositionModal
               pool={props.pool}
               sendTxFlow={props.sendTxFlow}
+              verifyParams={props.verifyParams}
             />
           </Container>
         )}
@@ -111,6 +121,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
             pool={props.pool}
             position={selectedPosition as AmbientUserPosition}
             sendTxFlow={props.sendTxFlow}
+            verifyParams={props.verifyParams}
           />
         )}
       </div>
@@ -130,8 +141,14 @@ const PositionList = ({
   setSelectedPosition,
 }: PositionListProps) => (
   <>
-    <div className={styles["scroll-view"]}>
-      <Container margin="md" gap={20} className={styles["items-list"]}>
+    <div
+      className={styles["scroll-view"]}
+      style={{
+        height: "100%",
+      }}
+    >
+      <Spacer height="20px" />
+      <Container gap={20} className={styles["items-list"]}>
         {positions.map((item, idx) => (
           <Container
             key={idx}
@@ -191,19 +208,14 @@ const PositionList = ({
         ))}
       </Container>
     </div>
-    <div
-      style={{
-        margin: "1rem",
+    <Spacer height="20px" />
+    <Button
+      width={"fill"}
+      onClick={() => {
+        setSelectedPosition("new");
       }}
     >
-      <Button
-        width={"fill"}
-        onClick={() => {
-          setSelectedPosition("new");
-        }}
-      >
-        New Position
-      </Button>
-    </div>
+      New Position
+    </Button>
   </>
 );

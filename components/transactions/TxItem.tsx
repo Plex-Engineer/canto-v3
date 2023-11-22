@@ -3,7 +3,6 @@ import Text from "../text";
 import styles from "./transactions.module.scss";
 import Container from "../container/container";
 import Spacer from "../layout/spacer";
-import { BridgeStatus, TransactionWithStatus } from "@/config/interfaces";
 import {
   dateToMomentsAgo,
   formatError,
@@ -11,7 +10,8 @@ import {
 } from "@/utils/formatting";
 import StatusIcon from "../icon/statusIcon";
 import { useQuery } from "react-query";
-import { getBridgeStatus } from "@/hooks/bridge/transactions/bridgeTxStatus";
+import { getBridgeStatus } from "@/transactions/bridge";
+import { BridgeStatus, TransactionWithStatus } from "@/transactions/interfaces";
 
 interface TxItemProps {
   tx: TransactionWithStatus;

@@ -43,6 +43,18 @@ export async function getCirculatingCNote(
   );
   if (error) return NEW_ERROR("getCirculatingCNote", error);
   // get total supply
-  const circulatingCNote = await cNoteContract.methods.totalSupply().call();
+  const totalSupply = await cNoteContract.methods.totalSupply().call();
+
+  // must subtract the cNote the accountant has
+  const accountantAddress = getCantoCoreAddress(chainId, "accountant");
+  if (!accountantAddress) throw Error("accountant address not found");
+
+  const accountantBalance = await cNoteContract.methods
+    .balanceOf(accountantAddress)
+    .call();
+
+  const circulatingCNote = new BigNumber(totalSupply as number).minus(
+    accountantBalance as number
+  );
   return NO_ERROR(circulatingCNote.toString());
 }

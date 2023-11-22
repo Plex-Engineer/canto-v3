@@ -1,2 +1,1 @@
-export * from "./connectKeplr"
-export * from "./performKeplrTx"
+export * from "./connectKeplr";

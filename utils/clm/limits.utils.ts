@@ -2,8 +2,8 @@ import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
 import { convertNoteAmountToToken, minOf } from "../math";
 import { convertToBigNumber } from "../formatting";
-import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
+import { CTokenLendingTxTypes } from "@/transactions/lending/types";
 
 /**
  * @notice Calculates the maximum amount of tokens that can be borrowed
@@ -42,7 +42,7 @@ export function cTokenWithdrawLimit(
   try {
     // make sure we have user data
     if (!cToken.userDetails) throw Error("no user details");
-    // first check if token is collateral (if not, then no limit)
+    // first check if token is collateral or no borrows are present (if not, then no limit)
     if (
       cToken.userDetails?.isCollateral === false ||
       Number(cToken.collateralFactor) === 0

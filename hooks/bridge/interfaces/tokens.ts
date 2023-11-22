@@ -1,5 +1,5 @@
 import { ERC20Token, IBCToken, OFTToken } from "@/config/interfaces";
-import { BridgingMethod } from "./bridgeMethods";
+import { BridgingMethod } from "@/transactions/bridge";
 
 export type BridgeToken = BridgeInToken | BridgeOutToken;
 

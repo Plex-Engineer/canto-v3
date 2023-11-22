@@ -1,43 +1,62 @@
-// transaction for claiming rewards in the clm and ambient dex
-
 import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  ReturnWithError,
+  Validation,
+} from "@/config/interfaces";
+import {
   Transaction,
   TxCreatorFunctionReturn,
-  errMsg,
-} from "@/config/interfaces";
-import { CLMClaimRewardsTxParams } from "@/hooks/lending/interfaces/lendingTxTypes";
-import { clmClaimRewardsTx } from "@/hooks/lending/transactions/claimRewards";
-import { claimAmbientRewardsTx } from "../../newAmbient/transactions/ambientTx";
+} from "@/transactions/interfaces";
+import {
+  CLMClaimRewardsTxParams,
+  clmClaimRewardsTx,
+} from "@/transactions/lending";
+import {
+  AmbientClaimRewardsTxParams,
+  claimAmbientRewardsTx,
+} from "@/transactions/pairs/ambient";
 
-export interface ClaimDexRewardsParams {
+interface ClaimDexRewardsParams {
   clmParams?: CLMClaimRewardsTxParams;
-  ambientParams?: CLMClaimRewardsTxParams;
+  ambientParams?: AmbientClaimRewardsTxParams;
 }
+// transaction for claiming rewards in the clm and ambient dex
 export async function claimDexRewardsComboTx(
   params: ClaimDexRewardsParams
 ): PromiseWithError<TxCreatorFunctionReturn> {
-  const txList: Transaction[] = [];
-  if (params.clmParams) {
-    const { data: lendingRewards, error: clmError } = await clmClaimRewardsTx(
-      params.clmParams
-    );
-    if (clmError) {
-      return NEW_ERROR("claimDexRewardsComboTx::" + errMsg(clmError));
+  try {
+    const txList: Transaction[] = [];
+    if (params.clmParams && params.clmParams?.estimatedRewards !== "0") {
+      const { data: clmRewards, error: clmError } = await clmClaimRewardsTx(
+        params.clmParams
+      );
+      if (clmError) throw clmError;
+      txList.push(...clmRewards.transactions);
     }
-    txList.push(...lendingRewards.transactions);
-  }
-  if (params.ambientParams) {
-    const { data: ambientRewards, error: ambientError } = claimAmbientRewardsTx(
-      params.ambientParams
-    );
-    if (ambientError) {
-      return NEW_ERROR("claimDexRewardsComboTx::" + errMsg(ambientError));
+    if (
+      params.ambientParams &&
+      params.ambientParams?.estimatedRewards !== "0"
+    ) {
+      const { data: ambientRewards, error: ambientError } =
+        claimAmbientRewardsTx(params.ambientParams);
+      if (ambientError) throw ambientError;
+      txList.push(...ambientRewards.transactions);
     }
-    txList.push(...ambientRewards.transactions);
-  }
+    // check that there are transactions to return
+    if (txList.length === 0) throw Error("No transactions to return");
 
-  return NO_ERROR({ transactions: txList });
+    // return the list of transactions
+    return NO_ERROR({
+      transactions: txList,
+    });
+  } catch (err) {
+    return NEW_ERROR("claimDexRewardsComboTx", err);
+  }
+}
+export function validateClaimDexRewardsComboTxParams(
+  _params: ClaimDexRewardsParams
+): ReturnWithError<Validation> {
+  return NO_ERROR({ error: false });
 }

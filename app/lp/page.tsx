@@ -2,7 +2,6 @@
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
-import { Validation } from "@/config/interfaces";
 import {
   GeneralAmbientPairRow,
   GeneralCantoDexPairRow,
@@ -10,9 +9,8 @@ import {
   UserCantoDexPairRow,
 } from "./components/pairRow";
 import Text from "@/components/text";
-import { CantoDexLPModal } from "./components/cantoDexLPModal";
+import { CantoDexLPModal } from "./components/dexModals/cantoDexLPModal";
 import styles from "./lp.module.scss";
-import { CantoDexTransactionParams } from "@/hooks/pairs/cantoDex/interfaces/pairsTxTypes";
 import useLP from "@/hooks/pairs/lpCombo/useLP";
 import {
   isAmbientPool,
@@ -23,101 +21,84 @@ import { displayAmount } from "@/utils/formatting";
 import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
-import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
-import { addTokenBalances } from "@/utils/math";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import { useState } from "react";
+import { CantoDexTransactionParams } from "@/transactions/pairs/cantoDex";
+import { AmbientTransactionParams } from "@/transactions/pairs/ambient";
 
 export default function Page() {
   const { txStore, signer, chainId } = useCantoSigner();
   // all pairs (ambient and cantoDex)
-  const { cantoDex, ambient, selection, isLoading, claimRewards } = useLP({
+  const { isLoading, pairs, rewards, selection, transactions } = useLP({
     chainId,
     userEthAddress: signer?.account.address ?? "",
   });
+  /** general selection */
+  const { pair: selectedPair, setPair } = selection;
+
   //   all pairs filtered by type
   const [filteredPairs, setFilteredPairs] = useState<string>("all");
 
   /** CANTO DEX */
-  const { pairs: cantoDexPairs } = cantoDex;
-  const sortedPairs = cantoDexPairs?.sort((a, b) =>
+  const sortedCantoDexPairs = pairs.allCantoDex.sort((a, b) =>
     a.symbol.localeCompare(b.symbol)
   );
-  const userCantoDexPairs = cantoDexPairs.filter(
-    (pair) =>
-      (pair.clmData?.userDetails?.balanceOfCToken !== "0" ||
-        pair.clmData?.userDetails?.balanceOfUnderlying !== "0") &&
-      pair.clmData?.userDetails?.balanceOfCToken !== undefined
-  );
-
-  // transactions
-  function sendCantoDexTxFlow(params: Partial<CantoDexTransactionParams>) {
-    const { data: flow, error } = cantoDex.transaction.createNewPairsFlow({
+  function validateCantoDexTx(params: Partial<CantoDexTransactionParams>) {
+    return transactions.validateCantoDexLPParams({
       chainId,
       ethAccount: signer?.account.address ?? "",
       pair: selectedPair,
       ...params,
     } as CantoDexTransactionParams);
-    if (error) {
-      console.log(error);
-    } else {
-      txStore?.addNewFlow({
-        txFlow: flow,
-        signer: signer,
-        onSuccessCallback: () => selection.setPair(null),
-      });
-    }
   }
-  function canPerformCantoDexTx(
-    params: Partial<CantoDexTransactionParams>
-  ): Validation {
-    return cantoDex.transaction.validateParams({
-      chainId: chainId,
+  function sendCantoDexTxFlow(params: Partial<CantoDexTransactionParams>) {
+    const flow = transactions.newCantoDexLPFlow({
+      chainId,
       ethAccount: signer?.account.address ?? "",
       pair: selectedPair,
       ...params,
     } as CantoDexTransactionParams);
+    txStore?.addNewFlow({
+      txFlow: flow,
+      signer: signer,
+      onSuccessCallback: () => selection.setPair(null),
+    });
   }
 
   /** AMBIENT */
-  const { ambientPools } = ambient;
-  const userAmbientPools = ambientPools.filter(
-    (pool) => pool.userPositions.length > 0
-  );
 
-  //transactions
-  function sendAmbientTxFlow(params: Partial<AmbientTransactionParams>) {
-    const { data: flow, error } = ambient.transaction.createNewPoolFlow({
+  function validateAmbientTxParams(params: Partial<AmbientTransactionParams>) {
+    return transactions.validateAmbientPoolTxParams({
       chainId,
       ethAccount: signer?.account.address ?? "",
       pool: selectedPair,
       ...params,
     } as AmbientTransactionParams);
-    if (error) {
-      console.log(error);
-    } else {
-      txStore?.addNewFlow({
-        txFlow: flow,
-        signer: signer,
-        onSuccessCallback: () => selection.setPair(null),
-      });
-    }
+  }
+  function sendAmbientTxFlow(params: Partial<AmbientTransactionParams>) {
+    const flow = transactions.newAmbientPoolTxFlow({
+      chainId,
+      ethAccount: signer?.account.address ?? "",
+      pool: selectedPair,
+      ...params,
+    } as AmbientTransactionParams);
+
+    txStore?.addNewFlow({
+      txFlow: flow,
+      signer: signer,
+      onSuccessCallback: () => selection.setPair(null),
+    });
   }
 
-  /** general selection */
-  const { pair: selectedPair, setPair } = selection;
+  /** REWARDS */
 
   function sendClaimRewardsFlow() {
-    const { data: flow, error } = claimRewards();
-    if (error) {
-      console.log(error);
-    } else {
-      txStore?.addNewFlow({
-        txFlow: flow,
-        signer: signer,
-        onSuccessCallback: () => selection.setPair(null),
-      });
-    }
+    const flow = transactions.newClaimRewardsFlow();
+    txStore?.addNewFlow({
+      txFlow: flow,
+      signer: signer,
+      onSuccessCallback: () => selection.setPair(null),
+    });
   }
 
   if (isLoading) {
@@ -132,19 +113,25 @@ export default function Page() {
   return (
     <div className={styles.container}>
       <Modal
+        width="min-content"
+        padded={false}
         open={selectedPair !== null}
         onClose={() => setPair(null)}
-        closeOnOverlayClick={false}
+        closeOnOverlayClick={true}
       >
         {selectedPair && isCantoDexPair(selectedPair) && (
           <CantoDexLPModal
             pair={selectedPair}
-            validateParams={canPerformCantoDexTx}
+            validateParams={validateCantoDexTx}
             sendTxFlow={sendCantoDexTxFlow}
           />
         )}
         {selectedPair && isAmbientPool(selectedPair) && (
-          <AmbientModal pool={selectedPair} sendTxFlow={sendAmbientTxFlow} />
+          <AmbientModal
+            pool={selectedPair}
+            sendTxFlow={sendAmbientTxFlow}
+            verifyParams={validateAmbientTxParams}
+          />
         )}
       </Modal>
 
@@ -155,18 +142,14 @@ export default function Page() {
 
         <Rewards
           onClick={sendClaimRewardsFlow}
-          value={displayAmount(
-            addTokenBalances(cantoDex.position.totalRewards, ambient.rewards),
-            18,
-            {
-              precision: 4,
-            }
-          )}
+          value={displayAmount(rewards.total, 18, {
+            precision: 4,
+          })}
         />
       </Container>
       <Spacer height="30px" />
 
-      {userCantoDexPairs.length + userAmbientPools.length > 0 && (
+      {pairs.userCantoDex.length + pairs.userAmbient.length > 0 && (
         <>
           <Table
             title="Your Pairs"
@@ -179,16 +162,16 @@ export default function Page() {
               { value: "Edit", ratio: 1 },
             ]}
             content={[
-              ...userAmbientPools.map((pool) =>
+              ...pairs.userAmbient.map((pool) =>
                 UserAmbientPairRow({
                   pool,
                   onManage: (poolAddress) => {
                     setPair(poolAddress);
                   },
-                  rewards: ambient.rewards,
+                  rewards: rewards.ambient,
                 })
               ),
-              ...userCantoDexPairs.map((pair) =>
+              ...pairs.userCantoDex.map((pair) =>
                 UserCantoDexPairRow({
                   pair,
                   onManage: (pairAddress) => {
@@ -224,7 +207,7 @@ export default function Page() {
           { value: "Action", ratio: 1 },
         ]}
         content={[
-          ...ambientPools
+          ...pairs.allAmbient
             .filter(
               (pool) =>
                 filteredPairs === "all" ||
@@ -237,7 +220,7 @@ export default function Page() {
                 onAddLiquidity: (poolAddress) => setPair(poolAddress),
               })
             ),
-          ...sortedPairs
+          ...sortedCantoDexPairs
             .filter(
               (pair) =>
                 filteredPairs === "all" ||
