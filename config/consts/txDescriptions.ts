@@ -58,6 +58,24 @@ export const TX_DESCRIPTIONS = {
       collateralize ? "Collateralize" : "Uncollateralize"
     } ${tokenSymbol} in the lending market`,
   }),
+  DELEGATE: (validatorName: string, amount: string, undelegate: boolean) => ({
+    title: `${undelegate ? "Undelegate from" : "Delegate to"} ${validatorName}`,
+    description: `${undelegate ? "Undelegate" : "Delegate"} ${amount} CANTO ${
+      undelegate ? "from" : "to"
+    } ${validatorName}`,
+  }),
+  REDELEGATE: (
+    validatorName: string,
+    newValidatorName: string,
+    amount: string
+  ) => ({
+    title: `Redelegate from ${validatorName} to ${newValidatorName}`,
+    description: `Redelegate ${amount} CANTO from ${validatorName} to ${newValidatorName}`,
+  }),
+  CLAIM_STAKING_REWARDS: () => ({
+    title: "Claim Staking Rewards",
+    description: "Claim staking rewards",
+  }),
   DRIP_COMPTROLLER: () => ({
     title: "Drip Comptroller",
     description: "Drip WCANTO rewards to the lending market from the reservoir",

@@ -187,7 +187,7 @@ export default function Page() {
                             })}</Text>
                             <Icon
                               icon={{
-                                url: "./tokens/canto.svg",
+                                url: "/tokens/canto.svg",
                                 size: 16,
                               }}
                             />
@@ -236,7 +236,7 @@ export default function Page() {
                           })}</Text>
                           <Icon
                             icon={{
-                              url: "./tokens/canto.svg",
+                              url: "/tokens/canto.svg",
                               size: 16,
                             }}
                           />
@@ -286,7 +286,7 @@ export default function Page() {
                           })}</Text>
                           <Icon
                             icon={{
-                              url: "./tokens/canto.svg",
+                              url: "/tokens/canto.svg",
                               size: 16,
                             }}
                           />
@@ -317,7 +317,7 @@ export default function Page() {
             </div>
             <div className={styles.votingInfoRow2}>
                 <div className={styles.infoRow1First}><Text font="proto_mono">{votesData.abstain}%</Text></div>
-                <div className={styles.infoRow1Second}>
+                <div className={styles.infoRow1First}>
                       <Container
                           direction="row"
                           gap={6}
@@ -330,7 +330,7 @@ export default function Page() {
                           })}</Text>
                           <Icon
                             icon={{
-                              url: "./tokens/canto.svg",
+                              url: "/tokens/canto.svg",
                               size: 16,
                             }}
                           />
