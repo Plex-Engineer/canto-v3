@@ -7,8 +7,11 @@ import Button from "@/components/button/button";
 import Link from "next/link";
 import Glitch from "@/components/glitch/glitch";
 import { gravityBridgeOutTx } from "@/transactions/bridge/gravityBridge/gravityBridgeOut";
+import useCantoSigner from "@/hooks/helpers/useCantoSigner";
+import { signCosmosEIP712Tx } from "@/transactions/signTx/cosmosEIP/signGravityEIP";
 
 export default function Home() {
+  const { signer } = useCantoSigner();
   return (
     <Container
       className={styles.container}
@@ -53,8 +56,16 @@ export default function Home() {
         >
           <Link href="/bridge">
             <Button width={280}>Bridge To Canto</Button>
-            <Button onClick={gravityBridgeOutTx}>GBRIDGE TEST</Button>
           </Link>
+          <Button
+            onClick={() =>
+              gravityBridgeOutTx({ ethSender: signer?.account.address }).then(
+                (txs) => signCosmosEIP712Tx(txs, signer).then(console.log)
+              )
+            }
+          >
+            GBRIDGE TEST
+          </Button>
           {/* <a href="#ecosystem">
             {" "}
             <Button width={280}>Explore Ecosystem</Button>

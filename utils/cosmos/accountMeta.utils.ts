@@ -1,4 +1,5 @@
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
+import { GRAVITY_BRIDGE } from "@/config/networks";
 import { Sender } from "@/transactions/interfaces";
 import { tryFetch } from "@/utils/async";
 import { getCantoCosmosNetwork } from "@/utils/networks";
@@ -62,5 +63,35 @@ export async function getCantoSenderObj(
     });
   } catch (err) {
     return NEW_ERROR("getCantoSenderObj", err);
+  }
+}
+
+interface GravityAccountReturn {
+  account: {
+    account_number: number;
+    sequence: number;
+    address: string;
+    pub_key: {
+      key: string;
+    } | null;
+  };
+}
+export async function getGravitySenderObj(
+  senderGravityAddress: string
+): PromiseWithError<Sender> {
+  try {
+    const { data: gravityAccount, error } =
+      await tryFetch<GravityAccountReturn>(
+        `${GRAVITY_BRIDGE.restEndpoint}/cosmos/auth/v1beta1/accounts/${senderGravityAddress}`
+      );
+    if (error) throw error;
+    return NO_ERROR({
+      accountAddress: gravityAccount.account.address,
+      sequence: gravityAccount.account.sequence,
+      accountNumber: gravityAccount.account.account_number,
+      pubkey: gravityAccount.account.pub_key?.key,
+    });
+  } catch (err) {
+    return NEW_ERROR("getGravitySenderObj", err);
   }
 }

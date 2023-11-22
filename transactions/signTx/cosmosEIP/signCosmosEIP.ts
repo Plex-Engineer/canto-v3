@@ -20,7 +20,7 @@ import {
   createEIP712,
 } from "@evmos/eip712";
 import { tryFetch, tryFetchWithRetry } from "@/utils/async";
-import { generateCantoEIP712TxContext } from "./txContext";
+import { generateCosmosEIP712TxContext } from "./txContext";
 
 export async function signCosmosEIPTx(
   tx: Transaction,
@@ -42,7 +42,7 @@ export async function signCosmosEIPTx(
     /** tx context */
 
     const { data: txContext, error: contextError } =
-      await generateCantoEIP712TxContext(tx.chainId, newSigner.account.address);
+      await generateCosmosEIP712TxContext(tx.chainId, signer.account.address);
     if (contextError) throw contextError;
 
     /** create and sign transaction */
@@ -167,7 +167,7 @@ async function signAndBroadcastCosmosTransaction(
       body: generatePostBodyBroadcast(signedTx),
     };
     const broadcastPost = await tryFetch(
-      getCosmosAPIEndpoint(context.chain.chainId).data +
+      getCosmosAPIEndpoint(context.chain.cosmosChainId).data +
         "/cosmos/tx/v1beta1/txs",
       postOptions
     );
