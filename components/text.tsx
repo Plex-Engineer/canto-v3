@@ -1,4 +1,5 @@
-import styled from "styled-components";
+"use client";
+import { styled } from "styled-components";
 
 interface Props {
   font?: "rm_mono" | "proto_mono";
@@ -56,14 +57,14 @@ const Text = ({
 }: Props) => {
   return (
     <Styled
-      as={semantics[size ?? "md"]}
+      //   as={semantics[size ?? "md"]}
       color={color}
-      kTheme={theme}
+      $ktheme={theme}
       opacity={opacity}
       weight={weight}
       size={size}
       className={className}
-      kFont={font}
+      $kfont={font}
       style={style}
     >
       {children}
@@ -72,21 +73,21 @@ const Text = ({
 };
 
 const Styled = styled.p<{
-  kFont?: string;
+  $kfont?: string;
   color?: string;
-  kTheme?: string;
+  $ktheme?: string;
   opacity?: number;
   weight?: string;
   size?: "xx-sm" | "x-sm" | "sm" | "md" | "lg" | "x-lg" | "title";
 }>`
-  font-family: ${({ kFont }) =>
+  font-family: ${({ $kfont: kFont }) =>
     kFont == "proto_mono" ? "var(--proto-mono)" : "var(--rm-mono)"};
   opacity: ${({ opacity }) => opacity ?? 1};
   font-weight: ${({ weight }) => weight};
   font-size: ${({ size }) => sizes[size ?? "md"] + "px"};
   line-height: 140%;
   letter-spacing: -0.32px;
-  color: ${({ kTheme, color }) =>
+  color: ${({ $ktheme: kTheme, color }) =>
     color == null ? themes[kTheme ?? "primary-dark"] : color};
 `;
 
