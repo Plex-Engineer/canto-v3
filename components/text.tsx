@@ -33,7 +33,7 @@ const themes: Record<string, string> = {
   "secondary-dark": "var(--text-dark-40-color)",
 };
 
-const semamtics: Record<string, string> = {
+const semantics: Record<string, string> = {
   title: "h1",
   "x-lg": "h2",
   lg: "h3",
@@ -56,7 +56,7 @@ const Text = ({
 }: Props) => {
   return (
     <Styled
-      as={semamtics[size ?? "md"]}
+      as={semantics[size ?? "md"]}
       font={font}
       color={color}
       kTheme={theme}
