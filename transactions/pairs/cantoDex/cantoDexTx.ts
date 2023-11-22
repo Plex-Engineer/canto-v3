@@ -47,6 +47,7 @@ export async function cantoDexLPTx(
         return await removeLiquidity(txParams);
       case CantoDexTxTypes.STAKE:
       case CantoDexTxTypes.UNSTAKE:
+        return await stakeCantoDexLPTx(txParams);
       default:
         throw new Error(TX_PARAM_ERRORS.PARAM_INVALID("Tx Type"));
     }
