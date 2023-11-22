@@ -7,7 +7,7 @@ import useBridgeCombo from "./util";
 
 export default function BridgePage() {
   const { bridgeDirection, router, pathName, createQueryString } =
-    useBridgeCombo();
+    useBridgeCombo("in");
 
   return (
     <>
