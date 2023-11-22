@@ -1,0 +1,117 @@
+.container {
+  display: flex;
+  height: 40rem;
+}
+
+.ambientContainer {
+  display: flex;
+  height: 40rem;
+}
+
+.baseContainer {
+  display: flex;
+  height: 40rem;
+  padding: 1rem;
+}
+
+.scroll-view {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding: 1px;
+}
+
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: transform 0.5s ease-out;
+  background-color: var(--card-sub-surface-color);
+}
+
+.iconTitle {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  border-radius: var(--border-radius, 0px);
+  background: var(--card-surface-color, #f1f1f1);
+  padding: 1rem;
+  gap: 10px;
+  //   /* old */
+  //   box-shadow: -3px -3px 0px 0px rgba(17, 17, 17, 0.2) inset,
+  //     2px 2px 0px 0px rgba(255, 255, 255, 0.4) inset;
+  box-shadow: -2px -2px 0px 0px rgba(17, 17, 17, 0.2) inset,
+    2px 2px 0px 0px rgba(255, 255, 255, 0.2) inset;
+}
+
+.infoPop {
+  border-radius: 50px;
+  border: 1px solid var(--border-stroke-color);
+  background-color: rgba(var(--dark-color), 0.04);
+
+  min-width: 24px;
+  padding: 0 6px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.liquiditySlider {
+  padding: 1rem;
+}
+
+.item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  height: 80px;
+  padding: 0 16px;
+  transition: all 0.2s ease-out;
+  position: relative;
+  border: 1px solid var(--border-stroke-color);
+  &::after {
+    position: absolute;
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(var(--dark-color), 0.1);
+    transform: scaleY(0.86);
+    opacity: 0;
+    transition: all 0.2s ease-out;
+    border-radius: var(--border-radius);
+  }
+
+  &:hover::after {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+
+  &:active::after {
+    transform: scale(0.99, 0.94);
+    background-color: rgba(var(--dark-color), 0.3);
+    opacity: 0.8;
+  }
+}
+
+.advancedContainer {
+  width: 100%;
+}
+
+.error-message {
+  color: var(--extra-failure-color, #ff0000);
+  font-size: 13px;
+  font-style: normal;
+  font-family: var(--rm-mono);
+  line-height: 140%; /* 16.8px */
+  letter-spacing: -0.48px;
+  text-align: justify;
+  transition: all 0.1s ease-in-out;
+}

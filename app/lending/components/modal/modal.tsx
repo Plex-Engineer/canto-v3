@@ -1,7 +1,6 @@
 "use client";
 import Button from "@/components/button/button";
 import Text from "@/components/text";
-import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { maxAmountForLendingTx } from "@/utils/clm";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
@@ -22,6 +21,7 @@ import Amount from "@/components/amount/amount";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { areEqualAddresses } from "@/utils/address";
 import { convertTokenAmountToNote } from "@/utils/math";
+import { CTokenLendingTxTypes } from "@/transactions/lending";
 interface Props {
   isSupplyModal: boolean;
   cToken: CTokenWithUserData | null;
@@ -162,11 +162,13 @@ export const LendingModal = (props: Props) => {
     // limits
     const maxAmount = maxAmountForLendingTx(actionType, cToken, position, 100);
     const limitAmount = maxAmountForLendingTx(actionType, cToken, position, 90);
+    // if withdrawing and nothing is borrowed no need for limit
     const needLimit =
       actionType === CTokenLendingTxTypes.BORROW ||
       (actionType === CTokenLendingTxTypes.WITHDRAW &&
         Number(limitAmount) <
-          Number(cToken.userDetails?.supplyBalanceInUnderlying));
+          Number(cToken.userDetails?.supplyBalanceInUnderlying) &&
+        Number(position.totalBorrow) !== 0);
     const limitProps = needLimit
       ? { limit: { limit: limitAmount, limitName: "90% limit" } }
       : {};

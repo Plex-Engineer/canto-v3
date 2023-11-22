@@ -1,10 +1,11 @@
+import { TX_PARAM_ERRORS } from "@/config/consts/errors";
 import { Validation } from "@/config/interfaces";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { getCTokensFromType } from "@/hooks/lending/config/cTokenAddresses";
-import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 import useLending from "@/hooks/lending/useLending";
+import { CTokenLendingTxTypes } from "@/transactions/lending";
 import { listIncludesAddress } from "@/utils/address";
 import { getCirculatingCNote, getCirculatingNote } from "@/utils/clm";
 import { addTokenBalances, convertTokenAmountToNote } from "@/utils/math";
@@ -132,20 +133,17 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     max: boolean
   ) {
     if (!selection.selectedCToken || !signer) return;
-    const { data, error } = transaction.createNewLendingFlow({
+    const txFlow = transaction.newLendingFlow({
       chainId: signer.chain.id,
       ethAccount: signer.account.address,
       cToken: selection.selectedCToken,
       amount,
       txType,
       max,
+      userPosition: position,
     });
-    if (error) {
-      console.log(error);
-      return;
-    }
     txStore?.addNewFlow({
-      txFlow: data,
+      txFlow,
       signer,
       onSuccessCallback: props.onSuccessTx,
     });
@@ -156,7 +154,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     max: boolean
   ): Validation => {
     if (!selection.selectedCToken || !signer)
-      return { error: true, reason: "No signer" };
+      return { error: true, reason: TX_PARAM_ERRORS.PARAM_MISSING("Signer") };
     return transaction.validateParams({
       chainId: signer.chain.id,
       ethAccount: signer.account.address,
@@ -164,6 +162,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
       amount,
       txType,
       max,
+      userPosition: position,
     });
   };
 

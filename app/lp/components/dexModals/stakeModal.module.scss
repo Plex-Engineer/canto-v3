@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.card {
+  border-radius: var(--border-radius, 0px);
+  background: var(--card-surface-color, #f1f1f1);
+  padding: 1rem;
+  gap: 10px;
+  /* old */
+  box-shadow: -3px -3px 0px 0px rgba(17, 17, 17, 0.2) inset,
+    2px 2px 0px 0px rgba(255, 255, 255, 0.4) inset;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: center;
+  width: 100%;
+  padding: 1rem;
+}

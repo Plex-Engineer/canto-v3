@@ -1,10 +1,7 @@
-import {
-  BaseNetwork,
-  NewTransactionFlow,
-  ReturnWithError,
-} from "@/config/interfaces";
+import { BaseNetwork, Validation } from "@/config/interfaces";
 import { BridgeToken } from "./tokens";
-import { BridgingMethod } from "../interfaces/bridgeMethods";
+import { BridgingMethod } from "@/transactions/bridge";
+import { NewTransactionFlow } from "@/transactions/flows";
 
 export interface BridgeHookInputParams {
   testnet?: boolean;
@@ -28,22 +25,6 @@ export interface BridgeHookState {
   connectedCosmosAddress: string | null;
   // only when ibc out of canto does this need to be set
   userInputCosmosAddress: string | null;
-}
-
-export interface BridgeTransactionParams {
-  from: {
-    chainId: string | number;
-    account: string;
-  };
-  to: {
-    chainId: string | number;
-    account: string;
-  };
-  token: {
-    data: BridgeToken;
-    amount: string;
-  };
-  method: BridgingMethod | null;
 }
 
 export interface BridgeHookTxParams {
@@ -70,10 +51,8 @@ export interface BridgeHookReturn {
     getReceiver: () => string | null;
   };
   bridge: {
-    createNewBridgeFlow: (
-      params: BridgeHookTxParams
-    ) => ReturnWithError<NewTransactionFlow>;
-    canBridge: (params: BridgeHookTxParams) => ReturnWithError<boolean>;
+    newBridgeFlow: (params: BridgeHookTxParams) => NewTransactionFlow;
+    validateParams: (params: BridgeHookTxParams) => Validation;
   };
 }
 

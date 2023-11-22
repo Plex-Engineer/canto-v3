@@ -1,12 +1,12 @@
 import { REDELEGATE_FEE } from "@/config/consts/fees";
+import { generateCosmosEIPTypes } from "@/transactions/cosmos/messages/base";
 import {
   CosmosNativeMessage,
   EIP712Message,
   UnsignedCosmosMessages,
-} from "@/config/interfaces";
+} from "@/transactions/interfaces";
 import { Coin } from "@buf/cosmos_cosmos-sdk.bufbuild_es/cosmos/base/v1beta1/coin_pb";
 import { MsgBeginRedelegate } from "@buf/cosmos_cosmos-sdk.bufbuild_es/cosmos/staking/v1beta1/tx_pb.js";
-import { generateCosmosEIPTypes } from "../base";
 
 const MSG_BEGIN_REDELEGATE_TYPES = {
   MsgValue: [

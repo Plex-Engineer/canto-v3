@@ -14,15 +14,17 @@ interface Props {
   width?: string;
   height?: string;
   closeOnOverlayClick?: boolean;
+  padded?: boolean;
 }
 
 const Modal = ({
   onClose,
   children,
   title,
-  width,
+  width = "32rem",
   height,
   open,
+  padded = true,
   closeOnOverlayClick = true,
 }: Props) => {
   const ref = React.useRef<HTMLDivElement>(null);
@@ -61,7 +63,13 @@ const Modal = ({
           height: height ? height : "auto",
         }}
       >
-        <div className={styles.modal}>
+        <div
+          className={styles.modal}
+          style={{
+            padding: padded ? "15px" : "0px",
+            width: width ? width : "auto",
+          }}
+        >
           <Container className={styles.close} onClick={handleClose}>
             <Icon
               themed

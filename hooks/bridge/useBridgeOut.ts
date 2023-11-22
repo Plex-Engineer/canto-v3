@@ -13,23 +13,23 @@ import {
   NEW_ERROR,
   NO_ERROR,
   ReturnWithError,
-  errMsg,
-  NewTransactionFlow,
   ERC20Token,
 } from "@/config/interfaces";
-import { BaseNetwork, CosmosNetwork } from "@/config/interfaces";
+import { BaseNetwork } from "@/config/interfaces";
 import { BridgeOutToken } from "./interfaces/tokens";
-import { BridgingMethod } from "./interfaces/bridgeMethods";
 import {
   MAIN_BRIDGE_OUT_NETWORKS,
   TEST_BRIDGE_NETWORKS,
 } from "./config/networks";
 import useTokenBalances from "../helpers/useTokenBalances";
 import { isERC20TokenList, isOFTToken, isBridgeOutToken } from "@/utils/tokens";
-import { convertToBigNumber } from "@/utils/formatting";
 import { isValidEthAddress } from "@/utils/address";
-import { isCosmosNetwork } from "@/utils/networks";
-import { createNewBridgeFlow } from "./helpers/createBridgeFlow";
+import {
+  BridgeTransactionParams,
+  BridgingMethod,
+  newCantoBridgeFlow,
+  validateCantoBridgeTxParams,
+} from "@/transactions/bridge";
 
 export default function useBridgeOut(
   props: BridgeHookInputParams
@@ -299,58 +299,23 @@ export default function useBridgeOut(
     }
   }
 
-  // will tell the parent if bridging params look good to bridge
-  function canBridge(params: BridgeHookTxParams): ReturnWithError<boolean> {
-    // check if we can create valid params
-    const { error: bridgeParamsError } = createBridgeOutTxFlow(params);
-    if (bridgeParamsError) {
-      return NEW_ERROR("useBridgeOut::canBridge::" + errMsg(bridgeParamsError));
-    }
-    // simple amount check, does not account for gas
-    const { data: userAmount, error: bigNumberError } = convertToBigNumber(
-      params.amount
-    );
-    if (bigNumberError) {
-      return NEW_ERROR("useBridgeOut::canBridge::" + bigNumberError.message);
-    }
-    const tokenBalance = getToken(state.selectedToken?.id ?? "").data.balance;
-    if (!tokenBalance) {
-      return NEW_ERROR("useBridgeOut::canBridge: no token balance");
-    }
-    // final check if ibc transfer (check input address)
-    if (state.selectedMethod === BridgingMethod.IBC) {
-      if (
-        !isCosmosNetwork(state.toNetwork as CosmosNetwork) ||
-        !(state.toNetwork as CosmosNetwork).checkAddress(
-          state.userInputCosmosAddress ?? ""
-        )
-      ) {
-        return NEW_ERROR(
-          "useBridgeOut::canBridge: input cosmos address doesn't match network" +
-            state.userInputCosmosAddress +
-            "->" +
-            state.toNetwork?.name
-        );
-      }
-    }
-    return NO_ERROR(userAmount.lte(tokenBalance) && userAmount.gt(0));
-  }
-
-  // will return a new transaction flow object that we can pass into the transaction store
-  function createBridgeOutTxFlow(
+  const bridgeTxParams = (
     params: BridgeHookTxParams
-  ): ReturnWithError<NewTransactionFlow> {
-    return createNewBridgeFlow({
-      bridgeIn: false,
-      token: getToken(state.selectedToken?.id ?? "").data,
-      fromNetwork: state.fromNetwork,
-      toNetwork: state.toNetwork,
-      method: state.selectedMethod,
-      sender: getSender(),
-      receiver: getReceiver(),
+  ): BridgeTransactionParams => ({
+    method: state.selectedMethod,
+    from: {
+      chainId: state.fromNetwork?.chainId ?? "",
+      account: getSender() ?? "",
+    },
+    to: {
+      chainId: state.toNetwork?.chainId ?? "",
+      account: getReceiver() ?? "",
+    },
+    token: {
+      data: getToken(state.selectedToken?.id ?? "").data,
       amount: params.amount,
-    });
-  }
+    },
+  });
 
   return {
     direction: "out",
@@ -375,8 +340,9 @@ export default function useBridgeOut(
     },
     setState: generalSetter,
     bridge: {
-      createNewBridgeFlow: createBridgeOutTxFlow,
-      canBridge,
+      validateParams: (params) =>
+        validateCantoBridgeTxParams(bridgeTxParams(params)),
+      newBridgeFlow: (params) => newCantoBridgeFlow(bridgeTxParams(params)),
     },
   };
 }
