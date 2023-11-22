@@ -75,7 +75,7 @@ const HighlightCard = ({
               />
             }
           />
-          <Item
+          {/* <Item
             value={formattedAmount(cToken.userDetails?.balanceOfCToken ?? "0")}
             name={
               <Container key={"popkey"} direction="row" gap={10}>
@@ -93,9 +93,9 @@ const HighlightCard = ({
                     </a>
                   </Text>
                 </InfoPop>
-              </Container>
+              </Container> 
             }
-          />
+          />*/}
         </Container>
         <Item
           name="Note Supplied"
