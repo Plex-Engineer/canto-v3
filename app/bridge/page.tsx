@@ -10,66 +10,19 @@ import Bridging from "./bridging";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Tabs from "@/components/tabs/tabs";
+import useBridgeCombo from "./util";
 
 export default function BridgePage() {
-  // router info
-  const pathName = usePathname();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  // query params
-  const bridgeDirection = () => {
-    const direction = searchParams.get("direction");
-
-    if (direction === "in") return "in";
-    if (direction === "out") return "out";
-    return "in";
-  };
-
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-      return params.toString();
-    },
-    [searchParams]
-  );
-
-  // bridge hooks
-  const { txStore, signer } = useCantoSigner();
-  const [onTestnet, setOnTestnet] = useState<boolean>(false);
-  const bridgeOut = useBridgeOut({
-    testnet: onTestnet,
-  });
-  const bridgeIn = useBridgeIn({
-    testnet: onTestnet,
-  });
-
-  useEffect(() => {
-    async function getKeplrInfoForBridge() {
-      const network = bridgeIn.selections.fromNetwork;
-      if (!network || !isCosmosNetwork(network)) return;
-      const keplrClient = await connectToKeplr(network.chainId);
-      bridgeIn.setState("cosmosAddress", keplrClient.data?.address);
-    }
-    getKeplrInfoForBridge();
-  }, [bridgeIn.selections.fromNetwork]);
-
-  useEffect(() => {
-    const { data: network, error } = getNetworkInfoFromChainId(
-      signer?.chain.id ?? 1
-    );
-    if (error) {
-      console.log(error);
-      return;
-    }
-    setOnTestnet(network.isTestChain);
-  }, [signer?.chain.id]);
-
-  useEffect(() => {
-    // set the signer address
-    bridgeIn.setState("ethAddress", signer?.account.address);
-    bridgeOut.setState("ethAddress", signer?.account.address);
-  }, [signer?.account.address]);
+  const {
+    bridgeDirection,
+    bridgeIn,
+    bridgeOut,
+    txStore,
+    signer,
+    router,
+    pathName,
+    createQueryString,
+  } = useBridgeCombo();
 
   return (
     <>
@@ -98,7 +51,7 @@ export default function BridgePage() {
                 title: "BRIDGE IN",
                 content: (
                   <Bridging
-                    hook={bridgeIn}
+                    type="in"
                     params={{
                       signer: signer,
                       transactionStore: txStore,
@@ -114,7 +67,7 @@ export default function BridgePage() {
                 title: "BRIDGE OUT",
                 content: (
                   <Bridging
-                    hook={bridgeOut}
+                    type="out"
                     params={{
                       signer: signer,
                       transactionStore: txStore,
