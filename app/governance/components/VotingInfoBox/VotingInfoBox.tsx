@@ -36,7 +36,7 @@ export function VotingInfoBox(proposal : any ){
                           })}</Text>
                           <Icon
                             icon={{
-                              url: "/tokens/canto.svg",
+                              url: "./tokens/canto.svg",
                               size: 16,
                             }}
                           />

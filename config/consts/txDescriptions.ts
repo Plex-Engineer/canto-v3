@@ -107,7 +107,7 @@ export const TX_DESCRIPTIONS = {
     description: `Wrap ${amount} ETH to WETH`,
   }),
   VOTE:(proposalId:number,voteOption: VoteOption ) => ({
-    title: "Voting for the Proposal ${proposalId}",
-    description: 'Vote for the proposal with the ${voteOption}'
+    title: `Voting for the Proposal ${proposalId}`,
+    description: `Vote for the proposal with the ${voteOption}`
   })
 };

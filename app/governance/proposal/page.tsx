@@ -18,6 +18,7 @@ import { NEW_ERROR, NewTransactionFlow } from "@/config/interfaces";
 import { TransactionFlowType } from "@/config/transactions/txMap";
 import { formatBalance } from "@/utils/formatting/balances.utils";
 import Container from "@/components/container/container";
+import RadioButton from "../components/VotingRadioButton/votingRadioBtn";
 
 
 
@@ -57,8 +58,7 @@ export default function Page() {
       setChecked(!isChecked);
   }
 
-  console.log(selectedVote);
-  
+  //console.log(selectedVote);
   if(isLoading){
 
     return (
@@ -149,24 +149,16 @@ export default function Page() {
       <div className={styles.proposalCardContainer2}>
        <div className={styles.proposalInfoBoxVoting}>
         <div className={styles.proposalInfoRow1}>
-          { isActive && <div className={styles.radioBtn}>
-                    <input
-                  type="radio"
-                  className="circle"
-                  name="voteOption"
-                  value={VoteOption.YES}
-                  checked={selectedVote === VoteOption.YES}
-                  onChange={() => handleCheck(VoteOption.YES)}
-                  style={{border: "10px solid green"}}
-                  disabled={!isActive}
-                  // style={{backgroundColor:isChecked ? 'red': 'white'}}
-                />
-                
-                </div>}
+          { isActive && <RadioButton value={VoteOption.YES} isActive={isActive} isChecked={selectedVote==VoteOption.YES}
+          onChange={() => 
+            setSelectedVote(VoteOption.YES)
+          } selectedValue={selectedVote}></RadioButton>    
+              }
             <div className={styles.proposalInfoVoting}>
             
             
               <div className={styles.votingInfoRow1}>
+              
               
              
                 <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "#06FC99", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Yes</Text></div></div>
@@ -199,18 +191,10 @@ export default function Page() {
               
 
             </div>
-            { isActive && <div className={styles.radioBtn}>
-                    <input
-                  type="radio"
-                  name="voteOption"
-                  value={VoteOption.NO}
-                  checked={selectedVote === VoteOption.NO}
-                  onChange={() => setSelectedVote(VoteOption.NO)}
-                  disabled={!isActive}
-                />
-                
-                
-              </div>}
+            { isActive && <RadioButton value={VoteOption.NO} isActive={isActive} isChecked={selectedVote==VoteOption.NO}
+          onChange={() => 
+            setSelectedVote(VoteOption.NO)
+            } selectedValue={selectedVote}></RadioButton>  }
               
           <div className={styles.proposalInfoVoting}>
             
@@ -251,16 +235,10 @@ export default function Page() {
             
 
         <div className={styles.proposalInfoRow1}>
-          { isActive && <div className={styles.radioBtn}>
-                    <input
-                  type="radio"
-                  name="voteOption"
-                  value={VoteOption.VETO}
-                  checked={selectedVote === VoteOption.VETO}
-                  onChange={() => setSelectedVote(VoteOption.VETO)}
-                  disabled={!isActive}
-                />
-              </div>}
+          { isActive && <RadioButton value={VoteOption.VETO} isActive={isActive} isChecked={selectedVote==VoteOption.VETO}
+          onChange={() => 
+            setSelectedVote(VoteOption.VETO)
+            } selectedValue={selectedVote}></RadioButton>}
 
           <div className={styles.proposalInfoVoting}>
             
@@ -295,17 +273,10 @@ export default function Page() {
                   </div>
             </div>
           </div>
-            { isActive && <div className={styles.radioBtn}>
-                    <input
-                  type="radio"
-                  name="voteOption"
-                  value={VoteOption.ABSTAIN}
-                  checked={selectedVote === VoteOption.ABSTAIN}
-                  onChange={() => setSelectedVote(VoteOption.ABSTAIN)}
-                  disabled={!isActive}
-                />
-
-              </div>}
+            { isActive && <RadioButton value={VoteOption.ABSTAIN} isActive={isActive} isChecked={selectedVote==VoteOption.ABSTAIN}
+          onChange={() => 
+            setSelectedVote(VoteOption.ABSTAIN)
+            } selectedValue={selectedVote}></RadioButton>}
           <div className={styles.proposalInfoVoting}>
             
             
