@@ -1,15 +1,8 @@
 "use client";
 import Spacer from "@/components/layout/spacer";
-import Selector, { Item } from "@/components/selector/selector";
+import Selector from "@/components/selector/selector";
 import Text from "@/components/text";
-import { BridgeHookReturn } from "@/hooks/bridge/interfaces/hookParams";
-import { TransactionStore } from "@/stores/transactionStore";
-import {
-  convertToBigNumber,
-  displayAmount,
-  formatBalance,
-} from "@/utils/formatting";
-import { useEffect, useState } from "react";
+import { displayAmount, formatBalance } from "@/utils/formatting";
 import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";
 import Input from "@/components/input/input";
@@ -17,191 +10,102 @@ import Container from "@/components/container/container";
 import Image from "next/image";
 import Modal from "@/components/modal/modal";
 import ConfirmationModal from "./components/confirmationModal";
-import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks";
-import { GetWalletClientResult } from "wagmi/actions";
-import { maxBridgeAmountInUnderlying } from "@/hooks/bridge/helpers/amounts";
-import { BaseNetwork } from "@/config/interfaces";
-import { validateWeiUserInputTokenAmount } from "@/utils/math";
+import { isEVMNetwork } from "@/utils/networks";
 import { ETHEREUM_VIA_GRAVITY_BRIDGE } from "@/config/networks";
-import { BridgingMethod } from "@/transactions/bridge";
+
+import useBridgeCombo from "./util";
 
 interface BridgeProps {
-  hook: BridgeHookReturn;
-  params: {
-    signer: GetWalletClientResult | undefined;
-    transactionStore?: TransactionStore;
-  };
+  type: "in" | "out";
 }
 const Bridging = (props: BridgeProps) => {
-  // STATES FOR BRIDGE
-  const [amount, setAmount] = useState<string>("");
-  const [maxBridgeAmount, setMaxBridgeAmount] = useState<string>("0");
-
-  // big number amount
-  const amountAsBigNumberString = (
-    convertToBigNumber(amount, props.hook.selections.token?.decimals ?? 18)
-      .data ?? "0"
-  ).toString();
-
-  // validate user input amount
-  const amountCheck = validateWeiUserInputTokenAmount(
-    amountAsBigNumberString,
-    "1",
+  const {
+    amount,
+    setAmount,
     maxBridgeAmount,
-    props.hook.selections.token?.symbol ?? "",
-    props.hook.selections.token?.decimals ?? 0
-  );
+    amountCheck,
+    canBridge,
+    bridgeTx,
+    isConfirmationModalOpen,
+    setIsConfirmationModalOpen,
+    amountAsBigNumberString,
+    networkName,
+    cosmosProps,
+    bridge,
+  } = useBridgeCombo(props.type);
 
-  useEffect(() => {
-    async function getMaxAmount() {
-      setMaxBridgeAmount(
-        await maxBridgeAmountInUnderlying(
-          props.hook.selections.token,
-          props.hook.selections.toNetwork?.id ?? ""
-        )
-      );
-    }
-    getMaxAmount();
-  }, [
-    props.hook.selections.token?.id,
-    props.hook.selections.toNetwork?.id,
-    props.hook.selections.token?.balance,
-  ]);
-
-  // transaction that will do the bridging
-  async function bridgeTx() {
-    // get flow
-    const flow = props.hook.bridge.newBridgeFlow({
-      amount: amountAsBigNumberString,
-    });
-    // add flow to store
-    props.params.transactionStore?.addNewFlow({
-      txFlow: flow,
-      signer: props.params.signer,
-      onSuccessCallback: () => setIsConfirmationModalOpen(false),
-    });
-  }
-
-  // check to see if bridging will be possible with the current parameters
-  const canBridge = props.hook.bridge.validateParams({
-    amount: amountAsBigNumberString,
-  });
-
-  // if confirmation is open
-  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
-
-  // cosmos address props
-  const cosmosProps =
-    props.hook.selections.method === BridgingMethod.IBC &&
-    props.hook.direction === "out" &&
-    props.hook.selections.toNetwork &&
-    isCosmosNetwork(props.hook.selections.toNetwork)
-      ? {
-          cosmosAddress: {
-            addressName:
-              props.hook.selections.toNetwork.id ===
-              ETHEREUM_VIA_GRAVITY_BRIDGE.id
-                ? "Gravity Bridge"
-                : undefined,
-            chainId: props.hook.selections.toNetwork.chainId,
-            addressPrefix: props.hook.selections.toNetwork.addressPrefix,
-            currentAddress: props.hook.addresses.getReceiver() ?? "",
-            setAddress: (address: string) =>
-              props.hook.setState("inputCosmosAddress", address),
-          },
-        }
-      : {};
-
-  // get network name to display in modal
-  const networkName = (network: BaseNetwork | null) => {
-    if (network) {
-      if (isCosmosNetwork(network) && network.altName) {
-        return network.altName;
-      }
-      return network.name;
-    }
-    return "";
-  };
+  const { fromNetwork, toNetwork, token } = bridge.selections;
   return (
     <>
-      <Modal
+      <ConfirmationModal
         open={isConfirmationModalOpen}
-        width="30rem"
-        height="min-content"
         onClose={() => {
           setIsConfirmationModalOpen(false);
         }}
-      >
-        <ConfirmationModal
-          {...cosmosProps}
-          token={{
-            name: props.hook.selections.token?.symbol ?? "",
-            url: props.hook.selections.token?.icon ?? "",
-          }}
-          imgUrl={
-            props.hook.direction === "in"
-              ? props.hook.selections.fromNetwork?.icon ?? ""
-              : props.hook.selections.toNetwork?.icon ?? ""
-          }
-          addresses={{
-            from: props.hook.addresses.getSender(),
-            to: props.hook.addresses.getReceiver(),
-          }}
-          fromNetwork={networkName(props.hook.selections.fromNetwork)}
-          toNetwork={networkName(props.hook.selections.toNetwork)}
-          type={props.hook.direction}
-          amount={formatBalance(
-            amountAsBigNumberString,
-            props.hook.selections.token?.decimals ?? 0,
-            {
-              symbol: props.hook.selections.token?.symbol,
-              precision: props.hook.selections.token?.decimals,
-              commify: true,
-            }
-          )}
-          confirmation={{
-            onConfirm: () => {
-              bridgeTx();
-            },
-            canConfirm: !canBridge.error,
-          }}
-          extraDetails={
-            props.hook.selections.toNetwork?.id ===
-            ETHEREUM_VIA_GRAVITY_BRIDGE.id ? (
-              <Text size="x-sm">
-                To bridge your tokens to Ethereum through Gravity Bridge, first
-                ensure that you have an IBC wallet like Keplr.
-                <br />
-                <br />
-                Next, enter your Gravity Bridge address (from Keplr) below and
-                confirm.
-                <br />
-                <br />
-                Once completed, you can transfer your tokens from Gravity Bridge
-                to Ethereum using the{" "}
-                <a
-                  style={{ textDecoration: "underline" }}
-                  href="https://bridge.blockscape.network/"
-                >
-                  Gravity Bridge Portal
-                </a>
-              </Text>
-            ) : undefined
-          }
-        />
-      </Modal>
+        {...cosmosProps}
+        token={{
+          name: token?.symbol ?? "",
+          url: token?.icon ?? "",
+        }}
+        imgUrl={
+          bridge.direction === "in"
+            ? fromNetwork?.icon ?? ""
+            : toNetwork?.icon ?? ""
+        }
+        addresses={{
+          from: bridge.addresses.getSender(),
+          to: bridge.addresses.getReceiver(),
+        }}
+        fromNetwork={networkName(fromNetwork)}
+        toNetwork={networkName(toNetwork)}
+        type={bridge.direction}
+        amount={formatBalance(amountAsBigNumberString, token?.decimals ?? 0, {
+          symbol: token?.symbol,
+          precision: token?.decimals,
+          commify: true,
+        })}
+        confirmation={{
+          onConfirm: () => {
+            bridgeTx();
+          },
+          canConfirm: !canBridge.error,
+        }}
+        extraDetails={
+          toNetwork?.id === ETHEREUM_VIA_GRAVITY_BRIDGE.id ? (
+            <Text size="x-sm">
+              To bridge your tokens to Ethereum through Gravity Bridge, first
+              ensure that you have an IBC wallet like Keplr.
+              <br />
+              <br />
+              Next, enter your Gravity Bridge address (from Keplr) below and
+              confirm.
+              <br />
+              <br />
+              Once completed, you can transfer your tokens from Gravity Bridge
+              to Ethereum using the{" "}
+              <a
+                style={{ textDecoration: "underline" }}
+                href="https://bridge.blockscape.network/"
+              >
+                Gravity Bridge Portal
+              </a>
+            </Text>
+          ) : undefined
+        }
+      />
+
       <section className={styles.container}>
         <div
           className={styles["network-selection"]}
           style={{
             flexDirection:
-              props.hook.direction === "in" ? "column" : "column-reverse",
+              bridge.direction === "in" ? "column" : "column-reverse",
           }}
         >
           {/* select network group */}
 
           <Container width="100%" gap={14}>
-            {props.hook.direction === "in" ? (
+            {bridge.direction === "in" ? (
               <>
                 <Text size="sm">Select Network</Text>
 
@@ -212,15 +116,15 @@ const Bridging = (props: BridgeProps) => {
                   }}
                   title="SELECT FROM NETWORK"
                   activeItem={
-                    props.hook.selections.fromNetwork ?? {
+                    fromNetwork ?? {
                       name: "Select network",
                       icon: "loader.svg",
                       id: "",
                     }
                   }
                   items={
-                    props.hook.direction === "in"
-                      ? props.hook.allOptions.networks.filter((network) =>
+                    bridge.direction === "in"
+                      ? bridge.allOptions.networks.filter((network) =>
                           isEVMNetwork(network)
                         )!
                       : []
@@ -232,14 +136,14 @@ const Bridging = (props: BridgeProps) => {
                         icon: "/icons/atom.svg",
                         id: "",
                       },
-                      items: props.hook.allOptions.networks.filter(
+                      items: bridge.allOptions.networks.filter(
                         (network) => !isEVMNetwork(network)
                       ),
                     },
                   ]}
                   onChange={
-                    props.hook.direction === "in"
-                      ? (networkId) => props.hook.setState("network", networkId)
+                    bridge.direction === "in"
+                      ? (networkId) => bridge.setState("network", networkId)
                       : () => false
                   }
                 />
@@ -260,22 +164,20 @@ const Bridging = (props: BridgeProps) => {
                   </Text>
                   <div className={styles.token}>
                     <Image
-                      src={
-                        props.hook.selections.fromNetwork?.icon ?? "loader.svg"
-                      }
-                      alt={props.hook.selections.fromNetwork?.name ?? "loading"}
+                      src={fromNetwork?.icon ?? "loader.svg"}
+                      alt={fromNetwork?.name ?? "loading"}
                       width={30}
                       height={30}
                     />
                     <Text size="md" font="proto_mono">
-                      {props.hook.selections.fromNetwork?.name}
+                      {fromNetwork?.name}
                     </Text>
                   </div>
                 </div>
               </>
             )}
 
-            {props.hook.direction === "out" ? (
+            {bridge.direction === "out" ? (
               <Selector
                 label={{
                   text: "To",
@@ -283,20 +185,18 @@ const Bridging = (props: BridgeProps) => {
                 }}
                 title="SELECT TO NETWORK"
                 activeItem={
-                  props.hook.selections.toNetwork ?? {
+                  toNetwork ?? {
                     name: "Select network",
                     icon: "loader.svg",
                     id: "",
                   }
                 }
                 items={
-                  props.hook.direction === "out"
-                    ? props.hook.allOptions.networks
-                    : []
+                  bridge.direction === "out" ? bridge.allOptions.networks : []
                 }
                 onChange={
-                  props.hook.direction === "out"
-                    ? (networkId) => props.hook.setState("network", networkId)
+                  bridge.direction === "out"
+                    ? (networkId) => bridge.setState("network", networkId)
                     : () => false
                 }
               />
@@ -314,13 +214,13 @@ const Bridging = (props: BridgeProps) => {
 
                 <div className={styles.token}>
                   <Image
-                    src={props.hook.selections.toNetwork?.icon ?? "loader.svg"}
-                    alt={props.hook.selections.toNetwork?.name ?? "loading"}
+                    src={toNetwork?.icon ?? "loader.svg"}
+                    alt={toNetwork?.name ?? "loading"}
                     width={30}
                     height={30}
                   />
                   <Text size="md" font="proto_mono">
-                    {props.hook.selections.toNetwork?.name}
+                    {toNetwork?.name}
                   </Text>
                 </div>
               </div>
@@ -335,13 +235,11 @@ const Bridging = (props: BridgeProps) => {
               <Selector
                 title="SELECT TOKEN"
                 activeItem={
-                  props.hook.selections.token
+                  token
                     ? {
-                        ...props.hook.selections.token,
+                        ...token,
                         name:
-                          props.hook.selections.token.name.length > 24
-                            ? props.hook.selections.token.symbol
-                            : props.hook.selections.token.name,
+                          token.name.length > 24 ? token.symbol : token.name,
                       }
                     : {
                         name: "Select Token",
@@ -349,7 +247,7 @@ const Bridging = (props: BridgeProps) => {
                         id: "",
                       }
                 }
-                items={props.hook.allOptions.tokens
+                items={bridge.allOptions.tokens
                   .map((token) => ({
                     ...token,
                     name: token.name.length > 24 ? token.symbol : token.name,
@@ -366,14 +264,14 @@ const Bridging = (props: BridgeProps) => {
                     }
                     return Number(a.secondary) > Number(b.secondary) ? -1 : 1;
                   })}
-                onChange={(tokenId) => props.hook.setState("token", tokenId)}
+                onChange={(tokenId) => bridge.setState("token", tokenId)}
               />
               <Container width="100%">
                 <Input
                   type="amount"
                   height={64}
                   balance={maxBridgeAmount}
-                  decimals={props.hook.selections.token?.decimals ?? 0}
+                  decimals={token?.decimals ?? 0}
                   placeholder="0.0"
                   value={amount}
                   onChange={(val) => {
@@ -390,17 +288,17 @@ const Bridging = (props: BridgeProps) => {
           <Selector
             title="SELECT METHOD"
             activeItem={{
-              name: getBridgeMethodInfo(props.hook.selections.method).name,
-              id: props.hook.selections.method ?? "0",
-              icon: getBridgeMethodInfo(props.hook.selections.method).icon,
+              name: getBridgeMethodInfo(method).name,
+              id: method ?? "0",
+              icon: getBridgeMethodInfo(method).icon,
             }}
-            items={props.hook.allOptions.methods.map((method) => ({
+            items={hook.allOptions.methods.map((method) => ({
               name: getBridgeMethodInfo(method).name,
               id: method,
               icon: getBridgeMethodInfo(method).icon,
             }))}
             onChange={(method) =>
-              props.hook.setters.method(method as BridgingMethod)
+              hook.setters.method(method as BridgingMethod)
             }
           /> */}
         </div>
@@ -413,7 +311,7 @@ const Bridging = (props: BridgeProps) => {
           }}
           disabled={amountCheck.error}
         >
-          {props.hook.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
+          {bridge.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
         </Button>
       </section>
     </>
