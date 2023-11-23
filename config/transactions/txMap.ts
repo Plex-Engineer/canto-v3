@@ -29,6 +29,9 @@ import {
 } from "@/hooks/pairs/lpCombo/transactions/claimRewards";
 import { AmbientTransactionParams } from "@/hooks/pairs/newAmbient/interfaces/ambientPoolTxTypes";
 import { ambientLiquidityTx } from "@/hooks/pairs/newAmbient/transactions/ambientTx";
+import { StakingTransactionParams } from "@/hooks/staking/interfaces/stakingTxTypes";
+import { stakingTx } from "@/hooks/staking/transactions/staking";
+
 
 export enum TransactionFlowType {
   BRIDGE_IN = "BRIDGE_IN",
@@ -38,6 +41,7 @@ export enum TransactionFlowType {
   CLAIM_LP_REWARDS_TX = "CLAIM_LP_REWARDS_TX",
   CLM_CTOKEN_TX = "CLM_CTOKEN_TX",
   STAKE_LP_TX = "STAKE_LP_TX",
+  STAKE_CANTO_TX = "STAKE_CANTO_TX"
 }
 
 export const TRANSACTION_FLOW_MAP: {
@@ -83,5 +87,10 @@ export const TRANSACTION_FLOW_MAP: {
   [TransactionFlowType.STAKE_LP_TX]: {
     validRetry: async (params: StakeLPParams) => NO_ERROR({ valid: false }),
     tx: async (params: StakeLPParams) => stakeLPFlow(params),
+  },
+  [TransactionFlowType.STAKE_CANTO_TX]: {
+    validRetry: async (params: StakingTransactionParams) =>
+      NO_ERROR({ valid: true }),
+    tx: async (params: StakingTransactionParams) => stakingTx(params),
   },
 };
