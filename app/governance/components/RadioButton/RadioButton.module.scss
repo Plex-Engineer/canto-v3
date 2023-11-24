@@ -31,3 +31,16 @@
 .radioBtn input[type='radio'][value="Abstain"]:checked:after{
     background-color: rgb(67, 64, 64);
 }
+
+.radioBtn2 {
+    display: flex;
+    align-items: center;
+    //margin: 0px 17px 0px 15px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: relative;
+    background-color: white;
+    visibility: visible;
+    border: 3px solid black;
+}
