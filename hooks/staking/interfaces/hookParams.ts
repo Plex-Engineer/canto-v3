@@ -17,6 +17,7 @@ export interface StakingHookInputParams {
 }
 
 export interface StakingHookReturn {
+  isLoading: boolean,
   validators: Validator[];
   apr: string;
   selection: {

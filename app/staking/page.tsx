@@ -9,24 +9,32 @@ import Spacer from "@/components/layout/spacer";
 import Container from "@/components/container/container";
 import Button from "@/components/button/button";
 import Icon from "@/components/icon/icon";
-import { displayAmount, formatBalance } from "@/utils/formatting/balances.utils";
+import { displayAmount, formatBalance, formatBigBalance } from "@/utils/formatting/balances.utils";
 import BigNumber from "bignumber.js";
 import { formatPercent } from "@/utils/formatting";
+import Table from "@/components/table/table";
+import Splash from "@/components/splash/splash";
 
 export default function StakingPage() {
 
   const {txStore,signer,chainId} = useCantoSigner();
 
-  const { validators, apr, userStaking, selection, transaction } = useStaking({
+  const { isLoading,validators, apr, userStaking, selection, transaction } = useStaking({
     chainId: chainId,
     userEthAddress: signer?.account.address,
   });
-
+  console.log(isLoading);
   console.log(validators);
   console.log(apr);
-  console.log(userStaking);
-  console.log(selection);
-  console.log(transaction);
+  // console.log(userStaking);
+  // console.log(selection);
+  // console.log(transaction);
+
+  if(isLoading){
+    return(
+      <Splash></Splash>
+    )
+  }
   return (
     <div className={styles.container}>
       {/* <Text size="x-lg" font="proto_mono" className={styles.title}>
@@ -76,6 +84,37 @@ export default function StakingPage() {
           
         </div>
 
+      </Container>
+      <Container>
+      <Table
+            title=""
+            headers={[
+              { value: "Name", ratio: 2 },
+              { value: "Validator Total", ratio: 1 },
+              { value: "Comission %", ratio: 1 },
+              { value: "Voting Participation", ratio: 1 },
+              { value: "Delegators", ratio: 1 },
+              { value: "", ratio: 1 },
+            ]}
+            content={[...validators.map((validator)=>{
+              return(
+                [
+                  <Container>Validator Name</Container>,
+                  <Container>{formatBigBalance(validator.tokens).shortAmount + formatBigBalance(validator.tokens).suffix} </Container>,
+                  <Container>{validator.commission}</Container>,
+                  <Container>95%</Container>,
+                  <Container>1000</Container>,
+                  <Container>
+                    <Button>DELEGATE</Button>
+                  </Container>
+
+                ]
+              )
+            }
+
+            )]}
+            />
+        <div></div>
       </Container>
       <h1>Staking Page</h1>
       {/* <BoxedBackground /> */}

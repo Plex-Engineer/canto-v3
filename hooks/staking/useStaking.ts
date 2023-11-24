@@ -36,7 +36,7 @@ export default function useStaking(
   ///
 
   // query staking data
-  const { data: staking } = useQuery(
+  const { data: staking, isLoading } = useQuery(
     ["staking", params.chainId, params.userEthAddress],
     async () => {
       const [allValidators, stakingApr, userStaking] = await Promise.all([
@@ -186,8 +186,8 @@ export default function useStaking(
       return NEW_ERROR("createNewStakingFlow" + validation.errorMessage);
     return createNewStakingTxFlow(params);
   }
-
   return {
+    isLoading,
     validators: staking?.validators ?? [],
     apr: staking?.apr ?? "0",
     selection: {
