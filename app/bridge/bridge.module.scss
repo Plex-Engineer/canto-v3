@@ -1,8 +1,15 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+}
+
 .network-selection {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
   align-self: stretch;
   width: 100%;
 }
@@ -18,13 +25,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-}
-.container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  padding: 2rem;
 }
 
 .token-selection {

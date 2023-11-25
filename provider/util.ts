@@ -47,10 +47,9 @@ export const cantoTheme: Theme = {
     modalMobile: "var(--border-radius, 0)",
   },
   shadows: {
-    connectButton: "var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15))",
-    dialog: "var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15))",
-    profileDetailsAction:
-      "var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15))",
+    connectButton: "3px 3px 0px 0px rgba(17, 17, 17, 0.15)",
+    dialog: "3px 3px 0px 0px rgba(17, 17, 17, 0.15)",
+    profileDetailsAction: "3px 3px 0px 0px rgba(17, 17, 17, 0.15)",
     selectedOption: "...",
     selectedWallet: "...",
     walletLogo: "...",

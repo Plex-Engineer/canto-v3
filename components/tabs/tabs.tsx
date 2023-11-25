@@ -1,8 +1,10 @@
 "use client";
-import { Tab, Tabs as TabsContainer, TabList, TabPanel } from "react-tabs";
-import "react-tabs/style/react-tabs.css";
-import "./tabs.scss";
+
+import { useState } from "react";
+import styles from "./tabs.module.scss";
 import Text from "../text";
+import clsx from "clsx";
+
 interface Props {
   defaultIndex?: number;
   tabs: {
@@ -11,27 +13,41 @@ interface Props {
     onClick?: () => void;
     content: React.ReactNode;
   }[];
+  height?: string;
   shadows?: boolean;
 }
-
 const Tabs = (props: Props) => {
+  const [activeTab, setActiveTab] = useState(props.defaultIndex ?? 0);
   return (
-    <TabsContainer defaultIndex={props.defaultIndex ?? 0}>
-      <TabList>
+    <div
+      className={styles.container}
+      style={{
+        boxShadow: props.shadows ? undefined : "none",
+        height: props.height,
+      }}
+    >
+      <div className={styles.tabs}>
         {props.tabs.map((tab, index) => (
-          <Tab key={index} disabled={tab.isDisabled} onClick={tab.onClick}>
-            <Text font="proto_mono" size="md">
+          <button
+            key={index}
+            onClick={() => {
+              console.log("clicked");
+              setActiveTab(index);
+              tab.onClick && tab.onClick();
+            }}
+            disabled={tab.isDisabled}
+            className={clsx(styles.tab, activeTab === index && styles.active)}
+          >
+            <Text font="proto_mono" size="sm">
               {tab.title}
             </Text>
-          </Tab>
+          </button>
         ))}
-      </TabList>
-      <>
-        {props.tabs.map((tab, index) => (
-          <TabPanel key={index}>{tab.content}</TabPanel>
-        ))}
-      </>
-    </TabsContainer>
+      </div>
+      <div className={styles.panel}>
+        {props.tabs.map((tab, index) => index === activeTab && tab.content)}
+      </div>
+    </div>
   );
 };
 

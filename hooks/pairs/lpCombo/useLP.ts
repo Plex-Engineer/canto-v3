@@ -1,43 +1,82 @@
 import { useState } from "react";
-import { areEqualAddresses } from "@/utils/address.utils";
+import { areEqualAddresses } from "@/utils/address";
 import {
   NEW_ERROR,
   NO_ERROR,
-  NewTransactionFlow,
   ReturnWithError,
+  Validation,
 } from "@/config/interfaces";
-import { CantoDexHookReturn } from "../cantoDex/interfaces/hookParams";
 import useCantoDex from "../cantoDex/useCantoDex";
 import { LPPairType } from "./interfaces.ts/pairTypes";
 import useAmbientPools from "../newAmbient/useAmbientPools";
-import { AmbientHookReturn } from "../newAmbient/interfaces/hookParams";
-import { TransactionFlowType } from "@/config/transactions/txMap";
-import { ClaimDexRewardsParams } from "./transactions/claimRewards";
+import { CantoDexPairWithUserCTokenData } from "../cantoDex/interfaces/pairs";
+import { AmbientPool } from "../newAmbient/interfaces/ambientPools";
+import { NewTransactionFlow, TransactionFlowType } from "@/transactions/flows";
+import { CantoDexTransactionParams } from "@/transactions/pairs/cantoDex";
+import { AmbientTransactionParams } from "@/transactions/pairs/ambient";
+import { addTokenBalances } from "@/utils/math";
 
 interface UseLPProps {
   chainId: number;
   userEthAddress?: string;
 }
+
 interface UseLPReturn {
   isLoading: boolean;
-  cantoDex: CantoDexHookReturn;
-  ambient: AmbientHookReturn;
+  pairs: {
+    allCantoDex: CantoDexPairWithUserCTokenData[];
+    userCantoDex: CantoDexPairWithUserCTokenData[];
+    allAmbient: AmbientPool[];
+    userAmbient: AmbientPool[];
+  };
+  rewards: {
+    cantoDex: string;
+    ambient: string;
+    total: string;
+  };
   selection: {
     pair: LPPairType | null;
     setPair: (pairAddress: string | null) => void;
   };
-  claimRewards: () => ReturnWithError<NewTransactionFlow>;
+  transactions: {
+    newCantoDexLPFlow: (
+      txParams: CantoDexTransactionParams
+    ) => NewTransactionFlow;
+    validateCantoDexLPParams: (
+      txParams: CantoDexTransactionParams
+    ) => Validation;
+    newAmbientPoolTxFlow: (
+      txParams: AmbientTransactionParams
+    ) => NewTransactionFlow;
+    validateAmbientPoolTxParams: (
+      txParams: AmbientTransactionParams
+    ) => Validation;
+    newClaimRewardsFlow: () => NewTransactionFlow;
+  };
 }
+
+// combination of canto dex and ambient pools
 export default function useLP(props: UseLPProps): UseLPReturn {
   // grab data from canto dex and ambient
   const cantoDex = useCantoDex(props);
   const ambient = useAmbientPools(props);
 
+  // get user pairs
+  const userCantoDexPairs = cantoDex.pairs.filter(
+    (pair) =>
+      (pair.clmData?.userDetails?.balanceOfCToken !== "0" ||
+        pair.clmData?.userDetails?.balanceOfUnderlying !== "0") &&
+      pair.clmData?.userDetails?.balanceOfCToken !== undefined
+  );
+  const userAmbientPairs = ambient.ambientPools.filter(
+    (pool) => pool.userPositions.length > 0
+  );
+
   // create list with all pairs
   const allPairs: LPPairType[] = [...cantoDex.pairs, ...ambient.ambientPools];
 
   ///
-  /// INTERNAL FUNCTIONS
+  /// SELECTED PAIR STATE
   ///
 
   // state for the pair so that balances can always update
@@ -51,44 +90,53 @@ export default function useLP(props: UseLPProps): UseLPReturn {
     return pair ? NO_ERROR(pair) : NEW_ERROR("Pair not found");
   }
 
+  ///
+  /// TRANSACTIONS
+  ///
+
   // claim rewards flow
-  function claimComboRewardsFlow(): ReturnWithError<NewTransactionFlow> {
-    const params: ClaimDexRewardsParams = {};
-    const clmRewards = cantoDex.position.totalRewards;
-    if (clmRewards !== "0") {
-      params.clmParams = {
-        chainId: props.chainId,
-        ethAccount: props.userEthAddress ?? "",
-        estimatedRewards: clmRewards,
-      };
-    }
-    const ambientRewards = ambient.rewards;
-    if (ambientRewards !== "0") {
-      params.ambientParams = {
-        chainId: props.chainId,
-        ethAccount: props.userEthAddress ?? "",
-        estimatedRewards: ambientRewards,
-      };
-    }
-    if (!params.ambientParams && !params.clmParams) {
-      return NEW_ERROR("No rewards to claim");
-    }
-    return NO_ERROR({
+  function newClaimComboRewardsFlow(): NewTransactionFlow {
+    const userParams = {
+      chainId: props.chainId,
+      ethAccount: props.userEthAddress ?? "",
+    };
+    return {
       title: "Claim Rewards",
       icon: "/icons/canto.svg",
-      txType: TransactionFlowType.CLAIM_LP_REWARDS_TX,
-      params,
-    });
+      txType: TransactionFlowType.LP_COMBO_CLAIM_REWARDS_TX,
+      params: {
+        clmParams: {
+          ...userParams,
+          estimatedRewards: cantoDex.position.totalRewards,
+        },
+        ambientParams: { ...userParams, estimatedRewards: ambient.rewards },
+      },
+    };
   }
 
   return {
     isLoading: cantoDex.isLoading && ambient.isLoading,
-    cantoDex,
-    ambient,
+    pairs: {
+      allCantoDex: cantoDex.pairs,
+      userCantoDex: userCantoDexPairs,
+      allAmbient: ambient.ambientPools,
+      userAmbient: userAmbientPairs,
+    },
+    rewards: {
+      cantoDex: cantoDex.position.totalRewards,
+      ambient: ambient.rewards,
+      total: addTokenBalances(cantoDex.position.totalRewards, ambient.rewards),
+    },
     selection: {
       pair: getPair(selectedPairId ?? "").data,
-      setPair: setSelectedPairId,
+      setPair: (pairAddress: string | null) => setSelectedPairId(pairAddress),
     },
-    claimRewards: claimComboRewardsFlow,
+    transactions: {
+      newAmbientPoolTxFlow: ambient.transaction.newAmbientPoolTxFlow,
+      validateAmbientPoolTxParams: ambient.transaction.validateParams,
+      newCantoDexLPFlow: cantoDex.transaction.newCantoDexLPFlow,
+      validateCantoDexLPParams: cantoDex.transaction.validateParams,
+      newClaimRewardsFlow: newClaimComboRewardsFlow,
+    },
   };
 }

@@ -1,5 +1,5 @@
-//@ts-nocheck
-import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
+// @ts-nocheck
+import { CTokenLendingTxTypes } from "@/transactions/lending/types";
 import {
   cTokenBorrowLimit,
   cTokenWithdrawLimit,
@@ -244,7 +244,11 @@ describe("liquidity limits tests", () => {
     ];
     params.forEach((p) => {
       const { data: maxWithdraw, error: maxWithdrawError } =
-        cTokenWithdrawLimit(p.cToken, p.currentLiquidity, p.percent);
+        cTokenWithdrawLimit(
+          p.cToken,
+          p.currentLiquidity,
+          p.percent
+        );
       if (p.error) {
         expect(maxWithdrawError).not.toBeNull();
         expect(maxWithdraw).toBeNull();

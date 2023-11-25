@@ -1,9 +1,8 @@
 "use client";
 import Button from "@/components/button/button";
 import Text from "@/components/text";
-import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import { maxAmountForLendingTx } from "@/utils/clm/limits.utils";
+import { maxAmountForLendingTx } from "@/utils/clm";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 import styles from "./modal.module.scss";
 import Tabs from "@/components/tabs/tabs";
@@ -13,25 +12,26 @@ import {
   convertToBigNumber,
   displayAmount,
   formatBalance,
-} from "@/utils/tokenBalances.utils";
+} from "@/utils/formatting";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import React, { useState } from "react";
-import { ValidationReturn } from "@/config/interfaces";
+import { Validation } from "@/config/interfaces";
 import Amount from "@/components/amount/amount";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
-import { areEqualAddresses } from "@/utils/address.utils";
-import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
+import { areEqualAddresses } from "@/utils/address";
+import { convertTokenAmountToNote } from "@/utils/math";
+import { CTokenLendingTxTypes } from "@/transactions/lending";
 interface Props {
   isSupplyModal: boolean;
   cToken: CTokenWithUserData | null;
   position: UserLMPosition;
   transaction: {
-    validateAmount: (
+    validateParams: (
       amount: string,
       txType: CTokenLendingTxTypes,
       max: boolean
-    ) => ValidationReturn;
+    ) => Validation;
     performTx: (
       amount: string,
       txType: CTokenLendingTxTypes,
@@ -131,11 +131,11 @@ export const LendingModal = (props: Props) => {
     actionType: CTokenLendingTxTypes,
     position: UserLMPosition,
     transaction: {
-      validateAmount: (
+      validateParams: (
         amount: string,
         txType: CTokenLendingTxTypes,
         max: boolean
-      ) => ValidationReturn;
+      ) => Validation;
       performTx: (
         amount: string,
         txType: CTokenLendingTxTypes,
@@ -156,26 +156,22 @@ export const LendingModal = (props: Props) => {
       maxClicked,
     ];
 
-    // check amount
-    const amountCheck = transaction.validateAmount(...txParams);
+    // check params
+    const paramCheck = transaction.validateParams(...txParams);
 
     // limits
+    const maxAmount = maxAmountForLendingTx(actionType, cToken, position, 100);
+    const limitAmount = maxAmountForLendingTx(actionType, cToken, position, 90);
+    // if withdrawing and nothing is borrowed no need for limit
     const needLimit =
       actionType === CTokenLendingTxTypes.BORROW ||
       (actionType === CTokenLendingTxTypes.WITHDRAW &&
+        Number(limitAmount) <
+          Number(cToken.userDetails?.supplyBalanceInUnderlying) &&
         Number(position.totalBorrow) !== 0);
-    const maxAmount = maxAmountForLendingTx(
-      actionType,
-      cToken,
-      position,
-      needLimit ? 90 : 100
-    );
-    const maxLabel =
-      !needLimit ||
-      (actionType === CTokenLendingTxTypes.WITHDRAW &&
-        maxAmount === cToken.userDetails?.supplyBalanceInUnderlying)
-        ? undefined
-        : "90% limit";
+    const limitProps = needLimit
+      ? { limit: { limit: limitAmount, limitName: "90% limit" } }
+      : {};
 
     return (
       <div className={styles.content}>
@@ -203,10 +199,9 @@ export const LendingModal = (props: Props) => {
           IconUrl={cToken.underlying.logoURI}
           title={cToken.underlying.symbol}
           max={maxAmount}
+          min="1"
           symbol={cToken.underlying.symbol}
-          error={!amountCheck.isValid && Number(amount) !== 0}
-          errorMessage={amountCheck.errorMessage}
-          limitName={maxLabel}
+          {...limitProps}
         />
         <Spacer height="40px" />
 
@@ -226,7 +221,7 @@ export const LendingModal = (props: Props) => {
           <Spacer height="20px" />
           <Button
             width={"fill"}
-            disabled={!amountCheck.isValid}
+            disabled={paramCheck.error}
             onClick={() => transaction.performTx(...txParams)}
           >
             CONFIRM

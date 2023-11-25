@@ -1,9 +1,8 @@
 .container {
   display: grid;
   grid-template-columns: 80px 1fr 1fr;
-  height: 80px;
   animation: fadeIn 0.5s ease-in-out;
-  //   background-color: red;
+  height: 60px;
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -22,7 +21,7 @@
   align-items: center;
 
   img {
-    width: 28px;
+    width: 24px;
   }
 }
 
@@ -75,15 +74,6 @@
 
 .active {
   opacity: 1;
-  //   &::after {
-  //     content: "";
-  //     display: block;
-  //     width: 140%;
-  //     transform: translateX(-15%) scaleX(1);
-  //     height: 10px;
-  //     border: 2px solid var(--primary-dark-color);
-  //     border-top: none;
-  //   }
   position: relative;
   &::before {
     content: "";
@@ -92,7 +82,7 @@
     display: block;
     position: absolute;
     width: 10px;
-    transform: translate(40%, -100%) scale(1, 1);
+    transform: translate(20%, -80%) scale(1, 1);
     height: 10px;
     border-right: 2px solid var(--primary-dark-color);
     border-top: 2px solid var(--primary-dark-color);
@@ -104,18 +94,16 @@
     content: "";
     display: block;
     width: 10px;
-    transform: translate(-40%, 110%) scale(1, 1);
+    transform: translate(-20%, 90%) scale(1, 1);
     height: 10px;
     border-left: 2px solid var(--primary-dark-color);
     border-bottom: 2px solid var(--primary-dark-color);
   }
 }
+
 .wallet-connect {
   display: flex;
-  //   align-items: center;
-  //   width: 100%;
   justify-content: flex-end;
-  //   padding: 12px 30px;
   * {
     font-weight: 400 !important;
   }
@@ -127,4 +115,12 @@
   gap: 20px;
   justify-content: flex-end;
   margin-right: 20px;
+}
+
+.theme {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  width: 76px;
 }

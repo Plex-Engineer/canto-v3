@@ -2,18 +2,14 @@
 import { useCallback, useEffect, useState } from "react";
 import AnimatedBackground from "@/components/animated_background/animatedBackground";
 import Container from "@/components/container/container";
-import Tabs from "@/components/tabs/tabs";
-import styles from "./bridge.module.scss";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
-import { connectToKeplr } from "@/utils/keplr/connectKeplr";
-import {
-  getNetworkInfoFromChainId,
-  isCosmosNetwork,
-} from "@/utils/networks.utils";
+import { connectToKeplr } from "@/utils/keplr";
+import { getNetworkInfoFromChainId, isCosmosNetwork } from "@/utils/networks";
 import Bridging from "./bridging";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
+import Tabs from "@/components/tabs/tabs";
 
 export default function BridgePage() {
   // router info
@@ -75,22 +71,6 @@ export default function BridgePage() {
     bridgeOut.setState("ethAddress", signer?.account.address);
   }, [signer?.account.address]);
 
-  function TxHistory() {
-    return (
-      <>
-        <div className="transaction-list"></div>
-      </>
-    );
-  }
-
-  function TxRecovery() {
-    return (
-      <>
-        <div className="recovery-list"></div>
-      </>
-    );
-  }
-
   return (
     <>
       <AnimatedBackground
@@ -99,20 +79,19 @@ export default function BridgePage() {
         time={20}
       />
       <Container
-        height="100vm"
         layer={1}
-        backgroundColor="background: var(--card-background-color, #C1C1C1)"
         center={{
           horizontal: true,
           vertical: true,
         }}
       >
         <Container
-          height="500px"
           width="700px"
           backgroundColor="var(--card-sub-surface-color, #DFDFDF)"
         >
           <Tabs
+            // height="510px"
+            shadows
             defaultIndex={bridgeDirection() === "in" ? 0 : 1}
             tabs={[
               {

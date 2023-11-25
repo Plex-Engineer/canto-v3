@@ -5,10 +5,10 @@ import {
   errMsg,
 } from "@/config/interfaces";
 import { UserCTokenDetails } from "@/hooks/lending/interfaces/tokens";
-import { isValidEthAddress } from "@/utils/address.utils";
-import { newContractInstance } from "@/utils/evm/helpers.utils";
+import { isValidEthAddress } from "@/utils/address";
+import { newContractInstance } from "@/utils/evm";
 import { CLM_LENS_ABI, COMPTROLLER_ABI } from "@/config/abis";
-import { isCantoChainId } from "@/utils/networks.utils";
+import { isCantoChainId } from "@/utils/networks";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 
 /**

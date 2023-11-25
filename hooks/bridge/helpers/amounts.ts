@@ -1,9 +1,9 @@
 import { BridgeToken } from "../interfaces/tokens";
-import { isOFTToken } from "@/utils/tokens/tokens.utils";
+import { isOFTToken } from "@/utils/tokens";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
-import { estimateOFTSendGasFee } from "../transactions/methods/layerZero";
 import BigNumber from "bignumber.js";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
+import { estimateOFTSendGasFee } from "@/transactions/bridge/layerZero/helpers";
 
 /**
  * Returns the maximum amount of tokens that can be bridged

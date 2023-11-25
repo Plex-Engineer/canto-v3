@@ -4,7 +4,7 @@
   align-items: center;
   max-width: 1200px;
   width: 100%;
-  margin: 2rem auto;
+  margin: 10px auto;
   border-top: 1px solid var(--primary-90-color);
   //   border-bottom: 1px solid var(--primary-90-color);
   position: relative;
@@ -40,7 +40,7 @@
 
 .rewards {
   display: flex;
-  height: 150px;
+  height: 100px;
   width: calc(100% - 2rem);
   padding: 1rem;
   background-color: var(--canto-color);

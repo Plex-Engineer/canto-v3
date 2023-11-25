@@ -7,10 +7,10 @@ import {
 import { getAmbientPoolsFromChainId } from "../config/ambientPools";
 import { AmbientPool, BaseAmbientPool } from "../interfaces/ambientPools";
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
-import { convertTokenAmountToNote } from "@/utils/tokens/tokenMath.utils";
+import { convertTokenAmountToNote } from "@/utils/math";
 import BigNumber from "bignumber.js";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
-import { getTokenPriceInUSDC } from "@/utils/tokens/prices.utils";
+import { getTokenPriceInUSDC } from "@/utils/tokens";
 
 // const for creating all queries to pool
 const poolQueries = (

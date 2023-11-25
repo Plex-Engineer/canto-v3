@@ -4,9 +4,9 @@ import {
   PromiseWithError,
   errMsg,
 } from "@/config/interfaces";
-import { tryFetch } from "@/utils/async.utils";
-import { newContractInstance } from "@/utils/evm/helpers.utils";
-import { isCantoChainId } from "@/utils/networks.utils";
+import { tryFetch } from "@/utils/async";
+import { newContractInstance } from "@/utils/evm";
+import { isCantoChainId } from "@/utils/networks";
 import { getAmbientAddress } from "../config/addresses";
 import { AMBIENT_REWARD_LEDGER_ABI } from "@/config/abis";
 

@@ -1,14 +1,9 @@
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
-import {
-  NEW_ERROR,
-  NO_ERROR,
-  ReturnWithError,
-  errMsg,
-} from "@/config/interfaces";
-import { convertNoteAmountToToken, minOf } from "../tokens/tokenMath.utils";
-import { convertToBigNumber } from "../tokenBalances.utils";
-import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
+import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
+import { convertNoteAmountToToken, minOf } from "../math";
+import { convertToBigNumber } from "../formatting";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
+import { CTokenLendingTxTypes } from "@/transactions/lending/types";
 
 /**
  * @notice Calculates the maximum amount of tokens that can be borrowed
@@ -26,7 +21,7 @@ export function cTokenBorrowLimit(
   const { data: maxTokenBorrow, error: maxTokenBorrowError } =
     convertNoteAmountToToken(currentLiquidity, cToken.price);
   if (maxTokenBorrowError) {
-    return NEW_ERROR(`cTokenBorrowLimit: ${errMsg(maxTokenBorrowError)}`);
+    return NEW_ERROR("cTokenBorrowLimit", maxTokenBorrowError);
   }
   return NO_ERROR(maxTokenBorrow.times(percent).div(100).toString());
 }
@@ -44,46 +39,44 @@ export function cTokenWithdrawLimit(
   currentLiquidity: string,
   percent: number = 100
 ): ReturnWithError<string> {
-  // make sure we have user data
-  if (!cToken.userDetails) {
-    return NEW_ERROR("cTokenWithdrawLimit: no user details");
-  }
-  // first check if token is collateral (if not, then no limit)
-  if (
-    cToken.userDetails?.isCollateral === false ||
-    Number(cToken.collateralFactor) === 0
-  ) {
-    return NO_ERROR(cToken.userDetails.supplyBalanceInUnderlying);
-  }
-  // liquidity change = (tokenAmount * price) * CF
-  // if this is greater than the current liquidity, then the user cannot withdraw
-  // maxWithdraw = (currentLiquidity * (percent/100)) / (CF * price) == amountInToken / CF
-  const { data: bnLiquidity, error: bnLiquidityError } =
-    convertToBigNumber(currentLiquidity);
-  if (bnLiquidityError) {
-    return NEW_ERROR(`cTokenWithdrawLimit: ${errMsg(bnLiquidityError)}`);
-  }
-  const liquidityToUse = bnLiquidity.times(percent).div(100);
+  try {
+    // make sure we have user data
+    if (!cToken.userDetails) throw Error("no user details");
+    // first check if token is collateral or no borrows are present (if not, then no limit)
+    if (
+      cToken.userDetails?.isCollateral === false ||
+      Number(cToken.collateralFactor) === 0
+    ) {
+      return NO_ERROR(cToken.userDetails.supplyBalanceInUnderlying);
+    }
+    // liquidity change = (tokenAmount * price) * CF
+    // if this is greater than the current liquidity, then the user cannot withdraw
+    // maxWithdraw = (currentLiquidity * (percent/100)) / (CF * price) == amountInToken / CF
+    const { data: bnLiquidity, error: bnLiquidityError } =
+      convertToBigNumber(currentLiquidity);
+    if (bnLiquidityError) throw bnLiquidityError;
 
-  const { data: liquidityInToken, error: liquidityInTokenError } =
-    convertNoteAmountToToken(liquidityToUse.toString(), cToken.price);
-  if (liquidityInTokenError) {
-    return NEW_ERROR(`cTokenWithdrawLimit: ${errMsg(liquidityInTokenError)}`);
+    const liquidityToUse = bnLiquidity.times(percent).div(100);
+
+    const { data: liquidityInToken, error: liquidityInTokenError } =
+      convertNoteAmountToToken(liquidityToUse.toString(), cToken.price);
+    if (liquidityInTokenError) throw liquidityInTokenError;
+
+    // get total limit
+    const totalLimit = liquidityInToken
+      .times(10 ** 18)
+      .div(cToken.collateralFactor);
+    // minumum between supplyBalance and totalLimit
+    const { data: userLimit, error: minError } = minOf(
+      totalLimit.toString(),
+      cToken.userDetails.supplyBalanceInUnderlying
+    );
+    if (minError) throw minError;
+    // CF is scaled to 10 ^ 18
+    return NO_ERROR(userLimit);
+  } catch (err) {
+    return NEW_ERROR("cTokenWithdrawLimit", err);
   }
-  // get total limit
-  const totalLimit = liquidityInToken
-    .times(10 ** 18)
-    .div(cToken.collateralFactor);
-  // minumum between supplyBalance and totalLimit
-  const { data: userLimit, error: minError } = minOf(
-    totalLimit.toString(),
-    cToken.userDetails.supplyBalanceInUnderlying
-  );
-  if (minError) {
-    return NEW_ERROR(`cTokenWithdrawLimit: ${errMsg(minError)}`);
-  }
-  // CF is scaled to 10 ^ 18
-  return NO_ERROR(userLimit);
 }
 
 /**

@@ -1,10 +1,6 @@
-import {
-  NEW_ERROR,
-  NO_ERROR,
-  PromiseWithError,
-} from "@/config/interfaces";
-import { tryFetch } from "../async.utils";
-import { getCosmosAPIEndpoint } from "../networks.utils";
+import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
+import { tryFetch } from "../async";
+import { getCosmosAPIEndpoint } from "../networks";
 import { getCosmosTokenBalanceList } from "./cosmosBalance.utils";
 
 interface UserNativeTokensWithIBCPath {
@@ -31,9 +27,7 @@ export async function getUserNativeTokenBalancesWithDenomTraces(
   const { data: allTokens, error: tokenError } =
     await getCosmosTokenBalanceList(chainId, cosmosAddress);
   if (tokenError) {
-    return NEW_ERROR(
-      "getUserNativeTokenBalancesWithDenomTraces::" + tokenError.message
-    );
+    return NEW_ERROR("getUserNativeTokenBalancesWithDenomTraces", tokenError);
   }
   const userTokenList: UserNativeTokensWithIBCPath[] = [];
   await Promise.all(
@@ -72,13 +66,13 @@ async function getIBCPathAndDenomFromNativeDenom(
 ): PromiseWithError<any> {
   const { data: nodeUrl, error: nodeError } = getCosmosAPIEndpoint(chainId);
   if (nodeError) {
-    return NEW_ERROR("getAllNativeTokenBalances: " + nodeError.message);
+    return NEW_ERROR("getAllNativeTokenBalances", nodeError);
   }
   const { data: result, error: fetchError } = await tryFetch<IBCDenomTrace>(
     `${nodeUrl}/ibc/apps/transfer/v1/denom_traces/${denom}`
   );
   if (fetchError) {
-    return NEW_ERROR("getAllNativeTokenBalances: " + fetchError.message);
+    return NEW_ERROR("getAllNativeTokenBalances", fetchError);
   }
   return NO_ERROR(result.denom_trace);
 }

@@ -2,15 +2,14 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
-  errMsg,
-  UserTokenBalances
+  UserTokenBalances,
 } from "@/config/interfaces";
-import { tryFetch } from "../async.utils";
+import { tryFetch } from "../async";
 import {
   getCosmosAPIEndpoint,
   getNetworkInfoFromChainId,
   isCosmosNetwork,
-} from "../networks.utils";
+} from "../networks";
 
 /**
  * @notice gets canto balance from cosmos
@@ -39,7 +38,7 @@ export async function getCosmosTokenBalance(
 ): PromiseWithError<string> {
   const { data: nodeURL, error: urlError } = getCosmosAPIEndpoint(chainId);
   if (urlError) {
-    return NEW_ERROR("getCosmosTokenBalance::" + errMsg(urlError));
+    return NEW_ERROR("getCosmosTokenBalance", urlError);
   }
   const { data: result, error: balanceError } = await tryFetch<{
     balance: { amount: string };
@@ -51,7 +50,7 @@ export async function getCosmosTokenBalance(
       tokenDenom
   );
   if (balanceError) {
-    return NEW_ERROR("getCosmosTokenBalance::" + errMsg(balanceError));
+    return NEW_ERROR("getCosmosTokenBalance", balanceError);
   }
   return NO_ERROR(result.balance.amount);
 }
@@ -66,37 +65,33 @@ export async function getCosmosTokenBalanceList(
   chainId: string,
   cosmosAddress: string
 ): PromiseWithError<UserTokenBalances> {
-  // check to make sure address matches chain
-  const { data: cosmosChain, error: chainError } =
-    getNetworkInfoFromChainId(chainId);
-  if (chainError) {
-    return NEW_ERROR("getCosmosTokenBalanceList::" + chainError.message);
-  }
-  if (!isCosmosNetwork(cosmosChain)) {
-    return NEW_ERROR(
-      "getCosmosTokenBalanceList::Invalid chainId for cosmos: " + chainId
-    );
-  }
+  try {
+    // check to make sure address matches chain
+    const { data: cosmosChain, error: chainError } =
+      getNetworkInfoFromChainId(chainId);
+    if (chainError) throw chainError;
 
-  if (!cosmosChain.checkAddress(cosmosAddress)) {
-    return NEW_ERROR(
-      "getCosmosTokenBalanceList::Invalid address for chain: " + cosmosAddress
-    );
+    if (!isCosmosNetwork(cosmosChain))
+      throw Error("Invalid chainId for cosmos: " + chainId);
+
+    if (!cosmosChain.checkAddress(cosmosAddress))
+      throw Error("Invalid address for chain: " + cosmosAddress);
+
+    // can look for balances of this address now
+    const { data: nodeURL, error: urlError } = getCosmosAPIEndpoint(chainId);
+    if (urlError) throw urlError;
+
+    const { data: result, error: balanceError } = await tryFetch<{
+      balances: { amount: string; denom: string }[];
+    }>(nodeURL + "/cosmos/bank/v1beta1/balances/" + cosmosAddress);
+    if (balanceError) throw balanceError;
+
+    const balances: UserTokenBalances = {};
+    result.balances.forEach((balance) => {
+      balances[balance.denom] = balance.amount;
+    });
+    return NO_ERROR(balances);
+  } catch (err) {
+    return NEW_ERROR("getCosmosTokenBalanceList", err);
   }
-  // can look for balances of this address now
-  const { data: nodeURL, error: urlError } = getCosmosAPIEndpoint(chainId);
-  if (urlError) {
-    return NEW_ERROR("getCosmosTokenBalanceList::" + urlError.message);
-  }
-  const { data: result, error: balanceError } = await tryFetch<{
-    balances: { amount: string; denom: string }[];
-  }>(nodeURL + "/cosmos/bank/v1beta1/balances/" + cosmosAddress);
-  if (balanceError) {
-    return NEW_ERROR("getCosmosTokenBalanceList::" + balanceError.message);
-  }
-  const balances: UserTokenBalances = {};
-  result.balances.forEach((balance) => {
-    balances[balance.denom] = balance.amount;
-  });
-  return NO_ERROR(balances);
 }

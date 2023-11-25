@@ -1,12 +1,12 @@
-import {
-  ReturnWithError,
-  NewTransactionFlow,
-  ValidationReturn,
-} from "@/config/interfaces";
-import { CTokenLendingTransactionParams } from "./lendingTxTypes";
 import { CTokenWithUserData } from "./tokens";
 import { UserLMPosition } from "./userPositions";
 import { LendingMarketType } from "../config/cTokenAddresses";
+import {
+  CLMClaimRewardsTxParams,
+  CTokenLendingTransactionParams,
+} from "@/transactions/lending";
+import { Validation } from "@/config/interfaces";
+import { NewTransactionFlow } from "@/transactions/flows";
 
 export interface LendingHookInputParams {
   chainId: number;
@@ -23,11 +23,12 @@ export interface LendingHookReturn {
     setSelectedCToken: (cTokenAddress: string | null) => void;
   };
   transaction: {
-    validateParams: (
+    validateParams: (txParams: CTokenLendingTransactionParams) => Validation;
+    newLendingFlow: (
       txParams: CTokenLendingTransactionParams
-    ) => ValidationReturn;
-    createNewLendingFlow: (
-      params: CTokenLendingTransactionParams
-    ) => ReturnWithError<NewTransactionFlow>;
+    ) => NewTransactionFlow;
+    newClaimRewardsFlow: (
+      txParams: CLMClaimRewardsTxParams
+    ) => NewTransactionFlow;
   };
 }

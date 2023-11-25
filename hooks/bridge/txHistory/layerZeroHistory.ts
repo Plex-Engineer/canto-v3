@@ -9,7 +9,7 @@ import {
   PromiseWithError,
   errMsg,
 } from "@/config/interfaces";
-import { newContractInstance } from "@/utils/evm/helpers.utils";
+import { newContractInstance } from "@/utils/evm";
 
 // this must be done on each OFT contract
 // TODO: allow list to be passed through, only works for single OFT contract right now

@@ -8,7 +8,7 @@ import {
   convertToBigNumber,
   displayAmount,
   formatBalance,
-} from "@/utils/tokenBalances.utils";
+} from "@/utils/formatting";
 import { useEffect, useState } from "react";
 import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";
@@ -17,13 +17,13 @@ import Container from "@/components/container/container";
 import Image from "next/image";
 import Modal from "@/components/modal/modal";
 import ConfirmationModal from "./components/confirmationModal";
-import { BridgingMethod } from "@/hooks/bridge/interfaces/bridgeMethods";
-import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks.utils";
+import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks";
 import { GetWalletClientResult } from "wagmi/actions";
 import { maxBridgeAmountInUnderlying } from "@/hooks/bridge/helpers/amounts";
 import { BaseNetwork } from "@/config/interfaces";
-import { validateInputTokenAmount } from "@/utils/validation.utils";
+import { validateWeiUserInputTokenAmount } from "@/utils/math";
 import { ETHEREUM_VIA_GRAVITY_BRIDGE } from "@/config/networks";
+import { BridgingMethod } from "@/transactions/bridge";
 
 interface BridgeProps {
   hook: BridgeHookReturn;
@@ -44,11 +44,12 @@ const Bridging = (props: BridgeProps) => {
   ).toString();
 
   // validate user input amount
-  const amountCheck = validateInputTokenAmount(
+  const amountCheck = validateWeiUserInputTokenAmount(
     amountAsBigNumberString,
+    "1",
     maxBridgeAmount,
     props.hook.selections.token?.symbol ?? "",
-    props.hook.selections.token?.decimals
+    props.hook.selections.token?.decimals ?? 0
   );
 
   useEffect(() => {
@@ -70,26 +71,19 @@ const Bridging = (props: BridgeProps) => {
   // transaction that will do the bridging
   async function bridgeTx() {
     // get flow
-    const { data, error } = props.hook.bridge.createNewBridgeFlow({
-      amount: convertToBigNumber(
-        amount,
-        props.hook.selections.token?.decimals ?? 18
-      ).data.toString(),
+    const flow = props.hook.bridge.newBridgeFlow({
+      amount: amountAsBigNumberString,
     });
-    if (error) {
-      console.log(error);
-      return;
-    }
     // add flow to store
     props.params.transactionStore?.addNewFlow({
-      txFlow: data,
+      txFlow: flow,
       signer: props.params.signer,
       onSuccessCallback: () => setIsConfirmationModalOpen(false),
     });
   }
 
   // check to see if bridging will be possible with the current parameters
-  const { data: canBridge } = props.hook.bridge.canBridge({
+  const canBridge = props.hook.bridge.validateParams({
     amount: amountAsBigNumberString,
   });
 
@@ -169,7 +163,7 @@ const Bridging = (props: BridgeProps) => {
             onConfirm: () => {
               bridgeTx();
             },
-            canConfirm: canBridge ?? false,
+            canConfirm: !canBridge.error,
           }}
           extraDetails={
             props.hook.selections.toNetwork?.id ===
@@ -386,8 +380,8 @@ const Bridging = (props: BridgeProps) => {
                     setAmount(val.target.value);
                   }}
                   className={styles["input"]}
-                  error={!amountCheck.isValid && Number(amount) !== 0}
-                  errorMessage={amountCheck.errorMessage}
+                  error={amountCheck.error && Number(amount) !== 0}
+                  errorMessage={amountCheck.error ? amountCheck.reason : ""}
                 />
               </Container>
             </Container>
@@ -411,13 +405,13 @@ const Bridging = (props: BridgeProps) => {
           /> */}
         </div>
 
-        <Spacer height="200px" />
+        <Spacer height="20px" />
         <Button
           width="fill"
           onClick={() => {
             setIsConfirmationModalOpen(true);
           }}
-          disabled={!amountCheck.isValid}
+          disabled={amountCheck.error}
         >
           {props.hook.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
         </Button>

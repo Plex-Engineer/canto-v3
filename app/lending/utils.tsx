@@ -1,19 +1,14 @@
-import { ValidationReturn } from "@/config/interfaces";
+import { TX_PARAM_ERRORS } from "@/config/consts/errors";
+import { Validation } from "@/config/interfaces";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { getCTokensFromType } from "@/hooks/lending/config/cTokenAddresses";
-import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 import useLending from "@/hooks/lending/useLending";
-import { listIncludesAddress } from "@/utils/address.utils";
-import {
-  getCirculatingCNote,
-  getCirculatingNote,
-} from "@/utils/clm/noteStats.utils";
-import {
-  addTokenBalances,
-  convertTokenAmountToNote,
-} from "@/utils/tokens/tokenMath.utils";
+import { CTokenLendingTxTypes } from "@/transactions/lending";
+import { listIncludesAddress } from "@/utils/address";
+import { getCirculatingCNote, getCirculatingNote } from "@/utils/clm";
+import { addTokenBalances, convertTokenAmountToNote } from "@/utils/math";
 import BigNumber from "bignumber.js";
 import { useEffect, useMemo, useState } from "react";
 
@@ -21,6 +16,7 @@ interface LendingComboReturn {
   cTokens: {
     cNote: CTokenWithUserData | undefined;
     rwas: CTokenWithUserData[];
+    stableCoins: CTokenWithUserData[];
   };
   isLoading: boolean;
   clmPosition: {
@@ -42,7 +38,7 @@ interface LendingComboReturn {
       amount: string,
       txType: CTokenLendingTxTypes,
       max: boolean
-    ) => ValidationReturn;
+    ) => Validation;
   };
   selection: {
     selectedCToken: CTokenWithUserData | undefined;
@@ -75,6 +71,11 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
   const rwaAddressList = getCTokensFromType(chainId, "rwas");
   const rwas = cTokens.filter((cToken) =>
     listIncludesAddress(rwaAddressList ?? [], cToken.address)
+  );
+
+  const stableCoinAddressList = getCTokensFromType(chainId, "stableCoins");
+  const stableCoins = cTokens.filter((cToken) =>
+    listIncludesAddress(stableCoinAddressList ?? [], cToken.address)
   );
 
   // relevant user position data to show in UI
@@ -132,20 +133,17 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     max: boolean
   ) {
     if (!selection.selectedCToken || !signer) return;
-    const { data, error } = transaction.createNewLendingFlow({
+    const txFlow = transaction.newLendingFlow({
       chainId: signer.chain.id,
       ethAccount: signer.account.address,
       cToken: selection.selectedCToken,
       amount,
       txType,
       max,
+      userPosition: position,
     });
-    if (error) {
-      console.log(error);
-      return;
-    }
     txStore?.addNewFlow({
-      txFlow: data,
+      txFlow,
       signer,
       onSuccessCallback: props.onSuccessTx,
     });
@@ -154,8 +152,9 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     amount: string,
     txType: CTokenLendingTxTypes,
     max: boolean
-  ): ValidationReturn => {
-    if (!selection.selectedCToken || !signer) return { isValid: false };
+  ): Validation => {
+    if (!selection.selectedCToken || !signer)
+      return { error: true, reason: TX_PARAM_ERRORS.PARAM_MISSING("Signer") };
     return transaction.validateParams({
       chainId: signer.chain.id,
       ethAccount: signer.account.address,
@@ -163,6 +162,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
       amount,
       txType,
       max,
+      userPosition: position,
     });
   };
 
@@ -170,6 +170,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     cTokens: {
       cNote,
       rwas,
+      stableCoins,
     },
     isLoading,
     clmPosition: {

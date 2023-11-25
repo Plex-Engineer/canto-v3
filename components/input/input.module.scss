@@ -2,14 +2,14 @@
   display: flex;
   flex-direction: column;
   position: relative;
-
+  // margin-bottom: 20px;
   section {
     display: flex;
   }
 
   label {
     position: absolute;
-    top: -32px;
+    top: -36px;
   }
   input {
     display: flex;
@@ -60,7 +60,7 @@
 
 .error-message {
   position: absolute;
-  top: 60px;
+  top: 65px;
   left: 2px;
   color: var(--extra-failure-color, #ff0000);
   font-size: 13px;

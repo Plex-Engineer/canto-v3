@@ -1,15 +1,15 @@
 .container {
   display: flex;
-  height: 40px;
+  height: 28px;
   position: fixed;
-  width: 100%;
+  width: calc(100% + 1px);
   background-color: var(--card-background-color);
   bottom: 0;
   z-index: 9;
 
   align-items: center;
   justify-content: space-between;
-  border: 1px solid var(--border-stoke-dark-color, #222);
+  border-top: 1px solid var(--border-stoke-dark-color, #222);
   border-radius: var(--border-radius, 0px);
   .links {
     display: flex;
