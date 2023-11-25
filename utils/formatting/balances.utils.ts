@@ -135,7 +135,7 @@ export function formatBalance(
  * @returns {string} formatted balance
  * @example 1,340,000 -> {shortAmount: "1.34", suffx: "M"}
  */
-function formatBigBalance(amount: string): {
+export function formatBigBalance(amount: string): {
   shortAmount: string;
   suffix: string;
 } {

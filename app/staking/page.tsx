@@ -26,10 +26,10 @@ export default function StakingPage() {
   console.log(isLoading);
   console.log(validators);
   console.log(apr);
+  //console.log((BigNumber(validators[1].tokens).dividedBy(new BigNumber(10).pow(18))).toString());
   // console.log(userStaking);
   // console.log(selection);
   // console.log(transaction);
-
   if(isLoading){
     return(
       <Splash></Splash>
@@ -96,15 +96,24 @@ export default function StakingPage() {
               { value: "Delegators", ratio: 1 },
               { value: "", ratio: 1 },
             ]}
-            content={[...validators.map((validator)=>{
+            content={[...validators.map((validator,index)=>{
               return(
                 [
-                  <Container>Validator Name</Container>,
-                  <Container>{formatBigBalance(validator.tokens).shortAmount + formatBigBalance(validator.tokens).suffix} </Container>,
-                  <Container>{validator.commission}</Container>,
-                  <Container>95%</Container>,
-                  <Container>1000</Container>,
-                  <Container>
+                  <Container key={`name_${index}`}>{validator.description.moniker}</Container>,
+                  <Container key={`tokens_${index}`} direction="row" center={{horizontal: true, vertical:true}} gap="auto">
+                    <Text >{(BigNumber(validator.tokens).dividedBy(new BigNumber(10).pow(18))).toNumber().toFixed(2)  } </Text>
+                    <div>{" "}</div>
+                    <Icon
+                      icon={{
+                        url: "./tokens/canto.svg",
+                        size: 16,
+                      }}
+                    />
+                  </Container>,
+                  <Container key={`commission_${index}`}>{validator.commission}</Container>,
+                  <Container key={`participation_${index}`}>95%</Container>,
+                  <Container key={`delegators_${index}`}>1000</Container>,
+                  <Container key={`button_${index}`}>
                     <Button>DELEGATE</Button>
                   </Container>
 
