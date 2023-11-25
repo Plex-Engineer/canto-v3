@@ -8,8 +8,12 @@ import { clsx } from "clsx";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TransactionModal from "../transactions/TxModal";
 import ThemeButton from "../footer/components/footerButton";
+import { useAutoConnect } from "@/provider/useAutoConnect";
 
 const NavBar = () => {
+  // This is used to connect safe as wallet,
+  // if the app is opened in the safe context.
+  useAutoConnect();
   const currentPath = usePathname();
 
   return (
