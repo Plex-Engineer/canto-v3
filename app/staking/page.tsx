@@ -16,6 +16,7 @@ import Table from "@/components/table/table";
 import Splash from "@/components/splash/splash";
 import { GenerateValidatorTableRow } from "./components/validatorTableRow";
 
+
 export default function StakingPage() {
 
   const {txStore,signer,chainId} = useCantoSigner();
@@ -91,11 +92,11 @@ export default function StakingPage() {
           <Table
                 title=""
                 headers={[
-                  { value: `<Text>hi<Text>`, ratio: 6 },
-                  { value: "Validator Total", ratio: 4 },
-                  { value: "Comission %", ratio: 3 },
-                  { value: "Voting Participation", ratio: 5 },
-                  { value: "Delegators", ratio: 3 },
+                  { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 6 },
+                  { value: <Text opacity={0.4}>Validator Total</Text>, ratio: 4 },
+                  { value: <Text opacity={0.4} font="rm_mono">Commission %</Text>, ratio: 3 },
+                  { value: <Text opacity={0.4} font="rm_mono">Voting Participation</Text>, ratio: 5 },
+                  { value: <Text opacity={0.4} font="rm_mono">Delegators</Text>, ratio: 3 },
                   { value: "", ratio: 4 },
                 ]}
                 content={[...validators.map((validator,index)=>
