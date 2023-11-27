@@ -14,6 +14,7 @@ import BigNumber from "bignumber.js";
 import { formatPercent } from "@/utils/formatting";
 import Table from "@/components/table/table";
 import Splash from "@/components/splash/splash";
+import { GenerateValidatorTableRow } from "./components/validatorTableRow";
 
 export default function StakingPage() {
 
@@ -85,45 +86,23 @@ export default function StakingPage() {
         </div>
 
       </Container>
-      <Container>
-      <Table
-            title=""
-            headers={[
-              { value: "Name", ratio: 2 },
-              { value: "Validator Total", ratio: 1 },
-              { value: "Comission %", ratio: 1 },
-              { value: "Voting Participation", ratio: 1 },
-              { value: "Delegators", ratio: 1 },
-              { value: "", ratio: 1 },
-            ]}
-            content={[...validators.map((validator,index)=>{
-              return(
-                [
-                  <Container key={`name_${index}`}>{validator.description.moniker}</Container>,
-                  <Container key={`tokens_${index}`} direction="row" center={{horizontal: true, vertical:true}} gap="auto">
-                    <Text >{(BigNumber(validator.tokens).dividedBy(new BigNumber(10).pow(18))).toNumber().toFixed(2)  } </Text>
-                    <div>{" "}</div>
-                    <Icon
-                      icon={{
-                        url: "./tokens/canto.svg",
-                        size: 16,
-                      }}
-                    />
-                  </Container>,
-                  <Container key={`commission_${index}`}>{validator.commission}</Container>,
-                  <Container key={`participation_${index}`}>95%</Container>,
-                  <Container key={`delegators_${index}`}>1000</Container>,
-                  <Container key={`button_${index}`}>
-                    <Button>DELEGATE</Button>
-                  </Container>
-
-                ]
-              )
-            }
-
-            )]}
+      <Spacer height="40px"/>
+      <Container width="100%">
+          <Table
+                title=""
+                headers={[
+                  { value: `<Text>hi<Text>`, ratio: 6 },
+                  { value: "Validator Total", ratio: 4 },
+                  { value: "Comission %", ratio: 3 },
+                  { value: "Voting Participation", ratio: 5 },
+                  { value: "Delegators", ratio: 3 },
+                  { value: "", ratio: 4 },
+                ]}
+                content={[...validators.map((validator,index)=>
+                  GenerateValidatorTableRow(validator,index)
+                )]}
             />
-        <div></div>
+          <div></div>
       </Container>
       <h1>Staking Page</h1>
       {/* <BoxedBackground /> */}
