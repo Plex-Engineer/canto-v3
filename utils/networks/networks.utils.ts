@@ -91,6 +91,8 @@ export function getCosmosAPIEndpoint(
         return NO_ERROR(COSMOS_NETWORKS.CANTO_MAINNET_COSMOS.restEndpoint);
       case NETWORKS.CANTO_TESTNET_EVM.chainId:
         return NO_ERROR(COSMOS_NETWORKS.CANTO_TESTNET_COSMOS.restEndpoint);
+      case NETWORKS.GRAVITY_BRIGDE_EVM.chainId:
+        return NO_ERROR(COSMOS_NETWORKS.GRAVITY_BRIDGE.restEndpoint);
       default:
         return NEW_ERROR("getCosmosAPIEndpoint", "Invalid chainId: " + chainId);
     }

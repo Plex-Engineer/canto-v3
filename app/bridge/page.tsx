@@ -98,6 +98,7 @@ export default function BridgePage() {
                 title: "BRIDGE IN",
                 content: (
                   <Bridging
+                    key={"bridge in"}
                     hook={bridgeIn}
                     params={{
                       signer: signer,
@@ -114,6 +115,7 @@ export default function BridgePage() {
                 title: "BRIDGE OUT",
                 content: (
                   <Bridging
+                    key={"bridge out"}
                     hook={bridgeOut}
                     params={{
                       signer: signer,
