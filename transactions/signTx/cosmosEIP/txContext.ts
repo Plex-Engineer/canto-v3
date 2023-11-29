@@ -3,7 +3,7 @@ import { GRAVITY_BRIDGE, GRAVITY_BRIGDE_EVM } from "@/config/networks";
 import { Chain, Sender } from "@/transactions/interfaces";
 import { ethToCantoAddress } from "@/utils/address";
 import { getCantoSenderObj, getGravitySenderObj } from "@/utils/cosmos";
-import { getCosmosChainObject, isCantoChainId } from "@/utils/networks";
+import { getCosmosEIPChainObject, isCantoChainId } from "@/utils/networks";
 import { ethToGravity } from "@gravity-bridge/address-converter";
 
 type Context = {
@@ -35,7 +35,7 @@ async function generateCantoEIP712TxContext(
 
     /** chain object */
     const { data: chainObj, error: chainObjError } =
-      getCosmosChainObject(chainId);
+      getCosmosEIPChainObject(chainId);
     if (chainObjError) throw chainObjError;
 
     /** sender object */
