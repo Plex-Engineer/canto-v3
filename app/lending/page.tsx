@@ -4,7 +4,6 @@ import styles from "./lending.module.scss";
 import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
-
 import { displayAmount, formatPercent } from "@/utils/formatting";
 import { useLendingCombo } from "./utils";
 import Text from "@/components/text";
@@ -48,6 +47,9 @@ export default function LendingPage() {
   const { cNote, rwas, stableCoins } = cTokens;
   const { selectedCToken, setSelectedCToken } = selection;
 
+  if (isLoading) {
+    return <div className={styles.loading}>{""}</div>;
+  }
   return (
     <div className={styles.container}>
       <Text size="x-lg" font="proto_mono" className={styles.title}>
