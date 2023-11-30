@@ -132,11 +132,11 @@ export function validateGravityBridgeOutTxParams(
       reason: TX_PARAM_ERRORS.PARAM_INVALID("token"),
     };
   }
-  // check fees
-  if (txParams.bridgeFee === "0" || txParams.chainFee === "0") {
+  // check chain fee
+  if (txParams.chainFee === "0") {
     return {
       error: true,
-      reason: TX_PARAM_ERRORS.PARAM_INVALID("fees"),
+      reason: TX_PARAM_ERRORS.PARAM_INVALID("chain fee"),
     };
   }
   // check if amount is valid

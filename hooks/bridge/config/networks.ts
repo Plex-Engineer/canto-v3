@@ -28,5 +28,4 @@ export const MAIN_BRIDGE_IN_NETWORKS: BaseNetwork[] = [
 ];
 export const MAIN_BRIDGE_OUT_NETWORKS: BaseNetwork[] = [
   ...MAIN_BRIDGE_IN_NETWORKS,
-  ALL_NETWORKS.ETHEREUM_VIA_GRAVITY_BRIDGE,
 ];
