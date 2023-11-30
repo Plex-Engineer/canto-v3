@@ -48,8 +48,9 @@ export default function LendingPage() {
   const { selectedCToken, setSelectedCToken } = selection;
 
   if (isLoading) {
-    return <div className={styles.loading}>{""}</div>;
+    return <div className={styles.loading}>loading</div>;
   }
+
   return (
     <div className={styles.container}>
       <Text size="x-lg" font="proto_mono" className={styles.title}>
@@ -189,6 +190,22 @@ export default function LendingPage() {
                     precision: 2,
                   }
                 )}
+                postChild={<NoteIcon />}
+              />
+              {/* Item for Total Borrowed */}
+              <Item
+                name="Total Borrowed"
+                value={displayAmount(clmPosition.position.totalBorrow, 18, {
+                  precision: 2,
+                })}
+                postChild={<NoteIcon />}
+              />
+              {/* Item for Total Supplied */}
+              <Item
+                name="Total Supplied"
+                value={displayAmount(clmPosition.position.totalSupply, 18, {
+                  precision: 2,
+                })}
                 postChild={<NoteIcon />}
               />
             </OutlineCard>
