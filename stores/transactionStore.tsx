@@ -325,11 +325,10 @@ const useTransactionStore = create<TransactionStore>()(
             } else {
               txChain = getNetworkInfoFromChainId(tx.tx.chainId);
             }
-            console.log(txChain)
             get().setTxStatus(ethAddress, flowId, txIndex, {
               status: "PENDING",
               hash: txHash,
-              txLink: txChain?.data.blockExplorer?.getTransactionLink(txHash),
+              txLink: txChain?.data?.blockExplorer?.getTransactionLink(txHash),
               timestamp: new Date().getTime(),
             });
             // wait for the result before moving on

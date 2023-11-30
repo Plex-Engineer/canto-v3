@@ -21,9 +21,10 @@ import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks";
 import { GetWalletClientResult } from "wagmi/actions";
 import { maxBridgeAmountInUnderlying } from "@/hooks/bridge/helpers/amounts";
 import { BaseNetwork } from "@/config/interfaces";
-import { validateWeiUserInputTokenAmount } from "@/utils/math";
+import { percentOfAmount, validateWeiUserInputTokenAmount } from "@/utils/math";
 import { ETHEREUM_VIA_GRAVITY_BRIDGE } from "@/config/networks";
 import { BridgingMethod } from "@/transactions/bridge";
+import { getGravityChainFeeInPercent } from "@/transactions/bridge/gravityBridge/gravityFees";
 
 interface BridgeProps {
   hook: BridgeHookReturn;
@@ -36,6 +37,21 @@ const Bridging = (props: BridgeProps) => {
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
   const [maxBridgeAmount, setMaxBridgeAmount] = useState<string>("0");
+
+  // FEES FOR GRAVITY BRIDGE
+  const [gravityChainFeePercent, setGravityChainFeePercent] = useState<
+    number | null
+  >(null);
+  const [gravityBridgeFee, setGravityBridgeFee] = useState<string | null>(null);
+
+  // get gravity chain fee onload
+  useEffect(() => {
+    async function gravityChainFee() {
+      const { data } = await getGravityChainFeeInPercent();
+      setGravityChainFeePercent(data);
+    }
+    gravityChainFee();
+  }, []);
 
   // big number amount
   const amountAsBigNumberString = (
@@ -68,12 +84,20 @@ const Bridging = (props: BridgeProps) => {
     props.hook.selections.token?.balance,
   ]);
 
+  const txParams = {
+    amount: amountAsBigNumberString,
+    bridgeFee: gravityBridgeFee ?? undefined,
+    chainFee:
+      percentOfAmount(
+        amountAsBigNumberString,
+        gravityChainFeePercent ?? 0
+      ).data?.toString() ?? undefined,
+  };
+
   // transaction that will do the bridging
   async function bridgeTx() {
     // get flow
-    const flow = props.hook.bridge.newBridgeFlow({
-      amount: amountAsBigNumberString,
-    });
+    const flow = props.hook.bridge.newBridgeFlow(txParams);
     // add flow to store
     props.params.transactionStore?.addNewFlow({
       txFlow: flow,
@@ -83,9 +107,7 @@ const Bridging = (props: BridgeProps) => {
   }
 
   // check to see if bridging will be possible with the current parameters
-  const canBridge = props.hook.bridge.validateParams({
-    amount: amountAsBigNumberString,
-  });
+  const canBridge = props.hook.bridge.validateParams(txParams);
 
   // if confirmation is open
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -405,6 +427,17 @@ const Bridging = (props: BridgeProps) => {
           /> */}
         </div>
 
+        <Spacer height="20px" />
+        {props.hook.direction === "out" &&
+          props.hook.selections.method === BridgingMethod.GRAVITY_BRIDGE && (
+            <div>
+              chain fee percent: {gravityChainFeePercent}%{" "}
+              {`(${percentOfAmount(
+                amountAsBigNumberString,
+                gravityChainFeePercent ?? 0
+              ).data?.toString()})`}
+            </div>
+          )}
         <Spacer height="20px" />
         <Button
           width="fill"

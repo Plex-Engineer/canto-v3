@@ -115,7 +115,7 @@ export async function gravityBridgeOutTx(
   }
 }
 
-function validateGravityBridgeOutTxParams(
+export function validateGravityBridgeOutTxParams(
   txParams: GravityBridgeOutParams
 ): Validation {
   // check if eth address is valid
@@ -130,6 +130,13 @@ function validateGravityBridgeOutTxParams(
     return {
       error: true,
       reason: TX_PARAM_ERRORS.PARAM_INVALID("token"),
+    };
+  }
+  // check fees
+  if (txParams.bridgeFee === "0" || txParams.chainFee === "0") {
+    return {
+      error: true,
+      reason: TX_PARAM_ERRORS.PARAM_INVALID("fees"),
     };
   }
   // check if amount is valid

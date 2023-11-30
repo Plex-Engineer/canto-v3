@@ -22,6 +22,10 @@ import {
 } from "./layerZero/layerZeroTx";
 import { IBCOutTx, validateIBCOutTxParams } from "./ibc/ibcOutTx";
 import { ibcInKeplr, validateKeplrIBCParams } from "./ibc/ibcInTx";
+import {
+  gravityBridgeOutTx,
+  validateGravityBridgeOutTxParams,
+} from "./gravityBridge/gravityBridgeOut";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging into canto
@@ -35,37 +39,14 @@ export async function cantoBridgeTx(
   switch (txParams.method) {
     case BridgingMethod.GRAVITY_BRIDGE:
       return isCantoChainId(txParams.to.chainId as number)
-        ? await gravityBridgeInTx({
-            ethSender: txParams.from.account,
-            token: txParams.token.data as ERC20Token,
-            amount: txParams.token.amount,
-          })
-        : NEW_ERROR("cantoBridgeTx::Unknown bridging method");
+        ? await gravityBridgeInTx(gbridgeInParams(txParams))
+        : await gravityBridgeOutTx(gbridgeOutParams(txParams));
     case BridgingMethod.LAYER_ZERO:
-      return await bridgeLayerZeroTx({
-        ethSender: txParams.from.account,
-        fromNetworkChainId: txParams.from.chainId as number,
-        toNetworkChainId: txParams.to.chainId as number,
-        token: txParams.token.data as OFTToken,
-        amount: txParams.token.amount,
-      });
+      return await bridgeLayerZeroTx(lzParams(txParams));
     case BridgingMethod.IBC:
       return isCantoChainId(txParams.to.chainId as number)
-        ? await ibcInKeplr({
-            senderCosmosAddress: txParams.from.account,
-            cantoEthReceiverAddress: txParams.to.account,
-            fromNetworkChainId: txParams.from.chainId as string,
-            token: txParams.token.data as IBCToken,
-            amount: txParams.token.amount,
-          })
-        : await IBCOutTx({
-            senderEthAddress: txParams.from.account,
-            receiverCosmosAddress: txParams.to.account,
-            receivingChainId: txParams.to.chainId as string,
-            token: txParams.token.data as IBCToken,
-            amount: txParams.token.amount,
-            convert: true,
-          });
+        ? await ibcInKeplr(keplrIBCParams(txParams))
+        : await IBCOutTx(ibcOutParams(txParams));
     default: {
       return NEW_ERROR(
         "cantoBridgeTx",
@@ -82,37 +63,14 @@ export function validateCantoBridgeTxParams(
   switch (txParams.method) {
     case BridgingMethod.GRAVITY_BRIDGE:
       return isCantoChainId(txParams.to.chainId as number)
-        ? validateGravityBridgeInTxParams({
-            ethSender: txParams.from.account,
-            token: txParams.token.data as ERC20Token,
-            amount: txParams.token.amount,
-          })
-        : { error: true, reason: "Invalid method" };
+        ? validateGravityBridgeInTxParams(gbridgeInParams(txParams))
+        : validateGravityBridgeOutTxParams(gbridgeOutParams(txParams));
     case BridgingMethod.LAYER_ZERO:
-      return validateLayerZeroTxParams({
-        ethSender: txParams.from.account,
-        fromNetworkChainId: txParams.from.chainId as number,
-        toNetworkChainId: txParams.to.chainId as number,
-        token: txParams.token.data as OFTToken,
-        amount: txParams.token.amount,
-      });
+      return validateLayerZeroTxParams(lzParams(txParams));
     case BridgingMethod.IBC:
       return isCantoChainId(txParams.to.chainId as number)
-        ? validateKeplrIBCParams({
-            senderCosmosAddress: txParams.from.account,
-            cantoEthReceiverAddress: txParams.to.account,
-            fromNetworkChainId: txParams.from.chainId as string,
-            token: txParams.token.data as IBCToken,
-            amount: txParams.token.amount,
-          })
-        : validateIBCOutTxParams({
-            senderEthAddress: txParams.from.account,
-            receiverCosmosAddress: txParams.to.account,
-            receivingChainId: txParams.to.chainId as string,
-            token: txParams.token.data as IBCToken,
-            amount: txParams.token.amount,
-            convert: true,
-          });
+        ? validateKeplrIBCParams(keplrIBCParams(txParams))
+        : validateIBCOutTxParams(ibcOutParams(txParams));
     default: {
       return {
         error: true,
@@ -136,3 +94,39 @@ export async function getBridgeStatus(
       return NEW_ERROR("getBridgeStatus::Unknown bridging method");
   }
 }
+
+// FORMATTERS
+const gbridgeInParams = (txParams: BridgeTransactionParams) => ({
+  ethSender: txParams.from.account,
+  token: txParams.token.data as ERC20Token,
+  amount: txParams.token.amount,
+});
+const gbridgeOutParams = (txParams: BridgeTransactionParams) => ({
+  ethSender: txParams.from.account,
+  token: txParams.token.data as IBCToken,
+  amount: txParams.token.amount,
+  bridgeFee: txParams.gravityBridgeFees?.bridgeFee ?? "0",
+  chainFee: txParams.gravityBridgeFees?.chainFee ?? "0",
+});
+const lzParams = (txParams: BridgeTransactionParams) => ({
+  ethSender: txParams.from.account,
+  fromNetworkChainId: txParams.from.chainId as number,
+  toNetworkChainId: txParams.to.chainId as number,
+  token: txParams.token.data as OFTToken,
+  amount: txParams.token.amount,
+});
+const keplrIBCParams = (txParams: BridgeTransactionParams) => ({
+  senderCosmosAddress: txParams.from.account,
+  cantoEthReceiverAddress: txParams.to.account,
+  fromNetworkChainId: txParams.from.chainId as string,
+  token: txParams.token.data as IBCToken,
+  amount: txParams.token.amount,
+});
+const ibcOutParams = (txParams: BridgeTransactionParams) => ({
+  senderEthAddress: txParams.from.account,
+  receiverCosmosAddress: txParams.to.account,
+  receivingChainId: txParams.to.chainId as string,
+  token: txParams.token.data as IBCToken,
+  amount: txParams.token.amount,
+  convert: true,
+});
