@@ -15,9 +15,16 @@ import { formatPercent } from "@/utils/formatting";
 import Table from "@/components/table/table";
 import Splash from "@/components/splash/splash";
 import { GenerateValidatorTableRow } from "./components/validatorTableRow";
+import { useState } from "react";
+import { StakingModal } from "./components/stakingModal/StakingModal";
+import { Validator } from "@/hooks/staking/interfaces/validators";
+import Modal from "@/components/modal/modal";
 
 
 export default function StakingPage() {
+
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [selectedValidator, setSelectedValidator] = useState<Validator | null>(null);
 
   const {txStore,signer,chainId} = useCantoSigner();
 
@@ -25,13 +32,29 @@ export default function StakingPage() {
     chainId: chainId,
     userEthAddress: signer?.account.address,
   });
-  console.log(isLoading);
-  console.log(validators);
-  console.log(apr);
+  //console.log(isLoading);
+  //console.log(validators);
+  //console.log(apr);
+  //console.log(userStaking);
   //console.log((BigNumber(validators[1].tokens).dividedBy(new BigNumber(10).pow(18))).toString());
   // console.log(userStaking);
   // console.log(selection);
   // console.log(transaction);
+  if(validators){
+    validators.sort((a, b) => {
+      // Convert the string representation of tokens to BigInt
+      let tokensA = BigInt(a.tokens);
+      let tokensB = BigInt(b.tokens);
+    
+      // Compare the BigInt values
+      if (tokensA < tokensB) return 1;
+      if (tokensA > tokensB) return -1;
+      return 0;
+    });
+  }
+  function handleClick(validator: Validator){
+    setSelectedValidator(validator);
+  }
   if(isLoading){
     return(
       <Splash></Splash>
@@ -100,13 +123,20 @@ export default function StakingPage() {
                   { value: "", ratio: 4 },
                 ]}
                 content={[...validators.map((validator,index)=>
-                  GenerateValidatorTableRow(validator,index)
+                  GenerateValidatorTableRow(validator,index,()=>handleClick(validator))
                 )]}
             />
           <div></div>
       </Container>
       <h1>Staking Page</h1>
       {/* <BoxedBackground /> */}
+      <Modal width="40%" onClose={()=>{}} title={selectedValidator?.description.moniker} 
+            closeOnOverlayClick={false}
+            open={selectedValidator!=null}
+        >
+          <StakingModal validator={selectedValidator} signer= {signer}></StakingModal>
+      </Modal>
+      
 
       
     </div>

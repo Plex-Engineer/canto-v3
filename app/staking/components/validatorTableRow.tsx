@@ -7,7 +7,7 @@ import BigNumber from "bignumber.js";
 import Text from "@/components/text";
 import { formatBalance } from "@/utils/formatting";
 
-export const GenerateValidatorTableRow = (validator: Validator, index: number)=>
+export const GenerateValidatorTableRow = (validator: Validator, index: number, onDelegate: (validator: Validator)=>void)=>
         [
             <Container key={`name_${index}`}><Text font="rm_mono">{validator.description.moniker}</Text></Container>,
                   <Container key={`tokens_${index}`} direction="row" center={{horizontal: true, vertical:true}} gap="auto">
@@ -24,6 +24,6 @@ export const GenerateValidatorTableRow = (validator: Validator, index: number)=>
                   <Container key={`participation_${index}`}><Text font="rm_mono">95%</Text></Container>,
                   <Container key={`delegators_${index}`}><Text font="rm_mono">1000</Text></Container>,
                   <Container key={`button_${index}`}>
-                    <Button>DELEGATE</Button>
+                    <Button onClick={()=>onDelegate(validator)}>DELEGATE</Button>
                   </Container>
         ];

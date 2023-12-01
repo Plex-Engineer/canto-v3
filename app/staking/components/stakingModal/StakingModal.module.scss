@@ -1,0 +1,19 @@
+.modalContainer{
+    display: flex;
+    flex-direction: column;
+}
+
+.spacer{
+    border-bottom: 1px solid gray;
+}
+
+.modalInfoRow{
+    display: flex;
+    //padding: auto;
+    flex-direction: row !important;
+    justify-content:space-between;
+}
+.buttonContainer{
+    display: flex;
+    justify-content: center;
+}
