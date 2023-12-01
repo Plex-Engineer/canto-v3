@@ -1,9 +1,46 @@
 import { OFT_ABI } from "@/config/abis";
-import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
+import {
+  NEW_ERROR,
+  NO_ERROR,
+  OFTToken,
+  PromiseWithError,
+} from "@/config/interfaces";
 import { newContractInstance } from "@/utils/evm";
 import BigNumber from "bignumber.js";
 import { encodePacked } from "web3-utils";
 import Web3 from "web3";
+import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
+import { ZERO_ADDRESS } from "@/config/consts/addresses";
+
+/**
+ * @notice estimates the gas fee for sending OFT (general)
+ * @param {OFTToken} token OFT token
+ * @param {string} receivingChainId chain id of the network to send to
+ * @returns {PromiseWithError<BigNumber>} gas fee for sending OFT or error
+ */
+export async function estimateOFTGasFeeFromTokenAndReceivingChainId(
+  token: OFTToken | null,
+  receivingChainId?: string
+): PromiseWithError<BigNumber> {
+  if (!token || !receivingChainId)
+    return NEW_ERROR(
+      "estimateOFTGasFeeFromTokenAndReceivingChainId: invalid token or receiving chain id"
+    );
+  const toLZChainId =
+    LZ_CHAIN_IDS[receivingChainId as keyof typeof LZ_CHAIN_IDS];
+  if (!toLZChainId)
+    return NEW_ERROR(
+      "estimateOFTGasFeeFromTokenAndReceivingChainId: invalid receiving chain id"
+    );
+  return await estimateOFTSendGasFee(
+    token.chainId,
+    toLZChainId,
+    token.address,
+    ZERO_ADDRESS,
+    new BigNumber(1).multipliedBy(10 ** token.decimals).toString(),
+    [1, 200000]
+  );
+}
 
 /**
  * @notice estimates the gas fee for sending OFT

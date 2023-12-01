@@ -9,7 +9,7 @@ import {
   displayAmount,
   formatBalance,
 } from "@/utils/formatting";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";
 import Input from "@/components/input/input";
@@ -19,12 +19,14 @@ import Modal from "@/components/modal/modal";
 import ConfirmationModal from "./components/confirmationModal";
 import { isCosmosNetwork, isEVMNetwork } from "@/utils/networks";
 import { GetWalletClientResult } from "wagmi/actions";
-import { maxBridgeAmountInUnderlying } from "@/hooks/bridge/helpers/amounts";
+import { maxBridgeAmountForToken } from "@/hooks/bridge/helpers/amounts";
 import { BaseNetwork } from "@/config/interfaces";
 import { validateWeiUserInputTokenAmount } from "@/utils/math";
 import { BridgingMethod } from "@/transactions/bridge";
 import useGravityFees from "@/hooks/bridge/useGravityFees";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
+import { estimateOFTGasFeeFromTokenAndReceivingChainId } from "@/transactions/bridge/layerZero/helpers";
+import { isOFTToken } from "@/utils/tokens";
 
 interface BridgeProps {
   hook: BridgeHookReturn;
@@ -36,7 +38,6 @@ interface BridgeProps {
 const Bridging = (props: BridgeProps) => {
   // STATES FOR BRIDGE
   const [amount, setAmount] = useState<string>("");
-  const [maxBridgeAmount, setMaxBridgeAmount] = useState<string>("0");
   const { token, fromNetwork, toNetwork, method } = props.hook.selections;
   const { addresses, direction } = props.hook;
 
@@ -45,12 +46,52 @@ const Bridging = (props: BridgeProps) => {
     convertToBigNumber(amount, token?.decimals ?? 18).data ?? "0"
   ).toString();
 
-  // gravity bridge fees state
+  // FEES
+  const [lzGasFee, setLzGasFee] = useState<string>("0");
+  // set lzFee when lz method is selected
+  useEffect(() => {
+    async function getLZFee() {
+      if (method === BridgingMethod.LAYER_ZERO && isOFTToken(token)) {
+        const { data: gas, error } =
+          await estimateOFTGasFeeFromTokenAndReceivingChainId(
+            token,
+            toNetwork?.id
+          );
+        if (error) {
+          console.log(error);
+          setLzGasFee("0");
+        } else {
+          setLzGasFee(gas.toString());
+        }
+      } else {
+        setLzGasFee("0");
+      }
+    }
+    getLZFee();
+  }, [method, toNetwork?.id, token]);
+
+  // gravity bridge fees state (only pass in token if gbridge)
   const gravityFees = useGravityFees({
-    balance: token?.balance,
+    token: method === BridgingMethod.GRAVITY_BRIDGE ? token : null,
     amount: amountAsBigNumberString,
-    address: token?.address,
   });
+
+  const maxBridgeAmount = useMemo(
+    () =>
+      maxBridgeAmountForToken(direction, token, method, {
+        lzFee: lzGasFee,
+        gravityChainFeePercent: gravityFees.chainFee.percent ?? undefined,
+        gravityBridgeFee: gravityFees.bridgeFee.selectedFee,
+      }),
+    [
+      direction,
+      token,
+      method,
+      lzGasFee,
+      gravityFees.chainFee.percent,
+      gravityFees.bridgeFee.selectedFee,
+    ]
+  );
 
   // validate user input amount
   const amountCheck = validateWeiUserInputTokenAmount(
@@ -61,23 +102,10 @@ const Bridging = (props: BridgeProps) => {
     token?.decimals ?? 0
   );
 
-  useEffect(() => {
-    async function getMaxAmount() {
-      const needGravityFees =
-        direction === "out" && method === BridgingMethod.GRAVITY_BRIDGE;
-      setMaxBridgeAmount(
-        needGravityFees
-          ? gravityFees.maxBridgeAmount
-          : await maxBridgeAmountInUnderlying(token, toNetwork?.id ?? "")
-      );
-    }
-    getMaxAmount();
-  }, [direction, method, gravityFees.maxBridgeAmount, token, toNetwork?.id]);
-
   const txParams = {
     amount: amountAsBigNumberString,
-    bridgeFee: gravityFees.selectedBridgeFee ?? undefined,
-    chainFee: gravityFees.chainFee ?? undefined,
+    bridgeFee: gravityFees.bridgeFee.selectedFee,
+    chainFee: gravityFees.chainFee.amount ?? undefined,
   };
 
   // transaction that will do the bridging
@@ -365,26 +393,30 @@ const Bridging = (props: BridgeProps) => {
                 <div>
                   {" "}
                   chain fee:{" "}
-                  {displayAmount(gravityFees.chainFee, token?.decimals ?? 0, {
-                    symbol: token?.symbol,
-                  })}{" "}
+                  {displayAmount(
+                    gravityFees.chainFee.amount ?? "0",
+                    token?.decimals ?? 0,
+                    {
+                      symbol: token?.symbol,
+                    }
+                  )}{" "}
                 </div>
                 bridge fee:
                 <ToggleGroup
                   options={
-                    gravityFees.bridgeFeeOptions
+                    gravityFees.bridgeFee.options
                       ? [
                           "0",
-                          ...Object.values(gravityFees.bridgeFeeOptions),
+                          ...Object.values(gravityFees.bridgeFee.options),
                         ].map((fee) => displayAmount(fee, token?.decimals ?? 0))
                       : []
                   }
                   selected={displayAmount(
-                    gravityFees.selectedBridgeFee ?? "0",
+                    gravityFees.bridgeFee.selectedFee ?? "0",
                     token?.decimals ?? 0
                   )}
                   setSelected={(fee) =>
-                    gravityFees.setSelectedBridgeFee(
+                    gravityFees.bridgeFee.setSelectedFee(
                       convertToBigNumber(
                         fee,
                         token?.decimals ?? 0
