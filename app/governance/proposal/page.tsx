@@ -19,6 +19,7 @@ import { TransactionFlowType } from "@/config/transactions/txMap";
 import { formatBalance } from "@/utils/formatting/balances.utils";
 import Container from "@/components/container/container";
 import { RadioButton} from "../components/RadioButton/RadioButton";
+import { VotingInfoBox } from "../components/VotingInfoBox/VotingInfoBox";
 
 
 
@@ -149,11 +150,44 @@ export default function Page() {
       </div>
       <div className={styles.proposalCardContainer2}>
        <div className={styles.proposalInfoBoxVoting}>
-        <div className={styles.proposalInfoRow1}>
-          { isActive && <div className={styles.radioBtnContainer}><RadioButton value={VoteOption.YES} isActive={isActive} 
+          <div className={styles.proposalInfoRow1}>
+            <VotingInfoBox isActive={isActive} value={VoteOption.YES} selectedVote={selectedVote} votesData={votesData} 
+            isSelected={selectedVote==VoteOption.YES} color1="#06FC99" color2="#AFE0CC" onClick={()=>setSelectedVote(VoteOption.YES)}
+            ></VotingInfoBox>
+          
+            
+            <VotingInfoBox isActive={isActive} value={VoteOption.NO} selectedVote={selectedVote} votesData={votesData}
+            isSelected={selectedVote==VoteOption.NO} color1="#FC5151" color2="#F2877A" onClick={()=>setSelectedVote(VoteOption.NO)}
+            ></VotingInfoBox>
+          </div>
+            
+            
+
+            <div className={styles.proposalInfoRow1}>
+              <VotingInfoBox isActive={isActive} value={VoteOption.VETO} selectedVote={selectedVote} votesData={votesData}
+              isSelected={selectedVote==VoteOption.VETO} color1="#4455EF" color2="#7E86D9" onClick={()=>setSelectedVote(VoteOption.VETO)}
+              ></VotingInfoBox>
+              <VotingInfoBox isActive={isActive} value={VoteOption.ABSTAIN} selectedVote={selectedVote} votesData={votesData}
+              isSelected={selectedVote==VoteOption.ABSTAIN} color1="#6F6969" color2="lightgray" onClick={()=>setSelectedVote(VoteOption.ABSTAIN)}
+              ></VotingInfoBox>
+
+            </div>
+        </div>
+        <div className={styles.VotingButton}>
+          <Button width={400} disabled={!isActive} onClick={()=>castVote(proposal.proposal_id, selectedVote)}>Vote</Button>
+          {/* {!isActive && <span className={styles.tooltip}>The Proposal is not Active</span>} */}
+        </div>
+      </div>
+    </div>
+  </div>)
+  );
+
+
+  {/* <div className={styles.proposalInfoVoting}>
+
+            { isActive && <div className={styles.radioBtnContainer}><RadioButton value={VoteOption.YES} isActive={isActive} 
           onClick={() => setSelectedVote(VoteOption.YES)} selectedValue={selectedVote} checkedColor="lightgreen"></RadioButton> </div>   
               }
-            <div className={styles.proposalInfoVoting}>
             
             
               <div className={styles.votingInfoRow1}>
@@ -164,7 +198,7 @@ export default function Page() {
                 
               </div>
               <div className={styles.votingInfoRow2}>
-                  <div className={styles.infoRow1First}><Text font="proto_mono">{votesData.yes}%</Text></div>
+                  <div className={styles.infoRow1First}><Text font="proto_mono">{votesData.Yes}%</Text></div>
                   <div className={styles.infoRow1First}>
                         <Container
                             direction="row"
@@ -173,7 +207,7 @@ export default function Page() {
                               vertical: true,
                             }}
                           >
-                            <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.yesAmount, 2, {
+                            <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.YesAmount, 2, {
                               commify: true,
                             })}</Text>
                             <Icon
@@ -189,132 +223,7 @@ export default function Page() {
               
               
 
-            </div>
-            { isActive && <div className={styles.radioBtnContainer}><RadioButton value={VoteOption.NO} isActive={isActive} 
-          onClick={() => setSelectedVote(VoteOption.NO)} selectedValue={selectedVote} checkedColor="red"></RadioButton></div>    }
-              
-          <div className={styles.proposalInfoVoting}>
-            
-            
-            <div className={styles.votingInfoRow1}>
-            
-           
-              <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "#FC5151", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">No</Text></div></div>
-              
-            </div>
-            <div className={styles.votingInfoRow2}>
-                <div className={styles.infoRow1First}><Text font="proto_mono">{votesData.no}%</Text></div>
-                <div className={styles.infoRow1First}>
-                      <Container
-                          direction="row"
-                          gap={6}
-                          center={{
-                            vertical: true,
-                          }}
-                        >
-                          <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.noAmount, 2, {
-                            commify: true,
-                          })}</Text>
-                          <Icon
-                            icon={{
-                              url: "/tokens/canto.svg",
-                              size: 16,
-                            }}
-                          />
-
-                        </Container>
-                  </div>
-            </div>
-          </div>
-
-        </div>
-            
-            
-
-        <div className={styles.proposalInfoRow1}>
-          { isActive && <div className={styles.radioBtnContainer}><RadioButton value={VoteOption.VETO} isActive={isActive} 
-          onClick={() => setSelectedVote(VoteOption.VETO)} selectedValue={selectedVote} checkedColor="#4455EF"></RadioButton></div>}
-
-          <div className={styles.proposalInfoVoting}>
-            
-            
-            <div className={styles.votingInfoRow1}>
-            
-           
-              <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "#4455EF", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Veto</Text></div></div>
-              
-            </div>
-            <div className={styles.votingInfoRow2}>
-                <div className={styles.infoRow1First}><Text font="proto_mono">{votesData.no_with_veto}%</Text></div>
-                <div className={styles.infoRow1First}>
-                      <Container
-                          direction="row"
-                          gap={6}
-                          center={{
-                            vertical: true,
-                          }}
-                        >
-                          <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.no_with_vetoAmount, 2, {
-                            commify: true,
-                          })}</Text>
-                          <Icon
-                            icon={{
-                              url: "/tokens/canto.svg",
-                              size: 16,
-                            }}
-                          />
-
-                        </Container>
-                  </div>
-            </div>
-          </div>
-            { isActive && <div className={styles.radioBtnContainer}><RadioButton value={VoteOption.ABSTAIN} isActive={isActive} 
-          onClick={() => setSelectedVote(VoteOption.ABSTAIN)} selectedValue={selectedVote} checkedColor="rgb(67, 64, 64)"></RadioButton></div>}
-          <div className={styles.proposalInfoVoting}>
-            
-            
-            <div className={styles.votingInfoRow1}>
-            
-           
-              <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: "rgb(67, 64, 64)", margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">Abstain</Text></div></div>
-              
-            </div>
-            <div className={styles.votingInfoRow2}>
-                <div className={styles.infoRow1First}><Text font="proto_mono">{votesData.abstain}%</Text></div>
-                <div className={styles.infoRow1First}>
-                      <Container
-                          direction="row"
-                          gap={6}
-                          center={{
-                            vertical: true,
-                          }}
-                        >
-                          <Text font="proto_mono" opacity={0.4} size="x-sm">{formatBalance(votesData.abstainAmount, 2, {
-                            commify: true,
-                          })}</Text>
-                          <Icon
-                            icon={{
-                              url: "/tokens/canto.svg",
-                              size: 16,
-                            }}
-                          />
-
-                        </Container>
-                  </div>
-            </div>
-          </div>
-            
-            
-        </div>
-        </div>
-        <div className={styles.VotingButton}>
-          <Button width={400} disabled={!isActive} onClick={()=>castVote(proposal.proposal_id, selectedVote)}>Vote</Button>
-          {/* {!isActive && <span className={styles.tooltip}>The Proposal is not Active</span>} */}
-        </div>
-      </div>
-    </div>
-  </div>)
-  );
+            </div> */}
   
 
   

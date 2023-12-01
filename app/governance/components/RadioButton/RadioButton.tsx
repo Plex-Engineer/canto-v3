@@ -12,9 +12,21 @@ interface Props{
   checkedColor : string
 }
 
+
+
 export const RadioButton = (props:Props) => {
     const isSelected = (props.value == props.selectedValue);
+
+    console.log(props.value);
+    console.log(props.selectedValue);
     
+    const getStyles = () => {
+        if(props.selectedValue == props.value){
+            return {backgroundColor: props.checkedColor}
+        }else{
+            return {};
+        }
+    }
     const handleClick = () => {
         if(props.isActive) {
             props.onClick();
@@ -25,7 +37,8 @@ export const RadioButton = (props:Props) => {
         <div 
             className={styles.radioBtn2}
             onClick={handleClick}
-            style={{ backgroundColor: isSelected && props.isActive ? props.checkedColor : 'transparent' }}
+            style={getStyles()}
+            // style={{ backgroundColor: isSelected && props.isActive ? props.checkedColor : 'transparent' }}
         >
         </div>
     );

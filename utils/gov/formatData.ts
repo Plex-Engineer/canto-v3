@@ -79,15 +79,15 @@ interface FinalTallyResult {
     no_with_veto: string;
   }
   
-  interface VoteData {
-    yesAmount: string,
-    noAmount: string,
-    abstainAmount: string,
-    no_with_vetoAmount: string,
-    yes: string;
-    abstain: string;
-    no: string;
-    no_with_veto: string;
+  export interface VoteData {
+    YesAmount: string,
+    NoAmount: string,
+    AbstainAmount: string,
+    VetoAmount: string,
+    Yes: string;
+    Abstain: string;
+    No: string;
+    Veto: string;
   }
 
 export function calculateVotePercentages(finalTallyResult: FinalTallyResult): VoteData {
@@ -112,14 +112,14 @@ export function calculateVotePercentages(finalTallyResult: FinalTallyResult): Vo
 
   if(totalVotesBigInt==0n){
     return {
-        yesAmount: "0",
-        noAmount: "0",
-        abstainAmount: "0",
-        no_with_vetoAmount: "0",
-        yes: "0",
-        abstain: "0",
-        no: "0",
-        no_with_veto: "0",
+        YesAmount: "0",
+        NoAmount: "0",
+        AbstainAmount: "0",
+        VetoAmount: "0",
+        Yes: "0",
+        Abstain: "0",
+        No: "0",
+        Veto: "0",
       };
   }
   
@@ -136,14 +136,14 @@ export function calculateVotePercentages(finalTallyResult: FinalTallyResult): Vo
   const noWithVetoString = noWithVetoNumber.toFixed(2);
 
   return {
-    yesAmount: yesString,
-    noAmount: noString,
-    abstainAmount: abstainString,
-    no_with_vetoAmount: noWithVetoString,
-    yes: yesPercentage,
-    abstain: abstainPercentage,
-    no: noPercentage,
-    no_with_veto: noWithVetoPercentage,
+    YesAmount: yesString,
+    NoAmount: noString,
+    AbstainAmount: abstainString,
+    VetoAmount: noWithVetoString,
+    Yes: yesPercentage,
+    Abstain: abstainPercentage,
+    No: noPercentage,
+    Veto: noWithVetoPercentage,
   };
 }
 
