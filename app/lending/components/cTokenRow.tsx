@@ -131,9 +131,7 @@ export const StableCoinRow = ({
       theme="primary-dark"
       key={cStableCoin.name + "cToken.supplyApy"}
     >
-      {`${(Number(cStableCoin.supplyApy) + Number(cStableCoin.distApy)).toFixed(
-        2
-      )}%`}
+      {`${Number(cStableCoin.supplyApy)}%`}
     </Text>
     <InfoPop>
       <Container gap={6}>
