@@ -4,7 +4,6 @@ import styles from "./lending.module.scss";
 import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
-
 import { displayAmount, formatPercent } from "@/utils/formatting";
 import { useLendingCombo } from "./utils";
 import Text from "@/components/text";
@@ -47,6 +46,10 @@ export default function LendingPage() {
   });
   const { cNote, rwas, stableCoins } = cTokens;
   const { selectedCToken, setSelectedCToken } = selection;
+
+  if (isLoading) {
+    return <div className={styles.loading}>loading</div>;
+  }
 
   return (
     <div className={styles.container}>
@@ -189,6 +192,22 @@ export default function LendingPage() {
                     precision: 2,
                   }
                 )}
+                postChild={<NoteIcon />}
+              />
+              {/* Item for Total Borrowed */}
+              <Item
+                name="Total Borrowed"
+                value={displayAmount(clmPosition.position.totalBorrow, 18, {
+                  precision: 2,
+                })}
+                postChild={<NoteIcon />}
+              />
+              {/* Item for Total Supplied */}
+              <Item
+                name="Total Supplied"
+                value={displayAmount(clmPosition.position.totalSupply, 18, {
+                  precision: 2,
+                })}
                 postChild={<NoteIcon />}
               />
             </OutlineCard>
