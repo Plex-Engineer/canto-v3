@@ -5,7 +5,7 @@ interface Props {
   title?: string;
   secondary?: React.ReactNode;
   headers: {
-    value: string;
+    value: string | React.ReactNode;
     ratio: number;
   }[];
   content: React.ReactNode[][];

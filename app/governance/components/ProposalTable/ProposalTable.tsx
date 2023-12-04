@@ -8,6 +8,8 @@ import Button from '@/components/button/button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ToggleGroup from '@/components/groupToggle/ToggleGroup';
+import Table from '@/components/table/table';
+import Container from '@/components/container/container';
 
 
 
@@ -94,32 +96,58 @@ const ProposalTable = ({ proposals }:TableProps) => {
       </div>
       {/* <Filter onFilterChange={handleFilterChange} currentFilter={currentFilter} /> */}
       {(filteredProposals.length==0 || !filteredProposals) ? <div className={styles.table}><div className={styles.noProposalContainer}><Text font="proto_mono"> No {currentFilter} Proposals Available </Text></div></div> : 
-        <table className={styles.table}>
-        <thead>
-          <tr key='proposalTableHeader'>
-            <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>ID</Text></th>
-            <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Title</Text></th>
-            <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Status</Text></th>
-            <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Type</Text></th>
-            <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Voting Date</Text></th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedProposals.map((proposal,index) => (
+      //   <table className={styles.table}>
+      //   <thead>
+      //     <tr key='proposalTableHeader'>
+      //       <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>ID</Text></th>
+      //       <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Title</Text></th>
+      //       <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Status</Text></th>
+      //       <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Type</Text></th>
+      //       <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Voting Date</Text></th>
+      //     </tr>
+      //   </thead>
+      //   <tbody>
+      //     {paginatedProposals.map((proposal,index) => (
           
-            <tr className={styles.row} key={proposal.proposal_id} onClick={()=>handleRowClick(proposal.proposal_id)}
-            style={{ cursor: 'pointer' }}>
-              <td className={styles.tableData}><Text font="rm_mono" size='sm'>{proposal.proposal_id}</Text></td>
-              <td className={styles.tableTitleColumn}><Text font="rm_mono" size='sm' className={styles.rowTitle}>{proposal.title}</Text></td>
-              <td className={styles.tableData}><Text font="rm_mono" size='sm'>{formatProposalStatus(proposal.status)}</Text></td>
-              <td className={styles.tableData}><Text font="rm_mono" size='sm'>{formatProposalType(proposal.type_url)}</Text></td>
-              <td className={styles.tableData}><Text font="rm_mono" size='sm'>{(new Date(proposal.voting_end_time)).toDateString()}</Text></td>
-            </tr>
+      //       <tr className={styles.row} key={proposal.proposal_id} onClick={()=>handleRowClick(proposal.proposal_id)}
+      //       style={{ cursor: 'pointer' }}>
+      //         <td className={styles.tableData}><Text font="rm_mono" size='sm'>{proposal.proposal_id}</Text></td>
+      //         <td className={styles.tableTitleColumn}><Text font="rm_mono" size='sm' className={styles.rowTitle}>{proposal.title}</Text></td>
+      //         <td className={styles.tableData}><Text font="rm_mono" size='sm'>{formatProposalStatus(proposal.status)}</Text></td>
+      //         <td className={styles.tableData}><Text font="rm_mono" size='sm'>{formatProposalType(proposal.type_url)}</Text></td>
+      //         <td className={styles.tableData}><Text font="rm_mono" size='sm'>{(new Date(proposal.voting_end_time)).toDateString()}</Text></td>
+      //       </tr>
         
-          ))}
+      //     ))}
           
-        </tbody>
-      </table>    
+      //   </tbody>
+      // </table>    
+      <div className={styles.table}>
+        <Table
+                title=""
+                headers={[
+                  { value: <Text opacity={0.4} font="rm_mono">ID</Text>, ratio: 2 },
+                  { value: <Text opacity={0.4}>Title</Text>, ratio: 10 },
+                  { value: <Text opacity={0.4} font="rm_mono">Status</Text>, ratio: 4},
+                  { value: <Text opacity={0.4} font="rm_mono">Type</Text>, ratio: 7 },
+                  { value: <Text opacity={0.4} font="rm_mono">Voting Date</Text>, ratio: 7 }
+                ]}
+                content={paginatedProposals.map((proposal,index)=>{
+                  return (
+                    [
+                      <Container key={`name_${index}`} style={{ cursor: 'pointer' }} onClick={()=>handleRowClick(proposal.proposal_id)}><Text font="rm_mono" className={styles.tableData}>{proposal.proposal_id}</Text></Container>,
+                      <Container key={`tokens_${index}`} style={{ cursor: 'pointer' }}direction="row" 
+                      onClick={()=>handleRowClick(proposal.proposal_id)} className={styles.tableTitleColumn} center={{horizontal: true, vertical:true}} gap="auto">
+                        <Text font="rm_mono" size='sm' className={styles.rowTitle}>{proposal.title}</Text>
+                      </Container>,
+                      <Container key={`commission_${index}`} style={{ cursor: 'pointer' }} onClick={()=>handleRowClick(proposal.proposal_id)}><Text font="rm_mono" className={styles.tableData}>{formatProposalStatus(proposal.status)}</Text></Container>,
+                      <Container key={`participation_${index}`} style={{ cursor: 'pointer' }} onClick={()=>handleRowClick(proposal.proposal_id)}><Text font="rm_mono" className={styles.tableData}>{formatProposalType(proposal.type_url)}</Text></Container>,
+                      <Container key={`delegators_${index}`} style={{ cursor: 'pointer' }} onClick={()=>handleRowClick(proposal.proposal_id)}><Text font="rm_mono" className={styles.tableData}>{(new Date(proposal.voting_end_time)).toDateString()}</Text></Container>
+                  ]
+                  );
+                })}
+            />
+      </div>
       }
       <div className={styles.paginationContainer}>
         <Button onClick={handlePrevious} disabled={currentPage === 1}>

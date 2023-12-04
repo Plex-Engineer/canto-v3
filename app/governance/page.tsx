@@ -13,9 +13,12 @@ import Spacer from "@/components/layout/spacer";
 import Button from "@/components/button/button";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Splash from "@/components/splash/splash";
+import { ethToCantoAddress } from "@/utils/address";
 
 
 export default function GovernancePage() {
+
+  console.log(ethToCantoAddress("0xc514d047714C019b6AA7fbE181f87DD00C199B12"));
 
   const { txStore, signer,chainId } = useCantoSigner();
   const { proposals,isLoading } = useProposals({ chainId: chainId });

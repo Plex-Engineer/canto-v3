@@ -36,7 +36,7 @@ export function VotingInfoBox({isActive,value, selectedVote,isSelected, votesDat
   
 
   const getHoverStyle = () => {
-    if(isSelected){
+    if(isSelected && isActive){
       return { backgroundColor: color1 };
     }
     if (isHovered) {
@@ -44,9 +44,9 @@ export function VotingInfoBox({isActive,value, selectedVote,isSelected, votesDat
     }
     return {};
   };
-  const getCheckedStyle = ()=>{
+  // const getCheckedStyle = ()=>{
     
-  }
+  // }
   const handleBoxClick = () => {
     // Check if the current box is already selected, if so, deselect it
     if (isChecked) {
