@@ -110,7 +110,9 @@ export default function LendingPage() {
             stableTokens={stableCoins.sort((a, b) =>
               a.underlying.symbol.localeCompare(b.underlying.symbol)
             )}
-            rwas={rwas}
+            rwas={rwas.sort((a, b) =>
+              a.underlying.symbol.localeCompare(b.underlying.symbol)
+            )}
             onSupply={(address) => {
               setSelectedCToken(address);
               setCurrentModal(CLMModalTypes.SUPPLY);

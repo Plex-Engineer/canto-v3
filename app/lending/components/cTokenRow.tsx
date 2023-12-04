@@ -17,15 +17,11 @@ export const RWARow = ({
     key={cRwa.address}
     direction="row"
     gap={10}
-    style={
-      {
-        // padding: "0 16px",
-        // width: "220px",
-      }
-    }
+    style={{
+      paddingLeft: "20px",
+    }}
     center={{
       vertical: true,
-      horizontal: true,
     }}
     width="100%"
   >
@@ -86,12 +82,6 @@ export const StableCoinRow = ({
     key={cStableCoin.address}
     direction="row"
     gap={10}
-    style={
-      {
-        // padding: "0 16px",
-        // width: "220px",
-      }
-    }
     center={{
       vertical: true,
       horizontal: true,
