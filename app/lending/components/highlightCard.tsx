@@ -48,12 +48,12 @@ const HighlightCard = ({
           theme="primary-light"
         />
         <Item
-          name="Supply APR"
+          name="Supply APY"
           value={cToken.supplyApy + "%"}
           theme="primary-light"
         />
         <Item
-          name="Borrow APR"
+          name="Borrow APY"
           value={cToken.borrowApy + "%"}
           theme="primary-light"
         />

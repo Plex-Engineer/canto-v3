@@ -127,7 +127,7 @@ export const StableCoinRow = ({
       <Container gap={6}>
         <Container gap={"auto"} direction="row">
           <Text font="proto_mono" size="x-sm">
-            supply apr:
+            supply apy:
           </Text>
           <Text font="proto_mono" size="x-sm">
             {`${Number(cStableCoin.supplyApy).toFixed(2)}%`}
@@ -135,7 +135,7 @@ export const StableCoinRow = ({
         </Container>
         <Container gap={"auto"} direction="row">
           <Text font="proto_mono" size="x-sm">
-            distribution apr:
+            distribution apy:
           </Text>
           <Text font="proto_mono" size="x-sm">
             {`${Number(cStableCoin.distApy).toFixed(2)}%`}
