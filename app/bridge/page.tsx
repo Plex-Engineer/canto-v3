@@ -6,14 +6,13 @@ import Tabs from "@/components/tabs/tabs";
 import useBridgeCombo from "./util";
 
 export default function BridgePage() {
-  const { bridgeDirection, router, pathName, createQueryString } =
-    useBridgeCombo("in");
-
+  const bridgeCombo = useBridgeCombo();
+  const { Direction } = bridgeCombo;
   return (
     <>
       <AnimatedBackground
         initSize="400px"
-        direction={bridgeDirection()}
+        direction={Direction.direction}
         time={20}
       />
       <Container
@@ -29,23 +28,17 @@ export default function BridgePage() {
         >
           <Tabs
             shadows
-            defaultIndex={bridgeDirection() === "in" ? 0 : 1}
+            defaultIndex={Direction.direction === "in" ? 0 : 1}
             tabs={[
               {
                 title: "BRIDGE IN",
-                content: <Bridging key={"bridge-in"} type="in" />,
-                onClick: () =>
-                  router.push(
-                    pathName + "?" + createQueryString("direction", "in")
-                  ),
+                content: <Bridging key={"bridge-in"} props={bridgeCombo} />,
+                onClick: () => Direction.setDirection("in"),
               },
               {
                 title: "BRIDGE OUT",
-                content: <Bridging key={"bridge-out"} type="out" />,
-                onClick: () =>
-                  router.push(
-                    pathName + "?" + createQueryString("direction", "out")
-                  ),
+                content: <Bridging key={"bridge-out"} props={bridgeCombo} />,
+                onClick: () => Direction.setDirection("out"),
               },
             ]}
           />

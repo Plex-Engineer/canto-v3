@@ -51,7 +51,7 @@ export function getLMTotalsFromCTokens(
       }
       // get the apr in $note
       const supplyAprInNote = new BigNumber(
-        Number(cToken.supplyApy) + Number(cToken.distApy)
+        Number(cToken.supplyApy)
       ).multipliedBy(supplyInNote);
       const borrowAprInNote = new BigNumber(cToken.borrowApy).multipliedBy(
         borrowInNote

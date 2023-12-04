@@ -1,6 +1,7 @@
-import { BaseNetwork } from "@/config/interfaces";
+import { BaseNetwork, Validation } from "@/config/interfaces";
 import { ETHEREUM_VIA_GRAVITY_BRIDGE } from "@/config/networks";
 import { maxBridgeAmountInUnderlying } from "@/hooks/bridge/helpers/amounts";
+import { BridgeHookReturn } from "@/hooks/bridge/interfaces/hookParams";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
@@ -16,20 +17,51 @@ import { useCallback, useEffect, useState } from "react";
 // it also gets the network info from the chain id
 // and sets the testnet to true if the network is a testnet
 
-export default function useBridgeCombo(type: "in" | "out") {
-  // router info
+export interface BridgeComboReturn {
+  // bridge direction
+  Direction: {
+    direction: "in" | "out";
+    setDirection: (direction: "in" | "out") => void;
+  };
+  // bridge selections
+  Amount: {
+    amount: string;
+    amountAsBigNumberString: string;
+    setAmount: (amount: string) => void;
+    amountCheck: Validation;
+    maxBridgeAmount: string;
+  };
+  // transaction
+  Transaction: {
+    canBridge: Validation;
+    bridgeTx: () => void;
+  };
+  Confirmation: {
+    isModalOpen: boolean;
+    setIsModalOpen: (isOpen: boolean) => void;
+  };
+  networkName: (network: BaseNetwork | null) => string;
+  cosmosProps:
+    | {
+        cosmosAddress: {
+          addressName: string;
+          chainId: string;
+          addressPrefix: string;
+          currentAddress: string;
+          setAddress: (address: string) => void;
+        };
+      }
+    | {};
+  bridgeHook: BridgeHookReturn;
+}
+
+export default function useBridgeCombo(): BridgeComboReturn {
+  // router info (to get bridge direction)
   const pathName = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+
   // query params
-  const bridgeDirection = () => {
-    const direction = searchParams.get("direction");
-
-    if (direction === "in") return "in";
-    if (direction === "out") return "out";
-    return "in";
-  };
-
   const createQueryString = useCallback(
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -38,6 +70,18 @@ export default function useBridgeCombo(type: "in" | "out") {
     },
     [searchParams]
   );
+
+  // direction info
+  const bridgeDirection = () => {
+    const direction = searchParams.get("direction");
+
+    if (direction === "in") return "in";
+    if (direction === "out") return "out";
+    return "in";
+  };
+  function setDirection(direction: "in" | "out") {
+    router.push(pathName + "?" + createQueryString("direction", direction));
+  }
 
   // bridge hooks
   const { txStore, signer } = useCantoSigner();
@@ -48,7 +92,7 @@ export default function useBridgeCombo(type: "in" | "out") {
   const bridgeIn = useBridgeIn({
     testnet: onTestnet,
   });
-  const bridge = type === "in" ? bridgeIn : bridgeOut;
+  const bridge = bridgeDirection() === "in" ? bridgeIn : bridgeOut;
 
   useEffect(() => {
     async function getKeplrInfoForBridge() {
@@ -77,6 +121,7 @@ export default function useBridgeCombo(type: "in" | "out") {
     bridgeOut.setState("ethAddress", signer?.account.address);
   }, [signer?.account.address]);
 
+  // user input amount
   const [amount, setAmount] = useState<string>("");
   const [maxBridgeAmount, setMaxBridgeAmount] = useState<string>("0");
 
@@ -166,31 +211,27 @@ export default function useBridgeCombo(type: "in" | "out") {
   };
 
   return {
-    // router info
-    pathName,
-    router,
-    searchParams,
-    // query params
-    bridgeDirection,
-    createQueryString,
-    // bridge hooks
-    txStore,
-    signer,
-    onTestnet,
-    bridgeOut,
-    bridgeIn,
-    amount,
-    setAmount,
-    maxBridgeAmount,
-    setMaxBridgeAmount,
-    amountAsBigNumberString,
-    amountCheck,
-    bridgeTx,
-    canBridge,
-    isConfirmationModalOpen,
-    setIsConfirmationModalOpen,
-    cosmosProps,
+    Direction: {
+      direction: bridgeDirection(),
+      setDirection,
+    },
+    Amount: {
+      amount,
+      amountAsBigNumberString,
+      setAmount,
+      amountCheck,
+      maxBridgeAmount,
+    },
+    Confirmation: {
+      isModalOpen: isConfirmationModalOpen,
+      setIsModalOpen: setIsConfirmationModalOpen,
+    },
+    Transaction: {
+      canBridge,
+      bridgeTx,
+    },
     networkName,
-    bridge,
+    cosmosProps,
+    bridgeHook: bridge,
   };
 }

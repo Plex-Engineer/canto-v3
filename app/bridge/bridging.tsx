@@ -8,39 +8,28 @@ import Button from "@/components/button/button";
 import Input from "@/components/input/input";
 import Container from "@/components/container/container";
 import Image from "next/image";
-import Modal from "@/components/modal/modal";
 import ConfirmationModal from "./components/confirmationModal";
 import { isEVMNetwork } from "@/utils/networks";
 import { ETHEREUM_VIA_GRAVITY_BRIDGE } from "@/config/networks";
+import { BridgeComboReturn } from "./util";
 
-import useBridgeCombo from "./util";
-
-interface BridgeProps {
-  type: "in" | "out";
-}
-const Bridging = (props: BridgeProps) => {
+const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
-    amount,
-    setAmount,
-    maxBridgeAmount,
-    amountCheck,
-    canBridge,
-    bridgeTx,
-    isConfirmationModalOpen,
-    setIsConfirmationModalOpen,
-    amountAsBigNumberString,
-    networkName,
+    Amount,
+    Direction,
+    Transaction,
+    Confirmation,
+    bridgeHook: bridge,
     cosmosProps,
-    bridge,
-  } = useBridgeCombo(props.type);
-
+    networkName,
+  } = props;
   const { fromNetwork, toNetwork, token } = bridge.selections;
   return (
     <>
       <ConfirmationModal
-        open={isConfirmationModalOpen}
+        open={Confirmation.isModalOpen}
         onClose={() => {
-          setIsConfirmationModalOpen(false);
+          Confirmation.setIsModalOpen(false);
         }}
         {...cosmosProps}
         token={{
@@ -59,16 +48,20 @@ const Bridging = (props: BridgeProps) => {
         fromNetwork={networkName(fromNetwork)}
         toNetwork={networkName(toNetwork)}
         type={bridge.direction}
-        amount={formatBalance(amountAsBigNumberString, token?.decimals ?? 0, {
-          symbol: token?.symbol,
-          precision: token?.decimals,
-          commify: true,
-        })}
+        amount={formatBalance(
+          Amount.amountAsBigNumberString,
+          token?.decimals ?? 0,
+          {
+            symbol: token?.symbol,
+            precision: token?.decimals,
+            commify: true,
+          }
+        )}
         confirmation={{
           onConfirm: () => {
-            bridgeTx();
+            Transaction.bridgeTx();
           },
-          canConfirm: !canBridge.error,
+          canConfirm: !Transaction.canBridge.error,
         }}
         extraDetails={
           toNetwork?.id === ETHEREUM_VIA_GRAVITY_BRIDGE.id ? (
@@ -270,16 +263,20 @@ const Bridging = (props: BridgeProps) => {
                 <Input
                   type="amount"
                   height={64}
-                  balance={maxBridgeAmount}
+                  balance={Amount.maxBridgeAmount}
                   decimals={token?.decimals ?? 0}
                   placeholder="0.0"
-                  value={amount}
+                  value={Amount.amount}
                   onChange={(val) => {
-                    setAmount(val.target.value);
+                    Amount.setAmount(val.target.value);
                   }}
                   className={styles["input"]}
-                  error={amountCheck.error && Number(amount) !== 0}
-                  errorMessage={amountCheck.error ? amountCheck.reason : ""}
+                  error={
+                    Amount.amountCheck.error && Number(Amount.amount) !== 0
+                  }
+                  errorMessage={
+                    Amount.amountCheck.error ? Amount.amountCheck.reason : ""
+                  }
                 />
               </Container>
             </Container>
@@ -307,9 +304,9 @@ const Bridging = (props: BridgeProps) => {
         <Button
           width="fill"
           onClick={() => {
-            setIsConfirmationModalOpen(true);
+            Confirmation.setIsModalOpen(true);
           }}
-          disabled={amountCheck.error}
+          disabled={Amount.amountCheck.error}
         >
           {bridge.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
         </Button>
