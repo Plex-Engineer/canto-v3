@@ -178,7 +178,7 @@ export default function LendingPage() {
                 })}
                 postChild={<NoteIcon />}
               /> */}
-              <Item name="Net APR" value={clmPosition.general.netApr + "%"} />
+              <Item name="Net APY" value={clmPosition.general.netApr + "%"} />
               <Item
                 name="Percent Limit Used"
                 value={clmPosition.general.percentLimitUsed + "%"}
@@ -243,7 +243,7 @@ const CTokenTable = ({
       ? [
           { value: "Asset", ratio: 1 },
           { value: "Balance", ratio: 1 },
-          { value: "APR", ratio: 1 },
+          { value: "APY", ratio: 1 },
           { value: "Supplied", ratio: 1 },
           { value: "Collateral Factor", ratio: 1 },
           { value: "Liquidity", ratio: 1 },
@@ -256,7 +256,7 @@ const CTokenTable = ({
             value: (
               <span>
                 Supply
-                <br /> APR
+                <br /> APY
               </span>
             ),
             ratio: 1,
@@ -266,7 +266,7 @@ const CTokenTable = ({
             value: (
               <span>
                 Borrow
-                <br /> APR
+                <br /> APY
               </span>
             ),
             ratio: 1,

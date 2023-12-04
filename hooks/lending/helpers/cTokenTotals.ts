@@ -25,10 +25,6 @@ export function getLMTotalsFromCTokens(
   // calculate total supply and borrow
   const totals = userCTokens.reduce(
     (acc, cToken, idx) => {
-      if (cToken.symbol === "cfBill") {
-        console.log("found");
-        cToken.price = "0";
-      }
       if (!cToken.userDetails) {
         // typeguard user details
         errorInLoop = true;
