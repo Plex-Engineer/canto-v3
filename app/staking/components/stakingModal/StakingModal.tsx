@@ -1,3 +1,4 @@
+"use client";
 import Container from "@/components/container/container";
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
@@ -9,9 +10,12 @@ import Icon from "@/components/icon/icon";
 import { formatBalance } from "@/utils/formatting/balances.utils";
 import Input from "@/components/input/input";
 import Button from "@/components/button/button";
+import { useState } from "react";
 
-export const StakingModal = ({validator, signer: any}:{validator: Validator | null, signer: GetWalletClientResult | undefined}) => {
+export const StakingModal = ({validator, signer, onConfirm}:{validator: Validator | null, signer: GetWalletClientResult | undefined, onConfirm: (validator:Validator | null,inputAmount: string )=>void}) => {
 
+    
+    const [inputAmount, setInputAmount] = useState("");
     if(!validator){
         return;
     }
@@ -49,9 +53,9 @@ export const StakingModal = ({validator, signer: any}:{validator: Validator | nu
                     <Input
                     height={"lg"}
                     type="number"
-                    onChange={()=>{}}
+                    onChange={(e)=>{setInputAmount(e.target.value)}}
                     placeholder={Number(0.0).toString()}
-                    value={Number(0.0).toString()}
+                    value={inputAmount.toString()}
                     error={Number(1) <= 0}
                     errorMessage="Deadline must be greater than 0 mins"/>
                     
@@ -70,7 +74,7 @@ export const StakingModal = ({validator, signer: any}:{validator: Validator | nu
                 </div>
                 <Spacer height="20px"></Spacer>
                 <div className={styles.buttonContainer}>
-                    <Button>Delegate</Button>
+                    <Button onClick={()=>{onConfirm(validator,inputAmount)}}>Delegate</Button>
                 </div>
 
             </Container>

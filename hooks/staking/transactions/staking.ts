@@ -33,6 +33,22 @@ import { displayAmount } from "@/utils/formatting/balances.utils";
     // switch based on tx type
     switch (txParams.txType) {
       case StakingTxTypes.DELEGATE:
+        return NO_ERROR({
+          transactions: [
+            _delegateTx(
+              txParams.chainId,
+              cantoAddress,
+              txParams.validatorAddress,
+              txParams.amount,
+              false,
+              TX_DESCRIPTIONS.DELEGATE(
+                txParams.validatorName ?? "",
+                displayAmount(txParams.amount, 18),
+                false
+              )
+            ),
+          ],
+        });
       case StakingTxTypes.UNDELEGATE:
         return NO_ERROR({
           transactions: [

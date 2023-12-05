@@ -9,7 +9,7 @@ import Spacer from "@/components/layout/spacer";
 import Container from "@/components/container/container";
 import Button from "@/components/button/button";
 import Icon from "@/components/icon/icon";
-import { displayAmount, formatBalance, formatBigBalance } from "@/utils/formatting/balances.utils";
+import { convertToBigNumber, displayAmount, formatBalance, formatBigBalance } from "@/utils/formatting/balances.utils";
 import BigNumber from "bignumber.js";
 import { formatPercent } from "@/utils/formatting";
 import Table from "@/components/table/table";
@@ -19,6 +19,10 @@ import { useState } from "react";
 import { StakingModal } from "./components/stakingModal/StakingModal";
 import { Validator } from "@/hooks/staking/interfaces/validators";
 import Modal from "@/components/modal/modal";
+import { NewTransactionFlow } from "@/config/interfaces/transactions/txFlows";
+import { TransactionFlowType } from "@/config/transactions/txMap";
+import { StakingTxTypes } from "@/hooks/staking/interfaces/stakingTxTypes";
+import { ethToCantoAddress } from "@/utils/address";
 
 
 export default function StakingPage() {
@@ -26,7 +30,31 @@ export default function StakingPage() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedValidator, setSelectedValidator] = useState<Validator | null>(null);
 
+
+  function handleStakingClick(validator: Validator | null,inputAmount: string ){
+
+    const newFlow: NewTransactionFlow = {
+      icon: "",
+      txType: TransactionFlowType.STAKE_CANTO_TX,
+      title: "Vote Tx",
+      params: {
+        chainId: chainId,
+        ethAccount: signer?.account.address ?? "",
+        txType: StakingTxTypes.DELEGATE,
+        validatorAddress: validator?.operator_address ?? "",
+        amount: (
+          convertToBigNumber(inputAmount, 18).data ?? "0"
+        ).toString(),  
+        validatorName: validator?.description.moniker ?? ""
+      },
+    };
+    txStore?.addNewFlow({ txFlow: newFlow, signer });
+  }
+
   const {txStore,signer,chainId} = useCantoSigner();
+
+
+  
 
   const { isLoading,validators, apr, userStaking, selection, transaction } = useStaking({
     chainId: chainId,
@@ -130,11 +158,11 @@ export default function StakingPage() {
       </Container>
       <h1>Staking Page</h1>
       {/* <BoxedBackground /> */}
-      <Modal width="40%" onClose={()=>{}} title={selectedValidator?.description.moniker} 
+      <Modal width="40%" onClose={()=>{setSelectedValidator(null)}} title={selectedValidator?.description.moniker} 
             closeOnOverlayClick={false}
             open={selectedValidator!=null}
         >
-          <StakingModal validator={selectedValidator} signer= {signer}></StakingModal>
+          <StakingModal validator={selectedValidator} signer= {signer} onConfirm={(selectedValidator,inputAmount) => handleStakingClick(selectedValidator,inputAmount)}></StakingModal>
       </Modal>
       
 
