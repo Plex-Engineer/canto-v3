@@ -13,6 +13,14 @@ export type NewTransactionFlow = {
   icon: string;
   txType: TransactionFlowType;
   params: object;
+  // for importing tokens from tx list
+  tokenMetadata?: {
+    chainId: number;
+    address: string;
+    symbol: string;
+    decimals: number;
+    icon: string;
+  }[];
 };
 
 ///
