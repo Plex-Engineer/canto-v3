@@ -421,6 +421,9 @@ export async function stakeCantoDexLPTx(
         if (currBalanceError) throw currBalanceError;
         stakeAmount = currBalance.minus(prevLPTokens).toString();
         isStaking = true;
+        // before calling withdraw, update the token balance in the txParams so lendingTx can use it
+        txParams.pair.clmData.userDetails.balanceOfUnderlying =
+          currBalance.toString();
         break;
       case CantoDexTxTypes.REMOVE_LIQUIDITY:
         isStaking = false;
