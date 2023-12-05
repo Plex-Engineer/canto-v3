@@ -36,10 +36,8 @@ export async function cantoDexLPTx(
   txParams: CantoDexTransactionParams
 ): PromiseWithError<TxCreatorFunctionReturn> {
   try {
-    console.log(txParams);
     // validate params
     const validation = validateCantoDexLPTxParams(txParams);
-    console.log("tx validation", validation);
     if (validation.error) throw new Error(validation.reason);
 
     switch (txParams.txType) {

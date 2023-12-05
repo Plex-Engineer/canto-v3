@@ -229,6 +229,7 @@ const useTransactionStore = create<TransactionStore>()(
               await TRANSACTION_FLOW_MAP[newFlow.extraFlow.txFlowType].tx(
                 newFlow.extraFlow.params
               );
+            console.log({ extraFlow, extraFlowError });
             // check if error
             if (extraFlowError) {
               return NEW_ERROR(
