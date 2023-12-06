@@ -8,9 +8,18 @@ import { clsx } from "clsx";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TransactionModal from "../transactions/TxModal";
 import ThemeButton from "../footer/components/footerButton";
+import { useBalance } from "wagmi";
+import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 
 const NavBar = () => {
   const currentPath = usePathname();
+
+  const { signer } = useCantoSigner();
+  const balance = useBalance({
+    address: signer?.account.address,
+    watch: true,
+    chainId: signer?.chain.id,
+  });
 
   return (
     <div className={styles.container}>
@@ -83,7 +92,7 @@ const NavBar = () => {
           <TransactionModal />
         </div>
         <div className={styles["wallet-connect"]}>
-          <ConnectButton chainStatus={"none"} />
+          <ConnectButton key={balance.data?.formatted} chainStatus={"none"} />
         </div>
       </div>
     </div>
