@@ -11,11 +11,14 @@ import { formatBalance } from "@/utils/formatting/balances.utils";
 import Input from "@/components/input/input";
 import Button from "@/components/button/button";
 import { useState } from "react";
+import Tabs from "@/components/tabs/tabs";
+import { StakingTxTypes } from "@/hooks/staking/interfaces/stakingTxTypes";
 
-export const StakingModal = ({validator, signer, onConfirm}:{validator: Validator | null, signer: GetWalletClientResult | undefined, onConfirm: (validator:Validator | null,inputAmount: string )=>void}) => {
+export const StakingModal = ({validator, signer, onConfirm}:{validator: Validator | null, signer: GetWalletClientResult | undefined, onConfirm: (validator:Validator | null,inputAmount: string,selectedTx: StakingTxTypes )=>void}) => {
 
     
     const [inputAmount, setInputAmount] = useState("");
+    const [selectedTx,setSelectedTx] = useState<StakingTxTypes>(StakingTxTypes.DELEGATE);
     if(!validator){
         return;
     }
@@ -32,7 +35,7 @@ export const StakingModal = ({validator, signer, onConfirm}:{validator: Validato
                     <div>
                         <Text>
                             {formatBalance(validator.tokens,18,{commify:true})}
-                            <Icon themed icon={{ url: "/tokens/canto.svg", size: 20 }} />
+                            <Icon themed icon={{ url: "/tokens/canto.svg", size: 16 }} />
                         </Text>
                     </div>
                 </div>
@@ -40,7 +43,7 @@ export const StakingModal = ({validator, signer, onConfirm}:{validator: Validato
                     <Text>Delegation</Text>
                     <Text>
                         {formatBalance(validator.tokens,18,{commify:true})}
-                        <Icon themed icon={{ url: "/tokens/canto.svg", size: 20 }} />
+                        <Icon themed icon={{ url: "/tokens/canto.svg", size: 16 }} />
                     </Text>
                 </div>
                 <div className={styles.modalInfoRow}>
@@ -49,6 +52,37 @@ export const StakingModal = ({validator, signer, onConfirm}:{validator: Validato
                         {formatBalance(validator.commission,-2,{commify:true,precision:2})}%
                     </Text>
                 </div>
+                <div style={{display:"flex",flexDirection:"row", width:"100%"}}>
+                    <Tabs tabs={[
+                        {
+                            title: "Delegate",
+                            //isDisabled?: boolean,
+                            onClick: () => setSelectedTx(StakingTxTypes.DELEGATE),
+                            content: (<div>
+                                
+                            </div>)
+
+                        },
+                        {
+                            title: "UnDelegate",
+                            //isDisabled?: boolean,
+                            onClick: () => setSelectedTx(StakingTxTypes.UNDELEGATE),
+                            content: (<div>
+                                
+                            </div>)
+
+                        },
+                        {
+                            title: "ReDelegate",
+                            //isDisabled?: boolean,
+                            onClick: () => setSelectedTx(StakingTxTypes.REDELEGATE),
+                            content: (<div>
+                                
+                            </div>)
+
+                        }
+                    ]}></Tabs>
+                </div>
                 <div>
                     <Input
                     height={"lg"}
@@ -56,8 +90,8 @@ export const StakingModal = ({validator, signer, onConfirm}:{validator: Validato
                     onChange={(e)=>{setInputAmount(e.target.value)}}
                     placeholder={Number(0.0).toString()}
                     value={inputAmount.toString()}
-                    error={Number(1) <= 0}
-                    errorMessage="Deadline must be greater than 0 mins"/>
+                    error={Number(inputAmount) <= 0}
+                    errorMessage="Amount must be greater than 0"/>
                     
                 </div>
                 <div className={styles.modalInfoRow}>
@@ -74,7 +108,7 @@ export const StakingModal = ({validator, signer, onConfirm}:{validator: Validato
                 </div>
                 <Spacer height="20px"></Spacer>
                 <div className={styles.buttonContainer}>
-                    <Button onClick={()=>{onConfirm(validator,inputAmount)}}>Delegate</Button>
+                    <Button onClick={()=>{onConfirm(validator,inputAmount,selectedTx)}} disabled={Number(inputAmount)<=0}>Delegate</Button>
                 </div>
 
             </Container>

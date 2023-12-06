@@ -15,7 +15,7 @@ import { formatPercent } from "@/utils/formatting";
 import Table from "@/components/table/table";
 import Splash from "@/components/splash/splash";
 import { GenerateValidatorTableRow } from "./components/validatorTableRow";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StakingModal } from "./components/stakingModal/StakingModal";
 import { Validator } from "@/hooks/staking/interfaces/validators";
 import Modal from "@/components/modal/modal";
@@ -30,17 +30,21 @@ export default function StakingPage() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedValidator, setSelectedValidator] = useState<Validator | null>(null);
 
+  //const [selectedTx,setSelectedTx] = useState<StakingTxTypes>(StakingTxTypes.DELEGATE);
 
-  function handleStakingClick(validator: Validator | null,inputAmount: string ){
+  
+
+
+  function handleStakingClick(validator: Validator | null,inputAmount: string,txType: StakingTxTypes ){
 
     const newFlow: NewTransactionFlow = {
       icon: "",
       txType: TransactionFlowType.STAKE_CANTO_TX,
-      title: "Vote Tx",
+      title: "Stake Canto",
       params: {
         chainId: chainId,
         ethAccount: signer?.account.address ?? "",
-        txType: StakingTxTypes.DELEGATE,
+        txType: txType,
         validatorAddress: validator?.operator_address ?? "",
         amount: (
           convertToBigNumber(inputAmount, 18).data ?? "0"
@@ -60,6 +64,8 @@ export default function StakingPage() {
     chainId: chainId,
     userEthAddress: signer?.account.address,
   });
+
+  
   //console.log(isLoading);
   //console.log(validators);
   //console.log(apr);
@@ -80,6 +86,30 @@ export default function StakingPage() {
       return 0;
     });
   }
+  const pageSize = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(Math.ceil(validators.length / pageSize));
+
+  const paginatedvalidators = validators.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  useEffect(() => {
+    setTotalPages(Math.ceil(validators.length / pageSize));
+  }, [validators.length, pageSize]);
   function handleClick(validator: Validator){
     setSelectedValidator(validator);
   }
@@ -139,7 +169,8 @@ export default function StakingPage() {
 
       </Container>
       <Spacer height="40px"/>
-      <Container width="100%">
+      <Container width="100%" className={styles.tableContainer} >
+        <div>
           <Table
                 title=""
                 headers={[
@@ -150,19 +181,28 @@ export default function StakingPage() {
                   { value: <Text opacity={0.4} font="rm_mono">Delegators</Text>, ratio: 3 },
                   { value: "", ratio: 4 },
                 ]}
-                content={[...validators.map((validator,index)=>
+                content={[...paginatedvalidators.map((validator,index)=>
                   GenerateValidatorTableRow(validator,index,()=>handleClick(validator))
                 )]}
             />
-          <div></div>
+          </div>
+          
+            <div className={styles.paginationContainer}>
+              <Button onClick={handlePrevious} disabled={currentPage === 1}>
+                Previous
+              </Button>
+              <Button onClick={handleNext} disabled={currentPage === totalPages}>
+                Next
+              </Button>
+            </div>
+          
       </Container>
-      <h1>Staking Page</h1>
       {/* <BoxedBackground /> */}
       <Modal width="40%" onClose={()=>{setSelectedValidator(null)}} title={selectedValidator?.description.moniker} 
             closeOnOverlayClick={false}
             open={selectedValidator!=null}
         >
-          <StakingModal validator={selectedValidator} signer= {signer} onConfirm={(selectedValidator,inputAmount) => handleStakingClick(selectedValidator,inputAmount)}></StakingModal>
+          <StakingModal validator={selectedValidator} signer= {signer} onConfirm={(selectedValidator,inputAmount,selectedTx) => handleStakingClick(selectedValidator,inputAmount,selectedTx)}></StakingModal>
       </Modal>
       
 
