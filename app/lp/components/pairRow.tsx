@@ -97,6 +97,7 @@ export const UserCantoDexPairRow = ({
           sendTxFlow({
             txType: CantoDexTxTypes.STAKE,
             amountLP: pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+            pair: pair
           })
         }
         value={
