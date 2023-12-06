@@ -4,8 +4,13 @@ import Icon from "@/components/icon/icon";
 import InfoPop from "@/components/infopop/infopop";
 import Spacer from "@/components/layout/spacer";
 import Text from "@/components/text";
+import Toggle from "@/components/toggle";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
+import {
+  CantoDexTransactionParams,
+  CantoDexTxTypes,
+} from "@/transactions/pairs/cantoDex/types";
 import { concLiquidityNoteValue } from "@/utils/ambient";
 import { formatPercent, displayAmount } from "@/utils/formatting";
 import {
@@ -18,9 +23,11 @@ import BigNumber from "bignumber.js";
 export const UserCantoDexPairRow = ({
   pair,
   onManage,
+  sendTxFlow,
 }: {
   pair: CantoDexPairWithUserCTokenData;
   onManage: (pairAddress: string) => void;
+  sendTxFlow: (params: Partial<CantoDexTransactionParams>) => void;
 }) => {
   if (!pair.clmData?.userDetails) return [];
   // add staked and wallet balance
@@ -79,13 +86,47 @@ export const UserCantoDexPairRow = ({
     //     pair.decimals
     //   )}
     // </Text>,
-    <Text key={pair.address + "rewards"}>
-      {displayAmount(pair.clmData?.userDetails?.rewards ?? "0", 18)}
-    </Text>,
     <Container
       key={pair.address + "edit"}
       direction="row"
-      center={{ horizontal: true }}
+      center={{ horizontal: true, vertical: true }}
+      gap={10}
+    >
+      <Toggle
+        onChange={() =>
+          sendTxFlow({
+            txType: CantoDexTxTypes.STAKE,
+            amountLP: pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+          })
+        }
+        value={
+          displayAmount(
+            pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+            pair.decimals
+          ) === "0"
+        }
+      />
+
+      <InfoPop>
+        <Text size="xx-sm">
+          You have{" "}
+          {displayAmount(
+            pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+            pair.decimals
+          )}{" "}
+          unstaked LP tokens. You must stake them to earn rewards.
+        </Text>
+      </InfoPop>
+    </Container>,
+    <Text key={pair.address + "rewards"}>
+      {displayAmount(pair.clmData?.userDetails?.rewards ?? "0", 18)}
+    </Text>,
+
+    <Container
+      key={pair.address + "edit"}
+      direction="row"
+      center={{ horizontal: true, vertical: true }}
+      gap={10}
     >
       <Button onClick={() => onManage(pair.address)} color="secondary">
         Manage LP
@@ -268,6 +309,12 @@ export const UserAmbientPairRow = ({
         }}
       />
     </Text>,
+    <Toggle
+      onChange={() => {}}
+      value={false}
+      disabled
+      key={pool.address + "toggle"}
+    />,
     <Text key={pool.symbol + "rewards"}>
       {displayAmount(rewards ?? "0", 18)}
     </Text>,
