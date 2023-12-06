@@ -77,11 +77,7 @@ const { connectors } = getDefaultWallets({
 // ]);
 
 const wagmiConfig = createConfig({
-  // Make sure to omit the autoConnect property or set it to false.
-  // Wagmi library automatically connects to the last used provider,
-  // but instead we want to automatically connect to the Safe if the app is loaded in the Safe Context.
-  // Autoconnect logic implemented via a separate hook useAutoConnect().
-  autoConnect: false,
+  autoConnect: true,
   connectors: [
     ...connectors(),
     new SafeConnector({

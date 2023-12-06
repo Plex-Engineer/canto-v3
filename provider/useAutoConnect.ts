@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { useAccount, useConnect } from "wagmi";
 
-const AUTOCONNECTED_CONNECTOR_IDS = ["safe", "injected"];
+const AUTOCONNECTED_CONNECTOR_IDS = ["safe"];
 
 function useAutoConnect() {
   const { connect, connectors } = useConnect();
+  const { connector } = useAccount();
 
   const onDisconnect = () => {
     const safeConnector = connectors.find(
@@ -21,22 +22,9 @@ function useAutoConnect() {
     const safeConnector = connectors.find(
       (c) => c.id === AUTOCONNECTED_CONNECTOR_IDS[0] && c.ready
     );
-    if (safeConnector) {
-      connect({ connector: safeConnector });
-      return;
-    }
-
-    AUTOCONNECTED_CONNECTOR_IDS.forEach((connectorId) => {
-      if (connectorId === AUTOCONNECTED_CONNECTOR_IDS[0]) return;
-
-      const connectorInstance = connectors.find(
-        (c) => c.id === connectorId && c.ready
-      );
-      if (connectorInstance) {
-        connect({ connector: connectorInstance });
-      }
-    });
-  }, [connect, connectors]);
+    if (!safeConnector || connector === safeConnector) return;
+    connect({ connector: safeConnector });
+  }, [connectors, connector, connect]);
 }
 
 export { useAutoConnect };
