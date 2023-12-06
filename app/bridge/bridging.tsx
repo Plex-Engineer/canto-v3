@@ -12,6 +12,8 @@ import ConfirmationModal from "./components/confirmationModal";
 import { isEVMNetwork } from "@/utils/networks";
 import { ETHEREUM_VIA_GRAVITY_BRIDGE } from "@/config/networks";
 import { BridgeComboReturn } from "./util";
+import useBridgingFees from "@/hooks/bridge/useBridgingFees";
+import { BridgingMethod } from "@/transactions/bridge";
 
 const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
@@ -23,7 +25,13 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
     cosmosProps,
     networkName,
   } = props;
-  const { fromNetwork, toNetwork, token } = bridge.selections;
+  const { fromNetwork, toNetwork, token, method } = bridge.selections;
+  const fees = useBridgingFees({
+    token,
+    method,
+    fromNetwork,
+    toNetwork,
+  });
   return (
     <>
       <ConfirmationModal
@@ -301,6 +309,9 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
         </div>
 
         <Spacer height="20px" />
+        <FeesSection props={fees} />
+        <Spacer height="20px" />
+
         <Button
           width="fill"
           onClick={() => {
@@ -316,3 +327,22 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
 };
 
 export default Bridging;
+
+// props are return type of useBridgingFees
+const FeesSection = ({
+  props,
+}: {
+  props: ReturnType<typeof useBridgingFees>;
+}) => {
+  return props.isLoading ? (
+    <div>loading fees.....</div>
+  ) : props.error !== null ? (
+    <div>error loading fees</div>
+  ) : (
+    <>
+      {props.method === BridgingMethod.LAYER_ZERO && (
+        <div>Gas Fee: {props.gasFee.formattedAmount}</div>
+      )}
+    </>
+  );
+};
