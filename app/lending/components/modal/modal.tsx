@@ -22,6 +22,7 @@ import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { areEqualAddresses } from "@/utils/address";
 import { convertTokenAmountToNote } from "@/utils/math";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
+import Toggle from "@/components/toggle";
 interface Props {
   isSupplyModal: boolean;
   cToken: CTokenWithUserData | null;
@@ -120,7 +121,33 @@ export const LendingModal = (props: Props) => {
       )}
       <ModalItem
         name="Collateral Factor"
-        value={formatBalance(cToken.collateralFactor, 16) + "%"}
+        value={
+          <Container
+            direction="row"
+            gap={10}
+            center={{
+              vertical: true,
+              horizontal: true,
+            }}
+          >
+            <Text font="proto_mono" size="sm">
+              {formatBalance(cToken.collateralFactor, 16) + "%"}{" "}
+            </Text>
+            <Toggle
+              onChange={() => {
+                props.transaction.performTx(
+                  "1",
+                  cToken.userDetails?.isCollateral
+                    ? CTokenLendingTxTypes.DECOLLATERALIZE
+                    : CTokenLendingTxTypes.COLLATERALIZE,
+                  true
+                );
+              }}
+              value={cToken.userDetails?.isCollateral ?? false}
+              /* disabled ={Number(cToken.collateralFactor) === 0} */
+            />
+          </Container>
+        }
       />
     </Container>
   );
