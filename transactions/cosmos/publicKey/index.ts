@@ -1,4 +1,3 @@
-import { CANTO_DUST_BOT_API_URL } from "@/config/api";
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 import {
   TX_DESCRIPTIONS,
@@ -29,7 +28,9 @@ export async function generateCantoPublicKeyWithTx(
     const enoughCanto = new BigNumber(cantoBalance).gte("300000000000000000");
 
     // call on api to get canto for the account
-    if (!enoughCanto) {
+    if (enoughCanto) {
+      const CANTO_DUST_BOT_API_URL = process.env.NEXT_PUBLIC_CANTO_DUST_BOT_URL;
+      if (!CANTO_DUST_BOT_API_URL) throw new Error("invalid dust bot url");
       const { error: botError } = await tryFetch(CANTO_DUST_BOT_API_URL, {
         method: "POST",
         headers: {
