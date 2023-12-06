@@ -12,6 +12,7 @@ import {
   TX_PLACEHOLDER,
   TransactionFlow,
 } from "@/transactions/flows";
+import { importERC20Token } from "@/utils/tokens";
 
 interface Props {
   txFlow?: TransactionFlow;
@@ -43,6 +44,7 @@ const TxFlow = (props: Props) => {
     }
     checkRetryParams();
   }, [props.txFlow?.status]);
+
   return (
     <div className={styles.container}>
       {props.txFlow && (
@@ -81,6 +83,24 @@ const TxFlow = (props: Props) => {
                   setBridgeStatus={() => false}
                 />
               )}
+            </>
+          )}
+          {props.txFlow.tokenMetadata && (
+            <>
+              <Spacer height="40px" />
+              <Button
+                onClick={() => {
+                  for (const token of props.txFlow?.tokenMetadata ?? []) {
+                    importERC20Token(token);
+                  }
+                }}
+              >
+                {`IMPORT ${
+                  props.txFlow.tokenMetadata.length > 1
+                    ? "TOKENS"
+                    : props.txFlow.tokenMetadata[0].symbol
+                }`}
+              </Button>
             </>
           )}
           {props.txFlow.status === "ERROR" && (
