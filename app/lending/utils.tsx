@@ -134,7 +134,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
   ) {
     if (!selection.selectedCToken || !signer) return;
     const txFlow = transaction.newLendingFlow({
-      chainId: signer.chain.id,
+      chainId: chainId,
       ethAccount: signer.account.address,
       cToken: selection.selectedCToken,
       amount,
@@ -156,7 +156,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     if (!selection.selectedCToken || !signer)
       return { error: true, reason: TX_PARAM_ERRORS.PARAM_MISSING("Signer") };
     return transaction.validateParams({
-      chainId: signer.chain.id,
+      chainId: chainId,
       ethAccount: signer.account.address,
       cToken: selection.selectedCToken,
       amount,
