@@ -1,6 +1,6 @@
 import {
   getCosmosAPIEndpoint,
-  getCosmosChainObject,
+  getCosmosEIPChainObject,
   getNetworkInfoFromChainId,
   isCosmosNetwork,
   isEVMNetwork,
@@ -147,6 +147,13 @@ describe("network getters", () => {
         },
       },
       {
+        chainId: 999999,
+        chainObject: {
+          chainId: NETWORKS.GRAVITY_BRIGDE_EVM.chainId,
+          cosmosChainId: NETWORKS.GRAVITY_BRIDGE.chainId,
+        }
+      },
+      {
         chainId: "canto_7700-1",
         chainObject: null,
       },
@@ -157,7 +164,7 @@ describe("network getters", () => {
     ];
     networks.forEach((n) => {
       //@ts-ignore
-      expect(getCosmosChainObject(n.chainId).data).toStrictEqual(n.chainObject);
+      expect(getCosmosEIPChainObject(n.chainId).data).toStrictEqual(n.chainObject);
     });
   });
 });

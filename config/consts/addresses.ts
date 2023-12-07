@@ -45,6 +45,10 @@ const CANTO_CORE_ADDRESSES = {
     mainnet: "0x826551890Dc65655a0Aceca109aB11AbDbD7a07B",
     testnet: "0x04a72466De69109889Db059Cb1A4460Ca0648d9D",
   },
+  weth: {
+    mainnet: "0x5FD55A1B9FC24967C4dB09C513C3BA0DFa7FF687",
+    testnet: "0xCa03230E7FB13456326a234443aAd111AC96410A",
+  },
 } as const;
 
 type ContractName = keyof typeof CANTO_CORE_ADDRESSES;

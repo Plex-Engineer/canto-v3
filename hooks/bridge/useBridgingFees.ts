@@ -14,15 +14,21 @@ import BigNumber from "bignumber.js";
 import { isOFTToken } from "@/utils/tokens";
 import useDebounceEffect from "@/utils/async/useDebounceEffect";
 import { displayAmount } from "@/utils/formatting";
+import {
+  getGravityBridgeFeesFromToken,
+  getGravityChainFeeInPercent,
+} from "@/transactions/bridge/gravityBridge/gravityFees";
+import { isCantoChainId } from "@/utils/networks";
 
-type BridgingFeesReturn =
+export type BridgingFeesReturn =
   | {
       isLoading: true;
+      ready: false;
     }
-  | { isLoading: false; error: string }
-  | ({ isLoading: false; error: null } & FeesByMethod);
+  | { isLoading: false; error: string; ready: false }
+  | ({ isLoading: false; error: null; ready: true } & BridgeFeesByMethod);
 
-type FeesByMethod =
+export type BridgeFeesByMethod =
   | {
       method: BridgingMethod.LAYER_ZERO;
       description: string;
@@ -34,8 +40,18 @@ type FeesByMethod =
       feeInBridgeToken: boolean;
     }
   | {
+      method: BridgingMethod.GRAVITY_BRIDGE;
+      description: string;
+      chainFeePercent: number;
+      bridgeFeeOptions: {
+        slow: string;
+        medium: string;
+        fast: string;
+      };
+    }
+  | {
       // not implemented yet
-      method: BridgingMethod.GRAVITY_BRIDGE | BridgingMethod.IBC | null;
+      method: BridgingMethod.IBC | null;
     };
 
 type BridgingFeesProps = {
@@ -59,7 +75,7 @@ export default function useBridgingFees({
   // error state
   const [error, setError] = useState<string | null>(null);
   // current fee state based on method used
-  const [fees, setFees] = useState<FeesByMethod>({ method: null });
+  const [fees, setFees] = useState<BridgeFeesByMethod>({ method: null });
 
   // props can change quickly and all at the same time, so debounce useEffect
   useDebounceEffect({
@@ -90,15 +106,16 @@ export default function useBridgingFees({
       }
       fetchFees();
     },
-    dependencies: [token, method, fromNetwork?.id, toNetwork?.id],
+    dependencies: [token?.id, method, fromNetwork?.id, toNetwork?.id],
     timeout: 1000,
   });
 
   return isLoading
-    ? { isLoading }
+    ? { isLoading, ready: false }
     : error !== null
-    ? { isLoading, error }
+    ? { isLoading, error, ready: false }
     : {
+        ready: true,
         isLoading,
         error,
         ...fees,
@@ -110,7 +127,7 @@ async function getFees({
   token,
   toNetwork,
   fromNetwork,
-}: BridgingFeesProps): PromiseWithError<FeesByMethod> {
+}: BridgingFeesProps): PromiseWithError<BridgeFeesByMethod> {
   // check props to make sure they exist
   if (!(token && method && fromNetwork && toNetwork))
     return NEW_ERROR("Missing props");
@@ -120,6 +137,9 @@ async function getFees({
     case BridgingMethod.LAYER_ZERO:
       return getLZFees(token, fromNetwork, toNetwork);
     case BridgingMethod.GRAVITY_BRIDGE:
+      return isCantoChainId(toNetwork.chainId as number)
+        ? NO_ERROR({ method: null })
+        : getGravityBridgeOutFees(token);
     case BridgingMethod.IBC:
     default:
       return NO_ERROR({ method: null });
@@ -129,35 +149,67 @@ async function getLZFees(
   token: BridgeToken,
   fromNetwork: BaseNetwork,
   toNetwork: BaseNetwork
-): PromiseWithError<FeesByMethod> {
-  // check token for OFT
-  if (!isOFTToken(token)) return NEW_ERROR("Invalid LZ Token");
-  // get OFT gas estimation
-  const toLZChainId = LZ_CHAIN_IDS[toNetwork.id as keyof typeof LZ_CHAIN_IDS];
-  if (!toLZChainId) return NEW_ERROR("Invalid network id");
-  const { data: gas, error } = await estimateOFTSendGasFee(
-    token.chainId,
-    toLZChainId,
-    token.address,
-    ZERO_ADDRESS,
-    new BigNumber(1).multipliedBy(10 ** token.decimals).toString(),
-    [1, 200000]
-  );
-  if (error) return NEW_ERROR(error.message);
-  return NO_ERROR({
-    method: BridgingMethod.LAYER_ZERO,
-    description:
-      "Gas will be higher than other transactions because you will be paying for gas on both the sending and receiving chains. The value shown here is an estimate and will vary with gas fees.",
-    gasFee: {
-      amount: gas.toString(),
-      formattedAmount: displayAmount(
-        gas.toString(),
-        fromNetwork.nativeCurrency.decimals,
-        {
-          symbol: fromNetwork.nativeCurrency.symbol,
-        }
-      ),
-    },
-    feeInBridgeToken: !!token.nativeWrappedToken,
-  });
+): PromiseWithError<BridgeFeesByMethod> {
+  try {
+    // check token for OFT
+    if (!isOFTToken(token)) throw new Error("Invalid token");
+    // get OFT gas estimation
+    const toLZChainId = LZ_CHAIN_IDS[toNetwork.id as keyof typeof LZ_CHAIN_IDS];
+    if (!toLZChainId) throw new Error("Invalid network");
+    const { data: gas, error } = await estimateOFTSendGasFee(
+      token.chainId,
+      toLZChainId,
+      token.address,
+      ZERO_ADDRESS,
+      new BigNumber(1).multipliedBy(10 ** token.decimals).toString(),
+      [1, 200000]
+    );
+    if (error) throw error;
+    return NO_ERROR({
+      method: BridgingMethod.LAYER_ZERO,
+      description:
+        "Gas will be higher than other transactions because you will be paying for gas on both the sending and receiving chains. The value shown here is an estimate and will vary with gas fees.",
+      gasFee: {
+        amount: gas.toString(),
+        formattedAmount: displayAmount(
+          gas.toString(),
+          fromNetwork.nativeCurrency.decimals,
+          {
+            symbol: fromNetwork.nativeCurrency.symbol,
+          }
+        ),
+      },
+      feeInBridgeToken: !!token.nativeWrappedToken,
+    });
+  } catch (err) {
+    return NEW_ERROR("getLZFees", err);
+  }
+}
+async function getGravityBridgeOutFees(
+  token: BridgeToken
+): PromiseWithError<BridgeFeesByMethod> {
+  try {
+    // check for token address (should always be there)
+    if (!token.address) throw new Error("Invalid token");
+
+    // get chain fee percent (doesn't matter what token this is)
+    const { data: chainFeePercent, error: chainFeePercentError } =
+      await getGravityChainFeeInPercent();
+    if (chainFeePercentError) throw chainFeePercentError;
+
+    // get bridge fees (depends on price of token and gas price on ETH)
+    const { data: bridgeFees, error: bridgeFeesError } =
+      await getGravityBridgeFeesFromToken(token.address);
+    if (bridgeFeesError) throw bridgeFeesError;
+
+    // return fees object
+    return NO_ERROR({
+      method: BridgingMethod.GRAVITY_BRIDGE,
+      description: "gravity bridge fees",
+      chainFeePercent,
+      bridgeFeeOptions: bridgeFees,
+    });
+  } catch (err) {
+    return NEW_ERROR("getGravityBridgeOutFees", err);
+  }
 }

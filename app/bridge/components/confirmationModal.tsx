@@ -32,7 +32,6 @@ interface Props {
     onConfirm: () => void;
   };
   cosmosAddress?: {
-    addressName?: string; // for eth via gravity bridge
     chainId: string;
     addressPrefix: string;
     currentAddress: string;
@@ -125,8 +124,7 @@ const ConfirmationModal = (props: Props) => {
                   content={<Text size="sm">{props.addresses.to}</Text>}
                 >
                   <Text size="sm">
-                    {(props.cosmosAddress?.addressName ?? props.toNetwork) +
-                      " : "}
+                    {props.toNetwork + " : "}
                     {props.addresses.to
                       ? props.addresses.to?.slice(0, 6) +
                         "..." +
@@ -136,8 +134,7 @@ const ConfirmationModal = (props: Props) => {
                 </PopUp>
               ) : (
                 <Text size="sm">
-                  {(props.cosmosAddress?.addressName ?? props.toNetwork) +
-                    " : "}
+                  {props.toNetwork + " : "}
                   {props.addresses.to
                     ? props.addresses.to?.slice(0, 6) +
                       "..." +
@@ -208,9 +205,7 @@ const ConfirmationModal = (props: Props) => {
                 </Text>
                 <InfoPop>
                   <Text size="xx-sm">
-                    {`manually enter your ${
-                      props.cosmosAddress?.addressName ?? props.toNetwork
-                    } address or click "Connect to Keplr"`}
+                    {`manually enter your ${props.toNetwork} address or click "Connect to Keplr"`}
                   </Text>
                 </InfoPop>
               </div>
