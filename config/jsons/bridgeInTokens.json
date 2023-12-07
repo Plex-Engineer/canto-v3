@@ -178,47 +178,47 @@
     ],
     "gravity-bridge-3": [
       {
-        "id": "gravity0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
+        "id": "gravity0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "chainId": "gravity-bridge-3",
         "name": "USDC",
         "symbol": "USDC",
         "decimals": 6,
         "icon": "/icons/usdc.svg",
         "ibcDenom": "ibc/17CD484EE7D9723B847D95015FA3EBD1572FD13BC84FB838F55B18A57450F25B",
-        "nativeName": "gravity0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
+        "nativeName": "gravity0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "bridgeMethods": ["1"]
       },
       {
-        "id": "gravity0xd567B3d7B8FE3C79a1AD8dA978812cfC4Fa05e75",
+        "id": "gravity0xdAC17F958D2ee523a2206206994597C13D831ec7",
         "chainId": "gravity-bridge-3",
         "name": "USDT",
         "symbol": "USDT",
         "decimals": 6,
         "icon": "/icons/usdt.svg",
         "ibcDenom": "ibc/4F6A2DEFEA52CD8D90966ADCB2BD0593D3993AB0DF7F6AEB3EFD6167D79237B0",
-        "nativeName": "gravity0xd567B3d7B8FE3C79a1AD8dA978812cfC4Fa05e75",
+        "nativeName": "gravity0xdAC17F958D2ee523a2206206994597C13D831ec7",
         "bridgeMethods": ["1"]
       },
       {
-        "id": "gravity0x5FD55A1B9FC24967C4dB09C513C3BA0DFa7FF687",
+        "id": "gravity0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
         "chainId": "gravity-bridge-3",
         "name": "ETH",
         "symbol": "ETH",
         "decimals": 18,
         "icon": "/icons/eth.svg",
         "ibcDenom": "ibc/DC186CA7A8C009B43774EBDC825C935CABA9743504CE6037507E6E5CCE12858A",
-        "nativeName": "gravity0x5FD55A1B9FC24967C4dB09C513C3BA0DFa7FF687",
+        "nativeName": "gravity0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
         "bridgeMethods": ["1"]
       },
       {
-        "id": "gravity0xc71aAf8e486e3F33841BB56Ca3FD2aC3fa8D29a8",
+        "id": "gravity0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
         "chainId": "gravity-bridge-3",
         "name": "Wrapped Staked ETH",
         "symbol": "WSTETH",
         "decimals": 18,
         "icon": "/icons/wsteth.svg",
         "ibcDenom": "ibc/35D050E2A1F7BEAFA783A4A4739DC802A6797E59041341D78D88F5B754948604",
-        "nativeName": "gravity0xc71aAf8e486e3F33841BB56Ca3FD2aC3fa8D29a8",
+        "nativeName": "gravity0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
         "bridgeMethods": ["1"]
       },
       {

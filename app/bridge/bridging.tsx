@@ -10,28 +10,26 @@ import Container from "@/components/container/container";
 import Image from "next/image";
 import ConfirmationModal from "./components/confirmationModal";
 import { isEVMNetwork } from "@/utils/networks";
-import { ETHEREUM_VIA_GRAVITY_BRIDGE } from "@/config/networks";
 import { BridgeComboReturn } from "./util";
-import useBridgingFees from "@/hooks/bridge/useBridgingFees";
+import { BridgingFeesReturn } from "@/hooks/bridge/useBridgingFees";
 import { BridgingMethod } from "@/transactions/bridge";
+import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 
 const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
     Amount,
-    Direction,
     Transaction,
     Confirmation,
     bridgeHook: bridge,
     cosmosProps,
     networkName,
+    feesHook: fees,
+    feesSelection,
   } = props;
-  const { fromNetwork, toNetwork, token, method } = bridge.selections;
-  const fees = useBridgingFees({
-    token,
-    method,
-    fromNetwork,
-    toNetwork,
-  });
+  const { fromNetwork, toNetwork, token } = bridge.selections;
+  const { selectedGBridgeFee, setSelectedGBridgeFee, totalChainFee } =
+    feesSelection.gravityBridge;
+
   return (
     <>
       <ConfirmationModal
@@ -71,28 +69,6 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
           },
           canConfirm: !Transaction.canBridge.error,
         }}
-        extraDetails={
-          toNetwork?.id === ETHEREUM_VIA_GRAVITY_BRIDGE.id ? (
-            <Text size="x-sm">
-              To bridge your tokens to Ethereum through Gravity Bridge, first
-              ensure that you have an IBC wallet like Keplr.
-              <br />
-              <br />
-              Next, enter your Gravity Bridge address (from Keplr) below and
-              confirm.
-              <br />
-              <br />
-              Once completed, you can transfer your tokens from Gravity Bridge
-              to Ethereum using the{" "}
-              <a
-                style={{ textDecoration: "underline" }}
-                href="https://bridge.blockscape.network/"
-              >
-                Gravity Bridge Portal
-              </a>
-            </Text>
-          ) : undefined
-        }
       />
 
       <section className={styles.container}>
@@ -309,7 +285,16 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
         </div>
 
         <Spacer height="20px" />
-        <FeesSection props={fees} />
+        <FeesSection
+          props={fees}
+          fees={{
+            totalChainFee: displayAmount(totalChainFee, token?.decimals ?? 0, {
+              symbol: token?.symbol,
+            }),
+            selected: selectedGBridgeFee,
+            setSelected: setSelectedGBridgeFee,
+          }}
+        />
         <Spacer height="20px" />
 
         <Button
@@ -331,8 +316,14 @@ export default Bridging;
 // props are return type of useBridgingFees
 const FeesSection = ({
   props,
+  fees,
 }: {
-  props: ReturnType<typeof useBridgingFees>;
+  props: BridgingFeesReturn;
+  fees: {
+    selected: string;
+    setSelected: (value: string) => void;
+    totalChainFee: string;
+  };
 }) => {
   return props.isLoading ? (
     <div>loading fees.....</div>
@@ -342,6 +333,20 @@ const FeesSection = ({
     <>
       {props.method === BridgingMethod.LAYER_ZERO && (
         <div>Gas Fee: {props.gasFee.formattedAmount}</div>
+      )}
+      {props.method === BridgingMethod.GRAVITY_BRIDGE && (
+        <>
+          <div>
+            Chain Fee Percent:{" "}
+            {`${props.chainFeePercent}% (${fees.totalChainFee})`}
+          </div>
+          <div>Selected Bridge Fee: {fees.selected}</div>
+          <ToggleGroup
+            options={Object.values(props.bridgeFeeOptions).map((fee) => fee)}
+            selected={fees.selected}
+            setSelected={fees.setSelected}
+          />
+        </>
       )}
     </>
   );

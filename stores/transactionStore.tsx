@@ -4,7 +4,10 @@ import {
   PromiseWithError,
   errMsg,
 } from "@/config/interfaces";
-import { getNetworkInfoFromChainId } from "@/utils/networks";
+import {
+  getCosmosEIPChainObject,
+  getNetworkInfoFromChainId,
+} from "@/utils/networks";
 import { GetWalletClientResult } from "wagmi/actions";
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
@@ -312,12 +315,21 @@ const useTransactionStore = create<TransactionStore>()(
 
             // we have a txHash so we can set status to pending
             // to get the txLink, we can grab it from the chainId,
+            let txChain;
+            if (tx.tx.type === "COSMOS") {
+              const { data: eipChain } = getCosmosEIPChainObject(
+                tx.tx.chainId as number
+              );
+              if (eipChain) {
+                txChain = getNetworkInfoFromChainId(eipChain.cosmosChainId);
+              }
+            } else {
+              txChain = getNetworkInfoFromChainId(tx.tx.chainId);
+            }
             get().setTxStatus(ethAddress, flowId, txIndex, {
               status: "PENDING",
               hash: txHash,
-              txLink: getNetworkInfoFromChainId(
-                tx.tx.chainId
-              ).data.blockExplorer?.getTransactionLink(txHash),
+              txLink: txChain?.data?.blockExplorer?.getTransactionLink(txHash),
               timestamp: new Date().getTime(),
             });
             // wait for the result before moving on

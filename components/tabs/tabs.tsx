@@ -31,7 +31,6 @@ const Tabs = (props: Props) => {
           <button
             key={index}
             onClick={() => {
-              console.log("clicked");
               setActiveTab(index);
               tab.onClick && tab.onClick();
             }}
