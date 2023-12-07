@@ -13,7 +13,8 @@ import { isEVMNetwork } from "@/utils/networks";
 import { BridgeComboReturn } from "./util";
 import { BridgingFeesReturn } from "@/hooks/bridge/useBridgingFees";
 import { BridgingMethod } from "@/transactions/bridge";
-import ToggleGroup from "@/components/groupToggle/ToggleGroup";
+import { addTokenBalances } from "@/utils/math";
+import { BridgeToken } from "@/hooks/bridge/interfaces/tokens";
 
 const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
@@ -288,12 +289,11 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
         <FeesSection
           props={fees}
           fees={{
-            totalChainFee: displayAmount(totalChainFee, token?.decimals ?? 0, {
-              symbol: token?.symbol,
-            }),
+            totalChainFee,
             selected: selectedGBridgeFee,
             setSelected: setSelectedGBridgeFee,
           }}
+          token={token}
         />
         <Spacer height="20px" />
 
@@ -317,6 +317,7 @@ export default Bridging;
 const FeesSection = ({
   props,
   fees,
+  token,
 }: {
   props: BridgingFeesReturn;
   fees: {
@@ -324,11 +325,12 @@ const FeesSection = ({
     setSelected: (value: string) => void;
     totalChainFee: string;
   };
+  token: BridgeToken | null;
 }) => {
   return props.isLoading ? (
     <div>loading fees.....</div>
   ) : props.error !== null ? (
-    <div>error loading fees</div>
+    <div>error loading fees {props.error}</div>
   ) : (
     <>
       {props.method === BridgingMethod.LAYER_ZERO && (
@@ -338,14 +340,30 @@ const FeesSection = ({
         <>
           <div>
             Chain Fee Percent:{" "}
-            {`${props.chainFeePercent}% (${fees.totalChainFee})`}
+            {`${props.chainFeePercent}% (${displayAmount(
+              fees.totalChainFee,
+              token?.decimals ?? 0
+            )})`}
           </div>
-          <div>Selected Bridge Fee: {fees.selected}</div>
-          <ToggleGroup
-            options={Object.values(props.bridgeFeeOptions).map((fee) => fee)}
-            selected={fees.selected}
-            setSelected={fees.setSelected}
-          />
+          <div>
+            Selected Bridge Fee:{" "}
+            {displayAmount(fees.selected, token?.decimals ?? 0)}
+          </div>
+          <div style={{ display: "flex", flexDirection: "row" }}>
+            {Object.values(props.bridgeFeeOptions).map((fee) => (
+              <Button
+                key={fee} 
+                onClick={() => fees.setSelected(fee)}
+                color={fees.selected === fee ? "accent" : "primary"}
+              >
+                {displayAmount(
+                  addTokenBalances(fee, fees.totalChainFee),
+                  token?.decimals ?? 0,
+                  { symbol: token?.symbol }
+                )}
+              </Button>
+            ))}
+          </div>
         </>
       )}
     </>
