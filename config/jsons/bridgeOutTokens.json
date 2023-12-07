@@ -24,6 +24,10 @@
           {
             "chainId": "eth-mainnet",
             "methods": ["2"]
+          },
+          {
+            "chainId": "bnb-mainnet",
+            "methods": ["2"]
           }
         ]
       },
@@ -41,6 +45,10 @@
         "bridgeMethods": [
           {
             "chainId": "eth-mainnet",
+            "methods": ["2"]
+          },
+          {
+            "chainId": "bnb-mainnet",
             "methods": ["2"]
           }
         ]

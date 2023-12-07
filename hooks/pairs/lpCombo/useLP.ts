@@ -15,6 +15,7 @@ import { NewTransactionFlow, TransactionFlowType } from "@/transactions/flows";
 import { CantoDexTransactionParams } from "@/transactions/pairs/cantoDex";
 import { AmbientTransactionParams } from "@/transactions/pairs/ambient";
 import { addTokenBalances } from "@/utils/math";
+import { getCantoCoreAddress } from "@/config/consts/addresses";
 
 interface UseLPProps {
   chainId: number;
@@ -100,6 +101,8 @@ export default function useLP(props: UseLPProps): UseLPReturn {
       chainId: props.chainId,
       ethAccount: props.userEthAddress ?? "",
     };
+    // need wCanto for importing token
+    const wCantoAddress = getCantoCoreAddress(props.chainId, "wcanto");
     return {
       title: "Claim Rewards",
       icon: "/icons/canto.svg",
@@ -111,6 +114,17 @@ export default function useLP(props: UseLPProps): UseLPReturn {
         },
         ambientParams: { ...userParams, estimatedRewards: ambient.rewards },
       },
+      tokenMetadata: wCantoAddress
+        ? [
+            {
+              chainId: props.chainId,
+              address: wCantoAddress,
+              symbol: "wCANTO",
+              decimals: 18,
+              icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/canto/images/canto.svg",
+            },
+          ]
+        : undefined,
     };
   }
 

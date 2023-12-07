@@ -52,7 +52,7 @@ const TransactionModal = () => {
           setIsOpen(false);
         }}
         height="36rem"
-        width="30rem"
+        width="32rem"
       >
         <Text size="lg" font="proto_mono">
           Activity
