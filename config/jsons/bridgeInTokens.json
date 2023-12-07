@@ -87,6 +87,32 @@
         "bridgeMethods": ["2"]
       }
     ],
+    "bnb-mainnet": [
+      {
+        "id": "0x56C03B8C4FA80Ba37F5A7b60CAAAEF749bB5b220",
+        "chainId": 56,
+        "address": "0x56C03B8C4FA80Ba37F5A7b60CAAAEF749bB5b220",
+        "name": "Canto",
+        "symbol": "CANTO",
+        "decimals": 18,
+        "icon": "/icons/canto.svg",
+        "isOFT": true,
+        "isOFTProxy": false,
+        "bridgeMethods": ["2"]
+      },
+      {
+        "id": "0xEbe265c9299d0C879bcc2A76948511BA6ED6C36D",
+        "chainId": 56,
+        "address": "0xEbe265c9299d0C879bcc2A76948511BA6ED6C36D",
+        "name": "cNote",
+        "symbol": "cNOTE",
+        "decimals": 18,
+        "icon": "/icons/cNote.svg",
+        "isOFT": true,
+        "isOFTProxy": false,
+        "bridgeMethods": ["2"]
+      }
+    ],
     "akashnet-2": [
       {
         "id": "uakt",
