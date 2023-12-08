@@ -92,6 +92,7 @@ const TxFlow = (props: Props) => {
                 width: "100%",
                 display: "flex",
                 flexDirection: "row-reverse",
+                marginRight: "-6px",
               }}
             >
               <InfoPop>
@@ -134,6 +135,7 @@ const TxFlow = (props: Props) => {
             <>
               <Spacer height="40px" />
               <Button
+                width={"fill"}
                 onClick={() => {
                   props.closeModal();
                   if (props.txFlow?.onSuccessCallback) {
