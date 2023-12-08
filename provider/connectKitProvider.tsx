@@ -3,10 +3,12 @@ import {
   ConnectKitProvider,
   ConnectKitButton,
   getDefaultConfig,
+  getDefaultConnectors,
 } from "connectkit";
 import * as EVM_CHAINS from "@/config/networks/evm";
 import { publicProvider } from "wagmi/providers/public";
 import { EVMNetwork } from "@/config/interfaces";
+import { get } from "http";
 
 const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
   (network: EVMNetwork) => {
@@ -49,11 +51,6 @@ const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
 const { chains, publicClient } = configureChains(formattedChains, [
   publicProvider(),
 ]);
-const { connectors } = getDefaultWallets({
-  appName: "Canto v3",
-  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID as string,
-  chains,
-});
 
 const config = createConfig(
   getDefaultConfig({
@@ -75,14 +72,23 @@ const config = createConfig(
 
 const wagmiConfig = createConfig({
   autoConnect: true,
-  connectors,
-  // connectors: specificConnectors,
+  connectors: getDefaultConnectors({
+    app: {
+      name: "Canto v3",
+      url: "https://canto.io",
+      icon: "https://canto.io/logo.png",
+    },
+    walletConnectProjectId: process.env
+      .NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID as string,
+    chains,
+  }),
+
   publicClient,
 });
 
 const CantoWalletProvider = ({ children }: { children: React.ReactNode }) => {
   return (
-    <WagmiConfig config={config}>
+    <WagmiConfig config={wagmiConfig}>
       <ConnectKitProvider>
         {children}
         <ConnectKitButton />
@@ -90,10 +96,5 @@ const CantoWalletProvider = ({ children }: { children: React.ReactNode }) => {
     </WagmiConfig>
   );
 };
-function getDefaultWallets(arg0: {
-  appName: string;
-  projectId: string;
-  chains: Chain[];
-}): { connectors: any } {
-  throw new Error("Function not implemented.");
-}
+
+export default CantoWalletProvider;

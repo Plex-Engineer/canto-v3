@@ -4,7 +4,7 @@ import "./globals.scss";
 import InfoBar from "@/components/info_bar/infoBar";
 import Footer from "@/components/footer/footer";
 import NavBar from "@/components/nav_bar/navBar";
-import CantoWalletProvider from "@/provider/rainbowProvider";
+import CantoWalletProvider from "@/provider/connectKitProvider";
 import localFont from "next/font/local";
 import DesktopOnly from "@/components/desktop-only/desktop-only";
 import { Metadata } from "next";

@@ -5,11 +5,11 @@ import Text from "../text";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TransactionModal from "../transactions/TxModal";
 import ThemeButton from "../footer/components/footerButton";
 import { useBalance } from "wagmi";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
+import { ConnectKitButton } from "connectkit";
 
 const NavBar = () => {
   const currentPath = usePathname();
@@ -92,7 +92,8 @@ const NavBar = () => {
           <TransactionModal />
         </div>
         <div className={styles["wallet-connect"]}>
-          <ConnectButton key={balance.data?.formatted} chainStatus={"none"} />
+          {/* <ConnectButton key={balance.data?.formatted} chainStatus={"none"} /> */}
+          <ConnectKitButton />
         </div>
       </div>
     </div>
