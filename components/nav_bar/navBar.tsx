@@ -8,9 +8,40 @@ import { clsx } from "clsx";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TransactionModal from "../transactions/TxModal";
 import ThemeButton from "../footer/components/footerButton";
+import { useEffect } from "react";
+import {Posthog} from "../../app/posthog"
+import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 
 const NavBar = () => {
-  const currentPath = usePathname();
+  const currentPath = usePathname()
+  const {signer } = useCantoSigner()
+
+  useEffect(() => {
+    if (signer?.account.address) {
+      Posthog.people.registerWallet(signer.account.address)
+      Posthog.identify(signer.account.address)
+      Posthog.people.set({ name: signer.account.address })
+      Posthog.events.connections.walletConnect(true)
+    }
+    else{
+      Posthog.reset()
+    }
+  }, [signer])
+
+  useEffect(()=>{
+    if(currentPath == "/bridge"){
+      Posthog.events.pageOpened("bridge")
+    }
+    else if(currentPath == "/lending"){
+      Posthog.events.pageOpened("lending")
+    }
+    else if(currentPath == "/lp"){
+      Posthog.events.pageOpened("lp interface")
+    }
+    else{
+      Posthog.events.pageOpened("home")
+    }
+  },[currentPath, signer])
 
   return (
     <div className={styles.container}>
