@@ -11,7 +11,7 @@ import { EVMNetwork } from "@/config/interfaces";
 import { useEffect, useState } from "react";
 
 const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
-  (network: EVMNetwork) => {
+  (network) => {
     const contractInfo = network.multicall3Address
       ? {
           multicall3: { address: network.multicall3Address },
@@ -35,16 +35,16 @@ const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
       },
       testnet: network.isTestChain,
       // eth main must have ens resolver
-      //   contracts:
-      //     network.chainId === EVM_CHAINS.ETH_MAINNET.chainId
-      //       ? {
-      //           ...contractInfo,
-      //           ensUniversalResolver: {
-      //             address: "0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62",
-      //           },
-      //         }
-      //       : contractInfo,
-    };
+      contracts:
+        network.chainId === EVM_CHAINS.ETH_MAINNET.chainId
+          ? {
+              ...contractInfo,
+              ensUniversalResolver: {
+                address: "0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62",
+              },
+            }
+          : contractInfo,
+    } as Chain;
   }
 );
 
