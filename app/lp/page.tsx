@@ -86,7 +86,6 @@ export default function Page() {
               { value: "APR", ratio: 1 },
               { value: "Pool Share", ratio: 1 },
               { value: "Value", ratio: 1 },
-              { value: "Stake", ratio: 1 },
               { value: "Rewards", ratio: 1 },
               { value: "Edit", ratio: 1 },
             ]}

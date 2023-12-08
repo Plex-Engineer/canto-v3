@@ -92,21 +92,9 @@ export const UserCantoDexPairRow = ({
       center={{ horizontal: true, vertical: true }}
       gap={10}
     >
-      <Toggle
-        onChange={() =>
-          sendTxFlow({
-            txType: CantoDexTxTypes.STAKE,
-            amountLP: pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
-          })
-        }
-        value={
-          displayAmount(
-            pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
-            pair.decimals
-          ) === "0"
-        }
-      />
-
+      <Text key={pair.address + "rewards"}>
+        {displayAmount(pair.clmData?.userDetails?.rewards ?? "0", 18)}
+      </Text>
       <InfoPop>
         <Text size="xx-sm">
           You have{" "}
@@ -118,9 +106,6 @@ export const UserCantoDexPairRow = ({
         </Text>
       </InfoPop>
     </Container>,
-    <Text key={pair.address + "rewards"}>
-      {displayAmount(pair.clmData?.userDetails?.rewards ?? "0", 18)}
-    </Text>,
 
     <Container
       key={pair.address + "edit"}
@@ -309,12 +294,6 @@ export const UserAmbientPairRow = ({
         }}
       />
     </Text>,
-    <Toggle
-      onChange={() => {}}
-      value={false}
-      disabled
-      key={pool.address + "toggle"}
-    />,
     <Text key={pool.symbol + "rewards"}>
       {displayAmount(rewards ?? "0", 18)}
     </Text>,
