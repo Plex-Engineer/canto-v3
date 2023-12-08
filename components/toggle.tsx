@@ -27,7 +27,7 @@ const Toggle: {
       scale={scale || 1}
       color={color}
       onClick={() => {
-        onChange(!value);
+        !disabled && onChange(!value);
       }}
       disabled={disabled}
     >
