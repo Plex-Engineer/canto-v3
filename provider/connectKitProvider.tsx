@@ -8,7 +8,7 @@ import {
 import * as EVM_CHAINS from "@/config/networks/evm";
 import { publicProvider } from "wagmi/providers/public";
 import { EVMNetwork } from "@/config/interfaces";
-import { get } from "http";
+import { useEffect, useState } from "react";
 
 const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
   (network: EVMNetwork) => {
@@ -87,10 +87,12 @@ const wagmiConfig = createConfig({
 });
 
 const CantoWalletProvider = ({ children }: { children: React.ReactNode }) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   return (
     <WagmiConfig config={wagmiConfig}>
       <ConnectKitProvider>
-        {children}
+        {mounted && children}
         <ConnectKitButton />
       </ConnectKitProvider>
     </WagmiConfig>
