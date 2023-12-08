@@ -181,7 +181,7 @@ export const LendingModal = (props: Props) => {
                       transaction.performTx(...collateralParams);
                     }}
                     value={cToken.userDetails?.isCollateral ?? false}
-                    // disabled={collateralTxValidation.error}
+                    disabled={collateralTxValidation.error}
                   />
                 </Container>
               }

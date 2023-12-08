@@ -3,6 +3,7 @@ import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
 import InfoPop from "@/components/infopop/infopop";
 import Spacer from "@/components/layout/spacer";
+import PopUp from "@/components/popup/popup";
 import Text from "@/components/text";
 import Toggle from "@/components/toggle";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
@@ -77,34 +78,40 @@ export const UserCantoDexPairRow = ({
         }}
       />
     </Text>,
-    // <Text key={pair.address + "totalUserTokens"}>
-    //   {displayAmount(totalUserLpTokens, pair.decimals)}
-    // </Text>,
-    // <Text key={pair.address + "userStake"}>
-    //   {displayAmount(
-    //     pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0",
-    //     pair.decimals
-    //   )}
-    // </Text>,
     <Container
       key={pair.address + "edit"}
       direction="row"
       center={{ horizontal: true, vertical: true }}
-      gap={10}
+      gap={4}
     >
       <Text key={pair.address + "rewards"}>
-        {displayAmount(pair.clmData?.userDetails?.rewards ?? "0", 18)}
+        {displayAmount(pair.clmData.userDetails.rewards, 18)}
       </Text>
-      <InfoPop>
-        <Text size="xx-sm">
-          You have{" "}
-          {displayAmount(
-            pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
-            pair.decimals
-          )}{" "}
-          unstaked LP tokens. You must stake them to earn rewards.
-        </Text>
-      </InfoPop>
+      {Number(pair.clmData.userDetails.balanceOfUnderlying) != 0 && (
+        <PopUp
+          content={
+            <Text size="xx-sm">
+              You have{" "}
+              {displayAmount(
+                pair.clmData.userDetails.balanceOfUnderlying,
+                pair.decimals
+              )}{" "}
+              unstaked LP tokens. You must stake them to earn rewards.
+            </Text>
+          }
+          width="300px"
+        >
+          <Icon
+            icon={{
+              url: "/warning.svg",
+              size: 16,
+            }}
+            style={{
+              translate: "0 1.5px",
+            }}
+          />
+        </PopUp>
+      )}
     </Container>,
 
     <Container
