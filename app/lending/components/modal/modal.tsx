@@ -101,56 +101,79 @@ export const LendingModal = (props: Props) => {
   const APRs = ({
     cToken,
     isSupply,
+    transaction,
   }: {
     cToken: CTokenWithUserData;
     isSupply: boolean;
-  }) => (
-    <Container className={styles.card} padding="md" width="100%">
-      {/* might need to change this in future for showing it on more tokens */}
-      {isSupply && cToken.symbol.toLowerCase() == "cnote" && (
-        <>
-          <ModalItem name="Supply APR" value={cToken.supplyApy + "%"} />
-          <ModalItem name="Dist APR" value={cToken.distApy + "%"} />
-        </>
-      )}
+    transaction: {
+      validateParams: (
+        amount: string,
+        txType: CTokenLendingTxTypes,
+        max: boolean
+      ) => Validation;
+      performTx: (
+        amount: string,
+        txType: CTokenLendingTxTypes,
+        max: boolean
+      ) => void;
+    };
+  }) => {
+    const isCollateral = cToken.userDetails?.isCollateral ?? false;
+    const collateralParams: [string, CTokenLendingTxTypes, boolean] = [
+      cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
+      isCollateral
+        ? CTokenLendingTxTypes.DECOLLATERALIZE
+        : CTokenLendingTxTypes.COLLATERALIZE,
+      false,
+    ];
+    const collateralTxValidation = transaction.validateParams(
+      ...collateralParams
+    );
 
-      {!isSupply && (
-        <>
-          <ModalItem name="Borrow APR" value={cToken.borrowApy + "%"} />
-        </>
-      )}
-      <ModalItem
-        name="Collateral Factor"
-        value={
-          <Container
-            direction="row"
-            gap={10}
-            center={{
-              vertical: true,
-              horizontal: true,
-            }}
-          >
-            <Text font="proto_mono" size="sm">
-              {formatBalance(cToken.collateralFactor, 16) + "%"}{" "}
-            </Text>
-            <Toggle
-              onChange={() => {
-                props.transaction.performTx(
-                  "1",
-                  cToken.userDetails?.isCollateral
-                    ? CTokenLendingTxTypes.DECOLLATERALIZE
-                    : CTokenLendingTxTypes.COLLATERALIZE,
-                  true
-                );
-              }}
-              value={cToken.userDetails?.isCollateral ?? false}
-              /* disabled ={Number(cToken.collateralFactor) === 0} */
-            />
-          </Container>
-        }
-      />
-    </Container>
-  );
+    return (
+      <Container className={styles.card} padding="md" width="100%">
+        {/* might need to change this in future for showing it on more tokens */}
+        {isSupply && cToken.symbol.toLowerCase() == "cnote" && (
+          <>
+            <ModalItem name="Supply APR" value={cToken.supplyApy + "%"} />
+            <ModalItem name="Dist APR" value={cToken.distApy + "%"} />
+          </>
+        )}
+
+        {!isSupply && (
+          <>
+            <ModalItem name="Borrow APR" value={cToken.borrowApy + "%"} />
+          </>
+        )}
+        {isSupply && (
+          <ModalItem
+            name="Collateral Factor"
+            value={
+              <Container
+                direction="row"
+                gap={10}
+                center={{
+                  vertical: true,
+                  horizontal: true,
+                }}
+              >
+                <Text font="proto_mono" size="sm">
+                  {formatBalance(cToken.collateralFactor, 16) + "%"}{" "}
+                </Text>
+                <Toggle
+                  onChange={() => {
+                    transaction.performTx(...collateralParams);
+                  }}
+                  value={cToken.userDetails?.isCollateral ?? false}
+                  // disabled={collateralTxValidation.error}
+                />
+              </Container>
+            }
+          />
+        )}
+      </Container>
+    );
+  };
 
   function Content(
     cToken: CTokenWithUserData,
@@ -233,7 +256,11 @@ export const LendingModal = (props: Props) => {
         <Spacer height="40px" />
 
         <Container width="100%" gap={20}>
-          <APRs cToken={cToken} isSupply={isSupplyModal} />
+          <APRs
+            cToken={cToken}
+            isSupply={isSupplyModal}
+            transaction={transaction}
+          />
           <Balances
             cToken={cToken}
             isSupply={isSupplyModal}
