@@ -146,30 +146,46 @@ export const LendingModal = (props: Props) => {
           </>
         )}
         {isSupply && (
-          <ModalItem
-            name="Collateral Factor"
-            value={
-              <Container
-                direction="row"
-                gap={10}
-                center={{
-                  vertical: true,
-                  horizontal: true,
-                }}
-              >
-                <Text font="proto_mono" size="sm">
-                  {formatBalance(cToken.collateralFactor, 16) + "%"}{" "}
-                </Text>
-                <Toggle
-                  onChange={() => {
-                    transaction.performTx(...collateralParams);
+          <>
+            <ModalItem
+              name="Collateral Factor"
+              value={
+                <Container
+                  direction="row"
+                  gap={10}
+                  center={{
+                    vertical: true,
+                    horizontal: true,
                   }}
-                  value={cToken.userDetails?.isCollateral ?? false}
-                  // disabled={collateralTxValidation.error}
-                />
-              </Container>
-            }
-          />
+                >
+                  <Text font="proto_mono" size="sm">
+                    {formatBalance(cToken.collateralFactor, 16) + "%"}{" "}
+                  </Text>
+                </Container>
+              }
+            />
+            <ModalItem
+              name="Collateral"
+              value={
+                <Container
+                  direction="row"
+                  gap={10}
+                  center={{
+                    vertical: true,
+                    horizontal: true,
+                  }}
+                >
+                  <Toggle
+                    onChange={() => {
+                      transaction.performTx(...collateralParams);
+                    }}
+                    value={cToken.userDetails?.isCollateral ?? false}
+                    // disabled={collateralTxValidation.error}
+                  />
+                </Container>
+              }
+            />
+          </>
         )}
       </Container>
     );
