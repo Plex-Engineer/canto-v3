@@ -23,6 +23,7 @@ import {
   TX_DESCRIPTIONS,
 } from "../interfaces";
 import { getAllUserCLMData } from "@/hooks/lending/helpers/userClmData";
+import { isCantoChainId } from "@/utils/networks";
 
 export async function cTokenLendingTx(
   txParams: CTokenLendingTransactionParams
@@ -189,6 +190,14 @@ export async function cTokenLendingTx(
 export function validateCTokenLendingTxParams(
   txParams: CTokenLendingTransactionParams
 ): Validation {
+  // tx must be on a canto chain
+  if (!isCantoChainId(txParams.chainId)) {
+    return {
+      error: true,
+      reason: TX_PARAM_ERRORS.CHAIN_NOT_SUPPORTED(txParams.chainId),
+    };
+  }
+
   // user details on token must be available
   if (!txParams.cToken.userDetails) {
     return {
