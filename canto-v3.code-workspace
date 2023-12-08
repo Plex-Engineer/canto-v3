@@ -1,0 +1,27 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+    ],
+    "settings": {},
+    "extensions": {
+        "recommendations": [
+            "formulahendry.auto-close-tag",
+            "aaron-bond.better-comments",
+            "streetsidesoftware.code-spell-checker",
+            "mikestead.dotenv",
+            "styled-components.vscode-styled-components",
+            "phoenisx.cssvar",
+            "figma.figma-vscode-extension",
+            "github.vscode-pull-request-github",
+            "eamodio.gitlens",
+            "wix.glean",
+            "wix.vscode-import-cost",
+            "christian-kohler.path-intellisense",
+            "esbenp.prettier-vscode",
+            "syler.sass-indented",
+            "gencer.html-slim-scss-css-class-completion"
+        ]
+    }
+}
