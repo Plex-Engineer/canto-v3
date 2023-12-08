@@ -14,10 +14,10 @@ import { signCosmosEIPTx } from "@/transactions/signTx/cosmosEIP/signCosmosEIP";
 export default function Home() {
   const { signer } = useCantoSigner();
   async function connect() {
-    const cantoAddress = await ethToCantoAddress(signer?.account.address);
+    const cantoAddress = await ethToCantoAddress(signer?.account.address ?? "");
     const tx = await generateCantoPublicKeyWithTx(
       7700,
-      signer?.account.address,
+      signer?.account.address ?? "",
       cantoAddress.data
     );
     console.log(tx);
