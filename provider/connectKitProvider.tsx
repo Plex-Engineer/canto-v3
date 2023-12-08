@@ -91,9 +91,12 @@ const CantoWalletProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => setMounted(true), []);
   return (
     <WagmiConfig config={wagmiConfig}>
-      <ConnectKitProvider>
+      <ConnectKitProvider
+        options={{
+          initialChainId: EVM_CHAINS.CANTO_MAINNET_EVM.chainId,
+        }}
+      >
         {mounted && children}
-        <ConnectKitButton />
       </ConnectKitProvider>
     </WagmiConfig>
   );

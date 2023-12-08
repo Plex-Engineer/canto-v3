@@ -93,7 +93,7 @@ const NavBar = () => {
         </div>
         <div className={styles["wallet-connect"]}>
           {/* <ConnectButton key={balance.data?.formatted} chainStatus={"none"} /> */}
-          <ConnectKitButton />
+          <ConnectKitButton showAvatar={false} showBalance />
         </div>
       </div>
     </div>
