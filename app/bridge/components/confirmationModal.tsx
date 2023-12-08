@@ -179,7 +179,7 @@ const ConfirmationModal = (props: Props) => {
                 {keplrError}
               </Text>
               <div
-                style={{ display: "flex", flexDirection: "row", gap: "10px" }}
+                style={{ display: "flex", flexDirection: "row", gap: "5px" }}
               >
                 <Text
                   size="xx-sm"

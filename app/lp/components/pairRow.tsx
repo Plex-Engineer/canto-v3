@@ -222,7 +222,7 @@ export const GeneralAmbientPairRow = ({
   <Container
     key={"popkey"}
     direction="row"
-    gap={10}
+    gap={4}
     center={{
       horizontal: true,
       vertical: true,
@@ -328,7 +328,7 @@ const AprBlock = ({ pool }: { pool: AmbientPool }) => {
     <Container
       key={"popkey1"}
       direction="row"
-      gap={10}
+      gap={4}
       center={{
         horizontal: true,
         vertical: true,
