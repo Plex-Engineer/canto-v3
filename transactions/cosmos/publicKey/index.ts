@@ -28,10 +28,10 @@ export async function generateCantoPublicKeyWithTx(
     const enoughCanto = new BigNumber(cantoBalance).gte("300000000000000000");
 
     // call on api to get canto for the account
-    if (enoughCanto) {
+    if (!enoughCanto) {
       const CANTO_DUST_BOT_API_URL = process.env.NEXT_PUBLIC_CANTO_DUST_BOT_URL;
       if (!CANTO_DUST_BOT_API_URL) throw new Error("invalid dust bot url");
-      const { error: botError } = await tryFetch(CANTO_DUST_BOT_API_URL, {
+      const botResponse = await fetch(CANTO_DUST_BOT_API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,11 +39,11 @@ export async function generateCantoPublicKeyWithTx(
           "Access-Control-Allow-Origin": "true",
         },
         body: JSON.stringify({
-          cantoAddress: cantoAddress,
-          hexAddress: ethAddress,
+          canto_address: cantoAddress,
+          eth_address: ethAddress,
         }),
       });
-      if (botError) throw botError;
+      if (!botResponse.ok) throw new Error(await botResponse.text());
     }
     return NO_ERROR([
       _generatePubKeyTx(
