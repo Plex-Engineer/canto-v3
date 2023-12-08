@@ -145,25 +145,26 @@ export const LendingModal = (props: Props) => {
             <ModalItem name="Borrow APR" value={cToken.borrowApy + "%"} />
           </>
         )}
-        {isSupply && (
-          <>
-            <ModalItem
-              name="Collateral Factor"
-              value={
-                <Container
-                  direction="row"
-                  gap={10}
-                  center={{
-                    vertical: true,
-                    horizontal: true,
-                  }}
-                >
-                  <Text font="proto_mono" size="sm">
-                    {formatBalance(cToken.collateralFactor, 16) + "%"}{" "}
-                  </Text>
-                </Container>
-              }
-            />
+
+        <>
+          <ModalItem
+            name="Collateral Factor"
+            value={
+              <Container
+                direction="row"
+                gap={10}
+                center={{
+                  vertical: true,
+                  horizontal: true,
+                }}
+              >
+                <Text font="proto_mono" size="sm">
+                  {formatBalance(cToken.collateralFactor, 16) + "%"}{" "}
+                </Text>
+              </Container>
+            }
+          />
+          {isSupply && (
             <ModalItem
               name="Collateral"
               value={
@@ -185,8 +186,8 @@ export const LendingModal = (props: Props) => {
                 </Container>
               }
             />
-          </>
-        )}
+          )}
+        </>
       </Container>
     );
   };
