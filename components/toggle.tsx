@@ -7,14 +7,19 @@ interface Props {
   onChange: (value: boolean) => void;
   scale?: number;
   color?: "primary" | "secondary";
+  disabled?: boolean;
 }
 
-const Toggle = ({
+const Toggle: {
+  (props: Props): JSX.Element;
+  defaultProps?: Partial<Props>;
+} = ({
   value,
   onChange,
   children,
   scale,
   color = "primary",
+  disabled,
 }: Props) => {
   return (
     <Styled
@@ -22,8 +27,9 @@ const Toggle = ({
       scale={scale || 1}
       color={color}
       onClick={() => {
-        onChange(!value);
+        !disabled && onChange(!value);
       }}
+      disabled={disabled}
     >
       <div className="toggle">{children}</div>
     </Styled>
@@ -36,6 +42,7 @@ const Styled = styled.div<{
   value: boolean;
   scale: number;
   color?: "primary" | "secondary";
+  disabled?: boolean;
 }>`
   display: inline-flex;
   height: 26px;
@@ -52,7 +59,9 @@ const Styled = styled.div<{
           : "var(--primary-90-color)"
         : "var(--card-surface-color)"};
   position: relative;
-
+  /* disabled means low opacity and disabled arrow */
+  opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   .toggle {
     transition: all 0.2s ease-in-out;
     left: ${({ value }) => (value ? "calc(100% - 23px)" : "1px")};
