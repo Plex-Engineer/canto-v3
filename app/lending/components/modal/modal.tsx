@@ -174,7 +174,7 @@ export const LendingModal = (props: Props) => {
       : {};
 
     return (
-      <div className={styles.content}>
+      <div className={styles.content} key={cToken.address + isSupplyModal}>
         <Spacer height="20px" />
         <Image
           src={cToken.underlying.logoURI}
