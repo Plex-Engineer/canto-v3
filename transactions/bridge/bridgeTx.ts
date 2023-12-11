@@ -78,6 +78,13 @@ export async function cantoBridgeTx(
 export function validateCantoBridgeTxParams(
   txParams: BridgeTransactionParams
 ): Validation {
+  // make sure token is present
+  if (!txParams.token) {
+    return {
+      error: true,
+      reason: TX_PARAM_ERRORS.PARAM_MISSING("token"),
+    };
+  }
   // figure out which type of bridge to use from the method type
   switch (txParams.method) {
     case BridgingMethod.GRAVITY_BRIDGE:
