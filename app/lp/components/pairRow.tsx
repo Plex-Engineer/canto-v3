@@ -291,7 +291,9 @@ export const UserAmbientPairRow = ({
       {formatPercent(divideBalances(value, pool.totals.noteTvl))}
     </Text>,
     <Text key={pool.symbol + "value"}>
-      {displayAmount(value, 18)}
+      {displayAmount(value, 18, {
+        precision: 2,
+      })}
       <Icon
         style={{ marginLeft: "5px" }}
         themed
@@ -301,6 +303,7 @@ export const UserAmbientPairRow = ({
         }}
       />
     </Text>,
+
     <Text key={pool.symbol + "rewards"}>
       {displayAmount(rewards ?? "0", 18)}
     </Text>,

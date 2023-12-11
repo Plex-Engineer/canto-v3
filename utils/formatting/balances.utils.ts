@@ -89,11 +89,15 @@ export function formatBalance(
   if (bnAmount.isLessThanOrEqualTo(0)) return "0";
   // divide by 10^decimals
   const formattedAmount = bnAmount.dividedBy(new BigNumber(10).pow(decimals));
+
+  //   if the amount is less than 0.001, then return <.001
+  if (formattedAmount.isLessThan(0.001)) return "<.001";
+
   // if precision is undefined, ret2 places after the first non-zero decimal
   let truncateAt =
     precision ??
     2 - Math.floor(Math.log(formattedAmount.toNumber()) / Math.log(10));
-  // make sure tuncation is not negative or greater than decimals
+  // make sure truncation is not negative or greater than decimals
   truncateAt = Math.max(
     0,
     Math.min(truncateAt, decimals < 0 ? truncateAt : decimals)
