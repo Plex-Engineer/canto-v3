@@ -6,23 +6,8 @@ import Icon from "@/components/icon/icon";
 import Button from "@/components/button/button";
 import Link from "next/link";
 import Glitch from "@/components/glitch/glitch";
-import useCantoSigner from "@/hooks/helpers/useCantoSigner";
-import { ethToCantoAddress } from "@/utils/address";
-import { generateCantoPublicKeyWithTx } from "@/transactions/cosmos/publicKey";
-import { signCosmosEIPTx } from "@/transactions/signTx/cosmosEIP/signCosmosEIP";
 
 export default function Home() {
-  const { signer } = useCantoSigner();
-  async function connect() {
-    const cantoAddress = await ethToCantoAddress(signer?.account.address ?? "");
-    const tx = await generateCantoPublicKeyWithTx(
-      7700,
-      signer?.account.address ?? "",
-      cantoAddress.data
-    );
-    console.log(tx);
-    console.log(await signCosmosEIPTx(tx.data[0], signer));
-  }
   return (
     <Container
       className={styles.container}
@@ -68,9 +53,6 @@ export default function Home() {
           <Link href="/bridge">
             <Button width={280}>Bridge To Canto</Button>
           </Link>
-          <Button width={280} onClick={connect}>
-            TEST
-          </Button>
           {/* <a href="#ecosystem">
             {" "}
             <Button width={280}>Explore Ecosystem</Button>
