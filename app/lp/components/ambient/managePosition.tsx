@@ -51,7 +51,11 @@ export const ManageAmbientPosition = ({
         {
           title: "Add",
           content: (
-            <Container width="100%" className={styles["scroll-view"]}>
+            <Container
+              width="100%"
+              className={styles["scroll-view"]}
+              key={pool.address + "add"}
+            >
               <Container
                 gap={16}
                 style={{
@@ -71,7 +75,11 @@ export const ManageAmbientPosition = ({
         {
           title: "Remove",
           content: (
-            <Container width="100%" className={styles["scroll-view"]}>
+            <Container
+              width="100%"
+              className={styles["scroll-view"]}
+              key={pool.address + "remove"}
+            >
               <Container
                 gap={16}
                 style={{

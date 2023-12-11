@@ -110,7 +110,7 @@ export const StableCoinRow = ({
   <Container
     key={"popkey" + cStableCoin.name}
     direction="row"
-    gap={10}
+    gap={4}
     center={{
       horizontal: true,
       vertical: true,

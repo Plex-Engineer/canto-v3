@@ -3,9 +3,15 @@ import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
 import InfoPop from "@/components/infopop/infopop";
 import Spacer from "@/components/layout/spacer";
+import PopUp from "@/components/popup/popup";
 import Text from "@/components/text";
+import Toggle from "@/components/toggle";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
+import {
+  CantoDexTransactionParams,
+  CantoDexTxTypes,
+} from "@/transactions/pairs/cantoDex/types";
 import { concLiquidityNoteValue } from "@/utils/ambient";
 import { formatPercent, displayAmount } from "@/utils/formatting";
 import {
@@ -18,9 +24,11 @@ import BigNumber from "bignumber.js";
 export const UserCantoDexPairRow = ({
   pair,
   onManage,
+  sendTxFlow,
 }: {
   pair: CantoDexPairWithUserCTokenData;
   onManage: (pairAddress: string) => void;
+  sendTxFlow: (params: Partial<CantoDexTransactionParams>) => void;
 }) => {
   if (!pair.clmData?.userDetails) return [];
   // add staked and wallet balance
@@ -70,22 +78,48 @@ export const UserCantoDexPairRow = ({
         }}
       />
     </Text>,
-    // <Text key={pair.address + "totalUserTokens"}>
-    //   {displayAmount(totalUserLpTokens, pair.decimals)}
-    // </Text>,
-    // <Text key={pair.address + "userStake"}>
-    //   {displayAmount(
-    //     pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0",
-    //     pair.decimals
-    //   )}
-    // </Text>,
-    <Text key={pair.address + "rewards"}>
-      {displayAmount(pair.clmData?.userDetails?.rewards ?? "0", 18)}
-    </Text>,
     <Container
       key={pair.address + "edit"}
       direction="row"
-      center={{ horizontal: true }}
+      center={{ horizontal: true, vertical: true }}
+      gap={4}
+    >
+      <Text key={pair.address + "rewards"}>
+        {displayAmount(pair.clmData.userDetails.rewards, 18)}
+      </Text>
+      {Number(pair.clmData.userDetails.balanceOfUnderlying) != 0 && (
+        <PopUp
+          content={
+            <Text size="xx-sm">
+              You have{" "}
+              {displayAmount(
+                pair.clmData.userDetails.balanceOfUnderlying,
+                pair.decimals
+              )}{" "}
+              unstaked LP tokens. You must stake them to earn rewards.
+            </Text>
+          }
+          width="300px"
+        >
+          <Icon
+            icon={{
+              url: "/warning.svg",
+              size: 16,
+            }}
+            themed
+            style={{
+              translate: "0 1.5px",
+            }}
+          />
+        </PopUp>
+      )}
+    </Container>,
+
+    <Container
+      key={pair.address + "edit"}
+      direction="row"
+      center={{ horizontal: true, vertical: true }}
+      gap={10}
     >
       <Button onClick={() => onManage(pair.address)} color="secondary">
         Manage LP
@@ -189,7 +223,7 @@ export const GeneralAmbientPairRow = ({
   <Container
     key={"popkey"}
     direction="row"
-    gap={10}
+    gap={4}
     center={{
       horizontal: true,
       vertical: true,
@@ -295,7 +329,7 @@ const AprBlock = ({ pool }: { pool: AmbientPool }) => {
     <Container
       key={"popkey1"}
       direction="row"
-      gap={10}
+      gap={4}
       center={{
         horizontal: true,
         vertical: true,

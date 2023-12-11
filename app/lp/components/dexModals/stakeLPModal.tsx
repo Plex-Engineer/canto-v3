@@ -89,7 +89,7 @@ export const StakeLPModal = (props: Props) => {
         ? cLPToken.userDetails?.balanceOfUnderlying
         : cLPToken.userDetails?.supplyBalanceInUnderlying) ?? "0";
     return (
-      <div className={styles.content}>
+      <div className={styles.content} key={cLPToken.address + txType}>
         <Spacer height="20px" />
         <Image
           src={cLPToken.underlying.logoURI}

@@ -98,6 +98,8 @@ export function maxAmountForLendingTx(
     case CTokenLendingTxTypes.SUPPLY:
       return cToken.userDetails.balanceOfUnderlying ?? "0";
     case CTokenLendingTxTypes.WITHDRAW:
+    case CTokenLendingTxTypes.DECOLLATERALIZE:
+      // decollateralize acts the same as withdrawing everything in terms of liquidity change
       const maxAmount = cTokenWithdrawLimit(
         cToken,
         position.liquidity,
@@ -116,6 +118,9 @@ export function maxAmountForLendingTx(
       );
       if (minRepay.error) return "0";
       return minRepay.data;
+    case CTokenLendingTxTypes.COLLATERALIZE:
+      // no limit on collateralize
+      return cToken.userDetails.supplyBalanceInUnderlying;
     default:
       return "0";
   }
