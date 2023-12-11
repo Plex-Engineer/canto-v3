@@ -3,7 +3,7 @@ import styles from "./input.module.scss";
 import Text from "../text";
 import clsx from "clsx";
 import Button from "../button/button";
-import { formatBalance } from "@/utils/formatting";
+import { displayAmount, formatBalance } from "@/utils/formatting";
 
 // if amount is true then add more required props
 type InputProps = {
@@ -72,10 +72,7 @@ const Input = (props: InputProps) => {
           {props.label}
           {props.type === "amount" && (
             <span className={styles["balance"]}>
-              Balance:{" "}
-              {formatBalance(props.balance, props.decimals, {
-                commify: true,
-              })}
+              Balance: {displayAmount(props.balance, props.decimals)}
             </span>
           )}
         </Text>

@@ -85,9 +85,7 @@ describe("formatBalance tests", () => {
       },
     ];
     params.forEach((p) => {
-      expect(formatBalance(p.amount, p.decimals, { short: false })).toBe(
-        p.expected
-      );
+      expect(formatBalance(p.amount, p.decimals)).toBe(p.expected);
     });
   });
   it("should format balance with options", () => {
@@ -202,6 +200,41 @@ describe("formatBalance tests", () => {
           short: true,
         },
         expected: "1,000.00T TOKEN",
+      },
+      {
+        amount: "0.00000000001",
+        decimals: 0,
+        options: {
+          symbol: "TOKEN",
+          commify: true,
+          precision: 2,
+          short: true,
+        },
+        expected: "<0.001 TOKEN",
+      },
+      {
+        amount: "0.00000000001",
+        decimals: 0,
+        options: {
+          symbol: "TOKEN",
+          commify: true,
+          precision: 2,
+          short: true,
+          maxSmallBalance: 0.002,
+        },
+        expected: "<0.002 TOKEN",
+      },
+      {
+        amount: "1",
+        decimals: 18,
+        options: {
+          symbol: "TOKEN",
+          commify: true,
+          precision: 2,
+          short: true,
+          maxSmallBalance: 0.001,
+        },
+        expected: "<0.001 TOKEN",
       },
     ];
     params.forEach((p) => {
