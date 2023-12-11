@@ -20,7 +20,7 @@ import {
   divideBalances,
 } from "@/utils/math";
 import BigNumber from "bignumber.js";
-
+import { HoverPositions } from "./HoverPositions";
 export const UserCantoDexPairRow = ({
   pair,
   onManage,
@@ -290,17 +290,33 @@ export const UserAmbientPairRow = ({
     <Text key={pool.symbol + "pool share"}>
       {formatPercent(divideBalances(value, pool.totals.noteTvl))}
     </Text>,
-    <Text key={pool.symbol + "value"}>
-      {displayAmount(value, 18)}
-      <Icon
-        style={{ marginLeft: "5px" }}
-        themed
-        icon={{
-          url: "/tokens/note.svg",
-          size: 16,
-        }}
-      />
-    </Text>,
+    <Container
+      key={pool.address + " value"}
+      direction="row"
+      center={{
+        horizontal: true,
+        vertical: true,
+      }}
+      gap={10}
+    >
+      <Text key={pool.symbol + "value"}>
+        {displayAmount(value, 18)}
+        <Icon
+          style={{ marginLeft: "5px" }}
+          themed
+          icon={{
+            url: "/tokens/note.svg",
+            size: 16,
+          }}
+        />
+      </Text>
+      <InfoPop>
+        {/* show all the positions */}
+        <Container>
+          <HoverPositions pool={pool} positions={pool.userPositions} />
+        </Container>
+      </InfoPop>
+    </Container>,
     <Text key={pool.symbol + "rewards"}>
       {displayAmount(rewards ?? "0", 18)}
     </Text>,

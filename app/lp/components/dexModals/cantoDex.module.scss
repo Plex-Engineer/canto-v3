@@ -115,3 +115,13 @@
   text-align: justify;
   transition: all 0.1s ease-in-out;
 }
+
+.non-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  height: 80px;
+  padding: 0 8px;
+  border: 1px solid var(--border-stroke-color);
+}
