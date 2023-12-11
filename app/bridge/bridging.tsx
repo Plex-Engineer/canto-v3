@@ -2,7 +2,7 @@
 import Spacer from "@/components/layout/spacer";
 import Selector from "@/components/selector/selector";
 import Text from "@/components/text";
-import { displayAmount, formatBalance } from "@/utils/formatting";
+import { displayAmount } from "@/utils/formatting";
 import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";
 import Input from "@/components/input/input";
@@ -48,13 +48,12 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
         fromNetwork={networkName(fromNetwork)}
         toNetwork={networkName(toNetwork)}
         type={bridge.direction}
-        amount={formatBalance(
+        amount={displayAmount(
           Amount.amountAsBigNumberString,
           token?.decimals ?? 0,
           {
             symbol: token?.symbol,
             precision: token?.decimals,
-            commify: true,
           }
         )}
         confirmation={{

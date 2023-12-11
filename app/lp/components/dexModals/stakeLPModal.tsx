@@ -5,11 +5,7 @@ import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import styles from "./stakeModal.module.scss";
 import Image from "next/image";
 import Container from "@/components/container/container";
-import {
-  convertToBigNumber,
-  displayAmount,
-  formatBalance,
-} from "@/utils/formatting";
+import { convertToBigNumber, displayAmount } from "@/utils/formatting";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import { useState } from "react";
@@ -236,8 +232,7 @@ const CTokenAmountCard = ({
         {name}
       </Text>
       <Text size="sm" font="proto_mono">
-        {formatBalance(amount, decimals, {
-          commify: true,
+        {displayAmount(amount, decimals, {
           symbol: note ? undefined : symbol,
         })}
         {valueInNote ? ` (${displayAmount(valueInNote.toString(), 18)} ` : " "}
