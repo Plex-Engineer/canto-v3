@@ -4,7 +4,6 @@ import {
   Transaction,
   TransactionDescription,
 } from "@/transactions/interfaces";
-import { tryFetch } from "@/utils/async";
 import { getCantoBalance } from "@/utils/cosmos";
 import BigNumber from "bignumber.js";
 import { createMsgsSend } from "../messages/messageSend";
@@ -35,8 +34,6 @@ export async function generateCantoPublicKeyWithTx(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // "Access-Control-Request-Headers": "Content-Type, Authorization",
-          // "Access-Control-Allow-Origin": "true",
         },
         body: JSON.stringify({
           canto_address: cantoAddress,
