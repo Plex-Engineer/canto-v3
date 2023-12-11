@@ -8,7 +8,11 @@ import styles from "./modal.module.scss";
 import Tabs from "@/components/tabs/tabs";
 import Image from "next/image";
 import Container from "@/components/container/container";
-import { convertToBigNumber, displayAmount } from "@/utils/formatting";
+import {
+  convertToBigNumber,
+  displayAmount,
+  formatBalance,
+} from "@/utils/formatting";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import React, { useState } from "react";
@@ -16,7 +20,7 @@ import { Validation } from "@/config/interfaces";
 import Amount from "@/components/amount/amount";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { areEqualAddresses } from "@/utils/address";
-import { convertTokenAmountToNote } from "@/utils/math";
+import { convertTokenAmountToNote, percentOfAmount } from "@/utils/math";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
 import Toggle from "@/components/toggle";
 interface Props {
@@ -265,6 +269,14 @@ export const LendingModal = (props: Props) => {
           {...limitProps}
         />
         <Spacer height="40px" />
+        {actionType === CTokenLendingTxTypes.BORROW && (
+          <BorrowLimits
+            maxBorrow={maxAmount}
+            setAmount={setAmount}
+            limits={[90, 94, 98]}
+            decimals={cToken.underlying.decimals}
+          />
+        )}
 
         <Container width="100%" gap={20}>
           <APRs
@@ -442,3 +454,32 @@ const CTokenAmountCard = ({
     </Container>
   );
 };
+
+const BorrowLimits = ({
+  maxBorrow,
+  setAmount,
+  limits,
+  decimals,
+}: {
+  maxBorrow: string;
+  setAmount: (amount: string) => void;
+  limits: number[];
+  decimals: number;
+}) => (
+  <div style={{ display: "flex", flexDirection: "row" }}>
+    {limits.map((limit) => (
+      <Button
+        key={limit}
+        onClick={() =>
+          setAmount(
+            formatBalance(
+              percentOfAmount(maxBorrow, limit).data ?? "0",
+              decimals,
+              { precision: decimals }
+            )
+          )
+        }
+      >{`${limit}%`}</Button>
+    ))}
+  </div>
+);
