@@ -2,7 +2,7 @@
 import Container from "@/components/container/container";
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
-import { Validator } from "@/hooks/staking/interfaces/validators";
+import { UserUnbondingDelegation, Validator, ValidatorWithDelegations } from "@/hooks/staking/interfaces/validators";
 import { GetWalletClientResult } from "wagmi/actions";
 import styles from "./StakingModal.module.scss";
 import Text from "@/components/text";
@@ -13,28 +13,60 @@ import Button from "@/components/button/button";
 import { useState } from "react";
 import Tabs from "@/components/tabs/tabs";
 import { StakingTxTypes } from "@/hooks/staking/interfaces/stakingTxTypes";
+import { StakingTabs } from "../stakingTab/StakingTabs";
+import { getBalanceForValidator } from "@/hooks/staking/helpers/userStaking";
 
-export const StakingModal = ({validator, signer, onConfirm}:{validator: Validator | null, signer: GetWalletClientResult | undefined, onConfirm: (validator:Validator | null,inputAmount: string,selectedTx: StakingTxTypes )=>void}) => {
+
+export interface StakingModalParams{
+    validator: Validator | null,
+    userStaking?: {
+        validators: ValidatorWithDelegations[];
+        unbonding: UserUnbondingDelegation[];
+        cantoBalance: string;
+      };
+    signer: GetWalletClientResult | undefined, 
+    onConfirm: (validator:Validator | null,inputAmount: string,selectedTx: StakingTxTypes )=>void
+}
+export const StakingModal = (props : StakingModalParams) => {
 
     
     const [inputAmount, setInputAmount] = useState("");
     const [selectedTx,setSelectedTx] = useState<StakingTxTypes>(StakingTxTypes.DELEGATE);
-    if(!validator){
+    const [activeTab, setActiveTab] = useState('delegate');
+    const [amount, setAmount] = useState('');
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setAmount('');
+  };
+    if(!props.validator){
         return;
     }
+    console.log(props.userStaking);
+
+    let userDelegationBalance: string | null = "0";
+
+    if(props.userStaking?.validators){
+        userDelegationBalance = getBalanceForValidator(props.userStaking?.validators,props.validator.operator_address);
+    }
+
+    //const getUserDelegationBalance = 
+    const userMaxBalance = userDelegationBalance? userDelegationBalance : "0";
+
+    console.log(userMaxBalance);
     return (
         
             <Container className={styles.modalContainer}>
                 <Spacer/>
                 <Container className={styles.spacer}><Spacer ></Spacer></Container>
                 <Spacer height="40px"/>
-                <Text>{validator?.description.moniker}</Text>
+                <Text>{props.validator?.description.moniker}</Text>
                 <Spacer height="20px"></Spacer>
                 <div className={styles.modalInfoRow}>
                     <div><Text>Available Balance</Text></div>
                     <div>
                         <Text>
-                            {formatBalance(validator.tokens,18,{commify:true})}
+                            {formatBalance(props.validator.tokens,18,{commify:true})}
                             <Icon themed icon={{ url: "/tokens/canto.svg", size: 16 }} />
                         </Text>
                     </div>
@@ -42,47 +74,19 @@ export const StakingModal = ({validator, signer, onConfirm}:{validator: Validato
                 <div className={styles.modalInfoRow}>
                     <Text>Delegation</Text>
                     <Text>
-                        {formatBalance(validator.tokens,18,{commify:true})}
+                        {formatBalance(props.validator.tokens,18,{commify:true})}
                         <Icon themed icon={{ url: "/tokens/canto.svg", size: 16 }} />
                     </Text>
                 </div>
                 <div className={styles.modalInfoRow}>
                     <Text>Commission</Text>
                     <Text>
-                        {formatBalance(validator.commission,-2,{commify:true,precision:2})}%
+                        {formatBalance(props.validator.commission,-2,{commify:true,precision:2})}%
                     </Text>
                 </div>
-                <div style={{display:"flex",flexDirection:"row", width:"100%"}}>
-                    <Tabs tabs={[
-                        {
-                            title: "Delegate",
-                            //isDisabled?: boolean,
-                            onClick: () => setSelectedTx(StakingTxTypes.DELEGATE),
-                            content: (<div>
-                                
-                            </div>)
-
-                        },
-                        {
-                            title: "UnDelegate",
-                            //isDisabled?: boolean,
-                            onClick: () => setSelectedTx(StakingTxTypes.UNDELEGATE),
-                            content: (<div>
-                                
-                            </div>)
-
-                        },
-                        {
-                            title: "ReDelegate",
-                            //isDisabled?: boolean,
-                            onClick: () => setSelectedTx(StakingTxTypes.REDELEGATE),
-                            content: (<div>
-                                
-                            </div>)
-
-                        }
-                    ]}></Tabs>
-                </div>
+                <Spacer height="20px"></Spacer>
+                <StakingTabs handleTabChange={handleTabChange} activeTab={activeTab}></StakingTabs>
+                <Spacer height="20px"></Spacer>
                 <div>
                     <Input
                     height={"lg"}
@@ -90,14 +94,14 @@ export const StakingModal = ({validator, signer, onConfirm}:{validator: Validato
                     onChange={(e)=>{setInputAmount(e.target.value)}}
                     placeholder={Number(0.0).toString()}
                     value={inputAmount.toString()}
-                    error={Number(inputAmount) <= 0}
+                    error={Number(inputAmount) < 0}
                     errorMessage="Amount must be greater than 0"/>
                     
                 </div>
                 <div className={styles.modalInfoRow}>
                     <Text>Enter Amount</Text>
                     <div >
-                        <Text opacity={0.4}>Balance: {formatBalance(validator.commission,-2,{commify:true,precision:2})}</Text><Text opacity={1}>(max)</Text>
+                        <Text opacity={0.4}>Balance: {formatBalance(userMaxBalance ,18,{commify:true,precision:2})}</Text><Text opacity={1}>(max)</Text>
                     </div>
                 </div>
                 <div style={{width: "100%"}} className={styles.modalInfoRow} >
@@ -108,7 +112,7 @@ export const StakingModal = ({validator, signer, onConfirm}:{validator: Validato
                 </div>
                 <Spacer height="20px"></Spacer>
                 <div className={styles.buttonContainer}>
-                    <Button onClick={()=>{onConfirm(validator,inputAmount,selectedTx)}} disabled={Number(inputAmount)<=0}>Delegate</Button>
+                    <Button onClick={()=>{props.onConfirm(props.validator,inputAmount,selectedTx)}} disabled={Number(inputAmount)<=0}>Delegate</Button>
                 </div>
 
             </Container>

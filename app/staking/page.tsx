@@ -14,7 +14,7 @@ import BigNumber from "bignumber.js";
 import { formatPercent } from "@/utils/formatting";
 import Table from "@/components/table/table";
 import Splash from "@/components/splash/splash";
-import { GenerateValidatorTableRow } from "./components/validatorTableRow";
+import { GenerateMyStakingTableRow, GenerateValidatorTableRow } from "./components/validatorTableRow";
 import { useEffect, useState } from "react";
 import { StakingModal } from "./components/stakingModal/StakingModal";
 import { Validator } from "@/hooks/staking/interfaces/validators";
@@ -65,7 +65,7 @@ export default function StakingPage() {
     userEthAddress: signer?.account.address,
   });
 
-  
+  console.log(userStaking?.validators);
   //console.log(isLoading);
   //console.log(validators);
   //console.log(apr);
@@ -172,12 +172,29 @@ export default function StakingPage() {
       <Container width="100%" className={styles.tableContainer} >
         <div>
           <Table
+                title="My Staking"
+                headers={[
+                  { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 6 },
+                  { value: <Text opacity={0.4}>My Stake</Text>, ratio: 4 },
+                  { value: <Text opacity={0.4} font="rm_mono">Validator Total</Text>, ratio: 3 },
+                  { value: <Text opacity={0.4} font="rm_mono">% Share</Text>, ratio: 3 },
+                  { value: <Text opacity={0.4} font="rm_mono">Commission</Text>, ratio: 3 },
+                  { value: "", ratio: 4 },
+                ]}
+                content={[...paginatedvalidators.map((validator,index)=>
+                  GenerateMyStakingTableRow(userStaking, validator,index,()=>handleClick(validator))
+                )]}
+            />
+          </div>
+      </Container>
+      <Container width="100%" className={styles.tableContainer} >
+        <div>
+          <Table
                 title=""
                 headers={[
                   { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 6 },
                   { value: <Text opacity={0.4}>Validator Total</Text>, ratio: 4 },
                   { value: <Text opacity={0.4} font="rm_mono">Commission %</Text>, ratio: 3 },
-                  { value: <Text opacity={0.4} font="rm_mono">Voting Participation</Text>, ratio: 5 },
                   { value: <Text opacity={0.4} font="rm_mono">Delegators</Text>, ratio: 3 },
                   { value: "", ratio: 4 },
                 ]}
@@ -195,6 +212,7 @@ export default function StakingPage() {
                 Next
               </Button>
             </div>
+            <Spacer height="80px" />
           
       </Container>
       {/* <BoxedBackground /> */}
@@ -202,7 +220,7 @@ export default function StakingPage() {
             closeOnOverlayClick={false}
             open={selectedValidator!=null}
         >
-          <StakingModal validator={selectedValidator} signer= {signer} onConfirm={(selectedValidator,inputAmount,selectedTx) => handleStakingClick(selectedValidator,inputAmount,selectedTx)}></StakingModal>
+          <StakingModal userStaking={userStaking} validator={selectedValidator} signer= {signer} onConfirm={(selectedValidator,inputAmount,selectedTx) => handleStakingClick(selectedValidator,inputAmount,selectedTx)}></StakingModal>
       </Modal>
       
 

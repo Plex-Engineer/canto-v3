@@ -8,6 +8,7 @@ import {
   DelegationResponse,
   DelegationRewardResponse,
   UnbondingDelegationResponse,
+  ValidatorWithDelegations,
 } from "../interfaces/validators";
 import { ethToCantoAddress } from "@/utils/address";
 import { tryFetch } from "@/utils/async";
@@ -86,4 +87,20 @@ export async function getAllUserStakingData(
   } catch (err) {
     return NEW_ERROR("getAllUserStakingData::" + errMsg(err));
   }
+}
+
+export function getBalanceForValidator(userStakings: ValidatorWithDelegations[], validatorAddress: string): string | null {
+  console.log(userStakings);
+  if(userStakings){
+    console.log(userStakings.length);
+    if(userStakings.length>0){
+      const staking = userStakings.find(stake => stake.operator_address === validatorAddress);
+      console.log(staking);
+      console.log(staking?.userDelegation.balance);
+      return staking ? staking.userDelegation.balance : null;
+    }
+    return null;
+    
+  }
+  return null;
 }
