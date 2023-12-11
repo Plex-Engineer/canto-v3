@@ -35,8 +35,8 @@ export async function generateCantoPublicKeyWithTx(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Request-Headers": "Content-Type, Authorization",
-          "Access-Control-Allow-Origin": "true",
+          // "Access-Control-Request-Headers": "Content-Type, Authorization",
+          // "Access-Control-Allow-Origin": "true",
         },
         body: JSON.stringify({
           canto_address: cantoAddress,
