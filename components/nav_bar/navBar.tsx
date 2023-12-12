@@ -51,7 +51,7 @@ const NavBar = () => {
         >
           <Text size="sm">Bridge</Text>
         </Link>
-        {/* <Link
+        <Link
           href="/staking"
           className={clsx(
             styles["nav-link"],
@@ -59,7 +59,7 @@ const NavBar = () => {
           )}
         >
           <Text>Staking</Text>
-        </Link> */}
+        </Link>
         <Link
           href="/lending"
           className={clsx(

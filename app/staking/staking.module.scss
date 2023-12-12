@@ -1,0 +1,86 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    max-width: 1400px;
+    margin: 10px auto;
+    border-top: 1px solid var(--primary-90-color);
+    //   border-bottom: 1px solid var(--primary-90-color);
+    
+    position: relative;
+    padding-top: 2rem;
+  
+    &::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      left: 0;
+      width: calc(100% - 1px);
+      height: 10px;
+      border-left: 1px solid var(--primary-90-color);
+      border-right: 1px solid var(--primary-90-color);
+    }
+
+    
+      &::after {
+        content: "";
+        position: absolute;
+        top: -1px;
+        left: 72%;
+        transform: translateX(-50%);
+        width: 1px;
+        height: 10px;
+        border-left: 1px solid var(--primary-90-color);
+      }
+  }
+
+
+.title {
+    font-size: 32px !important;
+    text-align: left;
+    width: 100%;
+    max-width: 1500px;
+  }
+
+.infoBox{
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+
+}
+.ClaimBtn{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.paginationContainer {
+  //max-width: 1200px;
+  //min-width: 400px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  //align-items: start;
+  //align-items: center;
+  //margin: 20px 20px 20px 20px;
+  //margin: 0 auto;
+  margin: 0 5% 0 5%;
+  padding: 16px;
+}
+
+.tableContainer {
+  //display: flex;
+    //width: 100% !important;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    //align-items: flex-start;
+    //background: var(--card-sub-surface-color, #dfdfdf);
+    //padding: 10px;
+    //z-index: 1;
+    //box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
+}
+
