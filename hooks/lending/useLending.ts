@@ -19,10 +19,7 @@ import {
  * @returns
  */
 export default function useLending(
-  params: LendingHookInputParams,
-  options?: {
-    refetchInterval?: number;
-  }
+  params: LendingHookInputParams
 ): LendingHookReturn {
   // use query to get all general and user cToken data
   const { data: clmData, isLoading: loadingCTokens } = useQuery(
@@ -46,7 +43,6 @@ export default function useLending(
       onError: (error) => {
         console.log(error);
       },
-      refetchInterval: options?.refetchInterval || 5000,
       placeholderData: {
         cTokens: [],
         position: undefined,
