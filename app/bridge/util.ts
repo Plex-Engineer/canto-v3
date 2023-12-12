@@ -85,6 +85,9 @@ export default function useBridgeCombo(): BridgeComboReturn {
 
   // bridge hooks
   const { txStore, signer } = useCantoSigner();
+  const connectedEthAddress = signer?.account.address ?? "";
+  const currentChainId = signer?.chain.id;
+
   const [onTestnet, setOnTestnet] = useState<boolean>(false);
   const bridgeOut = useBridgeOut({
     testnet: onTestnet,
@@ -106,20 +109,20 @@ export default function useBridgeCombo(): BridgeComboReturn {
 
   useEffect(() => {
     const { data: network, error } = getNetworkInfoFromChainId(
-      signer?.chain.id ?? 1
+      currentChainId ?? 1
     );
     if (error) {
       console.log(error);
       return;
     }
     setOnTestnet(network.isTestChain);
-  }, [signer?.chain.id]);
+  }, [currentChainId]);
 
   useEffect(() => {
     // set the signer address
-    bridgeIn.setState("ethAddress", signer?.account.address);
-    bridgeOut.setState("ethAddress", signer?.account.address);
-  }, [signer?.account.address]);
+    bridgeIn.setState("ethAddress", connectedEthAddress);
+    bridgeOut.setState("ethAddress", connectedEthAddress);
+  }, [connectedEthAddress]);
 
   // user input amount
   const [amount, setAmount] = useState<string>("");
@@ -165,7 +168,7 @@ export default function useBridgeCombo(): BridgeComboReturn {
     // add flow to store
     txStore?.addNewFlow({
       txFlow: flow,
-      signer: signer,
+      ethAccount: connectedEthAddress,
       onSuccessCallback: () => setIsConfirmationModalOpen(false),
     });
   }

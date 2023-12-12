@@ -144,7 +144,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     });
     txStore?.addNewFlow({
       txFlow,
-      signer,
+      ethAccount: signer.account.address,
       onSuccessCallback: props.onSuccessTx,
     });
   }

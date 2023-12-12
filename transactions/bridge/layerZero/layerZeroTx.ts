@@ -119,6 +119,7 @@ export async function bridgeLayerZeroTx(
           txList.push(
             _oftDepositOrWithdrawTx(
               txParams.token.chainId,
+              txParams.ethSender,
               true,
               txParams.token.address,
               amountToDeposit,

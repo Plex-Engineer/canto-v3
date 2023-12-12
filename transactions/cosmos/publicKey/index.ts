@@ -47,6 +47,7 @@ export async function generateCantoPublicKeyWithTx(
     return NO_ERROR([
       _generatePubKeyTx(
         chainId,
+        ethAddress,
         cantoAddress,
         TX_DESCRIPTIONS.GENERATE_PUBLIC_KEY()
       ),
@@ -58,6 +59,7 @@ export async function generateCantoPublicKeyWithTx(
 
 const _generatePubKeyTx = (
   chainId: number,
+  ethSender: string,
   cantoSender: string,
   description: TransactionDescription
 ): Transaction => {
@@ -69,6 +71,7 @@ const _generatePubKeyTx = (
   });
   return {
     chainId,
+    fromAddress: ethSender,
     type: "COSMOS",
     description,
     msg: pubKeyTx,

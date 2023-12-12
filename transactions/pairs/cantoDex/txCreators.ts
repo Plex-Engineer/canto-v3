@@ -24,6 +24,7 @@ export const _addCantoDexLiquidityTx = (
   const cantoInPair = isToken1Canto || isToken2Canto;
   return {
     description,
+    fromAddress: ethAccount,
     chainId: chainId,
     type: "EVM",
     target: routerAddress,
@@ -71,6 +72,7 @@ export const _removeCantoDexLiquidityTx = (
   const cantoInPair = isToken1Canto || isToken2Canto;
   return {
     description,
+    fromAddress: ethAccount,
     chainId: chainId,
     type: "EVM",
     target: routerAddress,

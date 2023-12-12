@@ -49,6 +49,7 @@ export async function createApprovalTxs(
       txList.push(
         _approveTx(
           chainId,
+          ethAccount,
           tokens[index].address,
           spender.address,
           amounts[index],
