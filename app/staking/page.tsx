@@ -29,6 +29,7 @@ export default function StakingPage() {
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedValidator, setSelectedValidator] = useState<Validator | null>(null);
+  
 
   //const [selectedTx,setSelectedTx] = useState<StakingTxTypes>(StakingTxTypes.DELEGATE);
 
@@ -64,6 +65,7 @@ export default function StakingPage() {
     chainId: chainId,
     userEthAddress: signer?.account.address,
   });
+  
 
   console.log(userStaking?.validators);
   //console.log(isLoading);
@@ -94,6 +96,8 @@ export default function StakingPage() {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+  const hasUserStaked: boolean | undefined = (userStaking && userStaking.validators && userStaking.validators.length>0);
+  
 
   const handlePrevious = () => {
     if (currentPage > 1) {
@@ -110,9 +114,12 @@ export default function StakingPage() {
   useEffect(() => {
     setTotalPages(Math.ceil(validators.length / pageSize));
   }, [validators.length, pageSize]);
+  
   function handleClick(validator: Validator){
     setSelectedValidator(validator);
   }
+  
+  console.log(hasUserStaked);
   if(isLoading){
     return(
       <Splash></Splash>
@@ -169,7 +176,8 @@ export default function StakingPage() {
 
       </Container>
       <Spacer height="40px"/>
-      <Container width="100%" className={styles.tableContainer} >
+      
+      {hasUserStaked && userStaking && <div><Container width="100%" className={styles.tableContainer} >
         <div>
           <Table
                 title="My Staking"
@@ -181,16 +189,20 @@ export default function StakingPage() {
                   { value: <Text opacity={0.4} font="rm_mono">Commission</Text>, ratio: 3 },
                   { value: "", ratio: 4 },
                 ]}
-                content={[...paginatedvalidators.map((validator,index)=>
-                  GenerateMyStakingTableRow(userStaking, validator,index,()=>handleClick(validator))
+                content={[...userStaking.validators.map((userStakingElement,index)=>
+                  GenerateMyStakingTableRow(userStakingElement, index,()=>handleClick(userStakingElement))
                 )]}
             />
           </div>
-      </Container>
+        </Container>
+        <Spacer height="40px"/>
+      </div>
+      }
+      <Spacer height="40px"/>
       <Container width="100%" className={styles.tableContainer} >
         <div>
           <Table
-                title=""
+                title="VALIDATORS"
                 headers={[
                   { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 6 },
                   { value: <Text opacity={0.4}>Validator Total</Text>, ratio: 4 },

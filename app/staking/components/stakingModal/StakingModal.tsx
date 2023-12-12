@@ -38,6 +38,14 @@ export const StakingModal = (props : StakingModalParams) => {
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     setAmount('');
+    if(tab=='delegate'){
+        setSelectedTx(StakingTxTypes.DELEGATE);
+    }if(tab=='undelegate'){
+        setSelectedTx(StakingTxTypes.UNDELEGATE);
+    }
+    if(tab=='redelegate'){
+        setSelectedTx(StakingTxTypes.REDELEGATE);
+    }
   };
     if(!props.validator){
         return;
