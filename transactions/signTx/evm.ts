@@ -92,17 +92,23 @@ export async function checkOnRightChain(
   chainId: number
 ): PromiseWithError<GetWalletClientResult> {
   try {
-    if (!signer) throw new Error(TX_SIGN_ERRORS.MISSING_SIGNER());
-    if (signer.chain.id !== chainId) {
-      const network = await switchNetwork({ chainId });
-      if (!network || network.id !== chainId) {
-        throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
-      }
-      const newSigner = await getWalletClient({ chainId });
-      if (!newSigner) throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
-      return NO_ERROR(newSigner);
+    const currentSigner = await getWalletClient({ chainId });
+    if (!currentSigner) throw new Error(TX_SIGN_ERRORS.MISSING_SIGNER());
+    // if signer is on the right chain, return
+    if (currentSigner.chain.id === chainId) return NO_ERROR(currentSigner);
+
+    // switch to correct chain
+    const network = await switchNetwork({ chainId });
+    if (!network || network.id !== chainId) {
+      throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
     }
-    return NO_ERROR(signer);
+
+    // get new signer
+    const newSigner = await getWalletClient({ chainId });
+    if (!newSigner) throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
+
+    // return new signer
+    return NO_ERROR(newSigner);
   } catch (err) {
     return NEW_ERROR("checkOnRightChain", err);
   }
