@@ -10,6 +10,8 @@ import {
   validateBridgeInRetryParams,
   validateBridgeOutRetryParams,
 } from "@/hooks/bridge/transactions/bridge";
+import { ProposalVoteTxParams } from "@/hooks/gov/interfaces/voteTxParams";
+import { proposalVoteTx } from "@/hooks/gov/transactions/vote";
 import { CTokenLendingTransactionParams } from "@/hooks/lending/interfaces/lendingTxTypes";
 import {
   cTokenLendingTx,
@@ -33,6 +35,8 @@ import { StakingTransactionParams } from "@/hooks/staking/interfaces/stakingTxTy
 import { stakingTx } from "@/hooks/staking/transactions/staking";
 
 
+
+
 export enum TransactionFlowType {
   BRIDGE_IN = "BRIDGE_IN",
   BRIDGE_OUT = "BRIDGE_OUT",
@@ -41,7 +45,11 @@ export enum TransactionFlowType {
   CLAIM_LP_REWARDS_TX = "CLAIM_LP_REWARDS_TX",
   CLM_CTOKEN_TX = "CLM_CTOKEN_TX",
   STAKE_LP_TX = "STAKE_LP_TX",
+<<<<<<< HEAD
   STAKE_CANTO_TX = "STAKE_CANTO_TX"
+=======
+  VOTE_TX = "VOTE_TX",
+>>>>>>> venu/eng-1226
 }
 
 export const TRANSACTION_FLOW_MAP: {
@@ -88,9 +96,16 @@ export const TRANSACTION_FLOW_MAP: {
     validRetry: async (params: StakeLPParams) => NO_ERROR({ valid: false }),
     tx: async (params: StakeLPParams) => stakeLPFlow(params),
   },
+<<<<<<< HEAD
   [TransactionFlowType.STAKE_CANTO_TX]: {
     validRetry: async (params: StakingTransactionParams) =>
       NO_ERROR({ valid: true }),
     tx: async (params: StakingTransactionParams) => stakingTx(params),
+=======
+  [TransactionFlowType.VOTE_TX]: {
+    validRetry: async (params: ProposalVoteTxParams) =>
+      NO_ERROR({ valid: false }),
+    tx: async (params: ProposalVoteTxParams) => proposalVoteTx(params),
+>>>>>>> venu/eng-1226
   },
 };
