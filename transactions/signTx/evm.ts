@@ -118,36 +118,3 @@ export async function getEvmSignerOnChainId(
     return NEW_ERROR("getEvmSignerOnChainId", err);
   }
 }
-
-/**
- * @notice checks if the signer is on the right chain and tries to switch if not
- * @dev for EVM wallets
- * @param {GetWalletClientResult} signer EVM signing wallet client
- * @param {number} chainId chainId signer should be on
- * @returns {PromiseWithError<GetWalletClientResult>} new signer if switch was made or error
- */
-export async function checkOnRightChain(
-  signer: GetWalletClientResult,
-  chainId: number
-): PromiseWithError<GetWalletClientResult> {
-  try {
-    // get current network
-    const currentNetwork = getNetwork();
-    if (!currentNetwork) throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
-
-    // check chain id
-    if (currentNetwork.chain?.id !== chainId) {
-      // switch chains
-      const network = await switchNetwork({ chainId });
-      if (!network || network.id !== chainId)
-        throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
-    }
-    // get new signer
-    const newSigner = await getWalletClient({ chainId });
-
-    // return new signer
-    return NO_ERROR(newSigner);
-  } catch (err) {
-    return NEW_ERROR("checkOnRightChain", err);
-  }
-}
