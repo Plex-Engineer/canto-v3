@@ -7,6 +7,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  ReturnWithError,
 } from "@/config/interfaces";
 import { estimateOFTSendGasFee } from "@/transactions/bridge/layerZero/helpers";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
@@ -18,7 +19,8 @@ import {
   getGravityBridgeFeesFromToken,
   getGravityChainFeeInPercent,
 } from "@/transactions/bridge/gravityBridge/gravityFees";
-import { isCantoChainId } from "@/utils/networks";
+import { BridgeFeesByMethod } from "./interfaces/bridgeFees";
+import { CONVERT_FEE, IBC_FEE } from "@/config/consts/fees";
 
 export type BridgingFeesReturn =
   | {
@@ -28,33 +30,8 @@ export type BridgingFeesReturn =
   | { isLoading: false; error: string; ready: false }
   | ({ isLoading: false; error: null; ready: true } & BridgeFeesByMethod);
 
-export type BridgeFeesByMethod =
-  | {
-      method: BridgingMethod.LAYER_ZERO;
-      description: string;
-      gasFee: {
-        amount: string;
-        formattedAmount: string;
-      };
-      // if the fee is in the same denom as the token being bridged
-      feeInBridgeToken: boolean;
-    }
-  | {
-      method: BridgingMethod.GRAVITY_BRIDGE;
-      description: string;
-      chainFeePercent: number;
-      bridgeFeeOptions: {
-        slow: string;
-        medium: string;
-        fast: string;
-      };
-    }
-  | {
-      // not implemented yet
-      method: BridgingMethod.IBC | null;
-    };
-
 type BridgingFeesProps = {
+  direction: "in" | "out";
   token: BridgeToken | null;
   method: BridgingMethod | null;
   fromNetwork: BaseNetwork | null;
@@ -65,6 +42,7 @@ type BridgingFeesProps = {
  * Includes gas fees (LZ), and bridging/chain fees (GBridge)
  */
 export default function useBridgingFees({
+  direction,
   token,
   method,
   fromNetwork,
@@ -89,6 +67,7 @@ export default function useBridgingFees({
       async function fetchFees() {
         // get fees
         const { data: fees, error } = await getFees({
+          direction,
           token,
           method,
           fromNetwork,
@@ -106,7 +85,13 @@ export default function useBridgingFees({
       }
       fetchFees();
     },
-    dependencies: [token?.id, method, fromNetwork?.id, toNetwork?.id],
+    dependencies: [
+      token?.id,
+      method,
+      fromNetwork?.id,
+      toNetwork?.id,
+      direction,
+    ],
     timeout: 1000,
   });
 
@@ -123,6 +108,7 @@ export default function useBridgingFees({
 }
 
 async function getFees({
+  direction,
   method,
   token,
   toNetwork,
@@ -137,10 +123,11 @@ async function getFees({
     case BridgingMethod.LAYER_ZERO:
       return getLZFees(token, fromNetwork, toNetwork);
     case BridgingMethod.GRAVITY_BRIDGE:
-      return isCantoChainId(toNetwork.chainId as number)
+      return direction === "in"
         ? NO_ERROR({ method: null })
         : getGravityBridgeOutFees(token);
     case BridgingMethod.IBC:
+      return direction === "in" ? NO_ERROR({ method: null }) : getIBCOutFees();
     default:
       return NO_ERROR({ method: null });
   }
@@ -167,9 +154,8 @@ async function getLZFees(
     if (error) throw error;
     return NO_ERROR({
       method: BridgingMethod.LAYER_ZERO,
-      description:
-        "Gas will be higher than other transactions because you will be paying for gas on both the sending and receiving chains. The value shown here is an estimate and will vary with gas fees.",
-      gasFee: {
+      lzFee: {
+        feeInBridgeToken: !!token.nativeWrappedToken,
         amount: gas.toString(),
         formattedAmount: displayAmount(
           gas.toString(),
@@ -178,8 +164,9 @@ async function getLZFees(
             symbol: fromNetwork.nativeCurrency.symbol,
           }
         ),
+        description:
+          "Gas will be higher than other transactions because you will be paying for gas on both the sending and receiving chains. The value shown here is an estimate and will vary with gas fees.",
       },
-      feeInBridgeToken: !!token.nativeWrappedToken,
     });
   } catch (err) {
     return NEW_ERROR("getLZFees", err);
@@ -205,11 +192,26 @@ async function getGravityBridgeOutFees(
     // return fees object
     return NO_ERROR({
       method: BridgingMethod.GRAVITY_BRIDGE,
+      direction: "out",
       description: "gravity bridge fees",
       chainFeePercent,
       bridgeFeeOptions: bridgeFees,
+      gasFees: [
+        { name: "convert coin", amount: CONVERT_FEE.amount },
+        { name: "ibc transfer", amount: IBC_FEE.amount },
+      ],
     });
   } catch (err) {
     return NEW_ERROR("getGravityBridgeOutFees", err);
   }
+}
+function getIBCOutFees(): ReturnWithError<BridgeFeesByMethod> {
+  return NO_ERROR({
+    method: BridgingMethod.IBC,
+    direction: "out",
+    gasFees: [
+      { name: "convert coin", amount: CONVERT_FEE.amount },
+      { name: "ibc transfer", amount: IBC_FEE.amount },
+    ],
+  });
 }

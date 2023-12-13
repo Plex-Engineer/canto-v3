@@ -333,37 +333,58 @@ const FeesSection = ({
   ) : (
     <>
       {props.method === BridgingMethod.LAYER_ZERO && (
-        <div>Gas Fee: {props.gasFee.formattedAmount}</div>
+        <div>Gas Fee: {props.lzFee.formattedAmount}</div>
       )}
-      {props.method === BridgingMethod.GRAVITY_BRIDGE && (
-        <>
-          <div>
-            Chain Fee Percent:{" "}
-            {`${props.chainFeePercent}% (${displayAmount(
-              fees.totalChainFee,
-              token?.decimals ?? 0
-            )})`}
-          </div>
-          <div>
-            Selected Bridge Fee:{" "}
-            {displayAmount(fees.selected, token?.decimals ?? 0)}
-          </div>
-          <div style={{ display: "flex", flexDirection: "row" }}>
-            {Object.values(props.bridgeFeeOptions).map((fee) => (
-              <Button
-                key={fee} 
-                onClick={() => fees.setSelected(fee)}
-                color={fees.selected === fee ? "accent" : "primary"}
-              >
-                {displayAmount(
-                  addTokenBalances(fee, fees.totalChainFee),
-                  token?.decimals ?? 0,
-                  { symbol: token?.symbol }
-                )}
-              </Button>
-            ))}
-          </div>
-        </>
+      {props.method === BridgingMethod.GRAVITY_BRIDGE &&
+        props.direction === "out" && (
+          <>
+            <div>
+              Chain Fee Percent:{" "}
+              {`${props.chainFeePercent}% (${displayAmount(
+                fees.totalChainFee,
+                token?.decimals ?? 0
+              )})`}
+            </div>
+            <div>
+              Selected Bridge Fee:{" "}
+              {displayAmount(fees.selected, token?.decimals ?? 0)}
+            </div>
+            <div style={{ display: "flex", flexDirection: "row" }}>
+              {Object.values(props.bridgeFeeOptions).map((fee) => (
+                <Button
+                  key={fee}
+                  onClick={() => fees.setSelected(fee)}
+                  color={fees.selected === fee ? "accent" : "primary"}
+                >
+                  {displayAmount(
+                    addTokenBalances(fee, fees.totalChainFee),
+                    token?.decimals ?? 0,
+                    { symbol: token?.symbol }
+                  )}
+                </Button>
+              ))}
+            </div>
+            <ul>
+              {Object.values(props.gasFees).map((fee) => (
+                <li key={fee.name}>{`${fee.name}: ${displayAmount(
+                  fee.amount,
+                  18,
+                  {
+                    symbol: "CANTO",
+                  }
+                )}`}</li>
+              ))}
+            </ul>
+          </>
+        )}
+      {props.method === BridgingMethod.IBC && props.direction === "out" && (
+        <ul>
+          {Object.values(props.gasFees).map((fee) => (
+            <li key={fee.name}>{`${fee.name}: ${displayAmount(fee.amount, 18, {
+              symbol: "CANTO",
+            })}`}</li>
+          ))}
+        </ul>
       )}
     </>
   );

@@ -163,6 +163,7 @@ export default function useBridgeCombo(): BridgeComboReturn {
   /// FEES
   ///
   const bridgeFees = useBridgingFees({
+    direction: bridge.direction,
     token: bridge.selections.token,
     method: bridge.selections.method,
     fromNetwork: bridge.selections.fromNetwork,
@@ -170,7 +171,9 @@ export default function useBridgeCombo(): BridgeComboReturn {
   });
   const [selectedGBridgeFee, setSelectedGBridgeFee] = useState<string>("0");
   const gBridgeFees =
-    bridgeFees.ready && bridgeFees.method === BridgingMethod.GRAVITY_BRIDGE
+    bridgeFees.ready &&
+    bridgeFees.method === BridgingMethod.GRAVITY_BRIDGE &&
+    bridgeFees.direction === "out"
       ? {
           chainFee:
             percentOfAmount(amountAsBigNumberString, bridgeFees.chainFeePercent)
@@ -178,6 +181,10 @@ export default function useBridgeCombo(): BridgeComboReturn {
           bridgeFee: selectedGBridgeFee,
         }
       : {};
+  // reset user selection when options change
+  useEffect(() => {
+    setSelectedGBridgeFee("0");
+  }, [bridgeFees.ready]);
 
   ///
   /// TRANSACTIONS

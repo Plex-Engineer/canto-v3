@@ -2,7 +2,7 @@ import { BridgeToken } from "../interfaces/tokens";
 import { isOFTToken } from "@/utils/tokens";
 import BigNumber from "bignumber.js";
 import { BridgingMethod } from "@/transactions/bridge";
-import { BridgeFeesByMethod } from "../useBridgingFees";
+import { BridgeFeesByMethod } from "../interfaces/bridgeFees";
 
 /**
  * @notice Returns the maximum amount of tokens that can be bridged
@@ -26,12 +26,12 @@ export function maxBridgeAmountForToken(
     isOFTToken(token) &&
     token.nativeWrappedToken
   ) {
-    const max = new BigNumber(token.balance).minus(fees.gasFee.amount);
+    const max = new BigNumber(token.balance).minus(fees.lzFee.amount);
     return max.isGreaterThan(0) ? max.integerValue().toString() : "0";
   }
 
   // check if gravity bridge out for bridging fees
-  if (fees.method === BridgingMethod.GRAVITY_BRIDGE) {
+  if (fees.method === BridgingMethod.GRAVITY_BRIDGE && fees.direction === "out") {
     const max = new BigNumber(token.balance)
       .dividedBy(1 + fees.chainFeePercent / 100)
       .minus(extraFees?.gBridgeFee ?? 0);
