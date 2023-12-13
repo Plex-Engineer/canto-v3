@@ -37,6 +37,11 @@ const actions = {
           pageName: pageName,
         });
       },
+      setTheme:(theme: string)=>{
+        posthog.capture("Theme Set To", {
+          theme: theme,
+        });
+      },
       connections: {
         walletConnect: (connected: boolean) => {
           if (connected) {
@@ -45,6 +50,13 @@ const actions = {
             posthog.capture("Wallet Disconnected");
           }
         },
+      },
+      lpInterfaceActions: {
+        setFilter: (type: string)=>{
+          posthog.capture("Pools Filtered To", {
+            type: type,
+          });
+        }
       },
     },
   };
