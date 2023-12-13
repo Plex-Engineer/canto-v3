@@ -20,7 +20,7 @@ interface Props {
     limitName: string;
     limit: string;
   };
-  extraNode: React.ReactNode;
+  extraNode?: React.ReactNode;
 }
 const Amount = (props: Props) => {
   const [focused, setFocused] = useState(false);
