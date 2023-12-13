@@ -252,10 +252,8 @@ export default function useBridgeOut(
     switch (state.selectedMethod) {
       case BridgingMethod.IBC:
       case BridgingMethod.LAYER_ZERO:
-        return state.connectedEthAddress;
       case BridgingMethod.GRAVITY_BRIDGE:
-        // method does not exist yet for bridge out
-        return null;
+        return state.connectedEthAddress;
       default:
         return null;
     }
@@ -267,10 +265,8 @@ export default function useBridgeOut(
       case BridgingMethod.IBC:
         return state.userInputCosmosAddress;
       case BridgingMethod.LAYER_ZERO:
-        return state.connectedEthAddress;
       case BridgingMethod.GRAVITY_BRIDGE:
-        // method does not exist yet for bridge out
-        return null;
+        return state.connectedEthAddress;
       default:
         return null;
     }
@@ -315,6 +311,14 @@ export default function useBridgeOut(
       data: getToken(state.selectedToken?.id ?? "").data,
       amount: params.amount,
     },
+    ...(params.bridgeFee && params.chainFee
+      ? {
+          gravityBridgeFees: {
+            bridgeFee: params.bridgeFee,
+            chainFee: params.chainFee,
+          },
+        }
+      : {}),
   });
 
   return {
