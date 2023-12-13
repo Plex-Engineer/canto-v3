@@ -13,7 +13,11 @@ import {
 import { TX_PARAM_ERRORS } from "@/config/consts/errors";
 import { areEqualAddresses, isValidEthAddress } from "@/utils/address";
 import { maxAmountForLendingTx } from "@/utils/clm";
-import { greaterThan, validateWeiUserInputTokenAmount } from "@/utils/math";
+import {
+  greaterThan,
+  percentOfAmount,
+  validateWeiUserInputTokenAmount,
+} from "@/utils/math";
 import { MAX_UINT256, getCantoCoreAddress } from "@/config/consts/addresses";
 import { createApprovalTxs } from "../erc20";
 import { displayAmount } from "@/utils/formatting";
@@ -83,6 +87,10 @@ export async function cTokenLendingTx(
       (txParams.txType === CTokenLendingTxTypes.SUPPLY ||
         txParams.txType === CTokenLendingTxTypes.REPAY)
     ) {
+      const approvalAmount =
+        txParams.txType === CTokenLendingTxTypes.REPAY && txParams.max
+          ? percentOfAmount(txParams.amount, 105).data ?? txParams.amount
+          : txParams.amount;
       const { data: allowanceTxs, error: allowanceError } =
         await createApprovalTxs(
           txParams.chainId,
@@ -93,7 +101,7 @@ export async function cTokenLendingTx(
               symbol: txParams.cToken.underlying.symbol,
             },
           ],
-          [txParams.amount],
+          [approvalAmount],
           { address: txParams.cToken.address, name: "Lending Market" }
         );
       if (allowanceError) throw allowanceError;
