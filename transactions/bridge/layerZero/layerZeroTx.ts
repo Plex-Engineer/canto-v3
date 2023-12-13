@@ -21,8 +21,7 @@ import { getMessagesBySrcTxHash } from "@layerzerolabs/scan-client";
 import Web3 from "web3";
 import { checkUseAdapterParams, estimateOFTSendGasFee } from "./helpers";
 import { createApprovalTxs } from "@/transactions/erc20";
-import BigNumber from "bignumber.js";
-import { _oftDepositOrWithdrawTx, _oftTransferTx } from "./txCreators";
+import { _oftTransferTx } from "./txCreators";
 import { displayAmount } from "@/utils/formatting";
 import { BridgingMethod, getBridgeMethodInfo } from "..";
 
@@ -71,7 +70,7 @@ export async function bridgeLayerZeroTx(
     );
 
     /** estimate gas */
-    const { data: gas, error: gasError } = await estimateOFTSendGasFee(
+    let { data: gas, error: gasError } = await estimateOFTSendGasFee(
       txParams.token.chainId,
       toLZChainId,
       txParams.token.address,
@@ -111,25 +110,9 @@ export async function bridgeLayerZeroTx(
           );
         if (oftBalanceError) throw oftBalanceError;
         // if OFT balance is less than amount, then user needs to deposit
+        // Native OFT contract will handle the deposit (just send extra gas to cover deposit amount)
         if (oftBalance.lt(txParams.amount)) {
-          const amountToDeposit = new BigNumber(txParams.amount)
-            .minus(oftBalance)
-            .toString();
-          // push tx
-          txList.push(
-            _oftDepositOrWithdrawTx(
-              txParams.token.chainId,
-              txParams.ethSender,
-              true,
-              txParams.token.address,
-              amountToDeposit,
-              TX_DESCRIPTIONS.OFT_DEPOSIT_OR_WITHDRAW(
-                txParams.token.symbol,
-                displayAmount(amountToDeposit, txParams.token.decimals),
-                true
-              )
-            )
-          );
+          gas = gas.plus(txParams.amount).minus(oftBalance);
         }
       }
     }
