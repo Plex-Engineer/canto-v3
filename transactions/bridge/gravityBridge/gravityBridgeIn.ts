@@ -99,6 +99,7 @@ export async function gravityBridgeInTx(
         txList.push(
           _wrapTx(
             txParams.token.chainId,
+            txParams.ethSender,
             txParams.token.address,
             amountToWrap,
             TX_DESCRIPTIONS.WRAP_ETH(
@@ -125,6 +126,7 @@ export async function gravityBridgeInTx(
     txList.push(
       _sendToCosmosTx(
         txParams.token.chainId,
+        txParams.ethSender,
         cantoReceiver,
         txParams.token.address,
         txParams.amount,

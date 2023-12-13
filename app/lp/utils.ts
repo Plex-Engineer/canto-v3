@@ -6,10 +6,11 @@ import { useState } from "react";
 
 export default function usePool() {
   const { txStore, signer, chainId } = useCantoSigner();
+  const connectedEthAccount = signer?.account.address ?? "";
   // all pairs (ambient and cantoDex)
   const { isLoading, pairs, rewards, selection, transactions } = useLP({
     chainId,
-    userEthAddress: signer?.account.address ?? "",
+    userEthAddress: connectedEthAccount,
   });
   /** general selection */
   const { pair: selectedPair, setPair } = selection;
@@ -24,7 +25,7 @@ export default function usePool() {
   function validateCantoDexTx(params: Partial<CantoDexTransactionParams>) {
     return transactions.validateCantoDexLPParams({
       chainId,
-      ethAccount: signer?.account.address ?? "",
+      ethAccount: connectedEthAccount,
       pair: selectedPair,
       ...params,
     } as CantoDexTransactionParams);
@@ -32,13 +33,13 @@ export default function usePool() {
   function sendCantoDexTxFlow(params: Partial<CantoDexTransactionParams>) {
     const flow = transactions.newCantoDexLPFlow({
       chainId,
-      ethAccount: signer?.account.address ?? "",
+      ethAccount: connectedEthAccount,
       pair: selectedPair,
       ...params,
     } as CantoDexTransactionParams);
     txStore?.addNewFlow({
       txFlow: flow,
-      signer: signer,
+      ethAccount: connectedEthAccount,
       onSuccessCallback: () => selection.setPair(null),
     });
   }
@@ -48,7 +49,7 @@ export default function usePool() {
   function validateAmbientTxParams(params: Partial<AmbientTransactionParams>) {
     return transactions.validateAmbientPoolTxParams({
       chainId,
-      ethAccount: signer?.account.address ?? "",
+      ethAccount: connectedEthAccount,
       pool: selectedPair,
       ...params,
     } as AmbientTransactionParams);
@@ -56,14 +57,14 @@ export default function usePool() {
   function sendAmbientTxFlow(params: Partial<AmbientTransactionParams>) {
     const flow = transactions.newAmbientPoolTxFlow({
       chainId,
-      ethAccount: signer?.account.address ?? "",
+      ethAccount: connectedEthAccount,
       pool: selectedPair,
       ...params,
     } as AmbientTransactionParams);
 
     txStore?.addNewFlow({
       txFlow: flow,
-      signer: signer,
+      ethAccount: connectedEthAccount,
       onSuccessCallback: () => selection.setPair(null),
     });
   }
@@ -74,7 +75,7 @@ export default function usePool() {
     const flow = transactions.newClaimRewardsFlow();
     txStore?.addNewFlow({
       txFlow: flow,
-      signer: signer,
+      ethAccount: connectedEthAccount,
       onSuccessCallback: () => selection.setPair(null),
     });
   }

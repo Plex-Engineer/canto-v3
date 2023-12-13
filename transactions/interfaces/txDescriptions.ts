@@ -51,10 +51,10 @@ export const TX_DESCRIPTIONS = {
   }),
   CTOKEN_COLLATERALIZE: (tokenSymbol: string, collateralize: boolean) => ({
     title: `${
-      collateralize ? "Collateralize" : "Uncollateralize"
+      collateralize ? "Collateralize" : "Decollateralize"
     } ${tokenSymbol}`,
     description: `${
-      collateralize ? "Collateralize" : "Uncollateralize"
+      collateralize ? "Collateralize" : "Decollateralize"
     } ${tokenSymbol} in the lending market`,
   }),
   DRIP_COMPTROLLER: () => ({

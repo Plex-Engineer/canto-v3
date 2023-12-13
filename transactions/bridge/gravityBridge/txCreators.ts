@@ -10,6 +10,7 @@ import { createMsgsSendToEth } from "@/transactions/cosmos/messages/gravitySendT
  */
 export const _sendToCosmosTx = (
   chainId: number,
+  fromEthAddress: string,
   cantoReceiverAddress: string,
   tokenAddress: string,
   amount: string,
@@ -19,6 +20,7 @@ export const _sendToCosmosTx = (
     type: BridgingMethod.GRAVITY_BRIDGE,
     lastStatus: "NONE",
   },
+  fromAddress: fromEthAddress,
   description,
   chainId: chainId,
   type: "EVM",
@@ -31,12 +33,14 @@ export const _sendToCosmosTx = (
 
 export const _wrapTx = (
   chainId: number,
+  fromEthAddress: string,
   wethAddress: string,
   amount: string,
   description: TransactionDescription
 ): Transaction => ({
   description,
   chainId: chainId,
+  fromAddress: fromEthAddress,
   type: "EVM",
   target: wethAddress,
   abi: WETH_ABI,

@@ -14,7 +14,7 @@ export function isValidCantoAddress(cantoAddress: string): boolean {
  * @param {string} ethAddress address to check
  * @returns {boolean} if a valid eth address
  */
-export function isValidEthAddress(ethAddress: string): boolean {
+export function isValidEthAddress(ethAddress: string): ethAddress is `0x${string}` {
   return checkHex(ethAddress);
 }
 

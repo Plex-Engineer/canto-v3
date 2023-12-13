@@ -102,9 +102,11 @@ export default function Page() {
               ...pairs.userCantoDex.map((pair) =>
                 UserCantoDexPairRow({
                   pair,
+
                   onManage: (pairAddress) => {
                     setPair(pairAddress);
                   },
+                  sendTxFlow: sendCantoDexTxFlow,
                 })
               ),
             ]}

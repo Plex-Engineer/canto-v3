@@ -26,7 +26,7 @@ async function getAmbientApiData<T>(
   chainId: number,
   endpointSuffix: string
 ): PromiseWithError<T> {
-  if (!isCantoChainId(chainId)) {
+  if (!isCantoChainId(chainId) || chainId === 7701) {
     return NEW_ERROR("getAmbientApiData: chainId not supported");
   }
   // get response from api

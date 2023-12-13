@@ -1,0 +1,10 @@
+{
+    "short_name": "Canto.io",
+    "name": "Canto.io",
+    "description": "Connects your Safe with Canto.io",
+    "iconPath": "canto.svg",
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#ffffff"
+}

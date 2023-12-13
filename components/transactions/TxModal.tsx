@@ -191,7 +191,10 @@ const TransactionModal = () => {
                 <TxFlow
                   txFlow={getFlowFromId(currentFlowId)}
                   onRetry={() => {
-                    txStore?.performFlow(signer, currentFlowId);
+                    txStore?.performFlow(
+                      signer?.account.address ?? "",
+                      currentFlowId
+                    );
                   }}
                   setBridgeStatus={(txIndex, status) =>
                     txStore?.setTxBridgeStatus(

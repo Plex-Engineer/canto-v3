@@ -57,7 +57,7 @@ type ChainType = "mainnet" | "testnet";
 export function getCantoCoreAddress(
   chainId: number,
   contractName: ContractName
-): string | null {
+): `0x${string}` | null {
   // make sure on canto chain id
   let chainType: ChainType;
   if (chainId === CANTO_MAINNET_EVM.chainId) chainType = "mainnet";

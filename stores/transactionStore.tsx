@@ -8,7 +8,6 @@ import {
   getCosmosEIPChainObject,
   getNetworkInfoFromChainId,
 } from "@/utils/networks";
-import { GetWalletClientResult } from "wagmi/actions";
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 import {
@@ -27,8 +26,8 @@ import { signTransaction, waitForTransaction } from "@/transactions/signTx";
 // only save last 100 flows for each user to save space
 const USER_FLOW_LIMIT = 100;
 interface AddNewFlowParams {
+  ethAccount: string;
   txFlow: NewTransactionFlow;
-  signer: GetWalletClientResult | undefined;
   onSuccessCallback?: () => void;
 }
 export interface TransactionStore {
@@ -38,12 +37,12 @@ export interface TransactionStore {
   // will delete the flow with the id provided, or the entire store if no index provided
   clearTransactions: (ethAccount: string, flowId?: string) => void;
   performFlow: (
-    signer: GetWalletClientResult | undefined,
+    ethAccount: string,
     flowId?: string
   ) => PromiseWithError<boolean>;
   // this should only be called internally
   performTx: (
-    signer: GetWalletClientResult | undefined,
+    ethAccount: string,
     flowId: string,
     txIndex: number,
     tx: TransactionWithStatus
@@ -79,12 +78,6 @@ const useTransactionStore = create<TransactionStore>()(
           return userTxFlows || [];
         },
         addNewFlow: async (params) => {
-          // make sure signer is here
-          if (!params.signer) {
-            return NEW_ERROR(
-              "useTransactionStore::addNewFlow: no signer provided"
-            );
-          }
           // create new flow before getting transactions
           // set the transactions to an empty array for now, since we will get them when actually performing the flow
           let newFlow: TransactionFlow = {
@@ -97,7 +90,7 @@ const useTransactionStore = create<TransactionStore>()(
           };
           // add the flow to the user map and set loading to null
           const currentUserTransactionFlows = get().getUserTransactionFlows(
-            params.signer.account.address
+            params.ethAccount
           );
           // make new list but make sure we don't go over the limit (take last 100)
           const newUserList = [...currentUserTransactionFlows, newFlow].slice(
@@ -105,14 +98,11 @@ const useTransactionStore = create<TransactionStore>()(
           );
           set({
             transactionFlows: new Map(
-              get().transactionFlows.set(
-                params.signer.account.address,
-                newUserList
-              )
+              get().transactionFlows.set(params.ethAccount, newUserList)
             ),
           });
           // we are expecting a signer so call performTransactions
-          return await get().performFlow(params.signer);
+          return await get().performFlow(params.ethAccount);
         },
         clearTransactions: (ethAccount, flowId) => {
           const txFlows = get().transactionFlows;
@@ -134,16 +124,9 @@ const useTransactionStore = create<TransactionStore>()(
             });
           }
         },
-        performFlow: async (signer, flowId) => {
-          // make sure signer is here
-          if (!signer) {
-            return NEW_ERROR(
-              "useTransactionStore::performFlow: no signer provided"
-            );
-          }
-          const ethAddress = signer.account.address;
+        performFlow: async (ethAccount, flowId) => {
           // grab user flows
-          const userTxFlows = get().getUserTransactionFlows(ethAddress);
+          const userTxFlows = get().getUserTransactionFlows(ethAccount);
           if (userTxFlows.length === 0) {
             return NEW_ERROR(
               "useTransactionStore::performFlow: no flows found"
@@ -158,7 +141,7 @@ const useTransactionStore = create<TransactionStore>()(
             return NEW_ERROR("useTransactionStore::performFlow: no flow found");
           }
           // set the flow status to populating since we are about to populate it with transactions
-          get().updateTxFlow(ethAddress, flowToPerform.id, {
+          get().updateTxFlow(ethAccount, flowToPerform.id, {
             status: "POPULATING",
           });
 
@@ -173,7 +156,7 @@ const useTransactionStore = create<TransactionStore>()(
             const errorMsgString =
               "useTransactionStore::performFlow: " +
               errMsg(newTransactionListError);
-            get().updateTxFlow(ethAddress, flowToPerform.id, {
+            get().updateTxFlow(ethAccount, flowToPerform.id, {
               status: "ERROR",
               error: errorMsgString,
             });
@@ -195,7 +178,7 @@ const useTransactionStore = create<TransactionStore>()(
           ];
 
           // set the transactions to the new list and set status to signing since we are about to sign them
-          get().updateTxFlow(ethAddress, flowToPerform.id, {
+          get().updateTxFlow(ethAccount, flowToPerform.id, {
             transactions: updatedTransactionList,
             placeholderFlow: newFlow.extraFlow,
             status: "SIGNING",
@@ -208,7 +191,7 @@ const useTransactionStore = create<TransactionStore>()(
           // go through each transaction and perform it
           for (let i = txIndex; i < updatedTransactionList.length; i++) {
             const { data: txResult, error: txError } = await get().performTx(
-              signer,
+              ethAccount,
               flowToPerform.id,
               i,
               updatedTransactionList[i]
@@ -232,7 +215,6 @@ const useTransactionStore = create<TransactionStore>()(
               await TRANSACTION_FLOW_MAP[newFlow.extraFlow.txFlowType].tx(
                 newFlow.extraFlow.params
               );
-            console.log({ extraFlow, extraFlowError });
             // check if error
             if (extraFlowError) {
               return NEW_ERROR(
@@ -242,7 +224,7 @@ const useTransactionStore = create<TransactionStore>()(
             }
             // grab the new list after all transactions were completed
             const completedTxs = get()
-              .getUserTransactionFlows(ethAddress)
+              .getUserTransactionFlows(ethAccount)
               .find((flow) => flow.id === flowToPerform.id)?.transactions;
             if (!completedTxs) {
               return NEW_ERROR(
@@ -258,14 +240,14 @@ const useTransactionStore = create<TransactionStore>()(
               })),
             ];
             // update the flow with the new transactions (could be another extra flow to add too)
-            get().updateTxFlow(ethAddress, flowToPerform.id, {
+            get().updateTxFlow(ethAccount, flowToPerform.id, {
               transactions: newFlowTxList,
               placeholderFlow: undefined,
             });
             // perform all new transactions that were just added
             for (let j = completedTxs.length; j < newFlowTxList.length; j++) {
               const { data: txResult, error: txError } = await get().performTx(
-                signer,
+                ethAccount,
                 flowToPerform.id,
                 j,
                 newFlowTxList[j]
@@ -280,23 +262,16 @@ const useTransactionStore = create<TransactionStore>()(
           }
 
           // made it through the whole list, so the flow was a success
-          get().updateTxFlow(ethAddress, flowToPerform.id, {
+          get().updateTxFlow(ethAccount, flowToPerform.id, {
             status: "SUCCESS",
           });
           return NO_ERROR(true);
         },
-        performTx: async (signer, flowId, txIndex, tx) => {
-          // make sure signer is here
-          if (!signer) {
-            return NEW_ERROR(
-              "useTransactionStore::performTx: no signer provided"
-            );
-          }
-          const ethAddress = signer.account.address;
+        performTx: async (ethAccount, flowId, txIndex, tx) => {
           try {
             // set pending since about to be signed
             // reset error, hash, and txLink since new tx
-            get().setTxStatus(ethAddress, flowId, txIndex, {
+            get().setTxStatus(ethAccount, flowId, txIndex, {
               status: "SIGNING",
               error: undefined,
               hash: undefined,
@@ -305,8 +280,7 @@ const useTransactionStore = create<TransactionStore>()(
             });
             // request signature and receive txHash once signed
             const { data: txHash, error: txError } = await signTransaction(
-              tx.tx,
-              signer
+              tx.tx
             );
             // if error with signature, set status and throw error
             if (txError) {
@@ -340,17 +314,17 @@ const useTransactionStore = create<TransactionStore>()(
               throw Error(receipt.error);
             }
             // transaction was a success so we can set status and
-            get().setTxStatus(ethAddress, flowId, txIndex, {
+            get().setTxStatus(ethAccount, flowId, txIndex, {
               status: "SUCCESS",
             });
           } catch (err) {
             // something failed, so set the flow and tx to failure
-            get().setTxStatus(ethAddress, flowId, txIndex, {
+            get().setTxStatus(ethAccount, flowId, txIndex, {
               status: "ERROR",
               error: "useTransactionStore::performFlow:" + errMsg(err),
               timestamp: new Date().getTime(),
             });
-            get().updateTxFlow(ethAddress, flowId, {
+            get().updateTxFlow(ethAccount, flowId, {
               status: "ERROR",
             });
             return NEW_ERROR(

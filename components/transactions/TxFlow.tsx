@@ -13,6 +13,7 @@ import {
   TransactionFlow,
 } from "@/transactions/flows";
 import { importERC20Token } from "@/utils/tokens";
+import InfoPop from "../infopop/infopop";
 
 interface Props {
   txFlow?: TransactionFlow;
@@ -86,35 +87,59 @@ const TxFlow = (props: Props) => {
             </>
           )}
           {props.txFlow.tokenMetadata && (
-            <>
-              <Spacer height="40px" />
-              <Button
-                onClick={() => {
-                  for (const token of props.txFlow?.tokenMetadata ?? []) {
-                    importERC20Token(token);
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "row-reverse",
+                marginRight: "-6px",
+              }}
+            >
+              <InfoPop>
+                <Text size="xx-sm">
+                  {
+                    "You will need to import the token into your wallet to see your balance. You only need to do this once."
                   }
+                </Text>
+              </InfoPop>
+              <Text
+                size="xx-sm"
+                weight="bold"
+                style={{
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                  paddingTop: "3px",
                 }}
               >
-                {`IMPORT ${
-                  props.txFlow.tokenMetadata.length > 1
-                    ? "TOKENS"
-                    : props.txFlow.tokenMetadata[0].symbol
-                }`}
-              </Button>
-            </>
+                <a
+                  onClick={() => {
+                    for (const token of props.txFlow?.tokenMetadata ?? []) {
+                      importERC20Token(token);
+                    }
+                  }}
+                >
+                  Import Token
+                </a>
+              </Text>
+            </div>
           )}
           {props.txFlow.status === "ERROR" && (
             <>
-              <Spacer height="40px" />
-              <Button disabled={!canRetry.valid} onClick={props.onRetry}>
+              <Spacer height="20px" />
+              <Button
+                disabled={!canRetry.valid}
+                onClick={props.onRetry}
+                width="fill"
+              >
                 RETRY
               </Button>
             </>
           )}
           {props.txFlow.status === "SUCCESS" && (
             <>
-              <Spacer height="40px" />
+              <Spacer height="20px" />
               <Button
+                width={"fill"}
                 onClick={() => {
                   props.closeModal();
                   if (props.txFlow?.onSuccessCallback) {

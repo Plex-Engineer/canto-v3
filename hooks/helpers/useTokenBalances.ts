@@ -10,17 +10,13 @@ import { useQuery } from "react-query";
  * @param {ERC20Token[]} tokens list of tokens to get balances for
  * @param {string | null} userEthAddress eth address to get balances for
  * @param {string | null} userCosmosAddress cosmos address to get balances for
- * @param {object} options options for the query
  * @returns {UserTokenBalances} object of token balances
  */
 export default function useTokenBalances(
   chainId: number | string | undefined,
   tokens: ERC20Token[],
   userEthAddress: string | null = null,
-  userCosmosAddress: string | null = null,
-  options?: {
-    refetchInterval?: number;
-  }
+  userCosmosAddress: string | null = null
 ): UserTokenBalances {
   const { data } = useQuery(
     ["tokenBalances", { chainId, tokens, userEthAddress, userCosmosAddress }],
@@ -36,7 +32,6 @@ export default function useTokenBalances(
       onError(error) {
         console.log(error);
       },
-      refetchInterval: options?.refetchInterval || 5000,
       placeholderData: {},
     }
   );
