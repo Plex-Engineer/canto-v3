@@ -20,6 +20,7 @@ interface Props {
     limitName: string;
     limit: string;
   };
+  extraNode: React.ReactNode;
 }
 const Amount = (props: Props) => {
   const [focused, setFocused] = useState(false);
@@ -106,7 +107,12 @@ const Amount = (props: Props) => {
         />
         <Text font="proto_mono">{props.title}</Text>
       </Container>
-      <Container direction="row" gap={6} className={styles.balance}>
+      <Container
+        direction="row"
+        gap={6}
+        className={styles.balance}
+        width="100%"
+      >
         <Text size="xx-sm" theme="secondary-dark">
           {props.limit ? "Limit: " : "Balance: "}
           {formatBalance(props.limit?.limit ?? props.max, props.decimals, {
@@ -114,8 +120,8 @@ const Amount = (props: Props) => {
           })}{" "}
           {props.symbol}
         </Text>
-
-        <span
+        <div className={styles.extra}>{props.extraNode}</div>
+        {/* <span
           className={styles.max}
           onClick={() => {
             props.onChange(
@@ -137,7 +143,7 @@ const Amount = (props: Props) => {
           <Text size="xx-sm" weight="bold">
             {`(${props.limit?.limitName ?? "max"})`}
           </Text>
-        </span>
+        </span> */}
       </Container>
       <Spacer width="20px" />
       <input

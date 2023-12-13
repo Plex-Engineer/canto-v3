@@ -12,6 +12,8 @@ interface Props {
   style?: React.CSSProperties;
   children: React.ReactNode;
   className?: string;
+  role?: string;
+  onClick?: () => void;
 }
 
 const sizes = {
@@ -41,10 +43,14 @@ const Text = ({
   style,
   opacity,
   className,
+  role,
+  onClick,
 }: Props) => {
   return (
     <p
+      role={role}
       className={className}
+      onClick={onClick}
       style={{
         fontFamily:
           font == "proto_mono" ? "var(--proto-mono)" : "var(--rm-mono)",

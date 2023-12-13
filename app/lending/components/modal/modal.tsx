@@ -267,16 +267,18 @@ export const LendingModal = (props: Props) => {
           min="1"
           symbol={cToken.underlying.symbol}
           {...limitProps}
+          extraNode={
+            actionType === CTokenLendingTxTypes.BORROW && (
+              <BorrowLimits
+                maxBorrow={maxAmount}
+                setAmount={setAmount}
+                limits={[90, 94, 98]}
+                decimals={cToken.underlying.decimals}
+              />
+            )
+          }
         />
-        <Spacer height="40px" />
-        {actionType === CTokenLendingTxTypes.BORROW && (
-          <BorrowLimits
-            maxBorrow={maxAmount}
-            setAmount={setAmount}
-            limits={[90, 94, 98]}
-            decimals={cToken.underlying.decimals}
-          />
-        )}
+        <Spacer height="20px" />
 
         <Container width="100%" gap={20}>
           <APRs
@@ -466,10 +468,17 @@ const BorrowLimits = ({
   limits: number[];
   decimals: number;
 }) => (
-  <div style={{ display: "flex", flexDirection: "row" }}>
+  <Container gap={20} direction="row">
     {limits.map((limit) => (
-      <Button
+      <Text
+        font="proto_mono"
+        role="button"
         key={limit}
+        size="x-sm"
+        style={{
+          cursor: "pointer",
+          textDecoration: "underline",
+        }}
         onClick={() =>
           setAmount(
             formatBalance(
@@ -479,7 +488,7 @@ const BorrowLimits = ({
             )
           )
         }
-      >{`${limit}%`}</Button>
+      >{`${limit}%`}</Text>
     ))}
-  </div>
+  </Container>
 );
