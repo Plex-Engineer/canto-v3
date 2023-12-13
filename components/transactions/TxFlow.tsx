@@ -126,7 +126,11 @@ const TxFlow = (props: Props) => {
           {props.txFlow.status === "ERROR" && (
             <>
               <Spacer height="20px" />
-              <Button disabled={!canRetry.valid} onClick={props.onRetry}>
+              <Button
+                disabled={!canRetry.valid}
+                onClick={props.onRetry}
+                width="fill"
+              >
                 RETRY
               </Button>
             </>
