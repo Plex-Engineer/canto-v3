@@ -467,28 +467,33 @@ const BorrowLimits = ({
   setAmount: (amount: string) => void;
   limits: number[];
   decimals: number;
-}) => (
-  <Container gap={20} direction="row">
-    {limits.map((limit) => (
-      <Text
-        font="proto_mono"
-        role="button"
-        key={limit}
-        size="x-sm"
-        style={{
-          cursor: "pointer",
-          textDecoration: "underline",
-        }}
-        onClick={() =>
-          setAmount(
-            formatBalance(
-              percentOfAmount(maxBorrow, limit).data ?? "0",
-              decimals,
-              { precision: decimals }
-            )
-          )
-        }
-      >{`${limit}%`}</Text>
-    ))}
-  </Container>
-);
+}) => {
+  const [activeLimit, setActiveLimit] = useState(-1);
+  return (
+    <Container gap={20} direction="row">
+      {limits.map((limit, idx) => (
+        <Text
+          font="proto_mono"
+          role="button"
+          key={limit}
+          size="x-sm"
+          style={{
+            cursor: "pointer",
+            textDecoration: "underline",
+            opacity: activeLimit === idx ? 1 : 0.5,
+          }}
+          onClick={() => {
+            setActiveLimit(idx);
+            setAmount(
+              formatBalance(
+                percentOfAmount(maxBorrow, limit).data ?? "0",
+                decimals,
+                { precision: decimals }
+              )
+            );
+          }}
+        >{`${limit}%`}</Text>
+      ))}
+    </Container>
+  );
+};
