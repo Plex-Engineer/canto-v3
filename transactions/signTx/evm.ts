@@ -2,6 +2,7 @@ import {
   GetWalletClientResult,
   getWalletClient,
   switchNetwork,
+  getNetwork,
 } from "wagmi/actions";
 import { Transaction } from "../interfaces";
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
@@ -92,17 +93,22 @@ export async function checkOnRightChain(
   chainId: number
 ): PromiseWithError<GetWalletClientResult> {
   try {
-    if (!signer) throw new Error(TX_SIGN_ERRORS.MISSING_SIGNER());
-    if (signer.chain.id !== chainId) {
+    // get current network
+    const currentNetwork = getNetwork();
+    if (!currentNetwork) throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
+
+    // check chain id
+    if (currentNetwork.chain?.id !== chainId) {
+      // switch chains
       const network = await switchNetwork({ chainId });
-      if (!network || network.id !== chainId) {
+      if (!network || network.id !== chainId)
         throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
-      }
-      const newSigner = await getWalletClient({ chainId });
-      if (!newSigner) throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
-      return NO_ERROR(newSigner);
     }
-    return NO_ERROR(signer);
+    // get new signer
+    const newSigner = await getWalletClient({ chainId });
+
+    // return new signer
+    return NO_ERROR(newSigner);
   } catch (err) {
     return NEW_ERROR("checkOnRightChain", err);
   }
