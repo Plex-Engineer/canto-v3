@@ -113,7 +113,30 @@ const Amount = (props: Props) => {
         className={styles.balance}
         width="100%"
       >
-        <Text size="xx-sm" theme="secondary-dark">
+        <Text
+          size="xx-sm"
+          theme="secondary-dark"
+          role="button"
+          style={{
+            cursor: "pointer",
+          }}
+          onClick={() =>
+            props.onChange(
+              {
+                target: {
+                  value: formatBalance(
+                    props.limit?.limit ?? props.max,
+                    props.decimals,
+                    {
+                      precision: props.decimals,
+                    }
+                  ),
+                },
+              } as any,
+              true
+            )
+          }
+        >
           {props.limit ? "Limit: " : "Balance: "}
           {formatBalance(props.limit?.limit ?? props.max, props.decimals, {
             commify: true,

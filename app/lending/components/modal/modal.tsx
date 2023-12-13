@@ -226,16 +226,12 @@ export const LendingModal = (props: Props) => {
 
     // limits
     const maxAmount = maxAmountForLendingTx(actionType, cToken, position, 100);
-    const limitAmount = maxAmountForLendingTx(actionType, cToken, position, 90);
-    // if withdrawing and nothing is borrowed no need for limit
+    // show limit if borrowing or withdrawing
     const needLimit =
       actionType === CTokenLendingTxTypes.BORROW ||
-      (actionType === CTokenLendingTxTypes.WITHDRAW &&
-        Number(limitAmount) <
-          Number(cToken.userDetails?.supplyBalanceInUnderlying) &&
-        Number(position.totalBorrow) !== 0);
+      actionType === CTokenLendingTxTypes.WITHDRAW;
     const limitProps = needLimit
-      ? { limit: { limit: limitAmount, limitName: "90% limit" } }
+      ? { limit: { limit: maxAmount, limitName: "" } }
       : {};
 
     return (
@@ -268,9 +264,10 @@ export const LendingModal = (props: Props) => {
           symbol={cToken.underlying.symbol}
           {...limitProps}
           extraNode={
-            actionType === CTokenLendingTxTypes.BORROW && (
+            needLimit && (
               <BorrowLimits
                 maxBorrow={maxAmount}
+                currentAmount={amount}
                 setAmount={setAmount}
                 limits={[90, 94, 98]}
                 decimals={cToken.underlying.decimals}
@@ -459,41 +456,42 @@ const CTokenAmountCard = ({
 
 const BorrowLimits = ({
   maxBorrow,
+  currentAmount,
   setAmount,
   limits,
   decimals,
 }: {
   maxBorrow: string;
+  currentAmount: string;
   setAmount: (amount: string) => void;
   limits: number[];
   decimals: number;
 }) => {
-  const [activeLimit, setActiveLimit] = useState(-1);
   return (
     <Container gap={20} direction="row">
-      {limits.map((limit, idx) => (
-        <Text
-          font="proto_mono"
-          role="button"
-          key={limit}
-          size="x-sm"
-          style={{
-            cursor: "pointer",
-            textDecoration: "underline",
-            opacity: activeLimit === idx ? 1 : 0.5,
-          }}
-          onClick={() => {
-            setActiveLimit(idx);
-            setAmount(
-              formatBalance(
-                percentOfAmount(maxBorrow, limit).data ?? "0",
-                decimals,
-                { precision: decimals }
-              )
-            );
-          }}
-        >{`${limit}%`}</Text>
-      ))}
+      {limits.map((limit) => {
+        const limitAmount = formatBalance(
+          percentOfAmount(maxBorrow, limit).data ?? "0",
+          decimals,
+          { precision: decimals }
+        );
+        return (
+          <Text
+            font="proto_mono"
+            role="button"
+            key={limit}
+            size="x-sm"
+            style={{
+              cursor: "pointer",
+              textDecoration: "underline",
+              opacity: limitAmount === currentAmount ? 1 : 0.5,
+            }}
+            onClick={() => {
+              setAmount(limitAmount);
+            }}
+          >{`${limit}%`}</Text>
+        );
+      })}
     </Container>
   );
 };
