@@ -60,6 +60,7 @@ export const _sendToEthGravityTx = (
   description: TransactionDescription
 ): Transaction => ({
   description,
+  fromAddress: ethReceiver,
   chainId: chainId,
   type: "COSMOS",
   msg: createMsgsSendToEth({
