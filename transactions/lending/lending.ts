@@ -55,6 +55,7 @@ export async function cTokenLendingTx(
         transactions: [
           _collateralizeTx(
             txParams.chainId,
+            txParams.ethAccount,
             comptrollerAddress,
             txParams.cToken.address,
             isCollateralize,
@@ -121,6 +122,7 @@ export async function cTokenLendingTx(
         txList.push(
           _withdrawAllCTokenTx(
             txParams.chainId,
+            txParams.ethAccount,
             txParams.cToken.address,
             txParams.cToken.userDetails.balanceOfCToken,
             txDescription
@@ -146,6 +148,7 @@ export async function cTokenLendingTx(
       _lendingCTokenTx(
         txParams.txType,
         txParams.chainId,
+        txParams.ethAccount,
         txParams.cToken.address,
         isCanto,
         txParams.amount,
@@ -168,6 +171,7 @@ export async function cTokenLendingTx(
       txList.push(
         _collateralizeTx(
           txParams.chainId,
+          txParams.ethAccount,
           comptrollerAddress,
           txParams.cToken.address,
           true,

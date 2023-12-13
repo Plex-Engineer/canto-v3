@@ -54,6 +54,7 @@ export async function clmClaimRewardsTx(
       txList.push(
         _dripComptrollerTx(
           txParams.chainId,
+          txParams.ethAccount,
           reservoirAddress,
           TX_DESCRIPTIONS.DRIP_COMPTROLLER()
         )

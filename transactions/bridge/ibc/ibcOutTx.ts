@@ -134,6 +134,7 @@ export async function IBCOutTx(
     txList.push(
       _ibcOutTx(
         txParams.token.chainId,
+        txParams.senderEthAddress,
         "transfer",
         channelId.fromCanto,
         txParams.amount,
