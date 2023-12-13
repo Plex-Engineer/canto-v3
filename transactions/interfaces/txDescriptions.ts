@@ -1,8 +1,4 @@
-<<<<<<< HEAD:transactions/interfaces/txDescriptions.ts
-=======
 import { VoteOption } from "@/hooks/gov/interfaces/voteOptions";
-import { CTokenLendingTxTypes } from "@/hooks/lending/interfaces/lendingTxTypes";
->>>>>>> venu/eng-1226:config/consts/txDescriptions.ts
 import { CantoDexPair } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
 

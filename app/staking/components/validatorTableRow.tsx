@@ -1,7 +1,6 @@
 import Button from "@/components/button/button";
 import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
-import { ValidationReturn } from "@/config/interfaces";
 import { Validator, ValidatorWithDelegations } from "@/hooks/staking/interfaces/validators";
 import BigNumber from "bignumber.js";
 import Text from "@/components/text";

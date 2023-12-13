@@ -16,16 +16,16 @@ import {
 } from "./interfaces/stakingTxTypes";
 import {
   NEW_ERROR,
-  NewTransactionFlow,
   ReturnWithError,
-  ValidationReturn,
+  Validation,
 } from "@/config/interfaces";
 
 import { useBalance } from "wagmi";
 
 import { createNewStakingTxFlow } from "./helpers/createNewStakingFlow";
 import { areEqualAddresses } from "@/utils/address";
-import { validateInputTokenAmount } from "@/utils/math";
+import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
+import { NewTransactionFlow } from "@/transactions/flows/types";
 
 export default function useStaking(
   params: StakingHookInputParams,
@@ -137,20 +137,21 @@ export default function useStaking(
   ///
   function validateParams(
     txParams: StakingTransactionParams
-  ): ValidationReturn {
+  ): Validation {
     // make sure userEthAddress is set and same as params
     if (!areEqualAddresses(txParams.ethAccount, params.userEthAddress ?? "")) {
       return {
-        isValid: false,
-        errorMessage: "user eth address is not the same",
+        error: true,
+        reason: "user eth address is not the same",
       };
     }
     // switch depending on tx type
     switch (txParams.txType) {
       case StakingTxTypes.DELEGATE:
         // amount just has to be less than canto balance
-        return validateInputTokenAmount(
+        return validateNonWeiUserInputTokenAmount(
           txParams.amount,
+          "0",
           userCantoBalance?.value.toString() ?? "0",
           "CANTO",
           18
@@ -163,10 +164,11 @@ export default function useStaking(
           !validator ||
           !(validator as ValidatorWithDelegations).userDelegation
         )
-          return { isValid: false, errorMessage: "validator not found" };
+          return { error: true, reason: "validator not found" };
 
-        return validateInputTokenAmount(
+        return validateNonWeiUserInputTokenAmount(
           txParams.amount,
+          "0",
           (validator as ValidatorWithDelegations).userDelegation?.balance ??
             "0",
           "CANTO",
@@ -174,7 +176,7 @@ export default function useStaking(
         );
       }
       default:
-        return { isValid: false, errorMessage: "tx type not found" };
+        return { error: true, reason: "tx type not found" };
     }
   }
 
@@ -182,8 +184,8 @@ export default function useStaking(
     params: StakingTransactionParams
   ): ReturnWithError<NewTransactionFlow> {
     const validation = validateParams(params);
-    if (!validation.isValid)
-      return NEW_ERROR("createNewStakingFlow" + validation.errorMessage);
+    if (validation.error)
+      return NEW_ERROR("createNewStakingFlow" + validation.reason);
     return createNewStakingTxFlow(params);
   }
   return {

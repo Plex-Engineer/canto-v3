@@ -2,9 +2,6 @@ import {
     NEW_ERROR,
     NO_ERROR,
     PromiseWithError,
-    Transaction,
-    TransactionDescription,
-    TxCreatorFunctionReturn,
     errMsg,
   } from "@/config/interfaces";
   import {
@@ -13,12 +10,14 @@ import {
   } from "../interfaces/stakingTxTypes";
 
   import { createMsgsDelegate } from "@/utils/cosmos/transactions/messages/staking/delegate";
-  import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
+ 
 
   import { createMsgsRedelegate } from "@/utils/cosmos/transactions/messages/staking/redelegate";
   import { createMsgsClaimStakingRewards } from "@/utils/cosmos/transactions/messages/staking/claimRewards";
 import { ethToCantoAddress } from "@/utils/address/conversion.utils";
 import { displayAmount } from "@/utils/formatting/balances.utils";
+import { TX_DESCRIPTIONS } from "@/transactions/interfaces/txDescriptions";
+import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/transactions/interfaces";
   
   export async function stakingTx(
     txParams: StakingTransactionParams

@@ -1,7 +1,6 @@
 import {
-  NewTransactionFlow,
-  ReturnWithError,
-  ValidationReturn,
+  ReturnWithError, Validation,
+  
 } from "@/config/interfaces";
 import {
   UnbondingDelegationResponse,
@@ -10,6 +9,7 @@ import {
   ValidatorWithDelegations,
 } from "./validators";
 import { StakingTransactionParams } from "./stakingTxTypes";
+import { NewTransactionFlow } from "@/transactions/flows/types";
 
 export interface StakingHookInputParams {
   chainId: number;
@@ -25,7 +25,7 @@ export interface StakingHookReturn {
     setValidator: (address: string | null) => void;
   };
   transaction: {
-    validateParams: (params: StakingTransactionParams) => ValidationReturn;
+    validateParams: (params: StakingTransactionParams) => Validation;
     createNewStakingFlow: (
       params: StakingTransactionParams
     ) => ReturnWithError<NewTransactionFlow>;

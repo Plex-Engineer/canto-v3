@@ -22,6 +22,10 @@ import {
   validateClaimDexRewardsComboTxParams,
 } from "@/hooks/pairs/lpCombo/transactions/claimRewards";
 import { cantoBridgeTx, validateCantoBridgeTxParams } from "../bridge";
+import { StakingTransactionParams } from "@/hooks/staking/interfaces/stakingTxTypes";
+import { stakingTx } from "@/hooks/staking/transactions/staking";
+import { proposalVoteTx } from "@/hooks/gov/transactions/vote";
+import { ProposalVoteTxParams } from "@/hooks/gov/interfaces/voteTxParams";
 
 export enum TransactionFlowType {
   //   // Bridge
@@ -35,6 +39,10 @@ export enum TransactionFlowType {
   // CLM
   CLM_CTOKEN_TX = "CLM_CTOKEN_TX",
   CLM_CLAIM_REWARDS_TX = "CLM_CLAIM_REWARDS_TX",
+  //STAKING
+  STAKE_CANTO_TX = "STAKE_CANTO_TX",
+  VOTE_TX = "VOTE_TX",
+
 }
 
 export const TRANSACTION_FLOW_MAP: {
@@ -76,4 +84,15 @@ export const TRANSACTION_FLOW_MAP: {
     tx: async (params) => clmClaimRewardsTx(params),
     validRetry: async (params) => validateClmClaimRewardsRetryTx(params),
   },
+  [TransactionFlowType.STAKE_CANTO_TX]: {
+    tx: async (params: StakingTransactionParams) => stakingTx(params),
+    validRetry: async (params: StakingTransactionParams) =>
+      NO_ERROR({ error: false }),
+  },
+  [TransactionFlowType.VOTE_TX]: {
+    tx: async (params: ProposalVoteTxParams) => proposalVoteTx(params),
+    validRetry: async (params: ProposalVoteTxParams) =>
+      NO_ERROR({ error: false })
+    
+  }
 };

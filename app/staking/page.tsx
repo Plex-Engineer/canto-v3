@@ -19,10 +19,11 @@ import { useEffect, useState } from "react";
 import { StakingModal } from "./components/stakingModal/StakingModal";
 import { Validator } from "@/hooks/staking/interfaces/validators";
 import Modal from "@/components/modal/modal";
-import { NewTransactionFlow } from "@/config/interfaces/transactions/txFlows";
-import { TransactionFlowType } from "@/config/transactions/txMap";
+
 import { StakingTxTypes } from "@/hooks/staking/interfaces/stakingTxTypes";
 import { ethToCantoAddress } from "@/utils/address";
+import { NewTransactionFlow } from "@/transactions/flows/types";
+import { TransactionFlowType } from "@/transactions/flows/flowMap";
 
 
 export default function StakingPage() {

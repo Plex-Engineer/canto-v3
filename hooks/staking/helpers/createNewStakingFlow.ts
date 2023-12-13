@@ -1,10 +1,11 @@
 import {
   NO_ERROR,
-  NewTransactionFlow,
   ReturnWithError,
 } from "@/config/interfaces";
 import { StakingTransactionParams } from "../interfaces/stakingTxTypes";
-import { TransactionFlowType } from "@/config/transactions/txMap";
+import { TransactionFlowType } from "@/transactions/flows/flowMap";
+import { NewTransactionFlow } from "@/transactions/flows/types";
+
 
 export function createNewStakingTxFlow(
   params: StakingTransactionParams

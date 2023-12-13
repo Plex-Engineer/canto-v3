@@ -14,12 +14,14 @@ import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Splash from "@/components/splash/splash";
 import { VoteOption } from "@/hooks/gov/interfaces/voteOptions";
 import Image from "next/image";
-import { NEW_ERROR, NewTransactionFlow } from "@/config/interfaces";
-import { TransactionFlowType } from "@/config/transactions/txMap";
+import { NEW_ERROR } from "@/config/interfaces";
+
 import { formatBalance } from "@/utils/formatting/balances.utils";
 import Container from "@/components/container/container";
 import { RadioButton} from "../components/RadioButton/RadioButton";
 import { VotingInfoBox } from "../components/VotingInfoBox/VotingInfoBox";
+import { TransactionFlowType } from "@/transactions/flows/flowMap";
+import { NewTransactionFlow } from "@/transactions/flows/types";
 
 
 

@@ -2,9 +2,6 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
-  Transaction,
-  TransactionDescription,
-  TxCreatorFunctionReturn,
   errMsg,
 } from "@/config/interfaces";
 
@@ -12,8 +9,10 @@ import { createMsgsVote } from "@/utils/cosmos/transactions/messages/voting/vote
 //import { createMsgsVote } from "@/utils/cosmos/transactions/messages/voting/vote";
 import { voteOptionToNumber } from "../interfaces/voteOptions";
 import { ProposalVoteTxParams } from "../interfaces/voteTxParams";
-import { TX_DESCRIPTIONS } from "@/config/consts/txDescriptions";
+
 import { ethToCantoAddress } from "@/utils/address/conversion.utils";
+import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/transactions/interfaces/txBase";
+import { TX_DESCRIPTIONS } from "@/transactions/interfaces/txDescriptions";
 
 export async function proposalVoteTx(
   params: ProposalVoteTxParams
