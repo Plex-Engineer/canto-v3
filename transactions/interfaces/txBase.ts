@@ -10,6 +10,8 @@ export interface TransactionDescription {
 }
 
 export type Transaction = {
+  // account address that will be used to sign the transaction
+  fromAddress: string;
   // chainId the wallet must be on to perform the transaction
   chainId: number | string;
   description: TransactionDescription;

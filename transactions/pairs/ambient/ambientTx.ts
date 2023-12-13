@@ -55,6 +55,7 @@ export async function ambientLiquidityTx(
           transactions: [
             _removeAmbientConcLiquidityTx(
               txParams.chainId,
+              txParams.ethAccount,
               crocDexAddress,
               txParams.pool.base.address,
               txParams.pool.quote.address,
@@ -151,6 +152,7 @@ async function addConLiquidity(
     txList.push(
       _addAmbientConcLiquidityTx(
         txParams.chainId,
+        txParams.ethAccount,
         txParams.crocDexAddress,
         txParams.pool.base.address,
         txParams.pool.quote.address,

@@ -38,4 +38,6 @@ export const TX_SIGN_ERRORS = {
   INCORRECT_CHAIN: () => "Incorrect chain",
   SWITCH_CHAIN_ERROR: () => "Error switching chains",
   MISSING_SIGNER: () => "No signer",
+  INCORRECT_SIGNER: (fromAddress: string, signerAddress: string) =>
+    `Incorrect signer. Expected ${fromAddress} but got ${signerAddress}`,
 };

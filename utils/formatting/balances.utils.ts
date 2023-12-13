@@ -37,12 +37,14 @@ export function convertToBigNumber(
  * @param {number} precision number of decimals to display
  * @param {boolean} commify whether to commify the balance
  * @param {boolean} short whether to display a short balance
+ * @param {number} maxSmallBalance the max balance to display before shortening (<maxSmallBalance)
  */
 interface FormatBalanceOptions {
   symbol?: string;
   precision?: number;
   commify?: boolean;
   short?: boolean;
+  maxSmallBalance?: number;
 }
 
 /**
@@ -61,6 +63,7 @@ export function displayAmount(
     precision: undefined,
     commify: true,
     short: true,
+    maxSmallBalance: undefined,
   };
   return formatBalance(amount, decimals, { ...defaultOptions, ...options });
 }
@@ -83,17 +86,19 @@ export function formatBalance(
     precision = undefined,
     commify = false,
     short = false,
+    maxSmallBalance = 0.001,
   } = options || {};
   const bnAmount = new BigNumber(amount);
   // make sure greater than zero
   if (bnAmount.isLessThanOrEqualTo(0)) return "0";
   // divide by 10^decimals
   const formattedAmount = bnAmount.dividedBy(new BigNumber(10).pow(decimals));
+
   // if precision is undefined, ret2 places after the first non-zero decimal
   let truncateAt =
     precision ??
     2 - Math.floor(Math.log(formattedAmount.toNumber()) / Math.log(10));
-  // make sure tuncation is not negative or greater than decimals
+  // make sure truncation is not negative or greater than decimals
   truncateAt = Math.max(
     0,
     Math.min(truncateAt, decimals < 0 ? truncateAt : decimals)
@@ -116,9 +121,15 @@ export function formatBalance(
   let finalAmount = truncatedAmount;
   let suffix = "";
   if (short) {
-    const { shortAmount, suffix: _suffix } = formatBigBalance(truncatedAmount);
-    finalAmount = shortAmount;
-    suffix = _suffix;
+    // check if the balance is less than 0.001 and return <0.001
+    if (Number(truncatedAmount) < maxSmallBalance) {
+      finalAmount = `<${maxSmallBalance}`;
+    } else {
+      const { shortAmount, suffix: _suffix } =
+        formatBigBalance(truncatedAmount);
+      finalAmount = shortAmount;
+      suffix = _suffix;
+    }
   }
 
   return `${

@@ -1,4 +1,3 @@
-import { GetWalletClientResult } from "wagmi/actions";
 import {
   CosmosTxContext,
   EIP712FeeObject,
@@ -7,7 +6,7 @@ import {
   UnsignedCosmosMessages,
 } from "../../interfaces";
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
-import { checkOnRightChain } from "../evm";
+import { getEvmSignerOnChainId } from "../evm";
 import { getCosmosAPIEndpoint } from "@/utils/networks";
 import { createTransactionWithMultipleMessages } from "@evmos/proto";
 import {
@@ -21,26 +20,29 @@ import {
 } from "@evmos/eip712";
 import { tryFetch, tryFetchWithRetry } from "@/utils/async";
 import { generateCosmosEIP712TxContext } from "./txContext";
+import { TX_SIGN_ERRORS } from "@/config/consts/errors";
 
 export async function signCosmosEIPTx(
-  tx: Transaction,
-  signer?: GetWalletClientResult
+  tx: Transaction
 ): PromiseWithError<string> {
   try {
     if (tx.type !== "COSMOS") throw Error("not cosmos tx");
-    if (!signer) throw Error("no signer");
     if (typeof tx.chainId !== "number")
       throw Error("invalid chainId: " + tx.chainId);
 
-    /** switch chains if neccessary */
-    const { data: newSigner, error: chainError } = await checkOnRightChain(
-      signer,
+    /** switch chains if neccessary and get signer */
+    const { data: signer, error: signerError } = await getEvmSignerOnChainId(
       tx.chainId
     );
-    if (chainError || !newSigner) throw chainError;
+    if (signerError) throw signerError;
+
+    /** check signer and tx from address */
+    if (signer.account.address !== tx.fromAddress)
+      throw Error(
+        TX_SIGN_ERRORS.INCORRECT_SIGNER(tx.fromAddress, signer.account.address)
+      );
 
     /** tx context */
-
     const { data: txContext, error: contextError } =
       await generateCosmosEIP712TxContext(tx.chainId, signer.account.address);
     if (contextError) throw contextError;
@@ -53,7 +55,7 @@ export async function signCosmosEIPTx(
           sender: txContext.senderObj,
           fee: tx.msg.fee,
           memo: "signed with metamask",
-          ethAddress: newSigner.account.address,
+          ethAddress: tx.fromAddress,
         },
         tx.msg
       );
