@@ -22,8 +22,8 @@ const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
   (network) => {
     const contractInfo = network.multicall3Address
       ? {
-        multicall3: { address: network.multicall3Address },
-      }
+          multicall3: { address: network.multicall3Address },
+        }
       : {};
     return {
       id: Number(network.chainId),
@@ -46,13 +46,13 @@ const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
       contracts:
         network.chainId === EVM_CHAINS.ETH_MAINNET.chainId
           ? {
-            ...contractInfo,
-            ensUniversalResolver: {
-              address: "0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62",
-            },
-          }
+              ...contractInfo,
+              ensUniversalResolver: {
+                address: "0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62",
+              },
+            }
           : contractInfo,
-    };
+    } as Chain;
   }
 );
 
