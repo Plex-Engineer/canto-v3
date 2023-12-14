@@ -98,7 +98,7 @@ const TxFlow = (props: Props) => {
               <InfoPop>
                 <Text size="xx-sm">
                   {
-                    "You will need to import the token into your wallet to see your balance. You only need to do this once."
+                    "Import token into wallet to view its balance. This only needs to be done once."
                   }
                 </Text>
               </InfoPop>
