@@ -2,6 +2,7 @@
 
 import { TransactionFlowType } from ".";
 import {
+  CantoFETxType,
   TransactionDescription,
   TransactionStatus,
   TransactionWithStatus,
@@ -56,6 +57,7 @@ export const TX_PLACEHOLDER = (
   placeholder: NewTransactionFlowPlaceholder
 ): TransactionWithStatus => ({
   tx: {
+    feTxType: CantoFETxType.NONE,
     fromAddress: "",
     chainId: 0,
     description: placeholder.description,

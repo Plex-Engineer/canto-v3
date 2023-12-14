@@ -5,7 +5,14 @@ import { TransactionFlowType } from "@/transactions/flows";
 import { CantoFETxType } from "@/transactions/interfaces";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
 import { CantoDexTxTypes } from "@/transactions/pairs/cantoDex";
-import { PostHog } from "posthog-js";
+import posthog from "posthog-js";
+
+posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+  api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST!,
+  autocapture: false,
+  capture_pageview: false,
+  capture_pageleave: false,
+});
 
 // (BRIDGE/LP/LENDING/...)
 type PostHogParentFlowType = TransactionFlowType;
@@ -26,59 +33,49 @@ type TxCapture = {
 };
 
 class PosthogWrapper {
-  posthog = new PostHog();
-  constructor() {
-    if (typeof window !== "undefined") {
-      this.posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-        api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST!,
-        autocapture: false,
-        capture_pageview: false,
-        capture_pageleave: false,
-      });
-    }
-  }
+  constructor() {}
   actions = {
     identify: (id: string) => {
-      this.posthog.identify(id);
+      posthog.identify(id);
     },
     reset: () => {
-      this.posthog.reset();
+      posthog.reset();
     },
     people: {
       set: (props: { [key: string]: string | number | boolean | null }) => {
-        this.posthog.setPersonProperties(props);
+        posthog.setPersonProperties(props);
       },
       registerWallet: (account: string) => {
-        this.posthog.register({ distinct_id: account, wallet: account });
+        posthog.register({ distinct_id: account, wallet: account });
       },
     },
     events: {
       pageOpened: (pageName: string) => {
-        this.posthog.capture("Page Opened", {
+        posthog.capture("Page Opened", {
           pageName: pageName,
         });
       },
       setTheme: (theme: string) => {
-        this.posthog.capture("Theme Set To", {
+        posthog.capture("Theme Set To", {
           theme: theme,
         });
       },
       connections: {
         walletConnect: (connected: boolean) => {
           if (connected) {
-            this.posthog.capture("Wallet Connected");
+            posthog.capture("Wallet Connected");
           } else {
-            this.posthog.capture("Wallet Disconnected");
+            posthog.capture("Wallet Disconnected");
           }
         },
       },
       flows: {
         started: (flowType: TransactionFlowType, flowId: string) =>
-          this.posthog.capture("Flow Started", { flowType, flowId }),
+          posthog.capture("Flow Started", { flowType, flowId }),
         success: (flowType: TransactionFlowType, flowId: string) =>
-          this.posthog.capture("Flow Success", { flowType, flowId }),
+          posthog.capture("Flow Success", { flowType, flowId }),
         transaction: (txCapture: TxCapture) =>
-          this.posthog.capture(
+          posthog.capture(
             txCapture.success ? "Transaction Success" : "Transaction Error",
             txCapture
           ),

@@ -90,10 +90,37 @@ export const TX_DESCRIPTIONS = {
 };
 
 export enum CantoFETxType {
+  NONE = "none",
+  APPROVE_TOKEN = "approveToken",
+  // CLM
+  BORROW = "borrow",
+  CLAIM_REWARDS_CLM = "claimRewardsClm",
+  COLLATERALIZE = "collateralize",
+  DECOLLATERALIZE = "decollateralize",
+  DRIP_COMPTROLLER = "dripComptroller",
+  REPAY = "repay",
+  SUPPLY = "supply",
+  WITHDRAW = "withdraw",
+  WITHDRAW_ALL = "withdrawAll",
+  // CONVERT
   CONVERT_COIN_COSMOS = "convertCoinCosmos",
   CONVERT_ERC_20_COSMOS = "convertERC20Cosmos",
+  // IBC
   IBC_IN_KEPLR = "ibcInKeplr",
   IBC_OUT_COSMOS = "ibcOutCosmos",
+  // GBRIDGE
+  GENERATE_PUBLIC_KEY_COSMOS = "generatePublicKeyCosmos",
   SEND_TO_COSMOS = "sendToCosmos",
   WRAP_ETH = "wrapEth",
+  // LZ OFT
+  OFT_DEPOSIT = "oftDeposit",
+  OFT_TRANSFER = "oftTransfer",
+  OFT_WITHDRAW = "oftWithdraw",
+  // LP AMBIENT
+  ADD_CONC_LIQUIDITY_AMBIENT = "addConcLiquidityAmbient",
+  CLAIM_REWARDS_AMBIENT = "claimRewardsAmbient",
+  REMOVE_CONC_LIQUIDITY_AMBIENT = "removeConcLiquidityAmbient",
+  // LP CANTO DEX
+  ADD_LIQUIDITY_CANTO_DEX = "addLiquidityCantoDex",
+  REMOVE_LIQUIDITY_CANTO_DEX = "removeLiquidityCantoDex",
 }

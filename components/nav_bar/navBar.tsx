@@ -34,6 +34,7 @@ const NavBar = () => {
   }, [signer]);
 
   useEffect(() => {
+    console.log(currentPath)
     if (currentPath == "/bridge") {
       posthog.actions.events.pageOpened("bridge");
     } else if (currentPath == "/lending") {

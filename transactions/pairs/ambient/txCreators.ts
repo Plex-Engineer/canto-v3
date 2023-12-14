@@ -1,5 +1,9 @@
 import { eth } from "web3";
-import { Transaction, TransactionDescription } from "@/transactions/interfaces";
+import {
+  CantoFETxType,
+  Transaction,
+  TransactionDescription,
+} from "@/transactions/interfaces";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
 import { AMBIENT_REWARD_LEDGER_ABI, CROC_SWAP_DEX_ABI } from "@/config/abis";
 import { roundLiquidityForAmbientTx } from "@/utils/ambient";
@@ -53,6 +57,7 @@ export const _addAmbientConcLiquidityTx = (
   );
   return {
     description,
+    feTxType: CantoFETxType.ADD_CONC_LIQUIDITY_AMBIENT,
     chainId: chainId,
     fromAddress: fromEthAddress,
     type: "EVM",
@@ -108,6 +113,7 @@ export const _removeAmbientConcLiquidityTx = (
   );
   return {
     description,
+    feTxType: CantoFETxType.REMOVE_CONC_LIQUIDITY_AMBIENT,
     chainId: chainId,
     fromAddress: fromEthAddress,
     type: "EVM",
@@ -126,6 +132,7 @@ export const _ambientClaimRewardsTx = (
   description: TransactionDescription
 ): Transaction => ({
   description,
+  feTxType: CantoFETxType.CLAIM_REWARDS_AMBIENT,
   chainId: chainId,
   fromAddress: fromEthAddress,
   type: "EVM",

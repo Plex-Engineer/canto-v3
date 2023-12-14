@@ -1,5 +1,9 @@
 import { ERC20_ABI } from "@/config/abis";
-import { Transaction, TransactionDescription } from "../interfaces";
+import {
+  CantoFETxType,
+  Transaction,
+  TransactionDescription,
+} from "../interfaces";
 
 export const _approveTx = (
   chainId: number,
@@ -10,6 +14,7 @@ export const _approveTx = (
   description: TransactionDescription
 ): Transaction => ({
   description,
+  feTxType: CantoFETxType.APPROVE_TOKEN,
   fromAddress: ethAccount,
   chainId: chainId,
   type: "EVM",

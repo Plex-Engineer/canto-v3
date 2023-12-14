@@ -1,5 +1,9 @@
 import { DEX_REOUTER_ABI } from "@/config/abis";
-import { Transaction, TransactionDescription } from "@/transactions/interfaces";
+import {
+  CantoFETxType,
+  Transaction,
+  TransactionDescription,
+} from "@/transactions/interfaces";
 
 /**
  * TRANSACTION CREATORS
@@ -24,6 +28,7 @@ export const _addCantoDexLiquidityTx = (
   const cantoInPair = isToken1Canto || isToken2Canto;
   return {
     description,
+    feTxType: CantoFETxType.ADD_LIQUIDITY_CANTO_DEX,
     fromAddress: ethAccount,
     chainId: chainId,
     type: "EVM",
@@ -72,6 +77,7 @@ export const _removeCantoDexLiquidityTx = (
   const cantoInPair = isToken1Canto || isToken2Canto;
   return {
     description,
+    feTxType: CantoFETxType.REMOVE_LIQUIDITY_CANTO_DEX,
     fromAddress: ethAccount,
     chainId: chainId,
     type: "EVM",

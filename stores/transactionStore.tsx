@@ -19,6 +19,9 @@ import {
   TransactionWithStatus,
 } from "@/transactions/interfaces";
 import { signTransaction, waitForTransaction } from "@/transactions/signTx";
+import PosthogWrapper from "@/app/posthog";
+
+const PostHog = new PosthogWrapper();
 
 // only save last 100 flows for each user to save space
 const USER_FLOW_LIMIT = 100;
@@ -98,6 +101,11 @@ const useTransactionStore = create<TransactionStore>()(
               get().transactionFlows.set(params.ethAccount, newUserList)
             ),
           });
+          // save tx to posthog
+          PostHog.actions.events.flows.started(
+            params.txFlow.txType,
+            newFlow.id
+          );
           // we are expecting a signer so call performTransactions
           return await get().performFlow(params.ethAccount);
         },
@@ -194,11 +202,30 @@ const useTransactionStore = create<TransactionStore>()(
               updatedTransactionList[i]
             );
             if (txError || !txResult) {
+              // save error to posthog
+              PostHog.actions.events.flows.transaction({
+                flowId: flowToPerform.id,
+                success: false,
+                parentType: flowToPerform.txType,
+                flowType: "",
+                txType: updatedTransactionList[i].tx.feTxType,
+                txParams: flowToPerform.params,
+                error: txError?.message,
+              });
               return NEW_ERROR(
                 "useTransactionStore::performTransactions: " +
                   errMsg(txError ?? "")
               );
             }
+            // save success to posthog
+            PostHog.actions.events.flows.transaction({
+              flowId: flowToPerform.id,
+              success: true,
+              parentType: flowToPerform.txType,
+              flowType: "",
+              txType: updatedTransactionList[i].tx.feTxType,
+              txParams: flowToPerform.params,
+            });
           }
 
           // deal with extra flows
@@ -262,6 +289,11 @@ const useTransactionStore = create<TransactionStore>()(
           get().updateTxFlow(ethAccount, flowToPerform.id, {
             status: "SUCCESS",
           });
+          // save tx to posthog
+          PostHog.actions.events.flows.success(
+            flowToPerform.txType,
+            flowToPerform.id
+          );
           return NO_ERROR(true);
         },
         performTx: async (ethAccount, flowId, txIndex, tx) => {
