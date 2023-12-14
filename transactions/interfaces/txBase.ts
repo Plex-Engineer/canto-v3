@@ -1,5 +1,5 @@
 import { ContractAbi } from "web3-types";
-import { TransactionStatus, UnsignedCosmosMessages } from ".";
+import { CantoFETxType, TransactionStatus, UnsignedCosmosMessages } from ".";
 import { PromiseWithError, ReturnWithError } from "@/config/interfaces/errors";
 import { NewTransactionFlowPlaceholder } from "../flows";
 import { BridgingMethod } from "../bridge";
@@ -13,6 +13,7 @@ export type Transaction = {
   // chainId the wallet must be on to perform the transaction
   chainId: number | string;
   description: TransactionDescription;
+  feTxType: CantoFETxType;
   bridge?: {
     type: BridgingMethod;
     lastStatus: TransactionStatus;

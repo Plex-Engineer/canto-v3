@@ -88,3 +88,12 @@ export const TX_DESCRIPTIONS = {
     description: `Wrap ${amount} ETH to WETH`,
   }),
 };
+
+export enum CantoFETxType {
+  CONVERT_COIN_COSMOS = "convertCoinCosmos",
+  CONVERT_ERC_20_COSMOS = "convertERC20Cosmos",
+  IBC_IN_KEPLR = "ibcInKeplr",
+  IBC_OUT_COSMOS = "ibcOutCosmos",
+  SEND_TO_COSMOS = "sendToCosmos",
+  WRAP_ETH = "wrapEth",
+}

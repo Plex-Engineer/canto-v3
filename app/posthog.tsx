@@ -1,64 +1,90 @@
-'use client'
+"use client";
 
-import posthog from "posthog-js"
+import { BridgingMethod } from "@/transactions/bridge";
+import { TransactionFlowType } from "@/transactions/flows";
+import { CantoFETxType } from "@/transactions/interfaces";
+import { CTokenLendingTxTypes } from "@/transactions/lending";
+import { CantoDexTxTypes } from "@/transactions/pairs/cantoDex";
+import { PostHog } from "posthog-js";
 
-if(typeof window !== 'undefined'){
-    posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!,{
+// (BRIDGE/LP/LENDING/...)
+type PostHogParentFlowType = TransactionFlowType;
+// (SUPPLY/WITHDRAW/GBRIDGE/LAYERZERO/LPANDSTAKE/...)
+type PostHogFlowType = CantoDexTxTypes | CTokenLendingTxTypes | BridgingMethod;
+// tx types (approve/mint/swap/...)
+type PostHogFlowTxType = CantoFETxType;
+
+type TxCapture = {
+  success: boolean;
+  flowId: string;
+  parentType: PostHogParentFlowType;
+  flowType: PostHogFlowType;
+  txType: PostHogFlowTxType;
+  txParams?: object; //{token: object, amount: string, method: BridgeMethod}
+  txHash?: string;
+  error?: string;
+};
+
+class PosthogWrapper {
+  posthog = new PostHog();
+  constructor() {
+    if (typeof window !== "undefined") {
+      this.posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
         api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST!,
         autocapture: false,
         capture_pageview: false,
         capture_pageleave: false,
+      });
     }
-    )
-}
-
-type attributes = {
-  [key: string]: string | number | true | null;
-};
-
-const actions = {
+  }
+  actions = {
     identify: (id: string) => {
-      posthog.identify(id);
+      this.posthog.identify(id);
     },
-    reset: () =>{
-      posthog.reset()
+    reset: () => {
+      this.posthog.reset();
     },
     people: {
-      set: (props: attributes) => {
-        posthog.setPersonProperties(props)
+      set: (props: { [key: string]: string | number | boolean | null }) => {
+        this.posthog.setPersonProperties(props);
       },
       registerWallet: (account: string) => {
-        posthog.register({ distinct_id: account, wallet: account });
+        this.posthog.register({ distinct_id: account, wallet: account });
       },
     },
     events: {
       pageOpened: (pageName: string) => {
-        posthog.capture("Page Opened", {
+        this.posthog.capture("Page Opened", {
           pageName: pageName,
         });
       },
-      setTheme:(theme: string)=>{
-        posthog.capture("Theme Set To", {
+      setTheme: (theme: string) => {
+        this.posthog.capture("Theme Set To", {
           theme: theme,
         });
       },
       connections: {
         walletConnect: (connected: boolean) => {
           if (connected) {
-            posthog.capture("Wallet Connected");
+            this.posthog.capture("Wallet Connected");
           } else {
-            posthog.capture("Wallet Disconnected");
+            this.posthog.capture("Wallet Disconnected");
           }
         },
       },
-      lpInterfaceActions: {
-        setFilter: (type: string)=>{
-          posthog.capture("Pools Filtered To", {
-            type: type,
-          });
-        }
+      flows: {
+        started: (flowType: TransactionFlowType, flowId: string) =>
+          this.posthog.capture("Flow Started", { flowType, flowId }),
+        success: (flowType: TransactionFlowType, flowId: string) =>
+          this.posthog.capture("Flow Success", { flowType, flowId }),
+        transaction: (txCapture: TxCapture) =>
+          this.posthog.capture(
+            txCapture.success ? "Transaction Success" : "Transaction Error",
+            txCapture
+          ),
       },
     },
   };
+}
 
-  export const Posthog = actions;
+export default PosthogWrapper;

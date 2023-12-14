@@ -1,6 +1,6 @@
 import Text from "../text";
 import styles from "./toggleGroup.module.scss";
-import {Posthog} from "../../app/posthog"
+
 interface Props {
   options: string[];
   selected: string;
@@ -25,10 +25,7 @@ const ToggleGroup = (props: Props) => {
             className={`${styles.option} ${
               props.selected === option ? styles.selected : ""
             }`}
-            onClick={() => {
-              Posthog.events.lpInterfaceActions.setFilter(option)
-              props.setSelected(option)
-            }}
+            onClick={() => props.setSelected(option)}
           >
             <Text key={option} size="sm">
               {option}

@@ -5,7 +5,7 @@ import Icon from "@/components/icon/icon";
 import Toggle from "@/components/toggle";
 import Rive, { useRive, useStateMachineInput } from "@rive-app/react-canvas";
 import { useCallback, useEffect, useState } from "react";
-import {Posthog} from "../../../app/posthog"
+import Posthog from "../../../app/posthog"
 
 const ThemeButton = () => {
   const [name, setName] = useState("dark");
@@ -41,7 +41,7 @@ const ThemeButton = () => {
     document.body.classList.remove(themeName == "dark" ? "light" : "dark");
     localStorage.setItem("theme", themeName);
     setName(themeName == "dark" ? "light" : "dark");
-    Posthog.events.setTheme(themeName)
+    (new Posthog()).actions.events.setTheme(themeName)
   }
   useEffect(() => {
     setTheme(localStorage.getItem("theme") as string);

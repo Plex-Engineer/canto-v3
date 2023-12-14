@@ -1,7 +1,11 @@
 import { createMsgsConvertCoin } from "@/transactions/cosmos/messages/convertCoin/convertCoin";
 import { createMsgsConvertERC20 } from "@/transactions/cosmos/messages/convertCoin/convertERC20";
 import { createMsgsIBCTransfer } from "@/transactions/cosmos/messages/ibc/ibc";
-import { Transaction, TransactionDescription } from "@/transactions/interfaces";
+import {
+  CantoFETxType,
+  Transaction,
+  TransactionDescription,
+} from "@/transactions/interfaces";
 
 export const _ibcOutTx = (
   chainId: number,
@@ -31,6 +35,7 @@ export const _ibcOutTx = (
   });
   return {
     chainId,
+    feTxType: CantoFETxType.IBC_OUT_COSMOS,
     type: "COSMOS",
     description,
     msg: ibcTx,
@@ -53,6 +58,7 @@ export const _convertERC20Tx = (
   });
   return {
     chainId,
+    feTxType: CantoFETxType.CONVERT_ERC_20_COSMOS,
     description,
     type: "COSMOS",
     msg: convertERC20Tx,
@@ -75,6 +81,7 @@ export const _convertCoinTx = (
   });
   return {
     chainId,
+    feTxType: CantoFETxType.CONVERT_COIN_COSMOS,
     description,
     type: "COSMOS",
     msg: convertCoinTx,

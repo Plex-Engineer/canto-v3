@@ -9,39 +9,36 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TransactionModal from "../transactions/TxModal";
 import ThemeButton from "../footer/components/footerButton";
 import { useEffect } from "react";
-import {Posthog} from "../../app/posthog"
+import Posthog from "../../app/posthog";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 
 const NavBar = () => {
-  const currentPath = usePathname()
-  const {signer } = useCantoSigner()
+  const currentPath = usePathname();
+  const { signer } = useCantoSigner();
+  const posthog = new Posthog();
 
   useEffect(() => {
     if (signer?.account.address) {
-      Posthog.people.registerWallet(signer.account.address)
-      Posthog.identify(signer.account.address)
-      Posthog.people.set({ name: signer.account.address })
-      Posthog.events.connections.walletConnect(true)
+      posthog.actions.people.registerWallet(signer.account.address);
+      posthog.actions.identify(signer.account.address);
+      posthog.actions.people.set({ name: signer.account.address });
+      posthog.actions.events.connections.walletConnect(true);
+    } else {
+      posthog.actions.reset();
     }
-    else{
-      Posthog.reset()
-    }
-  }, [signer])
+  }, [signer]);
 
-  useEffect(()=>{
-    if(currentPath == "/bridge"){
-      Posthog.events.pageOpened("bridge")
+  useEffect(() => {
+    if (currentPath == "/bridge") {
+      posthog.actions.events.pageOpened("bridge");
+    } else if (currentPath == "/lending") {
+      posthog.actions.events.pageOpened("lending");
+    } else if (currentPath == "/lp") {
+      posthog.actions.events.pageOpened("lp interface");
+    } else {
+      posthog.actions.events.pageOpened("home");
     }
-    else if(currentPath == "/lending"){
-      Posthog.events.pageOpened("lending")
-    }
-    else if(currentPath == "/lp"){
-      Posthog.events.pageOpened("lp interface")
-    }
-    else{
-      Posthog.events.pageOpened("home")
-    }
-  },[currentPath, signer])
+  }, [currentPath, signer]);
 
   return (
     <div className={styles.container}>

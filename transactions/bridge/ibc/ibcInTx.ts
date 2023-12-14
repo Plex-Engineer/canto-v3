@@ -37,6 +37,7 @@ import { isIBCToken } from "@/utils/tokens";
 import { TX_PARAM_ERRORS } from "@/config/consts/errors";
 import { validateWeiUserInputTokenAmount } from "@/utils/math";
 import {
+  CantoFETxType,
   Transaction,
   TX_DESCRIPTIONS,
   TxCreatorFunctionReturn,
@@ -163,6 +164,7 @@ export async function ibcInKeplr(
         CANTO_MAINNET_COSMOS.name,
         getBridgeMethodInfo(BridgingMethod.IBC).name
       ),
+      feTxType: CantoFETxType.IBC_IN_KEPLR,
       type: "KEPLR",
       tx: async () => {
         return await signAndBroadcastIBCKeplr(keplrClient.client, {
@@ -503,6 +505,7 @@ async function evmosIBCIn(
         CANTO_MAINNET_COSMOS.name,
         getBridgeMethodInfo(BridgingMethod.IBC).name
       ),
+      feTxType: CantoFETxType.IBC_IN_KEPLR,
       type: "KEPLR",
       tx: signAndBroadcast,
       getHash: (txResponse: { txhash: string }) => {
