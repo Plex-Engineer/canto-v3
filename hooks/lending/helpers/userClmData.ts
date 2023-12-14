@@ -66,7 +66,7 @@ export async function getAllUserCLMData(
   // get total user positions
   const { data: positionTotals, error: positionError } = getLMTotalsFromCTokens(
     combinedCTokenData,
-    userLMData.data.compAccrued.toString()
+    userLMData.data.compAccrued
   );
   if (positionError) {
     return NO_ERROR({
@@ -74,8 +74,8 @@ export async function getAllUserCLMData(
     });
   }
   const userTotalPosition = {
-    liquidity: userLMData.data.limits.liquidity.toString(),
-    shortfall: userLMData.data.limits.shortfall.toString(),
+    liquidity: userLMData.data.limits.liquidity,
+    shortfall: userLMData.data.limits.shortfall,
     totalSupply: positionTotals.totalSupply,
     totalBorrow: positionTotals.totalBorrow,
     totalRewards: positionTotals.totalRewards,
