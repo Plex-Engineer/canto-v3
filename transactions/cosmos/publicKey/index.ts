@@ -1,11 +1,9 @@
-import { CANTO_DUST_BOT_API_URL } from "@/config/api";
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 import {
   TX_DESCRIPTIONS,
   Transaction,
   TransactionDescription,
 } from "@/transactions/interfaces";
-import { tryFetch } from "@/utils/async";
 import { getCantoBalance } from "@/utils/cosmos";
 import BigNumber from "bignumber.js";
 import { createMsgsSend } from "../messages/messageSend";
@@ -30,23 +28,24 @@ export async function generateCantoPublicKeyWithTx(
 
     // call on api to get canto for the account
     if (!enoughCanto) {
-      const { error: botError } = await tryFetch(CANTO_DUST_BOT_API_URL, {
+      const CANTO_DUST_BOT_API_URL = process.env.NEXT_PUBLIC_CANTO_DUST_BOT_URL;
+      if (!CANTO_DUST_BOT_API_URL) throw new Error("invalid dust bot url");
+      const botResponse = await fetch(CANTO_DUST_BOT_API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Request-Headers": "Content-Type, Authorization",
-          "Access-Control-Allow-Origin": "true",
         },
         body: JSON.stringify({
-          cantoAddress: cantoAddress,
-          hexAddress: ethAddress,
+          canto_address: cantoAddress,
+          eth_address: ethAddress,
         }),
       });
-      if (botError) throw botError;
+      if (!botResponse.ok) throw new Error(await botResponse.text());
     }
     return NO_ERROR([
       _generatePubKeyTx(
         chainId,
+        ethAddress,
         cantoAddress,
         TX_DESCRIPTIONS.GENERATE_PUBLIC_KEY()
       ),
@@ -58,6 +57,7 @@ export async function generateCantoPublicKeyWithTx(
 
 const _generatePubKeyTx = (
   chainId: number,
+  ethSender: string,
   cantoSender: string,
   description: TransactionDescription
 ): Transaction => {
@@ -69,6 +69,7 @@ const _generatePubKeyTx = (
   });
   return {
     chainId,
+    fromAddress: ethSender,
     type: "COSMOS",
     description,
     msg: pubKeyTx,

@@ -1,7 +1,4 @@
-import {
-  GetWalletClientResult,
-  waitForTransaction as evmWait,
-} from "wagmi/actions";
+import { waitForTransaction as evmWait } from "wagmi/actions";
 import { Transaction } from "../interfaces";
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 import { signEVMTransaction } from "./evm";
@@ -12,20 +9,18 @@ import { signCosmosEIPTx, waitForCosmosTx } from "./cosmosEIP/signCosmosEIP";
  * @notice signs a single
  * @dev will know if EVM or COSMOS tx to perform
  * @param {Transaction} tx transaction to perform
- * @param {GetWalletClientResult} signer signer to perform tx with
  * @returns {PromiseWithError<string>} txHash of transaction or error
  */
 export async function signTransaction(
-  tx: Transaction,
-  signer: GetWalletClientResult
+  tx: Transaction
 ): PromiseWithError<string> {
   switch (tx.type) {
     case "EVM":
       // perform evm tx
-      return await signEVMTransaction(tx, signer);
+      return await signEVMTransaction(tx);
     case "COSMOS":
       // perform cosmos tx
-      return await signCosmosEIPTx(tx, signer);
+      return await signCosmosEIPTx(tx);
     case "KEPLR":
       // perform keplr tx
       return await signKeplrTx(tx);
@@ -55,7 +50,7 @@ export async function waitForTransaction(
       const receipt = await evmWait({
         chainId: chainId as number,
         hash: hash as `0x${string}`,
-        confirmations: 2,
+        confirmations: 1,
       });
       return NO_ERROR({
         status: receipt.status,

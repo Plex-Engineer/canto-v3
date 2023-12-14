@@ -9,6 +9,7 @@ export const _claimLendingRewardsTx = (
   description: TransactionDescription
 ): Transaction => ({
   description,
+  fromAddress: userEthAdress,
   chainId: chainId,
   type: "EVM",
   target: comptrollerAddress,
@@ -22,10 +23,12 @@ export const _claimLendingRewardsTx = (
 // called on reservoir contract, not comptroller
 export const _dripComptrollerTx = (
   chainId: number,
+  userEthAddress: string,
   reservoirAddress: string,
   description: TransactionDescription
 ): Transaction => ({
   description,
+  fromAddress: userEthAddress,
   chainId: chainId,
   type: "EVM",
   target: reservoirAddress,
@@ -42,6 +45,7 @@ export const _dripComptrollerTx = (
 export const _lendingCTokenTx = (
   lendingTx: CTokenLendingTxTypes,
   chainId: number,
+  userEthAddress: string,
   cTokenAddress: string,
   isCanto: boolean,
   amount: string,
@@ -54,6 +58,7 @@ export const _lendingCTokenTx = (
   );
   return {
     description,
+    fromAddress: userEthAddress,
     chainId: chainId,
     type: "EVM",
     target: cTokenAddress,
@@ -70,12 +75,14 @@ export const _lendingCTokenTx = (
 // redeemUnderlying may leave the user with very small amount of cTokens because of "accrueInterest"
 export const _withdrawAllCTokenTx = (
   chainId: number,
+  userEthAddress: string,
   cTokenAddress: string,
   amount: string,
   description: TransactionDescription
 ): Transaction => ({
   description,
   chainId: chainId,
+  fromAddress: userEthAddress,
   type: "EVM",
   target: cTokenAddress,
   abi: CERC20_ABI,
@@ -86,6 +93,7 @@ export const _withdrawAllCTokenTx = (
 
 export const _collateralizeTx = (
   chainId: number,
+  userEthAddress: string,
   comptrollerAddress: string,
   cTokenAddress: string,
   collateralize: boolean,
@@ -93,6 +101,7 @@ export const _collateralizeTx = (
 ): Transaction => ({
   description,
   chainId: chainId,
+  fromAddress: userEthAddress,
   type: "EVM",
   target: comptrollerAddress,
   abi: COMPTROLLER_ABI,

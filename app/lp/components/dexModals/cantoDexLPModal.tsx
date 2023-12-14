@@ -67,7 +67,7 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
             {
               title: "Add",
               content: (
-                <Container width="100%">
+                <Container width="100%" key={props.pair.address + "add"}>
                   <AddLiquidityModal
                     pair={props.pair}
                     validateParams={(params) =>
@@ -91,7 +91,11 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
                   )
                 ) === 0,
               content: (
-                <Container width="100%" padding="sm">
+                <Container
+                  width="100%"
+                  padding="sm"
+                  key={props.pair.address + "remove"}
+                >
                   <RemoveLiquidityModal
                     pair={props.pair}
                     validateParams={(params) =>

@@ -99,7 +99,7 @@ export async function gravityBridgeInTx(
         txList.push(
           _wrapTx(
             txParams.token.chainId,
-
+            txParams.ethSender,
             txParams.token.address,
             amountToWrap,
             TX_DESCRIPTIONS.WRAP_ETH(
@@ -126,6 +126,7 @@ export async function gravityBridgeInTx(
     txList.push(
       _sendToCosmosTx(
         txParams.token.chainId,
+        txParams.ethSender,
         cantoReceiver,
         txParams.token.address,
         txParams.amount,
@@ -166,7 +167,7 @@ export function validateGravityBridgeInTxParams(
   if (txParams.token.chainId !== ETH_MAINNET.chainId) {
     return {
       error: true,
-      reason: TX_PARAM_ERRORS.PARAM_INVALID("token chain id"),
+      reason: TX_PARAM_ERRORS.CHAIN_NOT_SUPPORTED(txParams.token.chainId),
     };
   }
   return validateWeiUserInputTokenAmount(

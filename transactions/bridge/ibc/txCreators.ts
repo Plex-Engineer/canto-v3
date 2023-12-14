@@ -9,6 +9,7 @@ import {
 
 export const _ibcOutTx = (
   chainId: number,
+  ethSender: string,
   sourcePort: string,
   sourceChannel: string,
   amount: string,
@@ -36,6 +37,7 @@ export const _ibcOutTx = (
   return {
     chainId,
     feTxType: CantoFETxType.IBC_OUT_COSMOS,
+    fromAddress: ethSender,
     type: "COSMOS",
     description,
     msg: ibcTx,
@@ -59,6 +61,7 @@ export const _convertERC20Tx = (
   return {
     chainId,
     feTxType: CantoFETxType.CONVERT_ERC_20_COSMOS,
+    fromAddress: ethSender,
     description,
     type: "COSMOS",
     msg: convertERC20Tx,
@@ -82,6 +85,7 @@ export const _convertCoinTx = (
   return {
     chainId,
     feTxType: CantoFETxType.CONVERT_COIN_COSMOS,
+    fromAddress: ethReceiver,
     description,
     type: "COSMOS",
     msg: convertCoinTx,

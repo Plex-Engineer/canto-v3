@@ -18,10 +18,7 @@ import {
 } from "@/transactions/pairs/ambient";
 
 export default function useAmbientPools(
-  params: AmbientHookInputParams,
-  options?: {
-    refetchInterval?: number;
-  }
+  params: AmbientHookInputParams
 ): AmbientHookReturn {
   ///
   /// INTERNAL STATE
@@ -51,13 +48,9 @@ export default function useAmbientPools(
       };
     },
     {
-      onSuccess: (response) => {
-        // console.log(response);
-      },
       onError: (error) => {
         console.log(error);
       },
-      refetchInterval: options?.refetchInterval || 5000,
     }
   );
 

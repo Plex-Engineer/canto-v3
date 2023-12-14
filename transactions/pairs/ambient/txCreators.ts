@@ -10,6 +10,7 @@ import { roundLiquidityForAmbientTx } from "@/utils/ambient";
  */
 export const _addAmbientConcLiquidityTx = (
   chainId: number,
+  fromEthAddress: string,
   crocDexAddress: string,
   baseAddress: string,
   quoteAddress: string,
@@ -53,6 +54,7 @@ export const _addAmbientConcLiquidityTx = (
   return {
     description,
     chainId: chainId,
+    fromAddress: fromEthAddress,
     type: "EVM",
     target: crocDexAddress,
     abi: CROC_SWAP_DEX_ABI,
@@ -64,6 +66,7 @@ export const _addAmbientConcLiquidityTx = (
 
 export const _removeAmbientConcLiquidityTx = (
   chainId: number,
+  fromEthAddress: string,
   crocDexAddress: string,
   baseAddress: string,
   quoteAddress: string,
@@ -106,6 +109,7 @@ export const _removeAmbientConcLiquidityTx = (
   return {
     description,
     chainId: chainId,
+    fromAddress: fromEthAddress,
     type: "EVM",
     target: crocDexAddress,
     abi: CROC_SWAP_DEX_ABI,
@@ -117,11 +121,13 @@ export const _removeAmbientConcLiquidityTx = (
 
 export const _ambientClaimRewardsTx = (
   chainId: number,
+  fromEthAddress: string,
   rewardsLedgerAddress: string,
   description: TransactionDescription
 ): Transaction => ({
   description,
   chainId: chainId,
+  fromAddress: fromEthAddress,
   type: "EVM",
   target: rewardsLedgerAddress,
   abi: AMBIENT_REWARD_LEDGER_ABI,

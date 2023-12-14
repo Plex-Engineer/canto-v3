@@ -6,6 +6,9 @@ export const TX_PARAM_ERRORS = {
   // general
   PARAM_MISSING: (paramName: string) => `${paramName} is missing`,
   PARAM_INVALID: (paramName: string) => `${paramName} is invalid`,
+  // chain error
+  CHAIN_NOT_SUPPORTED: (chainId: string | number) =>
+    `Chain (${chainId}) not supported`,
   // AMOUNT ERRORS
   AMOUNT_NOT_A_NUMBER: () => "Amount must be a number",
   AMOUNT_TOO_HIGH: (formattedMax: string, tokenSymbol?: string) =>
@@ -35,4 +38,6 @@ export const TX_SIGN_ERRORS = {
   INCORRECT_CHAIN: () => "Incorrect chain",
   SWITCH_CHAIN_ERROR: () => "Error switching chains",
   MISSING_SIGNER: () => "No signer",
+  INCORRECT_SIGNER: (fromAddress: string, signerAddress: string) =>
+    `Incorrect signer. Expected ${fromAddress} but got ${signerAddress}`,
 };

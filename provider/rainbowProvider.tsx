@@ -16,6 +16,7 @@ import * as EVM_CHAINS from "@/config/networks/evm";
 import { cantoTheme } from "./util";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { SafeConnector } from "wagmi/connectors/safe";
 
 const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
   (network) => {
@@ -51,7 +52,7 @@ const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
               },
             }
           : contractInfo,
-    };
+    } as Chain;
   }
 );
 
@@ -77,8 +78,16 @@ const { connectors } = getDefaultWallets({
 
 const wagmiConfig = createConfig({
   autoConnect: true,
-  connectors,
-  // connectors: specificConnectors,
+  connectors: [
+    ...connectors(),
+    new SafeConnector({
+      chains,
+      options: {
+        allowedDomains: [/safe.neobase.one$/],
+        debug: false,
+      },
+    }),
+  ],
   publicClient,
 });
 

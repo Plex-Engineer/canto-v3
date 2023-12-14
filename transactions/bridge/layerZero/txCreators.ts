@@ -27,6 +27,7 @@ export const _oftTransferTx = (
     type: BridgingMethod.LAYER_ZERO,
   },
   description,
+  fromAddress: ethAddress,
   chainId: chainId,
   type: "EVM",
   target: tokenAddress,
@@ -48,12 +49,14 @@ export const _oftTransferTx = (
 
 export const _oftDepositOrWithdrawTx = (
   chainId: number,
+  ethAccount: string,
   deposit: boolean,
   oftAddress: string,
   amount: string,
   description: TransactionDescription
 ): Transaction => ({
   description,
+  fromAddress: ethAccount,
   chainId: chainId,
   type: "EVM",
   target: oftAddress,

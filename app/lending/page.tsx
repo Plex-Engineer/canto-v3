@@ -4,7 +4,6 @@ import styles from "./lending.module.scss";
 import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
-
 import { displayAmount, formatPercent } from "@/utils/formatting";
 import { useLendingCombo } from "./utils";
 import Text from "@/components/text";
@@ -47,6 +46,10 @@ export default function LendingPage() {
   });
   const { cNote, rwas, stableCoins } = cTokens;
   const { selectedCToken, setSelectedCToken } = selection;
+
+  if (isLoading) {
+    return <div className={styles.loading}>loading</div>;
+  }
 
   return (
     <div className={styles.container}>
@@ -110,7 +113,9 @@ export default function LendingPage() {
             stableTokens={stableCoins.sort((a, b) =>
               a.underlying.symbol.localeCompare(b.underlying.symbol)
             )}
-            rwas={rwas}
+            rwas={rwas.sort((a, b) =>
+              a.underlying.symbol.localeCompare(b.underlying.symbol)
+            )}
             onSupply={(address) => {
               setSelectedCToken(address);
               setCurrentModal(CLMModalTypes.SUPPLY);
@@ -173,7 +178,7 @@ export default function LendingPage() {
                 })}
                 postChild={<NoteIcon />}
               /> */}
-              <Item name="Net APR" value={clmPosition.general.netApr + "%"} />
+              <Item name="Net APY" value={clmPosition.general.netApr + "%"} />
               <Item
                 name="Percent Limit Used"
                 value={clmPosition.general.percentLimitUsed + "%"}
@@ -187,6 +192,22 @@ export default function LendingPage() {
                     precision: 2,
                   }
                 )}
+                postChild={<NoteIcon />}
+              />
+              {/* Item for Total Borrowed */}
+              <Item
+                name="Total Borrowed"
+                value={displayAmount(clmPosition.position.totalBorrow, 18, {
+                  precision: 2,
+                })}
+                postChild={<NoteIcon />}
+              />
+              {/* Item for Total Supplied */}
+              <Item
+                name="Total Supplied"
+                value={displayAmount(clmPosition.position.totalSupply, 18, {
+                  precision: 2,
+                })}
                 postChild={<NoteIcon />}
               />
             </OutlineCard>
@@ -222,7 +243,7 @@ const CTokenTable = ({
       ? [
           { value: "Asset", ratio: 1 },
           { value: "Balance", ratio: 1 },
-          { value: "APR", ratio: 1 },
+          { value: "APY", ratio: 1 },
           { value: "Supplied", ratio: 1 },
           { value: "Collateral Factor", ratio: 1 },
           { value: "Liquidity", ratio: 1 },
@@ -235,7 +256,7 @@ const CTokenTable = ({
             value: (
               <span>
                 Supply
-                <br /> APR
+                <br /> APY
               </span>
             ),
             ratio: 1,
@@ -245,7 +266,7 @@ const CTokenTable = ({
             value: (
               <span>
                 Borrow
-                <br /> APR
+                <br /> APY
               </span>
             ),
             ratio: 1,

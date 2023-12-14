@@ -13,7 +13,11 @@ import {
 import { TX_PARAM_ERRORS } from "@/config/consts/errors";
 import { areEqualAddresses, isValidEthAddress } from "@/utils/address";
 import { maxAmountForLendingTx } from "@/utils/clm";
-import { greaterThan, validateWeiUserInputTokenAmount } from "@/utils/math";
+import {
+  greaterThan,
+  percentOfAmount,
+  validateWeiUserInputTokenAmount,
+} from "@/utils/math";
 import { MAX_UINT256, getCantoCoreAddress } from "@/config/consts/addresses";
 import { createApprovalTxs } from "../erc20";
 import { displayAmount } from "@/utils/formatting";
@@ -23,6 +27,7 @@ import {
   TX_DESCRIPTIONS,
 } from "../interfaces";
 import { getAllUserCLMData } from "@/hooks/lending/helpers/userClmData";
+import { isCantoChainId } from "@/utils/networks";
 
 export async function cTokenLendingTx(
   txParams: CTokenLendingTransactionParams
@@ -54,6 +59,7 @@ export async function cTokenLendingTx(
         transactions: [
           _collateralizeTx(
             txParams.chainId,
+            txParams.ethAccount,
             comptrollerAddress,
             txParams.cToken.address,
             isCollateralize,
@@ -81,6 +87,10 @@ export async function cTokenLendingTx(
       (txParams.txType === CTokenLendingTxTypes.SUPPLY ||
         txParams.txType === CTokenLendingTxTypes.REPAY)
     ) {
+      const approvalAmount =
+        txParams.txType === CTokenLendingTxTypes.REPAY && txParams.max
+          ? percentOfAmount(txParams.amount, 105).data ?? txParams.amount
+          : txParams.amount;
       const { data: allowanceTxs, error: allowanceError } =
         await createApprovalTxs(
           txParams.chainId,
@@ -91,7 +101,7 @@ export async function cTokenLendingTx(
               symbol: txParams.cToken.underlying.symbol,
             },
           ],
-          [txParams.amount],
+          [approvalAmount],
           { address: txParams.cToken.address, name: "Lending Market" }
         );
       if (allowanceError) throw allowanceError;
@@ -120,6 +130,7 @@ export async function cTokenLendingTx(
         txList.push(
           _withdrawAllCTokenTx(
             txParams.chainId,
+            txParams.ethAccount,
             txParams.cToken.address,
             txParams.cToken.userDetails.balanceOfCToken,
             txDescription
@@ -145,6 +156,7 @@ export async function cTokenLendingTx(
       _lendingCTokenTx(
         txParams.txType,
         txParams.chainId,
+        txParams.ethAccount,
         txParams.cToken.address,
         isCanto,
         txParams.amount,
@@ -167,6 +179,7 @@ export async function cTokenLendingTx(
       txList.push(
         _collateralizeTx(
           txParams.chainId,
+          txParams.ethAccount,
           comptrollerAddress,
           txParams.cToken.address,
           true,
@@ -189,6 +202,14 @@ export async function cTokenLendingTx(
 export function validateCTokenLendingTxParams(
   txParams: CTokenLendingTransactionParams
 ): Validation {
+  // tx must be on a canto chain
+  if (!isCantoChainId(txParams.chainId)) {
+    return {
+      error: true,
+      reason: TX_PARAM_ERRORS.CHAIN_NOT_SUPPORTED(txParams.chainId),
+    };
+  }
+
   // user details on token must be available
   if (!txParams.cToken.userDetails) {
     return {

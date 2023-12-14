@@ -13,6 +13,14 @@ export type NewTransactionFlow = {
   icon: string;
   txType: TransactionFlowType;
   params: object;
+  // for importing tokens from tx list
+  tokenMetadata?: {
+    chainId: number;
+    address: string;
+    symbol: string;
+    decimals: number;
+    icon: string;
+  }[];
 };
 
 ///
@@ -48,6 +56,7 @@ export const TX_PLACEHOLDER = (
   placeholder: NewTransactionFlowPlaceholder
 ): TransactionWithStatus => ({
   tx: {
+    fromAddress: "",
     chainId: 0,
     description: placeholder.description,
     type: "KEPLR",

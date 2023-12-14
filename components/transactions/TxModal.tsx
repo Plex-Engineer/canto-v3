@@ -52,7 +52,7 @@ const TransactionModal = () => {
           setIsOpen(false);
         }}
         height="36rem"
-        width="30rem"
+        width="32rem"
       >
         <Text size="lg" font="proto_mono">
           Activity
@@ -191,7 +191,10 @@ const TransactionModal = () => {
                 <TxFlow
                   txFlow={getFlowFromId(currentFlowId)}
                   onRetry={() => {
-                    txStore?.performFlow(signer, currentFlowId);
+                    txStore?.performFlow(
+                      signer?.account.address ?? "",
+                      currentFlowId
+                    );
                   }}
                   setBridgeStatus={(txIndex, status) =>
                     txStore?.setTxBridgeStatus(

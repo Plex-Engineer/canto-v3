@@ -8,11 +8,7 @@ import styles from "./modal.module.scss";
 import Tabs from "@/components/tabs/tabs";
 import Image from "next/image";
 import Container from "@/components/container/container";
-import {
-  convertToBigNumber,
-  displayAmount,
-  formatBalance,
-} from "@/utils/formatting";
+import { convertToBigNumber, displayAmount } from "@/utils/formatting";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import React, { useState } from "react";
@@ -22,6 +18,7 @@ import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { areEqualAddresses } from "@/utils/address";
 import { convertTokenAmountToNote } from "@/utils/math";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
+import Toggle from "@/components/toggle";
 interface Props {
   isSupplyModal: boolean;
   cToken: CTokenWithUserData | null;
@@ -88,9 +85,7 @@ export const LendingModal = (props: Props) => {
         )}
         <ModalItem
           name="Account Liquidity Remaining"
-          value={formatBalance(liquidityLeft, 18, {
-            commify: true,
-          })}
+          value={displayAmount(liquidityLeft, 18)}
           note
         />
       </Container>
@@ -100,30 +95,96 @@ export const LendingModal = (props: Props) => {
   const APRs = ({
     cToken,
     isSupply,
+    transaction,
   }: {
     cToken: CTokenWithUserData;
     isSupply: boolean;
-  }) => (
-    <Container className={styles.card} padding="md" width="100%">
-      {/* might need to change this in future for showing it on more tokens */}
-      {isSupply && cToken.symbol.toLowerCase() == "cnote" && (
-        <>
-          <ModalItem name="Supply APR" value={cToken.supplyApy + "%"} />
-          <ModalItem name="Dist APR" value={cToken.distApy + "%"} />
-        </>
-      )}
+    transaction: {
+      validateParams: (
+        amount: string,
+        txType: CTokenLendingTxTypes,
+        max: boolean
+      ) => Validation;
+      performTx: (
+        amount: string,
+        txType: CTokenLendingTxTypes,
+        max: boolean
+      ) => void;
+    };
+  }) => {
+    const isCollateral = cToken.userDetails?.isCollateral ?? false;
+    const collateralParams: [string, CTokenLendingTxTypes, boolean] = [
+      cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
+      isCollateral
+        ? CTokenLendingTxTypes.DECOLLATERALIZE
+        : CTokenLendingTxTypes.COLLATERALIZE,
+      false,
+    ];
+    const collateralTxValidation = transaction.validateParams(
+      ...collateralParams
+    );
 
-      {!isSupply && (
+    return (
+      <Container className={styles.card} padding="md" width="100%">
+        {/* might need to change this in future for showing it on more tokens */}
+        {isSupply && cToken.symbol.toLowerCase() == "cnote" && (
+          <>
+            <ModalItem name="Supply APR" value={cToken.supplyApy + "%"} />
+            <ModalItem name="Dist APR" value={cToken.distApy + "%"} />
+          </>
+        )}
+
+        {!isSupply && (
+          <>
+            <ModalItem name="Borrow APR" value={cToken.borrowApy + "%"} />
+          </>
+        )}
+
         <>
-          <ModalItem name="Borrow APR" value={cToken.borrowApy + "%"} />
+          <ModalItem
+            name="Collateral Factor"
+            value={
+              <Container
+                direction="row"
+                gap={10}
+                center={{
+                  vertical: true,
+                  horizontal: true,
+                }}
+              >
+                <Text font="proto_mono" size="sm">
+                  {displayAmount(cToken.collateralFactor, 16) + "%"}
+                </Text>
+              </Container>
+            }
+          />
+          {isSupply && (
+            <ModalItem
+              name="Collateral"
+              value={
+                <Container
+                  direction="row"
+                  gap={10}
+                  center={{
+                    vertical: true,
+                    horizontal: true,
+                  }}
+                >
+                  <Toggle
+                    onChange={() => {
+                      transaction.performTx(...collateralParams);
+                    }}
+                    value={cToken.userDetails?.isCollateral ?? false}
+                    disabled={collateralTxValidation.error}
+                  />
+                </Container>
+              }
+            />
+          )}
         </>
-      )}
-      <ModalItem
-        name="Collateral Factor"
-        value={formatBalance(cToken.collateralFactor, 16) + "%"}
-      />
-    </Container>
-  );
+      </Container>
+    );
+  };
 
   function Content(
     cToken: CTokenWithUserData,
@@ -174,7 +235,7 @@ export const LendingModal = (props: Props) => {
       : {};
 
     return (
-      <div className={styles.content}>
+      <div className={styles.content} key={cToken.address + isSupplyModal}>
         <Spacer height="20px" />
         <Image
           src={cToken.underlying.logoURI}
@@ -206,7 +267,11 @@ export const LendingModal = (props: Props) => {
         <Spacer height="40px" />
 
         <Container width="100%" gap={20}>
-          <APRs cToken={cToken} isSupply={isSupplyModal} />
+          <APRs
+            cToken={cToken}
+            isSupply={isSupplyModal}
+            transaction={transaction}
+          />
           <Balances
             cToken={cToken}
             isSupply={isSupplyModal}
@@ -357,8 +422,7 @@ const CTokenAmountCard = ({
         {name}
       </Text>
       <Text size="sm" font="proto_mono">
-        {formatBalance(amount, decimals, {
-          commify: true,
+        {displayAmount(amount, decimals, {
           symbol: note ? undefined : symbol,
         })}
         {valueInNote ? ` (${displayAmount(valueInNote.toString(), 18)} ` : " "}

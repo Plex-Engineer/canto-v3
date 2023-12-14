@@ -11,8 +11,13 @@ import ThemeButton from "../footer/components/footerButton";
 import { useEffect } from "react";
 import Posthog from "../../app/posthog";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
+import { useBalance } from "wagmi";
+import { useAutoConnect } from "@/provider/useAutoConnect";
 
 const NavBar = () => {
+  // This is used to connect safe as wallet,
+  // if the app is opened in the safe context.
+  useAutoConnect();
   const currentPath = usePathname();
   const { signer } = useCantoSigner();
   const posthog = new Posthog();
@@ -39,6 +44,12 @@ const NavBar = () => {
       posthog.actions.events.pageOpened("home");
     }
   }, [currentPath, signer]);
+
+  const balance = useBalance({
+    address: signer?.account.address,
+    watch: true,
+    chainId: signer?.chain.id,
+  });
 
   return (
     <div className={styles.container}>
@@ -111,7 +122,7 @@ const NavBar = () => {
           <TransactionModal />
         </div>
         <div className={styles["wallet-connect"]}>
-          <ConnectButton chainStatus={"none"} />
+          <ConnectButton key={balance.data?.formatted} chainStatus={"none"} />
         </div>
       </div>
     </div>

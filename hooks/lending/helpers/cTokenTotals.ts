@@ -25,33 +25,38 @@ export function getLMTotalsFromCTokens(
   // calculate total supply and borrow
   const totals = userCTokens.reduce(
     (acc, cToken, idx) => {
-      // typeguard user details
       if (!cToken.userDetails) {
+        // typeguard user details
         errorInLoop = true;
         errorReaons.push(idx + ": no user details");
         return acc;
       }
       // get the values in $note
-      const { data: supplyInNote, error: supplyError } =
-        convertTokenAmountToNote(
-          cToken.userDetails.supplyBalanceInUnderlying,
-          cToken.price
-        );
-      const { data: borrowInNote, error: borrowError } =
-        convertTokenAmountToNote(
-          cToken.userDetails.borrowBalance,
-          cToken.price
-        );
-      if (supplyError || borrowError) {
-        errorReaons.push(
-          idx + ": " + (supplyError?.message ?? borrowError?.message ?? "")
-        );
-        errorInLoop = true;
-        return acc;
+      let { data: supplyInNote, error: supplyError } = convertTokenAmountToNote(
+        cToken.userDetails.supplyBalanceInUnderlying,
+        cToken.price
+      );
+      let { data: borrowInNote, error: borrowError } = convertTokenAmountToNote(
+        cToken.userDetails.borrowBalance,
+        cToken.price
+      );
+      // check for errors (if error, set amount to 0 and continue)
+      if (supplyError) {
+        supplyInNote = new BigNumber(0);
       }
+      if (borrowError) {
+        borrowInNote = new BigNumber(0);
+      }
+      // if (supplyError || borrowError) {
+      //   errorReaons.push(
+      //     idx + ": " + (supplyError?.message ?? borrowError?.message ?? "")
+      //   );
+      //   errorInLoop = true;
+      //   return acc;
+      // }
       // get the apr in $note
       const supplyAprInNote = new BigNumber(
-        Number(cToken.supplyApy) + Number(cToken.distApy)
+        Number(cToken.supplyApy)
       ).multipliedBy(supplyInNote);
       const borrowAprInNote = new BigNumber(cToken.borrowApy).multipliedBy(
         borrowInNote

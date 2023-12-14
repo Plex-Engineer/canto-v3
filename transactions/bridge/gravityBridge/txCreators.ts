@@ -13,6 +13,7 @@ import { GRAVITY_BRIDGE_ABI, WETH_ABI } from "@/config/abis";
  */
 export const _sendToCosmosTx = (
   chainId: number,
+  fromEthAddress: string,
   cantoReceiverAddress: string,
   tokenAddress: string,
   amount: string,
@@ -22,6 +23,7 @@ export const _sendToCosmosTx = (
     type: BridgingMethod.GRAVITY_BRIDGE,
     lastStatus: "NONE",
   },
+  fromAddress: fromEthAddress,
   description,
   feTxType: CantoFETxType.SEND_TO_COSMOS,
   chainId: chainId,
@@ -35,6 +37,7 @@ export const _sendToCosmosTx = (
 
 export const _wrapTx = (
   chainId: number,
+  fromEthAddress: string,
   wethAddress: string,
   amount: string,
   description: TransactionDescription
@@ -42,6 +45,7 @@ export const _wrapTx = (
   description,
   feTxType: CantoFETxType.WRAP_ETH,
   chainId: chainId,
+  fromAddress: fromEthAddress,
   type: "EVM",
   target: wethAddress,
   abi: WETH_ABI,

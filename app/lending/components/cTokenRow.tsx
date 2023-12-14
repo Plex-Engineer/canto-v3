@@ -17,15 +17,11 @@ export const RWARow = ({
     key={cRwa.address}
     direction="row"
     gap={10}
-    style={
-      {
-        // padding: "0 16px",
-        // width: "220px",
-      }
-    }
+    style={{
+      paddingLeft: "20px",
+    }}
     center={{
       vertical: true,
-      horizontal: true,
     }}
     width="100%"
   >
@@ -86,12 +82,6 @@ export const StableCoinRow = ({
     key={cStableCoin.address}
     direction="row"
     gap={10}
-    style={
-      {
-        // padding: "0 16px",
-        // width: "220px",
-      }
-    }
     center={{
       vertical: true,
       horizontal: true,
@@ -120,7 +110,7 @@ export const StableCoinRow = ({
   <Container
     key={"popkey" + cStableCoin.name}
     direction="row"
-    gap={10}
+    gap={4}
     center={{
       horizontal: true,
       vertical: true,
@@ -131,15 +121,13 @@ export const StableCoinRow = ({
       theme="primary-dark"
       key={cStableCoin.name + "cToken.supplyApy"}
     >
-      {`${(Number(cStableCoin.supplyApy) + Number(cStableCoin.distApy)).toFixed(
-        2
-      )}%`}
+      {`${Number(cStableCoin.supplyApy)}%`}
     </Text>
     <InfoPop>
       <Container gap={6}>
         <Container gap={"auto"} direction="row">
           <Text font="proto_mono" size="x-sm">
-            supply apr:
+            supply apy:
           </Text>
           <Text font="proto_mono" size="x-sm">
             {`${Number(cStableCoin.supplyApy).toFixed(2)}%`}
@@ -147,7 +135,7 @@ export const StableCoinRow = ({
         </Container>
         <Container gap={"auto"} direction="row">
           <Text font="proto_mono" size="x-sm">
-            distribution apr:
+            distribution apy:
           </Text>
           <Text font="proto_mono" size="x-sm">
             {`${Number(cStableCoin.distApy).toFixed(2)}%`}
