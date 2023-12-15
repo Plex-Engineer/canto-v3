@@ -1,6 +1,5 @@
 import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
-import Spacer from "@/components/layout/spacer";
 import {
   AmbientPool,
   AmbientUserPosition,
@@ -10,13 +9,20 @@ import { displayAmount } from "@/utils/formatting";
 import BigNumber from "bignumber.js";
 import styles from "./dexModals/cantoDex.module.scss";
 import Text from "@/components/text";
+import { addTokenBalances } from "@/utils/math";
 
 // Listing Positions
 interface Props {
   pool: AmbientPool;
+  positionValues: {
+    baseAmount: string;
+    baseValue: string;
+    quoteAmount: string;
+    quoteValue: string;
+  }[];
   positions: AmbientUserPosition[];
 }
-export const HoverPositions = ({ pool, positions }: Props) => (
+export const HoverPositions = ({ pool, positionValues }: Props) => (
   <>
     <div
       className={styles["scroll-view"]}
@@ -25,7 +31,7 @@ export const HoverPositions = ({ pool, positions }: Props) => (
       }}
     >
       <Container gap={10} className={styles["items-list"]}>
-        {positions.map((item, idx) => (
+        {positionValues.map((item, idx) => (
           <Container
             key={idx}
             direction="row"
@@ -51,19 +57,12 @@ export const HoverPositions = ({ pool, positions }: Props) => (
                   lineBreak: "anywhere",
                 }}
               >
-                {idx + 1}) Range:
+                Position {idx + 1}:
               </Text>
 
               <Text size="x-sm" font="proto_mono">
                 {displayAmount(
-                  concLiquidityNoteValue(
-                    item.concLiq,
-                    pool.stats.lastPriceSwap.toString(),
-                    item.bidTick,
-                    item.askTick,
-                    new BigNumber(10).pow(36 - pool.base.decimals).toString(),
-                    new BigNumber(10).pow(36 - pool.quote.decimals).toString()
-                  ),
+                  addTokenBalances(item.baseValue, item.quoteValue),
                   18
                 )}{" "}
                 <Icon icon={{ url: "tokens/note.svg", size: 12 }} themed />
@@ -84,14 +83,11 @@ export const HoverPositions = ({ pool, positions }: Props) => (
                   lineBreak: "anywhere",
                 }}
               >
-                min :{" "}
-                {displayAmount(
-                  getPriceFromTick(item.askTick),
-                  pool.base.decimals - pool.quote.decimals,
-                  {
-                    precision: 5,
-                  }
-                )}
+                <Icon icon={{ url: pool.base.logoURI, size: 12 }} themed />
+                {`${pool.base.symbol}: `}
+                {displayAmount(item.baseAmount, pool.base.decimals, {
+                  precision: 2,
+                })}
               </Text>
               <Text
                 size="x-sm"
@@ -100,14 +96,11 @@ export const HoverPositions = ({ pool, positions }: Props) => (
                   lineBreak: "anywhere",
                 }}
               >
-                max:{" "}
-                {displayAmount(
-                  getPriceFromTick(item.askTick),
-                  pool.base.decimals - pool.quote.decimals,
-                  {
-                    precision: 5,
-                  }
-                )}
+                <Icon icon={{ url: pool.quote.logoURI, size: 12 }} themed />
+                {`${pool.quote.symbol}: `}
+                {displayAmount(item.quoteAmount, pool.quote.decimals, {
+                  precision: 2,
+                })}
               </Text>
             </Container>
           </Container>

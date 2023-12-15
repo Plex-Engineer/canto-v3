@@ -269,3 +269,33 @@ export function getDisplayTokenAmountFromRange(
     });
   }
 }
+
+/**
+ * @notice gets token amounts from liquidity
+ * @param liquidity liquidity of position
+ * @param currentPriceWei  price of base in quote
+ * @param lowerTick lower tick of position
+ * @param upperTick upper tick of position
+ * @returns token amounts
+ */
+export function concentratedLiquidityTokenAmounts(
+  liquidity: string,
+  currentPriceWei: string,
+  lowerTick: number,
+  upperTick: number
+): { base: string; quote: string } {
+  return {
+    base: baseTokenFromConcLiquidity(
+      liquidity,
+      currentPriceWei,
+      lowerTick,
+      upperTick
+    ),
+    quote: quoteTokenFromConcLiquidity(
+      liquidity,
+      currentPriceWei,
+      lowerTick,
+      upperTick
+    ),
+  };
+}

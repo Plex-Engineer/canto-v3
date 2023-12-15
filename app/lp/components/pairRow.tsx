@@ -2,17 +2,11 @@ import Button from "@/components/button/button";
 import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
 import InfoPop from "@/components/infopop/infopop";
-import Spacer from "@/components/layout/spacer";
 import PopUp from "@/components/popup/popup";
 import Text from "@/components/text";
-import Toggle from "@/components/toggle";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
-import {
-  CantoDexTransactionParams,
-  CantoDexTxTypes,
-} from "@/transactions/pairs/cantoDex/types";
-import { concLiquidityNoteValue } from "@/utils/ambient";
+import { concentratedLiquidityTokenAmounts } from "@/utils/ambient";
 import { formatPercent, displayAmount } from "@/utils/formatting";
 import {
   addTokenBalances,
@@ -24,11 +18,9 @@ import { HoverPositions } from "./HoverPositions";
 export const UserCantoDexPairRow = ({
   pair,
   onManage,
-  sendTxFlow,
 }: {
   pair: CantoDexPairWithUserCTokenData;
   onManage: (pairAddress: string) => void;
-  sendTxFlow: (params: Partial<CantoDexTransactionParams>) => void;
 }) => {
   if (!pair.clmData?.userDetails) return [];
   // add staked and wallet balance
@@ -255,19 +247,45 @@ export const UserAmbientPairRow = ({
   onManage: (poolAddress: string) => void;
   rewards?: string;
 }) => {
-  const value = pool.userPositions.reduce((acc, position) => {
-    return addTokenBalances(
-      acc,
-      concLiquidityNoteValue(
-        position.concLiq,
-        pool.stats.lastPriceSwap,
-        position.bidTick,
-        position.askTick,
-        new BigNumber(10).pow(36 - pool.base.decimals).toString(),
-        new BigNumber(10).pow(36 - pool.quote.decimals).toString()
+  let totalValue = "0";
+  const allPositionValues = pool.userPositions.map((position) => {
+    const tokenAmounts = concentratedLiquidityTokenAmounts(
+      position.concLiq,
+      pool.stats.lastPriceSwap,
+      position.bidTick,
+      position.askTick
+    );
+    const baseNoteValue = convertTokenAmountToNote(
+      tokenAmounts.base,
+      new BigNumber(10).pow(36 - pool.base.decimals).toString()
+    );
+    const quoteNoteValue = convertTokenAmountToNote(
+      tokenAmounts.quote,
+      new BigNumber(10).pow(36 - pool.quote.decimals).toString()
+    );
+    if (baseNoteValue.error || quoteNoteValue.error) {
+      return {
+        baseAmount: "0",
+        baseValue: "0",
+        quoteAmount: "0",
+        quoteValue: "0",
+      };
+    }
+    totalValue = addTokenBalances(
+      totalValue,
+      addTokenBalances(
+        baseNoteValue.data.toString(),
+        quoteNoteValue.data.toString()
       )
     );
-  }, "0");
+    return {
+      baseAmount: tokenAmounts.base,
+      baseValue: baseNoteValue.data.toString(),
+      quoteAmount: tokenAmounts.quote,
+      quoteValue: quoteNoteValue.data.toString(),
+    };
+  });
+
   return [
     <Container
       key={pool.address}
@@ -288,7 +306,7 @@ export const UserAmbientPairRow = ({
     </Container>,
     <AprBlock key={"apr"} pool={pool} />,
     <Text key={pool.symbol + "pool share"}>
-      {formatPercent(divideBalances(value, pool.totals.noteTvl))}
+      {formatPercent(divideBalances(totalValue, pool.totals.noteTvl))}
     </Text>,
     <Container
       key={pool.address + " value"}
@@ -300,7 +318,7 @@ export const UserAmbientPairRow = ({
       gap={10}
     >
       <Text key={pool.symbol + "value"}>
-        {displayAmount(value, 18)}
+        {displayAmount(totalValue, 18)}
         <Icon
           style={{ marginLeft: "5px" }}
           themed
@@ -313,7 +331,11 @@ export const UserAmbientPairRow = ({
       <InfoPop>
         {/* show all the positions */}
         <Container>
-          <HoverPositions pool={pool} positions={pool.userPositions} />
+          <HoverPositions
+            pool={pool}
+            positions={pool.userPositions}
+            positionValues={allPositionValues}
+          />
         </Container>
       </InfoPop>
     </Container>,

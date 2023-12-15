@@ -106,7 +106,6 @@ export default function Page() {
                   onManage: (pairAddress) => {
                     setPair(pairAddress);
                   },
-                  sendTxFlow: sendCantoDexTxFlow,
                 })
               ),
             ]}
