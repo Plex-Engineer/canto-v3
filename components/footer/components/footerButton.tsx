@@ -41,7 +41,6 @@ const ThemeButton = () => {
     document.body.classList.remove(themeName == "dark" ? "light" : "dark");
     localStorage.setItem("theme", themeName);
     setName(themeName == "dark" ? "light" : "dark");
-    (new Posthog()).actions.events.setTheme(themeName)
   }
   useEffect(() => {
     setTheme(localStorage.getItem("theme") as string);

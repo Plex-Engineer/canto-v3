@@ -1,63 +1,74 @@
 "use client";
 
-import { BridgingMethod } from "@/transactions/bridge";
+import { BridgingMethodName } from "@/transactions/bridge";
 import { TransactionFlowType } from "@/transactions/flows";
 import { CantoFETxType } from "@/transactions/interfaces";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
 import { CantoDexTxTypes } from "@/transactions/pairs/cantoDex";
 import posthog from "posthog-js";
 
-posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-  api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST!,
-  autocapture: false,
-  capture_pageview: false,
-  capture_pageleave: false,
-});
-
 // (BRIDGE/LP/LENDING/...)
-type PostHogParentFlowType = TransactionFlowType;
+type AnalyticsTransactionFlowCategory = TransactionFlowType;
 // (SUPPLY/WITHDRAW/GBRIDGE/LAYERZERO/LPANDSTAKE/...)
-type PostHogFlowType = CantoDexTxTypes | CTokenLendingTxTypes | BridgingMethod;
-// tx types (approve/mint/swap/...)
-type PostHogFlowTxType = CantoFETxType;
+type AnalyticsTransactionFlowType = CantoDexTxTypes | CTokenLendingTxTypes | BridgingMethodName | undefined;
+export type AnalyticsTransactionFlowData = {
+  // bridge info
+  bridgeFrom: string;
+  bridgeTo: string;
+  bridgeAsset: string;
+  bridgeAmount: string;
+  // dex info
+  // lending info
+};
 
-type TxCapture = {
-  success: boolean;
-  flowId: string;
-  parentType: PostHogParentFlowType;
-  flowType: PostHogFlowType;
-  txType: PostHogFlowTxType;
-  txParams?: object; //{token: object, amount: string, method: BridgeMethod}
-  txHash?: string;
-  error?: string;
+// tx types (approve/mint/swap/...)
+type AnalyticsTransactionType = CantoFETxType;
+
+export type AnalyticsTransactionFlowInfo = {
+  txFlowId: string;
+  txFlowCategory: AnalyticsTransactionFlowCategory;
+  txFlowType: AnalyticsTransactionFlowType;
+  txFlowData: AnalyticsTransactionFlowData;
+  txCount: number;
+}
+
+type AnalyticsTransactionFlowParams = {
+  txFlowId: string;
+  txFlowCategory: AnalyticsTransactionFlowCategory;
+  txFlowType: AnalyticsTransactionFlowType;
+  txFlowData: AnalyticsTransactionFlowData;
+  txCount: number;
+  txType?: AnalyticsTransactionType;
+  txSuccess?: boolean;
+  txListError?:string;
+  txError?: string;
 };
 
 class PosthogWrapper {
-  constructor() {}
+  constructor() {
+    posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+      api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST!,
+      autocapture: false,
+      capture_pageview: false,
+      capture_pageleave: false,
+    });
+  }
   actions = {
-    identify: (id: string) => {
-      posthog.identify(id);
+    identify: (account: string, props: object) => {
+      posthog.identify(account,props);
     },
-    reset: () => {
-      posthog.reset();
+    reset: () =>{
+      posthog.reset()
     },
     people: {
-      set: (props: { [key: string]: string | number | boolean | null }) => {
-        posthog.setPersonProperties(props);
-      },
       registerWallet: (account: string) => {
-        posthog.register({ distinct_id: account, wallet: account });
+        posthog.register({"account": account});
       },
     },
     events: {
       pageOpened: (pageName: string) => {
         posthog.capture("Page Opened", {
           pageName: pageName,
-        });
-      },
-      setTheme: (theme: string) => {
-        posthog.capture("Theme Set To", {
-          theme: theme,
         });
       },
       connections: {
@@ -69,19 +80,25 @@ class PosthogWrapper {
           }
         },
       },
-      flows: {
-        started: (flowType: TransactionFlowType, flowId: string) =>
-          posthog.capture("Flow Started", { flowType, flowId }),
-        success: (flowType: TransactionFlowType, flowId: string) =>
-          posthog.capture("Flow Success", { flowType, flowId }),
-        transaction: (txCapture: TxCapture) =>
+      transactionFlows: {
+        started: (params : AnalyticsTransactionFlowParams) => {
+          posthog.capture("Transaction Flow Started", params)
+        },
+        success: (params : AnalyticsTransactionFlowParams) => {
+          posthog.capture("Transaction Flow Success",params)
+        },
+        error: (params : AnalyticsTransactionFlowParams) => {
+          posthog.capture("Transaction Flow Error", params)
+        },
+        transaction: (params: AnalyticsTransactionFlowParams) => {
           posthog.capture(
-            txCapture.success ? "Transaction Success" : "Transaction Error",
-            txCapture
-          ),
+            params.txSuccess ? "Transaction Success" : "Transaction Error",
+            params
+          )
+        },
       },
     },
   };
 }
 
-export default PosthogWrapper;
+export default new PosthogWrapper();;

@@ -20,29 +20,28 @@ const NavBar = () => {
   useAutoConnect();
   const currentPath = usePathname();
   const { signer } = useCantoSigner();
-  const posthog = new Posthog();
+  
 
   useEffect(() => {
     if (signer?.account.address) {
-      posthog.actions.people.registerWallet(signer.account.address);
-      posthog.actions.identify(signer.account.address);
-      posthog.actions.people.set({ name: signer.account.address });
-      posthog.actions.events.connections.walletConnect(true);
+      Posthog.actions.people.registerWallet(signer.account.address);
+      Posthog.actions.identify(signer.account.address, { account: signer.account.address })
+      Posthog.actions.events.connections.walletConnect(true);
     } else {
-      posthog.actions.reset();
+      Posthog.actions.reset();
     }
   }, [signer]);
 
   useEffect(() => {
     console.log(currentPath)
     if (currentPath == "/bridge") {
-      posthog.actions.events.pageOpened("bridge");
+      Posthog.actions.events.pageOpened("bridge");
     } else if (currentPath == "/lending") {
-      posthog.actions.events.pageOpened("lending");
+      Posthog.actions.events.pageOpened("lending");
     } else if (currentPath == "/lp") {
-      posthog.actions.events.pageOpened("lp interface");
+      Posthog.actions.events.pageOpened("lp interface");
     } else {
-      posthog.actions.events.pageOpened("home");
+      Posthog.actions.events.pageOpened("home");
     }
   }, [currentPath, signer]);
 

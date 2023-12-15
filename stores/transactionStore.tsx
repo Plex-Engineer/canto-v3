@@ -19,9 +19,12 @@ import {
   TransactionWithStatus,
 } from "@/transactions/interfaces";
 import { signTransaction, waitForTransaction } from "@/transactions/signTx";
-import PosthogWrapper from "@/app/posthog";
+import  {v4 as uuidv4} from "uuid"
+import { TransactionFlowType } from "@/transactions/flows";
+import Posthog from "@/app/posthog";
+import {BridgeTransactionParams, BridgingMethod, getBridgingMethodName} from "@/transactions/bridge/types";
+import {AnalyticsTransactionFlowInfo, AnalyticsTransactionFlowData} from "@/app/posthog";
 
-const PostHog = new PosthogWrapper();
 
 // only save last 100 flows for each user to save space
 const USER_FLOW_LIMIT = 100;
@@ -80,12 +83,14 @@ const useTransactionStore = create<TransactionStore>()(
         addNewFlow: async (params) => {
           // create new flow before getting transactions
           // set the transactions to an empty array for now, since we will get them when actually performing the flow
+          let analyticsTransactionFlowInfo  = getAnalyticsTransactionFlowInfo(params.txFlow)
           let newFlow: TransactionFlow = {
             ...params.txFlow,
             id: Date.now().toString(),
             createdAt: new Date().getTime(),
             status: "POPULATING",
             transactions: [],
+            analyticsTransactionFlowInfo,
             onSuccessCallback: params.onSuccessCallback,
           };
           // add the flow to the user map and set loading to null
@@ -101,11 +106,7 @@ const useTransactionStore = create<TransactionStore>()(
               get().transactionFlows.set(params.ethAccount, newUserList)
             ),
           });
-          // save tx to posthog
-          PostHog.actions.events.flows.started(
-            params.txFlow.txType,
-            newFlow.id
-          );
+          
           // we are expecting a signer so call performTransactions
           return await get().performFlow(params.ethAccount);
         },
@@ -157,6 +158,16 @@ const useTransactionStore = create<TransactionStore>()(
               flowToPerform.params
             );
           if (newTransactionListError) {
+            if(flowToPerform.analyticsTransactionFlowInfo){
+              Posthog.actions.events.transactionFlows.error({
+                txFlowId: flowToPerform.analyticsTransactionFlowInfo.txFlowId,
+                txFlowCategory:  flowToPerform.analyticsTransactionFlowInfo.txFlowCategory,
+                txFlowType:  flowToPerform.analyticsTransactionFlowInfo.txFlowType,
+                txFlowData:  flowToPerform.analyticsTransactionFlowInfo.txFlowData,
+                txListError: newTransactionListError?.message,
+                txCount: 0,
+              });
+            }
             // something failed, so set the flow to failure
             const errorMsgString =
               "useTransactionStore::performFlow: " +
@@ -167,6 +178,9 @@ const useTransactionStore = create<TransactionStore>()(
             });
             return NEW_ERROR(errorMsgString);
           }
+
+
+          
 
           // keep all successful transactions in the flow
           const successfulTransactions = flowToPerform.transactions.filter(
@@ -190,6 +204,21 @@ const useTransactionStore = create<TransactionStore>()(
             error: undefined,
           });
 
+          // save tx flow to posthog only when performing tx flow for first time
+  
+          if(flowId === undefined && flowToPerform.analyticsTransactionFlowInfo){
+            flowToPerform.analyticsTransactionFlowInfo.txCount = updatedTransactionList.length
+            Posthog.actions.events.transactionFlows.started(
+              {
+                txFlowId: flowToPerform.analyticsTransactionFlowInfo.txFlowId,
+                txFlowCategory: flowToPerform.analyticsTransactionFlowInfo.txFlowCategory,
+                txFlowType: flowToPerform.analyticsTransactionFlowInfo.txFlowType,
+                txFlowData: flowToPerform.analyticsTransactionFlowInfo.txFlowData,
+                txCount: flowToPerform.analyticsTransactionFlowInfo.txCount,
+              }
+            );
+          }
+
           // start at the first transaction that hasn't been completed
           const txIndex = successfulTransactions.length;
 
@@ -202,30 +231,36 @@ const useTransactionStore = create<TransactionStore>()(
               updatedTransactionList[i]
             );
             if (txError || !txResult) {
-              // save error to posthog
-              PostHog.actions.events.flows.transaction({
-                flowId: flowToPerform.id,
-                success: false,
-                parentType: flowToPerform.txType,
-                flowType: "",
-                txType: updatedTransactionList[i].tx.feTxType,
-                txParams: flowToPerform.params,
-                error: txError?.message,
-              });
+              if(flowToPerform.analyticsTransactionFlowInfo){
+                Posthog.actions.events.transactionFlows.transaction({
+                  txFlowId: flowToPerform.analyticsTransactionFlowInfo.txFlowId,
+                  txFlowCategory:  flowToPerform.analyticsTransactionFlowInfo.txFlowCategory,
+                  txFlowType:  flowToPerform.analyticsTransactionFlowInfo.txFlowType,
+                  txFlowData:  flowToPerform.analyticsTransactionFlowInfo.txFlowData,
+                  txCount: flowToPerform.analyticsTransactionFlowInfo.txCount,
+                  txType: updatedTransactionList[i].tx.feTxType,
+                  txSuccess: false,
+                  txError: txError?.message,
+                });
+              }
               return NEW_ERROR(
                 "useTransactionStore::performTransactions: " +
                   errMsg(txError ?? "")
               );
             }
-            // save success to posthog
-            PostHog.actions.events.flows.transaction({
-              flowId: flowToPerform.id,
-              success: true,
-              parentType: flowToPerform.txType,
-              flowType: "",
-              txType: updatedTransactionList[i].tx.feTxType,
-              txParams: flowToPerform.params,
-            });
+  
+            if(flowToPerform.analyticsTransactionFlowInfo){
+              Posthog.actions.events.transactionFlows.transaction({
+                txFlowId: flowToPerform.analyticsTransactionFlowInfo.txFlowId,
+                txFlowCategory:  flowToPerform.analyticsTransactionFlowInfo.txFlowCategory,
+                txFlowType:  flowToPerform.analyticsTransactionFlowInfo.txFlowType,
+                txFlowData:  flowToPerform.analyticsTransactionFlowInfo.txFlowData,
+                txCount: flowToPerform.analyticsTransactionFlowInfo.txCount,
+                txType: updatedTransactionList[i].tx.feTxType,
+                txSuccess: true,
+              });
+            }
+          
           }
 
           // deal with extra flows
@@ -290,10 +325,15 @@ const useTransactionStore = create<TransactionStore>()(
             status: "SUCCESS",
           });
           // save tx to posthog
-          PostHog.actions.events.flows.success(
-            flowToPerform.txType,
-            flowToPerform.id
-          );
+          if(flowToPerform.analyticsTransactionFlowInfo){
+            Posthog.actions.events.transactionFlows.success({
+              txFlowId: flowToPerform.analyticsTransactionFlowInfo.txFlowId,
+              txFlowCategory:  flowToPerform.analyticsTransactionFlowInfo.txFlowCategory,
+              txFlowType:  flowToPerform.analyticsTransactionFlowInfo.txFlowType,
+              txFlowData:  flowToPerform.analyticsTransactionFlowInfo.txFlowData,
+              txCount: flowToPerform.analyticsTransactionFlowInfo.txCount,
+            });
+          }
           return NO_ERROR(true);
         },
         performTx: async (ethAccount, flowId, txIndex, tx) => {
@@ -510,5 +550,29 @@ const useTransactionStore = create<TransactionStore>()(
 BigInt.prototype.toJSON = function () {
   return this.toString();
 };
+
+function getAnalyticsTransactionFlowInfo(flow : NewTransactionFlow) : AnalyticsTransactionFlowInfo | undefined{
+  const txFlowCategory  = flow.txType
+  switch (txFlowCategory) {
+    case TransactionFlowType.BRIDGE:
+      const bridgeTxParams:  BridgeTransactionParams = flow.params as BridgeTransactionParams
+      const txFlowData : AnalyticsTransactionFlowData = {
+        bridgeFrom: getNetworkInfoFromChainId(bridgeTxParams.from.chainId).data.name,
+        bridgeTo: getNetworkInfoFromChainId(bridgeTxParams.to.chainId).data.name,
+        bridgeAsset:bridgeTxParams.token.data.symbol,
+        bridgeAmount:bridgeTxParams.token.amount,
+      }
+      const txFlowInfo : AnalyticsTransactionFlowInfo = {
+        txFlowId: uuidv4(),
+        txFlowCategory: txFlowCategory,
+        txFlowType: getBridgingMethodName(bridgeTxParams.method),
+        txFlowData,
+        txCount:0,
+      }
+      return txFlowInfo
+    default:
+      return undefined 
+  }
+} 
 
 export default useTransactionStore;
