@@ -165,7 +165,7 @@ const useTransactionStore = create<TransactionStore>()(
                 txFlowType:  flowToPerform.analyticsTransactionFlowInfo.txFlowType,
                 txFlowData:  flowToPerform.analyticsTransactionFlowInfo.txFlowData,
                 txListError: newTransactionListError?.message,
-                txCount: 0,
+                txCount: flowToPerform.analyticsTransactionFlowInfo.txCount,
               });
             }
             // something failed, so set the flow to failure
