@@ -97,11 +97,28 @@ export default function Page() {
   if (!proposal) {
     return <div><Text font="proto_mono">No proposal found with the ID {proposalId} </Text></div>;
   }
-  //console.log(proposal);
+
   const isActive = formatProposalStatus(proposal.status)=='ACTIVE';
 
   const votesData = calculateVotePercentages(proposal.final_vote);
+
+  console.log(votesData);
   
+  // const colorMap = new Map<number,String>();
+  // colorMap.set(1, "rgba(6, 252, 153, 0.5)");
+  // colorMap.set(2, "rgb(252, 81, 81,0.5)");
+  // colorMap.set(3, "rgb(68, 85, 239,0.5)");
+  // colorMap.set(4, "rgb(111, 105, 105,0.5)");
+  const amounts = [
+    parseFloat(votesData.Yes),
+    parseFloat(votesData.No),
+    parseFloat(votesData.Veto),
+    parseFloat(votesData.Abstain)
+  ];
+  console.log(Math.max(...amounts));
+
+const maxAmountIndex = amounts.indexOf(Math.max(...amounts));
+
 
 
   return (
@@ -178,21 +195,21 @@ export default function Page() {
           <div className={styles.proposalInfoBoxVoting} style={getVotingBoxStyles()}>
               <div className={styles.proposalInfoRow1}>
                 <VotingInfoBox isActive={isActive} value={VoteOption.YES} selectedVote={selectedVote} votesData={votesData} 
-                isSelected={selectedVote==VoteOption.YES} color1="rgba(6, 252, 153,1)" color2="rgba(6, 252, 153, 0.5)" onClick={()=>setSelectedVote(VoteOption.YES)}
+                isSelected={selectedVote==VoteOption.YES} color1="rgba(6, 252, 153,1)" color2="rgba(6, 252, 153, 0.5)" isHighest={maxAmountIndex==0} onClick={()=>setSelectedVote(VoteOption.YES)}
                 ></VotingInfoBox>
               
                 
                 <VotingInfoBox isActive={isActive} value={VoteOption.NO} selectedVote={selectedVote} votesData={votesData}
-                isSelected={selectedVote==VoteOption.NO} color1="rgb(252, 81, 81,1)" color2="rgb(252, 81, 81,0.5)" onClick={()=>setSelectedVote(VoteOption.NO)}
+                isSelected={selectedVote==VoteOption.NO} color1="rgb(252, 81, 81,1)" color2="rgb(252, 81, 81,0.5)"  isHighest={maxAmountIndex==1}onClick={()=>setSelectedVote(VoteOption.NO)}
                 ></VotingInfoBox>
               </div>
               
               <div className={styles.proposalInfoRow1}>
                 <VotingInfoBox isActive={isActive} value={VoteOption.VETO} selectedVote={selectedVote} votesData={votesData}
-                isSelected={selectedVote==VoteOption.VETO} color1="rgb(68, 85, 239,1)" color2="rgb(68, 85, 239,0.5)" onClick={()=>setSelectedVote(VoteOption.VETO)}
+                isSelected={selectedVote==VoteOption.VETO} color1="rgb(68, 85, 239,1)" color2="rgb(68, 85, 239,0.5)" isHighest={maxAmountIndex==2} onClick={()=>setSelectedVote(VoteOption.VETO)}
                 ></VotingInfoBox>
                 <VotingInfoBox isActive={isActive} value={VoteOption.ABSTAIN} selectedVote={selectedVote} votesData={votesData}
-                isSelected={selectedVote==VoteOption.ABSTAIN} color1="rgb(111, 105, 105,1)" color2="rgb(111, 105, 105,0.5)" onClick={()=>setSelectedVote(VoteOption.ABSTAIN)}
+                isSelected={selectedVote==VoteOption.ABSTAIN} color1="rgb(111, 105, 105,1)" color2="rgb(111, 105, 105,0.5)" isHighest={maxAmountIndex==3} onClick={()=>setSelectedVote(VoteOption.ABSTAIN)}
                 ></VotingInfoBox>
 
               </div>

@@ -74,6 +74,10 @@ export const StakingModal = (props : StakingModalParams) => {
     //const getUserDelegationBalance = 
     const userMaxBalance = userDelegationBalance? userDelegationBalance : "0";
 
+    const userStakedValidatorsAddressList = props.userStaking?.validators.map((validatorWithDelegation)=> validatorWithDelegation.operator_address);
+
+    const hasUserStaked = (userStakedValidatorsAddressList)? userStakedValidatorsAddressList.includes(props.validator.operator_address): false;
+
     console.log(userMaxBalance);
     return (
         
@@ -108,7 +112,7 @@ export const StakingModal = (props : StakingModalParams) => {
                     </Text>
                 </div>
                 <Spacer height="20px"></Spacer>
-                <StakingTabs handleTabChange={handleTabChange} activeTab={activeTab}></StakingTabs>
+                {hasUserStaked && <StakingTabs handleTabChange={handleTabChange} activeTab={activeTab}></StakingTabs>}
                 <Spacer height="20px"></Spacer>
                 {
                     (selectedTx==StakingTxTypes.REDELEGATE) && 

@@ -8,9 +8,9 @@ import RadioButton from "../RadioButton/RadioButton";
 import { VoteOption } from "@/hooks/gov/interfaces/voteOptions";
 import { useState } from "react";
 
-export function VotingInfoBox({isActive,value, selectedVote,isSelected, votesData, color1, color2, onClick }
+export function VotingInfoBox({isActive,value, selectedVote,isSelected, votesData, color1, color2, isHighest, onClick }
   :{isActive: boolean,value: VoteOption, selectedVote: VoteOption | null, isSelected: boolean, votesData: VoteData,
-  color1: string, color2:string, onClick: ()=> void} ){
+  color1: string, color2:string, isHighest: boolean, onClick: ()=> void} ){
 
 
     //const votesData = calculateVotePercentages(proposal.final_vote);
@@ -39,8 +39,11 @@ export function VotingInfoBox({isActive,value, selectedVote,isSelected, votesDat
     if(isSelected && isActive){
       return { backgroundColor: color2 };
     }
-    if (isHovered) {
+    if (isHovered && isActive) {
       return {backgroundColor: color2, opacity:"50%"};
+    }
+    if(isHighest){
+      return {backgroundColor: color2};
     }
     return {};
   };
