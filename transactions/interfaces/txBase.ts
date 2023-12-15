@@ -9,17 +9,19 @@ export interface TransactionDescription {
   description: string;
 }
 
+type BridgeProgress = {
+  type: BridgingMethod;
+  lastStatus: TransactionStatus;
+  timeLeft?: number;
+};
+
 export type Transaction = {
   // account address that will be used to sign the transaction
   fromAddress: string;
   // chainId the wallet must be on to perform the transaction
   chainId: number | string;
   description: TransactionDescription;
-  bridge?: {
-    type: BridgingMethod;
-    lastStatus: TransactionStatus;
-    timeLeft?: number;
-  };
+  bridge?: BridgeProgress;
 } & (
   | {
       type: "EVM";

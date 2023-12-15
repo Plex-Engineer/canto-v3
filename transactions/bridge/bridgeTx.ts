@@ -11,7 +11,7 @@ import { BridgeStatus, TxCreatorFunctionReturn } from "../interfaces";
 import { TX_PARAM_ERRORS } from "@/config/consts/errors";
 import { isCantoChainId } from "@/utils/networks";
 import {
-  checkGbridgeTxStatus,
+  checkGbridgeInTxStatus,
   gravityBridgeInTx,
   validateGravityBridgeInTxParams,
 } from "./gravityBridge/gravityBridgeIn";
@@ -136,7 +136,9 @@ export async function getBridgeStatus(
 ): PromiseWithError<BridgeStatus> {
   switch (type) {
     case BridgingMethod.GRAVITY_BRIDGE:
-      return checkGbridgeTxStatus(chainId, txHash);
+      return !isCantoChainId(chainId)
+        ? checkGbridgeInTxStatus(chainId, txHash)
+        : NEW_ERROR("getBridgeStatus::Unknown bridging method");
     case BridgingMethod.LAYER_ZERO:
       return checkLZBridgeStatus(chainId, txHash);
     default:

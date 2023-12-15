@@ -182,7 +182,7 @@ export function validateGravityBridgeInTxParams(
 /**
  * Will check to see if gbridge has completed the transaction
  */
-export async function checkGbridgeTxStatus(
+export async function checkGbridgeInTxStatus(
   chainId: number,
   txHash: string
 ): PromiseWithError<BridgeStatus> {
