@@ -15,7 +15,7 @@ import { multicall } from "wagmi/actions";
  * @param {string} userEthAddress Ethereum address of user
  * @param {number} chainId Whether to use testnet or mainnet
  * @param {string[]} cTokenAddresses List of cToken addresses to get data for
- * @returns {PromiseWithError<{ cTokens: UserCTokenDetails[]; limits: {liquidity: number}, compAccrued: number }>}
+ * @returns {PromiseWithError<{ cTokens: UserCTokenDetails[]; limits: {liquidity: string}, compAccrued: string }>}
  */
 export async function getUserCLMLensData(
   userEthAddress: string,
@@ -23,8 +23,8 @@ export async function getUserCLMLensData(
   cTokenAddresses: string[]
 ): PromiseWithError<{
   cTokens: UserCTokenDetails[];
-  limits: { liquidity: number; shortfall: number };
-  compAccrued: number;
+  limits: { liquidity: string; shortfall: string };
+  compAccrued: string;
 }> {
   try {
     if (!isValidEthAddress(userEthAddress)) {
@@ -97,10 +97,10 @@ export async function getUserCLMLensData(
       underlyingAllowance: data.underlyingAllowance.toString(),
     }));
     const limits = {
-      liquidity: Number(accountLimits.result.liquidity),
-      shortfall: Number(accountLimits.result.shortfall),
+      liquidity: accountLimits.result.liquidity.toString(),
+      shortfall: accountLimits.result.shortfall.toString(),
     };
-    const compAccrued = Number(accruedRewards.result);
+    const compAccrued = accruedRewards.result.toString();
 
     return NO_ERROR({ cTokens, limits, compAccrued });
   } catch (err) {
