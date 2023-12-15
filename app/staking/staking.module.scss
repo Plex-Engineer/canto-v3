@@ -84,3 +84,16 @@
     //box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
 }
 
+.TabRow{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  border-right: 1px solid var(--primary-90-color) ;
+
+  .Tab{
+    height: 40px;
+    border-right: 1px solid var(--primary-90-color) ;
+  }
+
+}
+

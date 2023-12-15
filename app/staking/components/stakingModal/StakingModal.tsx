@@ -10,11 +10,12 @@ import Icon from "@/components/icon/icon";
 import { formatBalance } from "@/utils/formatting/balances.utils";
 import Input from "@/components/input/input";
 import Button from "@/components/button/button";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import Tabs from "@/components/tabs/tabs";
 import { StakingTxTypes } from "@/hooks/staking/interfaces/stakingTxTypes";
 import { StakingTabs } from "../stakingTab/StakingTabs";
 import { getBalanceForValidator } from "@/hooks/staking/helpers/userStaking";
+import Selector, { Item } from "@/components/selector/selector";
 
 
 export interface StakingModalParams{
@@ -25,7 +26,8 @@ export interface StakingModalParams{
         cantoBalance: string;
       };
     signer: GetWalletClientResult | undefined, 
-    onConfirm: (validator:Validator | null,inputAmount: string,selectedTx: StakingTxTypes )=>void
+    onConfirm: (validator:Validator | null,inputAmount: string,selectedTx: StakingTxTypes, validatorToRedelegate: Validator | null | undefined )=>void,
+    validators: Validator[]
 }
 export const StakingModal = (props : StakingModalParams) => {
 
@@ -34,6 +36,17 @@ export const StakingModal = (props : StakingModalParams) => {
     const [selectedTx,setSelectedTx] = useState<StakingTxTypes>(StakingTxTypes.DELEGATE);
     const [activeTab, setActiveTab] = useState('delegate');
     const [amount, setAmount] = useState('');
+    const [validatorToRedelegate, setValidatorToRedelegate] = useState<Validator | null>();
+
+    const dropdownItems = props.validators.map((validator)=>{
+        return{
+            name: validator.description.moniker,
+            icon: "/tokens/canto.svg",
+            id: validator.operator_address
+        }
+        
+    });
+    console.log(validatorToRedelegate);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -79,6 +92,7 @@ export const StakingModal = (props : StakingModalParams) => {
                         </Text>
                     </div>
                 </div>
+                <Spacer height="10px"></Spacer>
                 <div className={styles.modalInfoRow}>
                     <Text>Delegation</Text>
                     <Text>
@@ -86,6 +100,7 @@ export const StakingModal = (props : StakingModalParams) => {
                         <Icon themed icon={{ url: "/tokens/canto.svg", size: 16 }} />
                     </Text>
                 </div>
+                <Spacer height="10px"></Spacer>
                 <div className={styles.modalInfoRow}>
                     <Text>Commission</Text>
                     <Text>
@@ -95,6 +110,39 @@ export const StakingModal = (props : StakingModalParams) => {
                 <Spacer height="20px"></Spacer>
                 <StakingTabs handleTabChange={handleTabChange} activeTab={activeTab}></StakingTabs>
                 <Spacer height="20px"></Spacer>
+                {
+                    (selectedTx==StakingTxTypes.REDELEGATE) && 
+                    <div>
+                        <Selector title=""  items={dropdownItems} activeItem={validatorToRedelegate ? 
+                            {
+                                name: validatorToRedelegate?.description.moniker,
+                                icon: "/tokens/canto.svg",
+                                id: validatorToRedelegate.operator_address
+                            }
+                            : 
+                            {
+                            name: "Select Validator",
+                            icon: "loader.svg",
+                            id: "",
+                          }} 
+                          groupedItems={[]} label={{text:"", width: "10px"}} onChange={(selectedValidator)=>{setValidatorToRedelegate(props.validators.find(e=>e.operator_address==selectedValidator))}} />
+                            
+                        
+                        <Spacer height="20px"></Spacer>
+                    </div>
+                }
+                <div className={styles.modalInfoRow}>
+                    <div><Text>Enter Amount</Text></div>
+                    <div className={styles.modalInfoRow2}>
+                        <div>
+                            <Text opacity={0.4}>Balance: {formatBalance(userMaxBalance ,18,{commify:true,precision:2})} </Text>
+                        </div>
+                        <div>
+                            <Text opacity={1}>(max)</Text>
+                        </div>
+                        
+                    </div>
+                </div>
                 <div>
                     <Input
                     height={"lg"}
@@ -106,21 +154,17 @@ export const StakingModal = (props : StakingModalParams) => {
                     errorMessage="Amount must be greater than 0"/>
                     
                 </div>
-                <div className={styles.modalInfoRow}>
-                    <Text>Enter Amount</Text>
-                    <div >
-                        <Text opacity={0.4}>Balance: {formatBalance(userMaxBalance ,18,{commify:true,precision:2})}</Text><Text opacity={1}>(max)</Text>
-                    </div>
-                </div>
+                
                 <div style={{width: "100%"}} className={styles.modalInfoRow} >
-                    <Text size="sm">
+                    <Text size="x-sm" color="#EE4B2B">
                         Please Note: Staking will lock up your funds for 21 days once you undelegate your staked canto, you will need to wait 21 days for your tokens to be liquid.
                     </Text>
                     
                 </div>
                 <Spacer height="20px"></Spacer>
                 <div className={styles.buttonContainer}>
-                    <Button onClick={()=>{props.onConfirm(props.validator,inputAmount,selectedTx)}} disabled={Number(inputAmount)<=0}>Delegate</Button>
+                    <Button width="fill" onClick={()=>{props.onConfirm(props.validator,inputAmount,selectedTx,validatorToRedelegate)}} disabled={Number(inputAmount)<=0 || 
+                    (selectedTx==StakingTxTypes.REDELEGATE && !validatorToRedelegate)}>Delegate</Button>
                 </div>
 
             </Container>

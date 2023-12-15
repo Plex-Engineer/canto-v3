@@ -19,18 +19,7 @@
     //margin: 0px 10px 0px 10px;
 }
 
-.radioBtn input[type='radio'][value="Yes"]:checked:after{
-    background-color: #06FC99;
-}
-.radioBtn input[type='radio'][value="No"]:checked:after{
-    background-color: #FC5151;
-}
-.radioBtn input[type='radio'][value="Veto"]:checked:after{
-    background-color: #4455EF;
-}
-.radioBtn input[type='radio'][value="Abstain"]:checked:after{
-    background-color: rgb(67, 64, 64);
-}
+
 
 .radioBtn2 {
     display: flex;

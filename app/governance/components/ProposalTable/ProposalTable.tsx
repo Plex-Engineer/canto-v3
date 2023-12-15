@@ -21,7 +21,7 @@ const ProposalTable = ({ proposals }:TableProps) => {
 
   
   const router = useRouter();
-  const [currentFilter, setCurrentFilter] = useState('All');
+  const [currentFilter, setCurrentFilter] = useState<string>('All');
   const [filteredProposals, setFilteredProposals] = useState<Proposal[]>(proposals);
 
   const pageSize = 10;
@@ -75,6 +75,12 @@ const ProposalTable = ({ proposals }:TableProps) => {
     //setTotalPages(Math.ceil(filteredProposals.length / pageSize));
   };
   
+  const proposalTitleMap = new Map<string,string>();
+  proposalTitleMap.set("All","ALL PROPOSALS");
+  proposalTitleMap.set("Active","ACTIVE PROPOSALS");
+  proposalTitleMap.set("Passed","PASSED PROPOSALS");
+  proposalTitleMap.set("Rejected","REJECTED PROPOSALS");
+  
   const handleRowClick = (proposalId:any) => {
     // Assuming you have access to the `useRouter` hook here
     //const router = useRouter();
@@ -82,20 +88,20 @@ const ProposalTable = ({ proposals }:TableProps) => {
     // Navigate to the appropriate page
     router.push(`/governance/proposal?id=${proposalId}`);
   };
+  console.log(proposalTitleMap.get(currentFilter));
   
   if (!proposals || proposals.length==0) {
     return <div><Text font="proto_mono">Loading Proposals...</Text></div>;
   }
   return (
     <div className={styles.tableContainer}>
-      <div className={styles.toggleGroupContainer}>
+      {/* <div className={styles.toggleGroupContainer}>
         <div className={styles.toggleGroup}>
           <ToggleGroup options={["All","Active","Passed","Rejected"]} selected={currentFilter} setSelected={handleFilterChange}></ToggleGroup>
         </div>
           
-      </div>
-      {/* <Filter onFilterChange={handleFilterChange} currentFilter={currentFilter} /> */}
-      {(filteredProposals.length==0 || !filteredProposals) ? <div className={styles.table}><div className={styles.noProposalContainer}><Text font="proto_mono"> No {currentFilter} Proposals Available </Text></div></div> : 
+      </div> */}
+      {/* {(filteredProposals.length==0 || !filteredProposals) ? <div className={styles.table}><div className={styles.noProposalContainer}><Text font="proto_mono"> No {currentFilter} Proposals Available </Text></div></div> : 
       //   <table className={styles.table}>
       //   <thead>
       //     <tr key='proposalTableHeader'>
@@ -121,10 +127,23 @@ const ProposalTable = ({ proposals }:TableProps) => {
       //     ))}
           
       //   </tbody>
-      // </table>    
+      // </table>     */}
+      
       <div className={styles.table}>
         <Table
-                title=""
+                title={proposalTitleMap.get(currentFilter)} 
+                secondary={
+                  <Container width="400px">
+                    <ToggleGroup
+                      options={["All", "Active","Passed", "Rejected"]}
+                      selected={currentFilter}
+                      setSelected={(value) => {
+                        setCurrentFilter(value);
+                      }}
+                      
+                    />
+                  </Container>
+                }
                 headers={[
                   { value: <Text opacity={0.4} font="rm_mono">ID</Text>, ratio: 2 },
                   { value: <Text opacity={0.4}>Title</Text>, ratio: 10 },
@@ -148,7 +167,7 @@ const ProposalTable = ({ proposals }:TableProps) => {
                 })}
             />
       </div>
-      }
+      
       <div className={styles.paginationContainer}>
         <Button onClick={handlePrevious} disabled={currentPage === 1}>
           Previous

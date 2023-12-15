@@ -37,10 +37,10 @@ export function VotingInfoBox({isActive,value, selectedVote,isSelected, votesDat
 
   const getHoverStyle = () => {
     if(isSelected && isActive){
-      return { backgroundColor: color1 };
+      return { backgroundColor: color2 };
     }
     if (isHovered) {
-      return {backgroundColor: color2};
+      return {backgroundColor: color2, opacity:"50%"};
     }
     return {};
   };
@@ -50,7 +50,7 @@ export function VotingInfoBox({isActive,value, selectedVote,isSelected, votesDat
   const handleBoxClick = () => {
     // Check if the current box is already selected, if so, deselect it
     if (isChecked) {
-      onClick(); // Passing null will reset the selected vote
+      onClick();
     } else {
       onClick();
     }
@@ -73,7 +73,7 @@ export function VotingInfoBox({isActive,value, selectedVote,isSelected, votesDat
             <div className={styles.votingInfoRow1}>
             
            
-              <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div className={styles.circle} style={{ backgroundColor: color1, margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">{value}</Text></div></div>
+              <div style={{display: "flex", flexDirection: "row", justifyContent:"space-around"}}> <div style={{ backgroundColor: color1, margin:"10px 5px 0px 10px" }}></div> <div><Text font="proto_mono">{value}</Text></div></div>
               
             </div>
             <div className={styles.votingInfoRow2}>
@@ -94,6 +94,7 @@ export function VotingInfoBox({isActive,value, selectedVote,isSelected, votesDat
                               url: "/tokens/canto.svg",
                               size: 16,
                             }}
+                            themed={true}
                           />
 
                         </Container>

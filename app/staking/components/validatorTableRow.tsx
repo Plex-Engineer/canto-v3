@@ -18,20 +18,20 @@ export const GenerateValidatorTableRow = (validator: Validator, index: number, o
                         url: "./tokens/canto.svg",
                         size: 16,
                       }}
+                      themed={true}
                     />
                   </Container>,
                   <Container key={`commission_${index}`}><Text font="rm_mono">{formatBalance(validator.commission,-2,{commify:true,precision:2})}%</Text></Container>,
-                  <Container key={`delegators_${index}`}><Text font="rm_mono">1000</Text></Container>,
                   <Container key={`button_${index}`}>
                     <Button onClick={()=>onDelegate(validator)}>DELEGATE</Button>
                   </Container>
         ];
 
-export const GenerateMyStakingTableRow = (userStaking: ValidatorWithDelegations, index: number, onDelegate: (validator: Validator)=>void) => 
+export const GenerateMyStakingTableRow = (userStakedValidator: ValidatorWithDelegations, index: number, onDelegate: (validator: Validator)=>void) => 
 [
-  <Container key={`name_${index}`}><Text font="rm_mono">{userStaking?.description.moniker}</Text></Container>,
+  <Container key={`name_${index}`}><Text font="rm_mono">{userStakedValidator?.description.moniker}</Text></Container>,
   <Container key={`mystake_${index}`} direction="row" center={{horizontal: true, vertical:true}} gap="auto">
-      <Text font="rm_mono">{formatBigBalance(formatBalance(userStaking.userDelegation.balance,18)).shortAmount + formatBigBalance(formatBalance(userStaking.userDelegation.balance,18)).suffix} </Text>
+      <Text font="rm_mono">{formatBigBalance(formatBalance(userStakedValidator.userDelegation.balance,18)).shortAmount + formatBigBalance(formatBalance(userStakedValidator.userDelegation.balance,18)).suffix} </Text>
       <div>{" "}</div>
       <Icon
         style={{ marginLeft: "5px" }}
@@ -39,10 +39,11 @@ export const GenerateMyStakingTableRow = (userStaking: ValidatorWithDelegations,
           url: "./tokens/canto.svg",
           size: 16,
         }}
+        themed={true}
       />
     </Container>,
   <Container key={`tokens_${index}`} direction="row" center={{horizontal: true, vertical:true}} gap="auto">
-    <Text font="rm_mono">{formatBigBalance(formatBalance(userStaking?.tokens,18)).shortAmount + formatBigBalance(formatBalance(userStaking?.tokens,18)).suffix} </Text>
+    <Text font="rm_mono">{formatBigBalance(formatBalance(userStakedValidator?.tokens,18)).shortAmount + formatBigBalance(formatBalance(userStakedValidator?.tokens,18)).suffix} </Text>
     <div>{" "}</div>
     <Icon
       style={{ marginLeft: "5px" }}
@@ -50,12 +51,13 @@ export const GenerateMyStakingTableRow = (userStaking: ValidatorWithDelegations,
         url: "./tokens/canto.svg",
         size: 16,
       }}
+      themed={true}
     />
 </Container>,
 <Container key={`commission_${index}`}><Text font="rm_mono">{formatBalance("1",-2,{commify:true,precision:2})}%</Text></Container>,
-<Container key={`commission_${index}`}><Text font="rm_mono">{formatBalance(userStaking?.commission,-2,{commify:true,precision:2})}%</Text></Container>,
+<Container key={`commission_${index}`}><Text font="rm_mono">{formatBalance(userStakedValidator?.commission,-2,{commify:true,precision:2})}%</Text></Container>,
 <Container key={`buttonManage_${index}`}>
-                    <Button onClick={()=>{}}>MANAGE</Button>
+                    <Button onClick={()=>onDelegate(userStakedValidator)}>MANAGE</Button>
                   </Container>
 
 

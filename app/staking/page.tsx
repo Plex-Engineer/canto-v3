@@ -20,41 +20,69 @@ import { StakingModal } from "./components/stakingModal/StakingModal";
 import { Validator } from "@/hooks/staking/interfaces/validators";
 import Modal from "@/components/modal/modal";
 
-import { StakingTxTypes } from "@/hooks/staking/interfaces/stakingTxTypes";
+import { StakingTransactionParams, StakingTxTypes } from "@/hooks/staking/interfaces/stakingTxTypes";
 import { ethToCantoAddress } from "@/utils/address";
 import { NewTransactionFlow } from "@/transactions/flows/types";
 import { TransactionFlowType } from "@/transactions/flows/flowMap";
+import { NEW_ERROR } from "@/config/interfaces";
+import Tabs from "@/components/tabs/tabs";
+import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 
 
 export default function StakingPage() {
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedValidator, setSelectedValidator] = useState<Validator | null>(null);
+  const [selectedValidatorToRedelegate, setSelectedValidatorToRedelegate] = useState<Validator | null>(null);
+  const [currentFilter, setCurrentFilter] = useState<string>("ACTIVE");
   
 
   //const [selectedTx,setSelectedTx] = useState<StakingTxTypes>(StakingTxTypes.DELEGATE);
 
   
+  
 
+  function handleStakingTxClick(validator: Validator | null,inputAmount: string,txType: StakingTxTypes,validatorToRedelegate: Validator | null | undefined){
 
-  function handleStakingClick(validator: Validator | null,inputAmount: string,txType: StakingTxTypes ){
+    if(txType==StakingTxTypes.REDELEGATE){
+      const newFlow: NewTransactionFlow = {
+        icon: "",
+        txType: TransactionFlowType.STAKE_CANTO_TX,
+        title: "Stake Canto",
+        params: {
+          chainId: chainId,
+          ethAccount: signer?.account.address ?? "",
+          txType: txType,
+          validatorAddress: validator?.operator_address ?? "",
+          newValidatorAddress: validatorToRedelegate?.operator_address,
+          newValidatorName: validatorToRedelegate?.description.moniker,
+          amount: (
+            convertToBigNumber(inputAmount, 18).data ?? "0"
+          ).toString(),  
+          validatorName: validator?.description.moniker ?? ""
+        },
+      };
+      txStore?.addNewFlow({ txFlow: newFlow, signer });
+    }else{
+      const newFlow: NewTransactionFlow = {
+        icon: "",
+        txType: TransactionFlowType.STAKE_CANTO_TX,
+        title: "Stake Canto",
+        params: {
+          chainId: chainId,
+          ethAccount: signer?.account.address ?? "",
+          txType: txType,
+          validatorAddress: validator?.operator_address ?? "",
+          amount: (
+            convertToBigNumber(inputAmount, 18).data ?? "0"
+          ).toString(),  
+          validatorName: validator?.description.moniker ?? ""
+        },
+      };
+      txStore?.addNewFlow({ txFlow: newFlow, signer });
+    }
 
-    const newFlow: NewTransactionFlow = {
-      icon: "",
-      txType: TransactionFlowType.STAKE_CANTO_TX,
-      title: "Stake Canto",
-      params: {
-        chainId: chainId,
-        ethAccount: signer?.account.address ?? "",
-        txType: txType,
-        validatorAddress: validator?.operator_address ?? "",
-        amount: (
-          convertToBigNumber(inputAmount, 18).data ?? "0"
-        ).toString(),  
-        validatorName: validator?.description.moniker ?? ""
-      },
-    };
-    txStore?.addNewFlow({ txFlow: newFlow, signer });
+    
   }
 
   const {txStore,signer,chainId} = useCantoSigner();
@@ -66,6 +94,47 @@ export default function StakingPage() {
     chainId: chainId,
     userEthAddress: signer?.account.address,
   });
+
+  
+
+  const allValidatorsAddresses = validators.map((validator)=>{return validator.operator_address});
+
+  function createStakingParams(chainId: number, ethAccount : string, txType: StakingTxTypes, amount: string, validator1: Validator, validatorNew: Validator){
+      if(txType==StakingTxTypes.CLAIM_REWARDS){
+        return {
+          chainId: chainId,
+          txType: txType,
+          ethAccount: ethAccount,
+          validatorAddresses: allValidatorsAddresses
+          
+        };
+      }
+      if(txType==StakingTxTypes.DELEGATE || txType==StakingTxTypes.UNDELEGATE){
+        return {
+          chainId: chainId,
+          txType: txType,
+          amount: amount,
+          ethAccount: ethAccount,
+          validatorAddress: validator1?.operator_address,
+          validatorName: validator1?.description.moniker,
+        };
+      }
+      if(txType== StakingTxTypes.REDELEGATE){
+        if(validatorNew){
+          return {
+            chainId: chainId,
+            txType: txType,
+            amount: amount,
+            ethAccount: ethAccount,
+            validatorAddress: validator1?.operator_address,
+            validatorName: validator1?.description.moniker,
+            newValidatorAddress: validatorNew?.operator_address
+          };
+        }
+        
+      }
+      
+  }
   
 
   console.log(userStaking?.validators);
@@ -93,7 +162,18 @@ export default function StakingPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(Math.ceil(validators.length / pageSize));
 
-  const paginatedvalidators = validators.slice(
+  const activeValidators = validators.filter(v=>v.jailed==false);
+  const inActiveValidators = validators.filter(v=>v.jailed==true);
+
+  const filteredvalidators = (currentFilter=="ACTIVE")? activeValidators : inActiveValidators;
+
+  
+  const validatorTitleMap = new Map<string,string>();
+  validatorTitleMap.set("ACTIVE","ACTIVE VALIDATORS");
+  validatorTitleMap.set("INACTIVE","INACTIVE VALIDATORS");
+  
+
+  const paginatedvalidators = filteredvalidators.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
@@ -134,7 +214,7 @@ export default function StakingPage() {
       <Spacer height="20px" /> */}
       <Container direction="row" width="96%" >
         <div className={styles.infoBox}>
-          <div>Total Staked</div>
+          <div><Text font="rm_mono">Total Staked </Text></div>
           <Container direction="row" center={{vertical: true }}>
             <Text font="proto_mono" size='title'>0</Text>
             <Icon
@@ -147,14 +227,14 @@ export default function StakingPage() {
             </Container>
         </div>
         <div className={styles.infoBox}>
-          <div>APR</div>
+          <div><Text font="rm_mono">APR</Text></div>
           <Container direction="row" center={{vertical: true }}>
             <Text font="proto_mono" size='title'>{formatPercent((parseFloat(apr)/100).toString())}</Text>
             
             </Container>
         </div>
         <div className={styles.infoBox}>
-          <div>Rewards</div>
+          <div><Text font="rm_mono">Rewards</Text></div>
           <Container direction="row" center={{vertical: true }}>
             <Text font="proto_mono" size='title'>0</Text>
             <Icon
@@ -169,7 +249,7 @@ export default function StakingPage() {
         <div className={styles.infoBox}>
           <div className={styles.ClaimBtn}>
             <Button>
-              Claim Staking Rewards
+            Claim Staking Rewards
             </Button>
           </div>
           
@@ -183,12 +263,12 @@ export default function StakingPage() {
           <Table
                 title="My Staking"
                 headers={[
-                  { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 6 },
-                  { value: <Text opacity={0.4}>My Stake</Text>, ratio: 4 },
+                  { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 5 },
+                  { value: <Text opacity={0.4}>My Stake</Text>, ratio: 3 },
                   { value: <Text opacity={0.4} font="rm_mono">Validator Total</Text>, ratio: 3 },
                   { value: <Text opacity={0.4} font="rm_mono">% Share</Text>, ratio: 3 },
                   { value: <Text opacity={0.4} font="rm_mono">Commission</Text>, ratio: 3 },
-                  { value: "", ratio: 4 },
+                  { value: <Text opacity={0.4} font="rm_mono">Edit</Text>, ratio: 3 },
                 ]}
                 content={[...userStaking.validators.map((userStakingElement,index)=>
                   GenerateMyStakingTableRow(userStakingElement, index,()=>handleClick(userStakingElement))
@@ -203,13 +283,30 @@ export default function StakingPage() {
       <Container width="100%" className={styles.tableContainer} >
         <div>
           <Table
-                title="VALIDATORS"
+                title={validatorTitleMap.get(currentFilter)}
+                // secondary={
+                //   <div className={styles.TabRow}>
+                //     <div className={styles.Tab}>ACTIVE VALIDATORS</div>
+                //     <div className={styles.Tab}>INACTIVE VALIDATORS</div>
+                //   </div>
+                // }
+                secondary={
+                  <Container width="400px">
+                    <ToggleGroup
+                      options={["ACTIVE","INACTIVE"]}
+                      selected={currentFilter}
+                      setSelected={(value) => {
+                        setCurrentFilter(value);
+                      }}
+                      
+                    />
+                  </Container>
+                }
                 headers={[
                   { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 6 },
                   { value: <Text opacity={0.4}>Validator Total</Text>, ratio: 4 },
                   { value: <Text opacity={0.4} font="rm_mono">Commission %</Text>, ratio: 3 },
-                  { value: <Text opacity={0.4} font="rm_mono">Delegators</Text>, ratio: 3 },
-                  { value: "", ratio: 4 },
+                  { value: <Text opacity={0.4} font="rm_mono">Action</Text>, ratio: 4 },
                 ]}
                 content={[...paginatedvalidators.map((validator,index)=>
                   GenerateValidatorTableRow(validator,index,()=>handleClick(validator))
@@ -228,12 +325,46 @@ export default function StakingPage() {
             <Spacer height="80px" />
           
       </Container>
+      {/* <Container>
+        <Tabs 
+          tabs={
+            [
+              {
+                title:"Active Validators",
+                content: (<div>
+                  <div>
+          <Table
+                title="VALIDATORS"
+                headers={[
+                  { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 6 },
+                  { value: <Text opacity={0.4}>Validator Total</Text>, ratio: 4 },
+                  { value: <Text opacity={0.4} font="rm_mono">Commission %</Text>, ratio: 3 },
+                  { value: <Text opacity={0.4} font="rm_mono">Delegators</Text>, ratio: 3 },
+                  { value: <Text opacity={0.4} font="rm_mono">Action</Text>, ratio: 4 },
+                ]}
+                content={[...paginatedvalidators.map((validator,index)=>
+                  GenerateValidatorTableRow(validator,index,()=>handleClick(validator))
+                )]}
+            />
+          </div>
+                </div>)
+              },
+              {
+                title:"InActive Validators",
+                content: (<div></div>)
+              }
+            ]
+          }
+        >
+          
+        </Tabs>
+      </Container> */}
       {/* <BoxedBackground /> */}
       <Modal width="40%" onClose={()=>{setSelectedValidator(null)}} title={selectedValidator?.description.moniker} 
             closeOnOverlayClick={false}
             open={selectedValidator!=null}
         >
-          <StakingModal userStaking={userStaking} validator={selectedValidator} signer= {signer} onConfirm={(selectedValidator,inputAmount,selectedTx) => handleStakingClick(selectedValidator,inputAmount,selectedTx)}></StakingModal>
+          <StakingModal validators={validators} userStaking={userStaking} validator={selectedValidator} signer= {signer} onConfirm={(selectedValidator,inputAmount,selectedTx,validatorToRedelegate) => handleStakingTxClick(selectedValidator,inputAmount,selectedTx,validatorToRedelegate)}></StakingModal>
       </Modal>
       
 

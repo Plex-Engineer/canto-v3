@@ -14,11 +14,18 @@ import Button from "@/components/button/button";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Splash from "@/components/splash/splash";
 import { ethToCantoAddress } from "@/utils/address";
+import { useRouter } from 'next/navigation';
 
 
 export default function GovernancePage() {
 
-  console.log(ethToCantoAddress("0xc514d047714C019b6AA7fbE181f87DD00C199B12"));
+  //console.log(ethToCantoAddress("0xc514d047714C019b6AA7fbE181f87DD00C199B12"));
+
+  const router = useRouter();
+
+  
+
+  
 
   const { txStore, signer,chainId } = useCantoSigner();
   const { proposals,isLoading } = useProposals({ chainId: chainId });
@@ -38,10 +45,10 @@ export default function GovernancePage() {
         Governance  
       </Text>
       <Text size='sm' opacity={0.4} className={styles.middleText}>Stake your $CANTO to participate in governance</Text>
-      <Button >Go to Staking</Button>
+      <Button onClick={()=>{router.push(`/staking`);}}>Go to Staking</Button>
     </div>
     
-    <Spacer height="20px" />
+    <Spacer height="40px" />
     
               
     <ProposalTable proposals={sorted_proposals}></ProposalTable>

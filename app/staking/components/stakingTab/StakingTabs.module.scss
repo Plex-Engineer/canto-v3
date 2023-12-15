@@ -16,6 +16,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
     
 }
 
@@ -30,4 +31,5 @@
     width: 33%;
     background-color: var(--border-stroke-color, #b3b3b3);
     border-bottom: 1px solid var(--primary-dark-color,#222);
+    cursor: pointer;
 }

@@ -22,7 +22,7 @@ export const RadioButton = (props:Props) => {
     
     const getStyles = () => {
         if(props.selectedValue == props.value){
-            return {backgroundColor: props.checkedColor}
+            return {backgroundColor: props.checkedColor, opacity: 1}
         }else{
             return {};
         }

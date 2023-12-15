@@ -22,6 +22,8 @@ import { RadioButton} from "../components/RadioButton/RadioButton";
 import { VotingInfoBox } from "../components/VotingInfoBox/VotingInfoBox";
 import { TransactionFlowType } from "@/transactions/flows/flowMap";
 import { NewTransactionFlow } from "@/transactions/flows/types";
+import { Height } from "@buf/cosmos_ibc.bufbuild_es/ibc/core/client/v1/client_pb";
+import Spacer from "@/components/layout/spacer";
 
 
 
@@ -75,6 +77,21 @@ export default function Page() {
         <div><Text font="proto_mono">Proposal ID is missing</Text></div>
     );
   }
+
+  function getVotingBoxStyles(){
+    if(isActive){
+      return {
+        height: "70%",
+        padding: "10px 0px 0px 0px"
+      }
+    }else{
+      return{
+        height: "100%",
+        padding: "0px 0px 20px 0px"
+      }
+      
+    }
+  }
   const proposal = proposals.find((p) => p.proposal_id === Number(proposalId));
 
   if (!proposal) {
@@ -90,8 +107,15 @@ export default function Page() {
   return (
     isLoading ? (<Splash/>):
   (<div className={styles.proposalContainer}>
+    <Spacer height="15%"></Spacer>
     <div className={styles.proposalHeaderContainer}>
         <div className={styles.proposalCard1}>
+          {/* <div><Icon 
+                icon={{
+                  url: "/reset.svg",
+                  size: 16,
+                }}
+                ></Icon></div> */}
           <div style={{borderRight: "1px solid", padding: "10px"}}><Text>#{proposal.proposal_id}</Text></div>
           <div style={{padding: "10px"}}><Text>{formatProposalStatus(proposal.status)}</Text></div>
         </div>
@@ -150,35 +174,32 @@ export default function Page() {
         </div>
         
       </div>
-      <div className={styles.proposalCardContainer2}>
-       <div className={styles.proposalInfoBoxVoting}>
-          <div className={styles.proposalInfoRow1}>
-            <VotingInfoBox isActive={isActive} value={VoteOption.YES} selectedVote={selectedVote} votesData={votesData} 
-            isSelected={selectedVote==VoteOption.YES} color1="#06FC99" color2="#AFE0CC" onClick={()=>setSelectedVote(VoteOption.YES)}
-            ></VotingInfoBox>
-          
-            
-            <VotingInfoBox isActive={isActive} value={VoteOption.NO} selectedVote={selectedVote} votesData={votesData}
-            isSelected={selectedVote==VoteOption.NO} color1="#FC5151" color2="#F2877A" onClick={()=>setSelectedVote(VoteOption.NO)}
-            ></VotingInfoBox>
+      <div className={styles.proposalCardContainer2} >
+          <div className={styles.proposalInfoBoxVoting} style={getVotingBoxStyles()}>
+              <div className={styles.proposalInfoRow1}>
+                <VotingInfoBox isActive={isActive} value={VoteOption.YES} selectedVote={selectedVote} votesData={votesData} 
+                isSelected={selectedVote==VoteOption.YES} color1="rgba(6, 252, 153,1)" color2="rgba(6, 252, 153, 0.5)" onClick={()=>setSelectedVote(VoteOption.YES)}
+                ></VotingInfoBox>
+              
+                
+                <VotingInfoBox isActive={isActive} value={VoteOption.NO} selectedVote={selectedVote} votesData={votesData}
+                isSelected={selectedVote==VoteOption.NO} color1="rgb(252, 81, 81,1)" color2="rgb(252, 81, 81,0.5)" onClick={()=>setSelectedVote(VoteOption.NO)}
+                ></VotingInfoBox>
+              </div>
+              
+              <div className={styles.proposalInfoRow1}>
+                <VotingInfoBox isActive={isActive} value={VoteOption.VETO} selectedVote={selectedVote} votesData={votesData}
+                isSelected={selectedVote==VoteOption.VETO} color1="rgb(68, 85, 239,1)" color2="rgb(68, 85, 239,0.5)" onClick={()=>setSelectedVote(VoteOption.VETO)}
+                ></VotingInfoBox>
+                <VotingInfoBox isActive={isActive} value={VoteOption.ABSTAIN} selectedVote={selectedVote} votesData={votesData}
+                isSelected={selectedVote==VoteOption.ABSTAIN} color1="rgb(111, 105, 105,1)" color2="rgb(111, 105, 105,0.5)" onClick={()=>setSelectedVote(VoteOption.ABSTAIN)}
+                ></VotingInfoBox>
+
+              </div>
           </div>
-            
-            
-
-            <div className={styles.proposalInfoRow1}>
-              <VotingInfoBox isActive={isActive} value={VoteOption.VETO} selectedVote={selectedVote} votesData={votesData}
-              isSelected={selectedVote==VoteOption.VETO} color1="#4455EF" color2="#7E86D9" onClick={()=>setSelectedVote(VoteOption.VETO)}
-              ></VotingInfoBox>
-              <VotingInfoBox isActive={isActive} value={VoteOption.ABSTAIN} selectedVote={selectedVote} votesData={votesData}
-              isSelected={selectedVote==VoteOption.ABSTAIN} color1="#6F6969" color2="lightgray" onClick={()=>setSelectedVote(VoteOption.ABSTAIN)}
-              ></VotingInfoBox>
-
-            </div>
-        </div>
-        <div className={styles.VotingButton}>
-          <Button width={400} disabled={!isActive} onClick={()=>castVote(proposal.proposal_id, selectedVote)}>Vote</Button>
-          {/* {!isActive && <span className={styles.tooltip}>The Proposal is not Active</span>} */}
-        </div>
+          {isActive && <div className={styles.VotingButton}>
+            <Button width={400} disabled={!isActive} onClick={()=>castVote(proposal.proposal_id, selectedVote)}>Vote</Button>
+          </div>}
       </div>
     </div>
   </div>)
