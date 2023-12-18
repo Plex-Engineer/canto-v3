@@ -27,6 +27,7 @@ import { TransactionFlowType } from "@/transactions/flows/flowMap";
 import { NEW_ERROR } from "@/config/interfaces";
 import Tabs from "@/components/tabs/tabs";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
+import { GetWalletClientResult } from "wagmi/actions";
 
 
 export default function StakingPage() {
@@ -98,6 +99,7 @@ export default function StakingPage() {
   
 
   const allValidatorsAddresses = validators.map((validator)=>{return validator.operator_address});
+  const allUserValidatorsAddresses: string[]  = userStaking? userStaking.validators.map((validator)=>{return validator.operator_address}) : [];
 
   function createStakingParams(chainId: number, ethAccount : string, txType: StakingTxTypes, amount: string, validator1: Validator, validatorNew: Validator){
       if(txType==StakingTxTypes.CLAIM_REWARDS){
@@ -137,7 +139,7 @@ export default function StakingPage() {
   }
   
 
-  console.log(userStaking?.validators);
+  //console.log(userStaking?.validators);
   //console.log(isLoading);
   //console.log(validators);
   //console.log(apr);
@@ -178,6 +180,18 @@ export default function StakingPage() {
     currentPage * pageSize
   );
   const hasUserStaked: boolean | undefined = (userStaking && userStaking.validators && userStaking.validators.length>0);
+  const totalStaked: number | undefined = hasUserStaked ? userStaking?.validators.reduce((sum, item) => {
+    const amountNumber = parseFloat(formatBalance(item.userDelegation.balance,18)); 
+    return sum + amountNumber;
+  }, 0): 0;
+
+  const totalRewards: number | undefined = hasUserStaked ? userStaking?.validators.reduce((sum , item) => {
+    console.log(parseFloat(formatBalance(item.userDelegation.rewards,18)));
+    const amountNumber = parseFloat(formatBalance(item.userDelegation.rewards,18));
+    console.log(sum);
+    return (sum + amountNumber);
+  }, 0): 0;
+  console.log();
   
 
   const handlePrevious = () => {
@@ -200,12 +214,27 @@ export default function StakingPage() {
     setSelectedValidator(validator);
   }
   
-  console.log(hasUserStaked);
+  //console.log(hasUserStaked);
   if(isLoading){
     return(
       <Splash></Splash>
     )
   }
+  function handleRewardsClaimClick(signer:GetWalletClientResult | undefined, validatorAddresses: string[])  {
+    const newFlow: NewTransactionFlow = {
+      icon: "",
+      txType: TransactionFlowType.STAKE_CANTO_TX,
+      title: "Stake Canto",
+      params: {
+        chainId: chainId,
+        ethAccount: signer?.account.address,
+        txType: StakingTxTypes.CLAIM_REWARDS,
+        validatorAddresses: validatorAddresses
+      },
+    };
+    txStore?.addNewFlow({ txFlow: newFlow, signer });
+  }
+
   return (
     <div className={styles.container}>
       {/* <Text size="x-lg" font="proto_mono" className={styles.title}>
@@ -216,7 +245,7 @@ export default function StakingPage() {
         <div className={styles.infoBox}>
           <div><Text font="rm_mono">Total Staked </Text></div>
           <Container direction="row" center={{vertical: true }}>
-            <Text font="proto_mono" size='title'>0</Text>
+            <Text font="proto_mono" size='title'>{totalStaked?.toFixed(2)}</Text>
             <Icon
             icon={{
               url: "./tokens/canto.svg",
@@ -236,7 +265,7 @@ export default function StakingPage() {
         <div className={styles.infoBox}>
           <div><Text font="rm_mono">Rewards</Text></div>
           <Container direction="row" center={{vertical: true }}>
-            <Text font="proto_mono" size='title'>0</Text>
+            <Text font="proto_mono" size='title'>{totalRewards?.toFixed(5)}</Text>
             <Icon
             icon={{
               url: "./tokens/canto.svg",
@@ -248,7 +277,7 @@ export default function StakingPage() {
         </div>
         <div className={styles.infoBox}>
           <div className={styles.ClaimBtn}>
-            <Button>
+            <Button onClick={()=>handleRewardsClaimClick(signer, allUserValidatorsAddresses)} disabled={!signer || !hasUserStaked}>
             Claim Staking Rewards
             </Button>
           </div>
@@ -258,8 +287,8 @@ export default function StakingPage() {
       </Container>
       <Spacer height="40px"/>
       
-      {hasUserStaked && userStaking && <div><Container width="100%" className={styles.tableContainer} >
-        <div>
+      {hasUserStaked && userStaking && <div className={styles.tableContainer} ><Container width="100%" >
+        <div className={styles.tableContainer2}>
           <Table
                 title="My Staking"
                 headers={[

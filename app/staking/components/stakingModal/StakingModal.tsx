@@ -18,6 +18,8 @@ import { getBalanceForValidator } from "@/hooks/staking/helpers/userStaking";
 import Selector, { Item } from "@/components/selector/selector";
 
 
+
+
 export interface StakingModalParams{
     validator: Validator | null,
     userStaking?: {
@@ -38,7 +40,9 @@ export const StakingModal = (props : StakingModalParams) => {
     const [amount, setAmount] = useState('');
     const [validatorToRedelegate, setValidatorToRedelegate] = useState<Validator | null>();
 
-    const dropdownItems = props.validators.map((validator)=>{
+    const splicedValidators =  props.validators.filter(validator => validator.operator_address !== props.validator?.operator_address);
+
+    const dropdownItems = splicedValidators.map((validator)=>{
         return{
             name: validator.description.moniker,
             icon: "/tokens/canto.svg",
@@ -46,6 +50,8 @@ export const StakingModal = (props : StakingModalParams) => {
         }
         
     });
+
+    console.log(dropdownItems);
     console.log(validatorToRedelegate);
 
   const handleTabChange = (tab: string) => {
@@ -74,9 +80,15 @@ export const StakingModal = (props : StakingModalParams) => {
     //const getUserDelegationBalance = 
     const userMaxBalance = userDelegationBalance? userDelegationBalance : "0";
 
+    const userCantoBalance = ( props.userStaking && props.userStaking.cantoBalance) ? props.userStaking.cantoBalance : "0";
+
+    const maxBalance = (selectedTx==StakingTxTypes.DELEGATE) ? userCantoBalance : userMaxBalance;
+
     const userStakedValidatorsAddressList = props.userStaking?.validators.map((validatorWithDelegation)=> validatorWithDelegation.operator_address);
 
     const hasUserStaked = (userStakedValidatorsAddressList)? userStakedValidatorsAddressList.includes(props.validator.operator_address): false;
+
+
 
     console.log(userMaxBalance);
     return (
@@ -91,7 +103,7 @@ export const StakingModal = (props : StakingModalParams) => {
                     <div><Text>Available Balance</Text></div>
                     <div>
                         <Text>
-                            {formatBalance(props.validator.tokens,18,{commify:true})}
+                            {formatBalance(( props.userStaking && props.userStaking.cantoBalance) ? props.userStaking.cantoBalance : "0",18,{commify:true})}
                             <Icon themed icon={{ url: "/tokens/canto.svg", size: 16 }} />
                         </Text>
                     </div>
@@ -100,7 +112,7 @@ export const StakingModal = (props : StakingModalParams) => {
                 <div className={styles.modalInfoRow}>
                     <Text>Delegation</Text>
                     <Text>
-                        {formatBalance(props.validator.tokens,18,{commify:true})}
+                        {formatBalance(userDelegationBalance? userDelegationBalance: "0",18,{commify:true})}
                         <Icon themed icon={{ url: "/tokens/canto.svg", size: 16 }} />
                     </Text>
                 </div>
@@ -129,7 +141,7 @@ export const StakingModal = (props : StakingModalParams) => {
                             icon: "loader.svg",
                             id: "",
                           }} 
-                          groupedItems={[]} label={{text:"", width: "10px"}} onChange={(selectedValidator)=>{setValidatorToRedelegate(props.validators.find(e=>e.operator_address==selectedValidator))}} />
+                        label={{text:"", width: "10px"}} onChange={(selectedValidator)=>{setValidatorToRedelegate(props.validators.find(e=>e.operator_address==selectedValidator))}} />
                             
                         
                         <Spacer height="20px"></Spacer>
@@ -139,7 +151,7 @@ export const StakingModal = (props : StakingModalParams) => {
                     <div><Text>Enter Amount</Text></div>
                     <div className={styles.modalInfoRow2}>
                         <div>
-                            <Text opacity={0.4}>Balance: {formatBalance(userMaxBalance ,18,{commify:true,precision:2})} </Text>
+                            <Text opacity={0.4}>Balance: {formatBalance(maxBalance ,18,{commify:true,precision:2})} </Text>
                         </div>
                         <div>
                             <Text opacity={1}>(max)</Text>

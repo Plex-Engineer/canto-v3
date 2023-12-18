@@ -23,7 +23,7 @@ export const GenerateValidatorTableRow = (validator: Validator, index: number, o
                   </Container>,
                   <Container key={`commission_${index}`}><Text font="rm_mono">{formatBalance(validator.commission,-2,{commify:true,precision:2})}%</Text></Container>,
                   <Container key={`button_${index}`}>
-                    <Button onClick={()=>onDelegate(validator)}>DELEGATE</Button>
+                    <Button onClick={()=>onDelegate(validator)} >DELEGATE</Button>
                   </Container>
         ];
 
