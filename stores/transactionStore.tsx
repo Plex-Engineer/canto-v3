@@ -24,8 +24,7 @@ import { TransactionFlowType } from "@/transactions/flows";
 import Posthog from "@/app/posthog";
 import {BridgeTransactionParams, BridgingMethod, getBridgingMethodName} from "@/transactions/bridge/types";
 import {AnalyticsTransactionFlowInfo, AnalyticsTransactionFlowData} from "@/app/posthog";
-
-
+import BigNumber from "bignumber.js";
 // only save last 100 flows for each user to save space
 const USER_FLOW_LIMIT = 100;
 interface AddNewFlowParams {
@@ -159,13 +158,10 @@ const useTransactionStore = create<TransactionStore>()(
             );
           if (newTransactionListError) {
             if(flowToPerform.analyticsTransactionFlowInfo){
+              let splitError = newTransactionListError?.message.split(":")
               Posthog.actions.events.transactionFlows.error({
-                txFlowId: flowToPerform.analyticsTransactionFlowInfo.txFlowId,
-                txFlowCategory:  flowToPerform.analyticsTransactionFlowInfo.txFlowCategory,
-                txFlowType:  flowToPerform.analyticsTransactionFlowInfo.txFlowType,
-                txFlowData:  flowToPerform.analyticsTransactionFlowInfo.txFlowData,
-                txListError: newTransactionListError?.message,
-                txCount: flowToPerform.analyticsTransactionFlowInfo.txCount,
+                ...flowToPerform.analyticsTransactionFlowInfo,
+                txListError: splitError[splitError.length-1],
               });
             }
             // something failed, so set the flow to failure
@@ -204,18 +200,13 @@ const useTransactionStore = create<TransactionStore>()(
             error: undefined,
           });
 
-          // save tx flow to posthog only when performing tx flow for first time
+          // save (event : tx flow started) to  posthog only when performing tx flow for first time
   
           if(flowId === undefined && flowToPerform.analyticsTransactionFlowInfo){
             flowToPerform.analyticsTransactionFlowInfo.txCount = updatedTransactionList.length
+            flowToPerform.analyticsTransactionFlowInfo.txList = updatedTransactionList.map((tx)=> tx.tx.feTxType)
             Posthog.actions.events.transactionFlows.started(
-              {
-                txFlowId: flowToPerform.analyticsTransactionFlowInfo.txFlowId,
-                txFlowCategory: flowToPerform.analyticsTransactionFlowInfo.txFlowCategory,
-                txFlowType: flowToPerform.analyticsTransactionFlowInfo.txFlowType,
-                txFlowData: flowToPerform.analyticsTransactionFlowInfo.txFlowData,
-                txCount: flowToPerform.analyticsTransactionFlowInfo.txCount,
-              }
+              flowToPerform.analyticsTransactionFlowInfo
             );
           }
 
@@ -232,15 +223,12 @@ const useTransactionStore = create<TransactionStore>()(
             );
             if (txError || !txResult) {
               if(flowToPerform.analyticsTransactionFlowInfo){
+                let splitError = txError?.message.split(":")
                 Posthog.actions.events.transactionFlows.transaction({
-                  txFlowId: flowToPerform.analyticsTransactionFlowInfo.txFlowId,
-                  txFlowCategory:  flowToPerform.analyticsTransactionFlowInfo.txFlowCategory,
-                  txFlowType:  flowToPerform.analyticsTransactionFlowInfo.txFlowType,
-                  txFlowData:  flowToPerform.analyticsTransactionFlowInfo.txFlowData,
-                  txCount: flowToPerform.analyticsTransactionFlowInfo.txCount,
+                  ...flowToPerform.analyticsTransactionFlowInfo,
                   txType: updatedTransactionList[i].tx.feTxType,
                   txSuccess: false,
-                  txError: txError?.message,
+                  txError: splitError ? splitError[splitError.length-1]: "",
                 });
               }
               return NEW_ERROR(
@@ -251,11 +239,7 @@ const useTransactionStore = create<TransactionStore>()(
   
             if(flowToPerform.analyticsTransactionFlowInfo){
               Posthog.actions.events.transactionFlows.transaction({
-                txFlowId: flowToPerform.analyticsTransactionFlowInfo.txFlowId,
-                txFlowCategory:  flowToPerform.analyticsTransactionFlowInfo.txFlowCategory,
-                txFlowType:  flowToPerform.analyticsTransactionFlowInfo.txFlowType,
-                txFlowData:  flowToPerform.analyticsTransactionFlowInfo.txFlowData,
-                txCount: flowToPerform.analyticsTransactionFlowInfo.txCount,
+                ...flowToPerform.analyticsTransactionFlowInfo,
                 txType: updatedTransactionList[i].tx.feTxType,
                 txSuccess: true,
               });
@@ -326,13 +310,7 @@ const useTransactionStore = create<TransactionStore>()(
           });
           // save tx to posthog
           if(flowToPerform.analyticsTransactionFlowInfo){
-            Posthog.actions.events.transactionFlows.success({
-              txFlowId: flowToPerform.analyticsTransactionFlowInfo.txFlowId,
-              txFlowCategory:  flowToPerform.analyticsTransactionFlowInfo.txFlowCategory,
-              txFlowType:  flowToPerform.analyticsTransactionFlowInfo.txFlowType,
-              txFlowData:  flowToPerform.analyticsTransactionFlowInfo.txFlowData,
-              txCount: flowToPerform.analyticsTransactionFlowInfo.txCount,
-            });
+            Posthog.actions.events.transactionFlows.success(flowToPerform.analyticsTransactionFlowInfo);
           }
           return NO_ERROR(true);
         },
@@ -560,7 +538,7 @@ function getAnalyticsTransactionFlowInfo(flow : NewTransactionFlow) : AnalyticsT
         bridgeFrom: getNetworkInfoFromChainId(bridgeTxParams.from.chainId).data.name,
         bridgeTo: getNetworkInfoFromChainId(bridgeTxParams.to.chainId).data.name,
         bridgeAsset:bridgeTxParams.token.data.symbol,
-        bridgeAmount:bridgeTxParams.token.amount,
+        bridgeAmount : new BigNumber(bridgeTxParams.token.amount).dividedBy(new BigNumber(10).pow(bridgeTxParams.token.data.decimals)).toString(),
       }
       const txFlowInfo : AnalyticsTransactionFlowInfo = {
         txFlowId: uuidv4(),
@@ -568,6 +546,7 @@ function getAnalyticsTransactionFlowInfo(flow : NewTransactionFlow) : AnalyticsT
         txFlowType: getBridgingMethodName(bridgeTxParams.method),
         txFlowData,
         txCount:0,
+        txList:[],
       }
       return txFlowInfo
     default:

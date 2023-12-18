@@ -14,6 +14,7 @@ import {
 } from "@/transactions/flows";
 import { importERC20Token } from "@/utils/tokens";
 import InfoPop from "../infopop/infopop";
+import Posthog from "@/app/posthog";
 
 interface Props {
   txFlow?: TransactionFlow;
@@ -71,6 +72,7 @@ const TxFlow = (props: Props) => {
                 <TxItem
                   key={idx}
                   tx={tx}
+                  analyticsTxFlowInfo={props.txFlow?.analyticsTransactionFlowInfo}
                   idx={idx + 1}
                   setBridgeStatus={(status) =>
                     props.setBridgeStatus(idx, status)
@@ -80,6 +82,7 @@ const TxFlow = (props: Props) => {
               {props.txFlow.placeholderFlow && (
                 <TxItem
                   tx={TX_PLACEHOLDER(props.txFlow.placeholderFlow)}
+                  analyticsTxFlowInfo={props.txFlow?.analyticsTransactionFlowInfo}
                   idx={props.txFlow.transactions.length + 1}
                   setBridgeStatus={() => false}
                 />
@@ -113,6 +116,9 @@ const TxFlow = (props: Props) => {
               >
                 <a
                   onClick={() => {
+                    if(props.txFlow?.analyticsTransactionFlowInfo){
+                      Posthog.actions.events.transactionFlows.tokensImported(props.txFlow?.analyticsTransactionFlowInfo)
+                    }
                     for (const token of props.txFlow?.tokenMetadata ?? []) {
                       importERC20Token(token);
                     }

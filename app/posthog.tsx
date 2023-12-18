@@ -30,6 +30,7 @@ export type AnalyticsTransactionFlowInfo = {
   txFlowType: AnalyticsTransactionFlowType;
   txFlowData: AnalyticsTransactionFlowData;
   txCount: number;
+  txList: string[];
 }
 
 type AnalyticsTransactionFlowParams = {
@@ -38,6 +39,7 @@ type AnalyticsTransactionFlowParams = {
   txFlowType: AnalyticsTransactionFlowType;
   txFlowData: AnalyticsTransactionFlowData;
   txCount: number;
+  txList: string[];
   txType?: AnalyticsTransactionType;
   txSuccess?: boolean;
   txListError?:string;
@@ -89,6 +91,12 @@ class PosthogWrapper {
         },
         error: (params : AnalyticsTransactionFlowParams) => {
           posthog.capture("Transaction Flow Error", params)
+        },
+        tokensImported: (params : AnalyticsTransactionFlowParams) => {
+          posthog.capture("Tokens Imported", params)
+        },
+        explorerViewed: (params : AnalyticsTransactionFlowParams) => {
+          posthog.capture("Explorer Viewed", params)
         },
         transaction: (params: AnalyticsTransactionFlowParams) => {
           posthog.capture(
