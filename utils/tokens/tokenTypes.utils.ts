@@ -11,6 +11,7 @@ import { ERC20Token, IBCToken, OFTToken } from "@/config/interfaces";
  * @see ERC20Token
  */
 export function isERC20Token(object: any): object is ERC20Token {
+  if (object === null || object === undefined) return false;
   return (
     typeof object === "object" &&
     "id" in object &&
@@ -30,6 +31,7 @@ export function isERC20Token(object: any): object is ERC20Token {
  * @see ERC20Token
  */
 export function isERC20TokenList(array: Array<object>): array is ERC20Token[] {
+  if (array === null || array === undefined) return false;
   return array.every(isERC20Token);
 }
 
@@ -40,6 +42,7 @@ export function isERC20TokenList(array: Array<object>): array is ERC20Token[] {
  * @see IBCToken
  */
 export function isIBCToken(object: any): object is IBCToken {
+  if (object === null || object === undefined) return false;
   return (
     typeof object === "object" &&
     "id" in object &&
@@ -54,6 +57,7 @@ export function isIBCToken(object: any): object is IBCToken {
 }
 
 export function isOFTToken(object: any): object is OFTToken {
+  if (object === null || object === undefined) return false;
   return (
     isERC20Token(object) &&
     "isOFTProxy" in object &&

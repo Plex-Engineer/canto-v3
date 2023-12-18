@@ -98,7 +98,7 @@ const TxFlow = (props: Props) => {
               <InfoPop>
                 <Text size="xx-sm">
                   {
-                    "You will need to import the token into your wallet to see your balance. You only need to do this once."
+                    "Import token into wallet to view its balance. This only needs to be done once."
                   }
                 </Text>
               </InfoPop>
@@ -126,7 +126,11 @@ const TxFlow = (props: Props) => {
           {props.txFlow.status === "ERROR" && (
             <>
               <Spacer height="20px" />
-              <Button disabled={!canRetry.valid} onClick={props.onRetry}>
+              <Button
+                disabled={!canRetry.valid}
+                onClick={props.onRetry}
+                width="fill"
+              >
                 RETRY
               </Button>
             </>

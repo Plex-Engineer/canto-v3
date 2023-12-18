@@ -13,6 +13,7 @@ export const ReactQueryClientProvider = ({
             notifyOnChangeProps: ["data", "error"],
             isDataEqual: (oldData, newData) =>
               JSON.stringify(oldData) === JSON.stringify(newData),
+            refetchInterval: 6000,
           },
         },
       })
