@@ -16,7 +16,7 @@ import Analytics, { AnalyticsTransactionFlowInfo } from "@/provider/analytics";
 
 interface TxItemProps {
   tx: TransactionWithStatus;
-  analyticsTxFlowInfo: AnalyticsTransactionFlowInfo | undefined;
+  analyticsTxFlowInfo?: AnalyticsTransactionFlowInfo;
   idx: number;
   setBridgeStatus: (status: BridgeStatus) => void;
 }
@@ -99,9 +99,12 @@ const TxItem = (props: TxItemProps) => {
               )}
               {props.tx.txLink && (
                 <a
-                  onClick={()=>{
-                    if(props.analyticsTxFlowInfo){
-                      Analytics.actions.events.transactionFlows.explorerViewed({...props.analyticsTxFlowInfo, txType: props.tx.tx.feTxType})
+                  onClick={() => {
+                    if (props.analyticsTxFlowInfo) {
+                      Analytics.actions.events.transactionFlows.explorerViewed({
+                        ...props.analyticsTxFlowInfo,
+                        txType: props.tx.tx.feTxType,
+                      });
                     }
                   }}
                   href={props.tx.txLink}

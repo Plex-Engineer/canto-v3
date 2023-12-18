@@ -12,29 +12,15 @@ export enum BridgingMethod {
   IBC = "1",
   LAYER_ZERO = "2",
 }
-
-export enum BridgingMethodName {
-  GRAVITY_BRIDGE = "Gravity Bridge",
-  IBC = "IBC",
-  LAYER_ZERO = "Layer Zero",
-}
-
-export function getBridgingMethodName(method: BridgingMethod | null): BridgingMethodName | undefined{
-  switch (method) {
-    case BridgingMethod.GRAVITY_BRIDGE:
-      return BridgingMethodName.GRAVITY_BRIDGE;
-    case BridgingMethod.IBC:
-      return BridgingMethodName.IBC;
-    case BridgingMethod.LAYER_ZERO:
-      return BridgingMethodName.LAYER_ZERO;
-    default:
-      return undefined;
-  }
-}
+export type BridgingMethodName =
+  | "Layer Zero"
+  | "Gravity Bridge"
+  | "IBC"
+  | "Unknown";
 
 type BridgeMethodInfo = {
   [key in BridgingMethod]: {
-    name: string;
+    name: BridgingMethodName;
     icon: string;
     id: string;
   };

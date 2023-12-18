@@ -47,9 +47,7 @@ export const newClaimCLMRewardsFlow = (
     title: "Claim CLM Rewards",
     icon: "/icons/canto.svg",
     txType: TransactionFlowType.CLM_CLAIM_REWARDS_TX,
-    params: {
-      clmParams: txParams,
-    },
+    params: txParams,
     tokenMetadata: wCantoAddress
       ? [
           {

@@ -20,7 +20,7 @@ import {
 } from "@/transactions/interfaces";
 import { signTransaction, waitForTransaction } from "@/transactions/signTx";
 import Analytics from "@/provider/analytics";
-import {getAnalyticsTransactionFlowInfo}  from "@/utils/analytics";
+import { getAnalyticsTransactionFlowInfo } from "@/utils/analytics";
 
 // only save last 100 flows for each user to save space
 const USER_FLOW_LIMIT = 100;
@@ -56,7 +56,12 @@ export interface TransactionStore {
   updateTxFlow: (
     ethAccount: string,
     flowId: string,
-    params: Partial<TransactionFlow>
+    params: Partial<
+      Omit<
+        TransactionFlow,
+        "id" | "createdAt" | "title" | "icon" | "txType" | "params"
+      >
+    >
   ) => void;
   // special function for setting bridge status on a transaction
   setTxBridgeStatus: (
@@ -78,11 +83,16 @@ const useTransactionStore = create<TransactionStore>()(
         },
         addNewFlow: async (params) => {
           // create new flow before getting transactions
+          // new flow id
+          const flowId = Date.now().toString() + params.ethAccount;
           // set the transactions to an empty array for now, since we will get them when actually performing the flow
-          let analyticsTransactionFlowInfo  = getAnalyticsTransactionFlowInfo(params.txFlow)
-          let newFlow: TransactionFlow = {
+          const analyticsTransactionFlowInfo = getAnalyticsTransactionFlowInfo(
+            params.txFlow,
+            flowId
+          );
+          const newFlow: TransactionFlow = {
             ...params.txFlow,
-            id: Date.now().toString(),
+            id: flowId,
             createdAt: new Date().getTime(),
             status: "POPULATING",
             transactions: [],
@@ -102,7 +112,7 @@ const useTransactionStore = create<TransactionStore>()(
               get().transactionFlows.set(params.ethAccount, newUserList)
             ),
           });
-          
+
           // we are expecting a signer so call performTransactions
           return await get().performFlow(params.ethAccount);
         },
@@ -127,189 +137,187 @@ const useTransactionStore = create<TransactionStore>()(
           }
         },
         performFlow: async (ethAccount, flowId) => {
-          // grab user flows
-          const userTxFlows = get().getUserTransactionFlows(ethAccount);
-          if (userTxFlows.length === 0) {
-            return NEW_ERROR(
-              "useTransactionStore::performFlow: no flows found"
-            );
-          }
-          // start with the most recent if none provided
-          const flowToPerform = flowId
-            ? userTxFlows.find((flow) => flow.id === flowId)
-            : userTxFlows[userTxFlows.length - 1];
-          // check that we have a transaction flow object
-          if (!flowToPerform) {
-            return NEW_ERROR("useTransactionStore::performFlow: no flow found");
-          }
-          // set the flow status to populating since we are about to populate it with transactions
-          get().updateTxFlow(ethAccount, flowToPerform.id, {
-            status: "POPULATING",
-          });
+          try {
+            // grab user flows
+            const userTxFlows = get().getUserTransactionFlows(ethAccount);
+            if (userTxFlows.length === 0) throw new Error("no flows found");
 
-          // create the new transactions to complete the flow
-          // we don't need to validate the params since they are validated when creating the transaction list anyways
-          const { data: newFlow, error: newTransactionListError } =
-            await TRANSACTION_FLOW_MAP[flowToPerform.txType].tx(
-              flowToPerform.params
-            );
-          if (newTransactionListError) {
-            if(flowToPerform.analyticsTransactionFlowInfo){
-              let splitError = newTransactionListError?.message.split(":")
-              Analytics.actions.events.transactionFlows.generateTransactionsError({
-                ...flowToPerform.analyticsTransactionFlowInfo,
-                txsGenerateError: splitError[splitError.length-1],
-              });
-            }
-            // something failed, so set the flow to failure
-            const errorMsgString =
-              "useTransactionStore::performFlow: " +
-              errMsg(newTransactionListError);
+            // start with the most recent if none provided
+            const flowToPerform = flowId
+              ? userTxFlows.find((flow) => flow.id === flowId)
+              : userTxFlows[userTxFlows.length - 1];
+            // check that we have a transaction flow object
+            if (!flowToPerform) throw new Error("no flow found");
+
+            // set the flow status to populating since we are about to populate it with transactions
             get().updateTxFlow(ethAccount, flowToPerform.id, {
-              status: "ERROR",
-              error: errorMsgString,
+              status: "POPULATING",
             });
-            return NEW_ERROR(errorMsgString);
-          }
 
-
-          
-
-          // keep all successful transactions in the flow
-          const successfulTransactions = flowToPerform.transactions.filter(
-            (tx) => tx.status === "SUCCESS"
-          );
-
-          // create updated list
-          const updatedTransactionList = [
-            ...successfulTransactions,
-            ...newFlow.transactions.map((tx) => ({
-              tx,
-              status: "NONE" as TransactionStatus,
-            })),
-          ];
-
-          // set the transactions to the new list and set status to signing since we are about to sign them
-          get().updateTxFlow(ethAccount, flowToPerform.id, {
-            transactions: updatedTransactionList,
-            placeholderFlow: newFlow.extraFlow,
-            status: "SIGNING",
-            error: undefined,
-          });
-
-          // save (event : tx flow started) to  analytics only when performing tx flow for first time
-  
-          if(flowId === undefined && flowToPerform.analyticsTransactionFlowInfo){
-            flowToPerform.analyticsTransactionFlowInfo.txCount = updatedTransactionList.length
-            flowToPerform.analyticsTransactionFlowInfo.txList = updatedTransactionList.map((tx)=> tx.tx.feTxType)
-            Analytics.actions.events.transactionFlows.started(
-              flowToPerform.analyticsTransactionFlowInfo
-            );
-          }
-
-          // start at the first transaction that hasn't been completed
-          const txIndex = successfulTransactions.length;
-
-          // go through each transaction and perform it
-          for (let i = txIndex; i < updatedTransactionList.length; i++) {
-            const { data: txResult, error: txError } = await get().performTx(
-              ethAccount,
-              flowToPerform.id,
-              i,
-              updatedTransactionList[i]
-            );
-            if (txError || !txResult) {
-              if(flowToPerform.analyticsTransactionFlowInfo){
-                let splitError = txError?.message.split(":")
-                Analytics.actions.events.transactionFlows.transaction({
-                  ...flowToPerform.analyticsTransactionFlowInfo,
-                  txType: updatedTransactionList[i].tx.feTxType,
-                  txSuccess: false,
-                  txError: splitError ? splitError[splitError.length-1]: "",
-                });
-              }
-              return NEW_ERROR(
-                "useTransactionStore::performTransactions: " +
-                  errMsg(txError ?? "")
+            // create the new transactions to complete the flow
+            // we don't need to validate the params since they are validated when creating the transaction list anyways
+            const { data: newFlow, error: newTransactionListError } =
+              await TRANSACTION_FLOW_MAP[flowToPerform.txType].tx(
+                flowToPerform.params
               );
-            }
-  
-            if(flowToPerform.analyticsTransactionFlowInfo){
-              Analytics.actions.events.transactionFlows.transaction({
-                ...flowToPerform.analyticsTransactionFlowInfo,
-                txType: updatedTransactionList[i].tx.feTxType,
-                txSuccess: true,
+
+            // check error (will need to set correct states before throwing error)
+            if (newTransactionListError) {
+              // set the flow to error
+              get().updateTxFlow(ethAccount, flowToPerform.id, {
+                status: "ERROR",
+                error: errMsg(newTransactionListError),
               });
-            }
-          
-          }
 
-          // deal with extra flows
-          // if there is an extra flow attached to this one, we need:
-          // 1. get new transactions
-          // 2. add them to the flow
-          // 3. perform all new transactions
-          if (newFlow.extraFlow) {
-            // get new transactions from this flow
-            const { data: extraFlow, error: extraFlowError } =
-              await TRANSACTION_FLOW_MAP[newFlow.extraFlow.txFlowType].tx(
-                newFlow.extraFlow.params
-              );
-            // check if error
-            if (extraFlowError) {
-              return NEW_ERROR(
-                "useTransactionStore::performTransactions: " +
-                  errMsg(extraFlowError)
-              );
+              // check if analytics info exists
+              if (flowToPerform.analyticsTransactionFlowInfo) {
+                // log error to analytics
+                Analytics.actions.events.transactionFlows.generateTransactionsError(
+                  {
+                    ...flowToPerform.analyticsTransactionFlowInfo,
+                    txsGenerateError: newTransactionListError.message
+                      .split(":")
+                      .pop(),
+                  }
+                );
+              }
+
+              // throw error
+              throw newTransactionListError;
             }
-            // grab the new list after all transactions were completed
-            const completedTxs = get()
-              .getUserTransactionFlows(ethAccount)
-              .find((flow) => flow.id === flowToPerform.id)?.transactions;
-            if (!completedTxs) {
-              return NEW_ERROR(
-                "useTransactionStore::performTransactions: no transactions found"
-              );
-            }
-            // add these new transactions to this list and delete the extra flow
-            const newFlowTxList = [
-              ...completedTxs,
-              ...extraFlow.transactions.map((tx) => ({
+
+            // keep all successful transactions in the flow
+            const successfulTransactions = flowToPerform.transactions.filter(
+              (tx) => tx.status === "SUCCESS"
+            );
+
+            // create updated list
+            const updatedTransactionList = [
+              ...successfulTransactions,
+              ...newFlow.transactions.map((tx) => ({
                 tx,
                 status: "NONE" as TransactionStatus,
               })),
             ];
-            // update the flow with the new transactions (could be another extra flow to add too)
+
+            // set the transactions to the new list and set status to signing since we are about to sign them
             get().updateTxFlow(ethAccount, flowToPerform.id, {
-              transactions: newFlowTxList,
-              placeholderFlow: undefined,
+              transactions: updatedTransactionList,
+              placeholderFlow: newFlow.extraFlow,
+              status: "SIGNING",
+              error: undefined,
             });
-            // perform all new transactions that were just added
-            for (let j = completedTxs.length; j < newFlowTxList.length; j++) {
+
+            // log tx flow started event to analytics
+            if (!flowId && flowToPerform.analyticsTransactionFlowInfo) {
+              flowToPerform.analyticsTransactionFlowInfo.txCount =
+                updatedTransactionList.length;
+              flowToPerform.analyticsTransactionFlowInfo.txList =
+                updatedTransactionList.map((tx) => tx.tx.feTxType);
+              Analytics.actions.events.transactionFlows.started(
+                flowToPerform.analyticsTransactionFlowInfo
+              );
+            }
+
+            // start at the first transaction that hasn't been completed
+            const txIndex = successfulTransactions.length;
+
+            // go through each transaction and perform it
+            for (let i = txIndex; i < updatedTransactionList.length; i++) {
               const { data: txResult, error: txError } = await get().performTx(
                 ethAccount,
                 flowToPerform.id,
-                j,
-                newFlowTxList[j]
+                i,
+                updatedTransactionList[i]
               );
+              // check if error (set states before throwing error)
               if (txError || !txResult) {
-                return NEW_ERROR(
-                  "useTransactionStore::performTransactions: " +
-                    errMsg(txError ?? "")
-                );
+                // perform tx will set the state of the tx and flow to error on it's own
+                // log error to analytics if it exists
+                if (flowToPerform.analyticsTransactionFlowInfo) {
+                  Analytics.actions.events.transactionFlows.transaction({
+                    ...flowToPerform.analyticsTransactionFlowInfo,
+                    txType: updatedTransactionList[i].tx.feTxType,
+                    txSuccess: false,
+                    txError: txError?.message.split(":").pop() ?? "",
+                  });
+                }
+                throw txError;
+              }
+              // log tx success to analytics if it exists
+              if (flowToPerform.analyticsTransactionFlowInfo) {
+                Analytics.actions.events.transactionFlows.transaction({
+                  ...flowToPerform.analyticsTransactionFlowInfo,
+                  txType: updatedTransactionList[i].tx.feTxType,
+                  txSuccess: true,
+                });
               }
             }
-          }
 
-          // made it through the whole list, so the flow was a success
-          get().updateTxFlow(ethAccount, flowToPerform.id, {
-            status: "SUCCESS",
-          });
-          // save tx to analytics
-          if(flowToPerform.analyticsTransactionFlowInfo){
-            Analytics.actions.events.transactionFlows.success(flowToPerform.analyticsTransactionFlowInfo);
+            // deal with extra flows
+            // if there is an extra flow attached to this one, we need:
+            // 1. get new transactions
+            // 2. add them to the flow
+            // 3. perform all new transactions
+            if (newFlow.extraFlow) {
+              // get new transactions from this flow
+              const { data: extraFlow, error: extraFlowError } =
+                await TRANSACTION_FLOW_MAP[newFlow.extraFlow.txFlowType].tx(
+                  newFlow.extraFlow.params
+                );
+              // check if error
+              if (extraFlowError) throw extraFlowError;
+
+              // grab the new list after all transactions were completed
+              const completedTxs = get()
+                .getUserTransactionFlows(ethAccount)
+                .find((flow) => flow.id === flowToPerform.id)?.transactions;
+              if (!completedTxs) throw new Error("no transactions found");
+
+              // add these new transactions to this list and delete the extra flow
+              const newFlowTxList = [
+                ...completedTxs,
+                ...extraFlow.transactions.map((tx) => ({
+                  tx,
+                  status: "NONE" as TransactionStatus,
+                })),
+              ];
+
+              // update the flow with the new transactions (could be another extra flow to add too)
+              get().updateTxFlow(ethAccount, flowToPerform.id, {
+                transactions: newFlowTxList,
+                placeholderFlow: undefined,
+              });
+
+              // perform all new transactions that were just added
+              for (let j = completedTxs.length; j < newFlowTxList.length; j++) {
+                const { data: txResult, error: txError } =
+                  await get().performTx(
+                    ethAccount,
+                    flowToPerform.id,
+                    j,
+                    newFlowTxList[j]
+                  );
+                if (txError || !txResult) throw txError;
+              }
+            }
+
+            // made it through the whole list, so the flow was a success
+            get().updateTxFlow(ethAccount, flowToPerform.id, {
+              status: "SUCCESS",
+            });
+            // save tx to analytics
+            if (flowToPerform.analyticsTransactionFlowInfo) {
+              Analytics.actions.events.transactionFlows.success(
+                flowToPerform.analyticsTransactionFlowInfo
+              );
+            }
+            return NO_ERROR(true);
+          } catch (err) {
+            return NEW_ERROR(
+              "useTransactionStore::performFlow: " + errMsg(err)
+            );
           }
-          return NO_ERROR(true);
         },
         performTx: async (ethAccount, flowId, txIndex, tx) => {
           try {
@@ -525,6 +533,5 @@ const useTransactionStore = create<TransactionStore>()(
 BigInt.prototype.toJSON = function () {
   return this.toString();
 };
-
 
 export default useTransactionStore;

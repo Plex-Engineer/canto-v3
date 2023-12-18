@@ -10,7 +10,11 @@ import posthog from "posthog-js";
 // (BRIDGE/LP/LENDING/...)
 type AnalyticsTransactionFlowCategory = TransactionFlowType;
 // (SUPPLY/WITHDRAW/GBRIDGE/LAYERZERO/LPANDSTAKE/...)
-type AnalyticsTransactionFlowType = CantoDexTxTypes | CTokenLendingTxTypes | BridgingMethodName | undefined;
+type AnalyticsTransactionFlowType =
+  | CantoDexTxTypes
+  | CTokenLendingTxTypes
+  | BridgingMethodName
+  | undefined;
 export type AnalyticsTransactionFlowData = {
   // bridge info
   bridgeFrom?: string;
@@ -31,18 +35,12 @@ export type AnalyticsTransactionFlowInfo = {
   txFlowData: AnalyticsTransactionFlowData;
   txCount: number;
   txList: string[];
-}
+};
 
-type AnalyticsTransactionFlowParams = {
-  txFlowId: string;
-  txFlowCategory: AnalyticsTransactionFlowCategory;
-  txFlowType: AnalyticsTransactionFlowType;
-  txFlowData: AnalyticsTransactionFlowData;
-  txCount: number;
-  txList: string[];
+type AnalyticsTransactionFlowParams = AnalyticsTransactionFlowInfo & {
   txType?: AnalyticsTransactionType;
   txSuccess?: boolean;
-  txsGenerateError?:string;
+  txsGenerateError?: string;
   txError?: string;
 };
 
@@ -57,14 +55,14 @@ class AnalyticsWrapper {
   }
   actions = {
     identify: (account: string, props: object) => {
-      posthog.identify(account,props);
+      posthog.identify(account, props);
     },
-    reset: () =>{
-      posthog.reset()
+    reset: () => {
+      posthog.reset();
     },
     people: {
       registerWallet: (account: string) => {
-        posthog.register({"account": account});
+        posthog.register({ account: account });
       },
     },
     events: {
@@ -83,30 +81,31 @@ class AnalyticsWrapper {
         },
       },
       transactionFlows: {
-        started: (params : AnalyticsTransactionFlowParams) => {
-          posthog.capture("Transaction Flow Started", params)
+        started: (params: AnalyticsTransactionFlowParams) => {
+          posthog.capture("Transaction Flow Started", params);
         },
-        success: (params : AnalyticsTransactionFlowParams) => {
-          posthog.capture("Transaction Flow Success",params)
+        success: (params: AnalyticsTransactionFlowParams) => {
+          posthog.capture("Transaction Flow Success", params);
         },
-        generateTransactionsError: (params : AnalyticsTransactionFlowParams) => {
-          posthog.capture("Generate Transactions Error", params)
+        generateTransactionsError: (params: AnalyticsTransactionFlowParams) => {
+          posthog.capture("Generate Transactions Error", params);
         },
-        tokensImported: (params : AnalyticsTransactionFlowParams) => {
-          posthog.capture("Tokens Imported", params)
+        tokensImported: (params: AnalyticsTransactionFlowParams) => {
+          posthog.capture("Tokens Imported", params);
         },
-        explorerViewed: (params : AnalyticsTransactionFlowParams) => {
-          posthog.capture("Explorer Viewed", params)
+        explorerViewed: (params: AnalyticsTransactionFlowParams) => {
+          posthog.capture("Explorer Viewed", params);
         },
         transaction: (params: AnalyticsTransactionFlowParams) => {
           posthog.capture(
             params.txSuccess ? "Transaction Success" : "Transaction Error",
             params
-          )
+          );
         },
       },
     },
   };
 }
 
-export default new AnalyticsWrapper();;
+const NewAnalyticsWrapper = new AnalyticsWrapper();
+export default NewAnalyticsWrapper;
