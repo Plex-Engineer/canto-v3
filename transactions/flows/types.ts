@@ -8,7 +8,7 @@ import {
   TransactionWithStatus,
 } from "../interfaces";
 
-import {AnalyticsTransactionFlowInfo} from "@/app/posthog";
+import {AnalyticsTransactionFlowInfo} from "@/provider/analytics";
 // txType is the key for the txMap that will create the Transaction[] list
 export type NewTransactionFlow = {
   title: string;

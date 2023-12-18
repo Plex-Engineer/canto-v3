@@ -13,10 +13,10 @@ type AnalyticsTransactionFlowCategory = TransactionFlowType;
 type AnalyticsTransactionFlowType = CantoDexTxTypes | CTokenLendingTxTypes | BridgingMethodName | undefined;
 export type AnalyticsTransactionFlowData = {
   // bridge info
-  bridgeFrom: string;
-  bridgeTo: string;
-  bridgeAsset: string;
-  bridgeAmount: string;
+  bridgeFrom?: string;
+  bridgeTo?: string;
+  bridgeAsset?: string;
+  bridgeAmount?: string;
   // dex info
   // lending info
 };
@@ -42,11 +42,11 @@ type AnalyticsTransactionFlowParams = {
   txList: string[];
   txType?: AnalyticsTransactionType;
   txSuccess?: boolean;
-  txListError?:string;
+  txsGenerateError?:string;
   txError?: string;
 };
 
-class PosthogWrapper {
+class AnalyticsWrapper {
   constructor() {
     posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
       api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST!,
@@ -89,8 +89,8 @@ class PosthogWrapper {
         success: (params : AnalyticsTransactionFlowParams) => {
           posthog.capture("Transaction Flow Success",params)
         },
-        error: (params : AnalyticsTransactionFlowParams) => {
-          posthog.capture("Transaction Flow Error", params)
+        generateTransactionsError: (params : AnalyticsTransactionFlowParams) => {
+          posthog.capture("Generate Transactions Error", params)
         },
         tokensImported: (params : AnalyticsTransactionFlowParams) => {
           posthog.capture("Tokens Imported", params)
@@ -109,4 +109,4 @@ class PosthogWrapper {
   };
 }
 
-export default new PosthogWrapper();;
+export default new AnalyticsWrapper();;

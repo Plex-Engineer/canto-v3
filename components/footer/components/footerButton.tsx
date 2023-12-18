@@ -5,7 +5,6 @@ import Icon from "@/components/icon/icon";
 import Toggle from "@/components/toggle";
 import Rive, { useRive, useStateMachineInput } from "@rive-app/react-canvas";
 import { useCallback, useEffect, useState } from "react";
-import Posthog from "../../../app/posthog"
 
 const ThemeButton = () => {
   const [name, setName] = useState("dark");

@@ -12,7 +12,7 @@ import StatusIcon from "../icon/statusIcon";
 import { useQuery } from "react-query";
 import { getBridgeStatus } from "@/transactions/bridge";
 import { BridgeStatus, TransactionWithStatus } from "@/transactions/interfaces";
-import Posthog, { AnalyticsTransactionFlowInfo } from "@/app/posthog";
+import Analytics, { AnalyticsTransactionFlowInfo } from "@/provider/analytics";
 
 interface TxItemProps {
   tx: TransactionWithStatus;
@@ -101,7 +101,7 @@ const TxItem = (props: TxItemProps) => {
                 <a
                   onClick={()=>{
                     if(props.analyticsTxFlowInfo){
-                      Posthog.actions.events.transactionFlows.explorerViewed({...props.analyticsTxFlowInfo, txType: props.tx.tx.feTxType})
+                      Analytics.actions.events.transactionFlows.explorerViewed({...props.analyticsTxFlowInfo, txType: props.tx.tx.feTxType})
                     }
                   }}
                   href={props.tx.txLink}

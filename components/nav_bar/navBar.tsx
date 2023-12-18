@@ -9,7 +9,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TransactionModal from "../transactions/TxModal";
 import ThemeButton from "../footer/components/footerButton";
 import { useEffect } from "react";
-import Posthog from "../../app/posthog";
+import Analytics from "@/provider/analytics";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { useBalance } from "wagmi";
 import { useAutoConnect } from "@/provider/useAutoConnect";
@@ -24,24 +24,24 @@ const NavBar = () => {
 
   useEffect(() => {
     if (signer?.account.address) {
-      Posthog.actions.people.registerWallet(signer.account.address);
-      Posthog.actions.identify(signer.account.address, { account: signer.account.address })
-      Posthog.actions.events.connections.walletConnect(true);
+      Analytics.actions.people.registerWallet(signer.account.address);
+      Analytics.actions.identify(signer.account.address, { account: signer.account.address })
+      Analytics.actions.events.connections.walletConnect(true);
     } else {
-      Posthog.actions.reset();
+      Analytics.actions.reset();
     }
   }, [signer]);
 
   useEffect(() => {
     console.log(currentPath)
     if (currentPath == "/bridge") {
-      Posthog.actions.events.pageOpened("bridge");
+      Analytics.actions.events.pageOpened("bridge");
     } else if (currentPath == "/lending") {
-      Posthog.actions.events.pageOpened("lending");
+      Analytics.actions.events.pageOpened("lending");
     } else if (currentPath == "/lp") {
-      Posthog.actions.events.pageOpened("lp interface");
+      Analytics.actions.events.pageOpened("lp interface");
     } else {
-      Posthog.actions.events.pageOpened("home");
+      Analytics.actions.events.pageOpened("home");
     }
   }, [currentPath, signer]);
 

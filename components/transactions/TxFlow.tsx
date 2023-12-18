@@ -14,7 +14,7 @@ import {
 } from "@/transactions/flows";
 import { importERC20Token } from "@/utils/tokens";
 import InfoPop from "../infopop/infopop";
-import Posthog from "@/app/posthog";
+import Analytics from "@/provider/analytics";
 
 interface Props {
   txFlow?: TransactionFlow;
@@ -117,7 +117,7 @@ const TxFlow = (props: Props) => {
                 <a
                   onClick={() => {
                     if(props.txFlow?.analyticsTransactionFlowInfo){
-                      Posthog.actions.events.transactionFlows.tokensImported(props.txFlow?.analyticsTransactionFlowInfo)
+                      Analytics.actions.events.transactionFlows.tokensImported(props.txFlow?.analyticsTransactionFlowInfo)
                     }
                     for (const token of props.txFlow?.tokenMetadata ?? []) {
                       importERC20Token(token);
