@@ -313,10 +313,19 @@ const useTransactionStore = create<TransactionStore>()(
             if (txReceiptError || receipt.status !== "success") {
               throw Error(receipt.error);
             }
+
             // transaction was a success so we can set status and
             get().setTxStatus(ethAccount, flowId, txIndex, {
               status: "SUCCESS",
             });
+
+            // some trasactions could need an extra check to make sure it is complete (ibc)
+            if (tx.tx.verifyTxComplete) {
+              const { data: verifyResult, error: verifyError } =
+                await tx.tx.verifyTxComplete(txHash);
+              // stop the flow if we must rely on this transaction to be verified (last tx still complete)
+              if (verifyError || !verifyResult) throw verifyError;
+            }
           } catch (err) {
             // something failed, so set the flow and tx to failure
             get().setTxStatus(ethAccount, flowId, txIndex, {

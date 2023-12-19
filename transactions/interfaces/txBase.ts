@@ -20,6 +20,7 @@ export type Transaction = {
     lastStatus: TransactionStatus;
     timeLeft?: number;
   };
+  verifyTxComplete?: (txHash: string) => PromiseWithError<boolean>;
 } & (
   | {
       type: "EVM";

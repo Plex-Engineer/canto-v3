@@ -23,6 +23,8 @@ import BigNumber from "bignumber.js";
 import { _convertERC20Tx, _ibcOutTx } from "./txCreators";
 import { CANTO_MAINNET_COSMOS } from "@/config/networks";
 import { BridgingMethod, getBridgeMethodInfo } from "..";
+import { getCosmosTxDetailsFromHash } from "@/transactions/signTx/cosmosEIP/signCosmosEIP";
+import { tryFetch } from "@/utils/async";
 
 type IBCOutTxParams = {
   senderEthAddress: string;
@@ -31,6 +33,7 @@ type IBCOutTxParams = {
   token: IBCToken;
   amount: string;
   convert: boolean;
+  verifyComplete?: boolean;
 };
 
 /**
@@ -131,29 +134,35 @@ export async function IBCOutTx(
     }
 
     /** ibc transfer */
-    txList.push(
-      _ibcOutTx(
-        txParams.token.chainId,
-        txParams.senderEthAddress,
-        "transfer",
-        channelId.fromCanto,
-        txParams.amount,
-        txParams.token.ibcDenom,
-        txParams.receiverCosmosAddress,
-        cantoAddress,
-        Number(ibcData.height.revision_number),
-        Number(ibcData.height.revision_height) + 1000,
-        blockTimestamp.slice(0, 9) + "00000000000",
-        "ibc from canto",
-        TX_DESCRIPTIONS.BRIDGE(
-          txParams.token.symbol,
-          displayAmount(txParams.amount, txParams.token.decimals),
-          CANTO_MAINNET_COSMOS.name,
-          receivingChain.name,
-          getBridgeMethodInfo(BridgingMethod.IBC).name
-        )
+    const ibcOutTx = _ibcOutTx(
+      txParams.token.chainId,
+      txParams.senderEthAddress,
+      "transfer",
+      channelId.fromCanto,
+      txParams.amount,
+      txParams.token.ibcDenom,
+      txParams.receiverCosmosAddress,
+      cantoAddress,
+      Number(ibcData.height.revision_number),
+      Number(ibcData.height.revision_height) + 1000,
+      blockTimestamp.slice(0, 9) + "00000000000",
+      "ibc from canto",
+      TX_DESCRIPTIONS.BRIDGE(
+        txParams.token.symbol,
+        displayAmount(txParams.amount, txParams.token.decimals),
+        CANTO_MAINNET_COSMOS.name,
+        receivingChain.name,
+        getBridgeMethodInfo(BridgingMethod.IBC).name
       )
     );
+
+    // add verify complete if requested
+    if (txParams.verifyComplete) {
+      ibcOutTx.verifyTxComplete = async (txHash) =>
+        waitForIBCOutComplete(txHash);
+    }
+
+    txList.push(ibcOutTx);
 
     /** return tx list */
     return NO_ERROR({ transactions: txList });
@@ -214,4 +223,70 @@ export function validateIBCOutTxParams(txParams: IBCOutTxParams): Validation {
     txParams.token.symbol,
     txParams.token.decimals
   );
+}
+
+// tx may not be acknoleged yet, so try for 5 blocks before giving up
+async function waitForIBCOutComplete(
+  txHash: string
+): PromiseWithError<boolean> {
+  let numTries = 0;
+  while (numTries < 5) {
+    const { data: done, error } = await verifyIBCOutComplete(txHash);
+    if (error || !done) {
+      numTries++;
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    } else {
+      return NO_ERROR(true);
+    }
+  }
+  return NEW_ERROR("waitForIBCOutComplete", "timeout");
+}
+
+// verifies IBC acknolwedgement from tx hash
+async function verifyIBCOutComplete(txHash: string): PromiseWithError<boolean> {
+  try {
+    // get tx data
+    const { data: txData, error } = await getCosmosTxDetailsFromHash(
+      CANTO_MAINNET_COSMOS.chainId,
+      txHash
+    );
+    if (error) throw error;
+
+    // grab all events from tx
+    const allEvents = txData.tx_response.logs.flatMap((log) => log.events);
+
+    // check events for "send_packet"
+    const sendPacketEvent = allEvents.find(
+      (event) => event.type === "send_packet"
+    );
+    if (!sendPacketEvent) throw new Error("no send_packet event");
+
+    // check attributes fo find the packet sequence
+    const packetSequence = sendPacketEvent.attributes.find(
+      (att) => att.key === "packet_sequence"
+    )?.value;
+    if (!packetSequence) throw new Error("no packet_sequence attribute");
+
+    // check attributes for channel id
+    const channelId = sendPacketEvent.attributes.find(
+      (att) => att.key === "packet_src_channel"
+    )?.value;
+    if (!channelId) throw new Error("no packet_src_channel attribute");
+
+    // check ibc module for acknowledgement of this packet sequence
+    const { data: ackData, error: ackError } = await tryFetch<{
+      acknowledgement: string;
+      proof: any;
+    }>(
+      `${CANTO_MAINNET_COSMOS.restEndpoint}/ibc/core/channel/v1/channels/${channelId}/ports/transfer/packet_acks/${packetSequence}`
+    );
+    if (ackError) throw ackError;
+
+    // check acknowledgement
+    if (!ackData.acknowledgement) throw new Error("no acknowledgement");
+
+    return NO_ERROR(true);
+  } catch (err) {
+    return NEW_ERROR("verifyIBCComplete", err);
+  }
 }

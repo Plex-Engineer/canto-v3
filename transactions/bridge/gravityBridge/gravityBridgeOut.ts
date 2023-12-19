@@ -88,6 +88,7 @@ export async function gravityBridgeOutTx(
         token: txParams.token,
         amount: amountToIBC.toString(),
         convert: true,
+        verifyComplete: true,
       });
       if (ibcTxsError) throw ibcTxsError;
       txList.push(...ibcTxs.transactions);
