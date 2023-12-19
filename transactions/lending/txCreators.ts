@@ -1,5 +1,9 @@
 import { CERC20_ABI, COMPTROLLER_ABI, RESERVOIR_ABI } from "@/config/abis";
-import { Transaction, TransactionDescription } from "../interfaces";
+import {
+  CantoFETxType,
+  Transaction,
+  TransactionDescription,
+} from "../interfaces";
 import { CTokenLendingTxTypes } from ".";
 
 export const _claimLendingRewardsTx = (
@@ -9,6 +13,7 @@ export const _claimLendingRewardsTx = (
   description: TransactionDescription
 ): Transaction => ({
   description,
+  feTxType: CantoFETxType.CLAIM_REWARDS_CLM,
   fromAddress: userEthAdress,
   chainId: chainId,
   type: "EVM",
@@ -28,6 +33,7 @@ export const _dripComptrollerTx = (
   description: TransactionDescription
 ): Transaction => ({
   description,
+  feTxType: CantoFETxType.DRIP_COMPTROLLER,
   fromAddress: userEthAddress,
   chainId: chainId,
   type: "EVM",
@@ -58,6 +64,7 @@ export const _lendingCTokenTx = (
   );
   return {
     description,
+    feTxType: txDetails.feTxType,
     fromAddress: userEthAddress,
     chainId: chainId,
     type: "EVM",
@@ -81,6 +88,7 @@ export const _withdrawAllCTokenTx = (
   description: TransactionDescription
 ): Transaction => ({
   description,
+  feTxType: CantoFETxType.WITHDRAW_ALL,
   chainId: chainId,
   fromAddress: userEthAddress,
   type: "EVM",
@@ -100,6 +108,9 @@ export const _collateralizeTx = (
   description: TransactionDescription
 ): Transaction => ({
   description,
+  feTxType: collateralize
+    ? CantoFETxType.COLLATERALIZE
+    : CantoFETxType.DECOLLATERALIZE,
   chainId: chainId,
   fromAddress: userEthAddress,
   type: "EVM",
@@ -121,6 +132,7 @@ function methodAndParamsFromLendingTxType(
   amount: string,
   isCanto: boolean
 ): {
+  feTxType: CantoFETxType;
   method: string;
   params: string[];
   value: string;
@@ -128,24 +140,28 @@ function methodAndParamsFromLendingTxType(
   switch (txType) {
     case CTokenLendingTxTypes.SUPPLY:
       return {
+        feTxType: CantoFETxType.SUPPLY,
         method: "mint",
         params: isCanto ? [] : [amount],
         value: isCanto ? amount : "0",
       };
     case CTokenLendingTxTypes.BORROW:
       return {
+        feTxType: CantoFETxType.BORROW,
         method: "borrow",
         params: [amount],
         value: "0",
       };
     case CTokenLendingTxTypes.REPAY:
       return {
+        feTxType: CantoFETxType.REPAY,
         method: "repayBorrow",
         params: isCanto ? [] : [amount],
         value: isCanto ? amount : "0",
       };
     case CTokenLendingTxTypes.WITHDRAW:
       return {
+        feTxType: CantoFETxType.WITHDRAW,
         method: "redeemUnderlying",
         params: [amount],
         value: "0",
