@@ -15,6 +15,7 @@ import { BridgingFeesReturn } from "@/hooks/bridge/useBridgingFees";
 import { BridgingMethod } from "@/transactions/bridge";
 import { addTokenBalances } from "@/utils/math";
 import { BridgeToken } from "@/hooks/bridge/interfaces/tokens";
+import FeeButton from "./components/feeButton";
 
 const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
@@ -355,21 +356,81 @@ const FeesSection = ({
               Selected Bridge Fee:{" "}
               {displayAmount(fees.selected, token?.decimals ?? 0)}
             </Text>
-            <div style={{ display: "flex", flexDirection: "row" }}>
-              {Object.values(props.bridgeFeeOptions).map((fee) => (
-                <Button
-                  key={fee}
-                  onClick={() => fees.setSelected(fee)}
-                  color={fees.selected === fee ? "accent" : "primary"}
-                >
-                  {displayAmount(
-                    addTokenBalances(fee, fees.totalChainFee),
-                    token?.decimals ?? 0,
-                    { symbol: token?.symbol }
-                  )}
-                </Button>
-              ))}
-            </div>
+
+            <Container direction="row" gap={10}>
+              <FeeButton
+                key={props.bridgeFeeOptions.slow}
+                onClick={() => fees.setSelected(props.bridgeFeeOptions.slow)}
+                title="slow"
+                subtext={"1 - 5 days"}
+                subtext2={"Batched transfer"}
+                priceInUSD={displayAmount(
+                  addTokenBalances(
+                    props.bridgeFeeOptions.slow,
+                    fees.totalChainFee
+                  ),
+                  token?.decimals ?? 0,
+                  { symbol: token?.symbol }
+                )}
+                priceInUSDFormatted={displayAmount(
+                  addTokenBalances(
+                    props.bridgeFeeOptions.slow,
+                    fees.totalChainFee
+                  ),
+                  token?.decimals ?? 0,
+                  { symbol: "$" }
+                )}
+                active={fees.selected === props.bridgeFeeOptions.slow}
+              />
+              <FeeButton
+                key={props.bridgeFeeOptions.medium}
+                onClick={() => fees.setSelected(props.bridgeFeeOptions.medium)}
+                title="medium"
+                subtext={"4 hours - 3 days"}
+                subtext2={"Batched transfer"}
+                priceInUSD={displayAmount(
+                  addTokenBalances(
+                    props.bridgeFeeOptions.medium,
+                    fees.totalChainFee
+                  ),
+                  token?.decimals ?? 0,
+                  { symbol: token?.symbol }
+                )}
+                priceInUSDFormatted={displayAmount(
+                  addTokenBalances(
+                    props.bridgeFeeOptions.medium,
+                    fees.totalChainFee
+                  ),
+                  token?.decimals ?? 0,
+                  { symbol: "$" }
+                )}
+                active={fees.selected === props.bridgeFeeOptions.medium}
+              />
+              <FeeButton
+                key={props.bridgeFeeOptions.fast}
+                onClick={() => fees.setSelected(props.bridgeFeeOptions.fast)}
+                title="fast"
+                subtext={"30 minutes"}
+                subtext2={"Individual transfer"}
+                priceInUSD={displayAmount(
+                  addTokenBalances(
+                    props.bridgeFeeOptions.fast,
+                    fees.totalChainFee
+                  ),
+                  token?.decimals ?? 0,
+                  { symbol: token?.symbol }
+                )}
+                priceInUSDFormatted={displayAmount(
+                  addTokenBalances(
+                    props.bridgeFeeOptions.fast,
+                    fees.totalChainFee
+                  ),
+                  token?.decimals ?? 0,
+                  { symbol: "$" }
+                )}
+                active={fees.selected === props.bridgeFeeOptions.fast}
+              />
+            </Container>
             <div>
               {Object.values(props.gasFees).map((fee) => (
                 <div key={fee.name}>
