@@ -87,6 +87,15 @@ const NavBar = () => {
         >
           <Text>Governance</Text>
         </Link> */}
+        <Link
+          href="/cool"
+          className={clsx(
+            styles["nav-link"],
+            currentPath == "/cool" && styles.active
+          )}
+        >
+          <Text size="sm">Cool On Canto</Text>
+        </Link>
       </div>
       <div className={styles["btn-grp"]}>
         <div className={styles.theme}>
