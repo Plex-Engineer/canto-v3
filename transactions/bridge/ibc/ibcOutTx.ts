@@ -159,7 +159,7 @@ export async function IBCOutTx(
     // add verify complete if requested
     if (txParams.verifyComplete) {
       ibcOutTx.verifyTxComplete = async (txHash) =>
-        waitForIBCOutComplete(txHash);
+        waitForIBCComplete(CANTO_MAINNET_COSMOS.chainId, txHash);
     }
 
     txList.push(ibcOutTx);
@@ -226,12 +226,16 @@ export function validateIBCOutTxParams(txParams: IBCOutTxParams): Validation {
 }
 
 // tx may not be acknoleged yet, so try for 5 blocks before giving up
-async function waitForIBCOutComplete(
+async function waitForIBCComplete(
+  originChainId: string,
   txHash: string
 ): PromiseWithError<boolean> {
   let numTries = 0;
   while (numTries < 5) {
-    const { data: done, error } = await verifyIBCOutComplete(txHash);
+    const { data: done, error } = await verifyIBCComplete(
+      originChainId,
+      txHash
+    );
     if (error || !done) {
       numTries++;
       await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -243,11 +247,21 @@ async function waitForIBCOutComplete(
 }
 
 // verifies IBC acknolwedgement from tx hash
-async function verifyIBCOutComplete(txHash: string): PromiseWithError<boolean> {
+async function verifyIBCComplete(
+  originChainId: string,
+  txHash: string
+): PromiseWithError<boolean> {
   try {
+    // get network info
+    const { data: originNetwork, error: networkError } =
+      getNetworkInfoFromChainId(originChainId);
+    if (networkError) throw networkError;
+    if (!isCosmosNetwork(originNetwork))
+      throw new Error("not a cosmos network");
+
     // get tx data
     const { data: txData, error } = await getCosmosTxDetailsFromHash(
-      CANTO_MAINNET_COSMOS.chainId,
+      originNetwork.chainId,
       txHash
     );
     if (error) throw error;
@@ -278,7 +292,7 @@ async function verifyIBCOutComplete(txHash: string): PromiseWithError<boolean> {
       acknowledgement: string;
       proof: any;
     }>(
-      `${CANTO_MAINNET_COSMOS.restEndpoint}/ibc/core/channel/v1/channels/${channelId}/ports/transfer/packet_acks/${packetSequence}`
+      `${originNetwork.restEndpoint}/ibc/core/channel/v1/channels/${channelId}/ports/transfer/packet_acks/${packetSequence}`
     );
     if (ackError) throw ackError;
 
