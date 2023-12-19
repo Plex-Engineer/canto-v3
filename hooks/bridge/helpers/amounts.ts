@@ -18,10 +18,11 @@ export function maxBridgeAmountForToken(
   }
 ): string {
   // make sure params are valid
-  if (!(token && token.balance && fees)) return "0";
+  if (!(token && token.balance)) return "0";
 
   // check if LZ bridge and native wrapped token (since gas takes away from balance)
   if (
+    fees &&
     fees.method === BridgingMethod.LAYER_ZERO &&
     isOFTToken(token) &&
     token.nativeWrappedToken
@@ -31,7 +32,11 @@ export function maxBridgeAmountForToken(
   }
 
   // check if gravity bridge out for bridging fees
-  if (fees.method === BridgingMethod.GRAVITY_BRIDGE && fees.direction === "out") {
+  if (
+    fees &&
+    fees.method === BridgingMethod.GRAVITY_BRIDGE &&
+    fees.direction === "out"
+  ) {
     const max = new BigNumber(token.balance)
       .dividedBy(1 + fees.chainFeePercent / 100)
       .minus(extraFees?.gBridgeFee ?? 0);

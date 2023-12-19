@@ -46,6 +46,11 @@ export async function gravityBridgeOutTx(
     /** convert eth address to gravity */
     const gravityAddress = ethToGravity(txParams.ethSender);
 
+    /** get total amount */
+    const totalAmount = new BigNumber(txParams.amount)
+      .plus(txParams.chainFee)
+      .plus(txParams.bridgeFee);
+
     /** create tx list */
     const txList: Transaction[] = [];
 
@@ -73,7 +78,7 @@ export async function gravityBridgeOutTx(
     if (gravBalanceError) throw gravBalanceError;
 
     /** check if user needs to ibc out to gravity bridge */
-    const amountToIBC = new BigNumber(txParams.amount).minus(gravTokenBalance);
+    const amountToIBC = totalAmount.minus(gravTokenBalance);
     if (amountToIBC.isGreaterThan(0)) {
       /** add IBCOut txs to list */
       const { data: ibcTxs, error: ibcTxsError } = await IBCOutTx({
@@ -139,9 +144,12 @@ export function validateGravityBridgeOutTxParams(
       reason: TX_PARAM_ERRORS.PARAM_INVALID("chain fee"),
     };
   }
+  const totalAmount = new BigNumber(txParams.amount)
+    .plus(txParams.chainFee)
+    .plus(txParams.bridgeFee);
   // check if amount is valid
   return validateWeiUserInputTokenAmount(
-    txParams.amount,
+    totalAmount.toString(),
     "1",
     txParams.token.balance ?? "0",
     txParams.token.symbol,

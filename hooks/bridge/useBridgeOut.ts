@@ -92,7 +92,8 @@ export default function useBridgeOut(
         }) as ERC20Token[])
       : [],
     state.connectedEthAddress,
-    null
+    null,
+    true
   );
 
   // will autoselect the first available token if there are any

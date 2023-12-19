@@ -123,7 +123,7 @@ export async function IBCOutTx(
             cantoAddress,
             TX_DESCRIPTIONS.CONVERT_ERC20(
               txParams.token.symbol,
-              displayAmount(txParams.amount, txParams.token.decimals)
+              displayAmount(amountToConvert, txParams.token.decimals)
             )
           )
         );
