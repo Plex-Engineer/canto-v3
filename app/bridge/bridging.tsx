@@ -327,28 +327,34 @@ const FeesSection = ({
   token: BridgeToken | null;
 }) => {
   return props.isLoading ? (
-    <div>loading fees.....</div>
+    <Text font="proto_mono" size="x-sm">
+      loading fees.....
+    </Text>
   ) : props.error !== null ? (
-    <div>error loading fees {props.error}</div>
+    <Text font="proto_mono" size="x-sm">
+      error loading fees {props.error}
+    </Text>
   ) : (
     <>
       {props.method === BridgingMethod.LAYER_ZERO && (
-        <div>Gas Fee: {props.lzFee.formattedAmount}</div>
+        <Text font="proto_mono" size="x-sm">
+          Gas Fee: {props.lzFee.formattedAmount}
+        </Text>
       )}
       {props.method === BridgingMethod.GRAVITY_BRIDGE &&
         props.direction === "out" && (
           <>
-            <div>
+            <Text font="proto_mono" size="x-sm">
               Chain Fee Percent:{" "}
               {`${props.chainFeePercent}% (${displayAmount(
                 fees.totalChainFee,
                 token?.decimals ?? 0
               )})`}
-            </div>
-            <div>
+            </Text>
+            <Text font="proto_mono" size="x-sm">
               Selected Bridge Fee:{" "}
               {displayAmount(fees.selected, token?.decimals ?? 0)}
-            </div>
+            </Text>
             <div style={{ display: "flex", flexDirection: "row" }}>
               {Object.values(props.bridgeFeeOptions).map((fee) => (
                 <Button
@@ -364,25 +370,29 @@ const FeesSection = ({
                 </Button>
               ))}
             </div>
-            <ul>
+            <div>
               {Object.values(props.gasFees).map((fee) => (
-                <li key={fee.name}>{`${fee.name}: ${displayAmount(
-                  fee.amount,
-                  18,
-                  {
-                    symbol: "CANTO",
-                  }
-                )}`}</li>
+                <div key={fee.name}>
+                  <Text font="proto_mono" size="x-sm">
+                    {`${fee.name}: ${displayAmount(fee.amount, 18, {
+                      symbol: "CANTO",
+                    })}`}
+                  </Text>
+                </div>
               ))}
-            </ul>
+            </div>
           </>
         )}
       {props.method === BridgingMethod.IBC && props.direction === "out" && (
         <ul>
           {Object.values(props.gasFees).map((fee) => (
-            <li key={fee.name}>{`${fee.name}: ${displayAmount(fee.amount, 18, {
-              symbol: "CANTO",
-            })}`}</li>
+            <li key={fee.name}>
+              <Text font="proto_mono" size="x-sm">
+                {`${fee.name}: ${displayAmount(fee.amount, 18, {
+                  symbol: "CANTO",
+                })}`}
+              </Text>
+            </li>
           ))}
         </ul>
       )}
