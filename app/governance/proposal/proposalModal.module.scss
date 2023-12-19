@@ -17,6 +17,19 @@
         border-style: solid !important;
         width: fit-content;
     }
+    .backButtonContainer{
+        border-right: 1px solid;
+        padding: 10px;
+    }
+    .backButton{
+        height: 100%;
+        transform: rotate(90deg);
+        
+    }
+    .backButtonContainer:hover{
+        background-color: var(--border-stroke-color, #b3b3b3); 
+        z-index: 1; // Ensure the row appears above the others
+    }
     .proposalCardContainer{
         padding: 10px 0px 0px 0px;
         display: flex !important;

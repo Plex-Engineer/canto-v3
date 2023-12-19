@@ -2,7 +2,7 @@ import Text from "../text";
 import styles from "./table.module.scss";
 
 interface Props {
-  title?: string;
+  title?: string | React.ReactNode;
   secondary?: React.ReactNode;
   headers: {
     value: string | React.ReactNode;

@@ -51,8 +51,7 @@ export const StakingModal = (props : StakingModalParams) => {
         
     });
 
-    console.log(dropdownItems);
-    console.log(validatorToRedelegate);
+    
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -69,7 +68,7 @@ export const StakingModal = (props : StakingModalParams) => {
     if(!props.validator){
         return;
     }
-    console.log(props.userStaking);
+    //console.log(props.userStaking);
 
     let userDelegationBalance: string | null = "0";
 
@@ -90,7 +89,8 @@ export const StakingModal = (props : StakingModalParams) => {
 
 
 
-    console.log(userMaxBalance);
+    //console.log(userMaxBalance);
+    console.log()
     return (
         
             <Container className={styles.modalContainer}>
@@ -180,7 +180,7 @@ export const StakingModal = (props : StakingModalParams) => {
                 <Spacer height="20px"></Spacer>
                 <div className={styles.buttonContainer}>
                     <Button width="fill" onClick={()=>{props.onConfirm(props.validator,inputAmount,selectedTx,validatorToRedelegate)}} disabled={Number(inputAmount)<=0 || 
-                    (selectedTx==StakingTxTypes.REDELEGATE && !validatorToRedelegate)}>Delegate</Button>
+                    (selectedTx==StakingTxTypes.REDELEGATE && !validatorToRedelegate) || Number(inputAmount)>Number(formatBalance(maxBalance ,18))}>Delegate</Button>
                 </div>
 
             </Container>

@@ -60,15 +60,40 @@
   //min-width: 400px;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content:center;
   //align-items: start;
   //align-items: center;
   //margin: 20px 20px 20px 20px;
   //margin: 0 auto;
   margin: 0 5% 0 5%;
   padding: 16px;
+  .paginationButton1{
+    //margin-left: 10%;
+    margin-right: 10%;
+  }
+  .paginationButton2{
+    margin-left: 10%;
+    //margin-right: 10%;
+  }
+
 }
 
+.searchBarContainer{
+  display: flex;
+  flex-direction: row;
+  margin-left: 40%;
+  width: 100%;
+}
+.tableSecondaryContent{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.tableTitleContainer{
+  display: flex;
+  flex-direction: row;
+}
 .tableContainer {
   //display: flex;
     //width: 100% !important;

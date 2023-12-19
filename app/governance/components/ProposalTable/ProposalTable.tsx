@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import ToggleGroup from '@/components/groupToggle/ToggleGroup';
 import Table from '@/components/table/table';
 import Container from '@/components/container/container';
+import Spacer from '@/components/layout/spacer';
 
 
 
@@ -168,14 +169,19 @@ const ProposalTable = ({ proposals }:TableProps) => {
             />
       </div>
       
+      <Spacer height='20px'/>
       <div className={styles.paginationContainer}>
-        <Button onClick={handlePrevious} disabled={currentPage === 1}>
-          Previous
-        </Button>
-        <Button onClick={handleNext} disabled={currentPage === totalPages}>
-          Next
-        </Button>
-      </div>
+          <div className={styles.paginationButton1}>
+              <Button onClick={handlePrevious} disabled={currentPage == 1}>
+                Previous
+              </Button>
+          </div>
+          <div className={styles.paginationButton2}>
+              <Button onClick={handleNext} disabled={currentPage == totalPages}>
+                Next
+              </Button>
+          </div>
+        </div>
       
     </div>
   );

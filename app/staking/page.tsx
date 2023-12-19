@@ -1,6 +1,6 @@
 "use client";
 import AnimatedBackground from "@/components/animated_background/animatedBackground";
-import BoxedBackground from "@/components/boxes_background/boxesBackground";
+import BoxedBackground from "@/components/boxes_background/boxesBackground"; 
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import useStaking from "@/hooks/staking/useStaking";
 import styles from './staking.module.scss';
@@ -28,6 +28,7 @@ import { NEW_ERROR } from "@/config/interfaces";
 import Tabs from "@/components/tabs/tabs";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import { GetWalletClientResult } from "wagmi/actions";
+import Input from "@/components/input/input";
 
 
 export default function StakingPage() {
@@ -36,52 +37,56 @@ export default function StakingPage() {
   const [selectedValidator, setSelectedValidator] = useState<Validator | null>(null);
   const [selectedValidatorToRedelegate, setSelectedValidatorToRedelegate] = useState<Validator | null>(null);
   const [currentFilter, setCurrentFilter] = useState<string>("ACTIVE");
+  const [searchQuery,setSearchQuery] = useState("");
+  const [searchString, setSearchString] = useState("");
   
-
+  
   //const [selectedTx,setSelectedTx] = useState<StakingTxTypes>(StakingTxTypes.DELEGATE);
 
   
   
 
   function handleStakingTxClick(validator: Validator | null,inputAmount: string,txType: StakingTxTypes,validatorToRedelegate: Validator | null | undefined){
-
-    if(txType==StakingTxTypes.REDELEGATE){
-      const newFlow: NewTransactionFlow = {
-        icon: "",
-        txType: TransactionFlowType.STAKE_CANTO_TX,
-        title: "Stake Canto",
-        params: {
-          chainId: chainId,
-          ethAccount: signer?.account.address ?? "",
-          txType: txType,
-          validatorAddress: validator?.operator_address ?? "",
-          newValidatorAddress: validatorToRedelegate?.operator_address,
-          newValidatorName: validatorToRedelegate?.description.moniker,
-          amount: (
-            convertToBigNumber(inputAmount, 18).data ?? "0"
-          ).toString(),  
-          validatorName: validator?.description.moniker ?? ""
-        },
-      };
-      txStore?.addNewFlow({ txFlow: newFlow, signer });
-    }else{
-      const newFlow: NewTransactionFlow = {
-        icon: "",
-        txType: TransactionFlowType.STAKE_CANTO_TX,
-        title: "Stake Canto",
-        params: {
-          chainId: chainId,
-          ethAccount: signer?.account.address ?? "",
-          txType: txType,
-          validatorAddress: validator?.operator_address ?? "",
-          amount: (
-            convertToBigNumber(inputAmount, 18).data ?? "0"
-          ).toString(),  
-          validatorName: validator?.description.moniker ?? ""
-        },
-      };
-      txStore?.addNewFlow({ txFlow: newFlow, signer });
+    if(signer){
+      if(txType==StakingTxTypes.REDELEGATE && signer){
+        const newFlow: NewTransactionFlow = {
+          icon: "",
+          txType: TransactionFlowType.STAKE_CANTO_TX,
+          title: "Stake Canto",
+          params: {
+            chainId: chainId,
+            ethAccount: signer?.account.address ?? "",
+            txType: txType,
+            validatorAddress: validator?.operator_address ?? "",
+            newValidatorAddress: validatorToRedelegate?.operator_address,
+            newValidatorName: validatorToRedelegate?.description.moniker,
+            amount: (
+              convertToBigNumber(inputAmount, 18).data ?? "0"
+            ).toString(),  
+            validatorName: validator?.description.moniker ?? ""
+          },
+        };
+        txStore?.addNewFlow({ txFlow: newFlow, ethAccount: signer?.account.address });
+      }else{
+        const newFlow: NewTransactionFlow = {
+          icon: "",
+          txType: TransactionFlowType.STAKE_CANTO_TX,
+          title: "Stake Canto",
+          params: {
+            chainId: chainId,
+            ethAccount: signer?.account.address ?? "",
+            txType: txType,
+            validatorAddress: validator?.operator_address ?? "",
+            amount: (
+              convertToBigNumber(inputAmount, 18).data ?? "0"
+            ).toString(),  
+            validatorName: validator?.description.moniker ?? ""
+          },
+        };
+        txStore?.addNewFlow({ txFlow: newFlow,  ethAccount: signer?.account.address});
+      }
     }
+    
 
     
   }
@@ -108,7 +113,6 @@ export default function StakingPage() {
           txType: txType,
           ethAccount: ethAccount,
           validatorAddresses: allValidatorsAddresses
-          
         };
       }
       if(txType==StakingTxTypes.DELEGATE || txType==StakingTxTypes.UNDELEGATE){
@@ -133,18 +137,9 @@ export default function StakingPage() {
             newValidatorAddress: validatorNew?.operator_address
           };
         }
-        
       }
-      
   }
-  
 
-  //console.log(userStaking?.validators);
-  //console.log(isLoading);
-  //console.log(validators);
-  //console.log(apr);
-  //console.log(userStaking);
-  //console.log((BigNumber(validators[1].tokens).dividedBy(new BigNumber(10).pow(18))).toString());
   // console.log(userStaking);
   // console.log(selection);
   // console.log(transaction);
@@ -160,35 +155,58 @@ export default function StakingPage() {
       return 0;
     });
   }
-  const pageSize = 10;
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(Math.ceil(validators.length / pageSize));
 
   const activeValidators = validators.filter(v=>v.jailed==false);
   const inActiveValidators = validators.filter(v=>v.jailed==true);
 
-  const filteredvalidators = (currentFilter=="ACTIVE")? activeValidators : inActiveValidators;
+  const filteredValidators = (currentFilter=="ACTIVE")? activeValidators : inActiveValidators;
 
   
   const validatorTitleMap = new Map<string,string>();
   validatorTitleMap.set("ACTIVE","ACTIVE VALIDATORS");
   validatorTitleMap.set("INACTIVE","INACTIVE VALIDATORS");
   
+  const handleSearch = () => {
+    const searchQuery2 = searchQuery;
+    const filteredListSearch = filteredValidators.filter((validator) =>
+        validator.description.moniker.toLowerCase().includes(searchQuery2.toLowerCase())
+    );
+    setFilteredValidatorsBySearch(filteredListSearch);
+    setCurrentPage(1);
+  };
+  
+  const [filteredValidatorsBySearch, setFilteredValidatorsBySearch] = useState<Validator[]>([]);
+                                             
+  const currentValidators = (searchQuery=="")?filteredValidators: filteredValidatorsBySearch;
+  const pageSize = 10;
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const paginatedvalidators = filteredvalidators.slice(
+
+  console.log(currentValidators.length);
+  
+
+  const [totalPages, setTotalPages] = useState(Math.ceil(currentValidators.length / pageSize));
+  //console.log(currentValidators);
+  const paginatedvalidators: Validator[] = currentValidators.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+
+  useEffect(()=>{
+    setTotalPages(Math.ceil(currentValidators.length / pageSize));
+  },[currentValidators]);
+
+   
   const hasUserStaked: boolean | undefined = (userStaking && userStaking.validators && userStaking.validators.length>0);
+
   const totalStaked: number | undefined = hasUserStaked ? userStaking?.validators.reduce((sum, item) => {
     const amountNumber = parseFloat(formatBalance(item.userDelegation.balance,18)); 
     return sum + amountNumber;
   }, 0): 0;
 
   const totalRewards: number | undefined = hasUserStaked ? userStaking?.validators.reduce((sum , item) => {
-    console.log(parseFloat(formatBalance(item.userDelegation.rewards,18)));
     const amountNumber = parseFloat(formatBalance(item.userDelegation.rewards,18));
-    console.log(sum);
+    //console.log(sum);
     return (sum + amountNumber);
   }, 0): 0;
   console.log();
@@ -214,25 +232,33 @@ export default function StakingPage() {
     setSelectedValidator(validator);
   }
   
+  console.log(currentPage);
+  console.log(totalPages);
+  console.log(currentValidators);
+
+
   //console.log(hasUserStaked);
   if(isLoading){
     return(
       <Splash></Splash>
     )
   }
-  function handleRewardsClaimClick(signer:GetWalletClientResult | undefined, validatorAddresses: string[])  {
-    const newFlow: NewTransactionFlow = {
-      icon: "",
-      txType: TransactionFlowType.STAKE_CANTO_TX,
-      title: "Stake Canto",
-      params: {
-        chainId: chainId,
-        ethAccount: signer?.account.address,
-        txType: StakingTxTypes.CLAIM_REWARDS,
-        validatorAddresses: validatorAddresses
-      },
-    };
-    txStore?.addNewFlow({ txFlow: newFlow, signer });
+  function handleRewardsClaimClick(signer:GetWalletClientResult | undefined, validatorAddresses: string[]){
+    if(signer){
+      const newFlow: NewTransactionFlow = {
+        icon: "",
+        txType: TransactionFlowType.STAKE_CANTO_TX,
+        title: "Stake Canto",
+        params: {
+          chainId: chainId,
+          ethAccount: signer?.account.address,
+          txType: StakingTxTypes.CLAIM_REWARDS,
+          validatorAddresses: validatorAddresses
+        },
+      };
+      txStore?.addNewFlow({ txFlow: newFlow, ethAccount: signer.account.address });
+    }
+    
   }
 
   return (
@@ -312,7 +338,41 @@ export default function StakingPage() {
       <Container width="100%" className={styles.tableContainer} >
         <div>
           <Table
-                title={validatorTitleMap.get(currentFilter)}
+                title={
+                  <div className={styles.tableTitleContainer}>
+                    <div>{validatorTitleMap.get(currentFilter)}</div>
+                    <div>
+                          <div className={styles.searchBarContainer}>
+                              <div>
+                                  <Input 
+                                  height={47}
+                                  type="text"
+                                  value={searchQuery}
+                                  onChange={(e) => {
+                                    setSearchQuery(e.target.value);
+                                    handleSearch();
+                                    //console.log("inside function");
+                                  }}
+                                  placeholder="Search..."
+                                  />
+                              </div>
+                              <div>
+                                  <Button shadow="none" onClick={()=>handleSearch()}>
+                                    <Icon
+                                      style={{ marginLeft: "5px" }}
+                                      icon={{
+                                        url: "/search.svg",
+                                        size: 14,
+                                      }}
+                                      themed={true}
+                                    />
+                                  </Button>
+                              </div>
+                          </div>
+                    </div>
+                  
+                  </div>
+                }
                 // secondary={
                 //   <div className={styles.TabRow}>
                 //     <div className={styles.Tab}>ACTIVE VALIDATORS</div>
@@ -321,14 +381,16 @@ export default function StakingPage() {
                 // }
                 secondary={
                   <Container width="400px">
-                    <ToggleGroup
-                      options={["ACTIVE","INACTIVE"]}
-                      selected={currentFilter}
-                      setSelected={(value) => {
-                        setCurrentFilter(value);
-                      }}
                       
-                    />
+                            <ToggleGroup
+                              options={["ACTIVE","INACTIVE"]}
+                              selected={currentFilter}
+                              setSelected={(value) => {
+                                setCurrentFilter(value);
+                              }}
+                              
+                            />
+                      
                   </Container>
                 }
                 headers={[
@@ -344,12 +406,16 @@ export default function StakingPage() {
           </div>
           
             <div className={styles.paginationContainer}>
-              <Button onClick={handlePrevious} disabled={currentPage === 1}>
-                Previous
-              </Button>
-              <Button onClick={handleNext} disabled={currentPage === totalPages}>
-                Next
-              </Button>
+              <div className={styles.paginationButton1}>
+                  <Button onClick={handlePrevious} disabled={currentPage == 1}>
+                    Previous
+                  </Button>
+              </div>
+              <div className={styles.paginationButton2}>
+                  <Button onClick={handleNext} disabled={currentPage == totalPages}>
+                    Next
+                  </Button>
+              </div>
             </div>
             <Spacer height="80px" />
           
@@ -389,7 +455,7 @@ export default function StakingPage() {
         </Tabs>
       </Container> */}
       {/* <BoxedBackground /> */}
-      <Modal width="40%" onClose={()=>{setSelectedValidator(null)}} title={selectedValidator?.description.moniker} 
+      <Modal width="40%" onClose={()=>{setSelectedValidator(null)}} title="STAKE" 
             closeOnOverlayClick={false}
             open={selectedValidator!=null}
         >

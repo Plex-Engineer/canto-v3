@@ -1,10 +1,10 @@
 .tableContainer {
   //display: flex;
     width: 100% !important;
-    background: var(--card-sub-surface-color, #dfdfdf);
+    //background: var(--card-sub-surface-color, #dfdfdf);
     padding: 10px;
     //z-index: 1;
-    box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
+    //box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
 
     .rowTitle{
       
@@ -71,9 +71,17 @@
     }
     .paginationContainer {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 20px 20px 20px 20px;
+      justify-content: center;
+      //align-items: center;
+      //margin: 20px 20px 20px 20px;
+    }
+    .paginationButton1{
+      //margin-left: 10%;
+      margin-right: 10%;
+    }
+    .paginationButton2{
+      margin-left: 10%;
+      //margin-right: 10%;
     }
 
     .emptyProposals{

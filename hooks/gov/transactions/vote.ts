@@ -32,6 +32,7 @@ export async function proposalVoteTx(
   return NO_ERROR({
     transactions: [
     _voteTx(
+      params.ethAccount,
       params.chainId,
       cantoAddress,
       params.proposalId,
@@ -46,12 +47,14 @@ export async function proposalVoteTx(
  * WILL NOT CHECK FOR VALIDITY OF PARAMS, MUST DO THIS BEFORE USING THESE CONSTRUCTORS
  */
 const _voteTx = (
+  ethAddress: string,
   chainId: number,
   cosmosSender: string,
   proposalId: number,
   option: number,
   description: TransactionDescription
 ): Transaction => ({
+  fromAddress: ethAddress,
   description,
   chainId: chainId,
   type: "COSMOS",

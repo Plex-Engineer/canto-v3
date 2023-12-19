@@ -35,6 +35,7 @@ import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/
         return NO_ERROR({
           transactions: [
             _delegateTx(
+              txParams.ethAccount,
               txParams.chainId,
               cantoAddress,
               txParams.validatorAddress,
@@ -52,6 +53,7 @@ import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/
         return NO_ERROR({
           transactions: [
             _delegateTx(
+              txParams.ethAccount,
               txParams.chainId,
               cantoAddress,
               txParams.validatorAddress,
@@ -69,6 +71,7 @@ import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/
         return NO_ERROR({
           transactions: [
             _redelegateTx(
+              txParams.ethAccount,
               txParams.chainId,
               cantoAddress,
               txParams.validatorAddress,
@@ -86,6 +89,7 @@ import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/
         return NO_ERROR({
           transactions: [
             _claimRewardsTx(
+              txParams.ethAccount,
               txParams.chainId,
               cantoAddress,
               txParams.validatorAddresses,
@@ -103,6 +107,7 @@ import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/
    * WILL NOT CHECK FOR VALIDITY OF PARAMS, MUST DO THIS BEFORE USING THESE CONSTRUCTORS
    */
   const _delegateTx = (
+    ethAddress: string,
     chainId: number,
     delegatorCantoAddress: string,
     validatorAddress: string,
@@ -110,6 +115,7 @@ import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/
     undelegate: boolean,
     description: TransactionDescription
   ): Transaction => ({
+    fromAddress: ethAddress,
     description,
     chainId: chainId,
     type: "COSMOS",
@@ -123,6 +129,7 @@ import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/
   });
   
   const _redelegateTx = (
+    ethAddress: string,
     chainId: number,
     delegatorCantoAddress: string,
     validatorSrcAddress: string,
@@ -130,6 +137,7 @@ import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/
     amount: string,
     description: TransactionDescription
   ): Transaction => ({
+    fromAddress: ethAddress,
     description,
     chainId: chainId,
     type: "COSMOS",
@@ -143,11 +151,13 @@ import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/
   });
   
   const _claimRewardsTx = (
+    ethAddress: string,
     chainId: number,
     delegatorCantoAddress: string,
     validatorAddresses: string[],
     description: TransactionDescription
   ): Transaction => ({
+    fromAddress: ethAddress,
     description,
     chainId: chainId,
     type: "COSMOS",

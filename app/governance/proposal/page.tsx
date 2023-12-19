@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Text from "@/components/text";
 import styles from './proposalModal.module.scss';
 //import useSingleProposalData from "@/hooks/gov/useSingleProposalData";
@@ -31,27 +31,31 @@ import Spacer from "@/components/layout/spacer";
 export default function Page() {
 
   function castVote(proposalId: number,voteOption: VoteOption | null) {
-    if(!voteOption){
-      return NEW_ERROR("Please select a vote option");
+    if(signer){
+      if(!voteOption){
+        return NEW_ERROR("Please select a vote option");
+      }
+      console.log("cast vote test");
+      const newFlow: NewTransactionFlow = {
+        icon: "",
+        txType: TransactionFlowType.VOTE_TX,
+        title: "Vote Tx",
+        params: {
+          chainId: chainId,
+          ethAccount: signer?.account.address ?? "",
+          proposalId: proposalId,
+          voteOption: voteOption,
+        },
+      };
+      txStore?.addNewFlow({ txFlow: newFlow, ethAccount:signer.account.address });
     }
-    console.log("cast vote test");
-    const newFlow: NewTransactionFlow = {
-      icon: "",
-      txType: TransactionFlowType.VOTE_TX,
-      title: "Vote Tx",
-      params: {
-        chainId: chainId,
-        ethAccount: signer?.account.address ?? "",
-        proposalId: proposalId,
-        voteOption: voteOption,
-      },
-    };
-    txStore?.addNewFlow({ txFlow: newFlow, signer });
+    
   }
 
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
   const proposalId = Number(id);
+  const router = useRouter();
 
   const { txStore, signer,chainId } = useCantoSigner();
   const { proposals,isLoading } = useProposals({ chainId: chainId });
@@ -119,6 +123,10 @@ export default function Page() {
 
 const maxAmountIndex = amounts.indexOf(Math.max(...amounts));
 
+function handleBackButtonClick(){
+  
+}
+
 
 
   return (
@@ -127,12 +135,17 @@ const maxAmountIndex = amounts.indexOf(Math.max(...amounts));
     <Spacer height="15%"></Spacer>
     <div className={styles.proposalHeaderContainer}>
         <div className={styles.proposalCard1}>
-          {/* <div><Icon 
-                icon={{
-                  url: "/reset.svg",
-                  size: 16,
-                }}
-                ></Icon></div> */}
+          <div  className={styles.backButtonContainer} onClick={()=>{router.push(`/governance`);}}>
+            <div className={styles.backButton}>
+                <Icon 
+                  icon={{
+                    url: "/dropdown.svg",
+                    size: 22,
+                  }}
+                />
+            </div>
+              
+            </div>
           <div style={{borderRight: "1px solid", padding: "10px"}}><Text>#{proposal.proposal_id}</Text></div>
           <div style={{padding: "10px"}}><Text>{formatProposalStatus(proposal.status)}</Text></div>
         </div>

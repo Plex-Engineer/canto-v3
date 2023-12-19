@@ -8,8 +8,8 @@ import { formatBalance, formatBigBalance } from "@/utils/formatting";
 
 export const GenerateValidatorTableRow = (validator: Validator, index: number, onDelegate: (validator: Validator)=>void)=>
         [
-            <Container key={`name_${index}`}><Text font="rm_mono">{validator.description.moniker}</Text></Container>,
-                  <Container key={`tokens_${index}`} direction="row" center={{horizontal: true, vertical:true}} gap="auto">
+            <Container  key={`name_${index}`}><Text font="rm_mono">{validator.description.moniker}</Text></Container>,
+                  <Container  key={`tokens_${index}`} direction="row" center={{horizontal: true, vertical:true}} gap="auto">
                     <Text font="rm_mono">{formatBigBalance(formatBalance(validator.tokens,18)).shortAmount + formatBigBalance(formatBalance(validator.tokens,18)).suffix} </Text>
                     <div>{" "}</div>
                     <Icon
@@ -23,7 +23,7 @@ export const GenerateValidatorTableRow = (validator: Validator, index: number, o
                   </Container>,
                   <Container key={`commission_${index}`}><Text font="rm_mono">{formatBalance(validator.commission,-2,{commify:true,precision:2})}%</Text></Container>,
                   <Container key={`button_${index}`}>
-                    <Button onClick={()=>onDelegate(validator)} >DELEGATE</Button>
+                    <Button onClick={()=>onDelegate(validator)}  disabled={validator.jailed}>DELEGATE</Button>
                   </Container>
         ];
 

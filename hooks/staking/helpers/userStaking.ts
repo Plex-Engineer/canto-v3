@@ -90,13 +90,13 @@ export async function getAllUserStakingData(
 }
 
 export function getBalanceForValidator(userStakings: ValidatorWithDelegations[], validatorAddress: string): string | null {
-  console.log(userStakings);
+  //console.log(userStakings);
   if(userStakings){
     console.log(userStakings.length);
     if(userStakings.length>0){
       const staking = userStakings.find(stake => stake.operator_address === validatorAddress);
-      console.log(staking);
-      console.log(staking?.userDelegation.balance);
+      //console.log(staking);
+      //console.log(staking?.userDelegation.balance);
       return staking ? staking.userDelegation.balance : null;
     }
     return null;
