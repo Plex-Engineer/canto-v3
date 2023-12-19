@@ -33,7 +33,6 @@ const NavBar = () => {
   }, [signer]);
 
   useEffect(() => {
-    console.log(currentPath)
     if (currentPath == "/bridge") {
       Analytics.actions.events.pageOpened("bridge");
     } else if (currentPath == "/lending") {

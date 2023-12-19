@@ -72,7 +72,9 @@ const TxFlow = (props: Props) => {
                 <TxItem
                   key={idx}
                   tx={tx}
-                  analyticsTxFlowInfo={props.txFlow?.analyticsTransactionFlowInfo}
+                  analyticsTxFlowInfo={
+                    props.txFlow?.analyticsTransactionFlowInfo
+                  }
                   idx={idx + 1}
                   setBridgeStatus={(status) =>
                     props.setBridgeStatus(idx, status)
@@ -82,7 +84,6 @@ const TxFlow = (props: Props) => {
               {props.txFlow.placeholderFlow && (
                 <TxItem
                   tx={TX_PLACEHOLDER(props.txFlow.placeholderFlow)}
-                  analyticsTxFlowInfo={props.txFlow?.analyticsTransactionFlowInfo}
                   idx={props.txFlow.transactions.length + 1}
                   setBridgeStatus={() => false}
                 />
@@ -116,8 +117,10 @@ const TxFlow = (props: Props) => {
               >
                 <a
                   onClick={() => {
-                    if(props.txFlow?.analyticsTransactionFlowInfo){
-                      Analytics.actions.events.transactionFlows.tokensImported(props.txFlow?.analyticsTransactionFlowInfo)
+                    if (props.txFlow?.analyticsTransactionFlowInfo) {
+                      Analytics.actions.events.transactionFlows.tokensImported(
+                        props.txFlow?.analyticsTransactionFlowInfo
+                      );
                     }
                     for (const token of props.txFlow?.tokenMetadata ?? []) {
                       importERC20Token(token);
