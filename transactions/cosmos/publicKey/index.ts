@@ -1,5 +1,6 @@
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 import {
+  CantoFETxType,
   TX_DESCRIPTIONS,
   Transaction,
   TransactionDescription,
@@ -69,6 +70,7 @@ const _generatePubKeyTx = (
   });
   return {
     chainId,
+    feTxType: CantoFETxType.GENERATE_PUBLIC_KEY_COSMOS,
     fromAddress: ethSender,
     type: "COSMOS",
     description,

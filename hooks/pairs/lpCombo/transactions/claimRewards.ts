@@ -18,13 +18,13 @@ import {
   claimAmbientRewardsTx,
 } from "@/transactions/pairs/ambient";
 
-interface ClaimDexRewardsParams {
+export interface ClaimDexComboRewardsParams {
   clmParams?: CLMClaimRewardsTxParams;
   ambientParams?: AmbientClaimRewardsTxParams;
 }
 // transaction for claiming rewards in the clm and ambient dex
 export async function claimDexRewardsComboTx(
-  params: ClaimDexRewardsParams
+  params: ClaimDexComboRewardsParams
 ): PromiseWithError<TxCreatorFunctionReturn> {
   try {
     const txList: Transaction[] = [];
@@ -56,7 +56,7 @@ export async function claimDexRewardsComboTx(
   }
 }
 export function validateClaimDexRewardsComboTxParams(
-  _params: ClaimDexRewardsParams
+  _params: ClaimDexComboRewardsParams
 ): ReturnWithError<Validation> {
   return NO_ERROR({ error: false });
 }

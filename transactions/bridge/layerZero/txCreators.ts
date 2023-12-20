@@ -5,7 +5,11 @@
 
 import { OFT_ABI } from "@/config/abis";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
-import { Transaction, TransactionDescription } from "@/transactions/interfaces";
+import {
+  CantoFETxType,
+  Transaction,
+  TransactionDescription,
+} from "@/transactions/interfaces";
 import { BridgingMethod } from "..";
 
 // if useCustomAdapterParams is true, we must pass in adapter params
@@ -26,6 +30,7 @@ export const _oftTransferTx = (
     lastStatus: "NONE",
     type: BridgingMethod.LAYER_ZERO,
   },
+  feTxType: CantoFETxType.OFT_TRANSFER,
   description,
   fromAddress: ethAddress,
   chainId: chainId,
@@ -56,6 +61,7 @@ export const _oftDepositOrWithdrawTx = (
   description: TransactionDescription
 ): Transaction => ({
   description,
+  feTxType: deposit ? CantoFETxType.OFT_DEPOSIT : CantoFETxType.OFT_WITHDRAW,
   fromAddress: ethAccount,
   chainId: chainId,
   type: "EVM",

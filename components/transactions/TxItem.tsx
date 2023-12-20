@@ -12,9 +12,11 @@ import StatusIcon from "../icon/statusIcon";
 import { useQuery } from "react-query";
 import { getBridgeStatus } from "@/transactions/bridge";
 import { BridgeStatus, TransactionWithStatus } from "@/transactions/interfaces";
+import Analytics, { AnalyticsTransactionFlowInfo } from "@/provider/analytics";
 
 interface TxItemProps {
   tx: TransactionWithStatus;
+  analyticsTxFlowInfo?: AnalyticsTransactionFlowInfo;
   idx: number;
   setBridgeStatus: (status: BridgeStatus) => void;
 }
@@ -97,6 +99,14 @@ const TxItem = (props: TxItemProps) => {
               )}
               {props.tx.txLink && (
                 <a
+                  onClick={() => {
+                    if (props.analyticsTxFlowInfo) {
+                      Analytics.actions.events.transactionFlows.explorerViewed({
+                        ...props.analyticsTxFlowInfo,
+                        txType: props.tx.tx.feTxType,
+                      });
+                    }
+                  }}
                   href={props.tx.txLink}
                   target="_blank"
                   style={{

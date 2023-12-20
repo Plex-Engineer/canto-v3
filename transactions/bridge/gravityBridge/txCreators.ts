@@ -1,4 +1,8 @@
-import { Transaction, TransactionDescription } from "@/transactions/interfaces";
+import {
+  Transaction,
+  TransactionDescription,
+  CantoFETxType,
+} from "@/transactions/interfaces";
 import { BridgingMethod } from "..";
 import { GRAVITY_BRIDGE_ETH_ADDRESS } from "@/config/consts/addresses";
 import { GRAVITY_BRIDGE_ABI, WETH_ABI } from "@/config/abis";
@@ -21,6 +25,7 @@ export const _sendToCosmosTx = (
   },
   fromAddress: fromEthAddress,
   description,
+  feTxType: CantoFETxType.SEND_TO_COSMOS,
   chainId: chainId,
   type: "EVM",
   target: GRAVITY_BRIDGE_ETH_ADDRESS,
@@ -38,6 +43,7 @@ export const _wrapTx = (
   description: TransactionDescription
 ): Transaction => ({
   description,
+  feTxType: CantoFETxType.WRAP_ETH,
   chainId: chainId,
   fromAddress: fromEthAddress,
   type: "EVM",

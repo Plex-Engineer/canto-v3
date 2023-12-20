@@ -8,8 +8,10 @@ import { clsx } from "clsx";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TransactionModal from "../transactions/TxModal";
 import ThemeButton from "../footer/components/footerButton";
-import { useBalance } from "wagmi";
+import { useEffect } from "react";
+import Analytics from "@/provider/analytics";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
+import { useBalance } from "wagmi";
 import { useAutoConnect } from "@/provider/useAutoConnect";
 
 const NavBar = () => {
@@ -17,8 +19,31 @@ const NavBar = () => {
   // if the app is opened in the safe context.
   useAutoConnect();
   const currentPath = usePathname();
-
   const { signer } = useCantoSigner();
+  
+
+  useEffect(() => {
+    if (signer?.account.address) {
+      Analytics.actions.people.registerWallet(signer.account.address);
+      Analytics.actions.identify(signer.account.address, { account: signer.account.address })
+      Analytics.actions.events.connections.walletConnect(true);
+    } else {
+      Analytics.actions.reset();
+    }
+  }, [signer]);
+
+  useEffect(() => {
+    if (currentPath == "/bridge") {
+      Analytics.actions.events.pageOpened("bridge");
+    } else if (currentPath == "/lending") {
+      Analytics.actions.events.pageOpened("lending");
+    } else if (currentPath == "/lp") {
+      Analytics.actions.events.pageOpened("lp interface");
+    } else {
+      Analytics.actions.events.pageOpened("home");
+    }
+  }, [currentPath, signer]);
+
   const balance = useBalance({
     address: signer?.account.address,
     watch: true,
