@@ -6,17 +6,17 @@
   border: 2px solid rgba(var(--dark-color), 0.1);
   outline: 80px solid rgba(var(--dark-color), 0.02);
 
-  animation: circle 10s var(--anim-delay) ease-in-out infinite forwards;
+  animation: circle 10s var(--anim-delay, 0s) linear infinite forwards;
 }
 
 body:where(.dark) .circle {
-  border: 2px solid rgba(var(--dark-color), 0.1);
-  outline: 80px solid rgba(var(--dark-color), 0.02);
+  border: 2px solid rgba(var(--dark-color), 0.03);
+  outline: 80px solid rgba(var(--dark-color), 0.008);
 }
 
 body:where(.light) .circle {
-  border: 2px solid rgba(var(--light-color), 0.2);
-  outline: 80px solid rgba(var(--light-color), 0.1);
+  border: 2px solid rgba(var(--light-color), 0.1);
+  outline: 80px solid rgba(var(--light-color), 0.05);
 }
 
 // cubic-bezier(0.55, 0.085, 0.68, 0.53)
@@ -27,13 +27,15 @@ body:where(.light) .circle {
     width: var(--init-size, 5%);
   }
   to {
-    width: 130%;
+    // width: 130%;
+    width: var(--final-size, 10%);
   }
 }
 
 .container {
   position: absolute;
   height: 100vh;
+  overflow: hidden;
   width: 100%;
   display: flex;
   justify-content: center;

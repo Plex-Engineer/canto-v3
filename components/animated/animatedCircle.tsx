@@ -18,8 +18,9 @@ const AnimatedCircle = () => {
           className={"circle"}
           style={
             {
-              "--anim-delay": `${index}s`,
-              //   "--init-size": `${(index / 40) * 100}%`,
+              // "--anim-delay": `${index}s`,
+              "--init-size": `${(index / 5) * 100}%`,
+              "--final-size": `${((index + 1) / 5) * 100}%`,
             } as React.CSSProperties
           }
         ></div>
