@@ -7,7 +7,7 @@ import Link from "next/link";
 export default function OutlinksPage() {
   return (
     <>
-      <AnimatedCircle />
+      {/* <AnimatedCircle /> */}
       <Container
         center={{
           horizontal: true,
