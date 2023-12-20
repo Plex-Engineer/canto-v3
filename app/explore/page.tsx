@@ -3,10 +3,12 @@ import Container from "@/components/container/container";
 import style from "./outlinks.module.scss";
 import Text from "@/components/text";
 import Image from "next/image";
+import AnimatedCircle from "@/components/animated/animatedCircle";
 export default function OutlinksPage() {
   return (
     <>
-      <AnimatedBackground initSize="400px" direction={"out"} time={20} />
+      {/* <AnimatedBackground initSize="400px" direction={"out"} time={20} /> */}
+      <AnimatedCircle />
       <Container
         center={{
           horizontal: true,
