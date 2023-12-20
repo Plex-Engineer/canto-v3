@@ -123,16 +123,13 @@ export default function Page() {
 
 const maxAmountIndex = amounts.indexOf(Math.max(...amounts));
 
-function handleBackButtonClick(){
-  
-}
 
 
 
   return (
     isLoading ? (<Splash/>):
   (<div className={styles.proposalContainer}>
-    <Spacer height="15%"></Spacer>
+    
     <div className={styles.proposalHeaderContainer}>
         <div className={styles.proposalCard1}>
           <div  className={styles.backButtonContainer} onClick={()=>{router.push(`/governance`);}}>
@@ -151,11 +148,14 @@ function handleBackButtonClick(){
         </div>
         <div style={{padding: "10px 0px 10px 0px"}}>
             <Text font='proto_mono' size="x-lg">{proposal.title}</Text>
+            
         </div>
+        
         <div>
           <Text opacity={0.4}>{proposal.description}</Text>
         </div>
     </div>
+   
     
     <div className={styles.proposalCardContainer}>
       <div className={styles.proposalCardContainer1}>

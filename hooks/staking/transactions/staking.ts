@@ -16,7 +16,7 @@ import {
   import { createMsgsClaimStakingRewards } from "@/utils/cosmos/transactions/messages/staking/claimRewards";
 import { ethToCantoAddress } from "@/utils/address/conversion.utils";
 import { displayAmount } from "@/utils/formatting/balances.utils";
-import { TX_DESCRIPTIONS } from "@/transactions/interfaces/txDescriptions";
+import { CantoFETxType, TX_DESCRIPTIONS } from "@/transactions/interfaces/txDescriptions";
 import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/transactions/interfaces";
   
   export async function stakingTx(
@@ -116,6 +116,7 @@ import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/
     description: TransactionDescription
   ): Transaction => ({
     fromAddress: ethAddress,
+    feTxType: CantoFETxType.NONE,
     description,
     chainId: chainId,
     type: "COSMOS",
@@ -140,6 +141,7 @@ import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/
     fromAddress: ethAddress,
     description,
     chainId: chainId,
+    feTxType: CantoFETxType.NONE,
     type: "COSMOS",
     msg: createMsgsRedelegate({
       delegatorCantoAddress,
@@ -158,6 +160,7 @@ import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/
     description: TransactionDescription
   ): Transaction => ({
     fromAddress: ethAddress,
+    feTxType: CantoFETxType.NONE,
     description,
     chainId: chainId,
     type: "COSMOS",

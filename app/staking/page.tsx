@@ -42,14 +42,14 @@ export default function StakingPage() {
   const [totalPages, setTotalPages] = useState(1);
   
   
-  //const [selectedTx,setSelectedTx] = useState<StakingTxTypes>(StakingTxTypes.DELEGATE);
+  const [selectedTx,setSelectedTx] = useState<StakingTxTypes>(StakingTxTypes.DELEGATE);
 
   
   
 
   function handleStakingTxClick(validator: Validator | null,inputAmount: string,txType: StakingTxTypes,validatorToRedelegate: Validator | null | undefined){
     if(signer){
-      if(txType==StakingTxTypes.REDELEGATE && signer){
+      if(txType==StakingTxTypes.REDELEGATE){
         const newFlow: NewTransactionFlow = {
           icon: "",
           txType: TransactionFlowType.STAKE_CANTO_TX,
@@ -59,7 +59,7 @@ export default function StakingPage() {
             ethAccount: signer?.account.address ?? "",
             txType: txType,
             validatorAddress: validator?.operator_address ?? "",
-            newValidatorAddress: validatorToRedelegate?.operator_address,
+            newValidatorAddress: validatorToRedelegate? validatorToRedelegate.operator_address : "",
             newValidatorName: validatorToRedelegate?.description.moniker,
             amount: (
               convertToBigNumber(inputAmount, 18).data ?? "0"
@@ -68,7 +68,8 @@ export default function StakingPage() {
           },
         };
         txStore?.addNewFlow({ txFlow: newFlow, ethAccount: signer?.account.address });
-      }else{
+      }
+      if((txType==StakingTxTypes.DELEGATE) || (txType==StakingTxTypes.UNDELEGATE)){
         const newFlow: NewTransactionFlow = {
           icon: "",
           txType: TransactionFlowType.STAKE_CANTO_TX,

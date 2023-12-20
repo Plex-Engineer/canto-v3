@@ -12,7 +12,7 @@ import { ProposalVoteTxParams } from "../interfaces/voteTxParams";
 
 import { ethToCantoAddress } from "@/utils/address/conversion.utils";
 import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/transactions/interfaces/txBase";
-import { TX_DESCRIPTIONS } from "@/transactions/interfaces/txDescriptions";
+import { CantoFETxType, TX_DESCRIPTIONS } from "@/transactions/interfaces/txDescriptions";
 
 export async function proposalVoteTx(
   params: ProposalVoteTxParams
@@ -55,6 +55,7 @@ const _voteTx = (
   description: TransactionDescription
 ): Transaction => ({
   fromAddress: ethAddress,
+  feTxType: CantoFETxType.NONE,
   description,
   chainId: chainId,
   type: "COSMOS",
