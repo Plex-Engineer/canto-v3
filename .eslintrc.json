@@ -1,3 +1,27 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": ["next/core-web-vitals", "eslint:recommended"],
+  "plugins": ["prettier"],
+  "rules": {
+    "no-await-in-loop": "error",
+    "no-duplicate-imports": "error",
+    "no-self-compare": "error",
+    "block-scoped-var": "error",
+    "default-case": "error",
+    "no-else-return": "error",
+    "no-var": "error",
+    "no-unused-vars": "off",
+    "prefer-const": "error",
+    "semi": "error",
+    "quotes": ["error", "double"],
+    "linebreak-style": ["error", "unix"],
+    "prettier/prettier": [
+      "error",
+      { "trailingComma": "es5" },
+      { "usePrettierrc": false }
+    ]
+  },
+  "globals": {
+    "NodeJS": true,
+    "React": true
+  }
 }

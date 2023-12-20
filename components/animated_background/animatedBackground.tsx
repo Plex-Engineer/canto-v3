@@ -86,16 +86,8 @@ const AnimatedBackground = (props: Props) => {
             gradientTransform="translate(948 948) rotate(-180) scale(1114.62 1152.54)"
           >
             <stop stopColor="white" stopOpacity="0" />
-            <stop
-              offset="0.208333"
-              stopColor="white"
-              stopOpacity="0.123773"
-            />
-            <stop
-              offset="0.557292"
-              stopColor="white"
-              stopOpacity="0.551823"
-            />
+            <stop offset="0.208333" stopColor="white" stopOpacity="0.123773" />
+            <stop offset="0.557292" stopColor="white" stopOpacity="0.551823" />
             <stop offset="0.640625" stopColor="white" stopOpacity="0.44795" />
             <stop offset="1" stopColor="white" stopOpacity="0" />
           </radialGradient>

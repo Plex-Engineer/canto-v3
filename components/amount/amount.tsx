@@ -55,14 +55,12 @@ const Amount = (props: Props) => {
     const parts = amount.split(".");
     if (parts.length === 1) {
       return amount;
-    } else {
-      const decimalsPart = parts[1];
-      if (decimalsPart.length > decimals) {
-        return `${parts[0]}.${decimalsPart.slice(0, decimals)}~`;
-      } else {
-        return amount;
-      }
     }
+    const decimalsPart = parts[1];
+    if (decimalsPart.length > decimals) {
+      return `${parts[0]}.${decimalsPart.slice(0, decimals)}~`;
+    }
+    return amount;
   }
 
   //commify and formatAmount

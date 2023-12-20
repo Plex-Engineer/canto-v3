@@ -16,7 +16,6 @@ import { BridgeComboReturn } from "./util";
 const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
     Amount,
-    Direction,
     Transaction,
     Confirmation,
     bridgeHook: bridge,
