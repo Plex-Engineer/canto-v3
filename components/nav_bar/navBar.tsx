@@ -91,7 +91,7 @@ const NavBar = () => {
           href="/explore"
           className={clsx(
             styles["nav-link"],
-            currentPath == "/cool" && styles.active
+            currentPath == "/explore" && styles.active
           )}
         >
           <Text size="sm">Explore</Text>
