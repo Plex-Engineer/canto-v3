@@ -331,11 +331,7 @@ export const UserAmbientPairRow = ({
       <InfoPop>
         {/* show all the positions */}
         <Container>
-          <HoverPositions
-            pool={pool}
-            positions={pool.userPositions}
-            positionValues={allPositionValues}
-          />
+          <HoverPositions pool={pool} positionValues={allPositionValues} />
         </Container>
       </InfoPop>
     </Container>,

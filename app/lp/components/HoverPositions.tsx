@@ -1,12 +1,7 @@
 import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
-import {
-  AmbientPool,
-  AmbientUserPosition,
-} from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
-import { getPriceFromTick, concLiquidityNoteValue } from "@/utils/ambient";
+import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
 import { displayAmount } from "@/utils/formatting";
-import BigNumber from "bignumber.js";
 import styles from "./dexModals/cantoDex.module.scss";
 import Text from "@/components/text";
 import { addTokenBalances } from "@/utils/math";
@@ -20,7 +15,6 @@ interface Props {
     quoteAmount: string;
     quoteValue: string;
   }[];
-  positions: AmbientUserPosition[];
 }
 export const HoverPositions = ({ pool, positionValues }: Props) => (
   <>
