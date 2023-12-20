@@ -9,6 +9,7 @@ import { formatBalance, formatBigBalance } from "@/utils/formatting";
 export const GenerateValidatorTableRow = (validator: Validator, index: number, onDelegate: (validator: Validator)=>void)=>
         [
             <Container  key={`name_${index}`}><Text font="rm_mono">{validator.description.moniker}</Text></Container>,
+            <Container key={`name_${index}`}><Text font="rm_mono">{validator.rank}</Text></Container>,
                   <Container  key={`tokens_${index}`} direction="row" center={{horizontal: true, vertical:true}} gap="auto">
                     <Text font="rm_mono">{formatBigBalance(formatBalance(validator.tokens,18)).shortAmount + formatBigBalance(formatBalance(validator.tokens,18)).suffix} </Text>
                     <div>{" "}</div>
@@ -54,7 +55,6 @@ export const GenerateMyStakingTableRow = (userStakedValidator: ValidatorWithDele
       themed={true}
     />
 </Container>,
-<Container key={`commission_${index}`}><Text font="rm_mono">{formatBalance("1",-2,{commify:true,precision:2})}%</Text></Container>,
 <Container key={`commission_${index}`}><Text font="rm_mono">{formatBalance(userStakedValidator?.commission,-2,{commify:true,precision:2})}%</Text></Container>,
 <Container key={`buttonManage_${index}`}>
                     <Button onClick={()=>onDelegate(userStakedValidator)}>MANAGE</Button>

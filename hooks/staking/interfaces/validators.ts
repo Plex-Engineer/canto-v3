@@ -16,6 +16,7 @@ export interface Validator {
     details?: string;
   };
   commission: string;
+  rank: number
 }
 export interface ValidatorWithDelegations extends Validator {
   userDelegation: {

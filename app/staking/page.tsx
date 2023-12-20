@@ -33,12 +33,13 @@ import Input from "@/components/input/input";
 
 export default function StakingPage() {
 
-  const [isModalOpen, setModalOpen] = useState(false);
   const [selectedValidator, setSelectedValidator] = useState<Validator | null>(null);
-  const [selectedValidatorToRedelegate, setSelectedValidatorToRedelegate] = useState<Validator | null>(null);
   const [currentFilter, setCurrentFilter] = useState<string>("ACTIVE");
   const [searchQuery,setSearchQuery] = useState("");
-  const [searchString, setSearchString] = useState("");
+  const [filteredValidatorsBySearch, setFilteredValidatorsBySearch] = useState<Validator[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [totalPages, setTotalPages] = useState(1);
   
   
   //const [selectedTx,setSelectedTx] = useState<StakingTxTypes>(StakingTxTypes.DELEGATE);
@@ -95,13 +96,16 @@ export default function StakingPage() {
 
 
   
-
+  
   const { isLoading,validators, apr, userStaking, selection, transaction } = useStaking({
     chainId: chainId,
     userEthAddress: signer?.account.address,
   });
 
-  
+  const validatorsWithRanks = validators.map((validator, index) => ({
+    ...validator,
+    rank: index + 1, // Adding 1 to make the rank start from 1
+  }));
 
   const allValidatorsAddresses = validators.map((validator)=>{return validator.operator_address});
   const allUserValidatorsAddresses: string[]  = userStaking? userStaking.validators.map((validator)=>{return validator.operator_address}) : [];
@@ -156,8 +160,8 @@ export default function StakingPage() {
     });
   }
 
-  const activeValidators = validators.filter(v=>v.jailed==false);
-  const inActiveValidators = validators.filter(v=>v.jailed==true);
+  const activeValidators = validatorsWithRanks.filter(v=>v.jailed==false);
+  const inActiveValidators = validatorsWithRanks.filter(v=>v.jailed==true);
 
   const filteredValidators = (currentFilter=="ACTIVE")? activeValidators : inActiveValidators;
 
@@ -165,6 +169,8 @@ export default function StakingPage() {
   const validatorTitleMap = new Map<string,string>();
   validatorTitleMap.set("ACTIVE","ACTIVE VALIDATORS");
   validatorTitleMap.set("INACTIVE","INACTIVE VALIDATORS");
+
+  
   
   const handleSearch = () => {
     const searchQuery2 = searchQuery;
@@ -174,29 +180,17 @@ export default function StakingPage() {
     setFilteredValidatorsBySearch(filteredListSearch);
     setCurrentPage(1);
   };
-  
-  const [filteredValidatorsBySearch, setFilteredValidatorsBySearch] = useState<Validator[]>([]);
                                              
   const currentValidators = (searchQuery=="")?filteredValidators: filteredValidatorsBySearch;
   const pageSize = 10;
-  const [currentPage, setCurrentPage] = useState(1);
+  useEffect(() => {
+    setTotalPages(Math.ceil(currentValidators.length / pageSize));
+  }, [currentValidators.length, pageSize]);
 
-
-  console.log(currentValidators.length);
-  
-
-  const [totalPages, setTotalPages] = useState(Math.ceil(currentValidators.length / pageSize));
-  //console.log(currentValidators);
   const paginatedvalidators: Validator[] = currentValidators.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-
-  useEffect(()=>{
-    setTotalPages(Math.ceil(currentValidators.length / pageSize));
-  },[currentValidators]);
-
-   
   const hasUserStaked: boolean | undefined = (userStaking && userStaking.validators && userStaking.validators.length>0);
 
   const totalStaked: number | undefined = hasUserStaked ? userStaking?.validators.reduce((sum, item) => {
@@ -206,11 +200,8 @@ export default function StakingPage() {
 
   const totalRewards: number | undefined = hasUserStaked ? userStaking?.validators.reduce((sum , item) => {
     const amountNumber = parseFloat(formatBalance(item.userDelegation.rewards,18));
-    //console.log(sum);
     return (sum + amountNumber);
   }, 0): 0;
-  console.log();
-  
 
   const handlePrevious = () => {
     if (currentPage > 1) {
@@ -224,25 +215,18 @@ export default function StakingPage() {
     }
   };
 
-  useEffect(() => {
-    setTotalPages(Math.ceil(validators.length / pageSize));
-  }, [validators.length, pageSize]);
   
+
   function handleClick(validator: Validator){
     setSelectedValidator(validator);
   }
   
-  console.log(currentPage);
-  console.log(totalPages);
-  console.log(currentValidators);
-
-
-  //console.log(hasUserStaked);
   if(isLoading){
     return(
       <Splash></Splash>
     )
   }
+
   function handleRewardsClaimClick(signer:GetWalletClientResult | undefined, validatorAddresses: string[]){
     if(signer){
       const newFlow: NewTransactionFlow = {
@@ -303,7 +287,7 @@ export default function StakingPage() {
         </div>
         <div className={styles.infoBox}>
           <div className={styles.ClaimBtn}>
-            <Button onClick={()=>handleRewardsClaimClick(signer, allUserValidatorsAddresses)} disabled={!signer || !hasUserStaked}>
+            <Button width={500} onClick={()=>handleRewardsClaimClick(signer, allUserValidatorsAddresses)} disabled={!signer || !hasUserStaked}>
             Claim Staking Rewards
             </Button>
           </div>
@@ -321,7 +305,6 @@ export default function StakingPage() {
                   { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 5 },
                   { value: <Text opacity={0.4}>My Stake</Text>, ratio: 3 },
                   { value: <Text opacity={0.4} font="rm_mono">Validator Total</Text>, ratio: 3 },
-                  { value: <Text opacity={0.4} font="rm_mono">% Share</Text>, ratio: 3 },
                   { value: <Text opacity={0.4} font="rm_mono">Commission</Text>, ratio: 3 },
                   { value: <Text opacity={0.4} font="rm_mono">Edit</Text>, ratio: 3 },
                 ]}
@@ -335,43 +318,48 @@ export default function StakingPage() {
       </div>
       }
       <Spacer height="40px"/>
+      
       <Container width="100%" className={styles.tableContainer} >
-        <div>
+      <div className={styles.searchBarContainer2}>
+                              <div className={styles.searchBarContainer}>
+                                  <div>
+                                      <Input 
+                                      height={47}
+                                      type="text"
+                                      value={searchQuery}
+                                      onChange={(e) => {
+                                        setSearchQuery(e.target.value);
+                                        
+                                        handleSearch();
+                                        //console.log("inside function");
+                                      }}
+                                      placeholder="Search..."
+                                      />
+                                    </div>
+                                  <div>
+                                      <Button shadow="none" onClick={()=>handleSearch()}>
+                                        <Icon
+                                          style={{ marginLeft: "5px" }}
+                                          icon={{
+                                            url: "/search.svg",
+                                            size: 14,
+                                          }}
+                                          themed={true}
+                                        />
+                                      </Button>
+                                    </div>
+                            </div>
+                        </div>
+
+        
+
+              
           <Table
                 title={
-                  <div className={styles.tableTitleContainer}>
-                    <div>{validatorTitleMap.get(currentFilter)}</div>
-                    <div>
-                          <div className={styles.searchBarContainer}>
-                              <div>
-                                  <Input 
-                                  height={47}
-                                  type="text"
-                                  value={searchQuery}
-                                  onChange={(e) => {
-                                    setSearchQuery(e.target.value);
-                                    handleSearch();
-                                    //console.log("inside function");
-                                  }}
-                                  placeholder="Search..."
-                                  />
-                              </div>
-                              <div>
-                                  <Button shadow="none" onClick={()=>handleSearch()}>
-                                    <Icon
-                                      style={{ marginLeft: "5px" }}
-                                      icon={{
-                                        url: "/search.svg",
-                                        size: 14,
-                                      }}
-                                      themed={true}
-                                    />
-                                  </Button>
-                              </div>
-                          </div>
+                        
+                    <div className={styles.tableTitleContainer}>
+                        <div>{validatorTitleMap.get(currentFilter)}</div>
                     </div>
-                  
-                  </div>
                 }
                 // secondary={
                 //   <div className={styles.TabRow}>
@@ -381,12 +369,17 @@ export default function StakingPage() {
                 // }
                 secondary={
                   <Container width="400px">
+
+                      
                       
                             <ToggleGroup
                               options={["ACTIVE","INACTIVE"]}
                               selected={currentFilter}
                               setSelected={(value) => {
                                 setCurrentFilter(value);
+                                setCurrentPage(1);
+                                setSearchQuery("");
+                              
                               }}
                               
                             />
@@ -395,6 +388,7 @@ export default function StakingPage() {
                 }
                 headers={[
                   { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 6 },
+                  {value: <Text opacity={0.4} font="rm_mono">Rank</Text>, ratio: 2},
                   { value: <Text opacity={0.4}>Validator Total</Text>, ratio: 4 },
                   { value: <Text opacity={0.4} font="rm_mono">Commission %</Text>, ratio: 3 },
                   { value: <Text opacity={0.4} font="rm_mono">Action</Text>, ratio: 4 },
@@ -403,7 +397,7 @@ export default function StakingPage() {
                   GenerateValidatorTableRow(validator,index,()=>handleClick(validator))
                 )]}
             />
-          </div>
+          
           
             <div className={styles.paginationContainer}>
               <div className={styles.paginationButton1}>
