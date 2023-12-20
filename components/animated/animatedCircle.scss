@@ -1,0 +1,42 @@
+.circle {
+  position: absolute;
+  width: var(--init-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid rgba(var(--dark-color), 0.1);
+  outline: 80px solid rgba(var(--dark-color), 0.02);
+
+  animation: circle 10s var(--anim-delay) ease-in-out infinite forwards;
+}
+
+body:where(.dark) .circle {
+  border: 2px solid rgba(var(--dark-color), 0.1);
+  outline: 80px solid rgba(var(--dark-color), 0.02);
+}
+
+body:where(.light) .circle {
+  border: 2px solid rgba(var(--light-color), 0.2);
+  outline: 80px solid rgba(var(--light-color), 0.1);
+}
+
+// cubic-bezier(0.55, 0.085, 0.68, 0.53)
+// cubic-bezier(0.445, 0.05, 0.55, 0.95)
+
+@keyframes circle {
+  from {
+    width: var(--init-size, 5%);
+  }
+  to {
+    width: 130%;
+  }
+}
+
+.container {
+  position: absolute;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: -1;
+}

@@ -9,4 +9,9 @@
   border: 1px solid rgba(var(--dark-color), 0.2);
   padding: 2rem;
   gap: 1.4rem;
+
+  a {
+    color: var(--card-primary-color);
+    text-decoration: underline;
+  }
 }

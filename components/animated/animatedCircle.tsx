@@ -1,8 +1,9 @@
-import style from "./animatedCircle.module.scss";
+import "./animatedCircle.scss";
 
 const AnimatedCircle = () => {
-  const delays = 40;
+  const delays = 10;
   const circles = Array.from({ length: delays });
+
   return (
     // create a array of length delays
     // map through the array
@@ -10,15 +11,15 @@ const AnimatedCircle = () => {
     // give the div a class of circle
     // give the div a style of --anim-delay: ${index}s
 
-    <div className={style.container}>
+    <div className={"container"}>
       {circles.map((_, index) => (
         <div
           key={index}
-          className={style.circle}
+          className={"circle"}
           style={
             {
-              //   "--anim-delay": `${index}s`,
-              "--init-size": `${(index / 40) * 100}%`,
+              "--anim-delay": `${index}s`,
+              //   "--init-size": `${(index / 40) * 100}%`,
             } as React.CSSProperties
           }
         ></div>
