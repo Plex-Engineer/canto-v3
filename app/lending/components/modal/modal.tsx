@@ -227,11 +227,14 @@ export const LendingModal = (props: Props) => {
     // limits
     const maxAmount = maxAmountForLendingTx(actionType, cToken, position, 100);
     // show limit if borrowing or withdrawing
-    const needLimit =
-      actionType === CTokenLendingTxTypes.BORROW ||
-      actionType === CTokenLendingTxTypes.WITHDRAW;
-    const limitProps = needLimit
-      ? { limit: { limit: maxAmount, limitName: "" } }
+    const limits =
+      actionType === CTokenLendingTxTypes.BORROW
+        ? [90, 94, 98]
+        : actionType === CTokenLendingTxTypes.WITHDRAW
+        ? [90, 94, 98, 100]
+        : null;
+    const limitProps = limits
+      ? { limit: { limit: maxAmount, limitName: "Limit" } }
       : {};
 
     return (
@@ -264,12 +267,12 @@ export const LendingModal = (props: Props) => {
           symbol={cToken.underlying.symbol}
           {...limitProps}
           extraNode={
-            needLimit && (
+            limits && (
               <BorrowLimits
                 maxBorrow={maxAmount}
                 currentAmount={amount}
                 setAmount={setAmount}
-                limits={[90, 94, 98]}
+                limits={limits}
                 decimals={cToken.underlying.decimals}
               />
             )

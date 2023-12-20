@@ -113,60 +113,40 @@ const Amount = (props: Props) => {
         className={styles.balance}
         width="100%"
       >
-        <Text
-          size="xx-sm"
-          theme="secondary-dark"
-          role="button"
-          style={{
-            cursor: "pointer",
-          }}
-          onClick={() =>
-            props.onChange(
-              {
-                target: {
-                  value: formatBalance(
-                    props.limit?.limit ?? props.max,
-                    props.decimals,
-                    {
-                      precision: props.decimals,
-                    }
-                  ),
-                },
-              } as any,
-              true
-            )
-          }
-        >
-          {props.limit ? "Limit: " : "Balance: "}
+        <Text size="xx-sm" theme="secondary-dark">
+          {props.limit ? `${props.limit.limitName}: ` : "Balance: "}
           {formatBalance(props.limit?.limit ?? props.max, props.decimals, {
             commify: true,
-          })}{" "}
-          {props.symbol}
+            symbol: props.symbol,
+          })}
         </Text>
-        <div className={styles.extra}>{props.extraNode}</div>
-        {/* <span
-          className={styles.max}
-          onClick={() => {
-            props.onChange(
-              {
-                target: {
-                  value: formatBalance(
-                    props.limit?.limit ?? props.max,
-                    props.decimals,
-                    {
-                      precision: props.decimals,
-                    }
-                  ),
-                },
-              } as any,
-              true
-            );
-          }}
-        >
-          <Text size="xx-sm" weight="bold">
-            {`(${props.limit?.limitName ?? "max"})`}
-          </Text>
-        </span> */}
+        {props.extraNode ? (
+          <div className={styles.extra}>{props.extraNode}</div>
+        ) : (
+          <span
+            className={styles.max}
+            onClick={() => {
+              props.onChange(
+                {
+                  target: {
+                    value: formatBalance(
+                      props.limit?.limit ?? props.max,
+                      props.decimals,
+                      {
+                        precision: props.decimals,
+                      }
+                    ),
+                  },
+                } as any,
+                true
+              );
+            }}
+          >
+            <Text size="xx-sm" weight="bold">
+              {`(${props.limit?.limitName ?? "max"})`}
+            </Text>
+          </span>
+        )}
       </Container>
       <Spacer width="20px" />
       <input
