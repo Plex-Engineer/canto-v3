@@ -15,7 +15,7 @@ import { formatPercent } from "@/utils/formatting";
 import Table from "@/components/table/table";
 import Splash from "@/components/splash/splash";
 import { GenerateMyStakingTableRow, GenerateValidatorTableRow } from "./components/validatorTableRow";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StakingModal } from "./components/stakingModal/StakingModal";
 import { Validator } from "@/hooks/staking/interfaces/validators";
 import Modal from "@/components/modal/modal";
@@ -103,10 +103,7 @@ export default function StakingPage() {
     userEthAddress: signer?.account.address,
   });
 
-  const validatorsWithRanks = validators.map((validator, index) => ({
-    ...validator,
-    rank: index + 1, // Adding 1 to make the rank start from 1
-  }));
+  
 
   const allValidatorsAddresses = validators.map((validator)=>{return validator.operator_address});
   const allUserValidatorsAddresses: string[]  = userStaking? userStaking.validators.map((validator)=>{return validator.operator_address}) : [];
@@ -148,18 +145,23 @@ export default function StakingPage() {
   // console.log(userStaking);
   // console.log(selection);
   // console.log(transaction);
-  if(validators){
-    validators.sort((a, b) => {
-      // Convert the string representation of tokens to BigInt
-      let tokensA = BigInt(a.tokens);
-      let tokensB = BigInt(b.tokens);
+  
+
+  const validatorsWithRanks  = useMemo(()=>
+    validators.sort((a,b) => BigInt(a.tokens) < BigInt(b.tokens) ? 1 : -1).map((validator,index)=>({
+      ...validator,
+      rank: index+1,
+    }))
+      
     
-      // Compare the BigInt values
-      if (tokensA < tokensB) return 1;
-      if (tokensA > tokensB) return -1;
-      return 0;
-    });
-  }
+,[validators]);
+
+  
+  
+  // const validatorsWithRanks = validators.map((validator, index) => ({
+  //   ...validator,
+  //   rank: index + 1, // Adding 1 to make the rank start from 1
+  // }));
 
   const activeValidators = validatorsWithRanks.filter(v=>v.jailed==false);
   const inActiveValidators = validatorsWithRanks.filter(v=>v.jailed==true);
