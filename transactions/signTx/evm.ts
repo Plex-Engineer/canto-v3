@@ -2,6 +2,7 @@ import {
   GetWalletClientResult,
   getWalletClient,
   switchNetwork,
+  getNetwork,
 } from "wagmi/actions";
 import { Transaction } from "../interfaces";
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
@@ -11,6 +12,7 @@ import { percentOfAmount } from "@/utils/math";
 import { asyncCallWithTimeout } from "@/utils/async";
 import { BaseError } from "viem";
 import { TransactionReceipt } from "web3";
+import { WalletClient } from "wagmi";
 
 /**
  * @notice signs evm transaction
@@ -19,26 +21,31 @@ import { TransactionReceipt } from "web3";
  * @returns {PromiseWithError<string>} txHash of transaction or error
  */
 export async function signEVMTransaction(
-  tx: Transaction,
-  signer?: GetWalletClientResult
+  tx: Transaction
 ): PromiseWithError<`0x${string}`> {
   try {
     if (tx.type !== "EVM")
       throw Error(TX_SIGN_ERRORS.INCORRECT_TX_TYPE(tx.type));
-    if (!signer) throw Error(TX_SIGN_ERRORS.MISSING_SIGNER());
+
     if (typeof tx.chainId !== "number")
       throw Error(TX_SIGN_ERRORS.INVALID_CHAIN_ID(tx.chainId));
 
-    const { data: newSigner, error: chainError } = await checkOnRightChain(
-      signer,
+    // get signer
+    const { data: signer, error: signerError } = await getEvmSignerOnChainId(
       tx.chainId
     );
-    if (chainError || !newSigner) throw chainError;
+    if (signerError) throw signerError;
+
+    // check that signer is the account that is supposed to sign the transaction
+    if (signer.account.address !== tx.fromAddress)
+      throw Error(
+        TX_SIGN_ERRORS.INCORRECT_SIGNER(tx.fromAddress, signer.account.address)
+      );
 
     // get contract instance
     const { data: contractInstance, error: contractError } =
       newContractInstance<typeof tx.abi>(tx.chainId, tx.target, tx.abi, {
-        signer: newSigner,
+        signer,
       });
     if (contractError) throw contractError;
 
@@ -46,7 +53,7 @@ export async function signEVMTransaction(
     const gasEstimate = await contractInstance.methods[tx.method](
       ...(tx.params as [])
     ).estimateGas({
-      from: newSigner.account.address,
+      from: tx.fromAddress,
       value: tx.value,
     });
     // make sure gas is at least base limit (21,000), then over estimate by 50%
@@ -60,7 +67,7 @@ export async function signEVMTransaction(
       await asyncCallWithTimeout<TransactionReceipt>(
         async () =>
           await contractInstance.methods[tx.method](...(tx.params as [])).send({
-            from: newSigner.account.address,
+            from: tx.fromAddress,
             value: tx.value,
             gas: gasLimit,
           }),
@@ -81,29 +88,33 @@ export async function signEVMTransaction(
 }
 
 /**
- * @notice checks if the signer is on the right chain and tries to switch if not
- * @dev for EVM wallets
- * @param {GetWalletClientResult} signer EVM signing wallet client
+ * @notice gets signer for correct chain and checks if signer is on the right chain
  * @param {number} chainId chainId signer should be on
- * @returns {PromiseWithError<GetWalletClientResult>} new signer if switch was made or error
+ * @returns {PromiseWithError<WalletClient>} signer or error
  */
-export async function checkOnRightChain(
-  signer: GetWalletClientResult,
+export async function getEvmSignerOnChainId(
   chainId: number
-): PromiseWithError<GetWalletClientResult> {
+): PromiseWithError<WalletClient> {
   try {
-    if (!signer) throw new Error(TX_SIGN_ERRORS.MISSING_SIGNER());
-    if (signer.chain.id !== chainId) {
+    // get current network
+    const currentNetwork = getNetwork();
+    if (!currentNetwork) throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
+
+    // check chain id
+    if (currentNetwork.chain?.id !== chainId) {
+      // switch chains
       const network = await switchNetwork({ chainId });
-      if (!network || network.id !== chainId) {
+      if (!network || network.id !== chainId)
         throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
-      }
-      const newSigner = await getWalletClient({ chainId });
-      if (!newSigner) throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
-      return NO_ERROR(newSigner);
     }
+
+    // get signer
+    const signer = await getWalletClient({ chainId });
+    if (!signer) throw new Error(TX_SIGN_ERRORS.MISSING_SIGNER());
+
+    // return signer
     return NO_ERROR(signer);
   } catch (err) {
-    return NEW_ERROR("checkOnRightChain", err);
+    return NEW_ERROR("getEvmSignerOnChainId", err);
   }
 }

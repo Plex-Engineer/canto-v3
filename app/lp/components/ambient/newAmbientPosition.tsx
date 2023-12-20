@@ -96,7 +96,8 @@ export const NewAmbientPositionModal = ({
             }}
             width="100%"
           >
-            <Text size="lg">Deposit Amounts</Text>
+            <div></div>
+            {/* <Text size="lg">Deposit Amounts</Text> */}
             <Container
               direction="row"
               center={{

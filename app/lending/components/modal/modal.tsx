@@ -8,11 +8,7 @@ import styles from "./modal.module.scss";
 import Tabs from "@/components/tabs/tabs";
 import Image from "next/image";
 import Container from "@/components/container/container";
-import {
-  convertToBigNumber,
-  displayAmount,
-  formatBalance,
-} from "@/utils/formatting";
+import { convertToBigNumber, displayAmount } from "@/utils/formatting";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import React, { useState } from "react";
@@ -89,9 +85,7 @@ export const LendingModal = (props: Props) => {
         )}
         <ModalItem
           name="Account Liquidity Remaining"
-          value={formatBalance(liquidityLeft, 18, {
-            commify: true,
-          })}
+          value={displayAmount(liquidityLeft, 18)}
           note
         />
       </Container>
@@ -159,7 +153,7 @@ export const LendingModal = (props: Props) => {
                 }}
               >
                 <Text font="proto_mono" size="sm">
-                  {formatBalance(cToken.collateralFactor, 16) + "%"}{" "}
+                  {displayAmount(cToken.collateralFactor, 16) + "%"}
                 </Text>
               </Container>
             }
@@ -428,8 +422,7 @@ const CTokenAmountCard = ({
         {name}
       </Text>
       <Text size="sm" font="proto_mono">
-        {formatBalance(amount, decimals, {
-          commify: true,
+        {displayAmount(amount, decimals, {
           symbol: note ? undefined : symbol,
         })}
         {valueInNote ? ` (${displayAmount(valueInNote.toString(), 18)} ` : " "}

@@ -31,8 +31,7 @@ export async function getAllUserCLMData(
     getCantoApiData<CToken[]>(chainId, CANTO_DATA_API_ENDPOINTS.allCTokens),
     getUserCLMLensData(userEthAddress, chainId, cTokenAddresses),
   ]);
-  // check errors and return what is available
-  // if general error, then return error now
+  // check general error first
   if (generalCTokens.error) {
     return NEW_ERROR("getAllUserCLMData::" + errMsg(generalCTokens.error));
   }
@@ -40,11 +39,18 @@ export async function getAllUserCLMData(
   const filteredCTokens = generalCTokens.data.filter((cToken) =>
     listIncludesAddress(cTokenAddresses, cToken.address)
   );
-  // if user error, then just return the general data
-  if (userLMData.error) {
-    return NO_ERROR({ cTokens: filteredCTokens });
+  // return general data if no user
+  if (!userEthAddress) {
+    return NO_ERROR({
+      cTokens: filteredCTokens,
+    });
   }
-  // since both are okay, combine the data
+  // there will be an error if no address is provided (if user is present, return error)
+  if (userLMData.error && userEthAddress) {
+    return NEW_ERROR("getAllUserCLMData::" + errMsg(userLMData.error));
+  }
+
+  // since user is present, combine the data
   const combinedCTokenData = filteredCTokens.map((cToken) => {
     const userCTokenDetails = userLMData.data.cTokens.find((userCToken) =>
       areEqualAddresses(userCToken.cTokenAddress, cToken.address)
@@ -60,7 +66,7 @@ export async function getAllUserCLMData(
   // get total user positions
   const { data: positionTotals, error: positionError } = getLMTotalsFromCTokens(
     combinedCTokenData,
-    userLMData.data.compAccrued.toString()
+    userLMData.data.compAccrued
   );
   if (positionError) {
     return NO_ERROR({
@@ -68,8 +74,8 @@ export async function getAllUserCLMData(
     });
   }
   const userTotalPosition = {
-    liquidity: userLMData.data.limits.liquidity.toString(),
-    shortfall: userLMData.data.limits.shortfall.toString(),
+    liquidity: userLMData.data.limits.liquidity,
+    shortfall: userLMData.data.limits.shortfall,
     totalSupply: positionTotals.totalSupply,
     totalBorrow: positionTotals.totalBorrow,
     totalRewards: positionTotals.totalRewards,

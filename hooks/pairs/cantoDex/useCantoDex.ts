@@ -14,10 +14,7 @@ import {
 } from "@/transactions/pairs/cantoDex";
 
 export default function useCantoDex(
-  params: CantoDexHookInputParams,
-  options?: {
-    refetchInterval?: number;
-  }
+  params: CantoDexHookInputParams
 ): CantoDexHookReturn {
   ///
   /// Internal Hooks
@@ -36,13 +33,9 @@ export default function useCantoDex(
       return data.sort((a, b) => a.address.localeCompare(b.address));
     },
     {
-      onSuccess: (data) => {
-        // console.log(data);
-      },
       onError: (error) => {
         console.log(error);
       },
-      refetchInterval: options?.refetchInterval ?? 5000,
     }
   );
   // get balances of all the underlying tokens

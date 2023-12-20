@@ -56,6 +56,7 @@ export const TX_PLACEHOLDER = (
   placeholder: NewTransactionFlowPlaceholder
 ): TransactionWithStatus => ({
   tx: {
+    fromAddress: "",
     chainId: 0,
     description: placeholder.description,
     type: "KEPLR",

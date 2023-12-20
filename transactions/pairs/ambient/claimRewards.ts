@@ -38,6 +38,7 @@ export function claimAmbientRewardsTx(
     transactions: [
       _ambientClaimRewardsTx(
         txParams.chainId,
+        txParams.ethAccount,
         rewardsLedgerAddress,
         TX_DESCRIPTIONS.CLAIM_REWARDS(
           displayAmount(txParams.estimatedRewards, 18),

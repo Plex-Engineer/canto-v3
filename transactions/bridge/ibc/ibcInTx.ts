@@ -156,6 +156,7 @@ export async function ibcInKeplr(
     /** create tx */
     txList.push({
       chainId: cosmosNetwork.chainId,
+      fromAddress: txParams.senderCosmosAddress,
       description: TX_DESCRIPTIONS.BRIDGE(
         txParams.token.symbol,
         displayAmount(txParams.amount, txParams.token.decimals),
@@ -496,6 +497,7 @@ async function evmosIBCIn(
   return NO_ERROR([
     {
       chainId: evmosNetwork.chainId,
+      fromAddress: evmosAddress,
       description: TX_DESCRIPTIONS.BRIDGE(
         token.symbol,
         displayAmount(amount, token.decimals),

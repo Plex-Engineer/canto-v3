@@ -10,8 +10,12 @@ import TransactionModal from "../transactions/TxModal";
 import ThemeButton from "../footer/components/footerButton";
 import { useBalance } from "wagmi";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
+import { useAutoConnect } from "@/provider/useAutoConnect";
 
 const NavBar = () => {
+  // This is used to connect safe as wallet,
+  // if the app is opened in the safe context.
+  useAutoConnect();
   const currentPath = usePathname();
 
   const { signer } = useCantoSigner();

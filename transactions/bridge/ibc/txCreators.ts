@@ -5,6 +5,7 @@ import { Transaction, TransactionDescription } from "@/transactions/interfaces";
 
 export const _ibcOutTx = (
   chainId: number,
+  ethSender: string,
   sourcePort: string,
   sourceChannel: string,
   amount: string,
@@ -31,6 +32,7 @@ export const _ibcOutTx = (
   });
   return {
     chainId,
+    fromAddress: ethSender,
     type: "COSMOS",
     description,
     msg: ibcTx,
@@ -53,6 +55,7 @@ export const _convertERC20Tx = (
   });
   return {
     chainId,
+    fromAddress: ethSender,
     description,
     type: "COSMOS",
     msg: convertERC20Tx,
@@ -75,6 +78,7 @@ export const _convertCoinTx = (
   });
   return {
     chainId,
+    fromAddress: ethReceiver,
     description,
     type: "COSMOS",
     msg: convertCoinTx,

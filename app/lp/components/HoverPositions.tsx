@@ -81,6 +81,7 @@ export const HoverPositions = ({ pool, positionValues }: Props) => (
                 {`${pool.base.symbol}: `}
                 {displayAmount(item.baseAmount, pool.base.decimals, {
                   precision: 2,
+                  maxSmallBalance: 0.01,
                 })}
               </Text>
               <Text
@@ -94,6 +95,7 @@ export const HoverPositions = ({ pool, positionValues }: Props) => (
                 {`${pool.quote.symbol}: `}
                 {displayAmount(item.quoteAmount, pool.quote.decimals, {
                   precision: 2,
+                  maxSmallBalance: 0.01,
                 })}
               </Text>
             </Container>

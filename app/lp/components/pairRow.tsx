@@ -98,6 +98,7 @@ export const UserCantoDexPairRow = ({
               url: "/warning.svg",
               size: 16,
             }}
+            themed
             style={{
               translate: "0 1.5px",
             }}
