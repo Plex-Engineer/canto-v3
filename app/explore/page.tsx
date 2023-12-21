@@ -67,8 +67,8 @@ export default function OutlinksPage() {
             <Image
               height={100}
               width={100}
-              src={"/ecosystem/blankrase.jpg"}
-              alt="1155tech"
+              src={"/ecosystem/blankrasa.svg"}
+              alt="blankrasa"
             />
             <Text size="x-sm">
               <Link href={"https://www.blankrasa.com/"} target="_blank">
@@ -89,8 +89,8 @@ export default function OutlinksPage() {
             <Image
               height={100}
               width={100}
-              src={"/ecosystem/vivacity.jpg"}
-              alt="1155tech"
+              src={"/ecosystem/vivacity.png"}
+              alt="vivacity"
             />
             <Text size="x-sm">
               <Link href={"https://vivacity.finance/"} target="_blank">
