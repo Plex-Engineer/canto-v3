@@ -81,24 +81,6 @@ export default function useTokenBalances(
                 nativeBalances[ibcToken.ibcDenom]
               );
             }
-            //TODO:HOTFIX FOR USER USDC GRAVITY BALANCE
-            if (token.id === "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd") {
-              const gravityAddress = ethToGravity(userEthAddress);
-              const usdcAddressOnGravity =
-                "gravity0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
-              const { data: usdcGravBalance, error } =
-                await getCosmosTokenBalance(
-                  GRAVITY_BRIDGE.chainId,
-                  gravityAddress,
-                  usdcAddressOnGravity
-                );
-              if (!error && usdcGravBalance) {
-                balances[token.id] = addTokenBalances(
-                  balances[token.id],
-                  usdcGravBalance
-                );
-              }
-            }
           }
         }
         return balances;
