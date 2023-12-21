@@ -7,6 +7,7 @@ import {
   Validation,
 } from "@/config/interfaces";
 import {
+  BridgeStatus,
   TX_DESCRIPTIONS,
   Transaction,
   TxCreatorFunctionReturn,
@@ -27,6 +28,8 @@ import BigNumber from "bignumber.js";
 import { _sendToEthGravityTx } from "./txCreators";
 import { BridgingMethod, getBridgeMethodInfo } from "..";
 import { displayAmount } from "@/utils/formatting";
+import { getCosmosTxDetailsFromHash } from "@/transactions/signTx/cosmosEIP/signCosmosEIP";
+import { tryFetch } from "@/utils/async";
 
 type GravityBridgeOutParams = {
   ethSender: string;
@@ -157,3 +160,77 @@ export function validateGravityBridgeOutTxParams(
     txParams.token.decimals
   );
 }
+
+/**
+ * Will check to see if gbridge has completed the transaction
+ */
+export async function checkGbridgeOutTxStatus(
+  txHash: string
+): PromiseWithError<BridgeStatus> {
+  try {
+    // get tx data from gravity bridge
+    const { data: txData, error } = await getCosmosTxDetailsFromHash(
+      GRAVITY_BRIDGE.chainId,
+      txHash
+    );
+    if (error) throw error;
+
+    // check if tx is complete
+    if (txData.tx_response.code !== 0) throw new Error("tx failed");
+
+    // get events from txData to get the txId
+    const allEvents = txData.tx_response.logs.flatMap((log) => log.events);
+
+    // get txId event
+    const txIdEvent = allEvents.find(
+      (event) => event.type === "gravity.v1.EventOutgoingTxId"
+    );
+    if (!txIdEvent) throw new Error("txId event not found");
+
+    // get txId from event (remove quotes from value)
+    const txId = txIdEvent.attributes
+      .find((att) => att.key === "tx_id")
+      ?.value?.replace(/["]+/g, "");
+    if (!txId) throw new Error("txId not found");
+
+    // get current pending sendToEthEvents
+    const { data: pendingSendToEth, error: pendingSendToEthError } =
+      await tryFetch<PendingSendToEthResponse>(
+        `${GRAVITY_BRIDGE.restEndpoint}/gravity/v1beta/query_pending_send_to_eth`
+      );
+    if (pendingSendToEthError) throw pendingSendToEthError;
+
+    // find tx with same id
+    const tx = [
+      ...pendingSendToEth.transfers_in_batches,
+      ...pendingSendToEth.unbatched_transfers,
+    ].find((batchTx) => {
+      return batchTx.id === txId;
+    });
+
+    // if tx is not found, it has been completed
+    if (!tx) {
+      return NO_ERROR({ status: "SUCCESS" });
+    }
+    return NO_ERROR({ status: "PENDING" });
+  } catch (err) {
+    return NEW_ERROR("checkGbridgeOutTxStatus" + err);
+  }
+}
+type PendingSendToEthResponse = {
+  transfers_in_batches: SendToEthTrasnfer[];
+  unbatched_transfers: SendToEthTrasnfer[];
+};
+type SendToEthTrasnfer = {
+  id: string;
+  sender: string;
+  dest_address: string;
+  erc20_token: {
+    contract: string;
+    amount: string;
+  };
+  erc20_fee: {
+    contract: string;
+    amount: string;
+  };
+};

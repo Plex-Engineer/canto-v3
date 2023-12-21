@@ -60,6 +60,10 @@ export const _sendToEthGravityTx = (
   description: TransactionDescription
 ): Transaction => ({
   description,
+  bridge: {
+    type: BridgingMethod.GRAVITY_BRIDGE,
+    lastStatus: "NONE",
+  },
   fromAddress: ethReceiver,
   chainId: chainId,
   type: "COSMOS",

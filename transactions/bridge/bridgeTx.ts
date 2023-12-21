@@ -23,9 +23,11 @@ import {
 import { IBCOutTx, validateIBCOutTxParams } from "./ibc/ibcOutTx";
 import { ibcInKeplr, validateKeplrIBCParams } from "./ibc/ibcInTx";
 import {
+  checkGbridgeOutTxStatus,
   gravityBridgeOutTx,
   validateGravityBridgeOutTxParams,
 } from "./gravityBridge/gravityBridgeOut";
+import { GRAVITY_BRIGDE_EVM } from "@/config/networks";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging into canto
@@ -94,9 +96,9 @@ export async function getBridgeStatus(
 ): PromiseWithError<BridgeStatus> {
   switch (type) {
     case BridgingMethod.GRAVITY_BRIDGE:
-      return !isCantoChainId(chainId)
-        ? checkGbridgeInTxStatus(chainId, txHash)
-        : NEW_ERROR("getBridgeStatus::Unknown bridging method");
+      return chainId === GRAVITY_BRIGDE_EVM.chainId
+        ? checkGbridgeOutTxStatus(txHash)
+        : checkGbridgeInTxStatus(txHash);
     case BridgingMethod.LAYER_ZERO:
       return checkLZBridgeStatus(chainId, txHash);
     default:

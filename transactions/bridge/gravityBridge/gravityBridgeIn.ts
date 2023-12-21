@@ -183,14 +183,16 @@ export function validateGravityBridgeInTxParams(
  * Will check to see if gbridge has completed the transaction
  */
 export async function checkGbridgeInTxStatus(
-  chainId: number,
   txHash: string
 ): PromiseWithError<BridgeStatus> {
   try {
     // get tx and block number
     const [transaction, currentBlock] = await Promise.all([
-      fetchTransaction({ chainId, hash: txHash as `0x${string}` }),
-      fetchBlockNumber({ chainId }),
+      fetchTransaction({
+        chainId: ETH_MAINNET.chainId,
+        hash: txHash as `0x${string}`,
+      }),
+      fetchBlockNumber({ chainId: ETH_MAINNET.chainId }),
     ]);
 
     // make sure transaction has actually succeeded
