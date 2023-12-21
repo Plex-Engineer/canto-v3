@@ -22,6 +22,7 @@ export type Transaction = {
   chainId: number | string;
   description: TransactionDescription;
   bridge?: BridgeProgress;
+  verifyTxComplete?: (txHash: string) => PromiseWithError<boolean>;
 } & (
   | {
       type: "EVM";

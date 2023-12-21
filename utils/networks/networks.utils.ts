@@ -91,6 +91,8 @@ export function getCosmosAPIEndpoint(
         return NO_ERROR(COSMOS_NETWORKS.CANTO_MAINNET_COSMOS.restEndpoint);
       case NETWORKS.CANTO_TESTNET_EVM.chainId:
         return NO_ERROR(COSMOS_NETWORKS.CANTO_TESTNET_COSMOS.restEndpoint);
+      case NETWORKS.GRAVITY_BRIGDE_EVM.chainId:
+        return NO_ERROR(COSMOS_NETWORKS.GRAVITY_BRIDGE.restEndpoint);
       default:
         return NEW_ERROR("getCosmosAPIEndpoint", "Invalid chainId: " + chainId);
     }
@@ -110,7 +112,9 @@ export function getCosmosAPIEndpoint(
  * @param {number} chainId chainId to get cosmos chain object
  * @returns {ReturnWithError<Chain>} cosmos chain object or error
  */
-export function getCosmosChainObject(chainId: number): ReturnWithError<Chain> {
+export function getCosmosEIPChainObject(
+  chainId: number
+): ReturnWithError<Chain> {
   switch (chainId) {
     case NETWORKS.CANTO_TESTNET_EVM.chainId:
       return NO_ERROR({
@@ -122,7 +126,12 @@ export function getCosmosChainObject(chainId: number): ReturnWithError<Chain> {
         chainId: NETWORKS.CANTO_MAINNET_EVM.chainId,
         cosmosChainId: COSMOS_NETWORKS.CANTO_MAINNET_COSMOS.chainId,
       });
+    case NETWORKS.GRAVITY_BRIGDE_EVM.chainId:
+      return NO_ERROR({
+        chainId: NETWORKS.GRAVITY_BRIGDE_EVM.chainId,
+        cosmosChainId: COSMOS_NETWORKS.GRAVITY_BRIDGE.chainId,
+      });
     default:
-      return NEW_ERROR("getCosmosChainObject", "Invalid chainId:" + chainId);
+      return NEW_ERROR("getCosmosEIPChainObject", "Invalid chainId:" + chainId);
   }
 }

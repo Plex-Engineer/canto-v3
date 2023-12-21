@@ -1,14 +1,16 @@
 import { BaseNetwork, Validation } from "@/config/interfaces";
-import { ETHEREUM_VIA_GRAVITY_BRIDGE } from "@/config/networks";
-import { maxBridgeAmountInUnderlying } from "@/hooks/bridge/helpers/amounts";
+import { maxBridgeAmountForToken } from "@/hooks/bridge/helpers/amounts";
 import { BridgeHookReturn } from "@/hooks/bridge/interfaces/hookParams";
 import useBridgeIn from "@/hooks/bridge/useBridgeIn";
 import useBridgeOut from "@/hooks/bridge/useBridgeOut";
+import useBridgingFees, {
+  BridgingFeesReturn,
+} from "@/hooks/bridge/useBridgingFees";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { BridgingMethod } from "@/transactions/bridge";
 import { convertToBigNumber } from "@/utils/formatting";
 import { connectToKeplr } from "@/utils/keplr";
-import { validateWeiUserInputTokenAmount } from "@/utils/math";
+import { percentOfAmount, validateWeiUserInputTokenAmount } from "@/utils/math";
 import { getNetworkInfoFromChainId, isCosmosNetwork } from "@/utils/networks";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -53,9 +55,21 @@ export interface BridgeComboReturn {
       }
     | {};
   bridgeHook: BridgeHookReturn;
+  feesHook: BridgingFeesReturn;
+  feesSelection: {
+    gravityBridge: {
+      totalChainFee: string;
+      selectedGBridgeFee: string;
+      setSelectedGBridgeFee: (fee: string) => void;
+    };
+  };
 }
 
 export default function useBridgeCombo(): BridgeComboReturn {
+  ///
+  /// ROUTER AND PATH
+  ///
+
   // router info (to get bridge direction)
   const pathName = usePathname();
   const router = useRouter();
@@ -71,6 +85,10 @@ export default function useBridgeCombo(): BridgeComboReturn {
     [searchParams]
   );
 
+  ///
+  /// DIRECTION
+  ///
+
   // direction info
   const bridgeDirection = () => {
     const direction = searchParams.get("direction");
@@ -82,6 +100,10 @@ export default function useBridgeCombo(): BridgeComboReturn {
   function setDirection(direction: "in" | "out") {
     router.push(pathName + "?" + createQueryString("direction", direction));
   }
+
+  ///
+  /// BRIDGE HOOKS
+  ///
 
   // bridge hooks
   const { txStore, signer } = useCantoSigner();
@@ -124,15 +146,56 @@ export default function useBridgeCombo(): BridgeComboReturn {
     bridgeOut.setState("ethAddress", connectedEthAddress);
   }, [connectedEthAddress]);
 
+  ///
+  /// AMOUNT
+  ///
+
   // user input amount
   const [amount, setAmount] = useState<string>("");
-  const [maxBridgeAmount, setMaxBridgeAmount] = useState<string>("0");
 
   // big number amount
   const amountAsBigNumberString = (
     convertToBigNumber(amount, bridge.selections.token?.decimals ?? 18).data ??
     "0"
   ).toString();
+
+  ///
+  /// FEES
+  ///
+  const bridgeFees = useBridgingFees({
+    direction: bridge.direction,
+    token: bridge.selections.token,
+    method: bridge.selections.method,
+    fromNetwork: bridge.selections.fromNetwork,
+    toNetwork: bridge.selections.toNetwork,
+  });
+  const [selectedGBridgeFee, setSelectedGBridgeFee] = useState<string>("0");
+  const gBridgeFees =
+    bridgeFees.ready &&
+    bridgeFees.method === BridgingMethod.GRAVITY_BRIDGE &&
+    bridgeFees.direction === "out"
+      ? {
+          chainFee:
+            percentOfAmount(amountAsBigNumberString, bridgeFees.chainFeePercent)
+              .data ?? "0",
+          bridgeFee: selectedGBridgeFee,
+        }
+      : {};
+  // reset user selection when options change
+  useEffect(() => {
+    setSelectedGBridgeFee("0");
+  }, [bridgeFees.ready]);
+
+  ///
+  /// TRANSACTIONS
+  ///
+
+  // get max bridge amount (estimation)
+  const maxBridgeAmount = maxBridgeAmountForToken(
+    bridge.selections.token,
+    bridgeFees.ready ? bridgeFees : null,
+    { gBridgeFee: selectedGBridgeFee }
+  );
 
   // validate user input amount
   const amountCheck = validateWeiUserInputTokenAmount(
@@ -143,28 +206,17 @@ export default function useBridgeCombo(): BridgeComboReturn {
     bridge.selections.token?.decimals ?? 0
   );
 
-  useEffect(() => {
-    async function getMaxAmount() {
-      setMaxBridgeAmount(
-        await maxBridgeAmountInUnderlying(
-          bridge.selections.token,
-          bridge.selections.toNetwork?.id ?? ""
-        )
-      );
-    }
-    getMaxAmount();
-  }, [
-    bridge.selections.token?.id,
-    bridge.selections.toNetwork?.id,
-    bridge.selections.token?.balance,
-  ]);
+  const txParams = {
+    amount: amountAsBigNumberString,
+    ...gBridgeFees,
+  };
+  // check to see if bridging will be possible with the current parameters
+  const canBridge = bridge.bridge.validateParams(txParams);
 
   // transaction that will do the bridging
   async function bridgeTx() {
     // get flow
-    const flow = bridge.bridge.newBridgeFlow({
-      amount: amountAsBigNumberString,
-    });
+    const flow = bridge.bridge.newBridgeFlow(txParams);
     // add flow to store
     txStore?.addNewFlow({
       txFlow: flow,
@@ -173,10 +225,9 @@ export default function useBridgeCombo(): BridgeComboReturn {
     });
   }
 
-  // check to see if bridging will be possible with the current parameters
-  const canBridge = bridge.bridge.validateParams({
-    amount: amountAsBigNumberString,
-  });
+  ///
+  /// CONFIRMATION MODAL
+  ///
 
   // if confirmation is open
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -189,10 +240,6 @@ export default function useBridgeCombo(): BridgeComboReturn {
     isCosmosNetwork(bridge.selections.toNetwork)
       ? {
           cosmosAddress: {
-            addressName:
-              bridge.selections.toNetwork.id === ETHEREUM_VIA_GRAVITY_BRIDGE.id
-                ? "Gravity Bridge"
-                : undefined,
             chainId: bridge.selections.toNetwork.chainId,
             addressPrefix: bridge.selections.toNetwork.addressPrefix,
             currentAddress: bridge.addresses.getReceiver() ?? "",
@@ -236,5 +283,13 @@ export default function useBridgeCombo(): BridgeComboReturn {
     networkName,
     cosmosProps,
     bridgeHook: bridge,
+    feesHook: bridgeFees,
+    feesSelection: {
+      gravityBridge: {
+        totalChainFee: gBridgeFees.chainFee ?? "0",
+        selectedGBridgeFee,
+        setSelectedGBridgeFee,
+      },
+    },
   };
 }

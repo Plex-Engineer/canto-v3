@@ -10,20 +10,28 @@ import Container from "@/components/container/container";
 import Image from "next/image";
 import ConfirmationModal from "./components/confirmationModal";
 import { isEVMNetwork } from "@/utils/networks";
-import { ETHEREUM_VIA_GRAVITY_BRIDGE } from "@/config/networks";
 import { BridgeComboReturn } from "./util";
+import { BridgingFeesReturn } from "@/hooks/bridge/useBridgingFees";
+import { BridgingMethod } from "@/transactions/bridge";
+import { addTokenBalances } from "@/utils/math";
+import { BridgeToken } from "@/hooks/bridge/interfaces/tokens";
+import FeeButton from "./components/feeButton";
 
 const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
     Amount,
-    Direction,
     Transaction,
     Confirmation,
     bridgeHook: bridge,
     cosmosProps,
     networkName,
+    feesHook: fees,
+    feesSelection,
   } = props;
   const { fromNetwork, toNetwork, token } = bridge.selections;
+  const { selectedGBridgeFee, setSelectedGBridgeFee, totalChainFee } =
+    feesSelection.gravityBridge;
+
   return (
     <>
       <ConfirmationModal
@@ -62,28 +70,6 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
           },
           canConfirm: !Transaction.canBridge.error,
         }}
-        extraDetails={
-          toNetwork?.id === ETHEREUM_VIA_GRAVITY_BRIDGE.id ? (
-            <Text size="x-sm">
-              To bridge your tokens to Ethereum through Gravity Bridge, first
-              ensure that you have an IBC wallet like Keplr.
-              <br />
-              <br />
-              Next, enter your Gravity Bridge address (from Keplr) below and
-              confirm.
-              <br />
-              <br />
-              Once completed, you can transfer your tokens from Gravity Bridge
-              to Ethereum using the{" "}
-              <a
-                style={{ textDecoration: "underline" }}
-                href="https://bridge.blockscape.network/"
-              >
-                Gravity Bridge Portal
-              </a>
-            </Text>
-          ) : undefined
-        }
       />
 
       <section className={styles.container}>
@@ -300,6 +286,17 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
         </div>
 
         <Spacer height="20px" />
+        <FeesSection
+          props={fees}
+          fees={{
+            totalChainFee,
+            selected: selectedGBridgeFee,
+            setSelected: setSelectedGBridgeFee,
+          }}
+          token={token}
+        />
+        <Spacer height="20px" />
+
         <Button
           width="fill"
           onClick={() => {
@@ -315,3 +312,151 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
 };
 
 export default Bridging;
+
+// props are return type of useBridgingFees
+const FeesSection = ({
+  props,
+  fees,
+  token,
+}: {
+  props: BridgingFeesReturn;
+  fees: {
+    selected: string;
+    setSelected: (value: string) => void;
+    totalChainFee: string;
+  };
+  token: BridgeToken | null;
+}) => {
+  return props.isLoading ? (
+    <Text font="proto_mono" size="x-sm">
+      loading fees.....
+    </Text>
+  ) : props.error !== null ? (
+    <Text font="proto_mono" size="x-sm">
+      error loading fees {props.error}
+    </Text>
+  ) : (
+    <>
+      {props.method === BridgingMethod.LAYER_ZERO && (
+        <Text font="proto_mono" size="x-sm">
+          Gas Fee: {props.lzFee.formattedAmount}
+        </Text>
+      )}
+      {props.method === BridgingMethod.GRAVITY_BRIDGE &&
+        props.direction === "out" && (
+          <>
+            <Text font="proto_mono" size="x-sm">
+              Chain Fee Percent:{" "}
+              {`${props.chainFeePercent}% (${displayAmount(
+                fees.totalChainFee,
+                token?.decimals ?? 0
+              )})`}
+            </Text>
+            <Text font="proto_mono" size="x-sm">
+              Selected Bridge Fee:{" "}
+              {displayAmount(fees.selected, token?.decimals ?? 0)}
+            </Text>
+
+            <Container direction="row" gap={10}>
+              <FeeButton
+                key={props.bridgeFeeOptions.slow}
+                onClick={() => fees.setSelected(props.bridgeFeeOptions.slow)}
+                title="slow"
+                subtext={"1 - 5 days"}
+                subtext2={"Batched transfer"}
+                priceInUSD={displayAmount(
+                  addTokenBalances(
+                    props.bridgeFeeOptions.slow,
+                    fees.totalChainFee
+                  ),
+                  token?.decimals ?? 0,
+                  { symbol: token?.symbol }
+                )}
+                priceInUSDFormatted={displayAmount(
+                  addTokenBalances(
+                    props.bridgeFeeOptions.slow,
+                    fees.totalChainFee
+                  ),
+                  token?.decimals ?? 0,
+                  { symbol: "$" }
+                )}
+                active={fees.selected === props.bridgeFeeOptions.slow}
+              />
+              <FeeButton
+                key={props.bridgeFeeOptions.medium}
+                onClick={() => fees.setSelected(props.bridgeFeeOptions.medium)}
+                title="medium"
+                subtext={"4 hours - 3 days"}
+                subtext2={"Batched transfer"}
+                priceInUSD={displayAmount(
+                  addTokenBalances(
+                    props.bridgeFeeOptions.medium,
+                    fees.totalChainFee
+                  ),
+                  token?.decimals ?? 0,
+                  { symbol: token?.symbol }
+                )}
+                priceInUSDFormatted={displayAmount(
+                  addTokenBalances(
+                    props.bridgeFeeOptions.medium,
+                    fees.totalChainFee
+                  ),
+                  token?.decimals ?? 0,
+                  { symbol: "$" }
+                )}
+                active={fees.selected === props.bridgeFeeOptions.medium}
+              />
+              <FeeButton
+                key={props.bridgeFeeOptions.fast}
+                onClick={() => fees.setSelected(props.bridgeFeeOptions.fast)}
+                title="fast"
+                subtext={"30 minutes"}
+                subtext2={"Individual transfer"}
+                priceInUSD={displayAmount(
+                  addTokenBalances(
+                    props.bridgeFeeOptions.fast,
+                    fees.totalChainFee
+                  ),
+                  token?.decimals ?? 0,
+                  { symbol: token?.symbol }
+                )}
+                priceInUSDFormatted={displayAmount(
+                  addTokenBalances(
+                    props.bridgeFeeOptions.fast,
+                    fees.totalChainFee
+                  ),
+                  token?.decimals ?? 0,
+                  { symbol: "$" }
+                )}
+                active={fees.selected === props.bridgeFeeOptions.fast}
+              />
+            </Container>
+            <div>
+              {Object.values(props.gasFees).map((fee) => (
+                <div key={fee.name}>
+                  <Text font="proto_mono" size="x-sm">
+                    {`${fee.name}: ${displayAmount(fee.amount, 18, {
+                      symbol: "CANTO",
+                    })}`}
+                  </Text>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      {props.method === BridgingMethod.IBC && props.direction === "out" && (
+        <ul>
+          {Object.values(props.gasFees).map((fee) => (
+            <li key={fee.name}>
+              <Text font="proto_mono" size="x-sm">
+                {`${fee.name}: ${displayAmount(fee.amount, 18, {
+                  symbol: "CANTO",
+                })}`}
+              </Text>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
+  );
+};

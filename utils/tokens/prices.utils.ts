@@ -35,3 +35,37 @@ export async function getTokenPriceInUSDC(
   }
   return NO_ERROR(new BigNumber(data.estimatedOutput).div(10 ** 6).toString());
 }
+
+/**
+ * @notice gets the amount of a token needed to swap for a certain amount of another token
+ * @param {string} fromAmount amount of token to swap from
+ * @param {string} fromAddress address of token to swap from
+ * @param {string} toAddress address of token to swap to
+ * @returns {PromiseWithError<string>} amount of token to swap to
+ */
+export async function getSwapAmountFromAmount(
+  fromAmount: string,
+  fromAddress: string,
+  toAddress: string
+): PromiseWithError<string> {
+  const { data, error } = await tryFetch<{ estimatedOutput: string }>(
+    SLINGSHOT_API_URL + "/trade",
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        liquidityZone: "canto",
+      },
+      body: JSON.stringify({
+        fromAmount,
+        from: fromAddress,
+        to: toAddress,
+      }),
+    }
+  );
+  if (error) {
+    return NEW_ERROR("getSwapAmountFromAmount", error);
+  }
+  return NO_ERROR(data.estimatedOutput);
+}

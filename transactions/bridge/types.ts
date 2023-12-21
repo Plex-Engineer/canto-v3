@@ -5,6 +5,10 @@ export type BridgeTransactionParams = {
   from: { chainId: string | number; account: string };
   to: { chainId: string | number; account: string };
   token: { data: BridgeToken; amount: string };
+  gravityBridgeFees?: {
+    bridgeFee: string;
+    chainFee: string;
+  };
 };
 
 export enum BridgingMethod {
