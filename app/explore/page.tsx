@@ -45,12 +45,13 @@ export default function OutlinksPage() {
                 target="_blank"
               >
                 1155tech
-              </Link>
-              : Your digital art can now reward you. 1155tech is not just
-              another art marketplace; receive a yield each time a key you own
-              is bought, sold, or burnt. It’s built by Atrium, one of the top
-              teams in crypto, and is backed by Electric Capital. They are also
-              currently producing the NounsDAO Movie.
+              </Link>{" "}
+              offers a marketplace for digital art with a unique feature - users
+              can earn yield each time a key they own is involved in a
+              transaction, whether it’s bought, sold, or burnt. The platform is
+              developed by Atrium, a top team in the crypto industry, and is
+              backed by Electric Capital. They are also currently producing the
+              NounsDAO movie.
             </Text>
           </Container>
 
@@ -72,10 +73,9 @@ export default function OutlinksPage() {
             <Text size="x-sm">
               <Link href={"https://www.blankrasa.com/"} target="_blank">
                 Blank Rasa
-              </Link>
-              : Discover NFTs with character on Blank Rasa. Home to the coveted
-              Canto Longneck, Shnoise, and Dead Ends collections. Step into
-              Canto’s dynamic NFT community and start curating your collection.
+              </Link>{" "}
+              is a platform for discovering and trading NFTs. It features
+              collections such as Canto Longneck, Shnoise, and Dead Ends.
             </Text>
           </Container>
           <Container
@@ -95,10 +95,10 @@ export default function OutlinksPage() {
             <Text size="x-sm">
               <Link href={"https://vivacity.finance/"} target="_blank">
                 Vivacity Finance
-              </Link>
-              : Canto’s RWA lending market. Earn extra yield by lending your
-              NOTE to borrowers. It’s built by B-Harvest, one of the most
-              respected engineering names in the Cosmos community.
+              </Link>{" "}
+              offers an onchain, institutional grade lending market for real
+              world assets on Canto. Users can lend their NOTE to borrowers to
+              earn additional yield.
             </Text>
           </Container>
         </div>
