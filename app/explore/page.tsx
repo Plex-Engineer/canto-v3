@@ -45,11 +45,12 @@ export default function OutlinksPage() {
                 target="_blank"
               >
                 1155tech
-              </Link>{" "}
-              is a platform for earning money by collecting digital art.
-              1155tech is the only art market that pays you. It is powered by
-              one of the top teams in crypto, Atrium. They are backed by
-              Electric Capital and currently producing the NounsDAO Movie.
+              </Link>
+              : Your digital art can now reward you. 1155tech is not just
+              another art marketplace; receive a yield each time a key you own
+              is bought, sold, or burnt. It’s built by Atrium, one of the top
+              teams in crypto, and is backed by Electric Capital. They are also
+              currently producing the NounsDAO Movie.
             </Text>
           </Container>
 
@@ -71,10 +72,10 @@ export default function OutlinksPage() {
             <Text size="x-sm">
               <Link href={"https://www.blankrasa.com/"} target="_blank">
                 Blank Rasa
-              </Link>{" "}
-              is canto’s NFT market. The only place to buy a Canto Longneck, a
-              Shnoise or a Dead Ends. It is celebrated for it’s great UX and is
-              a cornerstone of the canto NFT ecosystem.
+              </Link>
+              : Discover NFTs with character on Blank Rasa. Home to the coveted
+              Canto Longneck, Shnoise, and Dead Ends collections. Step into
+              Canto’s dynamic NFT community and start curating your collection.
             </Text>
           </Container>
           <Container
@@ -94,10 +95,10 @@ export default function OutlinksPage() {
             <Text size="x-sm">
               <Link href={"https://vivacity.finance/"} target="_blank">
                 Vivacity Finance
-              </Link>{" "}
-              is canto’s RWA lending market. Earn extra yield lending your NOTE
-              to borrowers. Vivacity Finance’s core team is B-Harvest, one of
-              the most respected engineering names in the Cosmos community.
+              </Link>
+              : Canto’s RWA lending market. Earn extra yield by lending your
+              NOTE to borrowers. It’s built by B-Harvest, one of the most
+              respected engineering names in the Cosmos community.
             </Text>
           </Container>
         </div>
