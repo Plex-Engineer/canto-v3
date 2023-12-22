@@ -18,7 +18,7 @@ import Toggle from "@/components/toggle";
 import { areEqualAddresses } from "@/utils/address";
 import PopUp from "@/components/popup/popup";
 import { CantoDexTxTypes } from "@/transactions/pairs/cantoDex";
-
+import Analytics from "@/provider/analytics";
 interface AddLiquidityProps {
   pair: CantoDexPairWithUserCTokenData;
   validateParams: (params: AddTxParams) => Validation;
@@ -104,6 +104,7 @@ export const AddLiquidityModal = ({
         decimals={pair.token1.decimals}
         value={valueToken1}
         onChange={(e) => {
+          Analytics.actions.events.liquidityPool.maxClicked()
           setValue(e.target.value, true);
         }}
         IconUrl={pair.token1.logoURI}
@@ -119,6 +120,7 @@ export const AddLiquidityModal = ({
         decimals={pair.token2.decimals}
         value={valueToken2}
         onChange={(e) => {
+          Analytics.actions.events.liquidityPool.maxClicked()
           setValue(e.target.value, false);
         }}
         IconUrl={pair.token2.logoURI}

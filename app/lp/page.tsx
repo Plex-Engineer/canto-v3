@@ -21,6 +21,7 @@ import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import usePool from "./utils";
+import Analytics from "@/provider/analytics";
 
 export default function Page() {
   const {
@@ -104,6 +105,12 @@ export default function Page() {
                   pair,
 
                   onManage: (pairAddress) => {
+                    Analytics.actions.events.liquidityPool.manageLPClicked({
+                      cantoLp: pair.symbol,
+                      cantoLpTokenBalance : displayAmount(pair.clmData?.userDetails?.balanceOfUnderlying ?? "0", pair.decimals, { short: false, precision: pair.decimals}),
+                      cantoLpStakedBalance: displayAmount(pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0", pair.decimals, { short: false, precision: pair.decimals}),
+                      cantoLpUnstakedBalance:  displayAmount(pair.clmData?.userDetails?.balanceOfUnderlying ?? "0", pair.decimals, { short: false, precision: pair.decimals}),
+                    })
                     setPair(pairAddress);
                   },
                   sendTxFlow: sendCantoDexTxFlow,
@@ -124,6 +131,7 @@ export default function Page() {
               options={["all", "stable", "volatile"]}
               selected={filteredPairs}
               setSelected={(value) => {
+                Analytics.actions.events.liquidityPool.tabSwitched(value)
                 setFilteredPairs(value);
               }}
             />
@@ -160,7 +168,12 @@ export default function Page() {
             .map((pair) =>
               GeneralCantoDexPairRow({
                 pair,
-                onAddLiquidity: (pairAddress) => setPair(pairAddress),
+                onAddLiquidity: (pairAddress) => {
+                  Analytics.actions.events.liquidityPool.addLPClicked({
+                    cantoLp: pair.symbol,
+                  })
+                  setPair(pairAddress)
+                },
               })
             ),
         ]}

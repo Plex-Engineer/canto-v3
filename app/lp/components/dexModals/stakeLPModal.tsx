@@ -15,6 +15,7 @@ import { addTokenBalances, convertTokenAmountToNote } from "@/utils/math";
 import { ModalItem } from "@/app/lending/components/modal/modal";
 import { Validation } from "@/config/interfaces";
 import Tabs from "@/components/tabs/tabs";
+import Analytics from "@/provider/analytics";
 interface Props {
   clpToken: CTokenWithUserData;
   onBack: () => void;
@@ -104,6 +105,7 @@ export const StakeLPModal = (props: Props) => {
           decimals={cLPToken.underlying.decimals}
           value={amount}
           onChange={(val) => {
+            Analytics.actions.events.liquidityPool.maxClicked()
             setAmount(val.target.value);
           }}
           IconUrl={cLPToken.underlying.logoURI}

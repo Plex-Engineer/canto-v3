@@ -19,6 +19,7 @@ import { areEqualAddresses } from "@/utils/address";
 import { convertTokenAmountToNote } from "@/utils/math";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
 import Toggle from "@/components/toggle";
+import Analytics from "@/provider/analytics";
 interface Props {
   isSupplyModal: boolean;
   cToken: CTokenWithUserData | null;
@@ -254,6 +255,12 @@ export const LendingModal = (props: Props) => {
           decimals={cToken.underlying.decimals}
           value={amount}
           onChange={(val, wasMax) => {
+            if(needLimit){
+              Analytics.actions.events.lendingMarket.limitClicked(limitProps.limit?.limitName ?? "")
+            }
+            else{
+              Analytics.actions.events.lendingMarket.maxClicked()
+            }
             wasMax ? setMaxClicked(true) : setMaxClicked(false);
             setAmount(val.target.value);
           }}

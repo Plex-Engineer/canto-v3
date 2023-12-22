@@ -28,6 +28,7 @@ import {
   useNewAmbientPositionManager,
 } from "@/utils/ambient/liquidityControllers";
 import { Validation } from "@/config/interfaces";
+import Analytics from "@/provider/analytics";
 
 interface NewPositionModalProps {
   pool: AmbientPool;
@@ -131,9 +132,10 @@ export const NewAmbientPositionModal = ({
           <Amount
             decimals={baseToken.decimals}
             value={positionManager.options.amountBase}
-            onChange={(e) =>
+            onChange={(e) =>{
+              Analytics.actions.events.liquidityPool.maxClicked()
               positionManager.setters.setAmount(e.target.value, true)
-            }
+            }}
             IconUrl={baseToken.logoURI}
             title={baseToken.symbol}
             min="0"
@@ -144,9 +146,10 @@ export const NewAmbientPositionModal = ({
           <Amount
             decimals={quoteToken.decimals}
             value={positionManager.options.amountQuote}
-            onChange={(e) =>
+            onChange={(e) =>{
+              Analytics.actions.events.liquidityPool.maxClicked()
               positionManager.setters.setAmount(e.target.value, false)
-            }
+            }}
             IconUrl={quoteToken.logoURI}
             title={quoteToken.symbol}
             min="0"
