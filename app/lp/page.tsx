@@ -107,10 +107,23 @@ export default function Page() {
                   onManage: (pairAddress) => {
                     Analytics.actions.events.liquidityPool.manageLPClicked({
                       cantoLp: pair.symbol,
-                      cantoLpTokenBalance : displayAmount(pair.clmData?.userDetails?.balanceOfUnderlying ?? "0", pair.decimals, { short: false, precision: pair.decimals}),
-                      cantoLpStakedBalance: displayAmount(pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0", pair.decimals, { short: false, precision: pair.decimals}),
-                      cantoLpUnstakedBalance:  displayAmount(pair.clmData?.userDetails?.balanceOfUnderlying ?? "0", pair.decimals, { short: false, precision: pair.decimals}),
-                    })
+                      cantoLpTokenBalance: displayAmount(
+                        pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+                        pair.decimals,
+                        { short: false, precision: pair.decimals }
+                      ),
+                      cantoLpStakedBalance: displayAmount(
+                        pair.clmData?.userDetails?.supplyBalanceInUnderlying ??
+                          "0",
+                        pair.decimals,
+                        { short: false, precision: pair.decimals }
+                      ),
+                      cantoLpUnstakedBalance: displayAmount(
+                        pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+                        pair.decimals,
+                        { short: false, precision: pair.decimals }
+                      ),
+                    });
                     setPair(pairAddress);
                   },
                 })
@@ -130,7 +143,7 @@ export default function Page() {
               options={["all", "stable", "volatile"]}
               selected={filteredPairs}
               setSelected={(value) => {
-                Analytics.actions.events.liquidityPool.tabSwitched(value)
+                Analytics.actions.events.liquidityPool.tabSwitched(value);
                 setFilteredPairs(value);
               }}
             />
@@ -170,8 +183,8 @@ export default function Page() {
                 onAddLiquidity: (pairAddress) => {
                   Analytics.actions.events.liquidityPool.addLPClicked({
                     cantoLp: pair.symbol,
-                  })
-                  setPair(pairAddress)
+                  });
+                  setPair(pairAddress);
                 },
               })
             ),

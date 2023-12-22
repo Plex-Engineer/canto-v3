@@ -20,12 +20,13 @@ const NavBar = () => {
   useAutoConnect();
   const currentPath = usePathname();
   const { signer } = useCantoSigner();
-  
 
   useEffect(() => {
     if (signer?.account.address) {
       Analytics.actions.people.registerWallet(signer.account.address);
-      Analytics.actions.identify(signer.account.address, { account: signer.account.address })
+      Analytics.actions.identify(signer.account.address, {
+        account: signer.account.address,
+      });
       Analytics.actions.events.connections.walletConnect(true);
     }
   }, [signer]);

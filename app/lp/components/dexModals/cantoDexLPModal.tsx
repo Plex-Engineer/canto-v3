@@ -23,7 +23,6 @@ import {
   createRemoveParams,
 } from "./RemoveLiquidityModal";
 import { createAddParams } from "./AddLiquidityModal";
-import Analytics from "@/provider/analytics";
 interface ManageCantoDexLPProps {
   pair: CantoDexPairWithUserCTokenData;
   sendTxFlow: (params: Partial<CantoDexTransactionParams>) => void;
@@ -176,33 +175,13 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
           </Container>
 
           <Container gap={20} direction="row">
-            <Button width="fill" onClick={() => {
-              Analytics.actions.events.liquidityPool.cantoDexLpModal.manageLPClicked(
-                {
-                  cantoLp: props.pair.symbol,
-                  cantoLpTokenBalance : displayAmount(props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0", props.pair.decimals, { short: false, precision: props.pair.decimals}),
-                  cantoLpStakedBalance: displayAmount(props.pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0", props.pair.decimals, { short: false, precision: props.pair.decimals}),
-                  cantoLpUnstakedBalance:  displayAmount(props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0", props.pair.decimals, { short: false, precision: props.pair.decimals}),
-                }
-              )
-              setModalType("liquidity")
-              }}>
+            <Button width="fill" onClick={() => setModalType("liquidity")}>
               Manage LP
             </Button>
             <Button
               disabled={Number(totalLP) === 0}
               width="fill"
-              onClick={() => {
-                Analytics.actions.events.liquidityPool.cantoDexLpModal.stakeLPClicked(
-                  {
-                    cantoLp: props.pair.symbol,
-                    cantoLpTokenBalance : displayAmount(props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0", props.pair.decimals, { short: false, precision: props.pair.decimals}),
-                    cantoLpStakedBalance: displayAmount(props.pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0", props.pair.decimals, { short: false, precision: props.pair.decimals}),
-                    cantoLpUnstakedBalance:  displayAmount(props.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0", props.pair.decimals, { short: false, precision: props.pair.decimals}),
-                  }
-                )
-                setModalType("stake")
-              }}
+              onClick={() => setModalType("stake")}
             >
               Manage Stake
             </Button>

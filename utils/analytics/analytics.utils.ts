@@ -1,252 +1,312 @@
-import {NewTransactionFlow} from "@/transactions/flows";
-import { TransactionFlowType } from "@/transactions/flows";
-import  {getBridgeMethodInfo} from "@/transactions/bridge/types";
-import {AnalyticsTransactionFlowInfo, AnalyticsTransactionFlowData} from "@/provider/analytics";
+import { NewTransactionFlow, TransactionFlowType } from "@/transactions/flows";
+import { getBridgeMethodInfo } from "@/transactions/bridge";
+import {
+  AnalyticsTransactionFlowInfo,
+  AnalyticsTransactionFlowData,
+} from "@/provider/analytics";
 import { BridgeTransactionParams } from "@/transactions/bridge/types";
-import { CantoDexTxTypes, CantoDexTransactionParams} from "@/transactions/pairs/cantoDex";
-import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
-import {AmbientTxType, AmbientTransactionParams} from "@/transactions/pairs/ambient/types"
-import {CTokenLendingTxTypes, CTokenLendingTransactionParams} from "@/transactions/lending/types"
-import {ClaimDexComboRewardsParams} from "@/hooks/pairs/lpCombo/transactions/claimRewards"
+import {
+  CantoDexTxTypes,
+  CantoDexTransactionParams,
+} from "@/transactions/pairs/cantoDex";
+import {
+  AmbientTxType,
+  AmbientTransactionParams,
+} from "@/transactions/pairs/ambient";
+import {
+  CTokenLendingTxTypes,
+  CTokenLendingTransactionParams,
+} from "@/transactions/lending";
+import { ClaimDexComboRewardsParams } from "@/hooks/pairs/lpCombo/transactions/claimRewards";
 import { getNetworkInfoFromChainId } from "@/utils/networks";
-import { convertToBigNumber, displayAmount, formatPercent } from "../formatting";
+import { displayAmount, formatPercent } from "../formatting";
 import { addTokenBalances } from "@/utils/math";
-import { quoteRemoveLiquidity } from "@/utils/cantoDex";
-import { getCantoCoreAddress } from "@/config/consts/addresses";
-import { NO_ERROR,PromiseWithError} from "@/config/interfaces/errors";
-import {getDisplayTokenAmountFromRange} from "@/utils/ambient";
+import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
+import { getDisplayTokenAmountFromRange } from "@/utils/ambient";
 
-async function getQuote(amountLp: string, pair :  CantoDexPairWithUserCTokenData): PromiseWithError<{
-  expectedToken1: string;
-  expectedToken2: string;
-}>{
-    const { data, error } = await quoteRemoveLiquidity(
-      Number(pair.token1.chainId),
-      getCantoCoreAddress(Number(pair.token1.chainId), "router") ?? "",
-      pair.token1.address,
-      pair.token2.address,
-      pair.stable,
-      (convertToBigNumber(amountLp, pair.decimals).data ?? "0").toString()
-    );
+const displayAnalyticsAmount = (amount: string, decimals: number) =>
+  displayAmount(amount, decimals, { short: false, precision: decimals });
 
-    if (error) {
-      return NO_ERROR({
-        expectedToken1: "0",
-        expectedToken2: "0",
-      });
+export function getAnalyticsTransactionFlowInfo(
+  flow: NewTransactionFlow,
+  flowId: string
+): ReturnWithError<AnalyticsTransactionFlowInfo> {
+  let txFlowInfo: AnalyticsTransactionFlowInfo = {
+    txFlowId: flowId,
+    txFlowCategory: flow.txType,
+    txCount: 0,
+    txList: [],
+  };
+
+  switch (flow.txType) {
+    case TransactionFlowType.BRIDGE: {
+      txFlowInfo.txFlowType = getBridgeMethodInfo(flow.params.method).name;
+      txFlowInfo.txFlowData = getBridgeTransactionFlowData(flow.params);
+      break;
     }
-    return NO_ERROR({
-      expectedToken1: data.expectedToken1 ?? "0",
-      expectedToken2: data.expectedToken2 ?? "0",
-    });
+    case TransactionFlowType.AMBIENT_LIQUIDITY_TX:
+      txFlowInfo.txFlowType = flow.params.txType;
+      txFlowInfo.txFlowData = getAmbientLiquidityTransactionFlowData(
+        flow.params
+      );
+      break;
+    case TransactionFlowType.CANTO_DEX_LP_TX:
+      txFlowInfo.txFlowType = flow.params.txType;
+      txFlowInfo.txFlowData = getCantoDexTransactionFlowData(flow.params);
+      break;
+
+    case TransactionFlowType.LP_COMBO_CLAIM_REWARDS_TX:
+      txFlowInfo.txFlowType = getLpComboClaimRewardsTransactionFlowType(
+        flow.params
+      );
+      break;
+    case TransactionFlowType.CLM_CTOKEN_TX:
+      txFlowInfo.txFlowType = flow.params.txType;
+      txFlowInfo.txFlowData = getClmCTokenTransactionFlowData(flow.params);
+      break;
+    default:
+      return NEW_ERROR("Invalid transaction flow type");
+  }
+  return NO_ERROR(txFlowInfo);
 }
 
-export async function getAnalyticsTransactionFlowInfo(flow : NewTransactionFlow, flowId: string) :  PromiseWithError< AnalyticsTransactionFlowInfo | undefined >{
-    let txFlowInfo  : AnalyticsTransactionFlowInfo = {
-      txFlowId: flowId,
-      txFlowCategory: flow.txType,
-      txCount:0,
-      txList:[],
-    }
+function getBridgeTransactionFlowData(
+  bridgeTxParams: BridgeTransactionParams
+): AnalyticsTransactionFlowData {
+  return {
+    bridgeFrom: getNetworkInfoFromChainId(bridgeTxParams.from.chainId).data
+      .name,
+    bridgeTo: getNetworkInfoFromChainId(bridgeTxParams.to.chainId).data.name,
+    bridgeAsset: bridgeTxParams.token.data.symbol,
+    bridgeAmount: displayAmount(
+      bridgeTxParams.token.amount,
+      bridgeTxParams.token.data.decimals,
+      { short: false, precision: bridgeTxParams.token.data.decimals }
+    ),
+  };
+}
 
-    switch (flow.txType) {
-      case TransactionFlowType.BRIDGE:
-        const bridgeTxFlowData = getBridgeTransactionFlowData(flow.params);
-        txFlowInfo.txFlowType = getBridgeMethodInfo(flow.params.method).name;
-        txFlowInfo.txFlowData = bridgeTxFlowData;
-        return  NO_ERROR(txFlowInfo)
+function getAmbientLiquidityTransactionFlowData(
+  ambientLiquidityTxParams: AmbientTransactionParams
+): AnalyticsTransactionFlowData {
+  const poolData = {
+    ambientLp: ambientLiquidityTxParams.pool.symbol,
+    ambientPositionId: ambientLiquidityTxParams.positionId,
+    ambientLpBaseToken: ambientLiquidityTxParams.pool.base.symbol,
+    ambientLpQuoteToken: ambientLiquidityTxParams.pool.quote.symbol,
+    ambientLpMinPrice: displayAnalyticsAmount(
+      ambientLiquidityTxParams.minExecPriceWei,
+      ambientLiquidityTxParams.pool.base.decimals -
+        ambientLiquidityTxParams.pool.quote.decimals
+    ),
+    ambientLpMaxPrice: displayAnalyticsAmount(
+      ambientLiquidityTxParams.maxExecPriceWei,
+      ambientLiquidityTxParams.pool.base.decimals -
+        ambientLiquidityTxParams.pool.quote.decimals
+    ),
+    ambientLpFee: formatPercent(
+      ambientLiquidityTxParams.pool.stats.feeRate.toString()
+    ),
+  };
+  if (ambientLiquidityTxParams.txType === AmbientTxType.ADD_CONC_LIQUIDITY) {
+    // add liquidity
+    const otherTokenAmount = getDisplayTokenAmountFromRange(
+      ambientLiquidityTxParams.amount,
+      ambientLiquidityTxParams.isAmountBase,
+      ambientLiquidityTxParams.minExecPriceWei,
+      ambientLiquidityTxParams.maxExecPriceWei,
+      ambientLiquidityTxParams.pool
+    );
+    const [baseAmount, quoteAmount] = [
+      ambientLiquidityTxParams.isAmountBase
+        ? displayAnalyticsAmount(
+            ambientLiquidityTxParams.amount,
+            ambientLiquidityTxParams.pool.base.decimals
+          )
+        : otherTokenAmount,
+      ambientLiquidityTxParams.isAmountBase
+        ? otherTokenAmount
+        : displayAnalyticsAmount(
+            ambientLiquidityTxParams.amount,
+            ambientLiquidityTxParams.pool.quote.decimals
+          ),
+    ];
 
-      case TransactionFlowType.CANTO_DEX_LP_TX:
-        const {data} =  await getCantoDexTransactionFlowData(flow.params)
-        if(!data){
-          return  NO_ERROR(undefined)
-        }
-        txFlowInfo.txFlowType = flow.params.txType;
-        txFlowInfo.txFlowData = data;
-        return  NO_ERROR(txFlowInfo)
+    const [baseBalance, quoteBalance] = [
+      displayAnalyticsAmount(
+        ambientLiquidityTxParams.pool.base.balance ?? "0",
+        ambientLiquidityTxParams.pool.base.decimals
+      ),
+      displayAnalyticsAmount(
+        ambientLiquidityTxParams.pool.quote.balance ?? "0",
+        ambientLiquidityTxParams.pool.quote.decimals
+      ),
+    ];
+    return {
+      ...poolData,
+      ambientLpBaseAmount: baseAmount,
+      ambientLpQuoteAmount: quoteAmount,
+      ambientLpBaseBalance: baseBalance,
+      ambientLpQuoteBalance: quoteBalance,
+    };
+  } else {
+    // remove liquidity
+    return {
+      ...poolData,
+      ambientLpLiquidity: ambientLiquidityTxParams.liquidity,
+    };
+  }
+}
 
-      case TransactionFlowType.AMBIENT_LIQUIDITY_TX:
-        const ambientLiquidityTxFlowData =  getAmbientLiquidityTransactionFlowData(flow.params)
-        if(!ambientLiquidityTxFlowData){
-          return  NO_ERROR(undefined)
-        }
-        txFlowInfo.txFlowType = flow.params.txType;
-        txFlowInfo.txFlowData = ambientLiquidityTxFlowData;
-        return  NO_ERROR(txFlowInfo)
-
-      case TransactionFlowType.LP_COMBO_CLAIM_REWARDS_TX:
-        const txFlowType = getLpComboClaimRewardsTransactionFlowType(flow.params)
-        if(!txFlowType){
-          return  NO_ERROR(undefined)
-        }
-        txFlowInfo.txFlowType = txFlowType;
-        return  NO_ERROR(txFlowInfo)
-
-      case TransactionFlowType.CLM_CTOKEN_TX:
-        const clmCTokenTxFlowData =  getClmCTokenTransactionFlowData(flow.params)
-        if(!clmCTokenTxFlowData){
-          return  NO_ERROR(undefined)
-        }
-        txFlowInfo.txFlowType = flow.params.txType;
-        txFlowInfo.txFlowData = clmCTokenTxFlowData;
-        return  NO_ERROR(txFlowInfo)
-
-      default:
-        return  NO_ERROR(undefined)
-    }
-  } 
-
-
-  export function getBridgeTransactionFlowData( bridgeTxParams : BridgeTransactionParams) : AnalyticsTransactionFlowData {
-    const bridgeTxFlowData : AnalyticsTransactionFlowData = {
-      bridgeFrom: getNetworkInfoFromChainId(bridgeTxParams.from.chainId).data.name,
-      bridgeTo: getNetworkInfoFromChainId(bridgeTxParams.to.chainId).data.name,
-      bridgeAsset:bridgeTxParams.token.data.symbol,
-      bridgeAmount : displayAmount(bridgeTxParams.token.amount, bridgeTxParams.token.data.decimals, { short: false, precision: bridgeTxParams.token.data.decimals }),
-    }
-    return bridgeTxFlowData
-  }  
-
-export async function getCantoDexTransactionFlowData( cantoDexTxParams : CantoDexTransactionParams) : PromiseWithError< AnalyticsTransactionFlowData | undefined > {
-  let txFlowData : AnalyticsTransactionFlowData
+function getCantoDexTransactionFlowData(
+  cantoDexTxParams: CantoDexTransactionParams
+): AnalyticsTransactionFlowData {
+  const pairData = {
+    cantoLp: cantoDexTxParams.pair.symbol,
+    cantoLpToken1: cantoDexTxParams.pair.token1.symbol,
+    cantoLpToken2: cantoDexTxParams.pair.token2.symbol,
+    cantoLPBalance1: displayAnalyticsAmount(
+      cantoDexTxParams.pair.token1.balance ?? "0",
+      cantoDexTxParams.pair.token1.decimals
+    ),
+    cantoLPBalance2: displayAnalyticsAmount(
+      cantoDexTxParams.pair.token2.balance ?? "0",
+      cantoDexTxParams.pair.token2.decimals
+    ),
+  };
   switch (cantoDexTxParams.txType) {
     case CantoDexTxTypes.ADD_LIQUIDITY:
-      txFlowData = {
-        cantoLp: cantoDexTxParams.pair.symbol,
-        cantoLpToken1: cantoDexTxParams.pair.token1.symbol,
-        cantoLpAmount1: displayAmount(cantoDexTxParams.amounts.amount1, cantoDexTxParams.pair.token1.decimals, { short: false, precision: cantoDexTxParams.pair.token1.decimals}),
-        cantoLpBalance1:  displayAmount(cantoDexTxParams.pair.token1.balance ?? "0", cantoDexTxParams.pair.token1.decimals, { short: false, precision: cantoDexTxParams.pair.token1.decimals}),
-        cantoLpToken2: cantoDexTxParams.pair.token2.symbol,
-        cantoLpAmount2:   displayAmount(cantoDexTxParams.amounts.amount2, cantoDexTxParams.pair.token2.decimals, { short: false, precision: cantoDexTxParams.pair.token2.decimals}),
-        cantoLpBalance2: displayAmount(cantoDexTxParams.pair.token2.balance ?? "0", cantoDexTxParams.pair.token2.decimals, { short: false, precision: cantoDexTxParams.pair.token2.decimals}),
+      return {
+        ...pairData,
+        cantoLpAmount1: displayAnalyticsAmount(
+          cantoDexTxParams.amounts.amount1,
+          cantoDexTxParams.pair.token1.decimals
+        ),
+        cantoLpAmount2: displayAnalyticsAmount(
+          cantoDexTxParams.amounts.amount2,
+          cantoDexTxParams.pair.token2.decimals
+        ),
         cantoLpSlippage: cantoDexTxParams.slippage,
         cantoLpDeadline: cantoDexTxParams.deadline,
         cantoLpStakeStatus: cantoDexTxParams.stake,
-      }
-      return  NO_ERROR(txFlowData)
-
+      };
     case CantoDexTxTypes.REMOVE_LIQUIDITY:
       const lpTokenBlance = addTokenBalances(
-        cantoDexTxParams.pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0",
+        cantoDexTxParams.pair.clmData?.userDetails?.supplyBalanceInUnderlying ??
+          "0",
         cantoDexTxParams.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0"
-      )
-      const {data} = await getQuote(cantoDexTxParams.amountLP ?? "0", cantoDexTxParams.pair)
-      txFlowData = {
-        cantoLp: cantoDexTxParams.pair.symbol,
-        cantoLpTokenAmount: displayAmount(cantoDexTxParams.amountLP ?? "0", cantoDexTxParams.pair.decimals, { short: false, precision: cantoDexTxParams.pair.decimals}),
-        cantoLpTokenBalance: displayAmount(lpTokenBlance, cantoDexTxParams.pair.decimals, { short: false, precision: cantoDexTxParams.pair.decimals}),
-        cantoLpExpectedToken1:  displayAmount(data.expectedToken1 , cantoDexTxParams.pair.token1.decimals, { short: false, precision: cantoDexTxParams.pair.token1.decimals}),
-        cantoLpExpectedToken2:  displayAmount(data.expectedToken2 , cantoDexTxParams.pair.token2.decimals, { short: false, precision: cantoDexTxParams.pair.token2.decimals}),
+      );
+      return {
+        ...pairData,
+        cantoLpTokenAmount: displayAnalyticsAmount(
+          cantoDexTxParams.amountLP ?? "0",
+          cantoDexTxParams.pair.decimals
+        ),
+        cantoLpTokenBalance: displayAnalyticsAmount(
+          lpTokenBlance,
+          cantoDexTxParams.pair.decimals
+        ),
         cantoLpSlippage: cantoDexTxParams.slippage,
         cantoLpDeadline: cantoDexTxParams.deadline,
-      }
-      return  NO_ERROR(txFlowData)
+        cantoLpExpectedToken1: displayAnalyticsAmount(
+          cantoDexTxParams.expectedAmount1 ?? "0",
+          cantoDexTxParams.pair.token1.decimals
+        ),
+        cantoLpExpectedToken2: displayAnalyticsAmount(
+          cantoDexTxParams.expectedAmount2 ?? "0",
+          cantoDexTxParams.pair.token2.decimals
+        ),
+      };
 
     case CantoDexTxTypes.STAKE || CantoDexTxTypes.UNSTAKE:
-      txFlowData = {
-        cantoLp: cantoDexTxParams.pair.symbol,
-        cantoLpTokenAmount:displayAmount(cantoDexTxParams.amountLP , cantoDexTxParams.pair.decimals, { short: false, precision: cantoDexTxParams.pair.decimals}),
-        cantoLpTokenBalance: displayAmount(cantoDexTxParams.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0", cantoDexTxParams.pair.decimals, { short: false, precision: cantoDexTxParams.pair.decimals}),
-        cantoLpStakedBalance: displayAmount(cantoDexTxParams.pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0", cantoDexTxParams.pair.decimals, { short: false, precision: cantoDexTxParams.pair.decimals}),
-        cantoLpUnstakedBalance:  displayAmount(cantoDexTxParams.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0", cantoDexTxParams.pair.decimals, { short: false, precision: cantoDexTxParams.pair.decimals}),
-      }
-      return  NO_ERROR(txFlowData)
-
+      return {
+        ...pairData,
+        cantoLpTokenAmount: displayAnalyticsAmount(
+          cantoDexTxParams.amountLP,
+          cantoDexTxParams.pair.decimals
+        ),
+        cantoLpTokenBalance: displayAnalyticsAmount(
+          cantoDexTxParams.pair.clmData?.userDetails?.balanceOfUnderlying ??
+            "0",
+          cantoDexTxParams.pair.decimals
+        ),
+        cantoLpStakedBalance: displayAnalyticsAmount(
+          cantoDexTxParams.pair.clmData?.userDetails
+            ?.supplyBalanceInUnderlying ?? "0",
+          cantoDexTxParams.pair.decimals
+        ),
+        cantoLpUnstakedBalance: displayAnalyticsAmount(
+          cantoDexTxParams.pair.clmData?.userDetails?.balanceOfUnderlying ??
+            "0",
+          cantoDexTxParams.pair.decimals
+        ),
+      };
     default:
-      return  NO_ERROR(undefined)
-    }
+      return {};
+  }
 }
 
-export function getAmbientLiquidityTransactionFlowData( ambientLiquidityTxParams : AmbientTransactionParams) : AnalyticsTransactionFlowData | undefined {
-  let txFlowData : AnalyticsTransactionFlowData
-  switch (ambientLiquidityTxParams.txType) {
-    case AmbientTxType.ADD_CONC_LIQUIDITY:
-      const otherTokenAmount = getDisplayTokenAmountFromRange(
-        ambientLiquidityTxParams.amount,
-        ambientLiquidityTxParams.isAmountBase,
-        ambientLiquidityTxParams.minExecPriceWei,
-        ambientLiquidityTxParams.maxExecPriceWei,
-        ambientLiquidityTxParams.pool,
-      );
-      const baseAmount =  ambientLiquidityTxParams.isAmountBase ? ambientLiquidityTxParams.amount : otherTokenAmount
-      const quoteAmount = ambientLiquidityTxParams.isAmountBase ? otherTokenAmount : ambientLiquidityTxParams.amount 
-      txFlowData = {
-        ambientLp: ambientLiquidityTxParams.pool.symbol,
-        ambientPositionId: ambientLiquidityTxParams.positionId,
-        ambientLpBaseToken: ambientLiquidityTxParams.pool.base.symbol,
-        ambientLpBaseAmount: baseAmount,
-        ambientLpBaseBalance: displayAmount( ambientLiquidityTxParams.pool.base.balance ?? "0",  ambientLiquidityTxParams.pool.base.decimals, { short: false, precision: ambientLiquidityTxParams.pool.base.decimals}),
-        ambientLpQuoteToken: ambientLiquidityTxParams.pool.quote.symbol,
-        ambientLpQuoteAmount: quoteAmount,
-        ambientLpQuoteBalance:displayAmount( ambientLiquidityTxParams.pool.quote.balance ?? "0",  ambientLiquidityTxParams.pool.quote.decimals, { short: false, precision: ambientLiquidityTxParams.pool.quote.decimals}),
-        ambientLpMinPrice:  displayAmount( ambientLiquidityTxParams.minExecPriceWei, 18, { short: false, precision: 18}),
-        ambientLpMaxPrice:  displayAmount( ambientLiquidityTxParams.maxExecPriceWei, 18, { short: false, precision: 18}),
-        ambientLpFee: formatPercent(ambientLiquidityTxParams.pool.stats.feeRate.toString())
-        
-      }
-      return txFlowData
-    case AmbientTxType.REMOVE_CONC_LIQUIDITY:
-      txFlowData = {
-        ambientLp: ambientLiquidityTxParams.pool.symbol,
-        ambientPositionId: ambientLiquidityTxParams.positionId,
-        ambientLpBaseToken: ambientLiquidityTxParams.pool.base.symbol,
-        ambientLpQuoteToken: ambientLiquidityTxParams.pool.quote.symbol,
-        ambientLpMinPrice: displayAmount( ambientLiquidityTxParams.minExecPriceWei, 18, { short: false, precision: 18}),
-        ambientLpMaxPrice: displayAmount( ambientLiquidityTxParams.maxExecPriceWei, 18, { short: false, precision: 18}),
-        ambientLpLiquidity: ambientLiquidityTxParams.liquidity,
-      }
-      return txFlowData
-    default:
-      return undefined;
-    }
-}
-
-
-export function getClmCTokenTransactionFlowData( clmCTokenTxParams : CTokenLendingTransactionParams) : AnalyticsTransactionFlowData | undefined {
-  let txFlowData : AnalyticsTransactionFlowData
+function getClmCTokenTransactionFlowData(
+  clmCTokenTxParams: CTokenLendingTransactionParams
+): AnalyticsTransactionFlowData {
+  const cTokenData = {
+    lmToken: clmCTokenTxParams.cToken.underlying.symbol,
+    lmAmount: displayAnalyticsAmount(
+      clmCTokenTxParams.amount,
+      clmCTokenTxParams.cToken.underlying.decimals
+    ),
+    lmWalletBalance: displayAnalyticsAmount(
+      clmCTokenTxParams.cToken.userDetails?.balanceOfUnderlying ?? "0",
+      clmCTokenTxParams.cToken.underlying.decimals
+    ),
+    lmAccountLiquidityRemaining: displayAnalyticsAmount(
+      clmCTokenTxParams.userPosition.liquidity,
+      18
+    ),
+  };
   switch (clmCTokenTxParams.txType) {
     case CTokenLendingTxTypes.SUPPLY || CTokenLendingTxTypes.WITHDRAW:
-      txFlowData = {
-        lmToken : clmCTokenTxParams.cToken.underlying.symbol,
-        lmAmount: displayAmount(clmCTokenTxParams.amount,  clmCTokenTxParams.cToken.underlying.decimals, { short: false, precision: clmCTokenTxParams.cToken.underlying.decimals}), 
+      return {
+        ...cTokenData,
         lmCollateralStatus: clmCTokenTxParams.cToken.userDetails?.isCollateral,
-        lmWalletBalance: displayAmount(clmCTokenTxParams.cToken.userDetails?.balanceOfUnderlying ?? "0",  clmCTokenTxParams.cToken.underlying.decimals, { short: false, precision: clmCTokenTxParams.cToken.underlying.decimals}), 
-        lmSuppliedAmount:displayAmount(clmCTokenTxParams.cToken.userDetails?.supplyBalanceInUnderlying?? "0",  clmCTokenTxParams.cToken.underlying.decimals, { short: false, precision: clmCTokenTxParams.cToken.underlying.decimals}), 
-        lmAccountLiquidityRemaining: displayAmount(clmCTokenTxParams.userPosition.liquidity,  18, { short: false, precision: 18}), 
-      }
-      return txFlowData
-
+        lmSuppliedAmount: displayAnalyticsAmount(
+          clmCTokenTxParams.cToken.userDetails?.supplyBalanceInUnderlying ??
+            "0",
+          clmCTokenTxParams.cToken.underlying.decimals
+        ),
+      };
     case CTokenLendingTxTypes.BORROW || CTokenLendingTxTypes.REPAY:
-      txFlowData = {
-        lmToken : clmCTokenTxParams.cToken.underlying.symbol,
-        lmAmount: displayAmount(clmCTokenTxParams.amount,  clmCTokenTxParams.cToken.underlying.decimals, { short: false, precision: clmCTokenTxParams.cToken.underlying.decimals}), 
-        lmWalletBalance: displayAmount(clmCTokenTxParams.cToken.userDetails?.balanceOfUnderlying ?? "0",  clmCTokenTxParams.cToken.underlying.decimals, { short: false, precision: clmCTokenTxParams.cToken.underlying.decimals}), 
-        lmBorrowedAmount:displayAmount(clmCTokenTxParams.cToken.userDetails?.borrowBalance?? "0",  clmCTokenTxParams.cToken.underlying.decimals, { short: false, precision: clmCTokenTxParams.cToken.underlying.decimals}), 
-        lmAccountLiquidityRemaining: displayAmount(clmCTokenTxParams.userPosition.liquidity,  18, { short: false, precision: 18}), 
-      }
-      return txFlowData
-   
-    case CTokenLendingTxTypes.COLLATERALIZE || CTokenLendingTxTypes.DECOLLATERALIZE:
-      txFlowData = {
-        lmToken : clmCTokenTxParams.cToken.underlying.symbol 
-      }
-      return txFlowData
-    default:
-      return undefined;
+      return {
+        ...cTokenData,
+        lmBorrowedAmount: displayAnalyticsAmount(
+          clmCTokenTxParams.cToken.userDetails?.borrowBalance ?? "0",
+          clmCTokenTxParams.cToken.underlying.decimals
+        ),
+      };
+    case CTokenLendingTxTypes.COLLATERALIZE ||
+      CTokenLendingTxTypes.DECOLLATERALIZE: {
+      return {
+        lmToken: clmCTokenTxParams.cToken.underlying.symbol,
+      };
     }
+    default:
+      return {};
+  }
 }
 
-export function getLpComboClaimRewardsTransactionFlowType( lpComboClaimRewardsTxParams : ClaimDexComboRewardsParams) : string | undefined {
-  if(lpComboClaimRewardsTxParams.clmParams && lpComboClaimRewardsTxParams.ambientParams){
-    return "Claim Canto and Ambient Rewards"
-  }
-  else if(lpComboClaimRewardsTxParams.clmParams){
-    return "Claim Canto Rewards"
-  }
-  else if(lpComboClaimRewardsTxParams.ambientParams){
-    return "Claim Ambient Rewards"
-  }
-  else{
-    return undefined
+function getLpComboClaimRewardsTransactionFlowType(
+  lpComboClaimRewardsTxParams: ClaimDexComboRewardsParams
+): string | undefined {
+  if (
+    lpComboClaimRewardsTxParams.clmParams &&
+    lpComboClaimRewardsTxParams.ambientParams
+  ) {
+    return "Claim Canto and Ambient Rewards";
+  } else if (lpComboClaimRewardsTxParams.clmParams) {
+    return "Claim Canto Rewards";
+  } else if (lpComboClaimRewardsTxParams.ambientParams) {
+    return "Claim Ambient Rewards";
+  } else {
+    return undefined;
   }
 }

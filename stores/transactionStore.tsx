@@ -84,18 +84,16 @@ const useTransactionStore = create<TransactionStore>()(
           // create new flow before getting transactions
           // new flow id
           const flowId = Date.now().toString() + params.ethAccount;
+          const { data: analyticsTransactionFlowInfo } =
+            getAnalyticsTransactionFlowInfo(params.txFlow, flowId);
           // set the transactions to an empty array for now, since we will get them when actually performing the flow
-          const {data} = await getAnalyticsTransactionFlowInfo(
-            params.txFlow,
-            flowId
-          );
           const newFlow: TransactionFlow = {
             ...params.txFlow,
             id: flowId,
             createdAt: new Date().getTime(),
             status: "POPULATING",
             transactions: [],
-            analyticsTransactionFlowInfo: data,
+            analyticsTransactionFlowInfo,
             onSuccessCallback: params.onSuccessCallback,
           };
           // add the flow to the user map and set loading to null

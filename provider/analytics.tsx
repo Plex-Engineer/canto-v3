@@ -5,7 +5,7 @@ import { TransactionFlowType } from "@/transactions/flows";
 import { CantoFETxType } from "@/transactions/interfaces";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
 import { CantoDexTxTypes } from "@/transactions/pairs/cantoDex";
-import { AmbientTxType  } from "@/transactions/pairs/ambient";
+import { AmbientTxType } from "@/transactions/pairs/ambient";
 import posthog from "posthog-js";
 
 // (BRIDGE/LP/LENDING/...)
@@ -16,53 +16,60 @@ type AnalyticsTransactionFlowType =
   | AmbientTxType
   | CTokenLendingTxTypes
   | BridgingMethodName
-  | string
+  | string;
 
-export type AnalyticsTransactionFlowData = {
-  // bridge info
-  bridgeFrom?: string;
-  bridgeTo?: string;
-  bridgeAsset?: string;
-  bridgeAmount?: string;
-  // canto dex info
-  cantoLp?: string;
-  cantoLpToken1?: string;
-  cantoLpToken2?: string;
-  cantoLpAmount1?: string;
-  cantoLpAmount2?: string;
-  cantoLpBalance1?: string;
-  cantoLpBalance2?: string;
-  cantoLpTokenAmount?: string;
-  cantoLpTokenBalance?: string;
-  cantoLpExpectedToken1?: string;
-  cantoLpStakedBalance?: string;
-  cantoLpUnstakedBalance?: string;
-  cantoLpExpectedToken2?: string;
-  cantoLpSlippage?: Number;
-  cantoLpDeadline?: string;
-  cantoLpStakeStatus?: boolean;
-  // ambient info
-  ambientLp?: string;
-  ambientPositionId?: string,
-  ambientLpBaseToken?: string;
-  ambientLpQuoteToken?: string;
-  ambientLpBaseAmount?: string;
-  ambientLpQuoteAmount?: string;
-  ambientLpBaseBalance?: string;
-  ambientLpQuoteBalance?: string;
-  ambientLpMinPrice?: string;
-  ambientLpMaxPrice?: string;
-  ambientLpLiquidity?: string;
-  ambientLpFee?: string;
-  // lending info
-  lmToken?: string;
-  lmAmount?: string;
-  lmCollateralStatus?:boolean;
-  lmWalletBalance?:string;
-  lmSuppliedAmount?:string;
-  lmBorrowedAmount?:string;
-  lmAccountLiquidityRemaining?:string;
-};
+export type AnalyticsTransactionFlowData =
+  | {
+      // bridge info
+      bridgeFrom: string;
+      bridgeTo: string;
+      bridgeAsset: string;
+      bridgeAmount: string;
+    }
+  | {
+      // canto dex info
+      cantoLp?: string;
+      cantoLpToken1?: string;
+      cantoLpToken2?: string;
+      cantoLpAmount1?: string;
+      cantoLpAmount2?: string;
+      cantoLpBalance1?: string;
+      cantoLpBalance2?: string;
+      cantoLpTokenAmount?: string;
+      cantoLpTokenBalance?: string;
+      cantoLpExpectedToken1?: string;
+      cantoLpStakedBalance?: string;
+      cantoLpUnstakedBalance?: string;
+      cantoLpExpectedToken2?: string;
+      cantoLpSlippage?: Number;
+      cantoLpDeadline?: string;
+      cantoLpStakeStatus?: boolean;
+    }
+  | {
+      // ambient info
+      ambientLp?: string;
+      ambientPositionId?: string;
+      ambientLpBaseToken?: string;
+      ambientLpQuoteToken?: string;
+      ambientLpBaseAmount?: string;
+      ambientLpQuoteAmount?: string;
+      ambientLpBaseBalance?: string;
+      ambientLpQuoteBalance?: string;
+      ambientLpMinPrice?: string;
+      ambientLpMaxPrice?: string;
+      ambientLpLiquidity?: string;
+      ambientLpFee?: string;
+    }
+  | {
+      // lending info
+      lmToken?: string;
+      lmAmount?: string;
+      lmCollateralStatus?: boolean;
+      lmWalletBalance?: string;
+      lmSuppliedAmount?: string;
+      lmBorrowedAmount?: string;
+      lmAccountLiquidityRemaining?: string;
+    };
 
 // tx types (approve/mint/swap/...)
 type AnalyticsTransactionType = CantoFETxType;
@@ -119,25 +126,25 @@ class AnalyticsWrapper {
           }
         },
       },
-      externalLinkClicked:(params : object)=>{
+      externalLinkClicked: (params: object) => {
         posthog.capture("External Link Clicked", params);
       },
-      liquidityPool :{
+      maxClicked: (maxName: string) => {
+        posthog.capture(`${maxName} Max Clicked`);
+      },
+      liquidityPool: {
         addLPClicked: (params: object) => {
           posthog.capture("Add LP Clicked", params);
         },
         manageLPClicked: (params: object) => {
           posthog.capture("Manage LP Clicked", params);
         },
-        tabSwitched:(tab: string)=>{
+        tabSwitched: (tab: string) => {
           posthog.capture("LP Tab Switched", {
             tab,
           });
         },
-        maxClicked:()=>{
-          posthog.capture("LP Modal Max Clicked");
-        },
-        cantoDexLpModal:{
+        cantoDexLpModal: {
           manageLPClicked: (params: object) => {
             posthog.capture("Canto LP Modal Manage LP Clicked", params);
           },
@@ -146,13 +153,10 @@ class AnalyticsWrapper {
           },
         },
       },
-      lendingMarket : {
-        maxClicked: ()=>{
-          posthog.capture("Lending Market Modal Max Clicked");
-        },
-        limitClicked: (limit: string)=>{
+      lendingMarket: {
+        limitClicked: (limit: string) => {
           posthog.capture("Lending Market Modal Limit Clicked", {
-            limit
+            limit,
           });
         },
       },

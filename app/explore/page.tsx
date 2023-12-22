@@ -46,8 +46,11 @@ export default function OutlinksPage() {
               <Link
                 href={"https://www.1155.tech/?rfc=378bde47-1571"}
                 target="_blank"
-                onClick={() => Analytics.actions.events.externalLinkClicked({Website : "1155tech"})
-              }
+                onClick={() =>
+                  Analytics.actions.events.externalLinkClicked({
+                    Website: "1155tech",
+                  })
+                }
               >
                 1155tech
               </Link>{" "}
@@ -76,7 +79,15 @@ export default function OutlinksPage() {
               alt="blankrasa"
             />
             <Text size="x-sm">
-              <Link href={"https://www.blankrasa.com/"} target="_blank" onClick={()=> Analytics.actions.events.externalLinkClicked({Website : "Blank Rasa"})}>
+              <Link
+                href={"https://www.blankrasa.com/"}
+                target="_blank"
+                onClick={() =>
+                  Analytics.actions.events.externalLinkClicked({
+                    Website: "Blank Rasa",
+                  })
+                }
+              >
                 Blank Rasa
               </Link>{" "}
               is a platform for discovering and trading NFTs. It features
@@ -98,7 +109,15 @@ export default function OutlinksPage() {
               alt="vivacity"
             />
             <Text size="x-sm">
-              <Link href={"https://vivacity.finance/"} target="_blank" onClick={()=> Analytics.actions.events.externalLinkClicked({Website : "Vivacity Finance"})} >
+              <Link
+                href={"https://vivacity.finance/"}
+                target="_blank"
+                onClick={() =>
+                  Analytics.actions.events.externalLinkClicked({
+                    Website: "Vivacity Finance",
+                  })
+                }
+              >
                 Vivacity Finance
               </Link>{" "}
               offers an onchain, institutional grade lending market for real

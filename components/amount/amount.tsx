@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import clsx from "clsx";
 import Spacer from "../layout/spacer";
 import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
+import Analytics from "@/provider/analytics";
 interface Props {
   IconUrl: string;
   title: string;
@@ -21,6 +22,7 @@ interface Props {
     limit: string;
   };
   extraNode?: React.ReactNode;
+  maxName?: string;
 }
 const Amount = (props: Props) => {
   const [focused, setFocused] = useState(false);
@@ -126,6 +128,7 @@ const Amount = (props: Props) => {
           <span
             className={styles.max}
             onClick={() => {
+              Analytics.actions.events.maxClicked(props.maxName ?? "Max Button");
               props.onChange(
                 {
                   target: {

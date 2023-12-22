@@ -17,7 +17,7 @@ import { ModalItem } from "@/app/lending/components/modal/modal";
 import { addTokenBalances } from "@/utils/math";
 import { areEqualAddresses } from "@/utils/address";
 import { CantoDexTxTypes } from "@/transactions/pairs/cantoDex";
-import Analytics from "@/provider/analytics";
+
 interface RemoveTxParams {
   pair: CantoDexPairWithUserCTokenData;
   amountLP: string;
@@ -120,14 +120,12 @@ export const RemoveLiquidityModal = ({
         <Amount
           value={amountLP}
           decimals={pair.decimals}
-          onChange={(e) => {
-            Analytics.actions.events.liquidityPool.maxClicked()
-            setAmountLP(e.target.value)
-          }}
+          onChange={(e) => setAmountLP(e.target.value)}
           IconUrl={pair.logoURI}
           title={pair.symbol}
           min="1"
           max={totalLP}
+          maxName="LP Modal"
           symbol={pair.symbol}
         />
         <Spacer height="20px" />
