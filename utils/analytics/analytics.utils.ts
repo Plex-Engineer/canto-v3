@@ -9,11 +9,12 @@ import {AmbientTxType, AmbientTransactionParams} from "@/transactions/pairs/ambi
 import {CTokenLendingTxTypes, CTokenLendingTransactionParams} from "@/transactions/lending/types"
 import {ClaimDexComboRewardsParams} from "@/hooks/pairs/lpCombo/transactions/claimRewards"
 import { getNetworkInfoFromChainId } from "@/utils/networks";
-import { convertToBigNumber, displayAmount } from "../formatting";
+import { convertToBigNumber, displayAmount, formatPercent } from "../formatting";
 import { addTokenBalances } from "@/utils/math";
 import { quoteRemoveLiquidity } from "@/utils/cantoDex";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { NO_ERROR,PromiseWithError} from "@/config/interfaces/errors";
+import {getDisplayTokenAmountFromRange} from "@/utils/ambient";
 
 async function getQuote(amountLp: string, pair :  CantoDexPairWithUserCTokenData): PromiseWithError<{
   expectedToken1: string;
@@ -160,17 +161,36 @@ export function getAmbientLiquidityTransactionFlowData( ambientLiquidityTxParams
   let txFlowData : AnalyticsTransactionFlowData
   switch (ambientLiquidityTxParams.txType) {
     case AmbientTxType.ADD_CONC_LIQUIDITY:
+      const otherTokenAmount = getDisplayTokenAmountFromRange(
+        ambientLiquidityTxParams.amount,
+        ambientLiquidityTxParams.isAmountBase,
+        ambientLiquidityTxParams.minExecPriceWei,
+        ambientLiquidityTxParams.maxExecPriceWei,
+        ambientLiquidityTxParams.pool,
+      );
+      const baseAmount =  ambientLiquidityTxParams.isAmountBase ? ambientLiquidityTxParams.amount : otherTokenAmount
+      const quoteAmount = ambientLiquidityTxParams.isAmountBase ? otherTokenAmount : ambientLiquidityTxParams.amount 
       txFlowData = {
         ambientLp: ambientLiquidityTxParams.pool.symbol,
+        ambientPositionId: ambientLiquidityTxParams.positionId,
+        ambientLpBaseToken: ambientLiquidityTxParams.pool.base.symbol,
+        ambientLpBaseAmount: baseAmount,
+        ambientLpBaseBalance: displayAmount( ambientLiquidityTxParams.pool.base.balance ?? "0",  ambientLiquidityTxParams.pool.base.decimals, { short: false, precision: ambientLiquidityTxParams.pool.base.decimals}),
+        ambientLpQuoteToken: ambientLiquidityTxParams.pool.quote.symbol,
+        ambientLpQuoteAmount: quoteAmount,
+        ambientLpQuoteBalance:displayAmount( ambientLiquidityTxParams.pool.quote.balance ?? "0",  ambientLiquidityTxParams.pool.quote.decimals, { short: false, precision: ambientLiquidityTxParams.pool.quote.decimals}),
         ambientLpMinPrice:  displayAmount( ambientLiquidityTxParams.minExecPriceWei, 18, { short: false, precision: 18}),
         ambientLpMaxPrice:  displayAmount( ambientLiquidityTxParams.maxExecPriceWei, 18, { short: false, precision: 18}),
-        ambientLpAmount: ambientLiquidityTxParams.amount,
+        ambientLpFee: formatPercent(ambientLiquidityTxParams.pool.stats.feeRate.toString())
         
       }
       return txFlowData
     case AmbientTxType.REMOVE_CONC_LIQUIDITY:
       txFlowData = {
         ambientLp: ambientLiquidityTxParams.pool.symbol,
+        ambientPositionId: ambientLiquidityTxParams.positionId,
+        ambientLpBaseToken: ambientLiquidityTxParams.pool.base.symbol,
+        ambientLpQuoteToken: ambientLiquidityTxParams.pool.quote.symbol,
         ambientLpMinPrice: displayAmount( ambientLiquidityTxParams.minExecPriceWei, 18, { short: false, precision: 18}),
         ambientLpMaxPrice: displayAmount( ambientLiquidityTxParams.maxExecPriceWei, 18, { short: false, precision: 18}),
         ambientLpLiquidity: ambientLiquidityTxParams.liquidity,

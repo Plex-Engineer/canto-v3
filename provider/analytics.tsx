@@ -43,10 +43,17 @@ export type AnalyticsTransactionFlowData = {
   cantoLpStakeStatus?: boolean;
   // ambient info
   ambientLp?: string;
+  ambientPositionId?: string,
+  ambientLpBaseToken?: string;
+  ambientLpQuoteToken?: string;
+  ambientLpBaseAmount?: string;
+  ambientLpQuoteAmount?: string;
+  ambientLpBaseBalance?: string;
+  ambientLpQuoteBalance?: string;
   ambientLpMinPrice?: string;
   ambientLpMaxPrice?: string;
-  ambientLpAmount?: string;
   ambientLpLiquidity?: string;
+  ambientLpFee?: string;
   // lending info
   lmToken?: string;
   lmAmount?: string;
