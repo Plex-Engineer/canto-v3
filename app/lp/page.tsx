@@ -113,7 +113,6 @@ export default function Page() {
                     })
                     setPair(pairAddress);
                   },
-                  sendTxFlow: sendCantoDexTxFlow,
                 })
               ),
             ]}
