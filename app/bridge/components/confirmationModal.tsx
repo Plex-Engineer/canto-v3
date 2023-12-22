@@ -26,6 +26,10 @@ interface Props {
   fromNetwork: string;
   toNetwork: string;
   amount: string;
+  extraValues?: {
+    key: string;
+    value: string;
+  }[];
   type: "in" | "out";
   confirmation: {
     canConfirm: boolean;
@@ -149,6 +153,23 @@ const ConfirmationModal = (props: Props) => {
               </Text>
               <Text size="sm">{props.amount}</Text>
             </Container>
+            {props.extraValues?.length != null && (
+              <div className={styles["extra-info"]}>
+                {props.extraValues?.map((extraValue) => (
+                  <Container
+                    width="100%"
+                    direction="row"
+                    gap={"auto"}
+                    key={extraValue.key}
+                  >
+                    <Text size="sm" theme="secondary-dark">
+                      {extraValue.key}
+                    </Text>
+                    <Text size="sm">{extraValue.value}</Text>
+                  </Container>
+                ))}
+              </div>
+            )}
           </Container>
         </Container>
         {props.cosmosAddress && (

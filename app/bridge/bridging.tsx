@@ -64,6 +64,30 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
             precision: token?.decimals,
           }
         )}
+        extraValues={[
+          {
+            key: "bridge fee (paid to validators)",
+            value: displayAmount(selectedGBridgeFee, token?.decimals ?? 0, {
+              symbol: token?.symbol,
+              precision: token?.decimals,
+            }),
+          },
+          {
+            key: "chain fee (paid to relayers)",
+            value: displayAmount(totalChainFee, token?.decimals ?? 0, {
+              symbol: token?.symbol,
+              precision: token?.decimals,
+            }),
+          },
+          {
+            key: "total fee",
+            value: displayAmount(
+              addTokenBalances(selectedGBridgeFee, totalChainFee),
+              token?.decimals ?? 0,
+              { symbol: token?.symbol }
+            ),
+          },
+        ]}
         confirmation={{
           onConfirm: () => {
             Transaction.bridgeTx();
@@ -302,7 +326,7 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
           onClick={() => {
             Confirmation.setIsModalOpen(true);
           }}
-          disabled={Amount.amountCheck.error}
+          //   disabled={Amount.amountCheck.error}
         >
           {bridge.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
         </Button>
