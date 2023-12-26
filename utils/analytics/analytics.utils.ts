@@ -22,7 +22,7 @@ import { getNetworkInfoFromChainId } from "@/utils/networks";
 import { displayAmount, formatPercent } from "../formatting";
 import { addTokenBalances } from "@/utils/math";
 import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
-import { getDisplayTokenAmountFromRange } from "@/utils/ambient";
+import { getDisplayTokenAmountFromRange, getPriceFromTick } from "@/utils/ambient";
 
 const displayAnalyticsAmount = (amount: string, decimals: number) =>
   displayAmount(amount, decimals, { short: false, precision: decimals });
@@ -94,12 +94,27 @@ function getAmbientLiquidityTransactionFlowData(
     ambientPositionId: ambientLiquidityTxParams.positionId,
     ambientLpBaseToken: ambientLiquidityTxParams.pool.base.symbol,
     ambientLpQuoteToken: ambientLiquidityTxParams.pool.quote.symbol,
-    ambientLpMinPrice: displayAnalyticsAmount(
+    ambientLpCurrentPrice: displayAnalyticsAmount(
+      ambientLiquidityTxParams.pool.stats.lastPriceSwap.toString(),
+      ambientLiquidityTxParams.pool.base.decimals -
+        ambientLiquidityTxParams.pool.quote.decimals 
+    ),
+    ambientLpMinRangePrice: displayAnalyticsAmount(
+      getPriceFromTick(ambientLiquidityTxParams.lowerTick),
+      ambientLiquidityTxParams.pool.base.decimals -
+        ambientLiquidityTxParams.pool.quote.decimals
+    ),
+    ambientLpMaxRangePrice: displayAnalyticsAmount(
+      getPriceFromTick(ambientLiquidityTxParams.upperTick),
+      ambientLiquidityTxParams.pool.base.decimals -
+        ambientLiquidityTxParams.pool.quote.decimals
+    ),
+    ambientLpMinExecPrice: displayAnalyticsAmount(
       ambientLiquidityTxParams.minExecPriceWei,
       ambientLiquidityTxParams.pool.base.decimals -
         ambientLiquidityTxParams.pool.quote.decimals
     ),
-    ambientLpMaxPrice: displayAnalyticsAmount(
+    ambientLpMaxExecPrice: displayAnalyticsAmount(
       ambientLiquidityTxParams.maxExecPriceWei,
       ambientLiquidityTxParams.pool.base.decimals -
         ambientLiquidityTxParams.pool.quote.decimals
@@ -110,26 +125,23 @@ function getAmbientLiquidityTransactionFlowData(
   };
   if (ambientLiquidityTxParams.txType === AmbientTxType.ADD_CONC_LIQUIDITY) {
     // add liquidity
+    const nonWeiAmount = ambientLiquidityTxParams.isAmountBase
+    ? displayAnalyticsAmount(ambientLiquidityTxParams.amount , ambientLiquidityTxParams.pool.base.decimals)
+    : displayAnalyticsAmount(ambientLiquidityTxParams.amount , ambientLiquidityTxParams.pool.quote.decimals)
     const otherTokenAmount = getDisplayTokenAmountFromRange(
-      ambientLiquidityTxParams.amount,
+      nonWeiAmount,
       ambientLiquidityTxParams.isAmountBase,
-      ambientLiquidityTxParams.minExecPriceWei,
-      ambientLiquidityTxParams.maxExecPriceWei,
+      getPriceFromTick(ambientLiquidityTxParams.lowerTick),
+      getPriceFromTick(ambientLiquidityTxParams.upperTick),
       ambientLiquidityTxParams.pool
     );
     const [baseAmount, quoteAmount] = [
       ambientLiquidityTxParams.isAmountBase
-        ? displayAnalyticsAmount(
-            ambientLiquidityTxParams.amount,
-            ambientLiquidityTxParams.pool.base.decimals
-          )
+        ? nonWeiAmount
         : otherTokenAmount,
       ambientLiquidityTxParams.isAmountBase
         ? otherTokenAmount
-        : displayAnalyticsAmount(
-            ambientLiquidityTxParams.amount,
-            ambientLiquidityTxParams.pool.quote.decimals
-          ),
+        : nonWeiAmount
     ];
 
     const [baseBalance, quoteBalance] = [

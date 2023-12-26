@@ -55,8 +55,11 @@ export type AnalyticsTransactionFlowData =
       ambientLpQuoteAmount?: string;
       ambientLpBaseBalance?: string;
       ambientLpQuoteBalance?: string;
-      ambientLpMinPrice?: string;
-      ambientLpMaxPrice?: string;
+      ambientLpCurrentPrice?: string;
+      ambientLpMinRangePrice?: string;
+      ambientLpMaxRangePrice?: string;
+      ambientLpMinExecPrice?: string;
+      ambientLpMaxExecPrice?: string;
       ambientLpLiquidity?: string;
       ambientLpFee?: string;
     }

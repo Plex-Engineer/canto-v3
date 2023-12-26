@@ -21,6 +21,7 @@ import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import usePool from "./utils";
+import { getPriceFromTick } from "@/utils/ambient";
 import Analytics from "@/provider/analytics";
 
 export default function Page() {
@@ -95,6 +96,26 @@ export default function Page() {
                 UserAmbientPairRow({
                   pool,
                   onManage: (poolAddress) => {
+                    const positions  = pool.userPositions.map((position)=> {
+                      return {
+                        positionId : position.positionId,
+                        liquidity : position.concLiq,
+                        minRangePrice : displayAmount(
+                          getPriceFromTick(position.bidTick),
+                          pool.base.decimals - pool.quote.decimals,
+                          { short:false, precision: pool.base.decimals - pool.quote.decimals }
+                        ),
+                        maxRangePrice : displayAmount(
+                          getPriceFromTick(position.askTick),
+                          pool.base.decimals - pool.quote.decimals,
+                          { short:false, precision: pool.base.decimals - pool.quote.decimals }
+                        ),
+                      }
+                    })
+                    Analytics.actions.events.liquidityPool.manageLPClicked({
+                      ambientLp: pool.symbol,
+                      positions,
+                    })
                     setPair(poolAddress);
                   },
                   rewards: rewards.ambient,
