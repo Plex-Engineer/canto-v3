@@ -162,10 +162,10 @@ const ConfirmationModal = (props: Props) => {
                     gap={"auto"}
                     key={extraValue.key}
                   >
-                    <Text size="sm" theme="secondary-dark">
+                    <Text size="x-sm" theme="secondary-dark">
                       {extraValue.key}
                     </Text>
-                    <Text size="sm">{extraValue.value}</Text>
+                    <Text size="x-sm">{extraValue.value}</Text>
                   </Container>
                 ))}
               </div>
