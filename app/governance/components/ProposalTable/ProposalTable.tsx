@@ -87,6 +87,7 @@ const ProposalTable = ({ proposals }:TableProps) => {
     //const router = useRouter();
   
     // Navigate to the appropriate page
+
     router.push(`/governance/proposal?id=${proposalId}`);
   };
   console.log(proposalTitleMap.get(currentFilter));
@@ -131,6 +132,9 @@ const ProposalTable = ({ proposals }:TableProps) => {
       // </table>     */}
       
       <div className={styles.table}>
+        {
+          (filteredProposals.length!=0) ?
+        
         <Table
                 title={proposalTitleMap.get(currentFilter)} 
                 secondary={
@@ -166,7 +170,8 @@ const ProposalTable = ({ proposals }:TableProps) => {
                   ]
                   );
                 })}
-            />
+            /> : <div>NO ACTIVE PROPOSALS FOUND</div>
+              }
       </div>
       
       <Spacer height='20px'/>

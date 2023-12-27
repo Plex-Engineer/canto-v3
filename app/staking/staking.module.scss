@@ -49,6 +49,14 @@
     width: 25%;
 
 }
+.infoBoxButton{
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+    justify-content: center;
+
+}
+
 .ClaimBtn{
     display: flex;
     flex-direction: row;
@@ -69,10 +77,10 @@
   padding: 16px;
   .paginationButton1{
     //margin-left: 10%;
-    margin-right: 10%;
+    margin-right: 3%;
   }
   .paginationButton2{
-    margin-left: 10%;
+    margin-left: 3%;
     //margin-right: 10%;
   }
 

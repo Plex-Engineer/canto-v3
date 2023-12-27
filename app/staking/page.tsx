@@ -152,8 +152,6 @@ export default function StakingPage() {
       ...validator,
       rank: index+1,
     }))
-      
-    
 ,[validators]);
 
   
@@ -163,8 +161,21 @@ export default function StakingPage() {
   //   rank: index + 1, // Adding 1 to make the rank start from 1
   // }));
 
-  const activeValidators = validatorsWithRanks.filter(v=>v.jailed==false);
-  const inActiveValidators = validatorsWithRanks.filter(v=>v.jailed==true);
+  const activeValidators = useMemo(
+    ()=>
+    validators.filter(v=>v.jailed==false).sort((a,b) => BigInt(a.tokens) < BigInt(b.tokens) ? 1 : -1).map((validator,index)=>({
+      ...validator,
+      rank: index+1,
+    }))
+,[validators]
+  ); //validatorsWithRanks.filter(v=>v.jailed==false);
+  const inActiveValidators = useMemo(
+    ()=>
+    validators.filter(v=>v.jailed==true).sort((a,b) => BigInt(a.tokens) < BigInt(b.tokens) ? 1 : -1).map((validator,index)=>({
+      ...validator,
+      rank: index+1,
+    }))
+,[validators]);
 
   const filteredValidators = (currentFilter=="ACTIVE")? activeValidators : inActiveValidators;
 
@@ -218,6 +229,8 @@ export default function StakingPage() {
     }
   };
 
+  const space = " ";
+
   
 
   function handleClick(validator: Validator){
@@ -258,8 +271,9 @@ export default function StakingPage() {
         <div className={styles.infoBox}>
           <div><Text font="rm_mono">Total Staked </Text></div>
           <Container direction="row" center={{vertical: true }}>
-            <Text font="proto_mono" size='title'>{totalStaked?.toFixed(2)}</Text>
-            <Icon
+          <div style={{marginRight: "5px"}}><Text font="proto_mono" size='title'>{totalStaked?.toFixed(2)} </Text></div>
+            <p>{space}</p>
+            <Icon themed
             icon={{
               url: "./tokens/canto.svg",
               size: 24,
@@ -278,8 +292,8 @@ export default function StakingPage() {
         <div className={styles.infoBox}>
           <div><Text font="rm_mono">Rewards</Text></div>
           <Container direction="row" center={{vertical: true }}>
-            <Text font="proto_mono" size='title'>{totalRewards?.toFixed(5)}</Text>
-            <Icon
+            <div style={{marginRight: "5px"}}><Text font="proto_mono" size='title'>{totalRewards?.toFixed(5)} </Text><Text>{" "}</Text></div>
+            <Icon themed
             icon={{
               url: "./tokens/canto.svg",
               size: 24,
@@ -288,9 +302,9 @@ export default function StakingPage() {
             
             </Container>
         </div>
-        <div className={styles.infoBox}>
+        <div className={styles.infoBoxButton}>
           <div className={styles.ClaimBtn}>
-            <Button width={500} onClick={()=>handleRewardsClaimClick(signer, allUserValidatorsAddresses)} disabled={!signer || !hasUserStaked}>
+            <Button width={500} height="large" onClick={()=>handleRewardsClaimClick(signer, allUserValidatorsAddresses)} disabled={!signer || !hasUserStaked}>
             Claim Staking Rewards
             </Button>
           </div>
@@ -321,6 +335,27 @@ export default function StakingPage() {
       </div>
       }
       <Spacer height="40px"/>
+      
+      {/* {
+        userStaking && 
+        <div className={styles.tableContainer2}>
+          <Table
+                title="My Staking"
+                headers={[
+                  { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 5 },
+                  { value: <Text opacity={0.4}>My Stake</Text>, ratio: 3 },
+                  { value: <Text opacity={0.4} font="rm_mono">Validator Total</Text>, ratio: 3 },
+                  { value: <Text opacity={0.4} font="rm_mono">Commission</Text>, ratio: 3 },
+                  { value: <Text opacity={0.4} font="rm_mono">Edit</Text>, ratio: 3 },
+                ]}
+                content={[...userStaking.unbonding.map((userStakingElement,index)=>
+                  GenerateMyStakingTableRow(userStakingElement, index,()=>handleClick(userStakingElement))
+                )]}
+            />
+          </div>
+
+      } */}
+      
       
       <Container width="100%" className={styles.tableContainer} >
       <div className={styles.searchBarContainer2}>
@@ -390,8 +425,8 @@ export default function StakingPage() {
                   </Container>
                 }
                 headers={[
-                  { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 6 },
                   {value: <Text opacity={0.4} font="rm_mono">Rank</Text>, ratio: 2},
+                  { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 6 },
                   { value: <Text opacity={0.4}>Validator Total</Text>, ratio: 4 },
                   { value: <Text opacity={0.4} font="rm_mono">Commission %</Text>, ratio: 3 },
                   { value: <Text opacity={0.4} font="rm_mono">Action</Text>, ratio: 4 },

@@ -97,24 +97,30 @@ export const StakingModal = (props : StakingModalParams) => {
                 <Spacer/>
                 <Container className={styles.spacer}><Spacer ></Spacer></Container>
                 <Spacer height="40px"/>
-                <Text>{props.validator?.description.moniker}</Text>
+                <Text weight="bold">{props.validator?.description.moniker}</Text>
                 <Spacer height="20px"></Spacer>
                 <div className={styles.modalInfoRow}>
                     <div><Text>Available Balance</Text></div>
-                    <div>
-                        <Text>
+                    <div style={{display:"flex", flexDirection:"row" }}>
+                        <div style={{marginRight:"5px"}}><Text>
                             {formatBalance(( props.userStaking && props.userStaking.cantoBalance) ? props.userStaking.cantoBalance : "0",18,{commify:true})}
-                            <Icon themed icon={{ url: "/tokens/canto.svg", size: 16 }} />
-                        </Text>
+                            
+                        </Text></div>
+                        <div style={{display:"flex", flexDirection:"column",justifyContent:"center"}}><Icon themed icon={{ url: "/tokens/canto.svg", size: 16 }} /></div>
                     </div>
                 </div>
                 <Spacer height="10px"></Spacer>
                 <div className={styles.modalInfoRow}>
                     <Text>Delegation</Text>
-                    <Text>
-                        {formatBalance(userDelegationBalance? userDelegationBalance: "0",18,{commify:true})}
-                        <Icon themed icon={{ url: "/tokens/canto.svg", size: 16 }} />
-                    </Text>
+                    <div style={{display:"flex", flexDirection:"row" }}>
+                        <div style={{marginRight:"5px"}}><Text>
+                            {formatBalance(userDelegationBalance? userDelegationBalance: "0",18,{commify:true})}
+                            
+                        </Text></div>
+                        <div style={{display:"flex", flexDirection:"column",justifyContent:"center"}}><Icon themed icon={{ url: "/tokens/canto.svg", size: 16 }} /></div>
+                        
+                    </div>
+                    
                 </div>
                 <Spacer height="10px"></Spacer>
                 <div className={styles.modalInfoRow}>
@@ -153,7 +159,7 @@ export const StakingModal = (props : StakingModalParams) => {
                         <div>
                             <Text opacity={0.4}>Balance: {formatBalance(maxBalance ,18,{commify:true,precision:2})} </Text>
                         </div>
-                        <div>
+                        <div style={{cursor:"pointer"}}onClick={()=>setInputAmount(formatBalance(maxBalance ,18,{commify:true,precision:2}))}>
                             <Text opacity={1}>(max)</Text>
                         </div>
                         
@@ -173,7 +179,7 @@ export const StakingModal = (props : StakingModalParams) => {
                 
                 <div style={{width: "100%"}} className={styles.modalInfoRow} >
                     <Text size="x-sm" color="#EE4B2B">
-                        Please Note: Staking will lock up your funds for 21 days once you undelegate your staked canto, you will need to wait 21 days for your tokens to be liquid.
+                        Please Note: Undelegation period is 21 days
                     </Text>
                     
                 </div>

@@ -50,6 +50,9 @@ const NavBar = () => {
     chainId: signer?.chain.id,
   });
 
+  console.log(currentPath);
+  console.log(currentPath == ("/governance" || "/governance/proposal"));
+
   return (
     <div className={styles.container}>
       <div className={styles.logo}>
@@ -103,15 +106,31 @@ const NavBar = () => {
         >
           <Text size="sm">Pools</Text>
         </Link>
-        <Link
+        {(currentPath=="/governance/proposal") &&
+          <Link
           href="/governance"
           className={clsx(
             styles["nav-link"],
-            currentPath == "/governance" && styles.active
+            styles.active
           )}
         >
           <Text>Governance</Text>
         </Link>
+        }
+        {
+          (currentPath!="/governance/proposal") &&
+          <Link
+          href="/governance"
+          className={clsx(
+            styles["nav-link"],
+            currentPath == ("/governance" || "/governance/proposal") && styles.active
+          )}
+        >
+          <Text>Governance</Text>
+        </Link>
+
+        }
+        
       </div>
       <div className={styles["btn-grp"]}>
         <div className={styles.theme}>
