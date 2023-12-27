@@ -30,7 +30,7 @@ const BridgeInProgress = ({}: Props) => {
       if (flow.txType === TransactionFlowType.BRIDGE) {
         // separate txs with bridge flag and status of pending
         flow.transactions.forEach((tx, idx) => {
-          if (tx.tx.bridge && tx.tx.bridge?.lastStatus !== "SUCCESS") {
+          if (tx.tx.bridge) {
             pendingTxs.push({ ...tx, txIndex: idx, flowId: flow.id });
           }
         });
