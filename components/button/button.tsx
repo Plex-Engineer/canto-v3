@@ -19,7 +19,7 @@ export interface ButtonProps {
   isLoading?: boolean;
   disabled?: boolean;
   shadow?: "small" | "medium" | "none";
-  buttonProps?: JSX.IntrinsicElements["button"];
+  buttonProps?: React.JSX.IntrinsicElements["button"];
 }
 
 const Button = (props: ButtonProps) => {
@@ -171,8 +171,8 @@ const Button = (props: ButtonProps) => {
               props.color == "primary"
                 ? "invert(var(--light-mode))"
                 : props.color == "accent"
-                ? "invert(0)"
-                : "invert(var(--dark-mode))",
+                  ? "invert(0)"
+                  : "invert(var(--dark-mode))",
           }}
           alt="icon"
           width={props.icon.size || 16}
@@ -188,8 +188,8 @@ const Button = (props: ButtonProps) => {
               props.color == "primary"
                 ? "invert(var(--light-mode))"
                 : props.color == "accent"
-                ? "invert(0)"
-                : "invert(var(--dark-mode))",
+                  ? "invert(0)"
+                  : "invert(var(--dark-mode))",
           }}
           src="/loader.svg"
           alt="loading"

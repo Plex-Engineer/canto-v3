@@ -1,6 +1,6 @@
 "use client";
 import { styled } from "styled-components";
-
+import React from "react";
 interface Props {
   value: boolean;
   children?: React.ReactNode;
@@ -11,7 +11,7 @@ interface Props {
 }
 
 const Toggle: {
-  (props: Props): JSX.Element;
+  (props: Props): React.JSX.Element;
   defaultProps?: Partial<Props>;
 } = ({
   value,

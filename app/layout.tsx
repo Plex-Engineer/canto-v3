@@ -7,7 +7,6 @@ import NavBar from "@/components/nav_bar/navBar";
 import CantoWalletProvider from "@/provider/rainbowProvider";
 import localFont from "next/font/local";
 import DesktopOnly from "@/components/desktop-only/desktop-only";
-import { Metadata } from "next";
 import { ReactQueryClientProvider } from "@/provider/reactQueryProvider";
 
 const rm_mono = localFont({

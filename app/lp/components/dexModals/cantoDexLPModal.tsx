@@ -17,12 +17,11 @@ import {
   divideBalances,
 } from "@/utils/math";
 import { CantoDexTransactionParams } from "@/transactions/pairs/cantoDex";
-import { AddLiquidityModal } from "./AddLiquidityModal";
+import { AddLiquidityModal, createAddParams } from "./AddLiquidityModal";
 import {
   RemoveLiquidityModal,
   createRemoveParams,
 } from "./RemoveLiquidityModal";
-import { createAddParams } from "./AddLiquidityModal";
 
 interface ManageCantoDexLPProps {
   pair: CantoDexPairWithUserCTokenData;
