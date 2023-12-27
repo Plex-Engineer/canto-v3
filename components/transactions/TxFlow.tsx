@@ -14,6 +14,7 @@ import {
 } from "@/transactions/flows";
 import { importERC20Token } from "@/utils/tokens";
 import InfoPop from "../infopop/infopop";
+import Analytics from "@/provider/analytics";
 
 interface Props {
   txFlow?: TransactionFlow;
@@ -71,6 +72,9 @@ const TxFlow = (props: Props) => {
                 <TxItem
                   key={idx}
                   tx={tx}
+                  analyticsTxFlowInfo={
+                    props.txFlow?.analyticsTransactionFlowInfo
+                  }
                   idx={idx + 1}
                   setBridgeStatus={(status) =>
                     props.setBridgeStatus(idx, status)
@@ -98,7 +102,7 @@ const TxFlow = (props: Props) => {
               <InfoPop>
                 <Text size="xx-sm">
                   {
-                    "You will need to import the token into your wallet to see your balance. You only need to do this once."
+                    "Import token into wallet to view its balance. This only needs to be done once."
                   }
                 </Text>
               </InfoPop>
@@ -113,6 +117,11 @@ const TxFlow = (props: Props) => {
               >
                 <a
                   onClick={() => {
+                    if (props.txFlow?.analyticsTransactionFlowInfo) {
+                      Analytics.actions.events.transactionFlows.tokensImported(
+                        props.txFlow?.analyticsTransactionFlowInfo
+                      );
+                    }
                     for (const token of props.txFlow?.tokenMetadata ?? []) {
                       importERC20Token(token);
                     }

@@ -1,18 +1,29 @@
 // how transactions are stored for the user (will allow retrying creating transactions)
 
 import { TransactionFlowType } from ".";
+import { BridgeTransactionParams } from "../bridge";
 import {
+  CantoFETxType,
   TransactionDescription,
   TransactionStatus,
   TransactionWithStatus,
 } from "../interfaces";
+import { AnalyticsTransactionFlowInfo } from "@/provider/analytics";
+import {
+  AmbientClaimRewardsTxParams,
+  AmbientTransactionParams,
+} from "../pairs/ambient";
+import { CantoDexTransactionParams } from "../pairs/cantoDex";
+import { ClaimDexComboRewardsParams } from "@/hooks/pairs/lpCombo/transactions/claimRewards";
+import {
+  CLMClaimRewardsTxParams,
+  CTokenLendingTransactionParams,
+} from "../lending";
 
 // txType is the key for the txMap that will create the Transaction[] list
 export type NewTransactionFlow = {
   title: string;
   icon: string;
-  txType: TransactionFlowType;
-  params: object;
   // for importing tokens from tx list
   tokenMetadata?: {
     chainId: number;
@@ -21,7 +32,38 @@ export type NewTransactionFlow = {
     decimals: number;
     icon: string;
   }[];
-};
+} & (
+  | {
+      txType: TransactionFlowType.BRIDGE;
+      params: BridgeTransactionParams;
+    }
+  | {
+      txType: TransactionFlowType.AMBIENT_LIQUIDITY_TX;
+      params: AmbientTransactionParams;
+    }
+  | {
+      txType: TransactionFlowType.AMBIENT_CLAIM_REWARDS_TX;
+      params: AmbientClaimRewardsTxParams;
+    }
+  | {
+      txType:
+        | TransactionFlowType.CANTO_DEX_LP_TX
+        | TransactionFlowType.CANTO_DEX_STAKE_LP_TX;
+      params: CantoDexTransactionParams;
+    }
+  | {
+      txType: TransactionFlowType.LP_COMBO_CLAIM_REWARDS_TX;
+      params: ClaimDexComboRewardsParams;
+    }
+  | {
+      txType: TransactionFlowType.CLM_CTOKEN_TX;
+      params: CTokenLendingTransactionParams;
+    }
+  | {
+      txType: TransactionFlowType.CLM_CLAIM_REWARDS_TX;
+      params: CLMClaimRewardsTxParams;
+    }
+);
 
 ///
 /// Transaction Flows will include multiple transactions
@@ -31,11 +73,12 @@ export type NewTransactionFlow = {
 ///
 export type TransactionFlow = NewTransactionFlow & {
   id: string;
-  status: TransactionStatus;
+  status: TransactionStatus; //yes
   createdAt: number;
-  transactions: TransactionWithStatus[];
-  placeholderFlow?: NewTransactionFlowPlaceholder;
-  error?: string;
+  transactions: TransactionWithStatus[]; //yes
+  placeholderFlow?: NewTransactionFlowPlaceholder; //yes
+  error?: string; //yes
+  analyticsTransactionFlowInfo?: AnalyticsTransactionFlowInfo;
   onSuccessCallback?: () => void;
 };
 
@@ -56,6 +99,7 @@ export const TX_PLACEHOLDER = (
   placeholder: NewTransactionFlowPlaceholder
 ): TransactionWithStatus => ({
   tx: {
+    feTxType: CantoFETxType.NONE,
     fromAddress: "",
     chainId: 0,
     description: placeholder.description,

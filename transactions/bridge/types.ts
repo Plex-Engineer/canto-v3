@@ -12,10 +12,15 @@ export enum BridgingMethod {
   IBC = "1",
   LAYER_ZERO = "2",
 }
+export type BridgingMethodName =
+  | "Layer Zero"
+  | "Gravity Bridge"
+  | "IBC"
+  | "Unknown";
 
 type BridgeMethodInfo = {
   [key in BridgingMethod]: {
-    name: string;
+    name: BridgingMethodName;
     icon: string;
     id: string;
   };
