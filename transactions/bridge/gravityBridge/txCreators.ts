@@ -6,6 +6,7 @@ import {
 import { BridgingMethod } from "..";
 import { GRAVITY_BRIDGE_ETH_ADDRESS } from "@/config/consts/addresses";
 import { GRAVITY_BRIDGE_ABI, WETH_ABI } from "@/config/abis";
+import { createMsgsSendToEth } from "@/transactions/cosmos/messages/gravitySendToEth/sendToEth";
 
 /**
  * TRANSACTION CREATORS
@@ -52,4 +53,28 @@ export const _wrapTx = (
   method: "deposit",
   params: [],
   value: amount,
+});
+
+export const _sendToEthGravityTx = (
+  chainId: number,
+  gravitySender: string,
+  ethReceiver: string,
+  nativeName: string,
+  amount: string,
+  bridgeFee: string,
+  chainFee: string,
+  description: TransactionDescription
+): Transaction => ({
+  description,
+  fromAddress: ethReceiver,
+  chainId: chainId,
+  type: "COSMOS",
+  msg: createMsgsSendToEth({
+    amount,
+    bridgeFee,
+    chainFee,
+    ethReceiver,
+    gravitySender,
+    nativeName,
+  }),
 });

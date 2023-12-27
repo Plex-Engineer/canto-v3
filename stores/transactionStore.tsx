@@ -4,7 +4,10 @@ import {
   PromiseWithError,
   errMsg,
 } from "@/config/interfaces";
-import { getNetworkInfoFromChainId } from "@/utils/networks";
+import {
+  getCosmosEIPChainObject,
+  getNetworkInfoFromChainId,
+} from "@/utils/networks";
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 import {
@@ -338,12 +341,21 @@ const useTransactionStore = create<TransactionStore>()(
 
             // we have a txHash so we can set status to pending
             // to get the txLink, we can grab it from the chainId,
+            let txChain;
+            if (tx.tx.type === "COSMOS") {
+              const { data: eipChain } = getCosmosEIPChainObject(
+                tx.tx.chainId as number
+              );
+              if (eipChain) {
+                txChain = getNetworkInfoFromChainId(eipChain.cosmosChainId);
+              }
+            } else {
+              txChain = getNetworkInfoFromChainId(tx.tx.chainId);
+            }
             get().setTxStatus(ethAccount, flowId, txIndex, {
               status: "PENDING",
               hash: txHash,
-              txLink: getNetworkInfoFromChainId(
-                tx.tx.chainId
-              ).data.blockExplorer?.getTransactionLink(txHash),
+              txLink: txChain?.data?.blockExplorer?.getTransactionLink(txHash),
               timestamp: new Date().getTime(),
             });
             // wait for the result before moving on
@@ -353,10 +365,19 @@ const useTransactionStore = create<TransactionStore>()(
             if (txReceiptError || receipt.status !== "success") {
               throw Error(receipt.error);
             }
+
             // transaction was a success so we can set status and
             get().setTxStatus(ethAccount, flowId, txIndex, {
               status: "SUCCESS",
             });
+
+            // some trasactions could need an extra check to make sure it is complete (ibc)
+            if (tx.tx.verifyTxComplete) {
+              const { data: verifyResult, error: verifyError } =
+                await tx.tx.verifyTxComplete(txHash);
+              // stop the flow if we must rely on this transaction to be verified (last tx still complete)
+              if (verifyError || !verifyResult) throw verifyError;
+            }
           } catch (err) {
             // something failed, so set the flow and tx to failure
             get().setTxStatus(ethAccount, flowId, txIndex, {
