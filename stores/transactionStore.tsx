@@ -358,10 +358,11 @@ const useTransactionStore = create<TransactionStore>()(
             get().setTxStatus(ethAccount, flowId, txIndex, {
               status: "PENDING",
               hash: txHash,
-              txLink: tx.tx.feTxType == CantoFETxType.OFT_TRANSFER
-              ? getLayerZeroTransactionlink(tx.tx.chainId)(txHash)
-                : txChain?.data.blockExplorer?.getTransactionLink(txHash),
-             timestamp: new Date().getTime(),
+              txLink:
+                tx.tx.feTxType == CantoFETxType.OFT_TRANSFER
+                  ? getLayerZeroTransactionlink(tx.tx.chainId)(txHash)
+                  : txChain?.data.blockExplorer?.getTransactionLink(txHash),
+              timestamp: new Date().getTime(),
             });
             // wait for the result before moving on
             const { data: receipt, error: txReceiptError } =
