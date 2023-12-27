@@ -1,8 +1,11 @@
+import Container from "@/components/container/container";
+import Text from "@/components/text";
 import TxItem from "@/components/transactions/TxItem";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { TransactionFlowType } from "@/transactions/flows";
 import { TransactionWithStatus } from "@/transactions/interfaces";
 import { useMemo } from "react";
+import InProgressTxItem from "./inProgressItem";
 
 type InProgressTx = TransactionWithStatus & {
   txIndex: number;
@@ -38,23 +41,45 @@ const BridgeInProgress = ({}: Props) => {
   }, [signer?.account.address, txStore]);
 
   return (
-    <div>
-      {inProgressTxs.map((tx, idx) => (
-        <TxItem
-          key={idx}
-          tx={tx}
-          idx={idx}
-          setBridgeStatus={(status) => {
-            txStore?.setTxBridgeStatus(
-              signer?.account.address ?? "",
-              tx.flowId,
-              tx.txIndex,
-              status
-            );
+    <Container height="468px" padding="lg">
+      {inProgressTxs.length > 0 ? (
+        inProgressTxs.map((tx, idx) => (
+          <InProgressTxItem
+            key={idx}
+            tx={tx}
+            idx={idx}
+            setBridgeStatus={(status) => {
+              txStore?.setTxBridgeStatus(
+                signer?.account.address ?? "",
+                tx.flowId,
+                tx.txIndex,
+                status
+              );
+            }}
+          />
+        ))
+      ) : (
+        <Container
+          height="100%"
+          center={{
+            horizontal: true,
+            vertical: true,
           }}
-        />
-      ))}
-    </div>
+        >
+          <Text
+            theme="secondary-dark"
+            size="sm"
+            style={{
+              textAlign: "center",
+              width: "80%",
+            }}
+          >
+            You have no pending transactions. To check history please click on
+            the transactions icon in the navbar.
+          </Text>
+        </Container>
+      )}
+    </Container>
   );
 };
 
