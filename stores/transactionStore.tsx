@@ -21,6 +21,8 @@ import {
 import { signTransaction, waitForTransaction } from "@/transactions/signTx";
 import Analytics from "@/provider/analytics";
 import { getAnalyticsTransactionFlowInfo } from "@/utils/analytics";
+import { CantoFETxType } from "@/transactions/interfaces";
+import { getLayerZeroTransactionlink } from "@/config/networks/evm/layerZero";
 
 // only save last 100 flows for each user to save space
 const USER_FLOW_LIMIT = 100;
@@ -344,9 +346,9 @@ const useTransactionStore = create<TransactionStore>()(
             get().setTxStatus(ethAccount, flowId, txIndex, {
               status: "PENDING",
               hash: txHash,
-              txLink: getNetworkInfoFromChainId(
-                tx.tx.chainId
-              ).data.blockExplorer?.getTransactionLink(txHash),
+              txLink: tx.tx.feTxType !== CantoFETxType.OFT_TRANSFER
+                ? getNetworkInfoFromChainId(tx.tx.chainId).data.blockExplorer?.getTransactionLink(txHash)
+                : getLayerZeroTransactionlink(tx.tx.chainId)(txHash),
               timestamp: new Date().getTime(),
             });
             // wait for the result before moving on
