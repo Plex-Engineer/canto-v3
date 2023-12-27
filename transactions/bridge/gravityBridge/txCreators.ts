@@ -66,6 +66,7 @@ export const _sendToEthGravityTx = (
   description: TransactionDescription
 ): Transaction => ({
   description,
+  feTxType: CantoFETxType.SEND_TO_ETH,
   bridge: {
     type: BridgingMethod.GRAVITY_BRIDGE,
     lastStatus: "NONE",
