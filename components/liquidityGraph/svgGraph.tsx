@@ -79,6 +79,8 @@ const SVGLiquidityGraph = ({
         newLeftPosition = leftPosition + offset;
         newRightPosition = rightPosition + offset;
         break;
+      default:
+        return;
     }
     // set the values in the parent (Only place where values are set in parent)
     const newMin = convertGraphValueToValue(newLeftPosition, xAxis, size.width);

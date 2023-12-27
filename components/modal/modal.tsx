@@ -97,9 +97,8 @@ const Modal = ({
       modalContent,
       document.querySelector("#modal-root")!
     );
-  } else {
-    return null;
   }
+  return null;
 };
 
 export default Modal;

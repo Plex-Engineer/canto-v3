@@ -53,8 +53,8 @@ const Container = (props: Props) => {
           props.gap == "auto"
             ? "space-between"
             : props.center?.horizontal
-            ? "center"
-            : "unset",
+              ? "center"
+              : "unset",
         alignItems: props.center?.vertical ? "center" : "",
         zIndex: props.layer,
         ...props.style,
