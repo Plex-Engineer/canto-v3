@@ -7,6 +7,7 @@ import {
 import {
   getCosmosEIPChainObject,
   getNetworkInfoFromChainId,
+  getLayerZeroTransactionlink,
 } from "@/utils/networks";
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
@@ -20,10 +21,12 @@ import {
   BridgeStatus,
   TransactionStatus,
   TransactionWithStatus,
+  CantoFETxType,
 } from "@/transactions/interfaces";
 import { signTransaction, waitForTransaction } from "@/transactions/signTx";
 import Analytics from "@/provider/analytics";
 import { getAnalyticsTransactionFlowInfo } from "@/utils/analytics";
+
 // only save last 100 flows for each user to save space
 const USER_FLOW_LIMIT = 100;
 interface AddNewFlowParams {
@@ -355,8 +358,10 @@ const useTransactionStore = create<TransactionStore>()(
             get().setTxStatus(ethAccount, flowId, txIndex, {
               status: "PENDING",
               hash: txHash,
-              txLink: txChain?.data?.blockExplorer?.getTransactionLink(txHash),
-              timestamp: new Date().getTime(),
+              txLink: tx.tx.feTxType == CantoFETxType.OFT_TRANSFER
+              ? getLayerZeroTransactionlink(tx.tx.chainId)(txHash)
+                : txChain?.data.blockExplorer?.getTransactionLink(txHash),
+             timestamp: new Date().getTime(),
             });
             // wait for the result before moving on
             const { data: receipt, error: txReceiptError } =

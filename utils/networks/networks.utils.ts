@@ -9,6 +9,19 @@ import {
 import * as NETWORKS from "@/config/networks";
 import * as COSMOS_NETWORKS from "@/config/networks/cosmos";
 import { Chain } from "@/transactions/interfaces";
+import { getEthTransactionLink } from "@/config/networks/helpers";
+
+const layerzeroMainnetScanUrl = "https://layerzeroscan.com";
+const layerzeroTestnetScanUrl = "https://testnet.layerzeroscan.com";
+
+
+export const getLayerZeroTransactionlink = (chainId: string | number) => {
+  if (getNetworkInfoFromChainId(chainId).data.isTestChain) {
+    return getEthTransactionLink(layerzeroTestnetScanUrl)
+  }
+  return getEthTransactionLink(layerzeroMainnetScanUrl)
+}
+
 
 // will get correct cosmos canto chain from evm or cosmos chain id
 export function getCantoCosmosNetwork(
