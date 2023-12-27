@@ -4,6 +4,7 @@ import Container from "@/components/container/container";
 import Bridging from "./bridging";
 import Tabs from "@/components/tabs/tabs";
 import useBridgeCombo from "./util";
+import BridgeInProgress from "./components/bridgeInProgress";
 
 export default function BridgePage() {
   const bridgeCombo = useBridgeCombo();
@@ -39,6 +40,10 @@ export default function BridgePage() {
                 title: "BRIDGE OUT",
                 content: <Bridging key={"bridge-out"} props={bridgeCombo} />,
                 onClick: () => Direction.setDirection("out"),
+              },
+              {
+                title: "IN PROGRESS",
+                content: <BridgeInProgress key={"in-progress"} />,
               },
             ]}
           />

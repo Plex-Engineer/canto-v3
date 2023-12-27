@@ -7,9 +7,9 @@ import {
   Validation,
 } from "@/config/interfaces";
 import {
+  BridgeStatus,
   TX_DESCRIPTIONS,
   Transaction,
-  TransactionStatus,
   TxCreatorFunctionReturn,
 } from "@/transactions/interfaces";
 import { isValidEthAddress } from "@/utils/address";
@@ -186,7 +186,7 @@ export function validateLayerZeroTxParams(
 export async function checkLZBridgeStatus(
   fromChainId: number,
   txHash: string
-): PromiseWithError<{ status: TransactionStatus }> {
+): PromiseWithError<BridgeStatus> {
   try {
     // get network
     const { data: fromNetwork, error: fromNetworkError } =

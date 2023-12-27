@@ -11,7 +11,7 @@ import { BridgeStatus, TxCreatorFunctionReturn } from "../interfaces";
 import { TX_PARAM_ERRORS } from "@/config/consts/errors";
 import { isCantoChainId } from "@/utils/networks";
 import {
-  checkGbridgeTxStatus,
+  checkGbridgeInTxStatus,
   gravityBridgeInTx,
   validateGravityBridgeInTxParams,
 } from "./gravityBridge/gravityBridgeIn";
@@ -23,9 +23,11 @@ import {
 import { IBCOutTx, validateIBCOutTxParams } from "./ibc/ibcOutTx";
 import { ibcInKeplr, validateKeplrIBCParams } from "./ibc/ibcInTx";
 import {
+  checkGbridgeOutTxStatus,
   gravityBridgeOutTx,
   validateGravityBridgeOutTxParams,
 } from "./gravityBridge/gravityBridgeOut";
+import { GRAVITY_BRIGDE_EVM } from "@/config/networks";
 
 /**
  * @notice creates a list of transactions that need to be made for bridging into canto
@@ -94,7 +96,9 @@ export async function getBridgeStatus(
 ): PromiseWithError<BridgeStatus> {
   switch (type) {
     case BridgingMethod.GRAVITY_BRIDGE:
-      return checkGbridgeTxStatus(chainId, txHash);
+      return chainId === GRAVITY_BRIGDE_EVM.chainId
+        ? checkGbridgeOutTxStatus(txHash)
+        : checkGbridgeInTxStatus(txHash);
     case BridgingMethod.LAYER_ZERO:
       return checkLZBridgeStatus(chainId, txHash);
     default:

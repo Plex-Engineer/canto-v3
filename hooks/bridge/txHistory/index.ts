@@ -16,7 +16,7 @@ interface AllUserBridgeTransactionHistory {
   ibc: UserIBCTransactionHistory;
 }
 
-export async function getAllUserBridgeTransactionHistory(
+async function getAllUserBridgeTransactionHistory(
   ethAccount: string
 ): PromiseWithError<AllUserBridgeTransactionHistory> {
   const [layerZero, gravityBridge, ibc] = await Promise.all([
