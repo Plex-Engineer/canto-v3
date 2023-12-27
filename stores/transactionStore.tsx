@@ -4,7 +4,7 @@ import {
   PromiseWithError,
   errMsg,
 } from "@/config/interfaces";
-import { getNetworkInfoFromChainId } from "@/utils/networks";
+import { getNetworkInfoFromChainId, getLayerZeroTransactionlink } from "@/utils/networks";
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 import {
@@ -22,7 +22,6 @@ import { signTransaction, waitForTransaction } from "@/transactions/signTx";
 import Analytics from "@/provider/analytics";
 import { getAnalyticsTransactionFlowInfo } from "@/utils/analytics";
 import { CantoFETxType } from "@/transactions/interfaces";
-import { getLayerZeroTransactionlink } from "@/config/networks/evm/layerZero";
 
 // only save last 100 flows for each user to save space
 const USER_FLOW_LIMIT = 100;
