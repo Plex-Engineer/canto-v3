@@ -64,30 +64,10 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
             precision: token?.decimals,
           }
         )}
-        extraValues={[
-          {
-            key: "bridge fee (paid to validators)",
-            value: displayAmount(selectedGBridgeFee, token?.decimals ?? 0, {
-              symbol: token?.symbol,
-              precision: token?.decimals,
-            }),
-          },
-          {
-            key: "chain fee (paid to relayers)",
-            value: displayAmount(totalChainFee, token?.decimals ?? 0, {
-              symbol: token?.symbol,
-              precision: token?.decimals,
-            }),
-          },
-          {
-            key: "total fee",
-            value: displayAmount(
-              addTokenBalances(selectedGBridgeFee, totalChainFee),
-              token?.decimals ?? 0,
-              { symbol: token?.symbol }
-            ),
-          },
-        ]}
+        extraValues={formattedFeesForConfirmation(fees, token, {
+          totalChainFee,
+          selected: selectedGBridgeFee,
+        })}
         confirmation={{
           onConfirm: () => {
             Transaction.bridgeTx();
@@ -272,7 +252,9 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
                 <Input
                   type="amount"
                   height={64}
-                  balance={Amount.maxBridgeAmount}
+                  balance={token?.balance ?? "0"}
+                  tokenMin="0"
+                  tokenMax={Amount.maxBridgeAmount}
                   decimals={token?.decimals ?? 0}
                   placeholder="0.0"
                   value={Amount.amount}
@@ -280,12 +262,6 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
                     Amount.setAmount(val.target.value);
                   }}
                   className={styles["input"]}
-                  error={
-                    Amount.amountCheck.error && Number(Amount.amount) !== 0
-                  }
-                  errorMessage={
-                    Amount.amountCheck.error ? Amount.amountCheck.reason : ""
-                  }
                 />
               </Container>
             </Container>
@@ -326,7 +302,7 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
           onClick={() => {
             Confirmation.setIsModalOpen(true);
           }}
-          //   disabled={Amount.amountCheck.error}
+          disabled={Confirmation.preConfirmCheck.error}
         >
           {bridge.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
         </Button>
@@ -336,6 +312,52 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
 };
 
 export default Bridging;
+
+const formattedFeesForConfirmation = (
+  props: BridgingFeesReturn,
+  token: BridgeToken | null,
+  gravityFees: {
+    selected: string;
+    totalChainFee: string;
+  }
+) => {
+  return props.isLoading
+    ? []
+    : props.error !== null
+    ? []
+    : props.method === BridgingMethod.LAYER_ZERO
+    ? [{ key: "gas fee", value: props.lzFee.formattedAmount }]
+    : props.method === BridgingMethod.GRAVITY_BRIDGE &&
+      props.direction === "out"
+    ? [
+        {
+          key: "bridge fee (paid to validators)",
+          value: displayAmount(gravityFees.selected, token?.decimals ?? 0, {
+            symbol: token?.symbol,
+          }),
+        },
+        {
+          key: "chain fee (paid to relayers)",
+          value: displayAmount(
+            gravityFees.totalChainFee,
+            token?.decimals ?? 0,
+            {
+              symbol: token?.symbol,
+            }
+          ),
+        },
+        ...Object.values(props.gasFees).map((fee) => ({
+          key: fee.name,
+          value: displayAmount(fee.amount, 18, { symbol: "CANTO" }),
+        })),
+      ]
+    : props.method === BridgingMethod.IBC && props.direction === "out"
+    ? Object.values(props.gasFees).map((fee) => ({
+        key: fee.name,
+        value: displayAmount(fee.amount, 18, { symbol: "CANTO" }),
+      }))
+    : [];
+};
 
 // props are return type of useBridgingFees
 const FeesSection = ({
@@ -369,18 +391,6 @@ const FeesSection = ({
       {props.method === BridgingMethod.GRAVITY_BRIDGE &&
         props.direction === "out" && (
           <>
-            <Text font="proto_mono" size="x-sm">
-              Chain Fee Percent:{" "}
-              {`${props.chainFeePercent}% (${displayAmount(
-                fees.totalChainFee,
-                token?.decimals ?? 0
-              )})`}
-            </Text>
-            <Text font="proto_mono" size="x-sm">
-              Selected Bridge Fee:{" "}
-              {displayAmount(fees.selected, token?.decimals ?? 0)}
-            </Text>
-
             <Container direction="row" gap={10}>
               <FeeButton
                 key={props.bridgeFeeOptions.slow}
@@ -388,22 +398,15 @@ const FeesSection = ({
                 title="slow"
                 subtext={"1 - 5 days"}
                 subtext2={"Batched transfer"}
-                priceInUSD={displayAmount(
+                tokenSymbol={token?.symbol ?? ""}
+                tokenAmount={displayAmount(
                   addTokenBalances(
                     props.bridgeFeeOptions.slow,
                     fees.totalChainFee
                   ),
-                  token?.decimals ?? 0,
-                  { symbol: token?.symbol }
+                  token?.decimals ?? 0
                 )}
-                priceInUSDFormatted={displayAmount(
-                  addTokenBalances(
-                    props.bridgeFeeOptions.slow,
-                    fees.totalChainFee
-                  ),
-                  token?.decimals ?? 0,
-                  { symbol: "$" }
-                )}
+                tokenPrice={props.feeTokenPriceFormatted}
                 active={fees.selected === props.bridgeFeeOptions.slow}
               />
               <FeeButton
@@ -412,22 +415,15 @@ const FeesSection = ({
                 title="medium"
                 subtext={"4 hours - 3 days"}
                 subtext2={"Batched transfer"}
-                priceInUSD={displayAmount(
+                tokenSymbol={token?.symbol ?? ""}
+                tokenAmount={displayAmount(
                   addTokenBalances(
                     props.bridgeFeeOptions.medium,
                     fees.totalChainFee
                   ),
-                  token?.decimals ?? 0,
-                  { symbol: token?.symbol }
+                  token?.decimals ?? 0
                 )}
-                priceInUSDFormatted={displayAmount(
-                  addTokenBalances(
-                    props.bridgeFeeOptions.medium,
-                    fees.totalChainFee
-                  ),
-                  token?.decimals ?? 0,
-                  { symbol: "$" }
-                )}
+                tokenPrice={props.feeTokenPriceFormatted}
                 active={fees.selected === props.bridgeFeeOptions.medium}
               />
               <FeeButton
@@ -436,50 +432,43 @@ const FeesSection = ({
                 title="fast"
                 subtext={"30 minutes"}
                 subtext2={"Individual transfer"}
-                priceInUSD={displayAmount(
+                tokenSymbol={token?.symbol ?? ""}
+                tokenAmount={displayAmount(
                   addTokenBalances(
                     props.bridgeFeeOptions.fast,
                     fees.totalChainFee
                   ),
-                  token?.decimals ?? 0,
-                  { symbol: token?.symbol }
+                  token?.decimals ?? 0
                 )}
-                priceInUSDFormatted={displayAmount(
-                  addTokenBalances(
-                    props.bridgeFeeOptions.fast,
-                    fees.totalChainFee
-                  ),
-                  token?.decimals ?? 0,
-                  { symbol: "$" }
-                )}
+                tokenPrice={props.feeTokenPriceFormatted}
                 active={fees.selected === props.bridgeFeeOptions.fast}
               />
             </Container>
-            <div>
-              {Object.values(props.gasFees).map((fee) => (
-                <div key={fee.name}>
-                  <Text font="proto_mono" size="x-sm">
-                    {`${fee.name}: ${displayAmount(fee.amount, 18, {
-                      symbol: "CANTO",
-                    })}`}
-                  </Text>
-                </div>
-              ))}
-            </div>
+            <Text font="proto_mono" size="x-sm">
+              Gas Fee:{" "}
+              {displayAmount(
+                Object.values(props.gasFees).reduce(
+                  (acc, fee) => addTokenBalances(acc, fee.amount),
+                  "0"
+                ),
+                18,
+                { symbol: "CANTO" }
+              )}
+            </Text>
           </>
         )}
       {props.method === BridgingMethod.IBC && props.direction === "out" && (
-        <ul>
-          {Object.values(props.gasFees).map((fee) => (
-            <li key={fee.name}>
-              <Text font="proto_mono" size="x-sm">
-                {`${fee.name}: ${displayAmount(fee.amount, 18, {
-                  symbol: "CANTO",
-                })}`}
-              </Text>
-            </li>
-          ))}
-        </ul>
+        <Text font="proto_mono" size="x-sm">
+          Gas Fee:{" "}
+          {displayAmount(
+            Object.values(props.gasFees).reduce(
+              (acc, fee) => addTokenBalances(acc, fee.amount),
+              "0"
+            ),
+            18,
+            { symbol: "CANTO" }
+          )}
+        </Text>
       )}
     </>
   );

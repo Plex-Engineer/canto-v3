@@ -33,7 +33,11 @@ export async function getGravityChainFeeInPercent(): PromiseWithError<number> {
  */
 export async function getGravityBridgeFeesFromToken(
   tokenAddress: string
-): PromiseWithError<{ slow: string; medium: string; fast: string }> {
+): PromiseWithError<{
+  slow: string;
+  medium: string;
+  fast: string;
+}> {
   try {
     // get current gas price on ETH mainnet
     const currentGasPrice = (

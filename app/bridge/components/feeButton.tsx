@@ -1,14 +1,16 @@
 import Text from "@/components/text";
 import style from "./feeButton.module.scss";
 import clsx from "clsx";
-import Spacer from "@/components/layout/spacer";
+import BigNumber from "bignumber.js";
+
 interface Props {
   title: string;
   subtext: string;
   subtext2: string;
 
-  priceInUSD: string;
-  priceInUSDFormatted: string;
+  tokenSymbol: string;
+  tokenAmount: string;
+  tokenPrice?: string;
   onClick?: () => void;
   active?: boolean;
 }
@@ -17,11 +19,15 @@ const FeeButton = ({
   title,
   subtext,
   subtext2,
-  priceInUSD,
-  priceInUSDFormatted,
+  tokenSymbol,
+  tokenAmount,
+  tokenPrice,
   onClick,
   active,
 }: Props) => {
+  const tokenUSDValue = tokenPrice
+    ? new BigNumber(tokenAmount).times(tokenPrice).toFixed(2)
+    : "unavailable";
   return (
     <div
       className={clsx(style.container, active && style.active)}
@@ -47,9 +53,9 @@ const FeeButton = ({
         {subtext2}
       </Text>
       <div className={style.divider} />
-      <Text font="proto_mono">{priceInUSD}</Text>
+      <Text font="proto_mono">{`${tokenAmount} ${tokenSymbol}`}</Text>
       <Text size="x-sm" theme="secondary-dark">
-        {priceInUSDFormatted}
+        {"$" + tokenUSDValue}
       </Text>
     </div>
   );

@@ -12,7 +12,7 @@ import {
 import { estimateOFTSendGasFee } from "@/transactions/bridge/layerZero/helpers";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
 import BigNumber from "bignumber.js";
-import { isOFTToken } from "@/utils/tokens";
+import { getTokenPriceInUSDC, isOFTToken } from "@/utils/tokens";
 import useDebounceEffect from "@/utils/async/useDebounceEffect";
 import { displayAmount } from "@/utils/formatting";
 import {
@@ -189,11 +189,18 @@ async function getGravityBridgeOutFees(
       await getGravityBridgeFeesFromToken(token.address);
     if (bridgeFeesError) throw bridgeFeesError;
 
+    // get price of token to estimate fee prices
+    const { data: price } = await getTokenPriceInUSDC(
+      token.address,
+      token.decimals
+    );
+
     // return fees object
     return NO_ERROR({
       method: BridgingMethod.GRAVITY_BRIDGE,
       direction: "out",
       description: "gravity bridge fees",
+      feeTokenPriceFormatted: price,
       chainFeePercent,
       bridgeFeeOptions: bridgeFees,
       gasFees: [

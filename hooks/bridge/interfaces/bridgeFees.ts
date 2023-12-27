@@ -24,6 +24,7 @@ type GravityBridgeFees = {
   | {
       direction: "out";
       description: string;
+      feeTokenPriceFormatted?: string;
       chainFeePercent: number;
       bridgeFeeOptions: {
         slow: string;

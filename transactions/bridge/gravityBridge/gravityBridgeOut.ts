@@ -139,7 +139,7 @@ export function validateGravityBridgeOutTxParams(
     };
   }
   // check chain fee
-  if (txParams.chainFee === "0") {
+  if (txParams.chainFee === "0" || txParams.bridgeFee === "0") {
     return {
       error: true,
       reason: TX_PARAM_ERRORS.PARAM_INVALID("chain fee"),

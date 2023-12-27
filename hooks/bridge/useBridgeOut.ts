@@ -95,7 +95,7 @@ export default function useBridgeOut(
     null,
     true
   );
-console.log(userTokenBalances)
+
   // will autoselect the first available token if there are any
   useAutoSelect(state.availableTokens, setToken);
   // will autoselect the first available network if there are any

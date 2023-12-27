@@ -30,7 +30,6 @@ export interface BridgeComboReturn {
     amount: string;
     amountAsBigNumberString: string;
     setAmount: (amount: string) => void;
-    amountCheck: Validation;
     maxBridgeAmount: string;
   };
   // transaction
@@ -39,6 +38,7 @@ export interface BridgeComboReturn {
     bridgeTx: () => void;
   };
   Confirmation: {
+    preConfirmCheck: Validation;
     isModalOpen: boolean;
     setIsModalOpen: (isOpen: boolean) => void;
   };
@@ -197,14 +197,25 @@ export default function useBridgeCombo(): BridgeComboReturn {
     { gBridgeFee: selectedGBridgeFee }
   );
 
-  // validate user input amount
-  const amountCheck = validateWeiUserInputTokenAmount(
-    amountAsBigNumberString,
-    "1",
-    maxBridgeAmount,
-    bridge.selections.token?.symbol ?? "",
-    bridge.selections.token?.decimals ?? 0
-  );
+  // pre-confirm check (will check all data except for user input address for IBC out)
+  const preConfirmCheck = (): Validation => {
+    // validate amount
+    const amountCheck = validateWeiUserInputTokenAmount(
+      amountAsBigNumberString,
+      "1",
+      maxBridgeAmount,
+      bridge.selections.token?.symbol ?? "",
+      bridge.selections.token?.decimals ?? 0
+    );
+    if (amountCheck.error) return amountCheck;
+    if (bridgeFees.ready && bridgeFees.method === BridgingMethod.GRAVITY_BRIDGE && selectedGBridgeFee === "0") {
+        return {
+          error: true,
+          reason: "Please select a bridge fee",
+        };
+    }
+    return { error: false };
+  }
 
   const txParams = {
     amount: amountAsBigNumberString,
@@ -269,10 +280,10 @@ export default function useBridgeCombo(): BridgeComboReturn {
       amount,
       amountAsBigNumberString,
       setAmount,
-      amountCheck,
       maxBridgeAmount,
     },
     Confirmation: {
+      preConfirmCheck: preConfirmCheck(),
       isModalOpen: isConfirmationModalOpen,
       setIsModalOpen: setIsConfirmationModalOpen,
     },

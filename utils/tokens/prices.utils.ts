@@ -14,6 +14,10 @@ export async function getTokenPriceInUSDC(
   tokenAddress: string,
   decimals: number
 ): PromiseWithError<string> {
+  const usdcAddress = "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd";
+  if (tokenAddress === usdcAddress) {
+    return NO_ERROR("1");
+  }
   const { data, error } = await tryFetch<{ estimatedOutput: string }>(
     SLINGSHOT_API_URL + "/trade",
     {
@@ -26,7 +30,7 @@ export async function getTokenPriceInUSDC(
       body: JSON.stringify({
         fromAmount: new BigNumber(10).pow(decimals).toString(),
         from: tokenAddress,
-        to: "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
+        to: usdcAddress,
       }),
     }
   );
