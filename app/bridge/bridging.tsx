@@ -324,39 +324,43 @@ const formattedFeesForConfirmation = (
   return props.isLoading
     ? []
     : props.error !== null
-    ? []
-    : props.method === BridgingMethod.LAYER_ZERO
-    ? [{ key: "gas fee", value: props.lzFee.formattedAmount }]
-    : props.method === BridgingMethod.GRAVITY_BRIDGE &&
-      props.direction === "out"
-    ? [
-        {
-          key: "bridge fee (paid to validators)",
-          value: displayAmount(gravityFees.selected, token?.decimals ?? 0, {
-            symbol: token?.symbol,
-          }),
-        },
-        {
-          key: "chain fee (paid to relayers)",
-          value: displayAmount(
-            gravityFees.totalChainFee,
-            token?.decimals ?? 0,
-            {
-              symbol: token?.symbol,
-            }
-          ),
-        },
-        ...Object.values(props.gasFees).map((fee) => ({
-          key: fee.name,
-          value: displayAmount(fee.amount, 18, { symbol: "CANTO" }),
-        })),
-      ]
-    : props.method === BridgingMethod.IBC && props.direction === "out"
-    ? Object.values(props.gasFees).map((fee) => ({
-        key: fee.name,
-        value: displayAmount(fee.amount, 18, { symbol: "CANTO" }),
-      }))
-    : [];
+      ? []
+      : props.method === BridgingMethod.LAYER_ZERO
+        ? [{ key: "gas fee", value: props.lzFee.formattedAmount }]
+        : props.method === BridgingMethod.GRAVITY_BRIDGE &&
+            props.direction === "out"
+          ? [
+              {
+                key: "bridge fee (paid to validators)",
+                value: displayAmount(
+                  gravityFees.selected,
+                  token?.decimals ?? 0,
+                  {
+                    symbol: token?.symbol,
+                  }
+                ),
+              },
+              {
+                key: "chain fee (paid to relayers)",
+                value: displayAmount(
+                  gravityFees.totalChainFee,
+                  token?.decimals ?? 0,
+                  {
+                    symbol: token?.symbol,
+                  }
+                ),
+              },
+              ...Object.values(props.gasFees).map((fee) => ({
+                key: fee.name,
+                value: displayAmount(fee.amount, 18, { symbol: "CANTO" }),
+              })),
+            ]
+          : props.method === BridgingMethod.IBC && props.direction === "out"
+            ? Object.values(props.gasFees).map((fee) => ({
+                key: fee.name,
+                value: displayAmount(fee.amount, 18, { symbol: "CANTO" }),
+              }))
+            : [];
 };
 
 // props are return type of useBridgingFees

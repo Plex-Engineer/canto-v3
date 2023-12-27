@@ -208,14 +208,18 @@ export default function useBridgeCombo(): BridgeComboReturn {
       bridge.selections.token?.decimals ?? 0
     );
     if (amountCheck.error) return amountCheck;
-    if (bridgeFees.ready && bridgeFees.method === BridgingMethod.GRAVITY_BRIDGE && selectedGBridgeFee === "0") {
-        return {
-          error: true,
-          reason: "Please select a bridge fee",
-        };
+    if (
+      bridgeFees.ready &&
+      bridgeFees.method === BridgingMethod.GRAVITY_BRIDGE &&
+      selectedGBridgeFee === "0"
+    ) {
+      return {
+        error: true,
+        reason: "Please select a bridge fee",
+      };
     }
     return { error: false };
-  }
+  };
 
   const txParams = {
     amount: amountAsBigNumberString,

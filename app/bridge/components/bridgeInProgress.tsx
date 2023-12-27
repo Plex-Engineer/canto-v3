@@ -1,6 +1,5 @@
 import Container from "@/components/container/container";
 import Text from "@/components/text";
-import TxItem from "@/components/transactions/TxItem";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { TransactionFlowType } from "@/transactions/flows";
 import { TransactionWithStatus } from "@/transactions/interfaces";
@@ -12,8 +11,7 @@ type InProgressTx = TransactionWithStatus & {
   flowId: string;
 };
 
-interface Props {}
-const BridgeInProgress = ({}: Props) => {
+const BridgeInProgress = () => {
   const { signer, txStore } = useCantoSigner();
 
   const inProgressTxs = useMemo(() => {
