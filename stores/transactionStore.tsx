@@ -77,7 +77,7 @@ const useTransactionStore = create<TransactionStore>()(
         addNewFlow: async (params) => {
           // create new flow before getting transactions
           // set the transactions to an empty array for now, since we will get them when actually performing the flow
-          let newFlow: TransactionFlow = {
+          const newFlow: TransactionFlow = {
             ...params.txFlow,
             id: Date.now().toString(),
             createdAt: new Date().getTime(),

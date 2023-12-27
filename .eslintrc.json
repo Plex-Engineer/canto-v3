@@ -2,7 +2,7 @@
   "extends": ["next/core-web-vitals", "eslint:recommended"],
   "plugins": ["prettier"],
   "rules": {
-    "no-await-in-loop": "error",
+    // "no-await-in-loop": ["warning"],
     "no-duplicate-imports": "error",
     "no-self-compare": "error",
     "block-scoped-var": "error",
@@ -22,6 +22,7 @@
   },
   "globals": {
     "NodeJS": true,
-    "React": true
+    "React": true,
+    "BigInt": true
   }
 }
