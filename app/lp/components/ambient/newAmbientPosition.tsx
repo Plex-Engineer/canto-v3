@@ -138,6 +138,7 @@ export const NewAmbientPositionModal = ({
             title={baseToken.symbol}
             min="0"
             max={baseToken.balance ?? "0"}
+            maxName="LP Modal"
             symbol={baseToken.symbol}
           />
           <Spacer height="12px" />
@@ -151,6 +152,7 @@ export const NewAmbientPositionModal = ({
             title={quoteToken.symbol}
             min="0"
             max={quoteToken.balance ?? "0"}
+            maxName="LP Modal"
             symbol={quoteToken.symbol}
           />
           <Spacer height="20px" />

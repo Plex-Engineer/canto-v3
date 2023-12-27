@@ -28,8 +28,6 @@ const NavBar = () => {
         account: signer.account.address,
       });
       Analytics.actions.events.connections.walletConnect(true);
-    } else {
-      Analytics.actions.reset();
     }
   }, [signer]);
 

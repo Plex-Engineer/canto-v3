@@ -3,6 +3,7 @@ import Text from "@/components/text";
 import Image from "next/image";
 import React from "react";
 import style from "./link.module.scss";
+import Analytics from "@/provider/analytics";
 
 interface Props {
   title: string;
@@ -12,7 +13,14 @@ interface Props {
 }
 const ExploreLink = ({ title, description, link, image }: Props) => {
   return (
-    <a className={style.container} href={link} target="_blank">
+    <a
+      className={style.container}
+      href={link}
+      target="_blank"
+      onClick={() =>
+        Analytics.actions.events.externalLinkClicked({ Website: title })
+      }
+    >
       <Container
         direction="row"
         gap={20}

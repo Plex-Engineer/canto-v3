@@ -23,6 +23,7 @@ import { areEqualAddresses } from "@/utils/address";
 import { convertTokenAmountToNote, percentOfAmount } from "@/utils/math";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
 import Toggle from "@/components/toggle";
+
 interface Props {
   isSupplyModal: boolean;
   cToken: CTokenWithUserData | null;
@@ -263,6 +264,7 @@ export const LendingModal = (props: Props) => {
           IconUrl={cToken.underlying.logoURI}
           title={cToken.underlying.symbol}
           max={maxAmount}
+          maxName="Lending Market Modal"
           min="1"
           symbol={cToken.underlying.symbol}
           {...limitProps}

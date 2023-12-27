@@ -21,7 +21,6 @@ import {
 import { signTransaction, waitForTransaction } from "@/transactions/signTx";
 import Analytics from "@/provider/analytics";
 import { getAnalyticsTransactionFlowInfo } from "@/utils/analytics";
-
 // only save last 100 flows for each user to save space
 const USER_FLOW_LIMIT = 100;
 interface AddNewFlowParams {
@@ -85,11 +84,9 @@ const useTransactionStore = create<TransactionStore>()(
           // create new flow before getting transactions
           // new flow id
           const flowId = Date.now().toString() + params.ethAccount;
+          const { data: analyticsTransactionFlowInfo } =
+            getAnalyticsTransactionFlowInfo(params.txFlow, flowId);
           // set the transactions to an empty array for now, since we will get them when actually performing the flow
-          const analyticsTransactionFlowInfo = getAnalyticsTransactionFlowInfo(
-            params.txFlow,
-            flowId
-          );
           const newFlow: TransactionFlow = {
             ...params.txFlow,
             id: flowId,
