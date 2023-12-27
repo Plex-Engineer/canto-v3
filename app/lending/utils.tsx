@@ -116,7 +116,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
           getCirculatingCNote(chainId, cNote.address),
         ]);
         if (circulatingNote.error || circulatingCNote.error) {
-          console.log(circulatingNote.error ?? circulatingCNote.error);
+          console.error(circulatingNote.error ?? circulatingCNote.error);
           return;
         }
         setCirculatingNote(circulatingNote.data);

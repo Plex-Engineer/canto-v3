@@ -134,7 +134,7 @@ export default function useBridgeCombo(): BridgeComboReturn {
       currentChainId ?? 1
     );
     if (error) {
-      console.log(error);
+      console.error(error);
       return;
     }
     setOnTestnet(network.isTestChain);

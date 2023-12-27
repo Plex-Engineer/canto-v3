@@ -30,7 +30,7 @@ const InProgressTxItem = (props: TxItemProps) => {
           props.tx.hash
         );
         if (error) {
-          console.log(error);
+          console.error(error);
           return;
         }
         props.setBridgeStatus(data);

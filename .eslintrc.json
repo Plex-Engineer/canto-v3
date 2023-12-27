@@ -3,6 +3,7 @@
   "plugins": ["prettier"],
   "rules": {
     // "no-await-in-loop": ["warning"],
+    "no-console": ["error", { "allow": ["warn", "error"] }],
     "no-duplicate-imports": "error",
     "no-self-compare": "error",
     "block-scoped-var": "error",
