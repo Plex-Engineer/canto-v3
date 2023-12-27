@@ -34,8 +34,8 @@ export const AmbientModal = (props: AmbientModalProps) => {
     props.pool.userPositions.length === 0 || selectedPosition === "new"
       ? "new"
       : !selectedPosition
-      ? "list"
-      : "manage";
+        ? "list"
+        : "manage";
 
   const title = () => {
     switch (modalState) {
@@ -45,6 +45,8 @@ export const AmbientModal = (props: AmbientModalProps) => {
         return "Create New Position";
       case "manage":
         return "Manage Position";
+      default:
+        return "";
     }
   };
 

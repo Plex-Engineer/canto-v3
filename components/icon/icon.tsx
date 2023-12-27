@@ -26,8 +26,8 @@ const Icon = (props: Props) => {
           ? props.color == "primary"
             ? "invert(var(--light-mode))"
             : props.color == "accent"
-            ? "invert(0)"
-            : "invert(var(--dark-mode))"
+              ? "invert(0)"
+              : "invert(var(--dark-mode))"
           : "",
         ...props.style,
       }}
