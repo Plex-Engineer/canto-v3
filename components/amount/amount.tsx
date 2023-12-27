@@ -126,7 +126,9 @@ const Amount = (props: Props) => {
           <span
             className={styles.max}
             onClick={() => {
-              Analytics.actions.events.maxClicked(props.maxName ?? "Max Button");
+              Analytics.actions.events.maxClicked(
+                props.maxName ?? "Max Button"
+              );
               props.onChange(
                 {
                   target: {
