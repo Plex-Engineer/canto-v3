@@ -61,7 +61,7 @@ const Input = (props: InputProps) => {
   }
 
   const inputError: Validation =
-    props.type === "amount"
+    props.type === "amount" && props.value
       ? validateNonWeiUserInputTokenAmount(
           props.value,
           props.tokenMin,
