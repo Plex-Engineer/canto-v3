@@ -15,6 +15,8 @@ export const OSMOSIS: CosmosNetwork = {
   isTestChain: false,
   rpcUrl: "https://rpc.osmosis.zone",
   restEndpoint: "https://lcd.osmosis.zone",
+  extraEndpoints: ["https://osmosis-api.lavenderfive.com:443"],
+  latestBlockEndpoint: "/cosmos/base/tendermint/v1beta1",
   addressPrefix: "osmo",
   checkAddress: function (address) {
     return checkCosmosAddress(this.addressPrefix)(address);
