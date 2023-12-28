@@ -86,7 +86,7 @@ export const StakingModal = (props: StakingModalParams) => {
       props.validator.operator_address
     );
   }
-
+  
   //const getUserDelegationBalance =
   const userMaxBalance = userDelegationBalance ? userDelegationBalance : "0";
 
@@ -97,6 +97,9 @@ export const StakingModal = (props: StakingModalParams) => {
 
   const maxBalance =
     selectedTx == StakingTxTypes.DELEGATE ? userCantoBalance : userMaxBalance;
+
+    console.log(Number(inputAmount));
+    console.log(Number(formatBalance(maxBalance,18)));
 
   const userStakedValidatorsAddressList = props.userStaking?.validators.map(
     (validatorWithDelegation) => validatorWithDelegation.operator_address
@@ -129,7 +132,7 @@ export const StakingModal = (props: StakingModalParams) => {
                   ? props.userStaking.cantoBalance
                   : "0",
                 18,
-                { commify: true }
+                { commify: true,precision: 2 }
               )}
             </Text>
           </div>
@@ -153,7 +156,7 @@ export const StakingModal = (props: StakingModalParams) => {
               {formatBalance(
                 userDelegationBalance ? userDelegationBalance : "0",
                 18,
-                { commify: true }
+                { commify: true, precision:2 }
               )}
             </Text>
           </div>
@@ -276,7 +279,7 @@ export const StakingModal = (props: StakingModalParams) => {
             Number(inputAmount) <= 0 ||
             (selectedTx == StakingTxTypes.REDELEGATE &&
               !validatorToRedelegate) ||
-            Number(inputAmount) > Number(formatBalance(maxBalance, 18))
+            Number(inputAmount) > Number(formatBalance(maxBalance, 18, { commify: true, precision: 2 }))
           }
         >
           Delegate
