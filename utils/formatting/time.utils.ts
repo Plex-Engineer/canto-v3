@@ -28,6 +28,31 @@ export function dateToMomentsAgo(timestamp: number): string {
   return Math.floor(seconds) + " seconds ago";
 }
 
+export default function secondsToTimeLeft(seconds: number): string {
+  if (seconds < 0) {
+    return "0 seconds left";
+  }
+  if (seconds < 60) {
+    return seconds + " seconds left";
+  }
+  if (seconds < 3600) {
+    return Math.floor(seconds / 60) + " minutes left";
+  }
+  if (seconds < 86400) {
+    return Math.floor(seconds / 3600) + " hours left";
+  }
+  if (seconds < 604800) {
+    return Math.floor(seconds / 86400) + " days left";
+  }
+  if (seconds < 2592000) {
+    return Math.floor(seconds / 604800) + " weeks left";
+  }
+  if (seconds < 31536000) {
+    return Math.floor(seconds / 2592000) + " months left";
+  }
+  return Math.floor(seconds / 31536000) + " years left";
+}
+
 /**
  * @notice Formats a number into a percentage
  * @param {number} seconds seconds to format

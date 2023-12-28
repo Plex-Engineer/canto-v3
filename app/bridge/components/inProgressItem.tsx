@@ -12,12 +12,17 @@ import Text from "@/components/text";
 import StatusIcon from "@/components/icon/statusIcon";
 import Spacer from "@/components/layout/spacer";
 import Container from "@/components/container/container";
+import secondsToTimeLeft from "@/utils/formatting/time.utils";
 
 interface TxItemProps {
   tx: TransactionWithStatus;
   idx: number;
   setBridgeStatus: (status: BridgeStatus) => void;
+  timeLeftInSeconds: number;
+  loadingPercentage?: number;
+  loading: boolean;
 }
+
 const InProgressTxItem = (props: TxItemProps) => {
   useQuery(
     "bridge status",
@@ -57,76 +62,79 @@ const InProgressTxItem = (props: TxItemProps) => {
       </div>
       <Spacer width="14px" />
       <Container width="100%">
-        <Container
-          width="100%"
-          center={{
-            horizontal: true,
-            vertical: false,
-          }}
-        >
-          <Text size="sm" theme="secondary-dark">
-            {props.tx.tx.description.title}
-          </Text>
-        </Container>
-        <div
-          className={styles.collapsable}
-          style={{
-            maxHeight: "500px",
-            width: "100%",
-          }}
-        >
-          <Text size="md">{props.tx.tx.description.description}</Text>
-          <Spacer height="8px" />
-          {props.tx.txLink && (
-            <Container direction="row" gap="auto">
-              {props.tx.hash && (
-                <Text size="sm">
-                  #
-                  {props.tx.hash.slice(0, 4) +
-                    "..." +
-                    props.tx.hash.slice(-5, -1)}
-                </Text>
-                // </PopUp>
-              )}
-              {props.tx.txLink && (
-                <a
-                  href={props.tx.txLink}
-                  target="_blank"
-                  style={{
-                    textDecoration: "underline",
-                  }}
-                >
-                  <Text size="sm">view explorer</Text>
-                </a>
-              )}
-            </Container>
-          )}
-          {props.tx.error && (
-            <Text size="sm" style={{ color: "var(--extra-failure-color,red)" }}>
-              {formatError(props.tx.error)}
-            </Text>
-          )}
-        </div>
-        <Container direction="row" gap={"auto"}>
-          {props.tx.timestamp && (
+        <Container direction="row">
+          <Container width="80%">
             <Text size="sm" theme="secondary-dark">
-              {dateToMomentsAgo(props.tx.timestamp)}
+              {props.tx.tx.description.title}
             </Text>
-          )}
-          {props.tx.tx.bridge && props.tx.tx.bridge.lastStatus !== "NONE" && (
-            <Container>
-              <Text size="sm" theme="secondary-dark">
-                Bridge Status - {props.tx.tx.bridge.lastStatus.toLowerCase()}
+            <Text size="md">{props.tx.tx.description.description}</Text>
+          </Container>
+          <Container width="30%">
+            <Spacer height="8px" />
+            {props.tx.txLink && (
+              <Container direction="row" gap="auto">
+                {props.tx.txLink && (
+                  <a
+                    href={props.tx.txLink}
+                    target="_blank"
+                    style={{
+                      textDecoration: "underline",
+                    }}
+                  >
+                    <Text size="sm">view explorer</Text>
+                  </a>
+                )}
+                <Spacer height="8px" />
+              </Container>
+            )}
+            {props.tx.error && (
+              <Text
+                size="sm"
+                style={{ color: "var(--extra-failure-color,red)" }}
+              >
+                {formatError(props.tx.error)}
               </Text>
-              {props.tx.tx.bridge.timeLeft !== undefined && (
+            )}
+
+            <Container direction="row" gap={"auto"}>
+              {props.tx.timestamp && (
                 <Text size="sm" theme="secondary-dark">
-                  TIME LEFT:{" "}
-                  {formatSecondsToMinutes(props.tx.tx.bridge.timeLeft)}
+                  {secondsToTimeLeft(props.timeLeftInSeconds)}
                 </Text>
               )}
+              {props.tx.tx.bridge &&
+                props.tx.tx.bridge.lastStatus !== "NONE" && (
+                  <Container>
+                    <Text size="sm" theme="secondary-dark">
+                      Bridge Status -{" "}
+                      {props.tx.tx.bridge.lastStatus.toLowerCase()}
+                    </Text>
+                    {props.tx.tx.bridge.timeLeft !== undefined && (
+                      <Text size="sm" theme="secondary-dark">
+                        TIME LEFT:{" "}
+                        {formatSecondsToMinutes(props.tx.tx.bridge.timeLeft)}
+                      </Text>
+                    )}
+                  </Container>
+                )}
             </Container>
-          )}
+          </Container>
         </Container>
+        <Spacer height="10px" />
+        {props.loadingPercentage != undefined && props.loadingPercentage > 0 ? (
+          <div className={styles.progress}>
+            <div
+              className={styles.progressBar}
+              style={{
+                width: `${props.loadingPercentage}%`,
+              }}
+            ></div>
+          </div>
+        ) : (
+          <div className={styles.progress}>
+            <div className={styles.infinityBar}></div>
+          </div>
+        )}
       </Container>
     </div>
   );
