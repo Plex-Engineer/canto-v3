@@ -3,7 +3,6 @@ export { CANTO_MAINNET_COSMOS, CANTO_TESTNET_COSMOS } from "../canto";
 export * from "./comdex";
 export * from "./cosmoshub";
 export * from "./crescent";
-export * from "./ethereumViaGBridge";
 export * from "./evmos";
 export * from "./gravitybridge";
 export * from "./injective";

@@ -125,6 +125,7 @@ export const RemoveLiquidityModal = ({
           title={pair.symbol}
           min="1"
           max={totalLP}
+          maxName="LP Modal"
           symbol={pair.symbol}
         />
         <Spacer height="20px" />

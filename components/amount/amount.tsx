@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import clsx from "clsx";
 import Spacer from "../layout/spacer";
 import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
+import Analytics from "@/provider/analytics";
 interface Props {
   IconUrl: string;
   title: string;
@@ -20,6 +21,8 @@ interface Props {
     limitName: string;
     limit: string;
   };
+  extraNode?: React.ReactNode;
+  maxName?: string;
 }
 const Amount = (props: Props) => {
   const [focused, setFocused] = useState(false);
@@ -55,14 +58,12 @@ const Amount = (props: Props) => {
     const parts = amount.split(".");
     if (parts.length === 1) {
       return amount;
-    } else {
-      const decimalsPart = parts[1];
-      if (decimalsPart.length > decimals) {
-        return `${parts[0]}.${decimalsPart.slice(0, decimals)}~`;
-      } else {
-        return amount;
-      }
     }
+    const decimalsPart = parts[1];
+    if (decimalsPart.length > decimals) {
+      return `${parts[0]}.${decimalsPart.slice(0, decimals)}~`;
+    }
+    return amount;
   }
 
   //commify and formatAmount
@@ -106,38 +107,49 @@ const Amount = (props: Props) => {
         />
         <Text font="proto_mono">{props.title}</Text>
       </Container>
-      <Container direction="row" gap={6} className={styles.balance}>
+      <Container
+        direction="row"
+        gap={6}
+        className={styles.balance}
+        width="100%"
+      >
         <Text size="xx-sm" theme="secondary-dark">
-          {props.limit ? "Limit: " : "Balance: "}
+          {props.limit ? `${props.limit.limitName}: ` : "Balance: "}
           {formatBalance(props.limit?.limit ?? props.max, props.decimals, {
             commify: true,
-          })}{" "}
-          {props.symbol}
+            symbol: props.symbol,
+          })}
         </Text>
-
-        <span
-          className={styles.max}
-          onClick={() => {
-            props.onChange(
-              {
-                target: {
-                  value: formatBalance(
-                    props.limit?.limit ?? props.max,
-                    props.decimals,
-                    {
-                      precision: props.decimals,
-                    }
-                  ),
-                },
-              } as any,
-              true
-            );
-          }}
-        >
-          <Text size="xx-sm" weight="bold">
-            {`(${props.limit?.limitName ?? "max"})`}
-          </Text>
-        </span>
+        {props.extraNode ? (
+          <div className={styles.extra}>{props.extraNode}</div>
+        ) : (
+          <span
+            className={styles.max}
+            onClick={() => {
+              Analytics.actions.events.maxClicked(
+                props.maxName ?? "Max Button"
+              );
+              props.onChange(
+                {
+                  target: {
+                    value: formatBalance(
+                      props.limit?.limit ?? props.max,
+                      props.decimals,
+                      {
+                        precision: props.decimals,
+                      }
+                    ),
+                  },
+                } as any,
+                true
+              );
+            }}
+          >
+            <Text size="xx-sm" weight="bold">
+              {`(${props.limit?.limitName ?? "max"})`}
+            </Text>
+          </span>
+        )}
       </Container>
       <Spacer width="20px" />
       <input

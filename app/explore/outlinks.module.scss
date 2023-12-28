@@ -1,0 +1,17 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  //   height: 34rem;
+  width: 54rem;
+  background-color: var(--card-surface-color);
+  border: 1px solid rgba(var(--dark-color), 0.2);
+  padding: 2rem;
+  gap: 1.4rem;
+
+  a {
+    color: var(--card-primary-color);
+    text-decoration: underline;
+  }
+}

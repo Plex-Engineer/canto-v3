@@ -103,13 +103,12 @@ export const AddLiquidityModal = ({
       <Amount
         decimals={pair.token1.decimals}
         value={valueToken1}
-        onChange={(e) => {
-          setValue(e.target.value, true);
-        }}
+        onChange={(e) => setValue(e.target.value, true)}
         IconUrl={pair.token1.logoURI}
         title={tokenSymbol(pair.token1)}
         min="1"
         max={pair.token1.balance ?? "0"}
+        maxName="LP Modal"
         symbol={tokenSymbol(pair.token1)}
       />
 
@@ -118,13 +117,12 @@ export const AddLiquidityModal = ({
       <Amount
         decimals={pair.token2.decimals}
         value={valueToken2}
-        onChange={(e) => {
-          setValue(e.target.value, false);
-        }}
+        onChange={(e) => setValue(e.target.value, false)}
         IconUrl={pair.token2.logoURI}
         title={tokenSymbol(pair.token2)}
         min="1"
         max={pair.token2.balance ?? "0"}
+        maxName="LP Modal"
         symbol={tokenSymbol(pair.token2)}
       />
       <Spacer height="20px" />

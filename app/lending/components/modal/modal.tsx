@@ -8,7 +8,11 @@ import styles from "./modal.module.scss";
 import Tabs from "@/components/tabs/tabs";
 import Image from "next/image";
 import Container from "@/components/container/container";
-import { convertToBigNumber, displayAmount } from "@/utils/formatting";
+import {
+  convertToBigNumber,
+  displayAmount,
+  formatBalance,
+} from "@/utils/formatting";
 import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import React, { useState } from "react";
@@ -16,9 +20,10 @@ import { Validation } from "@/config/interfaces";
 import Amount from "@/components/amount/amount";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { areEqualAddresses } from "@/utils/address";
-import { convertTokenAmountToNote } from "@/utils/math";
+import { convertTokenAmountToNote, percentOfAmount } from "@/utils/math";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
 import Toggle from "@/components/toggle";
+
 interface Props {
   isSupplyModal: boolean;
   cToken: CTokenWithUserData | null;
@@ -222,16 +227,15 @@ export const LendingModal = (props: Props) => {
 
     // limits
     const maxAmount = maxAmountForLendingTx(actionType, cToken, position, 100);
-    const limitAmount = maxAmountForLendingTx(actionType, cToken, position, 90);
-    // if withdrawing and nothing is borrowed no need for limit
-    const needLimit =
-      actionType === CTokenLendingTxTypes.BORROW ||
-      (actionType === CTokenLendingTxTypes.WITHDRAW &&
-        Number(limitAmount) <
-          Number(cToken.userDetails?.supplyBalanceInUnderlying) &&
-        Number(position.totalBorrow) !== 0);
-    const limitProps = needLimit
-      ? { limit: { limit: limitAmount, limitName: "90% limit" } }
+    // show limit if borrowing or withdrawing
+    const limits =
+      actionType === CTokenLendingTxTypes.BORROW
+        ? [90, 94, 98]
+        : actionType === CTokenLendingTxTypes.WITHDRAW
+          ? [90, 94, 98, 100]
+          : null;
+    const limitProps = limits
+      ? { limit: { limit: maxAmount, limitName: "Limit" } }
       : {};
 
     return (
@@ -260,11 +264,23 @@ export const LendingModal = (props: Props) => {
           IconUrl={cToken.underlying.logoURI}
           title={cToken.underlying.symbol}
           max={maxAmount}
+          maxName="Lending Market Modal"
           min="1"
           symbol={cToken.underlying.symbol}
           {...limitProps}
+          extraNode={
+            limits ? (
+              <BorrowLimits
+                maxBorrow={maxAmount}
+                currentAmount={amount}
+                setAmount={setAmount}
+                limits={limits}
+                decimals={cToken.underlying.decimals}
+              />
+            ) : undefined
+          }
         />
-        <Spacer height="40px" />
+        <Spacer height="20px" />
 
         <Container width="100%" gap={20}>
           <APRs
@@ -439,6 +455,48 @@ const CTokenAmountCard = ({
         </span>
         {valueInNote ? ")" : ""}
       </Text>
+    </Container>
+  );
+};
+
+const BorrowLimits = ({
+  maxBorrow,
+  currentAmount,
+  setAmount,
+  limits,
+  decimals,
+}: {
+  maxBorrow: string;
+  currentAmount: string;
+  setAmount: (amount: string) => void;
+  limits: number[];
+  decimals: number;
+}) => {
+  return (
+    <Container gap={20} direction="row">
+      {limits.map((limit) => {
+        const limitAmount = formatBalance(
+          percentOfAmount(maxBorrow, limit).data ?? "0",
+          decimals,
+          { precision: decimals }
+        );
+        return (
+          <Text
+            font="proto_mono"
+            role="button"
+            key={limit}
+            size="x-sm"
+            style={{
+              cursor: "pointer",
+              textDecoration: "underline",
+              opacity: limitAmount === currentAmount ? 1 : 0.5,
+            }}
+            onClick={() => {
+              setAmount(limitAmount);
+            }}
+          >{`${limit}%`}</Text>
+        );
+      })}
     </Container>
   );
 };

@@ -20,15 +20,14 @@ const NavBar = () => {
   useAutoConnect();
   const currentPath = usePathname();
   const { signer } = useCantoSigner();
-  
 
   useEffect(() => {
     if (signer?.account.address) {
       Analytics.actions.people.registerWallet(signer.account.address);
-      Analytics.actions.identify(signer.account.address, { account: signer.account.address })
+      Analytics.actions.identify(signer.account.address, {
+        account: signer.account.address,
+      });
       Analytics.actions.events.connections.walletConnect(true);
-    } else {
-      Analytics.actions.reset();
     }
   }, [signer]);
 
@@ -50,8 +49,8 @@ const NavBar = () => {
     chainId: signer?.chain.id,
   });
 
-  console.log(currentPath);
-  console.log(currentPath == ("/governance" || "/governance/proposal"));
+  //console.log(currentPath);
+  //console.log(currentPath == ("/governance" || "/governance/proposal"));
 
   return (
     <div className={styles.container}>
@@ -106,31 +105,26 @@ const NavBar = () => {
         >
           <Text size="sm">Pools</Text>
         </Link>
-        {(currentPath=="/governance/proposal") &&
+        {currentPath == "/governance/proposal" && (
           <Link
-          href="/governance"
-          className={clsx(
-            styles["nav-link"],
-            styles.active
-          )}
-        >
-          <Text>Governance</Text>
-        </Link>
-        }
-        {
-          (currentPath!="/governance/proposal") &&
+            href="/governance"
+            className={clsx(styles["nav-link"], styles.active)}
+          >
+            <Text>Governance</Text>
+          </Link>
+        )}
+        {currentPath != "/governance/proposal" && (
           <Link
-          href="/governance"
-          className={clsx(
-            styles["nav-link"],
-            currentPath == ("/governance" || "/governance/proposal") && styles.active
-          )}
-        >
-          <Text>Governance</Text>
-        </Link>
-
-        }
-        
+            href="/governance"
+            className={clsx(
+              styles["nav-link"],
+              currentPath == ("/governance" || "/governance/proposal") &&
+                styles.active
+            )}
+          >
+            <Text>Governance</Text>
+          </Link>
+        )}
       </div>
       <div className={styles["btn-grp"]}>
         <div className={styles.theme}>
