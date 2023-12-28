@@ -14,11 +14,13 @@ export const _sendToCosmosTx = (
   cantoReceiverAddress: string,
   tokenAddress: string,
   amount: string,
-  description: TransactionDescription
+  description: TransactionDescription,
+  bridgeInfo: { direction: "in" | "out"; amountFormatted: string }
 ): Transaction => ({
   bridge: {
     type: BridgingMethod.GRAVITY_BRIDGE,
     lastStatus: "NONE",
+    ...bridgeInfo,
   },
   fromAddress: fromEthAddress,
   description,
@@ -57,12 +59,14 @@ export const _sendToEthGravityTx = (
   amount: string,
   bridgeFee: string,
   chainFee: string,
-  description: TransactionDescription
+  description: TransactionDescription,
+  bridgeInfo: { direction: "in" | "out"; amountFormatted: string }
 ): Transaction => ({
   description,
   bridge: {
     type: BridgingMethod.GRAVITY_BRIDGE,
     lastStatus: "NONE",
+    ...bridgeInfo,
   },
   fromAddress: ethReceiver,
   chainId: chainId,

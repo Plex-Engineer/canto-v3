@@ -1,10 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import styles from "./inProgress.module.scss";
-import {
-  dateToMomentsAgo,
-  formatError,
-  formatSecondsToMinutes,
-} from "@/utils/formatting";
+import { formatSecondsToMinutes } from "@/utils/formatting";
 import { useQuery } from "react-query";
 import { getBridgeStatus } from "@/transactions/bridge";
 import { BridgeStatus, TransactionWithStatus } from "@/transactions/interfaces";
@@ -12,15 +8,11 @@ import Text from "@/components/text";
 import StatusIcon from "@/components/icon/statusIcon";
 import Spacer from "@/components/layout/spacer";
 import Container from "@/components/container/container";
-import secondsToTimeLeft from "@/utils/formatting/time.utils";
 
 interface TxItemProps {
   tx: TransactionWithStatus;
   idx: number;
   setBridgeStatus: (status: BridgeStatus) => void;
-  timeLeftInSeconds: number;
-  loadingPercentage?: number;
-  loading: boolean;
 }
 
 const InProgressTxItem = (props: TxItemProps) => {
@@ -35,7 +27,7 @@ const InProgressTxItem = (props: TxItemProps) => {
           props.tx.hash
         );
         if (error) {
-          console.log(error);
+          console.error(error);
           return;
         }
         props.setBridgeStatus(data);
@@ -49,15 +41,42 @@ const InProgressTxItem = (props: TxItemProps) => {
     }
   );
 
+  // get bridge info from tx
+  const bridgeData = useMemo(() => props.tx.tx.bridge, [props.tx.tx.bridge]);
+
+  // asumme full bar is 30 minutes
+  const loadingPercentage: number | null = useMemo(() => {
+    const isComplete = bridgeData?.lastStatus === "SUCCESS";
+    if (isComplete) {
+      return 100;
+    }
+    // time left may be null
+    if (!bridgeData?.timeLeft) {
+      return null;
+    }
+    // get percent left
+    const percentLeft = (bridgeData?.timeLeft / 1800) * 100;
+    if (percentLeft >= 100) {
+      // show small progress
+      return 1;
+    }
+    return 100 - percentLeft;
+  }, [bridgeData?.timeLeft, bridgeData?.lastStatus]);
+
+  // if bridge data is not defined, return null
+  if (!bridgeData) {
+    return null;
+  }
+
   return (
     <div className={styles.txBox}>
       <div className={styles.txImg}>
-        {props.tx.status === "NONE" ? (
+        {bridgeData.lastStatus === "NONE" ? (
           <Text font="proto_mono" opacity={0.5}>
             {props.idx}
           </Text>
         ) : (
-          <StatusIcon status={props.tx.status} size={24} />
+          <StatusIcon status={bridgeData.lastStatus} size={24} />
         )}
       </div>
       <Spacer width="14px" />
@@ -65,9 +84,9 @@ const InProgressTxItem = (props: TxItemProps) => {
         <Container direction="row">
           <Container width="80%">
             <Text size="sm" theme="secondary-dark">
-              {props.tx.tx.description.title}
+              {`bridge ${bridgeData.direction ?? ""}`}
             </Text>
-            <Text size="md">{props.tx.tx.description.description}</Text>
+            <Text size="md">{bridgeData.amountFormatted}</Text>
           </Container>
           <Container width="30%">
             <Spacer height="8px" />
@@ -87,54 +106,37 @@ const InProgressTxItem = (props: TxItemProps) => {
                 <Spacer height="8px" />
               </Container>
             )}
-            {props.tx.error && (
+            {/* {props.tx.error && (
               <Text
                 size="sm"
                 style={{ color: "var(--extra-failure-color,red)" }}
               >
                 {formatError(props.tx.error)}
               </Text>
-            )}
+            )} */}
 
             <Container direction="row" gap={"auto"}>
-              {props.tx.timestamp && (
-                <Text size="sm" theme="secondary-dark">
-                  {secondsToTimeLeft(props.timeLeftInSeconds)}
-                </Text>
+              {bridgeData.timeLeft !== undefined && (
+                <Container>
+                  <Text size="sm" theme="secondary-dark">
+                    TIME LEFT: {formatSecondsToMinutes(bridgeData.timeLeft)}
+                  </Text>
+                  )
+                </Container>
               )}
-              {props.tx.tx.bridge &&
-                props.tx.tx.bridge.lastStatus !== "NONE" && (
-                  <Container>
-                    <Text size="sm" theme="secondary-dark">
-                      Bridge Status -{" "}
-                      {props.tx.tx.bridge.lastStatus.toLowerCase()}
-                    </Text>
-                    {props.tx.tx.bridge.timeLeft !== undefined && (
-                      <Text size="sm" theme="secondary-dark">
-                        TIME LEFT:{" "}
-                        {formatSecondsToMinutes(props.tx.tx.bridge.timeLeft)}
-                      </Text>
-                    )}
-                  </Container>
-                )}
             </Container>
           </Container>
         </Container>
         <Spacer height="10px" />
-        {props.loadingPercentage != undefined && props.loadingPercentage > 0 ? (
-          <div className={styles.progress}>
-            <div
-              className={styles.progressBar}
-              style={{
-                width: `${props.loadingPercentage}%`,
-              }}
-            ></div>
-          </div>
-        ) : (
-          <div className={styles.progress}>
-            <div className={styles.infinityBar}></div>
-          </div>
-        )}
+        <div className={styles.progress}>
+          <div
+            className={
+              loadingPercentage ? styles.progressBar : styles.infinityBar
+            }
+            style={{ width: loadingPercentage ? `${loadingPercentage}%` : "" }}
+          ></div>
+        </div>
+        <Spacer height="10px" />
       </Container>
     </div>
   );

@@ -28,7 +28,7 @@ export function dateToMomentsAgo(timestamp: number): string {
   return Math.floor(seconds) + " seconds ago";
 }
 
-export default function secondsToTimeLeft(seconds: number): string {
+export function secondsToTimeLeft(seconds: number): string {
   if (seconds < 0) {
     return "0 seconds left";
   }

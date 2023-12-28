@@ -113,7 +113,15 @@ export async function gravityBridgeOutTx(
           GRAVITY_BRIDGE.name,
           ETH_MAINNET.name,
           getBridgeMethodInfo(BridgingMethod.GRAVITY_BRIDGE).name
-        )
+        ),
+        {
+          direction: "out",
+          amountFormatted: displayAmount(
+            txParams.amount,
+            txParams.token.decimals,
+            { symbol: txParams.token.symbol }
+          ),
+        }
       )
     );
 
