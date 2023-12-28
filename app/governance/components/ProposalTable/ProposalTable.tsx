@@ -133,7 +133,7 @@ const ProposalTable = ({ proposals }:TableProps) => {
       
       <div className={styles.table}>
         {
-          (filteredProposals.length!=0) ?
+         
         
         <Table
                 title={proposalTitleMap.get(currentFilter)} 
@@ -149,13 +149,13 @@ const ProposalTable = ({ proposals }:TableProps) => {
                     />
                   </Container>
                 }
-                headers={[
+                  headers={(filteredProposals.length!=0 || filteredProposals) ? [
                   { value: <Text opacity={0.4} font="rm_mono">ID</Text>, ratio: 2 },
                   { value: <Text opacity={0.4}>Title</Text>, ratio: 10 },
                   { value: <Text opacity={0.4} font="rm_mono">Status</Text>, ratio: 4},
                   { value: <Text opacity={0.4} font="rm_mono">Type</Text>, ratio: 7 },
                   { value: <Text opacity={0.4} font="rm_mono">Voting Date</Text>, ratio: 7 }
-                ]}
+                ]: []}
                 content={paginatedProposals.map((proposal,index)=>{
                   return (
                     [
@@ -170,7 +170,7 @@ const ProposalTable = ({ proposals }:TableProps) => {
                   ]
                   );
                 })}
-            /> : <div>NO ACTIVE PROPOSALS FOUND</div>
+            /> 
               }
       </div>
       

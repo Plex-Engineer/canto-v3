@@ -230,7 +230,24 @@ export default function StakingPage() {
   };
 
   const space = " ";
+  console.log(userStaking?.unbonding);
 
+  let unbondingDelegationsTable: any[] = [];
+  for(let i=0;i<( (userStaking && userStaking.unbonding) ? userStaking.unbonding.length : 0);i++){
+
+    const validatorAddress = userStaking?.unbonding[i].validator_address;
+    const validator = validators.filter(v=> v.operator_address==validatorAddress);
+    unbondingDelegationsTable.push(userStaking?.unbonding[i].entries.map((unbondingElement,index)=>({
+
+        unbondingDelegationsTable.push({
+                name: validator[0].description.moniker,
+                delegation: unbondingElement.balance,
+                completionDate: unbondingElement.completion_time
+        });
+    }
+    )));
+  }
+  console.log(unbondingDelegationsTable);
   
 
   function handleClick(validator: Validator){

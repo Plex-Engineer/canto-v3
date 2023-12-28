@@ -176,7 +176,7 @@ export const StakingModal = (props : StakingModalParams) => {
                     errorMessage="Amount must be greater than 0"/>
                     
                 </div>
-                
+                <Spacer height="10px"/>
                 <div style={{width: "100%"}} className={styles.modalInfoRow} >
                     <Text size="x-sm" color="#EE4B2B">
                         Please Note: Undelegation period is 21 days
