@@ -22,6 +22,7 @@ import PopUp from "@/components/popup/popup";
 import { Validation } from "@/config/interfaces";
 import { AmbientTransactionParams } from "@/transactions/pairs/ambient";
 import { AmbientPositionManager } from "@/utils/ambient/liquidityControllers";
+import { defaultPriceRangeFormatted } from "@/utils/ambient/liquidityControllers";
 
 interface ManagePostionProps {
   pool: AmbientPool;
@@ -294,15 +295,12 @@ const RemoveLiquidity = ({
 }: ManageProps) => {
   const { pool } = positionManager;
   const [percentToRemove, setPercentToRemove] = useState(0);
+  const executionPriceRange = defaultPriceRangeFormatted(pool, "DEFAULT");
   const [minExecutionPrice, setMinExecutionPrice] = useState(
-    positionManager.getFormattedPrice(
-      getPriceFromTick(positionManager.position.bidTick)
-    )
+    executionPriceRange.minPriceFormatted
   );
   const [maxExecutionPrice, setMaxExecutionPrice] = useState(
-    positionManager.getFormattedPrice(
-      getPriceFromTick(positionManager.position.askTick)
-    )
+    executionPriceRange.maxPriceFormatted
   );
 
   const expectedTokens =
