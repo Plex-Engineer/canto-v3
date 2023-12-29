@@ -1,22 +1,25 @@
 import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
-import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
 import { displayAmount } from "@/utils/formatting";
 import styles from "./dexModals/cantoDex.module.scss";
 import Text from "@/components/text";
 import { addTokenBalances } from "@/utils/math";
 
+type TokenPosition = {
+  amount: string;
+  value: string;
+  symbol: string;
+  decimals: number;
+  icon: string;
+};
 // Listing Positions
 interface Props {
-  pool: AmbientPool;
-  positionValues: {
-    baseAmount: string;
-    baseValue: string;
-    quoteAmount: string;
-    quoteValue: string;
+  positions: {
+    token1: TokenPosition;
+    token2: TokenPosition;
   }[];
 }
-export const HoverPositions = ({ pool, positionValues }: Props) => (
+export const HoverPositions = ({ positions }: Props) => (
   <>
     <div
       className={styles["scroll-view"]}
@@ -25,7 +28,7 @@ export const HoverPositions = ({ pool, positionValues }: Props) => (
       }}
     >
       <Container gap={10} className={styles["items-list"]}>
-        {positionValues.map((item, idx) => (
+        {positions.map((item, idx) => (
           <Container
             key={idx}
             direction="row"
@@ -56,7 +59,7 @@ export const HoverPositions = ({ pool, positionValues }: Props) => (
 
               <Text size="x-sm" font="proto_mono">
                 {displayAmount(
-                  addTokenBalances(item.baseValue, item.quoteValue),
+                  addTokenBalances(item.token1.value, item.token2.value),
                   18
                 )}{" "}
                 <Icon icon={{ url: "tokens/note.svg", size: 12 }} themed />
@@ -77,9 +80,9 @@ export const HoverPositions = ({ pool, positionValues }: Props) => (
                   lineBreak: "anywhere",
                 }}
               >
-                <Icon icon={{ url: pool.base.logoURI, size: 12 }} themed />
-                {`${pool.base.symbol}: `}
-                {displayAmount(item.baseAmount, pool.base.decimals, {
+                <Icon icon={{ url: item.token1.icon, size: 12 }} themed />
+                {`${item.token1.symbol}: `}
+                {displayAmount(item.token1.amount, item.token1.decimals, {
                   precision: 2,
                   maxSmallBalance: 0.01,
                 })}
@@ -91,9 +94,9 @@ export const HoverPositions = ({ pool, positionValues }: Props) => (
                   lineBreak: "anywhere",
                 }}
               >
-                <Icon icon={{ url: pool.quote.logoURI, size: 12 }} themed />
-                {`${pool.quote.symbol}: `}
-                {displayAmount(item.quoteAmount, pool.quote.decimals, {
+                <Icon icon={{ url: item.token2.icon, size: 12 }} themed />
+                {`${item.token2.symbol}: `}
+                {displayAmount(item.token2.amount, item.token2.decimals, {
                   precision: 2,
                   maxSmallBalance: 0.01,
                 })}

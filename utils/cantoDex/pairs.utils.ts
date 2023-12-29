@@ -8,6 +8,31 @@ import { DEX_REOUTER_ABI } from "@/config/abis";
 import { CantoDexPair } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { convertToBigNumber, formatBalance } from "../formatting";
+import BigNumber from "bignumber.js";
+
+export function estimateTokenAmountsFromLiquidity(poolProps: {
+  reserveA: string;
+  reserveB: string;
+  totalLPSupply: string;
+  liquidity: string;
+}): {
+  tokenA: string;
+  tokenB: string;
+} {
+  const liquidityBN = new BigNumber(poolProps.liquidity);
+  return {
+    tokenA: liquidityBN
+      .multipliedBy(poolProps.reserveA)
+      .dividedBy(poolProps.totalLPSupply)
+      .integerValue()
+      .toString(),
+    tokenB: liquidityBN
+      .multipliedBy(poolProps.reserveB)
+      .dividedBy(poolProps.totalLPSupply)
+      .integerValue()
+      .toString(),
+  };
+}
 
 export async function quoteRemoveLiquidity(
   chainId: number,
