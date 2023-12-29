@@ -37,10 +37,10 @@ export type AnalyticsTransactionFlowData =
       cantoLpBalance2?: string;
       cantoLpTokenAmount?: string;
       cantoLpTokenBalance?: string;
-      cantoLpExpectedToken1?: string;
+      cantoLpExpectedAmount1?: string;
       cantoLpStakedBalance?: string;
       cantoLpUnstakedBalance?: string;
-      cantoLpExpectedToken2?: string;
+      cantoLpExpectedAmount2?: string;
       cantoLpSlippage?: Number;
       cantoLpDeadline?: string;
       cantoLpStakeStatus?: boolean;
@@ -61,7 +61,10 @@ export type AnalyticsTransactionFlowData =
       ambientLpMinExecPrice?: string;
       ambientLpMaxExecPrice?: string;
       ambientLpLiquidity?: string;
+      ambientLpExpectedBaseAmount?: string;
+      ambientLpExpectedQuoteAmount?: string;
       ambientLpFee?: string;
+      ambientLpIsAdvanced?: boolean;
     }
   | {
       // lending info
