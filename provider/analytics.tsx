@@ -156,9 +156,14 @@ class AnalyticsWrapper {
             posthog.capture("Canto LP Modal Stake LP Clicked", params);
           },
         },
+        ambientDexLpModal: {
+          advanceClicked: (params: object) => {
+            posthog.capture("Ambient LP Modal Advanced Clicked", params);
+          },
+        },
       },
       lendingMarket: {
-        limitClicked: (limit: string) => {
+        limitClicked: (limit: number) => {
           posthog.capture("Lending Market Modal Limit Clicked", {
             limit,
           });
