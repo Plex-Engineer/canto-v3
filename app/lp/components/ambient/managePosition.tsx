@@ -21,8 +21,10 @@ import Amount from "@/components/amount/amount";
 import PopUp from "@/components/popup/popup";
 import { Validation } from "@/config/interfaces";
 import { AmbientTransactionParams } from "@/transactions/pairs/ambient";
-import { AmbientPositionManager } from "@/utils/ambient/liquidityControllers";
-import { defaultPriceRangeFormatted } from "@/utils/ambient/liquidityControllers";
+import {
+  AmbientPositionManager,
+  defaultPriceRangeFormatted,
+} from "@/utils/ambient/liquidityControllers";
 
 interface ManagePostionProps {
   pool: AmbientPool;
