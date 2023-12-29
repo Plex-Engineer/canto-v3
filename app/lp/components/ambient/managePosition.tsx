@@ -121,15 +121,12 @@ const AddLiquidity = ({
   const [amountQuote, setAmountQuote] = useState("");
   const [lastUpdate, setLastUpdate] = useState<"base" | "quote">("base");
   const positionValues = positionManager.displayPositionValues();
+  const defaultExecutionPrice = defaultPriceRangeFormatted(pool, "DEFAULT");
   const [minExecutionPrice, setMinExecutionPrice] = useState(
-    positionManager.getFormattedPrice(
-      getPriceFromTick(positionManager.position.bidTick)
-    )
+    defaultExecutionPrice.minPriceFormatted
   );
   const [maxExecutionPrice, setMaxExecutionPrice] = useState(
-    positionManager.getFormattedPrice(
-      getPriceFromTick(positionManager.position.askTick)
-    )
+    defaultExecutionPrice.maxPriceFormatted
   );
   // pack the params into a single object
   const userParams = {
