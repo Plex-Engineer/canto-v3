@@ -23,7 +23,7 @@ import { areEqualAddresses } from "@/utils/address";
 import { convertTokenAmountToNote, percentOfAmount } from "@/utils/math";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
 import Toggle from "@/components/toggle";
-import Analytics from "@/provider/analytics"
+import Analytics from "@/provider/analytics";
 
 interface Props {
   isSupplyModal: boolean;
@@ -493,7 +493,7 @@ const BorrowLimits = ({
               opacity: limitAmount === currentAmount ? 1 : 0.5,
             }}
             onClick={() => {
-              Analytics.actions.events.lendingMarket.limitClicked(limit)
+              Analytics.actions.events.lendingMarket.limitClicked(limit);
               setAmount(limitAmount);
             }}
           >{`${limit}%`}</Text>
