@@ -379,7 +379,12 @@ export const NewAmbientPositionModal = ({
       <Button
         disabled={positionValidation.error}
         width={"fill"}
-        onClick={() => sendTxFlow(positionManager.txParams.addLiquidity())}
+        onClick={() =>
+          sendTxFlow({
+            ...positionManager.txParams.addLiquidity(),
+            isAdvanced: showAdvanced,
+          })
+        }
       >
         {positionValidation.error
           ? positionValidation.reason

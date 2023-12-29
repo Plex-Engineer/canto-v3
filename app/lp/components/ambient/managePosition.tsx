@@ -415,9 +415,13 @@ const RemoveLiquidity = ({
         disabled={validParams.error}
         width={"fill"}
         onClick={() =>
-          sendTxFlow(
-            positionManager.createRemoveConcentratedLiquidtyParams(userParams)
-          )
+          sendTxFlow({
+            ...positionManager.createRemoveConcentratedLiquidtyParams(
+              userParams
+            ),
+            expectedBaseAmount: expectedTokens.base,
+            expectedQuoteAmount: expectedTokens.quote,
+          })
         }
       >
         {validParams.error ? validParams.reason : "Remove Liquidity"}

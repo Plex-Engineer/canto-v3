@@ -156,6 +156,7 @@ function getAmbientLiquidityTransactionFlowData(
     ];
     return {
       ...poolData,
+      ambientLpIsAdvanced: ambientLiquidityTxParams.isAdvanced ?? false,
       ambientLpBaseAmount: baseAmount,
       ambientLpQuoteAmount: quoteAmount,
       ambientLpBaseBalance: baseBalance,
@@ -163,9 +164,21 @@ function getAmbientLiquidityTransactionFlowData(
     };
   } else {
     // remove liquidity
+    const [ambientLpExpectedBaseAmount , ambientLpExpectedQuoteAmount] = [
+      displayAnalyticsAmount(
+        ambientLiquidityTxParams.expectedBaseAmount ?? "0",
+        ambientLiquidityTxParams.pool.base.decimals
+      ),
+      displayAnalyticsAmount(
+        ambientLiquidityTxParams.expectedQuoteAmount ?? "0",
+        ambientLiquidityTxParams.pool.quote.decimals
+      ),
+    ];
     return {
       ...poolData,
       ambientLpLiquidity: ambientLiquidityTxParams.liquidity,
+      ambientLpExpectedBaseAmount,
+      ambientLpExpectedQuoteAmount,
     };
   }
 }
@@ -220,11 +233,11 @@ function getCantoDexTransactionFlowData(
         ),
         cantoLpSlippage: cantoDexTxParams.slippage,
         cantoLpDeadline: cantoDexTxParams.deadline,
-        cantoLpExpectedToken1: displayAnalyticsAmount(
+        cantoLpExpectedAmount1: displayAnalyticsAmount(
           cantoDexTxParams.expectedAmount1 ?? "0",
           cantoDexTxParams.pair.token1.decimals
         ),
-        cantoLpExpectedToken2: displayAnalyticsAmount(
+        cantoLpExpectedAmount2: displayAnalyticsAmount(
           cantoDexTxParams.expectedAmount2 ?? "0",
           cantoDexTxParams.pair.token2.decimals
         ),
