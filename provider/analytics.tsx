@@ -88,6 +88,7 @@ export type AnalyticsTransactionFlowInfo = {
 
 type AnalyticsTransactionFlowParams = AnalyticsTransactionFlowInfo & {
   txType?: AnalyticsTransactionType;
+  txNetwork?: string;
   txSuccess?: boolean;
   txsGenerateError?: string;
   txError?: string;
