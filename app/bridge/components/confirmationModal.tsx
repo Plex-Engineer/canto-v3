@@ -26,13 +26,16 @@ interface Props {
   fromNetwork: string;
   toNetwork: string;
   amount: string;
+  extraValues?: {
+    key: string;
+    value: string;
+  }[];
   type: "in" | "out";
   confirmation: {
     canConfirm: boolean;
     onConfirm: () => void;
   };
   cosmosAddress?: {
-    addressName?: string; // for eth via gravity bridge
     chainId: string;
     addressPrefix: string;
     currentAddress: string;
@@ -125,8 +128,7 @@ const ConfirmationModal = (props: Props) => {
                   content={<Text size="sm">{props.addresses.to}</Text>}
                 >
                   <Text size="sm">
-                    {(props.cosmosAddress?.addressName ?? props.toNetwork) +
-                      " : "}
+                    {props.toNetwork + " : "}
                     {props.addresses.to
                       ? props.addresses.to?.slice(0, 6) +
                         "..." +
@@ -136,8 +138,7 @@ const ConfirmationModal = (props: Props) => {
                 </PopUp>
               ) : (
                 <Text size="sm">
-                  {(props.cosmosAddress?.addressName ?? props.toNetwork) +
-                    " : "}
+                  {props.toNetwork + " : "}
                   {props.addresses.to
                     ? props.addresses.to?.slice(0, 6) +
                       "..." +
@@ -152,6 +153,24 @@ const ConfirmationModal = (props: Props) => {
               </Text>
               <Text size="sm">{props.amount}</Text>
             </Container>
+            {props.extraValues?.length !== undefined &&
+              props.extraValues.length > 0 && (
+                <div className={styles["extra-info"]}>
+                  {props.extraValues?.map((extraValue) => (
+                    <Container
+                      width="100%"
+                      direction="row"
+                      gap={"auto"}
+                      key={extraValue.key}
+                    >
+                      <Text size="x-sm" theme="secondary-dark">
+                        {extraValue.key}
+                      </Text>
+                      <Text size="x-sm">{extraValue.value}</Text>
+                    </Container>
+                  ))}
+                </div>
+              )}
           </Container>
         </Container>
         {props.cosmosAddress && (
@@ -208,9 +227,7 @@ const ConfirmationModal = (props: Props) => {
                 </Text>
                 <InfoPop>
                   <Text size="xx-sm">
-                    {`manually enter your ${
-                      props.cosmosAddress?.addressName ?? props.toNetwork
-                    } address or click "Connect to Keplr"`}
+                    {`manually enter your ${props.toNetwork} address or click "Connect to Keplr"`}
                   </Text>
                 </InfoPop>
               </div>

@@ -23,6 +23,7 @@ import { areEqualAddresses } from "@/utils/address";
 import { convertTokenAmountToNote, percentOfAmount } from "@/utils/math";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
 import Toggle from "@/components/toggle";
+
 interface Props {
   isSupplyModal: boolean;
   cToken: CTokenWithUserData | null;
@@ -231,8 +232,8 @@ export const LendingModal = (props: Props) => {
       actionType === CTokenLendingTxTypes.BORROW
         ? [90, 94, 98]
         : actionType === CTokenLendingTxTypes.WITHDRAW
-        ? [90, 94, 98, 100]
-        : null;
+          ? [90, 94, 98, 100]
+          : null;
     const limitProps = limits
       ? { limit: { limit: maxAmount, limitName: "Limit" } }
       : {};
@@ -263,11 +264,12 @@ export const LendingModal = (props: Props) => {
           IconUrl={cToken.underlying.logoURI}
           title={cToken.underlying.symbol}
           max={maxAmount}
+          maxName="Lending Market Modal"
           min="1"
           symbol={cToken.underlying.symbol}
           {...limitProps}
           extraNode={
-            limits && (
+            limits ? (
               <BorrowLimits
                 maxBorrow={maxAmount}
                 currentAmount={amount}
@@ -275,7 +277,7 @@ export const LendingModal = (props: Props) => {
                 limits={limits}
                 decimals={cToken.underlying.decimals}
               />
-            )
+            ) : undefined
           }
         />
         <Spacer height="20px" />

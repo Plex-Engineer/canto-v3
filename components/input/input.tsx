@@ -4,6 +4,8 @@ import Text from "../text";
 import clsx from "clsx";
 import Button from "../button/button";
 import { displayAmount, formatBalance } from "@/utils/formatting";
+import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
+import { Validation } from "@/config/interfaces";
 
 // if amount is true then add more required props
 type InputProps = {
@@ -32,6 +34,8 @@ type InputProps = {
       type: "amount";
       balance: string;
       decimals: number;
+      tokenMin: string;
+      tokenMax: string;
     }
   | {
       type: "text";
@@ -55,6 +59,17 @@ const Input = (props: InputProps) => {
         return `${height}px`;
     }
   }
+
+  const inputError: Validation =
+    props.type === "amount" && props.value
+      ? validateNonWeiUserInputTokenAmount(
+          props.value,
+          props.tokenMin,
+          props.tokenMax,
+          "",
+          props.decimals
+        )
+      : { error: false };
 
   return (
     <div
@@ -106,13 +121,14 @@ const Input = (props: InputProps) => {
           autoComplete="off"
           style={{
             height: getHeight(props.height),
-
-            backgroundColor: props.error
-              ? " #ff000017"
-              : props.backgroundColor ?? "",
-            border: props.error
-              ? "1px solid var(--extra-failure-color, #ff0000)"
-              : "",
+            backgroundColor:
+              props.error || inputError.error
+                ? " #ff000017"
+                : props.backgroundColor ?? "",
+            border:
+              props.error || inputError.error
+                ? "1px solid var(--extra-failure-color, #ff0000)"
+                : "",
             ...props.style,
             fontFamily: "var(--rm-mono)",
             fontSize: props.type === "amount" ? "1.5rem" : "1rem",
@@ -123,7 +139,7 @@ const Input = (props: InputProps) => {
             onClick={() => {
               props.onChange({
                 target: {
-                  value: formatBalance(props.balance, props.decimals, {
+                  value: formatBalance(props.tokenMax, props.decimals, {
                     precision: props.decimals,
                   }),
                 },
@@ -139,10 +155,10 @@ const Input = (props: InputProps) => {
       <span
         className={styles["error-message"]}
         style={{
-          opacity: props.error ? 1 : 0,
+          opacity: props.error || inputError.error ? 1 : 0,
         }}
       >
-        {props.errorMessage}
+        {inputError.error ? inputError.reason : props.errorMessage}
       </span>
     </div>
   );
