@@ -24,11 +24,13 @@ export const _oftTransferTx = (
   amount: string,
   gas: string,
   needAdapterParams: boolean,
-  description: TransactionDescription
+  description: TransactionDescription,
+  bridgeInfo: { direction: "in" | "out"; amountFormatted: string }
 ): Transaction => ({
   bridge: {
     lastStatus: "NONE",
     type: BridgingMethod.LAYER_ZERO,
+    ...bridgeInfo,
   },
   feTxType: CantoFETxType.OFT_TRANSFER,
   description,

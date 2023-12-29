@@ -2,7 +2,6 @@ import {
   ERC20Token,
   IBCToken,
   NEW_ERROR,
-  NO_ERROR,
   PromiseWithError,
   UserTokenBalances,
 } from "@/config/interfaces";
@@ -54,37 +53,43 @@ export default function useTokenBalances(
 
         // check if we need to combine native balances (convert coins)
         if (combinedCantoNative && userEthAddress) {
-          // get chain ids for token lookups
-          const { data: chainObject, error: chainError } =
-            getCosmosEIPChainObject(chainId as number);
-          if (chainError) throw chainError;
+          // if error just return balances
+          try {
+            // get chain ids for token lookups
+            const { data: chainObject, error: chainError } =
+              getCosmosEIPChainObject(chainId as number);
+            if (chainError) throw chainError;
 
-          // get canto address
-          const { data: cantoAddress, error: cantoAddressError } =
-            await ethToCantoAddress(userEthAddress);
-          if (cantoAddressError) throw cantoAddressError;
+            // get canto address
+            const { data: cantoAddress, error: cantoAddressError } =
+              await ethToCantoAddress(userEthAddress);
+            if (cantoAddressError) throw cantoAddressError;
 
-          // get native balances
-          const { data: nativeBalances, error: nativeError } =
-            await getCosmosTokenBalanceList(
-              chainObject.cosmosChainId,
-              cantoAddress
-            );
-          if (nativeError) throw nativeError;
-
-          // go through token list to see if any are native compatible, (has ibcDenom)
-          for (let token of tokens) {
-            const ibcToken = token as IBCToken;
-            if (ibcToken.ibcDenom && nativeBalances[ibcToken.ibcDenom]) {
-              balances[token.id] = addTokenBalances(
-                balances[token.id],
-                nativeBalances[ibcToken.ibcDenom]
+            // get native balances
+            const { data: nativeBalances, error: nativeError } =
+              await getCosmosTokenBalanceList(
+                chainObject.cosmosChainId,
+                cantoAddress
               );
+            if (nativeError) throw nativeError;
+
+            // go through token list to see if any are native compatible, (has ibcDenom)
+            for (let token of tokens) {
+              const ibcToken = token as IBCToken;
+              if (ibcToken.ibcDenom && nativeBalances[ibcToken.ibcDenom]) {
+                balances[token.id] = addTokenBalances(
+                  balances[token.id],
+                  nativeBalances[ibcToken.ibcDenom]
+                );
+              }
             }
+          } catch (err) {
+            console.error(err);
           }
         }
         return balances;
       } catch (err) {
+        console.error(err);
         return {};
       }
     },
@@ -104,22 +109,11 @@ async function getTokenBalances(
   userEthAddress: string | null,
   userCosmosAddress: string | null
 ): PromiseWithError<UserTokenBalances> {
-  try {
-    // only set balances if there is a user and the chain is an evm chain
-    if (typeof chainId === "number" && userEthAddress) {
-      const { data: balances, error: balancesError } =
-        await getEVMTokenBalanceList(chainId, tokens, userEthAddress);
-      if (balancesError) throw balancesError;
-      return NO_ERROR(balances);
-    } else if (typeof chainId === "string" && userCosmosAddress) {
-      const { data: balances, error: balancesError } =
-        await getCosmosTokenBalanceList(chainId, userCosmosAddress);
-      if (balancesError) throw balancesError;
-      return NO_ERROR(balances);
-    } else {
-      throw new Error("invalid chainId or user address");
-    }
-  } catch (err) {
-    return NEW_ERROR("useTokenBalances::getTokenBalances" + err);
+  // only set balances if there is a user and the chain is an evm chain
+  if (typeof chainId === "number" && userEthAddress) {
+    return await getEVMTokenBalanceList(chainId, tokens, userEthAddress);
+  } else if (typeof chainId === "string" && userCosmosAddress) {
+    return await getCosmosTokenBalanceList(chainId, userCosmosAddress);
   }
+  return NEW_ERROR("useTokenBalances::getTokenBalances");
 }

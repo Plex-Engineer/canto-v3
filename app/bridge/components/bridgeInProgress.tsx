@@ -35,11 +35,13 @@ const BridgeInProgress = () => {
       }
     });
 
-    return pendingTxs;
+    return pendingTxs.sort(
+      (a, b) => Number(b.timestamp ?? 0) - Number(a.timestamp ?? 0)
+    );
   }, [signer?.account.address, txStore]);
 
   return (
-    <Container height="468px" padding="lg">
+    <Container height="468px" padding="lg" style={{ overflowY: "scroll" }}>
       {inProgressTxs.length > 0 ? (
         inProgressTxs.map((tx, idx) => (
           <InProgressTxItem

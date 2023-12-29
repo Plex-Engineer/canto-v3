@@ -136,7 +136,15 @@ export async function gravityBridgeInTx(
           ETH_MAINNET.name,
           CANTO_MAINNET_EVM.name,
           getBridgeMethodInfo(BridgingMethod.GRAVITY_BRIDGE).name
-        )
+        ),
+        {
+          direction: "in",
+          amountFormatted: displayAmount(
+            txParams.amount,
+            txParams.token.decimals,
+            { symbol: txParams.token.symbol }
+          ),
+        }
       )
     );
 
