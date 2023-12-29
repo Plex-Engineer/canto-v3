@@ -64,7 +64,7 @@ export const NewAmbientPositionModal = ({
         pool.quote.address,
         pool.poolIdx
       );
-      if (error) console.log(error);
+      if (error) console.error(error);
       setGraphPoints(convertLiquidityCurveToGraph(pool, curve));
     }
     getGraph();

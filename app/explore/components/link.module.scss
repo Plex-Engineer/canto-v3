@@ -1,0 +1,13 @@
+.container {
+  cursor: pointer;
+  display: block;
+  border: 1px solid transparent;
+  background-color: transparent;
+  padding: 1rem;
+  text-decoration: none !important;
+  transition: all 0.1s ease-in-out;
+  &:hover {
+    border: 1px solid rgba(var(--dark-color), 0.2);
+    background-color: rgba(var(--dark-color), 0.1);
+  }
+}

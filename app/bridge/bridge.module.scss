@@ -75,3 +75,15 @@
   gap: 1rem;
   width: 100%;
 }
+
+.extra-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  border: 1px solid var(--border-stroke-color);
+  padding: 1rem;
+  background-color: rgba(var(--dark-color), 0.04);
+}

@@ -96,26 +96,32 @@ export default function Page() {
                 UserAmbientPairRow({
                   pool,
                   onManage: (poolAddress) => {
-                    const positions  = pool.userPositions.map((position)=> {
+                    const positions = pool.userPositions.map((position) => {
                       return {
-                        positionId : position.positionId,
-                        liquidity : position.concLiq,
-                        minRangePrice : displayAmount(
+                        positionId: position.positionId,
+                        liquidity: position.concLiq,
+                        minRangePrice: displayAmount(
                           getPriceFromTick(position.bidTick),
                           pool.base.decimals - pool.quote.decimals,
-                          { short:false, precision: pool.base.decimals - pool.quote.decimals }
+                          {
+                            short: false,
+                            precision: pool.base.decimals - pool.quote.decimals,
+                          }
                         ),
-                        maxRangePrice : displayAmount(
+                        maxRangePrice: displayAmount(
                           getPriceFromTick(position.askTick),
                           pool.base.decimals - pool.quote.decimals,
-                          { short:false, precision: pool.base.decimals - pool.quote.decimals }
+                          {
+                            short: false,
+                            precision: pool.base.decimals - pool.quote.decimals,
+                          }
                         ),
-                      }
-                    })
+                      };
+                    });
                     Analytics.actions.events.liquidityPool.manageLPClicked({
                       ambientLp: pool.symbol,
                       positions,
-                    })
+                    });
                     setPair(poolAddress);
                   },
                   rewards: rewards.ambient,

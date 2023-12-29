@@ -19,8 +19,8 @@ const StatusIcon = (props: Props) => {
           props.status === "SUCCESS"
             ? "check.svg"
             : props.status === "ERROR"
-            ? "close.svg"
-            : "",
+              ? "close.svg"
+              : "",
         size: props.size,
       }}
       className={props.className}

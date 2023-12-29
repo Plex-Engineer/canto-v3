@@ -60,6 +60,7 @@ const Text = ({
         lineHeight: "140%",
         letterSpacing: "-0.32px",
         color: color == null ? themes[theme ?? "primary-dark"] : color,
+
         ...style,
       }}
     >

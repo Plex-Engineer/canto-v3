@@ -7,6 +7,13 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+
+  &:focus {
+    outline: 2px solid none;
+  }
+  &:focus-visible {
+    outline: 2px solid rgba(var(--dark-color), 0.2);
+  }
 }
 
 /* Chrome, Safari, Edge, Opera */

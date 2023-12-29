@@ -9,6 +9,12 @@ export interface TransactionDescription {
   description: string;
 }
 
+type BridgeProgress = {
+  type: BridgingMethod;
+  lastStatus: TransactionStatus;
+  timeLeft?: number;
+};
+
 export type Transaction = {
   // account address that will be used to sign the transaction
   fromAddress: string;
@@ -16,11 +22,8 @@ export type Transaction = {
   chainId: number | string;
   description: TransactionDescription;
   feTxType: CantoFETxType;
-  bridge?: {
-    type: BridgingMethod;
-    lastStatus: TransactionStatus;
-    timeLeft?: number;
-  };
+  bridge?: BridgeProgress;
+  verifyTxComplete?: (txHash: string) => PromiseWithError<boolean>;
 } & (
   | {
       type: "EVM";

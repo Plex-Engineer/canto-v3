@@ -58,14 +58,12 @@ const Amount = (props: Props) => {
     const parts = amount.split(".");
     if (parts.length === 1) {
       return amount;
-    } else {
-      const decimalsPart = parts[1];
-      if (decimalsPart.length > decimals) {
-        return `${parts[0]}.${decimalsPart.slice(0, decimals)}~`;
-      } else {
-        return amount;
-      }
     }
+    const decimalsPart = parts[1];
+    if (decimalsPart.length > decimals) {
+      return `${parts[0]}.${decimalsPart.slice(0, decimals)}~`;
+    }
+    return amount;
   }
 
   //commify and formatAmount
@@ -128,7 +126,9 @@ const Amount = (props: Props) => {
           <span
             className={styles.max}
             onClick={() => {
-              Analytics.actions.events.maxClicked(props.maxName ?? "Max Button");
+              Analytics.actions.events.maxClicked(
+                props.maxName ?? "Max Button"
+              );
               props.onChange(
                 {
                   target: {

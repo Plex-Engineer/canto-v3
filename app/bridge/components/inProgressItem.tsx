@@ -1,27 +1,24 @@
 import React from "react";
-import Text from "../text";
-import styles from "./transactions.module.scss";
-import Container from "../container/container";
-import Spacer from "../layout/spacer";
+import styles from "./inProgress.module.scss";
 import {
   dateToMomentsAgo,
   formatError,
   formatSecondsToMinutes,
 } from "@/utils/formatting";
-import StatusIcon from "../icon/statusIcon";
 import { useQuery } from "react-query";
 import { getBridgeStatus } from "@/transactions/bridge";
 import { BridgeStatus, TransactionWithStatus } from "@/transactions/interfaces";
-import Analytics, { AnalyticsTransactionFlowInfo } from "@/provider/analytics";
+import Text from "@/components/text";
+import StatusIcon from "@/components/icon/statusIcon";
+import Spacer from "@/components/layout/spacer";
+import Container from "@/components/container/container";
 
 interface TxItemProps {
   tx: TransactionWithStatus;
-  analyticsTxFlowInfo?: AnalyticsTransactionFlowInfo;
   idx: number;
   setBridgeStatus: (status: BridgeStatus) => void;
 }
-const TxItem = (props: TxItemProps) => {
-  const [isRevealing, setIsRevealing] = React.useState(false);
+const InProgressTxItem = (props: TxItemProps) => {
   useQuery(
     "bridge status",
     async () => {
@@ -48,12 +45,7 @@ const TxItem = (props: TxItemProps) => {
   );
 
   return (
-    <div
-      className={styles.txBox}
-      onClick={() => {
-        setIsRevealing((prev) => !prev);
-      }}
-    >
+    <div className={styles.txBox}>
       <div className={styles.txImg}>
         {props.tx.status === "NONE" ? (
           <Text font="proto_mono" opacity={0.5}>
@@ -72,23 +64,22 @@ const TxItem = (props: TxItemProps) => {
             vertical: false,
           }}
         >
-          <Text size="sm">{props.tx.tx.description.title}</Text>
+          <Text size="sm" theme="secondary-dark">
+            {props.tx.tx.description.title}
+          </Text>
         </Container>
         <div
           className={styles.collapsable}
           style={{
-            maxHeight: isRevealing ? "500px" : "0px",
+            maxHeight: "500px",
             width: "100%",
           }}
         >
-          <Text size="sm" theme="secondary-dark">
-            {props.tx.tx.description.description}
-          </Text>
+          <Text size="md">{props.tx.tx.description.description}</Text>
           <Spacer height="8px" />
           {props.tx.txLink && (
             <Container direction="row" gap="auto">
               {props.tx.hash && (
-                // <PopUp width="600px" content={<Text>{props.tx.hash}</Text>}>
                 <Text size="sm">
                   #
                   {props.tx.hash.slice(0, 4) +
@@ -99,14 +90,6 @@ const TxItem = (props: TxItemProps) => {
               )}
               {props.tx.txLink && (
                 <a
-                  onClick={() => {
-                    if (props.analyticsTxFlowInfo) {
-                      Analytics.actions.events.transactionFlows.explorerViewed({
-                        ...props.analyticsTxFlowInfo,
-                        txType: props.tx.tx.feTxType,
-                      });
-                    }
-                  }}
                   href={props.tx.txLink}
                   target="_blank"
                   style={{
@@ -149,4 +132,4 @@ const TxItem = (props: TxItemProps) => {
   );
 };
 
-export default TxItem;
+export default InProgressTxItem;
