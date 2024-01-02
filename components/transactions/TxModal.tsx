@@ -38,6 +38,10 @@ const TransactionModal = () => {
         if (flow.status === "POPULATING") {
           setIsOpen(true);
           setCurrentFlowId(flow.id);
+          // close bridge/lp/lm confirmation modals
+          if (flow?.onSuccessCallback) {
+            flow.onSuccessCallback();
+          }
           return;
         }
       });

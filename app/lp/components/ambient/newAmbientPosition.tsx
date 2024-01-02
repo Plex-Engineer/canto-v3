@@ -28,7 +28,7 @@ import {
   useNewAmbientPositionManager,
 } from "@/utils/ambient/liquidityControllers";
 import { Validation } from "@/config/interfaces";
-
+import Analytics from "@/provider/analytics";
 interface NewPositionModalProps {
   pool: AmbientPool;
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
@@ -113,6 +113,15 @@ export const NewAmbientPositionModal = ({
                 value={showAdvanced}
                 onChange={(advanced) => {
                   // reset prices to default
+                  if (advanced) {
+                    Analytics.actions.events.liquidityPool.ambientDexLpModal.advanceClicked(
+                      {
+                        ambientLp: pool.symbol,
+                        baseToken: pool.base.symbol,
+                        quoteToken: pool.quote.symbol,
+                      }
+                    );
+                  }
                   setDefaultParams("DEFAULT");
                   setShowAdvanced(advanced);
                 }}
@@ -370,7 +379,12 @@ export const NewAmbientPositionModal = ({
       <Button
         disabled={positionValidation.error}
         width={"fill"}
-        onClick={() => sendTxFlow(positionManager.txParams.addLiquidity())}
+        onClick={() =>
+          sendTxFlow({
+            ...positionManager.txParams.addLiquidity(),
+            isAdvanced: showAdvanced,
+          })
+        }
       >
         {positionValidation.error
           ? positionValidation.reason

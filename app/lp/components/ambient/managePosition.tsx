@@ -21,7 +21,10 @@ import Amount from "@/components/amount/amount";
 import PopUp from "@/components/popup/popup";
 import { Validation } from "@/config/interfaces";
 import { AmbientTransactionParams } from "@/transactions/pairs/ambient";
-import { AmbientPositionManager } from "@/utils/ambient/liquidityControllers";
+import {
+  AmbientPositionManager,
+  defaultPriceRangeFormatted,
+} from "@/utils/ambient/liquidityControllers";
 
 interface ManagePostionProps {
   pool: AmbientPool;
@@ -118,15 +121,12 @@ const AddLiquidity = ({
   const [amountQuote, setAmountQuote] = useState("");
   const [lastUpdate, setLastUpdate] = useState<"base" | "quote">("base");
   const positionValues = positionManager.displayPositionValues();
+  const defaultExecutionPrice = defaultPriceRangeFormatted(pool, "DEFAULT");
   const [minExecutionPrice, setMinExecutionPrice] = useState(
-    positionManager.getFormattedPrice(
-      getPriceFromTick(positionManager.position.bidTick)
-    )
+    defaultExecutionPrice.minPriceFormatted
   );
   const [maxExecutionPrice, setMaxExecutionPrice] = useState(
-    positionManager.getFormattedPrice(
-      getPriceFromTick(positionManager.position.askTick)
-    )
+    defaultExecutionPrice.maxPriceFormatted
   );
   // pack the params into a single object
   const userParams = {
@@ -294,15 +294,12 @@ const RemoveLiquidity = ({
 }: ManageProps) => {
   const { pool } = positionManager;
   const [percentToRemove, setPercentToRemove] = useState(0);
+  const executionPriceRange = defaultPriceRangeFormatted(pool, "DEFAULT");
   const [minExecutionPrice, setMinExecutionPrice] = useState(
-    positionManager.getFormattedPrice(
-      getPriceFromTick(positionManager.position.bidTick)
-    )
+    executionPriceRange.minPriceFormatted
   );
   const [maxExecutionPrice, setMaxExecutionPrice] = useState(
-    positionManager.getFormattedPrice(
-      getPriceFromTick(positionManager.position.askTick)
-    )
+    executionPriceRange.maxPriceFormatted
   );
 
   const expectedTokens =
@@ -418,9 +415,13 @@ const RemoveLiquidity = ({
         disabled={validParams.error}
         width={"fill"}
         onClick={() =>
-          sendTxFlow(
-            positionManager.createRemoveConcentratedLiquidtyParams(userParams)
-          )
+          sendTxFlow({
+            ...positionManager.createRemoveConcentratedLiquidtyParams(
+              userParams
+            ),
+            expectedBaseAmount: expectedTokens.base,
+            expectedQuoteAmount: expectedTokens.quote,
+          })
         }
       >
         {validParams.error ? validParams.reason : "Remove Liquidity"}

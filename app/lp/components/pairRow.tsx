@@ -15,6 +15,7 @@ import {
 } from "@/utils/math";
 import BigNumber from "bignumber.js";
 import { HoverPositions } from "./HoverPositions";
+import { estimateTokenAmountsFromLiquidity } from "@/utils/cantoDex";
 export const UserCantoDexPairRow = ({
   pair,
   onManage,
@@ -34,6 +35,14 @@ export const UserCantoDexPairRow = ({
   );
   if (error) return [];
   const userPoolShare = divideBalances(totalUserLpTokens, pair.totalSupply);
+
+  // get amount of tokens position represents
+  const tokenAmounts = estimateTokenAmountsFromLiquidity({
+    reserveA: pair.reserve1,
+    reserveB: pair.reserve2,
+    totalLPSupply: pair.totalSupply,
+    liquidity: totalUserLpTokens,
+  });
   return [
     <Container
       key={pair.address}
@@ -57,19 +66,61 @@ export const UserCantoDexPairRow = ({
     </Text>,
 
     <Text key={pair.address + "share"}>{formatPercent(userPoolShare)}</Text>,
-    <Text key={pair.address + "value"}>
-      {displayAmount(totalUserLPValue.toString(), 18, {
-        precision: 2,
-      })}
-      <Icon
-        style={{ marginLeft: "5px" }}
-        themed
-        icon={{
-          url: "/tokens/note.svg",
-          size: 16,
-        }}
-      />
-    </Text>,
+    <Container
+      key={pair.address + "value"}
+      direction="row"
+      center={{
+        horizontal: true,
+        vertical: true,
+      }}
+      gap={10}
+    >
+      <Text>
+        {displayAmount(totalUserLPValue.toString(), 18, {
+          precision: 2,
+        })}
+        <Icon
+          style={{ marginLeft: "5px" }}
+          themed
+          icon={{
+            url: "/tokens/note.svg",
+            size: 16,
+          }}
+        />
+      </Text>
+      <InfoPop>
+        <Container>
+          <HoverPositions
+            positions={[
+              {
+                token1: {
+                  amount: tokenAmounts.tokenA,
+                  value:
+                    convertTokenAmountToNote(
+                      tokenAmounts.tokenA,
+                      pair.price1
+                    ).data?.toString() ?? "0",
+                  symbol: pair.token1.symbol,
+                  decimals: pair.token1.decimals,
+                  icon: pair.token1.logoURI,
+                },
+                token2: {
+                  amount: tokenAmounts.tokenB,
+                  value:
+                    convertTokenAmountToNote(
+                      tokenAmounts.tokenB,
+                      pair.price2
+                    ).data?.toString() ?? "0",
+                  symbol: pair.token2.symbol,
+                  decimals: pair.token2.decimals,
+                  icon: pair.token2.logoURI,
+                },
+              },
+            ]}
+          />
+        </Container>
+      </InfoPop>
+    </Container>,
     <Container
       key={pair.address + "edit"}
       direction="row"
@@ -265,11 +316,16 @@ export const UserAmbientPairRow = ({
       new BigNumber(10).pow(36 - pool.quote.decimals).toString()
     );
     if (baseNoteValue.error || quoteNoteValue.error) {
+      const emptyToken = {
+        amount: "0",
+        value: "0",
+        symbol: "",
+        decimals: 0,
+        icon: "",
+      };
       return {
-        baseAmount: "0",
-        baseValue: "0",
-        quoteAmount: "0",
-        quoteValue: "0",
+        token1: emptyToken,
+        token2: emptyToken,
       };
     }
     totalValue = addTokenBalances(
@@ -280,10 +336,20 @@ export const UserAmbientPairRow = ({
       )
     );
     return {
-      baseAmount: tokenAmounts.base,
-      baseValue: baseNoteValue.data.toString(),
-      quoteAmount: tokenAmounts.quote,
-      quoteValue: quoteNoteValue.data.toString(),
+      token1: {
+        amount: tokenAmounts.base,
+        value: baseNoteValue.data.toString(),
+        symbol: pool.base.symbol,
+        decimals: pool.base.decimals,
+        icon: pool.base.logoURI,
+      },
+      token2: {
+        amount: tokenAmounts.quote,
+        value: quoteNoteValue.data.toString(),
+        symbol: pool.quote.symbol,
+        decimals: pool.quote.decimals,
+        icon: pool.quote.logoURI,
+      },
     };
   });
 
@@ -332,7 +398,7 @@ export const UserAmbientPairRow = ({
       <InfoPop>
         {/* show all the positions */}
         <Container>
-          <HoverPositions pool={pool} positionValues={allPositionValues} />
+          <HoverPositions positions={allPositionValues} />
         </Container>
       </InfoPop>
     </Container>,

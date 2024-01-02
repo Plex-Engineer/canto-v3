@@ -1,10 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import styles from "./inProgress.module.scss";
-import {
-  dateToMomentsAgo,
-  formatError,
-  formatSecondsToMinutes,
-} from "@/utils/formatting";
+import { formatSecondsToMinutes } from "@/utils/formatting";
 import { useQuery } from "react-query";
 import { getBridgeStatus } from "@/transactions/bridge";
 import { BridgeStatus, TransactionWithStatus } from "@/transactions/interfaces";
@@ -18,6 +14,7 @@ interface TxItemProps {
   idx: number;
   setBridgeStatus: (status: BridgeStatus) => void;
 }
+
 const InProgressTxItem = (props: TxItemProps) => {
   useQuery(
     "bridge status",
@@ -44,89 +41,102 @@ const InProgressTxItem = (props: TxItemProps) => {
     }
   );
 
+  // get bridge info from tx
+  const bridgeData = useMemo(() => props.tx.tx.bridge, [props.tx.tx.bridge]);
+
+  // asumme full bar is 30 minutes
+  const loadingPercentage: number | null = useMemo(() => {
+    const isComplete = bridgeData?.lastStatus === "SUCCESS";
+    if (isComplete) {
+      return 100;
+    }
+    // time left may be null
+    if (!bridgeData?.timeLeft) {
+      return null;
+    }
+    // get percent left
+    const percentLeft = (bridgeData?.timeLeft / 1800) * 100;
+    if (percentLeft >= 100) {
+      // show small progress
+      return 1;
+    }
+    return 100 - percentLeft;
+  }, [bridgeData?.timeLeft, bridgeData?.lastStatus]);
+
+  // if bridge data is not defined, return null
+  if (!bridgeData) {
+    return null;
+  }
+
   return (
     <div className={styles.txBox}>
       <div className={styles.txImg}>
-        {props.tx.status === "NONE" ? (
+        {bridgeData.lastStatus === "NONE" ? (
           <Text font="proto_mono" opacity={0.5}>
             {props.idx}
           </Text>
         ) : (
-          <StatusIcon status={props.tx.status} size={24} />
+          <StatusIcon status={bridgeData.lastStatus} size={24} />
         )}
       </div>
       <Spacer width="14px" />
       <Container width="100%">
-        <Container
-          width="100%"
-          center={{
-            horizontal: true,
-            vertical: false,
-          }}
-        >
-          <Text size="sm" theme="secondary-dark">
-            {props.tx.tx.description.title}
-          </Text>
-        </Container>
-        <div
-          className={styles.collapsable}
-          style={{
-            maxHeight: "500px",
-            width: "100%",
-          }}
-        >
-          <Text size="md">{props.tx.tx.description.description}</Text>
-          <Spacer height="8px" />
-          {props.tx.txLink && (
-            <Container direction="row" gap="auto">
-              {props.tx.hash && (
-                <Text size="sm">
-                  #
-                  {props.tx.hash.slice(0, 4) +
-                    "..." +
-                    props.tx.hash.slice(-5, -1)}
-                </Text>
-                // </PopUp>
-              )}
-              {props.tx.txLink && (
-                <a
-                  href={props.tx.txLink}
-                  target="_blank"
-                  style={{
-                    textDecoration: "underline",
-                  }}
-                >
-                  <Text size="sm">view explorer</Text>
-                </a>
-              )}
-            </Container>
-          )}
-          {props.tx.error && (
-            <Text size="sm" style={{ color: "var(--extra-failure-color,red)" }}>
-              {formatError(props.tx.error)}
-            </Text>
-          )}
-        </div>
-        <Container direction="row" gap={"auto"}>
-          {props.tx.timestamp && (
+        <Container direction="row">
+          <Container width="80%">
             <Text size="sm" theme="secondary-dark">
-              {dateToMomentsAgo(props.tx.timestamp)}
+              {`bridge ${bridgeData.direction ?? ""}`}
             </Text>
-          )}
-          {props.tx.tx.bridge && props.tx.tx.bridge.lastStatus !== "NONE" && (
-            <Container>
-              <Text size="sm" theme="secondary-dark">
-                Bridge Status - {props.tx.tx.bridge.lastStatus.toLowerCase()}
+            <Text size="md">{bridgeData.amountFormatted}</Text>
+          </Container>
+          <Container width="30%">
+            <Spacer height="8px" />
+            {props.tx.txLink && (
+              <Container direction="row" gap="auto">
+                {props.tx.txLink && (
+                  <a
+                    href={props.tx.txLink}
+                    target="_blank"
+                    style={{
+                      textDecoration: "underline",
+                    }}
+                  >
+                    <Text size="sm">view explorer</Text>
+                  </a>
+                )}
+                <Spacer height="8px" />
+              </Container>
+            )}
+            {/* {props.tx.error && (
+              <Text
+                size="sm"
+                style={{ color: "var(--extra-failure-color,red)" }}
+              >
+                {formatError(props.tx.error)}
               </Text>
-              {props.tx.tx.bridge.timeLeft !== undefined && (
-                <Text size="sm" theme="secondary-dark">
-                  TIME LEFT:{" "}
-                  {formatSecondsToMinutes(props.tx.tx.bridge.timeLeft)}
-                </Text>
+            )} */}
+
+            <Container direction="row" gap={"auto"}>
+              {bridgeData.timeLeft !== undefined && (
+                <Container>
+                  <Text size="sm" theme="secondary-dark">
+                    TIME LEFT: {formatSecondsToMinutes(bridgeData.timeLeft)}
+                  </Text>
+                  )
+                </Container>
               )}
             </Container>
-          )}
+          </Container>
         </Container>
+        <Spacer height="10px" />
+        <div className={styles.progress}>
+          <div
+            className={
+              loadingPercentage ? styles.progressBar : styles.infinityBar
+            }
+            style={{ width: loadingPercentage ? `${loadingPercentage}%` : "" }}
+          ></div>
+        </div>
+        <Spacer height="10px" />
       </Container>
     </div>
   );

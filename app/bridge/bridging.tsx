@@ -16,10 +16,14 @@ import { BridgingMethod } from "@/transactions/bridge";
 import { addTokenBalances } from "@/utils/math";
 import { BridgeToken } from "@/hooks/bridge/interfaces/tokens";
 import FeeButton from "./components/feeButton";
+import { useState } from "react";
+import GravityConfirmationModal from "./components/gravityConfirmationModal";
+import { GRAVITY_BRIDGE } from "@/config/networks";
 
 const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
     Amount,
+    Direction,
     Transaction,
     Confirmation,
     bridgeHook: bridge,
@@ -28,12 +32,28 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
     feesHook: fees,
     feesSelection,
   } = props;
-  const { fromNetwork, toNetwork, token } = bridge.selections;
+  const { fromNetwork, toNetwork, token, method } = bridge.selections;
   const { selectedGBridgeFee, setSelectedGBridgeFee, totalChainFee } =
     feesSelection.gravityBridge;
 
+  // special modal for gravity bridge out (check for wallet provider custom chains)
+  const [gravityModalOpen, setGravityModalOpen] = useState(false);
+
   return (
     <>
+      <GravityConfirmationModal
+        open={gravityModalOpen}
+        onClose={() => setGravityModalOpen(false)}
+        onConfirm={() => {
+          setGravityModalOpen(false);
+          Confirmation.setIsModalOpen(true);
+        }}
+        onReselectMethod={() => {
+          setGravityModalOpen(false);
+          bridge.setState("network", GRAVITY_BRIDGE.id);
+          Confirmation.setIsModalOpen(true);
+        }}
+      />
       <ConfirmationModal
         open={Confirmation.isModalOpen}
         onClose={() => {
@@ -300,7 +320,14 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
         <Button
           width="fill"
           onClick={() => {
-            Confirmation.setIsModalOpen(true);
+            if (
+              Direction.direction === "out" &&
+              method === BridgingMethod.GRAVITY_BRIDGE
+            ) {
+              setGravityModalOpen(true);
+            } else {
+              Confirmation.setIsModalOpen(true);
+            }
           }}
           disabled={Confirmation.preConfirmCheck.error}
         >

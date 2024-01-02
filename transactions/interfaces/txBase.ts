@@ -13,6 +13,8 @@ type BridgeProgress = {
   type: BridgingMethod;
   lastStatus: TransactionStatus;
   timeLeft?: number;
+  direction: "in" | "out";
+  amountFormatted: string;
 };
 
 export type Transaction = {
