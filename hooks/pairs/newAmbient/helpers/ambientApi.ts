@@ -218,21 +218,22 @@ export async function queryUserAmbientRewards(
   chainId: number,
   userEthAddress: string
 ): PromiseWithError<string> {
-  // get ledger address
-  const ledgerAddress = getAmbientAddress(chainId, "rewardLedger");
-  if (!ledgerAddress) {
-    return NEW_ERROR("queryUserAmbientRewards: chainId not supported");
+  try {
+    // get ledger address
+    const ledgerAddress = getAmbientAddress(chainId, "rewardLedger");
+    if (!ledgerAddress) throw Error("ledger address not found");
+
+    // get ambient rewards ledger contract
+    const { data: rewardsLedger, error } = newContractInstance<
+      typeof AMBIENT_REWARD_LEDGER_ABI
+    >(chainId, ledgerAddress, AMBIENT_REWARD_LEDGER_ABI);
+    if (error) throw error;
+    // get rewards
+    const rewards = await rewardsLedger.methods
+      .getUnclaimedRewards(userEthAddress)
+      .call();
+    return NO_ERROR(rewards.toString());
+  } catch (err) {
+    return NEW_ERROR("queryUserAmbientRewards", err);
   }
-  // get ambient rewards ledger contract
-  const { data: rewardsLedger, error } = newContractInstance<
-    typeof AMBIENT_REWARD_LEDGER_ABI
-  >(chainId, ledgerAddress, AMBIENT_REWARD_LEDGER_ABI);
-  if (error) {
-    return NEW_ERROR("queryUserAmbientRewards: " + errMsg(error));
-  }
-  // get rewards
-  const rewards = await rewardsLedger.methods
-    .getUnclaimedRewards(userEthAddress)
-    .call();
-  return NO_ERROR(rewards.toString());
 }
