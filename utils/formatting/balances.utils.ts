@@ -63,7 +63,7 @@ export function displayAmount(
     precision: undefined,
     commify: true,
     short: true,
-    maxSmallBalance: undefined,
+    maxSmallBalance: 0.001,
   };
   return formatBalance(amount, decimals, { ...defaultOptions, ...options });
 }
@@ -86,7 +86,7 @@ export function formatBalance(
     precision = undefined,
     commify = false,
     short = false,
-    maxSmallBalance = 0.001,
+    maxSmallBalance = undefined,
   } = options || {};
   const bnAmount = new BigNumber(amount);
   // make sure greater than zero
@@ -122,7 +122,7 @@ export function formatBalance(
   let suffix = "";
   if (short) {
     // check if the balance is less than 0.001 and return <0.001
-    if (Number(truncatedAmount) < maxSmallBalance) {
+    if (maxSmallBalance && Number(truncatedAmount) < maxSmallBalance) {
       finalAmount = `<${maxSmallBalance}`;
     } else {
       const { shortAmount, suffix: _suffix } =

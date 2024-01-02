@@ -24,6 +24,7 @@ export const _sendToCosmosTx = (
   bridge: {
     type: BridgingMethod.GRAVITY_BRIDGE,
     lastStatus: "NONE",
+    showInProgress: true,
     ...bridgeInfo,
   },
   fromAddress: fromEthAddress,
@@ -73,6 +74,7 @@ export const _sendToEthGravityTx = (
   bridge: {
     type: BridgingMethod.GRAVITY_BRIDGE,
     lastStatus: "NONE",
+    showInProgress: true,
     ...bridgeInfo,
   },
   fromAddress: ethReceiver,

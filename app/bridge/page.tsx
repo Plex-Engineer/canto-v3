@@ -5,10 +5,13 @@ import Bridging from "./bridging";
 import Tabs from "@/components/tabs/tabs";
 import useBridgeCombo from "./util";
 import BridgeInProgress from "./components/bridgeInProgress";
+import styles from "./bridge.module.scss";
+import useBridgingInProgess from "@/hooks/bridge/useBridgingInProgress";
 
 export default function BridgePage() {
   const bridgeCombo = useBridgeCombo();
   const { Direction } = bridgeCombo;
+  const bridgeProgress = useBridgingInProgess();
   return (
     <>
       <AnimatedBackground
@@ -43,7 +46,20 @@ export default function BridgePage() {
               },
               {
                 title: "IN PROGRESS",
-                content: <BridgeInProgress key={"in-progress"} />,
+                extraTitle:
+                  bridgeProgress.inProgressTxs.length > 0 ? (
+                    <div className={styles.notification}>
+                      {bridgeProgress.inProgressTxs.length.toString()}
+                    </div>
+                  ) : null,
+                content: (
+                  <BridgeInProgress
+                    key={"in-progress"}
+                    txs={bridgeProgress.inProgressTxs}
+                    clearTxs={bridgeProgress.clearTxs}
+                    setTxBridgeStatus={bridgeProgress.setTxBridgeStatus}
+                  />
+                ),
               },
             ]}
           />

@@ -9,6 +9,7 @@ interface Props {
   defaultIndex?: number;
   tabs: {
     title: string;
+    extraTitle?: React.ReactNode;
     isDisabled?: boolean;
     onClick?: () => void;
     content: React.ReactNode;
@@ -40,6 +41,7 @@ const Tabs = (props: Props) => {
             <Text font="proto_mono" size="sm">
               {tab.title}
             </Text>
+            {tab.extraTitle}
           </button>
         ))}
       </div>

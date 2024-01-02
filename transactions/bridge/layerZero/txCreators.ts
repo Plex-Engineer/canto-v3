@@ -30,6 +30,7 @@ export const _oftTransferTx = (
   bridge: {
     lastStatus: "NONE",
     type: BridgingMethod.LAYER_ZERO,
+    showInProgress: true,
     ...bridgeInfo,
   },
   feTxType: CantoFETxType.OFT_TRANSFER,

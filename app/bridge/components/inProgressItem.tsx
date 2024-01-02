@@ -11,7 +11,6 @@ import Container from "@/components/container/container";
 
 interface TxItemProps {
   tx: TransactionWithStatus;
-  idx: number;
   setBridgeStatus: (status: BridgeStatus) => void;
 }
 
@@ -71,13 +70,7 @@ const InProgressTxItem = (props: TxItemProps) => {
   return (
     <div className={styles.txBox}>
       <div className={styles.txImg}>
-        {bridgeData.lastStatus === "NONE" ? (
-          <Text font="proto_mono" opacity={0.5}>
-            {props.idx}
-          </Text>
-        ) : (
-          <StatusIcon status={bridgeData.lastStatus} size={24} />
-        )}
+        <StatusIcon status={bridgeData.lastStatus} size={24} />
       </div>
       <Spacer width="14px" />
       <Container width="100%">
@@ -88,20 +81,25 @@ const InProgressTxItem = (props: TxItemProps) => {
             </Text>
             <Text size="md">{bridgeData.amountFormatted}</Text>
           </Container>
-          <Container width="30%">
-            <Spacer height="8px" />
+          <Container width="50%">
             {props.tx.txLink && (
-              <Container direction="row" gap="auto">
+              <Container direction="column" style={{ textAlign: "right" }}>
                 {props.tx.txLink && (
                   <a
                     href={props.tx.txLink}
                     target="_blank"
                     style={{
                       textDecoration: "underline",
+                      right: 0,
                     }}
                   >
                     <Text size="sm">view explorer</Text>
                   </a>
+                )}
+                {bridgeData.timeLeft !== undefined && (
+                  <Text size="sm" theme="secondary-dark">
+                    TIME LEFT: {formatSecondsToMinutes(bridgeData.timeLeft)}
+                  </Text>
                 )}
                 <Spacer height="8px" />
               </Container>
@@ -114,17 +112,6 @@ const InProgressTxItem = (props: TxItemProps) => {
                 {formatError(props.tx.error)}
               </Text>
             )} */}
-
-            <Container direction="row" gap={"auto"}>
-              {bridgeData.timeLeft !== undefined && (
-                <Container>
-                  <Text size="sm" theme="secondary-dark">
-                    TIME LEFT: {formatSecondsToMinutes(bridgeData.timeLeft)}
-                  </Text>
-                  )
-                </Container>
-              )}
-            </Container>
           </Container>
         </Container>
         <Spacer height="10px" />
