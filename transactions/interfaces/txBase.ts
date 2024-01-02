@@ -9,12 +9,13 @@ export interface TransactionDescription {
   description: string;
 }
 
-type BridgeProgress = {
+export type BridgeProgress = {
   type: BridgingMethod;
   lastStatus: TransactionStatus;
   timeLeft?: number;
   direction: "in" | "out";
   amountFormatted: string;
+  showInProgress: boolean;
 };
 
 export type Transaction = {

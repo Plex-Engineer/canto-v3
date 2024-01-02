@@ -15,7 +15,7 @@ export function convertLiquidityCurveToGraph(
         displayAmount(
           getPriceFromTick(bump.bumpTick),
           pool.base.decimals - pool.quote.decimals,
-          { precision: 5 }
+          { precision: 5, maxSmallBalance: undefined }
         )
       ),
       y: prevLiq + bump.liquidityDelta,
