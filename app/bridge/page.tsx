@@ -47,9 +47,9 @@ export default function BridgePage() {
               {
                 title: "IN PROGRESS",
                 extraTitle:
-                  bridgeProgress.inProgressTxs.length > 0 ? (
+                  bridgeProgress.inProgressTxs.pending.length > 0 ? (
                     <div className={styles.notification}>
-                      {bridgeProgress.inProgressTxs.length.toString()}
+                      {bridgeProgress.inProgressTxs.pending.length.toString()}
                     </div>
                   ) : null,
                 content: (

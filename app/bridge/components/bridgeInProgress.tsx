@@ -11,12 +11,20 @@ const BridgeInProgress = ({
   clearTxs,
   setTxBridgeStatus,
 }: {
-  txs: Array<
-    TransactionWithStatus & {
-      txIndex: number;
-      flowId: string;
-    }
-  >;
+  txs: {
+    pending: Array<
+      TransactionWithStatus & {
+        txIndex: number;
+        flowId: string;
+      }
+    >;
+    completed: Array<
+      TransactionWithStatus & {
+        txIndex: number;
+        flowId: string;
+      }
+    >;
+  };
   clearTxs: () => void;
   setTxBridgeStatus: (
     flowId: string,
@@ -25,9 +33,10 @@ const BridgeInProgress = ({
     timeLeft: number | undefined
   ) => void;
 }) => {
+  const allTxs = [...txs.pending, ...txs.completed];
   return (
     <Container height="468px" padding="lg" style={{ overflowY: "scroll" }}>
-      {txs.length > 0 ? (
+      {allTxs.length > 0 ? (
         <>
           <Text
             size="sm"
@@ -38,10 +47,10 @@ const BridgeInProgress = ({
             }}
             onClick={clearTxs}
           >
-            clear all transactions
+            clear completed transactions
           </Text>
 
-          {txs.map((tx, idx) => (
+          {allTxs.map((tx, idx) => (
             <InProgressTxItem
               key={idx}
               tx={tx}
@@ -72,8 +81,8 @@ const BridgeInProgress = ({
               width: "80%",
             }}
           >
-            You have no pending transactions. To check history please click on
-            the transactions icon in the navbar.
+            No pending transactions. To check history click the activity icon in
+            the navigation bar.
           </Text>
         </Container>
       )}
