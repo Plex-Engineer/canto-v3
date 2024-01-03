@@ -18,9 +18,10 @@ export default function useBridgingInProgess() {
     const flows = txStore?.getUserTransactionFlows(
       signer?.account.address ?? ""
     );
-    if (!flows) return [];
+    if (!flows) return { pending: [], completed: [] };
 
     const pendingTxs: InProgressTx[] = [];
+    const completedTxs: InProgressTx[] = [];
 
     flows.forEach((flow) => {
       // filter by bridge flow type
@@ -28,19 +29,26 @@ export default function useBridgingInProgess() {
         // separate txs with bridge flag and status of pending
         flow.transactions.forEach((tx, idx) => {
           if (tx.tx.bridge && tx.tx.bridge.showInProgress) {
-            pendingTxs.push({ ...tx, txIndex: idx, flowId: flow.id });
+            tx.tx.bridge.lastStatus === "PENDING"
+              ? pendingTxs.push({ ...tx, txIndex: idx, flowId: flow.id })
+              : completedTxs.push({ ...tx, txIndex: idx, flowId: flow.id });
           }
         });
       }
     });
 
-    return pendingTxs.sort(
-      (a, b) => Number(b.timestamp ?? 0) - Number(a.timestamp ?? 0)
-    );
+    return {
+      pending: pendingTxs.sort(
+        (a, b) => Number(b.timestamp ?? 0) - Number(a.timestamp ?? 0)
+      ),
+      completed: completedTxs.sort(
+        (a, b) => Number(b.timestamp ?? 0) - Number(a.timestamp ?? 0)
+      ),
+    };
   }, [signer?.account.address, txStore]);
 
   function clearTxs() {
-    inProgressTxs.forEach((tx) => {
+    inProgressTxs.completed.forEach((tx) => {
       txStore?.setTxBridgeStatus(
         signer?.account.address ?? "",
         tx.flowId,

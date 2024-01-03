@@ -90,19 +90,19 @@
 
 .notification {
   /* circle shape, size and position */
-  position: absolute;
+  position: relative;
   right: -0.7em;
   top: -0.7em;
   min-width: 1.6em; /* or width, explained below. */
   height: 1.6em;
   border-radius: 0.8em; /* or 50%, explained below. */
-  border: 0.05em solid white;
-  background-color: red;
+  border: 1px solid var(--border-stroke-color);
+  background-color: rgba(var(--dark-color));
 
   /* number size and position */
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 0.8em;
-  color: white;
+  color: var(--text-light-color);
 }

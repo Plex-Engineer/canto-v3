@@ -18,23 +18,21 @@ const GravityConfirmationModal = ({
   onReselectMethod,
 }: Props) => {
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title={
+    <Modal open={open} onClose={onClose}>
+      <Container
+        width="100%"
+        center={{ horizontal: true }}
+        style={{ display: "flex", margin: "20px 0" }}
+      >
         <Icon
           icon={{
             url: "/warning.svg",
-            size: 32,
+            size: 44,
           }}
           themed
-          style={{
-            translate: "0 1.5px",
-          }}
         />
-      }
-    >
-      <Text>
+      </Container>
+      <Text size="sm">
         Please be aware that using a wallet that does not support custom chains
         while bridging out, such as Rabby, may result in inaccessible funds.
         <Spacer height="10px" />
@@ -43,7 +41,7 @@ const GravityConfirmationModal = ({
         Alternatively, transfer funds to Gravity Bridge and use the Gravity
         Bridge Portal to transfer funds from Gravity to Ethereum.
       </Text>
-      <Spacer height="20px" />
+      <Spacer height="30px" />
       <Container gap={20} direction="row" center={{ horizontal: true }}>
         <Button onClick={onConfirm}>CONTINUE</Button>{" "}
         <Button onClick={onReselectMethod}>USE GB PORTAL</Button>
