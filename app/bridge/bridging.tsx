@@ -455,11 +455,12 @@ const FeesSection = ({
     </Text>
   ) : (
     <>
-      {props.method === BridgingMethod.LAYER_ZERO && (
-        <Text font="proto_mono" size="x-sm">
-          Gas Fee: {props.lzFee.formattedAmount}
-        </Text>
-      )}
+      {props.method === BridgingMethod.LAYER_ZERO &&
+        props.direction === "out" && (
+          <Text font="proto_mono" size="x-sm">
+            Gas Fee: {props.lzFee.formattedAmount}
+          </Text>
+        )}
       {props.method === BridgingMethod.GRAVITY_BRIDGE &&
         props.direction === "out" && (
           <>

@@ -98,13 +98,13 @@ export default function useBridgingFees({
   return isLoading
     ? { isLoading, ready: false }
     : error !== null
-    ? { isLoading, error, ready: false }
-    : {
-        ready: true,
-        isLoading,
-        error,
-        ...fees,
-      };
+      ? { isLoading, error, ready: false }
+      : {
+          ready: true,
+          isLoading,
+          error,
+          ...fees,
+        };
 }
 
 async function getFees({
@@ -121,7 +121,7 @@ async function getFees({
   // return correct fees based on method
   switch (method) {
     case BridgingMethod.LAYER_ZERO:
-      return getLZFees(token, fromNetwork, toNetwork);
+      return getLZFees(direction, token, fromNetwork, toNetwork);
     case BridgingMethod.GRAVITY_BRIDGE:
       return direction === "in"
         ? NO_ERROR({ method: null })
@@ -133,6 +133,7 @@ async function getFees({
   }
 }
 async function getLZFees(
+  direction: "in" | "out",
   token: BridgeToken,
   fromNetwork: BaseNetwork,
   toNetwork: BaseNetwork
@@ -153,6 +154,7 @@ async function getLZFees(
     );
     if (error) throw error;
     return NO_ERROR({
+      direction,
       method: BridgingMethod.LAYER_ZERO,
       lzFee: {
         feeInBridgeToken: !!token.nativeWrappedToken,
