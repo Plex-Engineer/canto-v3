@@ -80,7 +80,7 @@ export const HoverPositions = ({ dexType, positions }: HoverPositionProps) => (
                 <Icon icon={{ url: item.token1.icon, size: 12 }} />
                 {` ${item.token1.symbol}: `}
                 {displayAmount(item.token1.amount, item.token1.decimals, {
-                  precision: 2,
+                  precision: 0,
                   maxSmallBalance: 0.0,
                 })}
               </Text>
@@ -94,7 +94,7 @@ export const HoverPositions = ({ dexType, positions }: HoverPositionProps) => (
                 <Icon icon={{ url: item.token2.icon, size: 12 }} />
                 {` ${item.token2.symbol}: `}
                 {displayAmount(item.token2.amount, item.token2.decimals, {
-                  precision: 2,
+                  precision: 0,
                   maxSmallBalance: 0.0,
                 })}
               </Text>

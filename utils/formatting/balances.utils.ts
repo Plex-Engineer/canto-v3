@@ -125,8 +125,10 @@ export function formatBalance(
     if (maxSmallBalance && Number(truncatedAmount) < maxSmallBalance) {
       finalAmount = `<${maxSmallBalance}`;
     } else {
-      const { shortAmount, suffix: _suffix } =
-        formatBigBalance(truncatedAmount);
+      const { shortAmount, suffix: _suffix } = formatBigBalance(
+        truncatedAmount,
+        precision
+      );
       finalAmount = shortAmount;
       suffix = _suffix;
     }
@@ -146,7 +148,10 @@ export function formatBalance(
  * @returns {string} formatted balance
  * @example 1,340,000 -> {shortAmount: "1.34", suffx: "M"}
  */
-function formatBigBalance(amount: string): {
+function formatBigBalance(
+  amount: string,
+  precision: number = 2
+): {
   shortAmount: string;
   suffix: string;
 } {
@@ -175,7 +180,7 @@ function formatBigBalance(amount: string): {
       shortAmount = bnAmount.dividedBy(new BigNumber(10).pow(3));
     }
     return {
-      shortAmount: shortAmount.toFixed(2),
+      shortAmount: shortAmount.toFixed(precision),
       suffix,
     };
   }
