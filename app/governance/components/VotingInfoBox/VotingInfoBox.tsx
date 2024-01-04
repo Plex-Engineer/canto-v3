@@ -139,7 +139,7 @@ export function VotingInfoBox({
             }}
           >
             <Text font="proto_mono" opacity={0.4} size="x-sm">
-              {formatBalance(getVotesInfo(value, votesData).voteAmount, 2, {
+              {formatBalance(getVotesInfo(value, votesData).voteAmount, 0, {
                 commify: true,
               })}
             </Text>

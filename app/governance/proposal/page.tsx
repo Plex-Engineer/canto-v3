@@ -148,6 +148,7 @@ export default function Page() {
                   url: "/dropdown.svg",
                   size: 22,
                 }}
+                themed
               />
             </div>
           </div>

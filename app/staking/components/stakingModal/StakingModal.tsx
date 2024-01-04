@@ -14,12 +14,13 @@ import Icon from "@/components/icon/icon";
 import { formatBalance } from "@/utils/formatting/balances.utils";
 import Input from "@/components/input/input";
 import Button from "@/components/button/button";
-import { SetStateAction, useState } from "react";
+import { ChangeEvent, SetStateAction, useState } from "react";
 import Tabs from "@/components/tabs/tabs";
 import { StakingTxTypes } from "@/hooks/staking/interfaces/stakingTxTypes";
 import { StakingTabs } from "../stakingTab/StakingTabs";
 import { getBalanceForValidator } from "@/hooks/staking/helpers/userStaking";
 import Selector, { Item } from "@/components/selector/selector";
+import Amount from "@/components/amount/amount";
 
 export interface StakingModalParams {
   validator: Validator | null;
@@ -39,6 +40,7 @@ export interface StakingModalParams {
 }
 export const StakingModal = (props: StakingModalParams) => {
   const [inputAmount, setInputAmount] = useState("");
+  const [maxClicked, setMaxClicked] = useState(false);
   const [selectedTx, setSelectedTx] = useState<StakingTxTypes>(
     StakingTxTypes.DELEGATE
   );
@@ -62,7 +64,7 @@ export const StakingModal = (props: StakingModalParams) => {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-    setAmount("");
+    setInputAmount("0");
     if (tab == "delegate") {
       setSelectedTx(StakingTxTypes.DELEGATE);
     }
@@ -103,7 +105,9 @@ export const StakingModal = (props: StakingModalParams) => {
     ? userStakedValidatorsAddressList.includes(props.validator.operator_address)
     : false;
 
-  //console.log(userMaxBalance);
+  //console.log(maxBalance);
+  //console.log(inputAmount);
+
   //console.log();
   return (
     <Container className={styles.modalContainer}>
@@ -220,7 +224,7 @@ export const StakingModal = (props: StakingModalParams) => {
           <Text>Enter Amount</Text>
         </div>
         <div className={styles.modalInfoRow2}>
-          <div>
+          {/* <div>
             <Text opacity={0.4}>
               Balance:{" "}
               {formatBalance(maxBalance, 18, { commify: true, precision: 2 })}{" "}
@@ -235,11 +239,11 @@ export const StakingModal = (props: StakingModalParams) => {
             }
           >
             <Text opacity={1}>(max)</Text>
-          </div>
+          </div> */}
         </div>
       </div>
       <div>
-        <Input
+        {/* <Input
           height={"lg"}
           type="number"
           onChange={(e) => {
@@ -249,7 +253,20 @@ export const StakingModal = (props: StakingModalParams) => {
           value={inputAmount.toString()}
           error={Number(inputAmount) < 0}
           errorMessage="Amount must be greater than 0"
-        />
+        /> */}
+        <Amount
+          IconUrl={"/tokens/canto.svg"}
+          title={""}
+          symbol={""}
+          onChange={(val, wasMax) => {
+            wasMax ? setMaxClicked(true) : setMaxClicked(false);
+            setInputAmount(val.target.value);
+          }}
+          decimals={0}
+          value={formatBalance(inputAmount, 0, { precision: 4 })}
+          min={""}
+          max={formatBalance(maxBalance, 18, { precision: 6 })}
+        ></Amount>
       </div>
       <Spacer height="10px" />
       <div style={{ width: "100%" }} className={styles.modalInfoRow}>
