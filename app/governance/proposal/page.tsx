@@ -97,6 +97,7 @@ export default function Page() {
       padding: "0px 0px 20px 0px",
     };
   }
+  //console.log(proposals);
   const proposal = proposals.find((p) => p.proposal_id === Number(proposalId));
 
   if (!proposal) {
@@ -114,6 +115,8 @@ export default function Page() {
   const votesData = calculateVotePercentages(proposal.final_vote);
 
   //console.log(votesData);
+  // console.log(proposal.title);
+  // console.log(proposal.description);
 
   // const colorMap = new Map<number,String>();
   // colorMap.set(1, "rgba(6, 252, 153, 0.5)");
