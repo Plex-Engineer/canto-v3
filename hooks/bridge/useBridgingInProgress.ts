@@ -29,7 +29,8 @@ export default function useBridgingInProgess() {
         // separate txs with bridge flag and status of pending
         flow.transactions.forEach((tx, idx) => {
           if (tx.tx.bridge && tx.tx.bridge.showInProgress) {
-            tx.tx.bridge.lastStatus === "PENDING"
+            tx.tx.bridge.lastStatus === "PENDING" ||
+            tx.tx.bridge.lastStatus === "NONE"
               ? pendingTxs.push({ ...tx, txIndex: idx, flowId: flow.id })
               : completedTxs.push({ ...tx, txIndex: idx, flowId: flow.id });
           }
