@@ -68,7 +68,7 @@ export default function Page() {
       </Modal>
 
       <Container direction="row" gap={"auto"} width="100%">
-        <Text size="x-lg" className={styles.title}>
+        <Text size="x-lg" font="proto_mono"  className={styles.title}>
           Pools
         </Text>
         <Rewards
