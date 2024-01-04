@@ -43,7 +43,8 @@ const proposalTypes = {
     '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal': 'Community Pool Spend',
     '/canto.govshuttle.v1.LendingMarketProposal': 'Lending Market',
     '/cosmos.gov.v1beta1.TextProposal': 'Text',
-    '/canto.erc20.v1.RegisterCoinProposal': 'Register Coin'
+    '/canto.erc20.v1.RegisterCoinProposal': 'Register Coin',
+    '/ibc.core.client.v1.ClientUpdateProposal':'ClientUpdateProposal'
 };
 
 

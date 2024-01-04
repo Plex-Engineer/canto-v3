@@ -64,7 +64,7 @@ export const StakingModal = (props: StakingModalParams) => {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-    setInputAmount("0");
+    setInputAmount("");
     if (tab == "delegate") {
       setSelectedTx(StakingTxTypes.DELEGATE);
     }
@@ -262,10 +262,10 @@ export const StakingModal = (props: StakingModalParams) => {
             wasMax ? setMaxClicked(true) : setMaxClicked(false);
             setInputAmount(val.target.value);
           }}
-          decimals={0}
-          value={formatBalance(inputAmount, 0, { precision: 4 })}
+          decimals={18}
+          value={inputAmount}
           min={""}
-          max={formatBalance(maxBalance, 18, { precision: 6 })}
+          max={maxBalance}
         ></Amount>
       </div>
       <Spacer height="10px" />
