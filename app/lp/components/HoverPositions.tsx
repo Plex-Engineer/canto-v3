@@ -67,7 +67,7 @@ export const HoverPositions = ({ dexType, positions }: HoverPositionProps) => (
               gap={10}
               width="100%"
               style={{
-                alignItems: dexType === "ambient" ? "flex-end" : "flex-start",
+                alignItems: dexType === "ambient" ? "flex-end" : "center",
               }}
             >
               <Text
