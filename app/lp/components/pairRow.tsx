@@ -91,6 +91,7 @@ export const UserCantoDexPairRow = ({
       <InfoPop>
         <Container>
           <HoverPositions
+            dexType="cantodex"
             positions={[
               {
                 token1: {
@@ -398,7 +399,7 @@ export const UserAmbientPairRow = ({
       <InfoPop>
         {/* show all the positions */}
         <Container>
-          <HoverPositions positions={allPositionValues} />
+          <HoverPositions dexType="ambient" positions={allPositionValues} />
         </Container>
       </InfoPop>
     </Container>,
