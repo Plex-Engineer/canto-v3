@@ -642,7 +642,7 @@ export default function StakingPage() {
       </Container> */}
       {/* <BoxedBackground /> */}
       <Modal
-        width="40%"
+        width="32rem"
         onClose={() => {
           setSelectedValidator(null);
         }}
