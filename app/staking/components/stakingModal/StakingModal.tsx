@@ -41,11 +41,11 @@ export interface StakingModalParams {
 export const StakingModal = (props: StakingModalParams) => {
   const [inputAmount, setInputAmount] = useState("");
   const [maxClicked, setMaxClicked] = useState(false);
+
   const [selectedTx, setSelectedTx] = useState<StakingTxTypes>(
     StakingTxTypes.DELEGATE
   );
   const [activeTab, setActiveTab] = useState("delegate");
-  const [amount, setAmount] = useState("");
   const [validatorToRedelegate, setValidatorToRedelegate] =
     useState<Validator | null>();
 
@@ -64,7 +64,7 @@ export const StakingModal = (props: StakingModalParams) => {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-    setInputAmount("0");
+    setInputAmount("");
     if (tab == "delegate") {
       setSelectedTx(StakingTxTypes.DELEGATE);
     }
@@ -105,10 +105,8 @@ export const StakingModal = (props: StakingModalParams) => {
     ? userStakedValidatorsAddressList.includes(props.validator.operator_address)
     : false;
 
-  //console.log(maxBalance);
-  //console.log(inputAmount);
+  const limits = {};
 
-  //console.log();
   return (
     <Container className={styles.modalContainer}>
       <Spacer />
@@ -262,10 +260,10 @@ export const StakingModal = (props: StakingModalParams) => {
             wasMax ? setMaxClicked(true) : setMaxClicked(false);
             setInputAmount(val.target.value);
           }}
-          decimals={0}
-          value={formatBalance(inputAmount, 0, { precision: 4 })}
+          decimals={18}
+          value={inputAmount}
           min={""}
-          max={formatBalance(maxBalance, 18, { precision: 6 })}
+          max={maxBalance}
         ></Amount>
       </div>
       <Spacer height="10px" />
