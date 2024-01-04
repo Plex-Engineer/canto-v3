@@ -28,7 +28,7 @@ import {
   useNewAmbientPositionManager,
 } from "@/utils/ambient/liquidityControllers";
 import { Validation } from "@/config/interfaces";
-
+import Analytics from "@/provider/analytics";
 interface NewPositionModalProps {
   pool: AmbientPool;
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
@@ -64,7 +64,7 @@ export const NewAmbientPositionModal = ({
         pool.quote.address,
         pool.poolIdx
       );
-      if (error) console.log(error);
+      if (error) console.error(error);
       setGraphPoints(convertLiquidityCurveToGraph(pool, curve));
     }
     getGraph();
@@ -113,6 +113,15 @@ export const NewAmbientPositionModal = ({
                 value={showAdvanced}
                 onChange={(advanced) => {
                   // reset prices to default
+                  if (advanced) {
+                    Analytics.actions.events.liquidityPool.ambientDexLpModal.advanceClicked(
+                      {
+                        ambientLp: pool.symbol,
+                        baseToken: pool.base.symbol,
+                        quoteToken: pool.quote.symbol,
+                      }
+                    );
+                  }
                   setDefaultParams("DEFAULT");
                   setShowAdvanced(advanced);
                 }}
@@ -138,6 +147,7 @@ export const NewAmbientPositionModal = ({
             title={baseToken.symbol}
             min="0"
             max={baseToken.balance ?? "0"}
+            maxName="LP Modal"
             symbol={baseToken.symbol}
           />
           <Spacer height="12px" />
@@ -151,6 +161,7 @@ export const NewAmbientPositionModal = ({
             title={quoteToken.symbol}
             min="0"
             max={quoteToken.balance ?? "0"}
+            maxName="LP Modal"
             symbol={quoteToken.symbol}
           />
           <Spacer height="20px" />
@@ -368,7 +379,12 @@ export const NewAmbientPositionModal = ({
       <Button
         disabled={positionValidation.error}
         width={"fill"}
-        onClick={() => sendTxFlow(positionManager.txParams.addLiquidity())}
+        onClick={() =>
+          sendTxFlow({
+            ...positionManager.txParams.addLiquidity(),
+            isAdvanced: showAdvanced,
+          })
+        }
       >
         {positionValidation.error
           ? positionValidation.reason

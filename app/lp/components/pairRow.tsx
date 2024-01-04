@@ -2,17 +2,11 @@ import Button from "@/components/button/button";
 import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
 import InfoPop from "@/components/infopop/infopop";
-import Spacer from "@/components/layout/spacer";
 import PopUp from "@/components/popup/popup";
 import Text from "@/components/text";
-import Toggle from "@/components/toggle";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
-import {
-  CantoDexTransactionParams,
-  CantoDexTxTypes,
-} from "@/transactions/pairs/cantoDex/types";
-import { concLiquidityNoteValue } from "@/utils/ambient";
+import { concentratedLiquidityTokenAmounts } from "@/utils/ambient";
 import { formatPercent, displayAmount } from "@/utils/formatting";
 import {
   addTokenBalances,
@@ -20,15 +14,14 @@ import {
   divideBalances,
 } from "@/utils/math";
 import BigNumber from "bignumber.js";
-
+import { HoverPositions } from "./HoverPositions";
+import { estimateTokenAmountsFromLiquidity } from "@/utils/cantoDex";
 export const UserCantoDexPairRow = ({
   pair,
   onManage,
-  sendTxFlow,
 }: {
   pair: CantoDexPairWithUserCTokenData;
   onManage: (pairAddress: string) => void;
-  sendTxFlow: (params: Partial<CantoDexTransactionParams>) => void;
 }) => {
   if (!pair.clmData?.userDetails) return [];
   // add staked and wallet balance
@@ -42,6 +35,14 @@ export const UserCantoDexPairRow = ({
   );
   if (error) return [];
   const userPoolShare = divideBalances(totalUserLpTokens, pair.totalSupply);
+
+  // get amount of tokens position represents
+  const tokenAmounts = estimateTokenAmountsFromLiquidity({
+    reserveA: pair.reserve1,
+    reserveB: pair.reserve2,
+    totalLPSupply: pair.totalSupply,
+    liquidity: totalUserLpTokens,
+  });
   return [
     <Container
       key={pair.address}
@@ -65,19 +66,62 @@ export const UserCantoDexPairRow = ({
     </Text>,
 
     <Text key={pair.address + "share"}>{formatPercent(userPoolShare)}</Text>,
-    <Text key={pair.address + "value"}>
-      {displayAmount(totalUserLPValue.toString(), 18, {
-        precision: 2,
-      })}
-      <Icon
-        style={{ marginLeft: "5px" }}
-        themed
-        icon={{
-          url: "/tokens/note.svg",
-          size: 16,
-        }}
-      />
-    </Text>,
+    <Container
+      key={pair.address + "value"}
+      direction="row"
+      center={{
+        horizontal: true,
+        vertical: true,
+      }}
+      gap={10}
+    >
+      <Text>
+        {displayAmount(totalUserLPValue.toString(), 18, {
+          precision: 2,
+        })}
+        <Icon
+          style={{ marginLeft: "5px" }}
+          themed
+          icon={{
+            url: "/tokens/note.svg",
+            size: 16,
+          }}
+        />
+      </Text>
+      <InfoPop>
+        <Container>
+          <HoverPositions
+            dexType="cantodex"
+            positions={[
+              {
+                token1: {
+                  amount: tokenAmounts.tokenA,
+                  value:
+                    convertTokenAmountToNote(
+                      tokenAmounts.tokenA,
+                      pair.price1
+                    ).data?.toString() ?? "0",
+                  symbol: pair.token1.symbol,
+                  decimals: pair.token1.decimals,
+                  icon: pair.token1.logoURI,
+                },
+                token2: {
+                  amount: tokenAmounts.tokenB,
+                  value:
+                    convertTokenAmountToNote(
+                      tokenAmounts.tokenB,
+                      pair.price2
+                    ).data?.toString() ?? "0",
+                  symbol: pair.token2.symbol,
+                  decimals: pair.token2.decimals,
+                  icon: pair.token2.logoURI,
+                },
+              },
+            ]}
+          />
+        </Container>
+      </InfoPop>
+    </Container>,
     <Container
       key={pair.address + "edit"}
       direction="row"
@@ -256,19 +300,60 @@ export const UserAmbientPairRow = ({
   onManage: (poolAddress: string) => void;
   rewards?: string;
 }) => {
-  const value = pool.userPositions.reduce((acc, position) => {
-    return addTokenBalances(
-      acc,
-      concLiquidityNoteValue(
-        position.concLiq,
-        pool.stats.lastPriceSwap,
-        position.bidTick,
-        position.askTick,
-        new BigNumber(10).pow(36 - pool.base.decimals).toString(),
-        new BigNumber(10).pow(36 - pool.quote.decimals).toString()
+  let totalValue = "0";
+  const allPositionValues = pool.userPositions.map((position) => {
+    const tokenAmounts = concentratedLiquidityTokenAmounts(
+      position.concLiq,
+      pool.stats.lastPriceSwap,
+      position.bidTick,
+      position.askTick
+    );
+    const baseNoteValue = convertTokenAmountToNote(
+      tokenAmounts.base,
+      new BigNumber(10).pow(36 - pool.base.decimals).toString()
+    );
+    const quoteNoteValue = convertTokenAmountToNote(
+      tokenAmounts.quote,
+      new BigNumber(10).pow(36 - pool.quote.decimals).toString()
+    );
+    if (baseNoteValue.error || quoteNoteValue.error) {
+      const emptyToken = {
+        amount: "0",
+        value: "0",
+        symbol: "",
+        decimals: 0,
+        icon: "",
+      };
+      return {
+        token1: emptyToken,
+        token2: emptyToken,
+      };
+    }
+    totalValue = addTokenBalances(
+      totalValue,
+      addTokenBalances(
+        baseNoteValue.data.toString(),
+        quoteNoteValue.data.toString()
       )
     );
-  }, "0");
+    return {
+      token1: {
+        amount: tokenAmounts.base,
+        value: baseNoteValue.data.toString(),
+        symbol: pool.base.symbol,
+        decimals: pool.base.decimals,
+        icon: pool.base.logoURI,
+      },
+      token2: {
+        amount: tokenAmounts.quote,
+        value: quoteNoteValue.data.toString(),
+        symbol: pool.quote.symbol,
+        decimals: pool.quote.decimals,
+        icon: pool.quote.logoURI,
+      },
+    };
+  });
+
   return [
     <Container
       key={pool.address}
@@ -289,22 +374,35 @@ export const UserAmbientPairRow = ({
     </Container>,
     <AprBlock key={"apr"} pool={pool} />,
     <Text key={pool.symbol + "pool share"}>
-      {formatPercent(divideBalances(value, pool.totals.noteTvl))}
+      {formatPercent(divideBalances(totalValue, pool.totals.noteTvl))}
     </Text>,
-    <Text key={pool.symbol + "value"}>
-      {displayAmount(value, 18, {
-        precision: 2,
-      })}
-      <Icon
-        style={{ marginLeft: "5px" }}
-        themed
-        icon={{
-          url: "/tokens/note.svg",
-          size: 16,
-        }}
-      />
-    </Text>,
-
+    <Container
+      key={pool.address + " value"}
+      direction="row"
+      center={{
+        horizontal: true,
+        vertical: true,
+      }}
+      gap={10}
+    >
+      <Text key={pool.symbol + "value"}>
+        {displayAmount(totalValue, 18)}
+        <Icon
+          style={{ marginLeft: "5px" }}
+          themed
+          icon={{
+            url: "/tokens/note.svg",
+            size: 16,
+          }}
+        />
+      </Text>
+      <InfoPop>
+        {/* show all the positions */}
+        <Container>
+          <HoverPositions dexType="ambient" positions={allPositionValues} />
+        </Container>
+      </InfoPop>
+    </Container>,
     <Text key={pool.symbol + "rewards"}>
       {displayAmount(rewards ?? "0", 18)}
     </Text>,

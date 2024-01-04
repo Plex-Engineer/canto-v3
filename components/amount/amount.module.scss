@@ -57,6 +57,7 @@
 .balance {
   position: absolute;
   bottom: 6px;
+  max-width: calc(100% - 2rem);
 }
 
 .error-message {
@@ -71,4 +72,8 @@
   letter-spacing: -0.48px;
   text-align: justify;
   transition: all 0.1s ease-in-out;
+}
+
+.extra {
+  margin-left: auto;
 }

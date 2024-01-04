@@ -1,10 +1,10 @@
+"use client";
+
 import Container from "@/components/container/container";
 import style from "./outlinks.module.scss";
 import Text from "@/components/text";
-import Image from "next/image";
-import AnimatedCircle from "@/components/animated/animatedCircle";
-import Link from "next/link";
 import ExploreLink from "./components/link";
+
 export default function OutlinksPage() {
   return (
     <>

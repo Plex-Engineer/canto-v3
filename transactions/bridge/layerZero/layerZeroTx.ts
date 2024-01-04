@@ -7,14 +7,14 @@ import {
   Validation,
 } from "@/config/interfaces";
 import {
+  BridgeStatus,
   TX_DESCRIPTIONS,
   Transaction,
-  TransactionStatus,
   TxCreatorFunctionReturn,
 } from "@/transactions/interfaces";
 import { isValidEthAddress } from "@/utils/address";
 import { validateWeiUserInputTokenAmount } from "@/utils/math";
-import { getNetworkInfoFromChainId } from "@/utils/networks";
+import { getNetworkInfoFromChainId, isCantoChainId } from "@/utils/networks";
 import { getTokenBalance, isOFTToken } from "@/utils/tokens";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
 import { getMessagesBySrcTxHash } from "@layerzerolabs/scan-client";
@@ -142,7 +142,15 @@ export async function bridgeLayerZeroTx(
           fromNetwork.name,
           toNetwork.name,
           getBridgeMethodInfo(BridgingMethod.LAYER_ZERO).name
-        )
+        ),
+        {
+          direction: isCantoChainId(txParams.toNetworkChainId) ? "in" : "out",
+          amountFormatted: displayAmount(
+            txParams.amount,
+            txParams.token.decimals,
+            { symbol: txParams.token.symbol }
+          ),
+        }
       )
     );
 
@@ -186,7 +194,7 @@ export function validateLayerZeroTxParams(
 export async function checkLZBridgeStatus(
   fromChainId: number,
   txHash: string
-): PromiseWithError<{ status: TransactionStatus }> {
+): PromiseWithError<BridgeStatus> {
   try {
     // get network
     const { data: fromNetwork, error: fromNetworkError } =

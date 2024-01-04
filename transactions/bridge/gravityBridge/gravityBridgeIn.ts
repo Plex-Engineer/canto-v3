@@ -136,7 +136,15 @@ export async function gravityBridgeInTx(
           ETH_MAINNET.name,
           CANTO_MAINNET_EVM.name,
           getBridgeMethodInfo(BridgingMethod.GRAVITY_BRIDGE).name
-        )
+        ),
+        {
+          direction: "in",
+          amountFormatted: displayAmount(
+            txParams.amount,
+            txParams.token.decimals,
+            { symbol: txParams.token.symbol }
+          ),
+        }
       )
     );
 
@@ -182,15 +190,17 @@ export function validateGravityBridgeInTxParams(
 /**
  * Will check to see if gbridge has completed the transaction
  */
-export async function checkGbridgeTxStatus(
-  chainId: number,
+export async function checkGbridgeInTxStatus(
   txHash: string
 ): PromiseWithError<BridgeStatus> {
   try {
     // get tx and block number
     const [transaction, currentBlock] = await Promise.all([
-      fetchTransaction({ chainId, hash: txHash as `0x${string}` }),
-      fetchBlockNumber({ chainId }),
+      fetchTransaction({
+        chainId: ETH_MAINNET.chainId,
+        hash: txHash as `0x${string}`,
+      }),
+      fetchBlockNumber({ chainId: ETH_MAINNET.chainId }),
     ]);
 
     // make sure transaction has actually succeeded

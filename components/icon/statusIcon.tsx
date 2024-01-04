@@ -9,7 +9,7 @@ interface Props {
 }
 
 const StatusIcon = (props: Props) => {
-  if (["PENDING", "SIGNING", "POPULATING"].includes(props.status))
+  if (["PENDING", "SIGNING", "POPULATING", "NONE"].includes(props.status))
     return <LoadingIcon size={props.size} />;
   return (
     <Icon
@@ -19,8 +19,8 @@ const StatusIcon = (props: Props) => {
           props.status === "SUCCESS"
             ? "check.svg"
             : props.status === "ERROR"
-            ? "close.svg"
-            : "",
+              ? "close.svg"
+              : "",
         size: props.size,
       }}
       className={props.className}

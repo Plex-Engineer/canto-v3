@@ -1,5 +1,5 @@
 import { ContractAbi } from "web3-types";
-import { TransactionStatus, UnsignedCosmosMessages } from ".";
+import { CantoFETxType, TransactionStatus, UnsignedCosmosMessages } from ".";
 import { PromiseWithError, ReturnWithError } from "@/config/interfaces/errors";
 import { NewTransactionFlowPlaceholder } from "../flows";
 import { BridgingMethod } from "../bridge";
@@ -9,17 +9,24 @@ export interface TransactionDescription {
   description: string;
 }
 
+export type BridgeProgress = {
+  type: BridgingMethod;
+  lastStatus: TransactionStatus;
+  timeLeft?: number;
+  direction: "in" | "out";
+  amountFormatted: string;
+  showInProgress: boolean;
+};
+
 export type Transaction = {
   // account address that will be used to sign the transaction
   fromAddress: string;
   // chainId the wallet must be on to perform the transaction
   chainId: number | string;
   description: TransactionDescription;
-  bridge?: {
-    type: BridgingMethod;
-    lastStatus: TransactionStatus;
-    timeLeft?: number;
-  };
+  feTxType: CantoFETxType;
+  bridge?: BridgeProgress;
+  verifyTxComplete?: (txHash: string) => PromiseWithError<boolean>;
 } & (
   | {
       type: "EVM";

@@ -24,12 +24,15 @@ export type AmbientAddConcentratedLiquidityParams = BaseConcLiqParams & {
   txType: AmbientTxType.ADD_CONC_LIQUIDITY;
   amount: string;
   isAmountBase: boolean;
+  isAdvanced?: boolean;
   positionId?: string;
 };
 export type AmbientRemoveConcentratedLiquidityParams = BaseConcLiqParams & {
   txType: AmbientTxType.REMOVE_CONC_LIQUIDITY;
   liquidity: string;
   positionId: string;
+  expectedBaseAmount?: string;
+  expectedQuoteAmount?: string;
 };
 
 export type AmbientClaimRewardsTxParams = {

@@ -29,6 +29,8 @@ export interface BridgeHookState {
 
 export interface BridgeHookTxParams {
   amount: string;
+  bridgeFee?: string;
+  chainFee?: string;
 }
 
 export interface BridgeHookReturn {

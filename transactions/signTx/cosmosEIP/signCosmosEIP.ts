@@ -18,7 +18,7 @@ import {
   generateMessageWithMultipleTransactions,
   createEIP712,
 } from "@evmos/eip712";
-import { tryFetch, tryFetchWithRetry } from "@/utils/async";
+import { sleep, tryFetch, tryFetchWithRetry } from "@/utils/async";
 import { generateCosmosEIP712TxContext } from "./txContext";
 import { TX_SIGN_ERRORS } from "@/config/consts/errors";
 
@@ -121,6 +121,8 @@ async function signAndBroadcastCosmosTransaction(
             94, 178,
           ])
         );
+        // sleep for 2 seconds to allow for the wallet to refresh
+        await sleep(2000);
       } catch (err) {
         return NEW_ERROR("signAndBroadcastCosmosTransaction", err);
       }
@@ -234,22 +236,54 @@ export async function waitForCosmosTx(
   status: string;
   error: any;
 }> {
-  const { data: endpoint, error: endpointError } =
-    getCosmosAPIEndpoint(chainId);
-  if (endpointError) {
-    return NEW_ERROR("waitForTransaction", endpointError);
-  }
-  const { data: response, error: fetchError } = await tryFetchWithRetry<{
-    tx_response: {
-      code: number;
-      raw_log: string;
-    };
-  }>(endpoint + "/cosmos/tx/v1beta1/txs/" + txHash, 5);
-  if (fetchError) {
-    return NEW_ERROR("waitForTransaction", fetchError);
+  // get cosmos tx data
+  const { data: txData, error: txDataError } = await getCosmosTxDetailsFromHash(
+    chainId,
+    txHash
+  );
+  if (txDataError) {
+    return NEW_ERROR("waitForTransaction", txDataError);
   }
   return NO_ERROR({
-    status: response.tx_response.code === 0 ? "success" : "fail",
-    error: response.tx_response.raw_log,
+    status: txData.tx_response.code === 0 ? "success" : "fail",
+    error: txData.tx_response.raw_log,
   });
+}
+
+interface CosmosTxResponse {
+  tx: object;
+  tx_response: {
+    code: number;
+    logs: Array<{
+      events: Array<{
+        type: string;
+        attributes: Array<{ key: string; value: string }>;
+      }>;
+    }>;
+    raw_log: string;
+  };
+}
+export async function getCosmosTxDetailsFromHash(
+  chainId: string | number,
+  txHash: string
+): PromiseWithError<CosmosTxResponse> {
+  try {
+    // get endpoint on correct chain
+    const { data: endpoint, error: endpointError } =
+      getCosmosAPIEndpoint(chainId);
+    if (endpointError) throw endpointError;
+
+    // get tx details
+    const { data: response, error: fetchError } =
+      await tryFetchWithRetry<CosmosTxResponse>(
+        endpoint + "/cosmos/tx/v1beta1/txs/" + txHash,
+        5
+      );
+    if (fetchError) throw fetchError;
+
+    // return response
+    return NO_ERROR(response);
+  } catch (err) {
+    return NEW_ERROR("getCosmosTxDetailsFromHash", err);
+  }
 }

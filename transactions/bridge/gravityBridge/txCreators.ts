@@ -1,7 +1,12 @@
-import { Transaction, TransactionDescription } from "@/transactions/interfaces";
+import {
+  Transaction,
+  TransactionDescription,
+  CantoFETxType,
+} from "@/transactions/interfaces";
 import { BridgingMethod } from "..";
 import { GRAVITY_BRIDGE_ETH_ADDRESS } from "@/config/consts/addresses";
 import { GRAVITY_BRIDGE_ABI, WETH_ABI } from "@/config/abis";
+import { createMsgsSendToEth } from "@/transactions/cosmos/messages/gravitySendToEth/sendToEth";
 
 /**
  * TRANSACTION CREATORS
@@ -13,14 +18,18 @@ export const _sendToCosmosTx = (
   cantoReceiverAddress: string,
   tokenAddress: string,
   amount: string,
-  description: TransactionDescription
+  description: TransactionDescription,
+  bridgeInfo: { direction: "in" | "out"; amountFormatted: string }
 ): Transaction => ({
   bridge: {
     type: BridgingMethod.GRAVITY_BRIDGE,
     lastStatus: "NONE",
+    showInProgress: true,
+    ...bridgeInfo,
   },
   fromAddress: fromEthAddress,
   description,
+  feTxType: CantoFETxType.SEND_TO_COSMOS,
   chainId: chainId,
   type: "EVM",
   target: GRAVITY_BRIDGE_ETH_ADDRESS,
@@ -38,6 +47,7 @@ export const _wrapTx = (
   description: TransactionDescription
 ): Transaction => ({
   description,
+  feTxType: CantoFETxType.WRAP_ETH,
   chainId: chainId,
   fromAddress: fromEthAddress,
   type: "EVM",
@@ -46,4 +56,36 @@ export const _wrapTx = (
   method: "deposit",
   params: [],
   value: amount,
+});
+
+export const _sendToEthGravityTx = (
+  chainId: number,
+  gravitySender: string,
+  ethReceiver: string,
+  nativeName: string,
+  amount: string,
+  bridgeFee: string,
+  chainFee: string,
+  description: TransactionDescription,
+  bridgeInfo: { direction: "in" | "out"; amountFormatted: string }
+): Transaction => ({
+  description,
+  feTxType: CantoFETxType.SEND_TO_ETH,
+  bridge: {
+    type: BridgingMethod.GRAVITY_BRIDGE,
+    lastStatus: "NONE",
+    showInProgress: true,
+    ...bridgeInfo,
+  },
+  fromAddress: ethReceiver,
+  chainId: chainId,
+  type: "COSMOS",
+  msg: createMsgsSendToEth({
+    amount,
+    bridgeFee,
+    chainFee,
+    ethReceiver,
+    gravitySender,
+    nativeName,
+  }),
 });

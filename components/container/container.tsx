@@ -1,3 +1,5 @@
+import { get } from "http";
+
 interface Props {
   children: React.ReactNode;
   margin?: "xx-sm" | "x-sm" | "sm" | "md" | "lg" | "x-lg";
@@ -42,7 +44,7 @@ const Container = (props: Props) => {
       onClick={props.onClick}
       style={{
         margin: getMargin(props.margin),
-        padding: props.padding,
+        padding: getMargin(props.padding),
         width: props.width,
         height: props.height,
         backgroundColor: props.backgroundColor,
@@ -53,8 +55,8 @@ const Container = (props: Props) => {
           props.gap == "auto"
             ? "space-between"
             : props.center?.horizontal
-            ? "center"
-            : "unset",
+              ? "center"
+              : "unset",
         alignItems: props.center?.vertical ? "center" : "",
         zIndex: props.layer,
         ...props.style,

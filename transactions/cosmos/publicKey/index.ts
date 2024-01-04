@@ -1,5 +1,6 @@
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 import {
+  CantoFETxType,
   TX_DESCRIPTIONS,
   Transaction,
   TransactionDescription,
@@ -9,6 +10,7 @@ import BigNumber from "bignumber.js";
 import { createMsgsSend } from "../messages/messageSend";
 import { PUB_KEY_BOT_ADDRESS } from "@/config/consts/addresses";
 import { getCantoCosmosNetwork } from "@/utils/networks";
+import { asyncCallWithRetry, sleep } from "@/utils/async";
 
 export async function generateCantoPublicKeyWithTx(
   chainId: number,
@@ -41,6 +43,26 @@ export async function generateCantoPublicKeyWithTx(
         }),
       });
       if (!botResponse.ok) throw new Error(await botResponse.text());
+
+      // wait for dust bot to send canto so account will exist on chain
+      const { error: sentCantoError } = await asyncCallWithRetry(
+        async (): PromiseWithError<boolean> => {
+          const { data, error } = await getCantoBalance(
+            cantoNetwork.chainId,
+            cantoAddress
+          );
+          if (error) return NEW_ERROR("generateCantoPublicKeyWithTx", error);
+          if (new BigNumber(data).lte("300000000000000000")) {
+            return NEW_ERROR(
+              "generateCantoPublicKeyWithTx",
+              "not enough canto"
+            );
+          }
+          return NO_ERROR(true);
+        },
+        { numTries: 3, sleepTime: 3000 }
+      );
+      if (sentCantoError) throw sentCantoError;
     }
     return NO_ERROR([
       _generatePubKeyTx(
@@ -69,6 +91,7 @@ const _generatePubKeyTx = (
   });
   return {
     chainId,
+    feTxType: CantoFETxType.GENERATE_PUBLIC_KEY_COSMOS,
     fromAddress: ethSender,
     type: "COSMOS",
     description,

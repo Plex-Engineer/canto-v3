@@ -20,6 +20,8 @@ export type CantoDexTransactionParams = {
       amountLP: string;
       slippage: number;
       deadline: string;
+      expectedAmount1?: string;
+      expectedAmount2?: string;
     }
   | {
       txType: CantoDexTxTypes.ADD_LIQUIDITY;

@@ -3,7 +3,7 @@ import Container from "@/components/container/container";
 import Input from "@/components/input/input";
 import Text from "@/components/text";
 import Image from "next/image";
-import React, { ReactNode } from "react";
+import React from "react";
 import styles from "../bridge.module.scss";
 import PopUp from "@/components/popup/popup";
 import { connectToKeplr } from "@/utils/keplr";
@@ -26,19 +26,25 @@ interface Props {
   fromNetwork: string;
   toNetwork: string;
   amount: string;
+  fees?: {
+    tokenFees: {
+      key: string;
+      value: string;
+    }[];
+    totalFees?: string;
+  };
   type: "in" | "out";
   confirmation: {
     canConfirm: boolean;
     onConfirm: () => void;
   };
   cosmosAddress?: {
-    addressName?: string; // for eth via gravity bridge
     chainId: string;
     addressPrefix: string;
     currentAddress: string;
     setAddress: (address: string) => void;
   };
-  extraDetails?: ReactNode;
+  showGravityPortalMsg?: boolean;
 }
 const ConfirmationModal = (props: Props) => {
   const [keplrError, setKeplrError] = React.useState<string>("");
@@ -56,41 +62,38 @@ const ConfirmationModal = (props: Props) => {
 
         <Image src={props.imgUrl} alt={"props"} width={60} height={60} />
 
-        <Text size="md" font="proto_mono">
-          {`Bridge ${props.token?.name} ${props.type} ${
-            props.type === "in"
-              ? "from " + props.fromNetwork
-              : "to " + props.toNetwork
-          }`}
-        </Text>
-        {props.extraDetails && (
-          <Container
-            width="100%"
-            style={{
-              alignItems: "flex-end",
-            }}
-          >
-            <PopUp content={props.extraDetails} width="300px">
-              {/* <Icon
-          icon={{
-            url: "/check.svg",
-            size: 24,
-          }}
-        /> */}
-              <span className={styles.infoPop}>
-                <Text
-                  theme="secondary-dark"
-                  size="sm"
-                  style={{
-                    textAlign: "right",
-                  }}
+        <Container direction="row" gap={10}>
+          <Text size="md" font="proto_mono">
+            {`Bridge ${props.token?.name} ${props.type} ${
+              props.type === "in"
+                ? "from " + props.fromNetwork
+                : "to " + props.toNetwork
+            }`}
+          </Text>
+          {props.showGravityPortalMsg && (
+            <InfoPop>
+              <Text size="x-sm">
+                To bridge your tokens to Ethereum through Gravity Bridge, first
+                ensure that you have an IBC wallet like Keplr.
+                <br />
+                <br />
+                Next, enter your Gravity Bridge address (from Keplr) below and
+                confirm.
+                <br />
+                <br />
+                Once completed, you can transfer your tokens from Gravity Bridge
+                to Ethereum using the{" "}
+                <a
+                  style={{ textDecoration: "underline" }}
+                  href="https://bridge.blockscape.network/"
                 >
-                  ?
-                </Text>
-              </span>
-            </PopUp>
-          </Container>
-        )}
+                  Gravity Bridge Portal
+                </a>
+              </Text>
+            </InfoPop>
+          )}
+        </Container>
+
         <Container
           width="100%"
           height="100%"
@@ -125,8 +128,7 @@ const ConfirmationModal = (props: Props) => {
                   content={<Text size="sm">{props.addresses.to}</Text>}
                 >
                   <Text size="sm">
-                    {(props.cosmosAddress?.addressName ?? props.toNetwork) +
-                      " : "}
+                    {props.toNetwork + " : "}
                     {props.addresses.to
                       ? props.addresses.to?.slice(0, 6) +
                         "..." +
@@ -136,8 +138,7 @@ const ConfirmationModal = (props: Props) => {
                 </PopUp>
               ) : (
                 <Text size="sm">
-                  {(props.cosmosAddress?.addressName ?? props.toNetwork) +
-                    " : "}
+                  {props.toNetwork + " : "}
                   {props.addresses.to
                     ? props.addresses.to?.slice(0, 6) +
                       "..." +
@@ -152,6 +153,41 @@ const ConfirmationModal = (props: Props) => {
               </Text>
               <Text size="sm">{props.amount}</Text>
             </Container>
+            {props.fees && (
+              <div className={styles["extra-info"]}>
+                {props.fees.tokenFees.map((fee) => (
+                  <Container
+                    width="100%"
+                    direction="row"
+                    gap={"auto"}
+                    key={fee.key}
+                  >
+                    <Text size="x-sm" theme="secondary-dark">
+                      {fee.key}
+                    </Text>
+                    <Text size="x-sm">{fee.value}</Text>
+                  </Container>
+                ))}
+                {props.fees.totalFees && (
+                  <>
+                    <div
+                      style={{
+                        width: "100%",
+                        border: "1px dotted var(--text-dark-40-color)",
+                      }}
+                    />
+                    <Container width="100%" direction="row" gap={"auto"}>
+                      <Text size="x-sm" theme="secondary-dark" weight="bold">
+                        total fee
+                      </Text>
+                      <Text size="x-sm" weight="bold">
+                        {props.fees.totalFees}
+                      </Text>
+                    </Container>
+                  </>
+                )}
+              </div>
+            )}
           </Container>
         </Container>
         {props.cosmosAddress && (
@@ -208,9 +244,7 @@ const ConfirmationModal = (props: Props) => {
                 </Text>
                 <InfoPop>
                   <Text size="xx-sm">
-                    {`manually enter your ${
-                      props.cosmosAddress?.addressName ?? props.toNetwork
-                    } address or click "Connect to Keplr"`}
+                    {`manually enter your ${props.toNetwork} address or click "Connect to Keplr"`}
                   </Text>
                 </InfoPop>
               </div>

@@ -75,3 +75,34 @@
   gap: 1rem;
   width: 100%;
 }
+
+.extra-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  border: 1px solid var(--border-stroke-color);
+  padding: 1rem;
+  background-color: rgba(var(--dark-color), 0.04);
+}
+
+.notification {
+  /* circle shape, size and position */
+  position: relative;
+  right: -0.7em;
+  top: -0.7em;
+  min-width: 1.6em; /* or width, explained below. */
+  height: 1.6em;
+  border-radius: 0.8em; /* or 50%, explained below. */
+  border: 1px solid var(--border-stroke-color);
+  background-color: rgba(var(--dark-color));
+
+  /* number size and position */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.8em;
+  color: var(--text-light-color);
+}

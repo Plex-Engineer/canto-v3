@@ -23,6 +23,8 @@ interface RemoveTxParams {
   amountLP: string;
   slippage: number;
   deadline: string;
+  expectedAmount1: string;
+  expectedAmount2: string;
 }
 export const createRemoveParams = (params: RemoveTxParams) => ({
   pair: params.pair,
@@ -31,6 +33,8 @@ export const createRemoveParams = (params: RemoveTxParams) => ({
   txType: CantoDexTxTypes.REMOVE_LIQUIDITY,
   amountLP: params.amountLP,
   unstake: true,
+  expectedAmount1: params.expectedAmount1,
+  expectedAmount2: params.expectedAmount2,
 });
 interface RemoveLiquidityProps {
   pair: CantoDexPairWithUserCTokenData;
@@ -51,6 +55,13 @@ export const RemoveLiquidityModal = ({
     pair.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0",
     pair.clmData?.userDetails?.balanceOfUnderlying ?? "0"
   );
+
+  // expected tokens
+  const [expectedTokens, setExpectedTokens] = useState({
+    expectedToken1: "0",
+    expectedToken2: "0",
+  });
+
   // validation
   const paramCheck = validateParams({
     pair,
@@ -59,13 +70,10 @@ export const RemoveLiquidityModal = ({
     ).toString(),
     deadline,
     slippage,
+    expectedAmount1: expectedTokens.expectedToken1,
+    expectedAmount2: expectedTokens.expectedToken2,
   });
 
-  // expected tokens
-  const [expectedTokens, setExpectedTokens] = useState({
-    expectedToken1: "0",
-    expectedToken2: "0",
-  });
   useEffect(() => {
     async function getQuote() {
       const { data, error } = await quoteRemoveLiquidity(
@@ -125,6 +133,7 @@ export const RemoveLiquidityModal = ({
           title={pair.symbol}
           min="1"
           max={totalLP}
+          maxName="LP Modal"
           symbol={pair.symbol}
         />
         <Spacer height="20px" />
@@ -228,6 +237,8 @@ export const RemoveLiquidityModal = ({
               ).toString(),
               deadline,
               slippage,
+              expectedAmount1: expectedTokens.expectedToken1,
+              expectedAmount2: expectedTokens.expectedToken2,
             })
           }
         >
