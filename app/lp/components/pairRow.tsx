@@ -412,6 +412,7 @@ export const UserAmbientPairRow = ({
         horizontal: true,
         vertical: true,
       }}
+      gap={10}
     >
       <Text key={pool.symbol + "rewards"}>
         {displayAmount(rewards ?? "0", 18)}
