@@ -41,11 +41,11 @@ export interface StakingModalParams {
 export const StakingModal = (props: StakingModalParams) => {
   const [inputAmount, setInputAmount] = useState("");
   const [maxClicked, setMaxClicked] = useState(false);
+
   const [selectedTx, setSelectedTx] = useState<StakingTxTypes>(
     StakingTxTypes.DELEGATE
   );
   const [activeTab, setActiveTab] = useState("delegate");
-  const [amount, setAmount] = useState("");
   const [validatorToRedelegate, setValidatorToRedelegate] =
     useState<Validator | null>();
 
@@ -105,10 +105,8 @@ export const StakingModal = (props: StakingModalParams) => {
     ? userStakedValidatorsAddressList.includes(props.validator.operator_address)
     : false;
 
-  //console.log(maxBalance);
-  //console.log(inputAmount);
+  const limits = {};
 
-  //console.log();
   return (
     <Container className={styles.modalContainer}>
       <Spacer />
