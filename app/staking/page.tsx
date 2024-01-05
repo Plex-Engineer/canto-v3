@@ -1,6 +1,4 @@
 "use client";
-import AnimatedBackground from "@/components/animated_background/animatedBackground";
-import BoxedBackground from "@/components/boxes_background/boxesBackground";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import useStaking from "@/hooks/staking/useStaking";
 import styles from "./staking.module.scss";
@@ -54,9 +52,9 @@ export default function StakingPage() {
 
   const [totalPages, setTotalPages] = useState(1);
 
-  const [selectedTx, setSelectedTx] = useState<StakingTxTypes>(
-    StakingTxTypes.DELEGATE
-  );
+  // const [selectedTx, setSelectedTx] = useState<StakingTxTypes>(
+  //   StakingTxTypes.DELEGATE
+  // );
 
   function handleStakingTxClick(
     validator: Validator | null,
@@ -607,42 +605,11 @@ export default function StakingPage() {
         <Spacer height="80px" />
       </Container>
       {/* <Container>
-        <Tabs 
-          tabs={
-            [
-              {
-                title:"Active Validators",
-                content: (<div>
-                  <div>
-          <Table
-                title="VALIDATORS"
-                headers={[
-                  { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 6 },
-                  { value: <Text opacity={0.4}>Validator Total</Text>, ratio: 4 },
-                  { value: <Text opacity={0.4} font="rm_mono">Commission %</Text>, ratio: 3 },
-                  { value: <Text opacity={0.4} font="rm_mono">Delegators</Text>, ratio: 3 },
-                  { value: <Text opacity={0.4} font="rm_mono">Action</Text>, ratio: 4 },
-                ]}
-                content={[...paginatedvalidators.map((validator,index)=>
-                  GenerateValidatorTableRow(validator,index,()=>handleClick(validator))
-                )]}
-            />
-          </div>
-                </div>)
-              },
-              {
-                title:"InActive Validators",
-                content: (<div></div>)
-              }
-            ]
-          }
-        >
-          
-        </Tabs>
+        
       </Container> */}
       {/* <BoxedBackground /> */}
       <Modal
-        width="40%"
+        width="32rem"
         onClose={() => {
           setSelectedValidator(null);
         }}
