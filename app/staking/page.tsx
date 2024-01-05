@@ -341,10 +341,6 @@ export default function StakingPage() {
 
   return (
     <div className={styles.container}>
-      {/* <Text size="x-lg" font="proto_mono" className={styles.title}>
-        Staking
-      </Text>
-      <Spacer height="20px" /> */}
       <Container direction="row" width="100%">
         <div className={styles.infoBoxButton}>
           <div className={styles.TitleStaking}>

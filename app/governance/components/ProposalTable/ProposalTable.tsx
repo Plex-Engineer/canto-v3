@@ -258,8 +258,6 @@ const ProposalTable = ({ proposals }: TableProps) => {
           />
         }
       </div>
-
-      <Spacer height="20px" />
       <div className={styles.paginationContainer}>
         <div className={styles.paginationButton1}>
           <Button

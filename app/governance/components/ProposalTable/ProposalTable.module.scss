@@ -72,8 +72,12 @@
     .paginationContainer {
       display: flex;
       justify-content: center;
-      //align-items: center;
-      //margin: 20px 20px 20px 20px;
+      background: var(--card-sub-surface-color, #dfdfdf);
+      box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
+      max-width: 1200px;
+      min-width: 400px;
+      margin: 0 auto;
+      padding: 16px;
     }
     .paginationButton1{
       //margin-left: 10%;
