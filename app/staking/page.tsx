@@ -67,7 +67,7 @@ export default function StakingPage() {
     if (signer) {
       if (txType == StakingTxTypes.REDELEGATE) {
         const newFlow: NewTransactionFlow = {
-          icon: "",
+          icon: "/tokens/canto.svg",
           txType: TransactionFlowType.STAKE_CANTO_TX,
           title: "Stake Canto",
           params: {
@@ -95,7 +95,7 @@ export default function StakingPage() {
         txType == StakingTxTypes.UNDELEGATE
       ) {
         const newFlow: NewTransactionFlow = {
-          icon: "",
+          icon: "/tokens/canto.svg",
           txType: TransactionFlowType.STAKE_CANTO_TX,
           title: "Stake Canto",
           params: {
