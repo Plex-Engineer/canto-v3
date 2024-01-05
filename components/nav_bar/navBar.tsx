@@ -122,7 +122,7 @@ const NavBar = () => {
                 styles.active
             )}
           >
-            <Text>Governance</Text>
+            <Text size="sm">Governance</Text>
           </Link>
         )}
       </div>

@@ -6,6 +6,7 @@ import Button from "../button/button";
 import { displayAmount, formatBalance } from "@/utils/formatting";
 import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
 import { Validation } from "@/config/interfaces";
+import Icon from "../icon/icon";
 
 // if amount is true then add more required props
 type InputProps = {
@@ -29,6 +30,7 @@ type InputProps = {
   max?: number;
   step?: number;
   required?: boolean;
+  icon?: string;
 } & (
   | {
       type: "amount";
@@ -90,6 +92,14 @@ const Input = (props: InputProps) => {
               Balance: {displayAmount(props.balance, props.decimals)}
             </span>
           )}
+          {/* {props.icon && <Icon
+            themed
+            icon={{
+              url: props.icon,
+              size: 24,
+            }}
+          />
+          } */}
         </Text>
       </label>
       <section>

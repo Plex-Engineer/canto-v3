@@ -262,12 +262,20 @@ const ProposalTable = ({ proposals }: TableProps) => {
       <Spacer height="20px" />
       <div className={styles.paginationContainer}>
         <div className={styles.paginationButton1}>
-          <Button onClick={handlePrevious} disabled={currentPage == 1}>
+          <Button
+            onClick={handlePrevious}
+            disabled={currentPage == 1}
+            width={100}
+          >
             Previous
           </Button>
         </div>
         <div className={styles.paginationButton2}>
-          <Button onClick={handleNext} disabled={currentPage == totalPages}>
+          <Button
+            onClick={handleNext}
+            disabled={currentPage == totalPages}
+            width={100}
+          >
             Next
           </Button>
         </div>

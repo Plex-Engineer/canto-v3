@@ -57,6 +57,13 @@ export default function StakingPage() {
   const [selectedTx, setSelectedTx] = useState<StakingTxTypes>(
     StakingTxTypes.DELEGATE
   );
+  const [isTyping, setIsTyping] = useState(false);
+  const handleInputTypingChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    // Update the state to indicate whether the user is typing
+    setIsTyping(event.target.value.length > 0);
+  };
 
   function handleStakingTxClick(
     validator: Validator | null,
@@ -225,8 +232,8 @@ export default function StakingPage() {
     currentFilter == "ACTIVE" ? activeValidators : inActiveValidators;
 
   const validatorTitleMap = new Map<string, string>();
-  validatorTitleMap.set("ACTIVE", "ACTIVE VALIDATORS");
-  validatorTitleMap.set("INACTIVE", "INACTIVE VALIDATORS");
+  validatorTitleMap.set("ACTIVE", "VALIDATORS");
+  validatorTitleMap.set("INACTIVE", "VALIDATORS");
 
   const handleSearch = () => {
     const searchQuery2 = searchQuery;
@@ -238,10 +245,9 @@ export default function StakingPage() {
     setFilteredValidatorsBySearch(filteredListSearch);
     setCurrentPage(1);
   };
-
+  const pageSize = 20;
   const currentValidators =
     searchQuery == "" ? filteredValidators : filteredValidatorsBySearch;
-  const pageSize = 10;
   useEffect(() => {
     setTotalPages(Math.ceil(currentValidators.length / pageSize));
   }, [currentValidators.length, pageSize]);
@@ -284,6 +290,7 @@ export default function StakingPage() {
   };
 
   const space = " ";
+  const str = "search...";
   //console.log(userStaking?.unbonding);
 
   // let unbondingDelegationsTable: any[] = [];
@@ -347,7 +354,14 @@ export default function StakingPage() {
         Staking
       </Text>
       <Spacer height="20px" /> */}
-      <Container direction="row" width="96%">
+      <Container direction="row" width="100%">
+        <div className={styles.infoBoxButton}>
+          <div className={styles.TitleStaking}>
+            <Text size="title" font="proto_mono">
+              STAKING
+            </Text>
+          </div>
+        </div>
         <div className={styles.infoBox}>
           <div>
             <Text font="rm_mono">Total Staked </Text>
@@ -492,11 +506,12 @@ export default function StakingPage() {
       } */}
 
       <Container width="100%" className={styles.tableContainer}>
-        <div className={styles.searchBarContainer2}>
+        {/* <div className={styles.searchBarContainer2}>
           <div className={styles.searchBarContainer}>
             <div>
               <Input
                 height={47}
+                icon="/searchIcon.svg"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => {
@@ -505,28 +520,77 @@ export default function StakingPage() {
                   handleSearch();
                   //console.log("inside function");
                 }}
-                placeholder="Search..."
+                placeholder={str[0].toUpperCase() + str.slice(1)}
               />
+                
+
             </div>
-            <div>
-              <Button shadow="none" onClick={() => handleSearch()}>
+            <div style={{display:"flex",flexDirection:"column", justifyContent:"center", alignItems:"center"}}>
+              <Button shadow="none" onClick={() => {}} >
                 <Icon
-                  style={{ marginLeft: "5px" }}
+                  
+                  themed
                   icon={{
-                    url: "/search.svg",
-                    size: 14,
+                    url: "/searchIcon.svg",
+                    size: 24,
                   }}
-                  themed={true}
                 />
               </Button>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <Table
           title={
             <div className={styles.tableTitleContainer}>
-              <div>{validatorTitleMap.get(currentFilter)}</div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "33%",
+                }}
+              >
+                <Text font="proto_mono" size="lg">
+                  {validatorTitleMap.get(currentFilter)}
+                </Text>
+              </div>
+              <div className={styles.searchBarContainer}>
+                <div>
+                  <Input
+                    height={40}
+                    icon="/searchIcon.svg"
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+
+                      handleSearch();
+                      //console.log("inside function");
+                    }}
+                    placeholder={str[0].toUpperCase() + str.slice(1)}
+                  />
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Button height={40} shadow="none" onClick={() => {}}>
+                    <Icon
+                      themed
+                      icon={{
+                        url: "/searchIcon.svg",
+                        size: 24,
+                      }}
+                    />
+                  </Button>
+                </div>
+              </div>
             </div>
           }
           // secondary={
@@ -536,7 +600,7 @@ export default function StakingPage() {
           //   </div>
           // }
           secondary={
-            <Container width="400px">
+            <Container width="25%">
               <ToggleGroup
                 options={["ACTIVE", "INACTIVE"]}
                 selected={currentFilter}
@@ -594,12 +658,20 @@ export default function StakingPage() {
 
         <div className={styles.paginationContainer}>
           <div className={styles.paginationButton1}>
-            <Button onClick={handlePrevious} disabled={currentPage == 1}>
+            <Button
+              onClick={handlePrevious}
+              disabled={currentPage == 1}
+              width={100}
+            >
               Previous
             </Button>
           </div>
           <div className={styles.paginationButton2}>
-            <Button onClick={handleNext} disabled={currentPage == totalPages}>
+            <Button
+              onClick={handleNext}
+              disabled={currentPage == totalPages}
+              width={100}
+            >
               Next
             </Button>
           </div>
