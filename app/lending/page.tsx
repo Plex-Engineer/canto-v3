@@ -101,14 +101,17 @@ export default function LendingPage() {
                     lmToken: cNote.underlying.symbol,
                     lmWalletBalance: displayAnalyticsAmount(
                       cNote.userDetails?.balanceOfUnderlying ?? "0",
-                      cNote.underlying.decimals,
+                      cNote.underlying.decimals
                     ),
                     lmSupppliedAmount: displayAnalyticsAmount(
                       cNote.userDetails?.supplyBalanceInUnderlying ?? "0",
-                      cNote.underlying.decimals,
+                      cNote.underlying.decimals
                     ),
-                    lmLiquidityRemaining: displayAnalyticsAmount(clmPosition.position.liquidity, 18)
-                  })
+                    lmLiquidityRemaining: displayAnalyticsAmount(
+                      clmPosition.position.liquidity,
+                      18
+                    ),
+                  });
                   setSelectedCToken(cNote.address);
                   setCurrentModal(CLMModalTypes.SUPPLY);
                 }}
@@ -117,14 +120,17 @@ export default function LendingPage() {
                     lmToken: cNote.underlying.symbol,
                     lmWalletBalance: displayAnalyticsAmount(
                       cNote.userDetails?.balanceOfUnderlying ?? "0",
-                      cNote.underlying.decimals,
+                      cNote.underlying.decimals
                     ),
                     lmBorrowedAmount: displayAnalyticsAmount(
                       cNote.userDetails?.borrowBalance ?? "0",
-                      cNote.underlying.decimals,
+                      cNote.underlying.decimals
                     ),
-                    lmLiquidityRemaining: displayAnalyticsAmount(clmPosition.position.liquidity, 18)
-                  })
+                    lmLiquidityRemaining: displayAnalyticsAmount(
+                      clmPosition.position.liquidity,
+                      18
+                    ),
+                  });
                   setSelectedCToken(cNote.address);
                   setCurrentModal(CLMModalTypes.BORROW);
                 }}
@@ -262,7 +268,7 @@ const CTokenTable = ({
   isLoading: boolean;
   stableTokens: CTokenWithUserData[];
   rwas: CTokenWithUserData[];
-  liquidity: string,
+  liquidity: string;
   onSupply: (address: string) => void;
   onBorrow: (address: string) => void;
 }) => {
@@ -341,19 +347,22 @@ const CTokenTable = ({
                   RWARow({
                     cRwa,
                     onSupply: () => {
-                       Analytics.actions.events.lendingMarket.supplyClicked({
-                          lmToken: cRwa.underlying.symbol,
-                          lmWalletBalance: displayAnalyticsAmount(
-                            cRwa.userDetails?.balanceOfUnderlying ?? "0",
-                            cRwa.underlying.decimals,
-                          ),
-                          lmSupppliedAmount: displayAnalyticsAmount(
-                            cRwa.userDetails?.supplyBalanceInUnderlying ?? "0",
-                            cRwa.underlying.decimals,
-                          ),
-                          lmLiquidityRemaining: displayAnalyticsAmount(liquidity, 18)
-                        })
-                      onSupply(cRwa.address)
+                      Analytics.actions.events.lendingMarket.supplyClicked({
+                        lmToken: cRwa.underlying.symbol,
+                        lmWalletBalance: displayAnalyticsAmount(
+                          cRwa.userDetails?.balanceOfUnderlying ?? "0",
+                          cRwa.underlying.decimals
+                        ),
+                        lmSupppliedAmount: displayAnalyticsAmount(
+                          cRwa.userDetails?.supplyBalanceInUnderlying ?? "0",
+                          cRwa.underlying.decimals
+                        ),
+                        lmLiquidityRemaining: displayAnalyticsAmount(
+                          liquidity,
+                          18
+                        ),
+                      });
+                      onSupply(cRwa.address);
                     },
                   })
                 )
@@ -366,30 +375,37 @@ const CTokenTable = ({
                           lmToken: cStableCoin.underlying.symbol,
                           lmWalletBalance: displayAnalyticsAmount(
                             cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
-                            cStableCoin.underlying.decimals,
+                            cStableCoin.underlying.decimals
                           ),
                           lmSupppliedAmount: displayAnalyticsAmount(
-                            cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
-                            cStableCoin.underlying.decimals,
+                            cStableCoin.userDetails
+                              ?.supplyBalanceInUnderlying ?? "0",
+                            cStableCoin.underlying.decimals
                           ),
-                          lmLiquidityRemaining: displayAnalyticsAmount(liquidity, 18)
-                        })
-                        onSupply(cStableCoin.address)
+                          lmLiquidityRemaining: displayAnalyticsAmount(
+                            liquidity,
+                            18
+                          ),
+                        });
+                        onSupply(cStableCoin.address);
                       },
                       onBorrow: () => {
                         Analytics.actions.events.lendingMarket.borrowClicked({
                           lmToken: cStableCoin.underlying.symbol,
                           lmWalletBalance: displayAnalyticsAmount(
                             cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
-                            cStableCoin.underlying.decimals,
+                            cStableCoin.underlying.decimals
                           ),
                           lmBorrowedAmount: displayAnalyticsAmount(
                             cStableCoin.userDetails?.borrowBalance ?? "0",
-                            cStableCoin.underlying.decimals,
+                            cStableCoin.underlying.decimals
                           ),
-                          lmLiquidityRemaining: displayAnalyticsAmount(liquidity, 18)
-                        })
-                        onBorrow(cStableCoin.address)
+                          lmLiquidityRemaining: displayAnalyticsAmount(
+                            liquidity,
+                            18
+                          ),
+                        });
+                        onBorrow(cStableCoin.address);
                       },
                     })
                   )

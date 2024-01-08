@@ -94,9 +94,15 @@ interface PropLink {
 const FooterLink = ({ href, text }: PropLink) => {
   return (
     <Text size="x-sm" font="proto_mono" className={styles.link}>
-      <a href={href} target="_blank" onClick={() => Analytics.actions.events.externalLinkClicked({
-        Website: text
-      })}>
+      <a
+        href={href}
+        target="_blank"
+        onClick={() =>
+          Analytics.actions.events.externalLinkClicked({
+            Website: text,
+          })
+        }
+      >
         {text}
       </a>
     </Text>

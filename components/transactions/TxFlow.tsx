@@ -139,14 +139,15 @@ const TxFlow = (props: Props) => {
                 disabled={!canRetry.valid}
                 onClick={() => {
                   if (props.txFlow?.analyticsTransactionFlowInfo) {
-                    const timeDifferenceInSeconds = Math.floor((new Date().getTime() - props.txFlow.createdAt) / 1000);
-                    Analytics.actions.events.transactionFlows.retry(
-                      {
-                        ...props.txFlow?.analyticsTransactionFlowInfo,
-                        txRetryTimeInSeconds: timeDifferenceInSeconds,
-                      })
+                    const timeDifferenceInSeconds = Math.floor(
+                      (new Date().getTime() - props.txFlow.createdAt) / 1000
+                    );
+                    Analytics.actions.events.transactionFlows.retry({
+                      ...props.txFlow?.analyticsTransactionFlowInfo,
+                      txRetryTimeInSeconds: timeDifferenceInSeconds,
+                    });
                   }
-                  props.onRetry()
+                  props.onRetry();
                 }}
                 width="fill"
               >

@@ -83,7 +83,9 @@ const ThemeButton = () => {
       scale={1.5}
       color="secondary"
       onChange={(value) => {
-        Analytics.actions.events.themeChanged(document.body.classList.contains("dark") ? "light" : "dark")
+        Analytics.actions.events.themeChanged(
+          document.body.classList.contains("dark") ? "light" : "dark"
+        );
         document.body.classList.contains("dark")
           ? setTheme("light")
           : setTheme("dark");
