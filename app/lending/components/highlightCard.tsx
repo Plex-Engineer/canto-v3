@@ -29,13 +29,15 @@ const HighlightCard = ({
     });
 
   const formattedSupplyAmount = (amount: string) => {
-    const suppliedAmount = new BigNumber(cToken.userDetails?.supplyBalanceInUnderlying ?? "0");
+    const suppliedAmount = new BigNumber(
+      cToken.userDetails?.supplyBalanceInUnderlying ?? "0"
+    );
     const minAmount = new BigNumber("100000000000");
-    if(suppliedAmount.comparedTo(minAmount) == -1){
-      return "0"
+    if (suppliedAmount.comparedTo(minAmount) === -1) {
+      return "0";
     }
-    return formattedAmount(amount)
-  }
+    return formattedAmount(amount);
+  };
 
   return (
     <div className={styles.container}>
