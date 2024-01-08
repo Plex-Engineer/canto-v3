@@ -9,6 +9,8 @@ import Text from "@/components/text";
 import InfoPop from "@/components/infopop/infopop";
 import PopUp from "@/components/popup/popup";
 import Container from "@/components/container/container";
+import BigNumber from "bignumber.js";
+
 interface Props {
   cToken: CTokenWithUserData;
   precisionInValues?: number;
@@ -25,6 +27,16 @@ const HighlightCard = ({
     displayAmount(amount, cToken.underlying.decimals, {
       precision: precisionInValues,
     });
+
+  const formattedSupplyAmount = (amount: string) => {
+    const suppliedAmount = new BigNumber(cToken.userDetails?.supplyBalanceInUnderlying ?? "0");
+    const minAmount = new BigNumber("100000000000");
+    if(suppliedAmount.comparedTo(minAmount) == -1){
+      return "0"
+    }
+    return formattedAmount(amount)
+  }
+
   return (
     <div className={styles.container}>
       <Image
@@ -99,7 +111,7 @@ const HighlightCard = ({
         </Container>
         <Item
           name="Note Supplied"
-          value={formattedAmount(
+          value={formattedSupplyAmount(
             cToken.userDetails?.supplyBalanceInUnderlying ?? "0"
           )}
           postChild={
