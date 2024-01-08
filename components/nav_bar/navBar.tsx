@@ -85,7 +85,7 @@ const NavBar = () => {
             currentPath == "/staking" && styles.active
           )}
         >
-          <Text>Staking</Text>
+          <Text size="sm">Staking</Text>
         </Link>
         <Link
           href="/lending"
@@ -110,7 +110,7 @@ const NavBar = () => {
             href="/governance"
             className={clsx(styles["nav-link"], styles.active)}
           >
-            <Text>Governance</Text>
+            <Text size="sm">Governance</Text>
           </Link>
         )}
         {currentPath != "/governance/proposal" && (
@@ -122,7 +122,7 @@ const NavBar = () => {
                 styles.active
             )}
           >
-            <Text>Governance</Text>
+            <Text size="sm">Governance</Text>
           </Link>
         )}
       </div>

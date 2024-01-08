@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import Container from "@/components/container/container";
 import { Proposal } from "@/hooks/gov/interfaces/proposal";
@@ -24,12 +24,16 @@ export default function GovernancePage() {
   const { txStore, signer, chainId } = useCantoSigner();
   const { proposals, isLoading } = useProposals({ chainId: chainId });
 
-  const sorted_proposals = proposals.sort(
-    (a: Proposal, b: Proposal) => b.proposal_id - a.proposal_id
+  const sorted_proposals = useMemo(
+    () =>
+      proposals.sort(
+        (a: Proposal, b: Proposal) => b.proposal_id - a.proposal_id
+      ),
+    [proposals]
   );
 
-  const proposalsPerPage = 10; // Number of proposals per page
-  const totalPages = Math.ceil(proposals?.length / proposalsPerPage);
+  //const proposalsPerPage = 10; // Number of proposals per page
+  //const totalPages = Math.ceil(proposals?.length / proposalsPerPage);
 
   return isLoading ? (
     <Splash />

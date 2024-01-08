@@ -88,3 +88,9 @@ export interface DelegationRewardResponse {
   }[];
   error: string | null;
 }
+
+export interface UnbondingDelegation {
+  name: string;
+  undelegation: string;
+  completion_date: string;
+}

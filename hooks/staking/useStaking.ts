@@ -93,7 +93,7 @@ export default function useStaking(
     },
     {
       onSuccess: (data) => {
-        console.log(data);
+        //console.log(data);
       },
       onError: (error) => {
         console.log(error);
