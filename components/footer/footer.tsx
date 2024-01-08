@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { getTokenPriceInUSDC } from "@/utils/tokens";
 import { useBlockNumber } from "wagmi";
 import { CANTO_MAINNET_EVM } from "@/config/networks";
+import Analytics from "@/provider/analytics";
 
 const Footer = () => {
   const [cantoPrice, setCantoPrice] = useState("0");
@@ -93,7 +94,9 @@ interface PropLink {
 const FooterLink = ({ href, text }: PropLink) => {
   return (
     <Text size="x-sm" font="proto_mono" className={styles.link}>
-      <a href={href} target="_blank">
+      <a href={href} target="_blank" onClick={() => Analytics.actions.events.externalLinkClicked({
+        Website: text
+      })}>
         {text}
       </a>
     </Text>

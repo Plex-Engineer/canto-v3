@@ -137,7 +137,17 @@ const TxFlow = (props: Props) => {
               <Spacer height="20px" />
               <Button
                 disabled={!canRetry.valid}
-                onClick={props.onRetry}
+                onClick={() => {
+                  if (props.txFlow?.analyticsTransactionFlowInfo) {
+                    const timeDifferenceInSeconds = Math.floor((new Date().getTime() - props.txFlow.createdAt) / 1000);
+                    Analytics.actions.events.transactionFlows.retry(
+                      {
+                        ...props.txFlow?.analyticsTransactionFlowInfo,
+                        txRetryTimeInSeconds: timeDifferenceInSeconds,
+                      })
+                  }
+                  props.onRetry()
+                }}
                 width="fill"
               >
                 RETRY

@@ -24,8 +24,9 @@ import { addTokenBalances } from "@/utils/math";
 import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
 import { getDisplayTokenAmountFromRange, getPriceFromTick } from "@/utils/ambient";
 
-const displayAnalyticsAmount = (amount: string, decimals: number) =>
-  displayAmount(amount, decimals, { short: false, precision: decimals });
+export function displayAnalyticsAmount(amount: string, decimals: number){
+  return displayAmount(amount, decimals, { short: false, precision: decimals });
+}
 
 export function getAnalyticsTransactionFlowInfo(
   flow: NewTransactionFlow,
