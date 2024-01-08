@@ -12,6 +12,7 @@ import StatusIcon from "../icon/statusIcon";
 import Splash from "../splash/splash";
 import { dateToMomentsAgo } from "@/utils/formatting";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
+import Analytics from "@/provider/analytics";
 
 const TransactionModal = () => {
   // set modal open state
@@ -235,6 +236,7 @@ const TransactionModal = () => {
         padding={10}
         height={40}
         onClick={() => {
+          Analytics.actions.events.transactionModalOpened();
           setIsOpen(true);
         }}
       >
