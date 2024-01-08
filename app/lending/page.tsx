@@ -243,7 +243,7 @@ const CTokenTable = ({
       ? [
           { value: "Asset", ratio: 1 },
           { value: "Balance", ratio: 1 },
-          { value: "APY", ratio: 1 },
+          { value: "APR", ratio: 1 },
           { value: "Supplied", ratio: 1 },
           { value: "Collateral Factor", ratio: 1 },
           { value: "Liquidity", ratio: 1 },
