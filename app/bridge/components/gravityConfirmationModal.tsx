@@ -34,9 +34,8 @@ const GravityConfirmationModal = ({
       </Container>
       <Text size="sm">
         Direct bridging to Ethereum only works for wallets that support custom
-        chains such as Metamask & Frame.
-        <Spacer height="10px" />
-        Rabby, Rainbow, and Coinbase wallet are not supported yet.
+        chains such as Metamask & Frame. Rabby, Rainbow, and Coinbase wallet are
+        not supported yet.
         <Spacer height="10px" />
         If you are not using a supported wallet, use the Gravity Bridge portal.
       </Text>

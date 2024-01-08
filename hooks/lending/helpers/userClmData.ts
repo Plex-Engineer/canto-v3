@@ -39,27 +39,6 @@ export async function getAllUserCLMData(
   const filteredCTokens = generalCTokens.data.filter((cToken) =>
     listIncludesAddress(cTokenAddresses, cToken.address)
   );
-
-  // special apy for fBill
-  //"0xF1F89dF149bc5f2b6B29783915D1F9FE2d24459c", //cfBILL
-  //"0x897709FC83ba7a4271d22Ed4C01278cc1Da8d6F8", //cifBILL
-  const cfBill = filteredCTokens.findIndex((cToken) =>
-    areEqualAddresses(
-      cToken.address,
-      "0xF1F89dF149bc5f2b6B29783915D1F9FE2d24459c"
-    )
-  );
-  const ciFBill = filteredCTokens.findIndex((cToken) =>
-    areEqualAddresses(
-      cToken.address,
-      "0x897709FC83ba7a4271d22Ed4C01278cc1Da8d6F8"
-    )
-  );
-  if (cfBill !== -1 && ciFBill !== -1) {
-    filteredCTokens[cfBill].supplyApy = "4.9";
-    filteredCTokens[ciFBill].supplyApy = "4.9";
-  }
-
   // return general data if no user
   if (!userEthAddress) {
     return NO_ERROR({
