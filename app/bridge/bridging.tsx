@@ -331,11 +331,11 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
               Confirmation.setIsModalOpen(true);
             }
           }}
-          // disabled={
-          //   Confirmation.preConfirmCheck.error ||
-          //   fees.isLoading ||
-          //   fees.error !== null
-          // }
+          disabled={
+            Confirmation.preConfirmCheck.error ||
+            fees.isLoading ||
+            fees.error !== null
+          }
         >
           {bridge.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
         </Button>
