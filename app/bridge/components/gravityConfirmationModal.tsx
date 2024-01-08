@@ -45,7 +45,7 @@ const GravityConfirmationModal = ({
       setAddChainError(null);
       onConfirm();
     } catch (err) {
-      setAddChainError("unable to add custom chain");
+      setAddChainError("Error: Wallet not supported");
     }
   }
   return (
@@ -86,6 +86,7 @@ const GravityConfirmationModal = ({
           style={{
             color: "var(--extra-failure-color, #ff0000)",
             marginTop: 10,
+            textAlign: "center",
           }}
         >
           {addChainError}
