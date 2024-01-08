@@ -19,11 +19,15 @@ import Table from "@/components/table/table";
 import Splash from "@/components/splash/splash";
 import {
   GenerateMyStakingTableRow,
+  GenerateUnbondingDelegationsTableRow,
   GenerateValidatorTableRow,
 } from "./components/validatorTableRow";
 import { useEffect, useMemo, useState } from "react";
 import { StakingModal } from "./components/stakingModal/StakingModal";
-import { Validator } from "@/hooks/staking/interfaces/validators";
+import {
+  UnbondingDelegation,
+  Validator,
+} from "@/hooks/staking/interfaces/validators";
 import Modal from "@/components/modal/modal";
 
 import {
@@ -307,6 +311,47 @@ export default function StakingPage() {
   //   );
   // }
   //console.log(unbondingDelegationsTable);
+  // let unbondingDelegations:UnbondingDelegation[] = [];
+  // if(userStaking && userStaking.unbonding && userStaking.unbonding.length>0){
+  //   for(let i=0;i<userStaking.unbonding.length;i++){
+  //     const validatorAddress = userStaking.unbonding[i].validator_address;
+  //     const validatorUnbonded = validators.find(e=>e.operator_address==validatorAddress);
+  //     const validatorName = validatorUnbonded?.description.moniker;
+
+  //     for(let j=0;j<userStaking.unbonding[i].entries.length;j++){
+  //         const undelegationAmount = userStaking.unbonding[i].entries[j].balance;
+  //         const completion_time = userStaking.unbonding[i].entries[j].completion_time;
+  //         unbondingDelegations.push({
+  //           name: validatorName? validatorName : "",
+  //           completion_date:completion_time,
+  //           undelegation: undelegationAmount
+  //         })
+  //     }
+  //   }
+  // }
+
+  const unbondingDelegations: UnbondingDelegation[] =
+    userStaking?.unbonding
+      ?.map((unbondingEntry) => {
+        const validatorAddress = unbondingEntry.validator_address;
+        const validatorName = validators?.find(
+          (e) => e.operator_address === validatorAddress
+        )?.description.moniker;
+        //const validatorName = validatorUnbonded?.description.moniker;
+
+        const entries = unbondingEntry.entries.map((entry) => ({
+          name: validatorName || "",
+          completion_date: entry.completion_time,
+          undelegation: entry.balance,
+        }));
+
+        return entries;
+      })
+      .flat() || [];
+
+  // console.log(userStaking);
+  // console.log(userStaking?.unbonding);
+  // console.log(unbondingDelegations);
 
   function handleClick(validator: Validator) {
     setSelectedValidator(validator);
@@ -322,7 +367,7 @@ export default function StakingPage() {
   ) {
     if (signer) {
       const newFlow: NewTransactionFlow = {
-        icon: "",
+        icon: "/tokens/canto.svg",
         txType: TransactionFlowType.STAKE_CANTO_TX,
         title: "Stake Canto",
         params: {
@@ -472,25 +517,73 @@ export default function StakingPage() {
       )}
       <Spacer height="40px" />
 
-      {/* {
-        userStaking && 
+      {userStaking && (
         <div className={styles.tableContainer2}>
           <Table
-                title="My Staking"
-                headers={[
-                  { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 5 },
-                  { value: <Text opacity={0.4}>My Stake</Text>, ratio: 3 },
-                  { value: <Text opacity={0.4} font="rm_mono">Validator Total</Text>, ratio: 3 },
-                  { value: <Text opacity={0.4} font="rm_mono">Commission</Text>, ratio: 3 },
-                  { value: <Text opacity={0.4} font="rm_mono">Edit</Text>, ratio: 3 },
-                ]}
-                content={[...userStaking.unbonding.map((userStakingElement,index)=>
-                  GenerateMyStakingTableRow(userStakingElement, index,()=>handleClick(userStakingElement))
-                )]}
-            />
-          </div>
+            title="Unbonding Delegations"
+            headers={[
+              {
+                value: (
+                  <Text opacity={0.4} font="rm_mono">
+                    Name
+                  </Text>
+                ),
+                ratio: 3,
+              },
+              { value: <Text opacity={0.4}>Undelegation</Text>, ratio: 2 },
+              {
+                value: (
+                  <Text opacity={0.4} font="rm_mono">
+                    Completion Time
+                  </Text>
+                ),
+                ratio: 5,
+              },
+            ]}
+            content={[
+              ...unbondingDelegations.map((userStakingElement, index) =>
+                GenerateUnbondingDelegationsTableRow(userStakingElement, index)
+              ),
+            ]}
+          />
+          <Spacer height="40px" />
+        </div>
+      )}
 
-      } */}
+      <Spacer height="40px" />
+
+      {userStaking && (
+        <div className={styles.tableContainer2}>
+          <Table
+            title="Unbonding Delegations"
+            headers={[
+              {
+                value: (
+                  <Text opacity={0.4} font="rm_mono">
+                    Name
+                  </Text>
+                ),
+                ratio: 3,
+              },
+              { value: <Text opacity={0.4}>Undelegation</Text>, ratio: 2 },
+              {
+                value: (
+                  <Text opacity={0.4} font="rm_mono">
+                    Completion Time
+                  </Text>
+                ),
+                ratio: 5,
+              },
+            ]}
+            content={[
+              ...unbondingDelegations.map((userStakingElement, index) =>
+                GenerateUnbondingDelegationsTableRow(userStakingElement, index)
+              ),
+            ]}
+          />
+          <Spacer height="40px" />
+        </div>
+      )}
 
       <Container width="100%" className={styles.tableContainer}>
         {/* <div className={styles.searchBarContainer2}>

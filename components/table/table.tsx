@@ -63,13 +63,17 @@ const Table = (props: Props) => {
                     .join(" "),
                 }}
               >
-                {row.map((cell, index) => {
-                  return (
-                    <div key={index} className={styles.cell}>
-                      {cell}
-                    </div>
-                  );
-                })}
+                {Array.isArray(props.content[0]) ? (
+                  row.map((cell, index) => {
+                    return (
+                      <div key={index} className={styles.cell}>
+                        {cell}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div></div>
+                )}
               </div>
             );
           })}
