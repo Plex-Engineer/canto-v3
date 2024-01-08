@@ -72,12 +72,12 @@
     .paginationContainer {
       display: flex;
       justify-content: center;
-      background: var(--card-sub-surface-color, #dfdfdf);
-      box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
+      //background: var(--card-sub-surface-color, #dfdfdf);
+      //box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
       max-width: 1200px;
       min-width: 400px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 16px 16px 0px 16px;
     }
     .paginationButton1{
       //margin-left: 10%;
@@ -92,11 +92,12 @@
       padding: 20px;
     }
     .noProposalContainer {
-      display: flex;
-      flex-direction: column;
+      // display: flex;
+      // flex-direction: column;
       justify-content: center;
       align-items: center;
-      margin-top: 20%;
+      margin-top: 50px;
+      margin-bottom: 50px;
       text-align: center;
       flex-grow: 1;
       //width: 40%;

@@ -9,11 +9,14 @@ interface Props {
     value: string | React.ReactNode;
     ratio: number;
   }[];
-  content: React.ReactNode[][]; //| React.ReactNode[];
+  content: React.ReactNode[][] | React.ReactNode[];
   textSize?: string;
+  isPaginated?: boolean;
 }
+
 const Table = (props: Props) => {
   //console.log(typeof(props.content));
+
   const isRowData: boolean = !props.content[0];
   //const isRowData = typeof(props.content)== React.ReactNode[];
   return (
@@ -51,7 +54,7 @@ const Table = (props: Props) => {
         </div>
         <div className={styles.content}>
           {props.content.map((row, index) => {
-            return (
+            return Array.isArray(row) ? (
               <div
                 key={index}
                 className={styles.row}
@@ -63,18 +66,16 @@ const Table = (props: Props) => {
                     .join(" "),
                 }}
               >
-                {Array.isArray(props.content[0]) ? (
-                  row.map((cell, index) => {
-                    return (
-                      <div key={index} className={styles.cell}>
-                        {cell}
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div></div>
-                )}
+                {row.map((cell, index) => {
+                  return (
+                    <div key={index} className={styles.cell}>
+                      {cell}
+                    </div>
+                  );
+                })}
               </div>
+            ) : (
+              <div className={styles.rowElement}>{row}</div>
             );
           })}
         </div>

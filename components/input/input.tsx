@@ -30,7 +30,7 @@ type InputProps = {
   max?: number;
   step?: number;
   required?: boolean;
-  icon?: string;
+  searchicon?: boolean;
 } & (
   | {
       type: "amount";
@@ -48,6 +48,12 @@ type InputProps = {
 );
 
 const Input = (props: InputProps) => {
+  const getSearchStyle = () => {
+    if (props.searchicon) {
+      return { borderLeft: "none" };
+    }
+    return {};
+  };
   function getHeight(height: InputProps["height"]) {
     switch (height) {
       //   in px
@@ -139,6 +145,9 @@ const Input = (props: InputProps) => {
               props.error || inputError.error
                 ? "1px solid var(--extra-failure-color, #ff0000)"
                 : "",
+            borderLeft: props.searchicon
+              ? ""
+              : "1px solid var(--border-stroke-color, #b3b3b3)",
             ...props.style,
             fontFamily: "var(--rm-mono)",
             fontSize: props.type === "amount" ? "1.5rem" : "1rem",

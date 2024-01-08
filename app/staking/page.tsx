@@ -550,41 +550,6 @@ export default function StakingPage() {
         </div>
       )}
 
-      <Spacer height="40px" />
-
-      {userStaking && (
-        <div className={styles.tableContainer2}>
-          <Table
-            title="Unbonding Delegations"
-            headers={[
-              {
-                value: (
-                  <Text opacity={0.4} font="rm_mono">
-                    Name
-                  </Text>
-                ),
-                ratio: 3,
-              },
-              { value: <Text opacity={0.4}>Undelegation</Text>, ratio: 2 },
-              {
-                value: (
-                  <Text opacity={0.4} font="rm_mono">
-                    Completion Time
-                  </Text>
-                ),
-                ratio: 5,
-              },
-            ]}
-            content={[
-              ...unbondingDelegations.map((userStakingElement, index) =>
-                GenerateUnbondingDelegationsTableRow(userStakingElement, index)
-              ),
-            ]}
-          />
-          <Spacer height="40px" />
-        </div>
-      )}
-
       <Container width="100%" className={styles.tableContainer}>
         {/* <div className={styles.searchBarContainer2}>
           <div className={styles.searchBarContainer}>
@@ -637,10 +602,19 @@ export default function StakingPage() {
                 </Text>
               </div>
               <div className={styles.searchBarContainer}>
+                <div className={styles.searchIconContainer}>
+                  <Icon
+                    themed
+                    icon={{
+                      url: "/searchIcon.svg",
+                      size: 24,
+                    }}
+                  />
+                </div>
                 <div>
                   <Input
                     height={40}
-                    icon="/searchIcon.svg"
+                    searchicon={true}
                     type="text"
                     value={searchQuery}
                     onChange={(e) => {
@@ -652,7 +626,7 @@ export default function StakingPage() {
                     placeholder={str[0].toUpperCase() + str.slice(1)}
                   />
                 </div>
-                <div
+                {/* <div
                   style={{
                     display: "flex",
                     flexDirection: "column",
@@ -669,7 +643,7 @@ export default function StakingPage() {
                       }}
                     />
                   </Button>
-                </div>
+                </div> */}
               </div>
             </div>
           }
@@ -727,16 +701,40 @@ export default function StakingPage() {
               ratio: 4,
             },
           ]}
-          content={[
-            ...paginatedvalidators.map((validator, index) =>
-              GenerateValidatorTableRow(validator, index, () =>
-                handleClick(validator)
-              )
-            ),
-          ]}
+          content={
+            paginatedvalidators.length > 0
+              ? [
+                  ...paginatedvalidators.map((validator, index) =>
+                    GenerateValidatorTableRow(validator, index, () =>
+                      handleClick(validator)
+                    )
+                  ),
+                  <div key="Pagination" className={styles.paginationContainer}>
+                    <div className={styles.paginationButton1}>
+                      <Button
+                        onClick={handlePrevious}
+                        disabled={currentPage == 1}
+                        width={100}
+                      >
+                        Previous
+                      </Button>
+                    </div>
+                    <div className={styles.paginationButton2}>
+                      <Button
+                        onClick={handleNext}
+                        disabled={currentPage == totalPages}
+                        width={100}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>,
+                ]
+              : [<div key="noData">NO VALIDATORS FOUND</div>]
+          }
         />
 
-        <div className={styles.paginationContainer}>
+        {/* <div className={styles.paginationContainer}>
           <div className={styles.paginationButton1}>
             <Button
               onClick={handlePrevious}
@@ -755,7 +753,7 @@ export default function StakingPage() {
               Next
             </Button>
           </div>
-        </div>
+        </div> */}
         <Spacer height="80px" />
       </Container>
       {/* <Container>

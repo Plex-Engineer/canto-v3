@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./ProposalTable.module.scss";
 import { Proposal } from "@/hooks/gov/interfaces/proposal";
 import {
@@ -202,63 +202,102 @@ const ProposalTable = ({ proposals }: TableProps) => {
                   ]
                 : []
             }
-            content={paginatedProposals.map((proposal, index) => {
-              return [
-                <Container
-                  key={`name_${index}`}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleRowClick(proposal.proposal_id)}
-                >
-                  <Text font="rm_mono" className={styles.tableData}>
-                    {proposal.proposal_id}
-                  </Text>
-                </Container>,
-                <Container
-                  key={`tokens_${index}`}
-                  style={{ cursor: "pointer" }}
-                  direction="row"
-                  onClick={() => handleRowClick(proposal.proposal_id)}
-                  className={styles.tableTitleColumn}
-                  center={{ horizontal: true, vertical: true }}
-                  gap="auto"
-                >
-                  <Text font="rm_mono" size="sm" className={styles.rowTitle}>
-                    {proposal.title}
-                  </Text>
-                </Container>,
-                <Container
-                  key={`commission_${index}`}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleRowClick(proposal.proposal_id)}
-                >
-                  <Text font="rm_mono" className={styles.tableData}>
-                    {formatProposalStatus(proposal.status)}
-                  </Text>
-                </Container>,
-                <Container
-                  key={`participation_${index}`}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleRowClick(proposal.proposal_id)}
-                >
-                  <Text font="rm_mono" className={styles.tableData}>
-                    {formatProposalType(proposal.type_url)}
-                  </Text>
-                </Container>,
-                <Container
-                  key={`delegators_${index}`}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleRowClick(proposal.proposal_id)}
-                >
-                  <Text font="rm_mono" className={styles.tableData}>
-                    {new Date(proposal.voting_end_time).toDateString()}
-                  </Text>
-                </Container>,
-              ];
-            })}
+            content={
+              paginatedProposals.length > 0
+                ? [
+                    ...paginatedProposals.map((proposal, index) => {
+                      return [
+                        <Container
+                          key={`name_${index}`}
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleRowClick(proposal.proposal_id)}
+                        >
+                          <Text font="rm_mono" className={styles.tableData}>
+                            {proposal.proposal_id}
+                          </Text>
+                        </Container>,
+                        <Container
+                          key={`tokens_${index}`}
+                          style={{ cursor: "pointer" }}
+                          direction="row"
+                          onClick={() => handleRowClick(proposal.proposal_id)}
+                          className={styles.tableTitleColumn}
+                          center={{ horizontal: true, vertical: true }}
+                          gap="auto"
+                        >
+                          <Text
+                            font="rm_mono"
+                            size="sm"
+                            className={styles.rowTitle}
+                          >
+                            {proposal.title}
+                          </Text>
+                        </Container>,
+                        <Container
+                          key={`commission_${index}`}
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleRowClick(proposal.proposal_id)}
+                        >
+                          <Text font="rm_mono" className={styles.tableData}>
+                            {formatProposalStatus(proposal.status)}
+                          </Text>
+                        </Container>,
+                        <Container
+                          key={`participation_${index}`}
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleRowClick(proposal.proposal_id)}
+                        >
+                          <Text font="rm_mono" className={styles.tableData}>
+                            {formatProposalType(proposal.type_url)}
+                          </Text>
+                        </Container>,
+                        <Container
+                          key={`delegators_${index}`}
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleRowClick(proposal.proposal_id)}
+                        >
+                          <Text font="rm_mono" className={styles.tableData}>
+                            {new Date(proposal.voting_end_time).toDateString()}
+                          </Text>
+                        </Container>,
+                      ];
+                    }),
+                    <div
+                      key="pagination"
+                      className={styles.paginationContainer}
+                    >
+                      <div className={styles.paginationButton1}>
+                        <Button
+                          onClick={handlePrevious}
+                          disabled={currentPage == 1}
+                          width={100}
+                        >
+                          Previous
+                        </Button>
+                      </div>
+                      <div className={styles.paginationButton2}>
+                        <Button
+                          onClick={handleNext}
+                          disabled={currentPage == totalPages}
+                          width={100}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>,
+                  ]
+                : [
+                    <div key="noData" className={styles.noProposalContainer}>
+                      <Text font="proto_mono" size="lg">
+                        NO {currentFilter} PROPOSALS FOUND
+                      </Text>
+                    </div>,
+                  ]
+            }
           />
         }
       </div>
-      <div className={styles.paginationContainer}>
+      {/* <div className={styles.paginationContainer}>
         <div className={styles.paginationButton1}>
           <Button
             onClick={handlePrevious}
@@ -277,7 +316,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
             Next
           </Button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
