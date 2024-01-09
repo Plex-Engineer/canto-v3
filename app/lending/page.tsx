@@ -75,145 +75,6 @@ export default function LendingPage() {
           />
         )}
       </Modal>
-
-      <Container className={styles.grid} direction="row">
-        <Container gap={54}>
-          <div className={styles.highlightCard}>
-            {isLoading ? (
-              <Container
-                width="1000px"
-                height="300px"
-                center={{
-                  horizontal: true,
-                  vertical: true,
-                }}
-              >
-                <LoadingIcon />
-              </Container>
-            ) : cNote ? (
-              <HighlightCard
-                cToken={cNote}
-                precisionInValues={2}
-                onSupply={() => {
-                  setSelectedCToken(cNote.address);
-                  setCurrentModal(CLMModalTypes.SUPPLY);
-                }}
-                onBorrow={() => {
-                  setSelectedCToken(cNote.address);
-                  setCurrentModal(CLMModalTypes.BORROW);
-                }}
-              />
-            ) : (
-              <Text>No Supply Tokens Found</Text>
-            )}
-          </div>
-
-          <CTokenTable
-            isLoading={isLoading}
-            stableTokens={stableCoins.sort((a, b) =>
-              a.underlying.symbol.localeCompare(b.underlying.symbol)
-            )}
-            rwas={rwas.sort((a, b) =>
-              a.underlying.symbol.localeCompare(b.underlying.symbol)
-            )}
-            onSupply={(address) => {
-              setSelectedCToken(address);
-              setCurrentModal(CLMModalTypes.SUPPLY);
-            }}
-            onBorrow={(address) => {
-              setSelectedCToken(address);
-              setCurrentModal(CLMModalTypes.BORROW);
-            }}
-          />
-          <Spacer height="20px" />
-        </Container>
-
-        <Container gap={20}>
-          <div className={styles.widget1}>
-            <OutlineCard>
-              <Item
-                name="Total Note"
-                value={displayAmount(
-                  addTokenBalances(
-                    lendingStats.circulatingNote,
-                    lendingStats.circulatingCNote
-                  ),
-                  18
-                )}
-                postChild={<NoteIcon />}
-              />
-              <Item
-                name="Percent Note Deposited"
-                value={formatPercent(
-                  divideBalances(
-                    lendingStats.circulatingCNote,
-                    addTokenBalances(
-                      lendingStats.circulatingNote,
-                      lendingStats.circulatingCNote
-                    )
-                  )
-                )}
-              />
-              <Item
-                name="Price of cNote"
-                value={displayAmount(lendingStats.cNotePrice, 18, {
-                  precision: 4,
-                })}
-                postChild={<NoteIcon />}
-              />
-              <Item
-                name="Value of rwas on canto"
-                value={displayAmount(lendingStats.valueOfAllRWA, 18)}
-                postChild={<NoteIcon />}
-              />
-            </OutlineCard>
-          </div>
-
-          <div className={styles.widget2}>
-            <OutlineCard>
-              {/* <Item
-                name="Outstanding Debt"
-                value={displayAmount(clmPosition.general.outstandingDebt, 18, {
-                  precision: 2,
-                })}
-                postChild={<NoteIcon />}
-              /> */}
-              <Item name="Net APY" value={clmPosition.general.netApr + "%"} />
-              <Item
-                name="Percent Limit Used"
-                value={clmPosition.general.percentLimitUsed + "%"}
-              />
-              <Item
-                name="Borrow Limit"
-                value={displayAmount(
-                  clmPosition.general.maxAccountLiquidity,
-                  18,
-                  {
-                    precision: 2,
-                  }
-                )}
-                postChild={<NoteIcon />}
-              />
-              {/* Item for Total Borrowed */}
-              <Item
-                name="Total Borrowed"
-                value={displayAmount(clmPosition.position.totalBorrow, 18, {
-                  precision: 2,
-                })}
-                postChild={<NoteIcon />}
-              />
-              {/* Item for Total Supplied */}
-              <Item
-                name="Total Supplied"
-                value={displayAmount(clmPosition.position.totalSupply, 18, {
-                  precision: 2,
-                })}
-                postChild={<NoteIcon />}
-              />
-            </OutlineCard>
-          </div>
-        </Container>
-      </Container>
     </div>
   );
 }
@@ -314,14 +175,14 @@ const CTokenTable = ({
                   })
                 )
               : filteredPairs == "Stablecoins"
-                ? stableTokens.map((cStableCoin) =>
-                    StableCoinRow({
-                      cStableCoin,
-                      onSupply: () => onSupply(cStableCoin.address),
-                      onBorrow: () => onBorrow(cStableCoin.address),
-                    })
-                  )
-                : []
+              ? stableTokens.map((cStableCoin) =>
+                  StableCoinRow({
+                    cStableCoin,
+                    onSupply: () => onSupply(cStableCoin.address),
+                    onBorrow: () => onBorrow(cStableCoin.address),
+                  })
+                )
+              : []
           }
         />
       ) : (
