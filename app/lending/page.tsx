@@ -75,6 +75,10 @@ export default function LendingPage() {
           />
         )}
       </Modal>
+
+      <div className={styles.accountHealth} />
+      <div className={styles.highlightCard} />
+      <div className={styles.mainTable}></div>
     </div>
   );
 }

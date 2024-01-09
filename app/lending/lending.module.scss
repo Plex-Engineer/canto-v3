@@ -1,13 +1,20 @@
 .container {
   display: grid;
   flex-direction: column;
-  align-items: center;
+  justify-self: center;
   max-width: 1400px;
-  width: 100%;
-  margin: 10px auto;
+    width: 100%;
+  margin: 10px 0;
+  padding: 0 clamp(1rem, 5vw, 5rem);
   border-top: 1px solid var(--primary-90-color);
   position: relative;
   padding-top: 2rem;
+    grid-template-columns: 1fr .7fr;
+    gap: 2rem;
+  grid-template-areas: 
+  "title title"
+  "accountHealth highlightCard"
+  "mainContent mainContent";
 
   &::before {
     content: "";
@@ -26,6 +33,7 @@
   text-align: left;
   width: 100%;
   max-width: 1500px;
+  grid-area: title;
 }
 
 .grid {
@@ -36,23 +44,50 @@
   width: 100%;
 }
 
-.highlightCard {
-  max-width: 1000px;
-  width: 100%;
-  display: flex;
-  justify-content: stretch;
-}
+
 
 .mainTable {
-  max-width: 1000px;
-  width: 100vw;
-  display: flex;
-  justify-content: stretch;
+  grid-area: mainContent;
+  background-color: yellow;
+  height: 1000px;
 }
 
-.widget1 {
+.accountHealth{
+    background-color: red;
+    width: 100%;
+    height: 20rem;
+    grid-area: accountHealth;
 }
 
-.widget2 {
-  margin-bottom: 4rem;
+.highlightCard{
+    background-color: blue;
+    width: 100%;
+    height: 20rem;
+    grid-area: highlightCard;
 }
+
+
+@media screen and (max-width: 768px) {
+  .container {
+    grid-template-areas: 
+    "title"
+    "accountHealth"
+    "highlightCard"
+    "mainContent";
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .grid {
+    flex-direction: column;
+    gap: 0;
+  }
+  .title {
+    text-align: center;
+  }
+  .mainTable {
+    padding-top: 2rem;
+  }
+    
+}
+
+
