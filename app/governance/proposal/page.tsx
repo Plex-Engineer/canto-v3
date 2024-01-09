@@ -30,6 +30,7 @@ import { TransactionFlowType } from "@/transactions/flows/flowMap";
 import { NewTransactionFlow } from "@/transactions/flows/types";
 import { Height } from "@buf/cosmos_ibc.bufbuild_es/ibc/core/client/v1/client_pb";
 import Spacer from "@/components/layout/spacer";
+import useStaking from "@/hooks/staking/useStaking";
 
 export default function Page() {
   function castVote(proposalId: number, voteOption: VoteOption | null) {
@@ -62,7 +63,7 @@ export default function Page() {
   const router = useRouter();
 
   const { txStore, signer, chainId } = useCantoSigner();
-  const { proposals, isLoading } = useProposals({ chainId: chainId });
+  const { proposals, isProposalsLoading } = useProposals({ chainId: chainId });
   const [selectedVote, setSelectedVote] = useState<VoteOption | null>(null);
 
   const [isChecked, setChecked] = useState(false);
@@ -73,7 +74,7 @@ export default function Page() {
   };
 
   //console.log(selectedVote);
-  if (isLoading) {
+  if (isProposalsLoading) {
     return <Splash />;
   }
 
@@ -130,7 +131,7 @@ export default function Page() {
 
   const maxAmountIndex = amounts.indexOf(Math.max(...amounts));
 
-  return isLoading ? (
+  return isProposalsLoading ? (
     <Splash />
   ) : (
     <div className={styles.proposalContainer}>

@@ -5,7 +5,7 @@ export interface ProposalHookParams {
 }
 export interface ProposalHookReturn {
   proposals: Proposal[],
-  isLoading: boolean
+  isProposalsLoading: boolean
 }
 
 export interface ProposalHookReturnSingle{

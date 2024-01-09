@@ -41,12 +41,12 @@ export default function useProposals(
     //console.log(JSON.parse(proposals));
     return {
       proposals: proposals,
-      isLoading
+      isProposalsLoading: isLoading
     };
   }
   return {
     proposals :[],
-    isLoading
+    isProposalsLoading: isLoading
   }
 
   

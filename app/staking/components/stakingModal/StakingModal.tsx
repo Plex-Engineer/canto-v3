@@ -294,7 +294,7 @@ export const StakingModal = (props: StakingModalParams) => {
               )
           }
         >
-          Delegate
+          {selectedTx}
         </Button>
       </div>
     </Container>

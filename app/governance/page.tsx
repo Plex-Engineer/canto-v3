@@ -22,7 +22,7 @@ export default function GovernancePage() {
   const router = useRouter();
 
   const { txStore, signer, chainId } = useCantoSigner();
-  const { proposals, isLoading } = useProposals({ chainId: chainId });
+  const { proposals, isProposalsLoading } = useProposals({ chainId: chainId });
 
   const sorted_proposals = useMemo(
     () =>
@@ -35,7 +35,7 @@ export default function GovernancePage() {
   //const proposalsPerPage = 10; // Number of proposals per page
   //const totalPages = Math.ceil(proposals?.length / proposalsPerPage);
 
-  return isLoading ? (
+  return isProposalsLoading ? (
     <Splash />
   ) : (
     <div>

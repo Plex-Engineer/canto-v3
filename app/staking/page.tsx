@@ -401,7 +401,9 @@ export default function StakingPage() {
           <Container direction="row" center={{ vertical: true }}>
             <div style={{ marginRight: "5px" }}>
               <Text font="proto_mono" size="title">
-                {totalStaked?.toFixed(2)}{" "}
+                {displayAmount(totalStaked ? totalStaked.toFixed(2) : "0", 0, {
+                  commify: true,
+                })}{" "}
               </Text>
             </div>
             <p>{space}</p>
@@ -517,7 +519,7 @@ export default function StakingPage() {
       )}
       <Spacer height="40px" />
 
-      {userStaking && (
+      {userStaking && userStaking.unbonding.length > 0 && (
         <div className={styles.tableContainer2}>
           <Table
             title="Unbonding Delegations"
