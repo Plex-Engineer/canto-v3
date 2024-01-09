@@ -11,7 +11,6 @@ import {
   convertToBigNumber,
   displayAmount,
   formatBalance,
-  formatBigBalance,
 } from "@/utils/formatting/balances.utils";
 import BigNumber from "bignumber.js";
 import { formatPercent } from "@/utils/formatting";

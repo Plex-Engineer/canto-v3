@@ -11,9 +11,6 @@ import { useQuery } from "react-query";
 import { getCosmosEIPChainObject } from "@/utils/networks";
 import { ethToCantoAddress } from "@/utils/address";
 import { addTokenBalances } from "@/utils/math";
-import { ethToGravity } from "@gravity-bridge/address-converter";
-import { getCosmosTokenBalance } from "@/utils/cosmos";
-import { GRAVITY_BRIDGE } from "@/config/networks";
 
 /**
  * @notice hook to get an object of token balances for a given address and available tokens
@@ -74,7 +71,7 @@ export default function useTokenBalances(
             if (nativeError) throw nativeError;
 
             // go through token list to see if any are native compatible, (has ibcDenom)
-            for (let token of tokens) {
+            for (const token of tokens) {
               const ibcToken = token as IBCToken;
               if (ibcToken.ibcDenom && nativeBalances[ibcToken.ibcDenom]) {
                 balances[token.id] = addTokenBalances(
@@ -89,13 +86,13 @@ export default function useTokenBalances(
         }
         return balances;
       } catch (err) {
-        console.error(err);
+        // console.error(err);
         return {};
       }
     },
     {
       onError(error) {
-        console.log(error);
+        console.error(error);
       },
       placeholderData: {},
     }

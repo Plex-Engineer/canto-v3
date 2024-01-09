@@ -18,7 +18,7 @@ import {
   generateMessageWithMultipleTransactions,
   createEIP712,
 } from "@evmos/eip712";
-import { tryFetch, tryFetchWithRetry } from "@/utils/async";
+import { sleep, tryFetch, tryFetchWithRetry } from "@/utils/async";
 import { generateCosmosEIP712TxContext } from "./txContext";
 import { TX_SIGN_ERRORS } from "@/config/consts/errors";
 
@@ -121,6 +121,8 @@ async function signAndBroadcastCosmosTransaction(
             94, 178,
           ])
         );
+        // sleep for 2 seconds to allow for the wallet to refresh
+        await sleep(2000);
       } catch (err) {
         return NEW_ERROR("signAndBroadcastCosmosTransaction", err);
       }

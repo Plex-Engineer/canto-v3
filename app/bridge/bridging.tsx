@@ -35,6 +35,10 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const { fromNetwork, toNetwork, token, method } = bridge.selections;
   const { selectedGBridgeFee, setSelectedGBridgeFee, totalChainFee } =
     feesSelection.gravityBridge;
+  const feeObject = formattedFeesForConfirmation(fees, token, {
+    totalChainFee,
+    selected: selectedGBridgeFee,
+  });
 
   // special modal for gravity bridge out (check for wallet provider custom chains)
   const [gravityModalOpen, setGravityModalOpen] = useState(false);
@@ -84,16 +88,14 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
             precision: token?.decimals,
           }
         )}
-        extraValues={formattedFeesForConfirmation(fees, token, {
-          totalChainFee,
-          selected: selectedGBridgeFee,
-        })}
+        fees={feeObject}
         confirmation={{
           onConfirm: () => {
             Transaction.bridgeTx();
           },
           canConfirm: !Transaction.canBridge.error,
         }}
+        showGravityPortalMsg={toNetwork?.id === GRAVITY_BRIDGE.id}
       />
 
       <section className={styles.container}>
@@ -329,7 +331,11 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
               Confirmation.setIsModalOpen(true);
             }
           }}
-          disabled={Confirmation.preConfirmCheck.error}
+          disabled={
+            Confirmation.preConfirmCheck.error ||
+            fees.isLoading ||
+            fees.error !== null
+          }
         >
           {bridge.direction === "in" ? "BRIDGE IN" : "BRIDGE OUT"}
         </Button>
@@ -347,47 +353,86 @@ const formattedFeesForConfirmation = (
     selected: string;
     totalChainFee: string;
   }
-) => {
+):
+  | { tokenFees: { key: string; value: string }[]; totalFees?: string }
+  | undefined => {
   return props.isLoading
-    ? []
+    ? undefined
     : props.error !== null
-      ? []
+      ? undefined
       : props.method === BridgingMethod.LAYER_ZERO
-        ? [{ key: "gas fee", value: props.lzFee.formattedAmount }]
+        ? {
+            tokenFees: [{ key: "gas fee", value: props.lzFee.formattedAmount }],
+          }
         : props.method === BridgingMethod.GRAVITY_BRIDGE &&
             props.direction === "out"
-          ? [
-              {
-                key: "bridge fee (paid to validators)",
-                value: displayAmount(
-                  gravityFees.selected,
+          ? {
+              tokenFees: [
+                {
+                  key: "bridge fee (paid to validators)",
+                  value: displayAmount(
+                    gravityFees.selected,
+                    token?.decimals ?? 0,
+                    {
+                      symbol: token?.symbol,
+                      maxSmallBalance: undefined,
+                    }
+                  ),
+                },
+                {
+                  key: "chain fee (paid to relayers)",
+                  value: displayAmount(
+                    gravityFees.totalChainFee,
+                    token?.decimals ?? 0,
+                    {
+                      symbol: token?.symbol,
+                      maxSmallBalance: undefined,
+                    }
+                  ),
+                },
+                ...Object.values(props.gasFees).map((fee) => ({
+                  key: fee.name,
+                  value: displayAmount(fee.amount, 18, { symbol: "CANTO" }),
+                })),
+              ],
+              totalFees:
+                displayAmount(
+                  addTokenBalances(
+                    gravityFees.selected,
+                    gravityFees.totalChainFee
+                  ),
                   token?.decimals ?? 0,
                   {
                     symbol: token?.symbol,
+                    maxSmallBalance: undefined,
                   }
+                ) +
+                " & " +
+                displayAmount(
+                  Object.values(props.gasFees).reduce(
+                    (acc, fee) => addTokenBalances(acc, fee.amount),
+                    "0"
+                  ),
+                  18,
+                  { symbol: "CANTO" }
                 ),
-              },
-              {
-                key: "chain fee (paid to relayers)",
-                value: displayAmount(
-                  gravityFees.totalChainFee,
-                  token?.decimals ?? 0,
-                  {
-                    symbol: token?.symbol,
-                  }
-                ),
-              },
-              ...Object.values(props.gasFees).map((fee) => ({
-                key: fee.name,
-                value: displayAmount(fee.amount, 18, { symbol: "CANTO" }),
-              })),
-            ]
+            }
           : props.method === BridgingMethod.IBC && props.direction === "out"
-            ? Object.values(props.gasFees).map((fee) => ({
-                key: fee.name,
-                value: displayAmount(fee.amount, 18, { symbol: "CANTO" }),
-              }))
-            : [];
+            ? {
+                tokenFees: Object.values(props.gasFees).map((fee) => ({
+                  key: fee.name,
+                  value: displayAmount(fee.amount, 18, { symbol: "CANTO" }),
+                })),
+                totalFees: displayAmount(
+                  Object.values(props.gasFees).reduce(
+                    (acc, fee) => addTokenBalances(acc, fee.amount),
+                    "0"
+                  ),
+                  18,
+                  { symbol: "CANTO" }
+                ),
+              }
+            : undefined;
 };
 
 // props are return type of useBridgingFees
@@ -414,11 +459,12 @@ const FeesSection = ({
     </Text>
   ) : (
     <>
-      {props.method === BridgingMethod.LAYER_ZERO && (
-        <Text font="proto_mono" size="x-sm">
-          Gas Fee: {props.lzFee.formattedAmount}
-        </Text>
-      )}
+      {props.method === BridgingMethod.LAYER_ZERO &&
+        props.direction === "out" && (
+          <Text font="proto_mono" size="x-sm">
+            Gas Fee: {props.lzFee.formattedAmount}
+          </Text>
+        )}
       {props.method === BridgingMethod.GRAVITY_BRIDGE &&
         props.direction === "out" && (
           <>
@@ -435,7 +481,8 @@ const FeesSection = ({
                     props.bridgeFeeOptions.slow,
                     fees.totalChainFee
                   ),
-                  token?.decimals ?? 0
+                  token?.decimals ?? 0,
+                  { maxSmallBalance: undefined }
                 )}
                 tokenPrice={props.feeTokenPriceFormatted}
                 active={fees.selected === props.bridgeFeeOptions.slow}
@@ -452,7 +499,8 @@ const FeesSection = ({
                     props.bridgeFeeOptions.medium,
                     fees.totalChainFee
                   ),
-                  token?.decimals ?? 0
+                  token?.decimals ?? 0,
+                  { maxSmallBalance: undefined }
                 )}
                 tokenPrice={props.feeTokenPriceFormatted}
                 active={fees.selected === props.bridgeFeeOptions.medium}
@@ -469,7 +517,8 @@ const FeesSection = ({
                     props.bridgeFeeOptions.fast,
                     fees.totalChainFee
                   ),
-                  token?.decimals ?? 0
+                  token?.decimals ?? 0,
+                  { maxSmallBalance: undefined }
                 )}
                 tokenPrice={props.feeTokenPriceFormatted}
                 active={fees.selected === props.bridgeFeeOptions.fast}

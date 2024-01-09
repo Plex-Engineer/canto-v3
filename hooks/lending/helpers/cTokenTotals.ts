@@ -82,10 +82,8 @@ export function getLMTotalsFromCTokens(
   // cummulative apr = supplyApr * supply - borrowApr * borrow (All in $NOTE)
   let avgApr = new BigNumber(0);
   // check if division by zero will happen
-  if (totals.totalSupply.plus(totals.totalBorrow).isGreaterThan(0)) {
-    avgApr = totals.cummulativeApr.div(
-      totals.totalSupply.plus(totals.totalBorrow)
-    );
+  if (totals.totalSupply.isGreaterThan(0)) {
+    avgApr = totals.cummulativeApr.div(totals.totalSupply);
   }
   return errorInLoop
     ? NEW_ERROR("getLMTotalsFromCTokens: " + errorReaons.join(", "))

@@ -205,7 +205,10 @@ const TransactionModal = () => {
                       signer?.account.address ?? "",
                       currentFlowId,
                       txIndex,
-                      status
+                      {
+                        lastStatus: status.status,
+                        timeLeft: status.completedIn,
+                      }
                     )
                   }
                   closeModal={() => setIsOpen(false)}

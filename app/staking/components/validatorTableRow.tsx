@@ -9,7 +9,7 @@ import {
 } from "@/hooks/staking/interfaces/validators";
 import BigNumber from "bignumber.js";
 import Text from "@/components/text";
-import { formatBalance, formatBigBalance } from "@/utils/formatting";
+import { formatBalance } from "@/utils/formatting";
 import { formatTime } from "@/utils/gov/formatData";
 
 export const GenerateValidatorTableRow = (
@@ -30,8 +30,7 @@ export const GenerateValidatorTableRow = (
     gap="auto"
   >
     <Text font="rm_mono">
-      {formatBigBalance(formatBalance(validator.tokens, 18)).shortAmount +
-        formatBigBalance(formatBalance(validator.tokens, 18)).suffix}{" "}
+      {formatBalance(validator.tokens, 18, { commify: true, short: true })}{" "}
     </Text>
     <div> </div>
     <Icon
@@ -71,12 +70,9 @@ export const GenerateMyStakingTableRow = (
     gap="auto"
   >
     <Text font="rm_mono">
-      {formatBigBalance(
-        formatBalance(userStakedValidator.userDelegation.balance, 18)
-      ).shortAmount +
-        formatBigBalance(
-          formatBalance(userStakedValidator.userDelegation.balance, 18)
-        ).suffix}{" "}
+      {formatBalance(userStakedValidator.userDelegation.balance, 18, {
+        commify: true,
+      })}{" "}
     </Text>
     <div> </div>
     <Icon
@@ -95,10 +91,10 @@ export const GenerateMyStakingTableRow = (
     gap="auto"
   >
     <Text font="rm_mono">
-      {formatBigBalance(formatBalance(userStakedValidator?.tokens, 18))
-        .shortAmount +
-        formatBigBalance(formatBalance(userStakedValidator?.tokens, 18))
-          .suffix}{" "}
+      {formatBalance(userStakedValidator?.tokens, 18, {
+        commify: true,
+        short: true,
+      })}{" "}
     </Text>
     <div> </div>
     <Icon
@@ -138,10 +134,7 @@ export const GenerateUnbondingDelegationsTableRow = (
     gap="auto"
   >
     <Text font="rm_mono">
-      {formatBigBalance(formatBalance(userStakedValidator.undelegation, 18))
-        .shortAmount +
-        formatBigBalance(formatBalance(userStakedValidator.undelegation, 18))
-          .suffix}{" "}
+      {formatBalance(userStakedValidator.undelegation, 18, { commify: true })}{" "}
     </Text>
     <div> </div>
     <Icon

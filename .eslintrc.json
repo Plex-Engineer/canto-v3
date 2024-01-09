@@ -24,6 +24,7 @@
   "globals": {
     "NodeJS": true,
     "React": true,
-    "BigInt": true
+    "BigInt": true,
+    "RequestInit": true
   }
 }

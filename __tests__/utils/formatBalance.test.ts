@@ -209,6 +209,7 @@ describe("formatBalance tests", () => {
           commify: true,
           precision: 2,
           short: true,
+          maxSmallBalance: 0.001,
         },
         expected: "<0.001 TOKEN",
       },

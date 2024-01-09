@@ -81,7 +81,7 @@ export async function tryFetchWithRetry<T>(
  * @param {number} ms milliseconds to sleep for
  * @returns {Promise<void>} void
  */
-async function sleep(ms: number): Promise<void> {
+export async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -114,4 +114,33 @@ export async function asyncCallWithTimeout<T>(
       error: err as Error,
     };
   }
+}
+
+/**
+ * @notice will call async function, but retry if fails
+ * @param {() => Promise<T>} asyncPromise async function to call
+ * @param {object} options retry options
+ * @returns {PromiseWithError<T>} object of return type T or error
+ */
+export async function asyncCallWithRetry<T>(
+  asyncPromise: () => PromiseWithError<T>,
+  options?: {
+    numTries?: number;
+    sleepTime?: number;
+  }
+): PromiseWithError<T> {
+  let numberOfTries = 0;
+  while (numberOfTries < (options?.numTries ?? MAX_TRIES)) {
+    const result = await asyncPromise();
+    if (result.error) {
+      numberOfTries++;
+      await sleep(options?.sleepTime ?? 4000);
+    } else {
+      return NO_ERROR<T>(result as T);
+    }
+  }
+  return NEW_ERROR(
+    "asyncCallWithRetry",
+    "no response after " + numberOfTries + " tries"
+  );
 }

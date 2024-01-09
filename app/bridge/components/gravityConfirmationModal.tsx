@@ -1,4 +1,6 @@
 import Button from "@/components/button/button";
+import Container from "@/components/container/container";
+import Icon from "@/components/icon/icon";
 import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
 import Text from "@/components/text";
@@ -16,19 +18,35 @@ const GravityConfirmationModal = ({
   onReselectMethod,
 }: Props) => {
   return (
-    <Modal open={open} onClose={onClose} title="WARNING">
-      <Spacer height="30px" />
-      <Text>
-        Please be aware that using a wallet that does not support custom chains
-        while bridging out, such as Rabby, may result in inaccessible funds. We
-        recommend Metamask for bridging out to Ethereum. Alternatively, transfer
-        funds to Gravity Bridge and use the Gravity Bridge Portal to transfer
-        funds from Gravity to Ethereum.
+    <Modal open={open} onClose={onClose}>
+      <Container
+        width="100%"
+        center={{ horizontal: true }}
+        style={{ margin: "20px 0", alignItems: "center" }}
+      >
+        <Icon
+          icon={{
+            url: "/warning.svg",
+            size: 44,
+          }}
+          themed
+        />
+      </Container>
+      <Text size="sm">
+        Direct bridging to Ethereum only works for wallets that support custom
+        chains such as Metamask & Frame.
+        <Spacer height="10px" />
+        Rabby, Rainbow, and Coinbase wallet are not supported yet.
+        <Spacer height="10px" />
+        If you are not using a supported wallet, use the Gravity Bridge portal.
       </Text>
-      <Spacer height="10px" />
-      <Button onClick={onConfirm}>CONTINUE</Button>
-      <Spacer height="10px" />
-      <Button onClick={onReselectMethod}>USE GRAVITY BRIDGE PORTAL</Button>
+      <Spacer height="30px" />
+      <Container gap={20} direction="row" center={{ horizontal: true }}>
+        <Button onClick={onConfirm}>{"I'm using a supported wallet"}</Button>{" "}
+        <Button onClick={onReselectMethod}>
+          {"Use Gravity Bridge Portal"}
+        </Button>
+      </Container>
     </Modal>
   );
 };

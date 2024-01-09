@@ -7,6 +7,7 @@ export type BridgeFeesByMethod =
   | { method: null };
 
 type LayerZeroFees = {
+  direction: "in" | "out";
   method: BridgingMethod.LAYER_ZERO;
   lzFee: {
     description: string;

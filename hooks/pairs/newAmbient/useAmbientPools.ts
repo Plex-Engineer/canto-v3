@@ -39,8 +39,7 @@ export default function useAmbientPools(
           params.chainId,
           params.userEthAddress
         );
-        if (rewardsQuery.error) throw rewardsQuery.error;
-        rewards = rewardsQuery.data;
+        rewards = rewardsQuery.data ?? "0";
       }
       return {
         pools: pools.data,

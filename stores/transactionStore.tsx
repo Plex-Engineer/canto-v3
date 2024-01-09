@@ -22,6 +22,7 @@ import {
   TransactionStatus,
   TransactionWithStatus,
   CantoFETxType,
+  BridgeProgress,
 } from "@/transactions/interfaces";
 import { signTransaction, waitForTransaction } from "@/transactions/signTx";
 import Analytics from "@/provider/analytics";
@@ -73,7 +74,7 @@ export interface TransactionStore {
     ethAccount: string,
     flowId: string,
     txIndex: number,
-    status: BridgeStatus
+    status: Partial<BridgeProgress>
   ) => void;
 }
 
@@ -233,7 +234,9 @@ const useTransactionStore = create<TransactionStore>()(
                 i,
                 updatedTransactionList[i]
               );
-              const network = getNetworkInfoFromChainId(updatedTransactionList[i].tx.chainId).data
+              const network = getNetworkInfoFromChainId(
+                updatedTransactionList[i].tx.chainId
+              ).data;
               // check if error (set states before throwing error)
               if (txError || !txResult) {
                 // perform tx will set the state of the tx and flow to error on it's own
@@ -242,7 +245,9 @@ const useTransactionStore = create<TransactionStore>()(
                   Analytics.actions.events.transactionFlows.transaction({
                     ...flowToPerform.analyticsTransactionFlowInfo,
                     txType: updatedTransactionList[i].tx.feTxType,
-                    txNetwork: network.isTestChain ? network.name : network.name + "Mainnet",
+                    txNetwork: network.isTestChain
+                      ? network.name
+                      : network.name + "Mainnet",
                     txSuccess: false,
                     txError: txError?.message.split(":").pop() ?? "",
                   });
@@ -254,7 +259,9 @@ const useTransactionStore = create<TransactionStore>()(
                 Analytics.actions.events.transactionFlows.transaction({
                   ...flowToPerform.analyticsTransactionFlowInfo,
                   txType: updatedTransactionList[i].tx.feTxType,
-                  txNetwork: network.isTestChain ? network.name : network.name + "Mainnet",
+                  txNetwork: network.isTestChain
+                    ? network.name
+                    : network.name + "Mainnet",
                   txSuccess: true,
                 });
               }
@@ -481,8 +488,7 @@ const useTransactionStore = create<TransactionStore>()(
               ...txToUpdate.tx,
               bridge: {
                 ...txToUpdate.tx.bridge,
-                lastStatus: status.status,
-                timeLeft: status.completedIn,
+                ...status,
               },
             },
           };

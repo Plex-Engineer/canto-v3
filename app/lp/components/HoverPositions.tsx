@@ -12,14 +12,16 @@ type TokenPosition = {
   decimals: number;
   icon: string;
 };
-// Listing Positions
-interface Props {
+type HoverPositionProps = {
+  dexType: "ambient" | "cantodex";
   positions: {
     token1: TokenPosition;
     token2: TokenPosition;
   }[];
-}
-export const HoverPositions = ({ positions }: Props) => (
+};
+
+// Listing Positions
+export const HoverPositions = ({ dexType, positions }: HoverPositionProps) => (
   <>
     <div
       className={styles["scroll-view"]}
@@ -39,38 +41,33 @@ export const HoverPositions = ({ positions }: Props) => (
             }}
             className={styles["non-item"]}
           >
-            <Container
-              direction="column"
-              gap={10}
-              width="100%"
-              style={{
-                alignItems: "flex-start",
-              }}
-            >
-              <Text
-                size="x-sm"
-                font="proto_mono"
+            {dexType === "ambient" && (
+              <Container
+                direction="column"
+                gap={10}
+                width="100%"
                 style={{
-                  lineBreak: "anywhere",
+                  alignItems: "flex-start",
                 }}
               >
-                Position {idx + 1}:
-              </Text>
+                <Text
+                  size="x-sm"
+                  font="proto_mono"
+                  style={{
+                    lineBreak: "anywhere",
+                  }}
+                >
+                  Position {idx + 1}:
+                </Text>
+              </Container>
+            )}
 
-              <Text size="x-sm" font="proto_mono">
-                {displayAmount(
-                  addTokenBalances(item.token1.value, item.token2.value),
-                  18
-                )}{" "}
-                <Icon icon={{ url: "tokens/note.svg", size: 12 }} themed />
-              </Text>
-            </Container>
             <Container
               direction="column"
               gap={10}
               width="100%"
               style={{
-                alignItems: "flex-end",
+                alignItems: dexType === "ambient" ? "flex-end" : "center",
               }}
             >
               <Text
@@ -80,11 +77,11 @@ export const HoverPositions = ({ positions }: Props) => (
                   lineBreak: "anywhere",
                 }}
               >
-                <Icon icon={{ url: item.token1.icon, size: 12 }} themed />
-                {`${item.token1.symbol}: `}
+                <Icon icon={{ url: item.token1.icon, size: 12 }} />
+                {` ${item.token1.symbol}: `}
                 {displayAmount(item.token1.amount, item.token1.decimals, {
-                  precision: 2,
-                  maxSmallBalance: 0.01,
+                  precision: 0,
+                  maxSmallBalance: 0.0,
                 })}
               </Text>
               <Text
@@ -94,11 +91,11 @@ export const HoverPositions = ({ positions }: Props) => (
                   lineBreak: "anywhere",
                 }}
               >
-                <Icon icon={{ url: item.token2.icon, size: 12 }} themed />
-                {`${item.token2.symbol}: `}
+                <Icon icon={{ url: item.token2.icon, size: 12 }} />
+                {` ${item.token2.symbol}: `}
                 {displayAmount(item.token2.amount, item.token2.decimals, {
-                  precision: 2,
-                  maxSmallBalance: 0.01,
+                  precision: 0,
+                  maxSmallBalance: 0.0,
                 })}
               </Text>
             </Container>
