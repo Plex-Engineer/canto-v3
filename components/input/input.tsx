@@ -6,6 +6,7 @@ import Button from "../button/button";
 import { displayAmount, formatBalance } from "@/utils/formatting";
 import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
 import { Validation } from "@/config/interfaces";
+import Icon from "../icon/icon";
 
 // if amount is true then add more required props
 type InputProps = {
@@ -29,6 +30,7 @@ type InputProps = {
   max?: number;
   step?: number;
   required?: boolean;
+  searchicon?: boolean;
 } & (
   | {
       type: "amount";
@@ -46,6 +48,12 @@ type InputProps = {
 );
 
 const Input = (props: InputProps) => {
+  const getSearchStyle = () => {
+    if (props.searchicon) {
+      return { borderLeft: "none" };
+    }
+    return {};
+  };
   function getHeight(height: InputProps["height"]) {
     switch (height) {
       //   in px
@@ -90,6 +98,14 @@ const Input = (props: InputProps) => {
               Balance: {displayAmount(props.balance, props.decimals)}
             </span>
           )}
+          {/* {props.icon && <Icon
+            themed
+            icon={{
+              url: props.icon,
+              size: 24,
+            }}
+          />
+          } */}
         </Text>
       </label>
       <section>
@@ -129,6 +145,9 @@ const Input = (props: InputProps) => {
               props.error || inputError.error
                 ? "1px solid var(--extra-failure-color, #ff0000)"
                 : "",
+            borderLeft: props.searchicon
+              ? ""
+              : "1px solid var(--border-stroke-color, #b3b3b3)",
             ...props.style,
             fontFamily: "var(--rm-mono)",
             fontSize: props.type === "amount" ? "1.5rem" : "1rem",

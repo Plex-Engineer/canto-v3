@@ -65,7 +65,7 @@ export function VotingInfoBox({
     if (isHovered && isActive) {
       return { backgroundColor: color2, opacity: "50%" };
     }
-    if (isHighest) {
+    if (isHighest && !isActive) {
       return { backgroundColor: color2 };
     }
     return {};
@@ -73,14 +73,7 @@ export function VotingInfoBox({
   // const getCheckedStyle = ()=>{
 
   // }
-  const handleBoxClick = () => {
-    // Check if the current box is already selected, if so, deselect it
-    if (isChecked) {
-      onClick();
-    } else {
-      onClick();
-    }
-  };
+
   return (
     <div
       className={styles.proposalInfoVoting}

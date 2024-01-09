@@ -19,11 +19,15 @@ import Table from "@/components/table/table";
 import Splash from "@/components/splash/splash";
 import {
   GenerateMyStakingTableRow,
+  GenerateUnbondingDelegationsTableRow,
   GenerateValidatorTableRow,
 } from "./components/validatorTableRow";
 import { useEffect, useMemo, useState } from "react";
 import { StakingModal } from "./components/stakingModal/StakingModal";
-import { Validator } from "@/hooks/staking/interfaces/validators";
+import {
+  UnbondingDelegation,
+  Validator,
+} from "@/hooks/staking/interfaces/validators";
 import Modal from "@/components/modal/modal";
 
 import {
@@ -223,8 +227,8 @@ export default function StakingPage() {
     currentFilter == "ACTIVE" ? activeValidators : inActiveValidators;
 
   const validatorTitleMap = new Map<string, string>();
-  validatorTitleMap.set("ACTIVE", "ACTIVE VALIDATORS");
-  validatorTitleMap.set("INACTIVE", "INACTIVE VALIDATORS");
+  validatorTitleMap.set("ACTIVE", "VALIDATORS");
+  validatorTitleMap.set("INACTIVE", "VALIDATORS");
 
   const handleSearch = () => {
     const searchQuery2 = searchQuery;
@@ -236,10 +240,9 @@ export default function StakingPage() {
     setFilteredValidatorsBySearch(filteredListSearch);
     setCurrentPage(1);
   };
-
+  const pageSize = 20;
   const currentValidators =
     searchQuery == "" ? filteredValidators : filteredValidatorsBySearch;
-  const pageSize = 10;
   useEffect(() => {
     setTotalPages(Math.ceil(currentValidators.length / pageSize));
   }, [currentValidators.length, pageSize]);
@@ -282,6 +285,7 @@ export default function StakingPage() {
   };
 
   const space = " ";
+  const str = "search...";
   //console.log(userStaking?.unbonding);
 
   // let unbondingDelegationsTable: any[] = [];
@@ -307,6 +311,47 @@ export default function StakingPage() {
   //   );
   // }
   //console.log(unbondingDelegationsTable);
+  // let unbondingDelegations:UnbondingDelegation[] = [];
+  // if(userStaking && userStaking.unbonding && userStaking.unbonding.length>0){
+  //   for(let i=0;i<userStaking.unbonding.length;i++){
+  //     const validatorAddress = userStaking.unbonding[i].validator_address;
+  //     const validatorUnbonded = validators.find(e=>e.operator_address==validatorAddress);
+  //     const validatorName = validatorUnbonded?.description.moniker;
+
+  //     for(let j=0;j<userStaking.unbonding[i].entries.length;j++){
+  //         const undelegationAmount = userStaking.unbonding[i].entries[j].balance;
+  //         const completion_time = userStaking.unbonding[i].entries[j].completion_time;
+  //         unbondingDelegations.push({
+  //           name: validatorName? validatorName : "",
+  //           completion_date:completion_time,
+  //           undelegation: undelegationAmount
+  //         })
+  //     }
+  //   }
+  // }
+
+  const unbondingDelegations: UnbondingDelegation[] =
+    userStaking?.unbonding
+      ?.map((unbondingEntry) => {
+        const validatorAddress = unbondingEntry.validator_address;
+        const validatorName = validators?.find(
+          (e) => e.operator_address === validatorAddress
+        )?.description.moniker;
+        //const validatorName = validatorUnbonded?.description.moniker;
+
+        const entries = unbondingEntry.entries.map((entry) => ({
+          name: validatorName || "",
+          completion_date: entry.completion_time,
+          undelegation: entry.balance,
+        }));
+
+        return entries;
+      })
+      .flat() || [];
+
+  // console.log(userStaking);
+  // console.log(userStaking?.unbonding);
+  // console.log(unbondingDelegations);
 
   function handleClick(validator: Validator) {
     setSelectedValidator(validator);
@@ -322,7 +367,7 @@ export default function StakingPage() {
   ) {
     if (signer) {
       const newFlow: NewTransactionFlow = {
-        icon: "",
+        icon: "/tokens/canto.svg",
         txType: TransactionFlowType.STAKE_CANTO_TX,
         title: "Stake Canto",
         params: {
@@ -341,11 +386,14 @@ export default function StakingPage() {
 
   return (
     <div className={styles.container}>
-      {/* <Text size="x-lg" font="proto_mono" className={styles.title}>
-        Staking
-      </Text>
-      <Spacer height="20px" /> */}
-      <Container direction="row" width="96%">
+      <Container direction="row" width="100%">
+        <div className={styles.infoBoxButton}>
+          <div className={styles.TitleStaking}>
+            <Text size="title" font="proto_mono">
+              STAKING
+            </Text>
+          </div>
+        </div>
         <div className={styles.infoBox}>
           <div>
             <Text font="rm_mono">Total Staked </Text>
@@ -353,7 +401,9 @@ export default function StakingPage() {
           <Container direction="row" center={{ vertical: true }}>
             <div style={{ marginRight: "5px" }}>
               <Text font="proto_mono" size="title">
-                {totalStaked?.toFixed(2)}{" "}
+                {displayAmount(totalStaked ? totalStaked.toFixed(2) : "0", 0, {
+                  commify: true,
+                })}{" "}
               </Text>
             </div>
             <p>{space}</p>
@@ -469,32 +519,46 @@ export default function StakingPage() {
       )}
       <Spacer height="40px" />
 
-      {/* {
-        userStaking && 
+      {userStaking && userStaking.unbonding.length > 0 && (
         <div className={styles.tableContainer2}>
           <Table
-                title="My Staking"
-                headers={[
-                  { value: <Text opacity={0.4} font="rm_mono">Name</Text>, ratio: 5 },
-                  { value: <Text opacity={0.4}>My Stake</Text>, ratio: 3 },
-                  { value: <Text opacity={0.4} font="rm_mono">Validator Total</Text>, ratio: 3 },
-                  { value: <Text opacity={0.4} font="rm_mono">Commission</Text>, ratio: 3 },
-                  { value: <Text opacity={0.4} font="rm_mono">Edit</Text>, ratio: 3 },
-                ]}
-                content={[...userStaking.unbonding.map((userStakingElement,index)=>
-                  GenerateMyStakingTableRow(userStakingElement, index,()=>handleClick(userStakingElement))
-                )]}
-            />
-          </div>
-
-      } */}
+            title="Unbonding Delegations"
+            headers={[
+              {
+                value: (
+                  <Text opacity={0.4} font="rm_mono">
+                    Name
+                  </Text>
+                ),
+                ratio: 3,
+              },
+              { value: <Text opacity={0.4}>Undelegation</Text>, ratio: 2 },
+              {
+                value: (
+                  <Text opacity={0.4} font="rm_mono">
+                    Completion Time
+                  </Text>
+                ),
+                ratio: 5,
+              },
+            ]}
+            content={[
+              ...unbondingDelegations.map((userStakingElement, index) =>
+                GenerateUnbondingDelegationsTableRow(userStakingElement, index)
+              ),
+            ]}
+          />
+          <Spacer height="40px" />
+        </div>
+      )}
 
       <Container width="100%" className={styles.tableContainer}>
-        <div className={styles.searchBarContainer2}>
+        {/* <div className={styles.searchBarContainer2}>
           <div className={styles.searchBarContainer}>
             <div>
               <Input
                 height={47}
+                icon="/searchIcon.svg"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => {
@@ -503,28 +567,86 @@ export default function StakingPage() {
                   handleSearch();
                   //console.log("inside function");
                 }}
-                placeholder="Search..."
+                placeholder={str[0].toUpperCase() + str.slice(1)}
               />
+                
+
             </div>
-            <div>
-              <Button shadow="none" onClick={() => handleSearch()}>
+            <div style={{display:"flex",flexDirection:"column", justifyContent:"center", alignItems:"center"}}>
+              <Button shadow="none" onClick={() => {}} >
                 <Icon
-                  style={{ marginLeft: "5px" }}
+                  
+                  themed
                   icon={{
-                    url: "/search.svg",
-                    size: 14,
+                    url: "/searchIcon.svg",
+                    size: 24,
                   }}
-                  themed={true}
                 />
               </Button>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <Table
           title={
             <div className={styles.tableTitleContainer}>
-              <div>{validatorTitleMap.get(currentFilter)}</div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "33%",
+                }}
+              >
+                <Text font="proto_mono" size="lg">
+                  {validatorTitleMap.get(currentFilter)}
+                </Text>
+              </div>
+              <div className={styles.searchBarContainer}>
+                <div className={styles.searchIconContainer}>
+                  <Icon
+                    themed
+                    icon={{
+                      url: "/searchIcon.svg",
+                      size: 24,
+                    }}
+                  />
+                </div>
+                <div>
+                  <Input
+                    height={40}
+                    searchicon={true}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+
+                      handleSearch();
+                      //console.log("inside function");
+                    }}
+                    placeholder={str[0].toUpperCase() + str.slice(1)}
+                  />
+                </div>
+                {/* <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Button height={40} shadow="none" onClick={() => {}}>
+                    <Icon
+                      themed
+                      icon={{
+                        url: "/searchIcon.svg",
+                        size: 24,
+                      }}
+                    />
+                  </Button>
+                </div> */}
+              </div>
             </div>
           }
           // secondary={
@@ -534,7 +656,7 @@ export default function StakingPage() {
           //   </div>
           // }
           secondary={
-            <Container width="400px">
+            <Container width="25%">
               <ToggleGroup
                 options={["ACTIVE", "INACTIVE"]}
                 selected={currentFilter}
@@ -581,27 +703,59 @@ export default function StakingPage() {
               ratio: 4,
             },
           ]}
-          content={[
-            ...paginatedvalidators.map((validator, index) =>
-              GenerateValidatorTableRow(validator, index, () =>
-                handleClick(validator)
-              )
-            ),
-          ]}
+          content={
+            paginatedvalidators.length > 0
+              ? [
+                  ...paginatedvalidators.map((validator, index) =>
+                    GenerateValidatorTableRow(validator, index, () =>
+                      handleClick(validator)
+                    )
+                  ),
+                  <div key="Pagination" className={styles.paginationContainer}>
+                    <div className={styles.paginationButton1}>
+                      <Button
+                        onClick={handlePrevious}
+                        disabled={currentPage == 1}
+                        width={100}
+                      >
+                        Previous
+                      </Button>
+                    </div>
+                    <div className={styles.paginationButton2}>
+                      <Button
+                        onClick={handleNext}
+                        disabled={currentPage == totalPages}
+                        width={100}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>,
+                ]
+              : [<div key="noData">NO VALIDATORS FOUND</div>]
+          }
         />
 
-        <div className={styles.paginationContainer}>
+        {/* <div className={styles.paginationContainer}>
           <div className={styles.paginationButton1}>
-            <Button onClick={handlePrevious} disabled={currentPage == 1}>
+            <Button
+              onClick={handlePrevious}
+              disabled={currentPage == 1}
+              width={100}
+            >
               Previous
             </Button>
           </div>
           <div className={styles.paginationButton2}>
-            <Button onClick={handleNext} disabled={currentPage == totalPages}>
+            <Button
+              onClick={handleNext}
+              disabled={currentPage == totalPages}
+              width={100}
+            >
               Next
             </Button>
           </div>
-        </div>
+        </div> */}
         <Spacer height="80px" />
       </Container>
       {/* <Container>

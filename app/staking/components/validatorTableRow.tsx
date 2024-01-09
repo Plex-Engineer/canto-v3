@@ -2,6 +2,7 @@ import Button from "@/components/button/button";
 import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
 import {
+  UnbondingDelegation,
   UserUnbondingDelegation,
   Validator,
   ValidatorWithDelegations,
@@ -9,6 +10,7 @@ import {
 import BigNumber from "bignumber.js";
 import Text from "@/components/text";
 import { formatBalance, formatBigBalance } from "@/utils/formatting";
+import { formatTime } from "@/utils/gov/formatData";
 
 export const GenerateValidatorTableRow = (
   validator: Validator,
@@ -123,12 +125,11 @@ export const GenerateMyStakingTableRow = (
 ];
 
 export const GenerateUnbondingDelegationsTableRow = (
-  userStakedValidator: UserUnbondingDelegation,
-  index: number,
-  onDelegate: (validator: Validator) => void
+  userStakedValidator: UnbondingDelegation,
+  index: number
 ) => [
   <Container key={`name_${index}`}>
-    <Text font="rm_mono">{userStakedValidator?.validator_address}</Text>
+    <Text font="rm_mono">{userStakedValidator.name}</Text>
   </Container>,
   <Container
     key={`mystake_${index}`}
@@ -137,12 +138,10 @@ export const GenerateUnbondingDelegationsTableRow = (
     gap="auto"
   >
     <Text font="rm_mono">
-      {formatBigBalance(
-        formatBalance(userStakedValidator.entries[0].balance, 18)
-      ).shortAmount +
-        formatBigBalance(
-          formatBalance(userStakedValidator.entries[0].balance, 18)
-        ).suffix}{" "}
+      {formatBigBalance(formatBalance(userStakedValidator.undelegation, 18))
+        .shortAmount +
+        formatBigBalance(formatBalance(userStakedValidator.undelegation, 18))
+          .suffix}{" "}
     </Text>
     <div> </div>
     <Icon
@@ -154,40 +153,18 @@ export const GenerateUnbondingDelegationsTableRow = (
       themed={true}
     />
   </Container>,
-  <Container
-    key={`tokens_${index}`}
-    direction="row"
-    center={{ horizontal: true, vertical: true }}
-    gap="auto"
-  >
+  <Container key={`name_${index}`}>
     <Text font="rm_mono">
-      {formatBigBalance(
-        formatBalance(userStakedValidator.entries[0].balance, 18)
-      ).shortAmount +
-        formatBigBalance(
-          formatBalance(userStakedValidator.entries[0].balance, 18)
-        ).suffix}{" "}
+      {new Date(userStakedValidator.completion_date).toDateString() +
+        ", " +
+        new Date(userStakedValidator.completion_date).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        }) +
+        (new Date(userStakedValidator.completion_date).getHours() >= Number(12)
+          ? "PM"
+          : "AM")}
     </Text>
-    <div> </div>
-    <Icon
-      style={{ marginLeft: "5px" }}
-      icon={{
-        url: "./tokens/canto.svg",
-        size: 16,
-      }}
-      themed={true}
-    />
-  </Container>,
-  <Container key={`commission_${index}`}>
-    <Text font="rm_mono">
-      {formatBalance(userStakedValidator.entries[0].balance, -2, {
-        commify: true,
-        precision: 2,
-      })}
-      %
-    </Text>
-  </Container>,
-  <Container key={`buttonManage_${index}`}>
-    <Button onClick={() => {}}>MANAGE</Button>
   </Container>,
 ];

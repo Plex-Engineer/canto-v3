@@ -1,3 +1,4 @@
+import React from "react";
 import Text from "../text";
 import styles from "./table.module.scss";
 
@@ -8,16 +9,28 @@ interface Props {
     value: string | React.ReactNode;
     ratio: number;
   }[];
-  content: React.ReactNode[][];
+  content: React.ReactNode[][] | React.ReactNode[];
   textSize?: string;
+  isPaginated?: boolean;
 }
+
 const Table = (props: Props) => {
+  //console.log(typeof(props.content));
+
+  const isRowData: boolean = !props.content[0];
+  //const isRowData = typeof(props.content)== React.ReactNode[];
   return (
     <div className={styles.container} style={{ fontSize: props.textSize }}>
       <div className={styles.title}>
-        <Text font="proto_mono" size="lg">
-          {props.title}
-        </Text>
+        {/* <div font="proto_mono" size="lg"> */}
+        {typeof props.title === "string" ? (
+          <Text font="proto_mono" size="lg">
+            {props.title}
+          </Text>
+        ) : (
+          React.isValidElement(props.title) && props.title
+        )}
+
         {props.secondary}
       </div>
       <div className={styles.table}>
@@ -41,7 +54,7 @@ const Table = (props: Props) => {
         </div>
         <div className={styles.content}>
           {props.content.map((row, index) => {
-            return (
+            return Array.isArray(row) ? (
               <div
                 key={index}
                 className={styles.row}
@@ -61,6 +74,8 @@ const Table = (props: Props) => {
                   );
                 })}
               </div>
+            ) : (
+              <div className={styles.rowElement}>{row}</div>
             );
           })}
         </div>

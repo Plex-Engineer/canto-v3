@@ -46,11 +46,18 @@
     background: rgba(var(--dark-color), 0.1);
   }
 }
-
+.cellRow {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
 .cell {
   font-family: var(--proto-mono);
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+}
+
+.rowElement {
 }
