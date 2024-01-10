@@ -23,7 +23,10 @@ import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import usePool from "./utils";
 import { getPriceFromTick } from "@/utils/ambient";
 import Analytics from "@/provider/analytics";
-import {getAnalyticsCantoLiquidityPoolInfo, getAnalyticsAmbientLiquidityPoolInfo} from "@/utils/analytics";
+import {
+  getAnalyticsCantoLiquidityPoolInfo,
+  getAnalyticsAmbientLiquidityPoolInfo,
+} from "@/utils/analytics";
 
 export default function Page() {
   const {
@@ -112,8 +115,8 @@ export default function Page() {
 
                   onManage: (pairAddress) => {
                     Analytics.actions.events.liquidityPool.manageLPClicked({
-                     lpType: "CANTO",
-                     ...getAnalyticsCantoLiquidityPoolInfo(pair),
+                      lpType: "CANTO",
+                      ...getAnalyticsCantoLiquidityPoolInfo(pair),
                     });
                     setPair(pairAddress);
                   },
@@ -163,7 +166,7 @@ export default function Page() {
                     lpType: "AMBIENT",
                     ambientLp: pool.symbol,
                   });
-                  setPair(poolAddress)
+                  setPair(poolAddress);
                 },
               })
             ),

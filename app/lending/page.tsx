@@ -20,7 +20,7 @@ import { addTokenBalances, divideBalances } from "@/utils/math";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import Analytics from "@/provider/analytics";
-import { getAnalyticsLendingMarketTokenInfo} from "@/utils/analytics";
+import { getAnalyticsLendingMarketTokenInfo } from "@/utils/analytics";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -99,7 +99,11 @@ export default function LendingPage() {
                 onSupply={() => {
                   Analytics.actions.events.lendingMarket.supplyClicked({
                     lmType: "CTOKEN",
-                    ...getAnalyticsLendingMarketTokenInfo(cNote, clmPosition.position.liquidity, true),
+                    ...getAnalyticsLendingMarketTokenInfo(
+                      cNote,
+                      clmPosition.position.liquidity,
+                      true
+                    ),
                   });
                   setSelectedCToken(cNote.address);
                   setCurrentModal(CLMModalTypes.SUPPLY);
@@ -107,7 +111,11 @@ export default function LendingPage() {
                 onBorrow={() => {
                   Analytics.actions.events.lendingMarket.borrowClicked({
                     lmType: "CTOKEN",
-                    ...getAnalyticsLendingMarketTokenInfo(cNote, clmPosition.position.liquidity, false),
+                    ...getAnalyticsLendingMarketTokenInfo(
+                      cNote,
+                      clmPosition.position.liquidity,
+                      false
+                    ),
                   });
                   setSelectedCToken(cNote.address);
                   setCurrentModal(CLMModalTypes.BORROW);
@@ -327,7 +335,11 @@ const CTokenTable = ({
                     onSupply: () => {
                       Analytics.actions.events.lendingMarket.supplyClicked({
                         lmType: "RWA",
-                        ...getAnalyticsLendingMarketTokenInfo(cRwa, liquidity, true),
+                        ...getAnalyticsLendingMarketTokenInfo(
+                          cRwa,
+                          liquidity,
+                          true
+                        ),
                       });
                       onSupply(cRwa.address);
                     },
@@ -340,14 +352,22 @@ const CTokenTable = ({
                       onSupply: () => {
                         Analytics.actions.events.lendingMarket.supplyClicked({
                           lmType: "CTOKEN",
-                          ...getAnalyticsLendingMarketTokenInfo(cStableCoin, liquidity, true),
+                          ...getAnalyticsLendingMarketTokenInfo(
+                            cStableCoin,
+                            liquidity,
+                            true
+                          ),
                         });
                         onSupply(cStableCoin.address);
                       },
                       onBorrow: () => {
                         Analytics.actions.events.lendingMarket.borrowClicked({
                           lmType: "CTOKEN",
-                          ...getAnalyticsLendingMarketTokenInfo(cStableCoin, liquidity, false),
+                          ...getAnalyticsLendingMarketTokenInfo(
+                            cStableCoin,
+                            liquidity,
+                            false
+                          ),
                         });
                         onBorrow(cStableCoin.address);
                       },
