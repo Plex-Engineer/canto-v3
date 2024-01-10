@@ -53,7 +53,7 @@ const InfoBar = ({ values }: Props) => {
             </div>
           ))}
         </div> */}
-      <Text font="proto_mono" color="var(--text-only-light)" size="sm">
+      {/* <Text font="proto_mono" color="var(--text-only-light)" size="sm">
         For Staking & Governance GO{" "}
         <a
           href="https://v2.canto.io/"
@@ -66,7 +66,7 @@ const InfoBar = ({ values }: Props) => {
           Here
         </a>
         .
-      </Text>
+      </Text> */}
       {/* </Marquee> */}
     </div>
   );

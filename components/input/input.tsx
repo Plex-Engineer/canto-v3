@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./input.module.scss";
 import Text from "../text";
 import clsx from "clsx";
@@ -49,9 +49,10 @@ type InputProps = {
 );
 
 const Input = (props: InputProps) => {
+  const [isInputClicked,setInputClicked] = useState(false);
   const getSearchStyle = () => {
-    if (props.searchicon) {
-      return { borderLeft: "none" };
+    if(props.searchicon && isInputClicked){
+      return {backgroundColor: "lightgrey"};
     }
     return {};
   };
@@ -102,15 +103,20 @@ const Input = (props: InputProps) => {
         </Text>
       </label>
       {props.icon ? (
-        <div className={styles.searchIconContainer}>
-          <Icon
-            themed
-            icon={{
-              url: props.icon,
-              size: 20,
-            }}
-          />
+        <div className={styles.searchIconContainer} style={getSearchStyle()} >
+
+            <div >
+                <Icon
+                themed
+                icon={{
+                  url: props.icon,
+                  size: 20,
+                }}
+              />
+            </div>
           <section>
+            
+          
             <input
               type={props.type}
               value={props.value}
@@ -142,7 +148,7 @@ const Input = (props: InputProps) => {
                 backgroundColor:
                   props.error || inputError.error
                     ? " #ff000017"
-                    : props.backgroundColor ?? "",
+                    : "",
                 border:
                   props.error || inputError.error
                     ? "1px solid var(--extra-failure-color, #ff0000)"
@@ -154,7 +160,14 @@ const Input = (props: InputProps) => {
                 fontFamily: "var(--rm-mono)",
                 fontSize: props.type === "amount" ? "1.5rem" : "1rem",
               }}
+              onClick={()=>setInputClicked(true)}
+              onBlur={()=>setInputClicked(false)}
             />
+             
+            
+         
+            
+            
             {props.type === "amount" && (
               <Button
                 onClick={() => {
@@ -171,6 +184,7 @@ const Input = (props: InputProps) => {
                 MAX
               </Button>
             )}
+            
           </section>
         </div>
       ) : (
