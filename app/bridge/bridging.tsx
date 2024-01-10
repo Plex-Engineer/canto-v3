@@ -19,6 +19,7 @@ import FeeButton from "./components/feeButton";
 import { useState } from "react";
 import GravityConfirmationModal from "./components/gravityConfirmationModal";
 import { GRAVITY_BRIDGE } from "@/config/networks";
+import Icon from "@/components/icon/icon";
 
 const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
@@ -450,9 +451,21 @@ const FeesSection = ({
   token: BridgeToken | null;
 }) => {
   return props.isLoading ? (
-    <Text font="proto_mono" size="x-sm">
-      loading fees.....
-    </Text>
+    <div>
+      {/* <Text font="proto_mono" size="x-sm">
+          loading fees.....
+        </Text> */}
+      <Icon
+        icon={{
+          url: "/loader.svg",
+          size: {
+            width: 20,
+            height: 20,
+          },
+        }}
+        themed
+      />
+    </div>
   ) : props.error !== null ? (
     <Text font="proto_mono" size="x-sm">
       error loading fees {props.error}
