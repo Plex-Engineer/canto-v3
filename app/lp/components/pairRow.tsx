@@ -16,7 +16,6 @@ import {
 import BigNumber from "bignumber.js";
 import { HoverPositions } from "./HoverPositions";
 import { estimateTokenAmountsFromLiquidity } from "@/utils/cantoDex";
-import Spacer from "@/components/layout/spacer";
 
 export const UserCantoDexPairRow = ({
   pair,
