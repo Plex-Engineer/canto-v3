@@ -31,6 +31,7 @@ type InputProps = {
   step?: number;
   required?: boolean;
   searchicon?: boolean;
+  icon?: string;
 } & (
   | {
       type: "amount";
@@ -86,11 +87,13 @@ const Input = (props: InputProps) => {
         height: getHeight(props.height),
       }}
     >
+
       <label
         htmlFor={props.id}
         className={props.labelClassName}
         style={props.labelStyle}
       >
+        
         <Text font="rm_mono" size="sm">
           {props.label}
           {props.type === "amount" && (
@@ -98,16 +101,84 @@ const Input = (props: InputProps) => {
               Balance: {displayAmount(props.balance, props.decimals)}
             </span>
           )}
-          {/* {props.icon && <Icon
-            themed
-            icon={{
-              url: props.icon,
-              size: 24,
-            }}
-          />
-          } */}
+          
         </Text>
       </label>
+      {props.icon ? 
+      
+      <div className={styles.searchIconContainer}>
+        <Icon
+              themed
+              icon={{
+                url: props.icon,
+                size: 20,
+              }}
+            />
+        <section>
+        <input
+          type={props.type}
+          value={props.value}
+          onChange={
+            props.type === "amount"
+              ? (e) => {
+                  if (
+                    e.target.value === "" ||
+                    e.target.value.match(/^\d*\.?\d*$/)
+                  ) {
+                    props.onChange(e);
+                  }
+                }
+              : props.onChange
+          }
+          placeholder={props.placeholder}
+          className={clsx(props.className)}
+          disabled={props.disabled}
+          name={props.name}
+          id={props.id}
+          maxLength={props.maxLength}
+          min={props.min}
+          max={props.max}
+          step={props.step}
+          required={props.required}
+          autoComplete="off"
+          style={{
+            height: getHeight(props.height),
+            backgroundColor:
+              props.error || inputError.error
+                ? " #ff000017"
+                : props.backgroundColor ?? "",
+            border:
+              props.error || inputError.error
+                ? "1px solid var(--extra-failure-color, #ff0000)"
+                : "none",
+            borderLeft: props.searchicon
+              ? "none"
+              : "1px solid var(--border-stroke-color, #b3b3b3)",
+            ...props.style,
+            fontFamily: "var(--rm-mono)",
+            fontSize: props.type === "amount" ? "1.5rem" : "1rem",
+          }}
+        />
+        {props.type === "amount" && (
+          <Button
+            onClick={() => {
+              props.onChange({
+                target: {
+                  value: formatBalance(props.tokenMax, props.decimals, {
+                    precision: props.decimals,
+                  }),
+                },
+              } as any);
+            }}
+            height={Number(getHeight(props.height).slice(0, -2))}
+          >
+            MAX
+          </Button>
+        )}
+      </section>
+
+      </div> : 
+      
       <section>
         <input
           type={props.type}
@@ -145,9 +216,6 @@ const Input = (props: InputProps) => {
               props.error || inputError.error
                 ? "1px solid var(--extra-failure-color, #ff0000)"
                 : "",
-            borderLeft: props.searchicon
-              ? ""
-              : "1px solid var(--border-stroke-color, #b3b3b3)",
             ...props.style,
             fontFamily: "var(--rm-mono)",
             fontSize: props.type === "amount" ? "1.5rem" : "1rem",
@@ -170,7 +238,9 @@ const Input = (props: InputProps) => {
           </Button>
         )}
       </section>
-
+      
+      }
+      
       <span
         className={styles["error-message"]}
         style={{

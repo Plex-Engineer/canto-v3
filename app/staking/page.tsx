@@ -603,7 +603,7 @@ export default function StakingPage() {
                 </Text>
               </div>
               <div className={styles.searchBarContainer}>
-                <div className={styles.searchIconContainer}>
+                {/* <div className={styles.searchIconContainer}>
                   <Icon
                     themed
                     icon={{
@@ -611,7 +611,7 @@ export default function StakingPage() {
                       size: 24,
                     }}
                   />
-                </div>
+                </div> */}
                 <div>
                   <Input
                     height={40}
@@ -625,6 +625,7 @@ export default function StakingPage() {
                       //console.log("inside function");
                     }}
                     placeholder={str[0].toUpperCase() + str.slice(1)}
+                    icon="/searchIcon.svg"
                   />
                 </div>
                 {/* <div
