@@ -20,62 +20,62 @@ type AnalyticsTransactionFlowType =
 
 export type AnalyticsTransactionFlowData =
   | {
-      // bridge info
-      bridgeFrom: string;
-      bridgeTo: string;
-      bridgeAsset: string;
-      bridgeAmount: string;
-    }
+    // bridge info
+    bridgeFrom: string;
+    bridgeTo: string;
+    bridgeAsset: string;
+    bridgeAmount: string;
+  }
   | {
-      // canto dex info
-      cantoLp?: string;
-      cantoLpToken1?: string;
-      cantoLpToken2?: string;
-      cantoLpAmount1?: string;
-      cantoLpAmount2?: string;
-      cantoLpBalance1?: string;
-      cantoLpBalance2?: string;
-      cantoLpTokenAmount?: string;
-      cantoLpTokenBalance?: string;
-      cantoLpExpectedAmount1?: string;
-      cantoLpStakedBalance?: string;
-      cantoLpUnstakedBalance?: string;
-      cantoLpExpectedAmount2?: string;
-      cantoLpSlippage?: Number;
-      cantoLpDeadline?: string;
-      cantoLpStakeStatus?: boolean;
-    }
+    // canto dex info
+    cantoLp?: string;
+    cantoLpToken1?: string;
+    cantoLpToken2?: string;
+    cantoLpAmount1?: string;
+    cantoLpAmount2?: string;
+    cantoLpBalance1?: string;
+    cantoLpBalance2?: string;
+    cantoLpTokenAmount?: string;
+    cantoLpTokenBalance?: string;
+    cantoLpExpectedAmount1?: string;
+    cantoLpStakedBalance?: string;
+    cantoLpUnstakedBalance?: string;
+    cantoLpExpectedAmount2?: string;
+    cantoLpSlippage?: Number;
+    cantoLpDeadline?: string;
+    cantoLpStakeStatus?: boolean;
+  }
   | {
-      // ambient info
-      ambientLp?: string;
-      ambientPositionId?: string;
-      ambientLpBaseToken?: string;
-      ambientLpQuoteToken?: string;
-      ambientLpBaseAmount?: string;
-      ambientLpQuoteAmount?: string;
-      ambientLpBaseBalance?: string;
-      ambientLpQuoteBalance?: string;
-      ambientLpCurrentPrice?: string;
-      ambientLpMinRangePrice?: string;
-      ambientLpMaxRangePrice?: string;
-      ambientLpMinExecPrice?: string;
-      ambientLpMaxExecPrice?: string;
-      ambientLpLiquidity?: string;
-      ambientLpExpectedBaseAmount?: string;
-      ambientLpExpectedQuoteAmount?: string;
-      ambientLpFee?: string;
-      ambientLpIsAdvanced?: boolean;
-    }
+    // ambient info
+    ambientLp?: string;
+    ambientPositionId?: string;
+    ambientLpBaseToken?: string;
+    ambientLpQuoteToken?: string;
+    ambientLpBaseAmount?: string;
+    ambientLpQuoteAmount?: string;
+    ambientLpBaseBalance?: string;
+    ambientLpQuoteBalance?: string;
+    ambientLpCurrentPrice?: string;
+    ambientLpMinRangePrice?: string;
+    ambientLpMaxRangePrice?: string;
+    ambientLpMinExecPrice?: string;
+    ambientLpMaxExecPrice?: string;
+    ambientLpLiquidity?: string;
+    ambientLpExpectedBaseAmount?: string;
+    ambientLpExpectedQuoteAmount?: string;
+    ambientLpFee?: string;
+    ambientLpIsAdvanced?: boolean;
+  }
   | {
-      // lending info
-      lmToken?: string;
-      lmAmount?: string;
-      lmCollateralStatus?: boolean;
-      lmWalletBalance?: string;
-      lmSuppliedAmount?: string;
-      lmBorrowedAmount?: string;
-      lmAccountLiquidityRemaining?: string;
-    };
+    // lending info
+    lmToken?: string;
+    lmAmount?: string;
+    lmCollateralStatus?: boolean;
+    lmWalletBalance?: string;
+    lmSuppliedAmount?: string;
+    lmBorrowedAmount?: string;
+    lmAccountLiquidityRemaining?: string;
+  };
 
 // tx types (approve/mint/swap/...)
 type AnalyticsTransactionType = CantoFETxType;
@@ -93,6 +93,7 @@ type AnalyticsTransactionFlowParams = AnalyticsTransactionFlowInfo & {
   txType?: AnalyticsTransactionType;
   txNetwork?: string;
   txSuccess?: boolean;
+  txRetryTimeInSeconds?: Number;
   txsGenerateError?: string;
   txError?: string;
 };
@@ -120,7 +121,7 @@ class AnalyticsWrapper {
     },
     events: {
       pageOpened: (pageName: string) => {
-        posthog.capture("Page Opened", {
+        posthog.capture("$pageview", {
           pageName: pageName,
         });
       },
@@ -132,6 +133,14 @@ class AnalyticsWrapper {
             posthog.capture("Wallet Disconnected");
           }
         },
+      },
+      themeChanged: (theme: string) => {
+        posthog.capture("Theme Changed", {
+          theme
+        });
+      },
+      transactionModalOpened: () => {
+        posthog.capture("Transaction Modal Opened");
       },
       externalLinkClicked: (params: object) => {
         posthog.capture("External Link Clicked", params);
@@ -167,8 +176,19 @@ class AnalyticsWrapper {
       },
       lendingMarket: {
         limitClicked: (limit: number) => {
-          posthog.capture("Lending Market Modal Limit Clicked", {
+          posthog.capture("LM Modal Limit Clicked", {
             limit,
+          });
+        },
+        supplyClicked: (params: object) => {
+          posthog.capture("Supply LM Clicked", params);
+        },
+        borrowClicked: (params: object) => {
+          posthog.capture("Borrow LM Clicked", params);
+        },
+        tabSwitched: (tab: string) => {
+          posthog.capture("LM Tab Switched", {
+            tab,
           });
         },
       },
@@ -178,6 +198,9 @@ class AnalyticsWrapper {
         },
         success: (params: AnalyticsTransactionFlowParams) => {
           posthog.capture("Transaction Flow Success", params);
+        },
+        retry: (params: AnalyticsTransactionFlowParams) => {
+          posthog.capture("Transaction Flow Retry", params);
         },
         generateTransactionsError: (params: AnalyticsTransactionFlowParams) => {
           posthog.capture("Generate Transactions Error", params);

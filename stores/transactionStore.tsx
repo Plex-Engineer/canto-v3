@@ -247,7 +247,7 @@ const useTransactionStore = create<TransactionStore>()(
                     txType: updatedTransactionList[i].tx.feTxType,
                     txNetwork: network.isTestChain
                       ? network.name
-                      : network.name + "Mainnet",
+                      : network.name + " Mainnet",
                     txSuccess: false,
                     txError: txError?.message.split(":").pop() ?? "",
                   });

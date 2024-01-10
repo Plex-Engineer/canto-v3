@@ -38,6 +38,8 @@ const NavBar = () => {
       Analytics.actions.events.pageOpened("lending");
     } else if (currentPath == "/lp") {
       Analytics.actions.events.pageOpened("lp interface");
+    } else if (currentPath == "/explore") {
+      Analytics.actions.events.pageOpened("explore");
     } else {
       Analytics.actions.events.pageOpened("home");
     }
