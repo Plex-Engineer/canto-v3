@@ -1,0 +1,21 @@
+.items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-gap: 1rem;
+   
+}
+
+.bar {
+    display: flex;
+    width: 100%;
+    height: 20px;
+background-color: blue;
+    .fill {
+        border: 1px solid var(--Text-dark-color, #111);
+        background: #06FC99;
+    height: 22px;
+    }
+
+   
+}
+

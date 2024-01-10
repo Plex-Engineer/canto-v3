@@ -19,6 +19,7 @@ import Spacer from "@/components/layout/spacer";
 import { addTokenBalances, divideBalances } from "@/utils/math";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
+import AccountHealth from "./components/accountHealth/accountHealth";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -76,7 +77,48 @@ export default function LendingPage() {
         )}
       </Modal>
 
-      <div className={styles.accountHealth} />
+      <div className={styles.accountHealth}>
+        <AccountHealth
+          title="Account Health"
+          items={[
+            {
+              name: "Supplied",
+              value: displayAmount(clmPosition.position.totalSupply, 18, {
+                precision: 2,
+              }),
+            },
+            {
+              name: "Borrow Limit",
+              value: displayAmount(
+                clmPosition.general.maxAccountLiquidity,
+                18,
+                {
+                  precision: 2,
+                }
+              ),
+            },
+            {
+              name: "Net APY",
+              value: clmPosition.general.netApr + "%",
+            },
+            {
+              name: "Borrowed",
+              value: displayAmount(clmPosition.position.totalBorrow, 18, {
+                precision: 2,
+              }),
+            },
+            {
+              name: "Liquidity Remaining",
+              value: "TBA",
+            },
+            {
+              name: "Limit Used",
+              value: "TBA",
+            },
+          ]}
+          percent={0.5}
+        />
+      </div>
       <div className={styles.highlightCard} />
       <div className={styles.mainTable}></div>
     </div>

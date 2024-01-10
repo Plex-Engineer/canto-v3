@@ -1,27 +1,33 @@
+import Text from "@/components/text";
 import Item from "../item";
-
+import styles from "./accountHealth.module.scss";
 interface Props {
   title: string;
   items: {
     name: string | React.ReactNode;
     value: string;
-    postChild?: React.ReactNode;
-    theme?:
-      | "primary-light"
-      | "primary-dark"
-      | "secondary-light"
-      | "secondary-dark"
-      | undefined;
+    symbol?: boolean;
   }[];
+  percent: number;
 }
 
 const AccountHealth = (props: Props) => {
   return (
     <div>
-      <h2>{props.title}</h2>
-      {props.items.map((item, i) => (
-        <Item key={i} {...item} />
-      ))}
+      <Text size="lg" font="proto_mono">
+        {props.title}
+      </Text>
+      <div className={styles.items}>
+        {props.items.map((item, i) => (
+          <Item key={i} {...item} />
+        ))}
+      </div>
+      <div className={styles.bar}>
+        <div
+          className={styles.fill}
+          style={{ width: `${props.percent}%` }}
+        ></div>
+      </div>
     </div>
   );
 };
