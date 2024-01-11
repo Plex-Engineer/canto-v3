@@ -43,7 +43,7 @@ const Selector = (props: Props) => {
       <Modal
         open={isOpen}
         onClose={() => setIsOpen(false)}
-        width="30rem"
+        width="32rem"
         height="36rem"
       >
         <Text size="lg" font="proto_mono">
