@@ -17,8 +17,6 @@ import { ethToCantoAddress } from "@/utils/address";
 import { useRouter } from "next/navigation";
 
 export default function GovernancePage() {
-  //console.log(ethToCantoAddress("0xc514d047714C019b6AA7fbE181f87DD00C199B12"));
-
   const router = useRouter();
 
   const { txStore, signer, chainId } = useCantoSigner();
@@ -29,11 +27,8 @@ export default function GovernancePage() {
       proposals.sort(
         (a: Proposal, b: Proposal) => b.proposal_id - a.proposal_id
       ),
-    [proposals]
+    [proposals.length]
   );
-
-  //const proposalsPerPage = 10; // Number of proposals per page
-  //const totalPages = Math.ceil(proposals?.length / proposalsPerPage);
 
   return isProposalsLoading ? (
     <Splash />
