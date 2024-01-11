@@ -188,7 +188,7 @@ export const StakingModal = (props: StakingModalParams) => {
       {selectedTx == StakingTxTypes.REDELEGATE && (
         <div>
           <Selector
-            title="Revalidate"
+            title="Redelegate"
             items={dropdownItems}
             activeItem={
               validatorToRedelegate
