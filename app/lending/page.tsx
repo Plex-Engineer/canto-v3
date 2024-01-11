@@ -238,6 +238,7 @@ const CTokenTable = ({
   onBorrow: (address: string) => void;
 }) => {
   const [filteredPairs, setFilteredPairs] = useState("RWAs");
+
   const headers =
     filteredPairs === "RWAs"
       ? [
@@ -275,6 +276,7 @@ const CTokenTable = ({
           { value: "Liquidity", ratio: 1 },
           { value: "Manage", ratio: 2 },
         ];
+
 
   return (
     <div className={styles.mainTable}>

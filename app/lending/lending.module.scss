@@ -55,3 +55,22 @@
 .widget2 {
   margin-bottom: 4rem;
 }
+
+@media screen and (max-width: 768px) {
+    .container {
+        padding : 1rem;
+    }
+  .grid {
+    flex-direction: column-reverse !important;
+    width: calc(100% - 2rem) !important;
+
+  }
+  .highlightCard {
+    flex-direction: column;
+  }
+  .mainTable {
+
+    flex-direction: column;
+  }
+    
+}
