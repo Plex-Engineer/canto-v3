@@ -13,7 +13,7 @@ interface Props {
 
 const InfoBar = ({ values }: Props) => {
   return (
-    <div >
+    <div>
       {/* <Marquee delay={1} pauseOnHover speed={20}> */}
       {/* <div className={styles.content}>
           {values.map((value, idx) => (
