@@ -27,7 +27,7 @@ export const newCantoBridgeFlow = (
 
 // for importing tokens from tx list
 const bridgeTokenMetadata = (txParams: BridgeTransactionParams) => {
-  const token = txParams.token.data;
+  let tokenToAdd = txParams.token.data;
   // always add tokens to the receiving chain
   switch (txParams.method) {
     case BridgingMethod.LAYER_ZERO: {
@@ -38,20 +38,20 @@ const bridgeTokenMetadata = (txParams: BridgeTransactionParams) => {
         );
         if (!bridgeOutTokens) return undefined;
         // match by symbol
-        const tokenToAdd = bridgeOutTokens.find(
-          (t) => t.symbol === token.symbol
+        const matchedToken = bridgeOutTokens.find(
+          (t) => t.symbol === tokenToAdd.symbol
         );
-        const underlyingAddress = (tokenToAdd as OFTToken).oftUnderlyingAddress;
+        const underlyingAddress = (matchedToken as OFTToken)
+          .oftUnderlyingAddress;
 
         if (!underlyingAddress) return undefined;
-        token.address = underlyingAddress;
+        tokenToAdd = { ...tokenToAdd, address: underlyingAddress };
       }
       // address will always be the same on both chains if going from canto
-      return checkAndReturnTokenMetadata(txParams.to.chainId, token);
+      return checkAndReturnTokenMetadata(txParams.to.chainId, tokenToAdd);
     }
     case BridgingMethod.GRAVITY_BRIDGE:
       // match tokens by symbol, add token on receiving chain
-      let tokenToAdd;
       if (isCantoChainId(txParams.to.chainId as number)) {
         // match eth token to canto token
         // get token list from bridge out token list
@@ -62,8 +62,9 @@ const bridgeTokenMetadata = (txParams: BridgeTransactionParams) => {
 
         // find matching token by symbol
         const cantoToken = bridgeOutTokens.find(
-          (t) => t.symbol === token.symbol
+          (t) => t.symbol === tokenToAdd.symbol
         );
+        if (!cantoToken) return undefined;
         tokenToAdd = cantoToken;
       } else {
         // match canto token to eth token
@@ -72,9 +73,12 @@ const bridgeTokenMetadata = (txParams: BridgeTransactionParams) => {
         if (!bridgeInTokens) return undefined;
 
         // find matching token by symbol
-        tokenToAdd = bridgeInTokens.find((t) => t.symbol === token.symbol);
+        const matchedToken = bridgeInTokens.find(
+          (t) => t.symbol === tokenToAdd.symbol
+        );
+        if (!matchedToken) return undefined;
+        tokenToAdd = matchedToken;
       }
-      if (!tokenToAdd) return undefined;
       return checkAndReturnTokenMetadata(txParams.to.chainId, tokenToAdd);
     case BridgingMethod.IBC: {
       // going to cosmos chain (don't import tokens)
@@ -91,7 +95,7 @@ const bridgeTokenMetadata = (txParams: BridgeTransactionParams) => {
 
       // find matching token by ibcDenom
       const cantoToken = (bridgeOutTokens as IBCToken[]).find(
-        (t) => t.ibcDenom === (token as IBCToken).ibcDenom
+        (t) => t.ibcDenom === (tokenToAdd as IBCToken).ibcDenom
       );
       if (!cantoToken) return undefined;
 
