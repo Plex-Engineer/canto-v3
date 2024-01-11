@@ -21,6 +21,7 @@ import spinner from "../../public/anims/spinner.gif";
 import GravityConfirmationModal from "./components/gravityConfirmationModal";
 import { GRAVITY_BRIDGE } from "@/config/networks";
 import Icon from "@/components/icon/icon";
+import LoadingIcon from "@/components/loader/loading";
 
 const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
@@ -453,20 +454,7 @@ const FeesSection = ({
 }) => {
   return props.isLoading ? (
     <div>
-      {/* <Text font="proto_mono" size="x-sm">
-          loading fees.....
-        </Text> */}
-      {/* <img src={"/anims/spinner.gif"} alt={"loading..."} /> */}
-      <Icon
-        icon={{
-          url: "/anims/spinner2.gif",
-          size: {
-            width: 20,
-            height: 20,
-          },
-        }}
-        themed
-      />
+      <LoadingIcon />
     </div>
   ) : props.error !== null ? (
     <Text font="proto_mono" size="x-sm">
