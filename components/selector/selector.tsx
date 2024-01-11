@@ -12,7 +12,7 @@ import LoadingIcon from "../loader/loading";
 
 export interface Item {
   id: string;
-  icon: string;
+  icon?: string;
   name: string;
   secondary?: number | string;
 }
@@ -76,7 +76,14 @@ const Selector = (props: Props) => {
                   setIsOpen(false);
                 }}
               >
-                <Image src={item.icon} alt={item.name} width={30} height={30} />
+                {item.icon && (
+                  <Image
+                    src={item.icon}
+                    alt={item.name}
+                    width={30}
+                    height={30}
+                  />
+                )}
                 <Container direction="row" gap={"auto"} width="100%">
                   <Text size="md" font="proto_mono">
                     {item.name}
@@ -103,12 +110,14 @@ const Selector = (props: Props) => {
                       setIsExpanded(!isExpanded);
                     }}
                   >
-                    <Image
-                      src={group.main.icon}
-                      alt={group.main.name}
-                      width={30}
-                      height={30}
-                    />
+                    {group.main.icon && (
+                      <Image
+                        src={group.main.icon}
+                        alt={group.main.name}
+                        width={30}
+                        height={30}
+                      />
+                    )}
                     <Text size="md" font="proto_mono">
                       {group.main.name} {group.main.secondary}
                     </Text>
@@ -184,12 +193,14 @@ const Selector = (props: Props) => {
                       setIsOpen(false);
                     }}
                   >
-                    <Image
-                      src={item.icon}
-                      alt={item.name}
-                      width={30}
-                      height={30}
-                    />
+                    {item.icon && (
+                      <Image
+                        src={item.icon}
+                        alt={item.name}
+                        width={30}
+                        height={30}
+                      />
+                    )}
                     <Text size="md" font="proto_mono">
                       {item.name} {item.secondary}
                     </Text>
@@ -231,12 +242,14 @@ const Selector = (props: Props) => {
           {props.activeItem?.icon == "loader.svg" ? (
             <LoadingIcon />
           ) : (
-            <Image
-              src={props.activeItem?.icon ?? ""}
-              alt={props.activeItem?.name + " icon"}
-              width={30}
-              height={30}
-            />
+            props.activeItem?.icon && (
+              <Image
+                src={props.activeItem?.icon ?? ""}
+                alt={props.activeItem?.name + " icon"}
+                width={30}
+                height={30}
+              />
+            )
           )}
           <Text size="md" font="proto_mono">
             {props.activeItem?.name ?? "SELECT ITEM"}
