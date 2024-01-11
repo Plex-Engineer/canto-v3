@@ -17,6 +17,7 @@ import { addTokenBalances } from "@/utils/math";
 import { BridgeToken } from "@/hooks/bridge/interfaces/tokens";
 import FeeButton from "./components/feeButton";
 import { useState } from "react";
+import spinner from "../../public/anims/spinner.gif";
 import GravityConfirmationModal from "./components/gravityConfirmationModal";
 import { GRAVITY_BRIDGE } from "@/config/networks";
 import Icon from "@/components/icon/icon";
@@ -455,9 +456,10 @@ const FeesSection = ({
       {/* <Text font="proto_mono" size="x-sm">
           loading fees.....
         </Text> */}
+      {/* <img src={"/anims/spinner.gif"} alt={"loading..."} /> */}
       <Icon
         icon={{
-          url: "/loader.svg",
+          url: "/anims/spinner2.gif",
           size: {
             width: 20,
             height: 20,
