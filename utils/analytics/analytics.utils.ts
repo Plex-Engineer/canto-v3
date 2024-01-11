@@ -343,7 +343,7 @@ function getLpComboClaimRewardsTransactionFlowType(
   }
 }
 
-export function getAnalyticsLendingMarketTokenInfo(cToken: CTokenWithUserData, liquidity: string, isSuppy: boolean): AnalyticsLMData {
+export function getAnalyticsLendingMarketTokenInfo(cToken: CTokenWithUserData, liquidity: string, isSupply: boolean): AnalyticsLMData {
   const cTokenData = {
     lmToken: cToken.underlying.symbol,
     lmWalletBalance: displayAnalyticsAmount(
@@ -355,7 +355,7 @@ export function getAnalyticsLendingMarketTokenInfo(cToken: CTokenWithUserData, l
       18
     ),
   }
-  if(isSuppy){
+  if(isSupply){
     return {
       ...cTokenData,
       lmSuppliedAmount: displayAnalyticsAmount(
