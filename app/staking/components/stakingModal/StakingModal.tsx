@@ -57,7 +57,6 @@ export const StakingModal = (props: StakingModalParams) => {
   const dropdownItems = splicedValidators.map((validator) => {
     return {
       name: validator.description.moniker,
-      icon: "/tokens/canto.svg",
       id: validator.operator_address,
     };
   });
@@ -195,12 +194,10 @@ export const StakingModal = (props: StakingModalParams) => {
               validatorToRedelegate
                 ? {
                     name: validatorToRedelegate?.description.moniker,
-                    icon: "/tokens/canto.svg",
                     id: validatorToRedelegate.operator_address,
                   }
                 : {
                     name: "Select Validator",
-                    icon: "loader.svg",
                     id: "",
                   }
             }
