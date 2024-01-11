@@ -68,7 +68,7 @@ export default function StakingPage() {
     if (signer) {
       if (txType == StakingTxTypes.REDELEGATE) {
         const newFlow: NewTransactionFlow = {
-          icon: "/tokens/canto.svg",
+          icon: "/canto.svg",
           txType: TransactionFlowType.STAKE_CANTO_TX,
           title: "Stake Canto",
           params: {
@@ -96,7 +96,7 @@ export default function StakingPage() {
         txType == StakingTxTypes.UNDELEGATE
       ) {
         const newFlow: NewTransactionFlow = {
-          icon: "/tokens/canto.svg",
+          icon: "/canto.svg",
           txType: TransactionFlowType.STAKE_CANTO_TX,
           title: "Stake Canto",
           params: {
@@ -285,49 +285,6 @@ export default function StakingPage() {
 
   const space = " ";
   const str = "search...";
-  //console.log(userStaking?.unbonding);
-
-  // let unbondingDelegationsTable: any[] = [];
-
-  // const unbondingDelegationsTable1 =
-  //   userStaking && userStaking.unbonding ? userStaking.unbonding.map : [];
-  // for (
-  //   let i = 0;
-  //   i <
-  //   (userStaking && userStaking.unbonding ? userStaking.unbonding.length : 0);
-  //   i++
-  // ) {
-  //   const validatorAddress = userStaking?.unbonding[i].validator_address;
-  //   const validator = validators.filter(
-  //     (v) => v.operator_address == validatorAddress
-  //   );
-  //   const unbondingTable = userStaking?.unbonding[i].entries.map(
-  //     (unbondingElement, index) => ({
-  //       name: validator[0].description.moniker,
-  //       delegation: unbondingElement.balance,
-  //       completionDate: unbondingElement.completion_time,
-  //     })
-  //   );
-  // }
-  //console.log(unbondingDelegationsTable);
-  // let unbondingDelegations:UnbondingDelegation[] = [];
-  // if(userStaking && userStaking.unbonding && userStaking.unbonding.length>0){
-  //   for(let i=0;i<userStaking.unbonding.length;i++){
-  //     const validatorAddress = userStaking.unbonding[i].validator_address;
-  //     const validatorUnbonded = validators.find(e=>e.operator_address==validatorAddress);
-  //     const validatorName = validatorUnbonded?.description.moniker;
-
-  //     for(let j=0;j<userStaking.unbonding[i].entries.length;j++){
-  //         const undelegationAmount = userStaking.unbonding[i].entries[j].balance;
-  //         const completion_time = userStaking.unbonding[i].entries[j].completion_time;
-  //         unbondingDelegations.push({
-  //           name: validatorName? validatorName : "",
-  //           completion_date:completion_time,
-  //           undelegation: undelegationAmount
-  //         })
-  //     }
-  //   }
-  // }
 
   const unbondingDelegations: UnbondingDelegation[] =
     userStaking?.unbonding
@@ -366,7 +323,7 @@ export default function StakingPage() {
   ) {
     if (signer) {
       const newFlow: NewTransactionFlow = {
-        icon: "/tokens/canto.svg",
+        icon: "/canto.svg",
         txType: TransactionFlowType.STAKE_CANTO_TX,
         title: "Stake Canto",
         params: {

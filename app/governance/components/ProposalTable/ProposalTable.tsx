@@ -88,7 +88,6 @@ const ProposalTable = ({ proposals }: TableProps) => {
 
     //setTotalPages(Math.ceil(filteredProposals.length / pageSize));
   };
-
   const proposalTitleMap = new Map<string, string>();
   proposalTitleMap.set("All", "ALL PROPOSALS");
   proposalTitleMap.set("Active", "ACTIVE PROPOSALS");
@@ -114,40 +113,6 @@ const ProposalTable = ({ proposals }: TableProps) => {
   }
   return (
     <div className={styles.tableContainer}>
-      {/* <div className={styles.toggleGroupContainer}>
-        <div className={styles.toggleGroup}>
-          <ToggleGroup options={["All","Active","Passed","Rejected"]} selected={currentFilter} setSelected={handleFilterChange}></ToggleGroup>
-        </div>
-          
-      </div> */}
-      {/* {(filteredProposals.length==0 || !filteredProposals) ? <div className={styles.table}><div className={styles.noProposalContainer}><Text font="proto_mono"> No {currentFilter} Proposals Available </Text></div></div> : 
-      //   <table className={styles.table}>
-      //   <thead>
-      //     <tr key='proposalTableHeader'>
-      //       <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>ID</Text></th>
-      //       <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Title</Text></th>
-      //       <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Status</Text></th>
-      //       <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Type</Text></th>
-      //       <th className={styles.tableHeader}><Text font='rm_mono' size='sm' weight='normal' opacity={0.4}>Voting Date</Text></th>
-      //     </tr>
-      //   </thead>
-      //   <tbody>
-      //     {paginatedProposals.map((proposal,index) => (
-          
-      //       <tr className={styles.row} key={proposal.proposal_id} onClick={()=>handleRowClick(proposal.proposal_id)}
-      //       style={{ cursor: 'pointer' }}>
-      //         <td className={styles.tableData}><Text font="rm_mono" size='sm'>{proposal.proposal_id}</Text></td>
-      //         <td className={styles.tableTitleColumn}><Text font="rm_mono" size='sm' className={styles.rowTitle}>{proposal.title}</Text></td>
-      //         <td className={styles.tableData}><Text font="rm_mono" size='sm'>{formatProposalStatus(proposal.status)}</Text></td>
-      //         <td className={styles.tableData}><Text font="rm_mono" size='sm'>{formatProposalType(proposal.type_url)}</Text></td>
-      //         <td className={styles.tableData}><Text font="rm_mono" size='sm'>{(new Date(proposal.voting_end_time)).toDateString()}</Text></td>
-      //       </tr>
-        
-      //     ))}
-          
-      //   </tbody>
-      // </table>     */}
-
       <div className={styles.table}>
         {
           <Table

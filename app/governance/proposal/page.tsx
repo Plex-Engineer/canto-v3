@@ -40,7 +40,7 @@ export default function Page() {
       }
       //console.log("cast vote test");
       const newFlow: NewTransactionFlow = {
-        icon: "/tokens/canto.svg",
+        icon: "/canto.svg",
         txType: TransactionFlowType.VOTE_TX,
         title: "Vote Tx",
         params: {
