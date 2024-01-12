@@ -108,14 +108,16 @@
   top: 6px;
   right: 6px;
   cursor: pointer;
-  transition: transform 0.3s 0.2s cubic-bezier(0.165, 0.84, 0.44, 1),
+  transition:
+    transform 0.3s 0.2s cubic-bezier(0.165, 0.84, 0.44, 1),
     scale 0.3s ease-in;
   scale: 0.9;
   z-index: 30;
   &:hover {
     transform: rotateZ(270deg);
     scale: 1.1;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    transition:
+      transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
       scale 0.3s ease-in;
   }
 }
@@ -126,4 +128,19 @@
   height: 100%;
   width: 100%;
   flex-grow: 2;
+}
+
+@media screen and (max-width: 768px) {
+  .modal {
+    min-width: calc(100% - 2rem) !important;
+    width: calc(100% - 2rem) !important;
+    min-height: calc(100% - 2rem) !important;
+    border-radius: 0px;
+
+    margin: 0 1rem;
+  }
+  .close {
+    top: 0;
+    right: 0;
+  }
 }
