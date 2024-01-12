@@ -112,8 +112,7 @@ const NavBar = () => {
           href="/governance"
           className={clsx(
             styles["nav-link"],
-            currentPath == ("/governance" || "/governance/proposal") &&
-              styles.active
+            currentPath.includes("governance") && styles.active
           )}
         >
           <Text size="sm">Governance</Text>
