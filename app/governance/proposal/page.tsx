@@ -3,7 +3,6 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import Text from "@/components/text";
 import styles from "./proposalModal.module.scss";
-//import useSingleProposalData from "@/hooks/gov/useSingleProposalData";
 import {
   calculateVotePercentages,
   formatDeposit,
@@ -22,15 +21,9 @@ import { VoteOption } from "@/hooks/gov/interfaces/voteOptions";
 import Image from "next/image";
 import { NEW_ERROR } from "@/config/interfaces";
 
-import { formatBalance } from "@/utils/formatting/balances.utils";
-import Container from "@/components/container/container";
-import { RadioButton } from "../components/RadioButton/RadioButton";
 import { VotingInfoBox } from "../components/VotingInfoBox/VotingInfoBox";
 import { TransactionFlowType } from "@/transactions/flows/flowMap";
 import { NewTransactionFlow } from "@/transactions/flows/types";
-import { Height } from "@buf/cosmos_ibc.bufbuild_es/ibc/core/client/v1/client_pb";
-import Spacer from "@/components/layout/spacer";
-import useStaking from "@/hooks/staking/useStaking";
 
 export default function Page() {
   function castVote(proposalId: number, voteOption: VoteOption | null) {

@@ -74,7 +74,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
               marginRight: "6px",
             }}
           >
-            <Icon icon={{ url: "./dropdown.svg", size: 24 }} themed />
+            <Icon icon={{ url: "/dropdown.svg", size: 24 }} themed />
           </div>
         )}
         <Text font="proto_mono" size="lg">
@@ -203,7 +203,7 @@ const PositionList = ({
                   ),
                   18
                 )}{" "}
-                <Icon icon={{ url: "tokens/note.svg", size: 16 }} themed />
+                <Icon icon={{ url: "/tokens/note.svg", size: 16 }} themed />
               </Text>
             </Container>
           </Container>

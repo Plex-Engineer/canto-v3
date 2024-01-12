@@ -1,25 +1,21 @@
 "use client";
 
-import { useMemo, useState } from "react";
-
-import Container from "@/components/container/container";
+import { useMemo } from "react";
 import { Proposal } from "@/hooks/gov/interfaces/proposal";
 import useProposals from "@/hooks/gov/useProposals";
 import ProposalTable from "./components/ProposalTable/ProposalTable";
-import Table from "@/components/table/table";
 import styles from "./gov.module.scss";
 import Text from "@/components/text";
 import Spacer from "@/components/layout/spacer";
 import Button from "@/components/button/button";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Splash from "@/components/splash/splash";
-import { ethToCantoAddress } from "@/utils/address";
 import { useRouter } from "next/navigation";
 
 export default function GovernancePage() {
   const router = useRouter();
 
-  const { txStore, signer, chainId } = useCantoSigner();
+  const { chainId } = useCantoSigner();
   const { proposals, isProposalsLoading } = useProposals({ chainId: chainId });
 
   const sorted_proposals = useMemo(

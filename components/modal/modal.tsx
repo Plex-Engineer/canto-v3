@@ -74,7 +74,7 @@ const Modal = ({
             <Icon
               themed
               icon={{
-                url: "close.svg",
+                url: "/close.svg",
                 size: 40,
               }}
             />

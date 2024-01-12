@@ -107,26 +107,17 @@ const NavBar = () => {
         >
           <Text size="sm">Pools</Text>
         </Link>
-        {currentPath == "/governance/proposal" && (
-          <Link
-            href="/governance"
-            className={clsx(styles["nav-link"], styles.active)}
-          >
-            <Text size="sm">Governance</Text>
-          </Link>
-        )}
-        {currentPath != "/governance/proposal" && (
-          <Link
-            href="/governance"
-            className={clsx(
-              styles["nav-link"],
-              currentPath == ("/governance" || "/governance/proposal") &&
-                styles.active
-            )}
-          >
-            <Text size="sm">Governance</Text>
-          </Link>
-        )}
+
+        <Link
+          href="/governance"
+          className={clsx(
+            styles["nav-link"],
+            currentPath == ("/governance" || "/governance/proposal") &&
+              styles.active
+          )}
+        >
+          <Text size="sm">Governance</Text>
+        </Link>
       </div>
       <div className={styles["btn-grp"]}>
         <div className={styles.theme}>
