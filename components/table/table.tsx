@@ -74,6 +74,8 @@ const Table = (props: Props) => {
                   );
                 })}
               </div>
+            ) : props.isPaginated && props.content.length == index + 1 ? (
+              <div>{row}</div>
             ) : (
               <div className={styles.rowElement}>{row}</div>
             );

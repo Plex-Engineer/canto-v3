@@ -250,9 +250,9 @@ export const StakingModal = (props: StakingModalParams) => {
           errorMessage="Amount must be greater than 0"
         /> */}
         <Amount
-          IconUrl={"/tokens/canto.svg"}
-          title={""}
-          symbol={""}
+          IconUrl={"/canto.svg"}
+          title={"CANTO"}
+          symbol={"CANTO"}
           onChange={(val, wasMax) => {
             wasMax ? setMaxClicked(true) : setMaxClicked(false);
             setInputAmount(val.target.value);

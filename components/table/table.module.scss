@@ -46,6 +46,20 @@
     background: rgba(var(--dark-color), 0.1);
   }
 }
+.rowElement{
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  &:not(.header) {
+    // cursor: pointer;
+    border: 1px solid var(--border-stroke-color);
+    border-top: none;
+  }
+  &:not(.header):hover {
+    background: rgba(var(--dark-color), 0.1);
+  }
+}
 .cellRow {
   width: 100%;
   display: flex;

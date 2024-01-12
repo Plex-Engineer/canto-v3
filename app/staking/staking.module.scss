@@ -160,3 +160,12 @@
     border-right: 1px solid var(--primary-90-color);
   }
 }
+
+.noValidatorContainer{
+  justify-content: center;
+  align-items: center;
+  margin-top: 100px;
+  margin-bottom: 100px;
+  text-align: center;
+  flex-grow: 1;
+}

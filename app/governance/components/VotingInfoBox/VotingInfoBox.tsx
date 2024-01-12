@@ -57,13 +57,14 @@ export function VotingInfoBox({
     }
     return { votePercentage: "", voteAmount: "" };
   }
+  //const color3 = `rgba(${color2},0.5)`;
 
   const getHoverStyle = () => {
     if (isSelected && isActive) {
-      return { backgroundColor: color2 };
+      return { backgroundColor: color1, cursor: "pointer" };
     }
     if (isHovered && isActive) {
-      return { backgroundColor: color2, opacity: "50%" };
+      return { backgroundColor: color2, cursor: "pointer" };
     }
     if (isHighest && !isActive) {
       return { backgroundColor: color2 };

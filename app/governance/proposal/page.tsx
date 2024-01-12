@@ -24,6 +24,7 @@ import { NEW_ERROR } from "@/config/interfaces";
 import { VotingInfoBox } from "../components/VotingInfoBox/VotingInfoBox";
 import { TransactionFlowType } from "@/transactions/flows/flowMap";
 import { NewTransactionFlow } from "@/transactions/flows/types";
+import Spacer from "@/components/layout/spacer";
 
 export default function Page() {
   function castVote(proposalId: number, voteOption: VoteOption | null) {
@@ -35,7 +36,7 @@ export default function Page() {
       const newFlow: NewTransactionFlow = {
         icon: "/canto.svg",
         txType: TransactionFlowType.VOTE_TX,
-        title: "Vote Tx",
+        title: "Voting",
         params: {
           chainId: chainId,
           ethAccount: signer?.account.address ?? "",
@@ -95,7 +96,7 @@ export default function Page() {
 
   if (!proposal) {
     return (
-      <div>
+      <div className={styles.noProposalContainer}>
         <Text font="proto_mono">
           No proposal found with the ID {proposalId}{" "}
         </Text>
@@ -203,11 +204,13 @@ export default function Page() {
             <div className={styles.proposalInfo}>
               <div>
                 <Text font="proto_mono" opacity={0.3}>
-                  Turnout/ Quorum:{" "}
+                  Turnout / Quorum:{" "}
                 </Text>
               </div>
               <div>
-                <Text font="proto_mono">38.1% 33.4%</Text>
+                <Text font="proto_mono">
+                  {"38.1%"} &nbsp; {"33.4%"}
+                </Text>
               </div>
             </div>
           </div>

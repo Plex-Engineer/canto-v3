@@ -325,7 +325,7 @@ export default function StakingPage() {
       const newFlow: NewTransactionFlow = {
         icon: "/canto.svg",
         txType: TransactionFlowType.STAKE_CANTO_TX,
-        title: "Stake Canto",
+        title: "Rewards",
         params: {
           chainId: chainId,
           ethAccount: signer?.account.address,
@@ -689,8 +689,15 @@ export default function StakingPage() {
                     </div>
                   </div>,
                 ]
-              : [<div key="noData">NO VALIDATORS FOUND</div>]
+              : [
+                  <div key="noData" className={styles.noValidatorContainer}>
+                    <Text font="proto_mono" size="lg">
+                      NO VALIDATORS FOUND
+                    </Text>
+                  </div>,
+                ]
           }
+          isPaginated={true}
         />
 
         {/* <div className={styles.paginationContainer}>
