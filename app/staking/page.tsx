@@ -691,6 +691,7 @@ export default function StakingPage() {
                 ]
               : [<div key="noData">NO VALIDATORS FOUND</div>]
           }
+          isPaginated={true}
         />
 
         {/* <div className={styles.paginationContainer}>

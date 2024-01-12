@@ -14,6 +14,9 @@
       overflow: hidden;
       text-overflow: ellipsis;
       //max-width: 250px;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
     }
    
     .toggleGroupContainer{
@@ -66,13 +69,15 @@
         flex-direction: row;
         align-items: center;
         justify-content: center;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        //padding-left:35px;
+        //overflow: hidden;
+        //text-overflow: ellipsis;
         padding-left: 10px;
         padding-right: 10px;
+        //max-width: 300px;
         //max-width: 15ch;
         //display: block ;
-        overflow-wrap: break-word ;
+        //overflow-wrap: break-word ;
       }
     }
     .paginationContainer {

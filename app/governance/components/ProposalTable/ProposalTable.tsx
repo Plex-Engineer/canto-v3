@@ -171,66 +171,85 @@ const ProposalTable = ({ proposals }: TableProps) => {
               paginatedProposals.length > 0
                 ? [
                     ...paginatedProposals.map((proposal, index) => {
-                      return <div style={{display:"flex",flexDirection:"row",cursor:"pointer",alignItems:"center", justifyContent:"center",height:"80px"}}>
-                        <Container width="10%"
-                          key={`name_${index}`}
-                          style={{ cursor: "pointer" , alignItems:"center"}}
-                          onClick={() => handleRowClick(proposal.proposal_id)}
+                      return (
+                        <div
+                          key={`row_${index}`}
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            cursor: "pointer",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            height: "80px",
+                          }}
                         >
-                          <Text font="rm_mono" className={styles.tableData}>
-                            {proposal.proposal_id}
-                          </Text>
-                        </Container>
-                        <Container width="30%"
-                          key={`tokens_${index}`}
-                          style={{ cursor: "pointer"}}
-                          //direction="row"
-                          onClick={() => handleRowClick(proposal.proposal_id)}
-                          className={styles.tableTitleColumn}
-                          
-                          //gap="auto"
-                        >
-                          <Text
-                            font="rm_mono"
-                            size="sm"
-                            className={styles.rowTitle}
+                          <Container
+                            width="10%"
+                            key={`name_${index}`}
+                            style={{ cursor: "pointer", alignItems: "center" }}
+                            onClick={() => handleRowClick(proposal.proposal_id)}
                           >
-                            {proposal.title}
-                          </Text>
-                        </Container>
-                        <Container width="15%" 
-                          key={`commission_${index}`}
-                          style={{ cursor: "pointer" ,alignItems:"center"}}
-                          onClick={() => handleRowClick(proposal.proposal_id)}
-                        >
-                          <Text font="rm_mono" className={styles.tableData}>
-                            {formatProposalStatus(proposal.status)}
-                          </Text>
-                        </Container>
-                        <Container width="25%"
-                          key={`participation_${index}`}
-                          style={{ cursor: "pointer",alignItems:"center"}}
-                          onClick={() => handleRowClick(proposal.proposal_id)}
-                        >
-                          <Text font="rm_mono" className={styles.tableData}>
-                            {formatProposalType(proposal.type_url)}
-                          </Text>
-                        </Container>
-                        <Container width="20%"
-                          key={`delegators_${index}`}
-                          style={{ cursor: "pointer" ,alignItems:"center"}}
-                          onClick={() => handleRowClick(proposal.proposal_id)}
-                        >
-                          <Text font="rm_mono" className={styles.tableData}>
-                            {new Date(proposal.voting_end_time).toDateString()}
-                          </Text>
-                        </Container>
-                      </div>;
+                            <Text font="rm_mono" className={styles.tableData}>
+                              {proposal.proposal_id}
+                            </Text>
+                          </Container>
+                          <Container
+                            width="30%"
+                            key={`tokens_${index}`}
+                            style={{ cursor: "pointer" }}
+                            //direction="row"
+                            onClick={() => handleRowClick(proposal.proposal_id)}
+                            className={styles.tableTitleColumn}
+
+                            //gap="auto"
+                          >
+                            <Text
+                              font="rm_mono"
+                              size="sm"
+                              className={styles.rowTitle}
+                            >
+                              {proposal.title}
+                            </Text>
+                          </Container>
+                          <Container
+                            width="15%"
+                            key={`commission_${index}`}
+                            style={{ cursor: "pointer", alignItems: "center" }}
+                            onClick={() => handleRowClick(proposal.proposal_id)}
+                          >
+                            <Text font="rm_mono" className={styles.tableData}>
+                              {formatProposalStatus(proposal.status)}
+                            </Text>
+                          </Container>
+                          <Container
+                            width="25%"
+                            key={`participation_${index}`}
+                            style={{ cursor: "pointer", alignItems: "center" }}
+                            onClick={() => handleRowClick(proposal.proposal_id)}
+                          >
+                            <Text font="rm_mono" className={styles.tableData}>
+                              {formatProposalType(proposal.type_url)}
+                            </Text>
+                          </Container>
+                          <Container
+                            width="20%"
+                            key={`delegators_${index}`}
+                            style={{ cursor: "pointer", alignItems: "center" }}
+                            onClick={() => handleRowClick(proposal.proposal_id)}
+                          >
+                            <Text font="rm_mono" className={styles.tableData}>
+                              {new Date(
+                                proposal.voting_end_time
+                              ).toDateString()}
+                            </Text>
+                          </Container>
+                        </div>
+                      );
                     }),
                     <div
                       key="pagination"
                       className={styles.paginationContainer}
-                      style={{border:"none"}}
+                      style={{ border: "none" }}
                     >
                       <div className={styles.paginationButton1}>
                         <Button
@@ -260,6 +279,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                     </div>,
                   ]
             }
+            isPaginated={true}
           />
         }
       </div>
