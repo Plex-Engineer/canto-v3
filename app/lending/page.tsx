@@ -277,7 +277,6 @@ const CTokenTable = ({
           { value: "Manage", ratio: 2 },
         ];
 
-
   return (
     <div className={styles.mainTable}>
       {isLoading ? (
