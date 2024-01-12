@@ -57,20 +57,19 @@
 }
 
 @media screen and (max-width: 768px) {
-    .container {
-        padding : 1rem;
-    }
+  .container {
+    margin: 1rem;
+    width: calc(100% - 2rem);
+  }
   .grid {
     flex-direction: column-reverse !important;
     width: calc(100% - 2rem) !important;
-
   }
   .highlightCard {
     flex-direction: column;
   }
   .mainTable {
-
     flex-direction: column;
+    width: calc(100%) !important;
   }
-    
 }
