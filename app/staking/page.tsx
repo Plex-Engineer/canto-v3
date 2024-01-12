@@ -325,7 +325,7 @@ export default function StakingPage() {
       const newFlow: NewTransactionFlow = {
         icon: "/canto.svg",
         txType: TransactionFlowType.STAKE_CANTO_TX,
-        title: "Stake Canto",
+        title: "Rewards",
         params: {
           chainId: chainId,
           ethAccount: signer?.account.address,

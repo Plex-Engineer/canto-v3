@@ -35,7 +35,7 @@ export default function Page() {
       const newFlow: NewTransactionFlow = {
         icon: "/canto.svg",
         txType: TransactionFlowType.VOTE_TX,
-        title: "Vote Tx",
+        title: "Voting",
         params: {
           chainId: chainId,
           ethAccount: signer?.account.address ?? "",
