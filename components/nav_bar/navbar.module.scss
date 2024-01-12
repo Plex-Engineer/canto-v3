@@ -39,7 +39,9 @@
 .nav-link {
   padding: 0 1rem;
   opacity: 0.4;
-  transition: opacity 0.1s, transform 0.3s;
+  transition:
+    opacity 0.1s,
+    transform 0.3s;
 
   &:hover {
     opacity: 1;
@@ -51,7 +53,10 @@
     display: block;
     height: 1px;
     transform: translate(-15%, 0%) scale(0, 0);
-    transition: transform 0.3s, height 0.3s 0.1s, width 0.3s 0.1s;
+    transition:
+      transform 0.3s,
+      height 0.3s 0.1s,
+      width 0.3s 0.1s;
   }
   &::before {
     content: "";
@@ -59,7 +64,10 @@
     height: 1px;
     transform: translate(-15%, 0%) scale(0, 0);
 
-    transition: transform 0.3s, height 0.3s 0.1s, width 0.3s 0.1s;
+    transition:
+      transform 0.3s,
+      height 0.3s 0.1s,
+      width 0.3s 0.1s;
   }
   //   &:hover::after {
   //     content: "";
@@ -123,4 +131,23 @@
   justify-content: center;
   width: fit-content;
   width: 76px;
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    grid-template-columns: 0.2fr 1fr;
+  }
+  .activity {
+    display: none;
+  }
+  .nav-links {
+    display: none;
+  }
+  .btn-grp {
+    justify-self: end;
+  }
+  .wallet-connect {
+    background-color: red;
+    justify-content: center;
+  }
 }
