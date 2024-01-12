@@ -96,7 +96,7 @@ export default function Page() {
 
   if (!proposal) {
     return (
-      <div>
+      <div className={styles.noProposalContainer}>
         <Text font="proto_mono">
           No proposal found with the ID {proposalId}{" "}
         </Text>
@@ -209,7 +209,7 @@ export default function Page() {
               </div>
               <div>
                 <Text font="proto_mono">
-                  {"38.1% "} {" 33.4%"}
+                  {"38.1%"} &nbsp; {"33.4%"}
                 </Text>
               </div>
             </div>

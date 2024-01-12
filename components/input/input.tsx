@@ -52,7 +52,7 @@ const Input = (props: InputProps) => {
   const [isInputClicked, setInputClicked] = useState(false);
   const getSearchStyle = () => {
     if (props.searchicon && isInputClicked) {
-      return { backgroundColor: "lightgrey" };
+      return { backgroundColor: "rgba(var(--dark-color), 0.07)" };
     }
     return {};
   };

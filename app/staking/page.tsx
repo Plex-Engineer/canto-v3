@@ -689,7 +689,13 @@ export default function StakingPage() {
                     </div>
                   </div>,
                 ]
-              : [<div key="noData">NO VALIDATORS FOUND</div>]
+              : [
+                  <div key="noData" className={styles.noValidatorContainer}>
+                    <Text font="proto_mono" size="lg">
+                      NO VALIDATORS FOUND
+                    </Text>
+                  </div>,
+                ]
           }
           isPaginated={true}
         />
