@@ -100,10 +100,9 @@ export default function Page() {
                 UserAmbientPairRow({
                   pool,
                   onManage: (poolAddress) => {
-                    Analytics.actions.events.liquidityPool.manageLPClicked({
-                      lpType: "AMBIENT",
-                      ...getAnalyticsAmbientLiquidityPoolInfo(pool),
-                    });
+                    Analytics.actions.events.liquidityPool.manageLPClicked(
+                      getAnalyticsAmbientLiquidityPoolInfo(pool)
+                    );
                     setPair(poolAddress);
                   },
                   rewards: rewards.ambient,
@@ -114,10 +113,9 @@ export default function Page() {
                   pair,
 
                   onManage: (pairAddress) => {
-                    Analytics.actions.events.liquidityPool.manageLPClicked({
-                      lpType: "CANTO",
-                      ...getAnalyticsCantoLiquidityPoolInfo(pair),
-                    });
+                    Analytics.actions.events.liquidityPool.manageLPClicked(
+                      getAnalyticsCantoLiquidityPoolInfo(pair)
+                    );
                     setPair(pairAddress);
                   },
                 })

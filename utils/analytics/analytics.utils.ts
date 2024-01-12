@@ -343,7 +343,7 @@ function getLpComboClaimRewardsTransactionFlowType(
   }
 }
 
-export function getAnalyticsLendingMarketTokenInfo(cToken: CTokenWithUserData, liquidity: string, isSupply: boolean): AnalyticsLMData {
+export function getAnalyticsLendingMarketTokenInfo(lmType: string, cToken: CTokenWithUserData, liquidity: string, isSupply: boolean): AnalyticsLMData {
   const cTokenData = {
     lmToken: cToken.underlying.symbol,
     lmWalletBalance: displayAnalyticsAmount(
@@ -396,6 +396,7 @@ export function getAnalyticsAmbientLiquidityPoolInfo(pool : AmbientPool) : Analy
 }));
 
 return {
+  lpType: "AMBIENT",
   ambientLp : pool.symbol,
   ambientLPPositions: positions,
 }
@@ -403,6 +404,7 @@ return {
 
 export function getAnalyticsCantoLiquidityPoolInfo(pool : CantoDexPairWithUserCTokenData) : AnalyticsCantoLPData {
   return {
+    lpType: "CANTO",
     cantoLp: pool.symbol,
     cantoLpTokenBalance: displayAmount(
       pool.clmData?.userDetails?.balanceOfUnderlying ?? "0",

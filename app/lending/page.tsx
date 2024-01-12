@@ -97,26 +97,26 @@ export default function LendingPage() {
                 cToken={cNote}
                 precisionInValues={2}
                 onSupply={() => {
-                  Analytics.actions.events.lendingMarket.supplyClicked({
-                    lmType: "CTOKEN",
-                    ...getAnalyticsLendingMarketTokenInfo(
+                  Analytics.actions.events.lendingMarket.supplyClicked(
+                    getAnalyticsLendingMarketTokenInfo(
+                      "CTOKEN",
                       cNote,
                       clmPosition.position.liquidity,
                       true
-                    ),
-                  });
+                    )
+                  );
                   setSelectedCToken(cNote.address);
                   setCurrentModal(CLMModalTypes.SUPPLY);
                 }}
                 onBorrow={() => {
-                  Analytics.actions.events.lendingMarket.borrowClicked({
-                    lmType: "CTOKEN",
-                    ...getAnalyticsLendingMarketTokenInfo(
+                  Analytics.actions.events.lendingMarket.borrowClicked(
+                    getAnalyticsLendingMarketTokenInfo(
+                      "CTOKEN",
                       cNote,
                       clmPosition.position.liquidity,
                       false
-                    ),
-                  });
+                    )
+                  );
                   setSelectedCToken(cNote.address);
                   setCurrentModal(CLMModalTypes.BORROW);
                 }}
@@ -333,14 +333,14 @@ const CTokenTable = ({
                   RWARow({
                     cRwa,
                     onSupply: () => {
-                      Analytics.actions.events.lendingMarket.supplyClicked({
-                        lmType: "RWA",
-                        ...getAnalyticsLendingMarketTokenInfo(
+                      Analytics.actions.events.lendingMarket.supplyClicked(
+                        getAnalyticsLendingMarketTokenInfo(
+                          "RWA",
                           cRwa,
                           liquidity,
                           true
-                        ),
-                      });
+                        )
+                      );
                       onSupply(cRwa.address);
                     },
                   })
@@ -350,25 +350,25 @@ const CTokenTable = ({
                     StableCoinRow({
                       cStableCoin,
                       onSupply: () => {
-                        Analytics.actions.events.lendingMarket.supplyClicked({
-                          lmType: "CTOKEN",
-                          ...getAnalyticsLendingMarketTokenInfo(
+                        Analytics.actions.events.lendingMarket.supplyClicked(
+                          getAnalyticsLendingMarketTokenInfo(
+                            "CTOKEN",
                             cStableCoin,
                             liquidity,
                             true
-                          ),
-                        });
+                          )
+                        );
                         onSupply(cStableCoin.address);
                       },
                       onBorrow: () => {
-                        Analytics.actions.events.lendingMarket.borrowClicked({
-                          lmType: "CTOKEN",
-                          ...getAnalyticsLendingMarketTokenInfo(
+                        Analytics.actions.events.lendingMarket.borrowClicked(
+                          getAnalyticsLendingMarketTokenInfo(
+                            "CTOKEN",
                             cStableCoin,
                             liquidity,
                             false
-                          ),
-                        });
+                          )
+                        );
                         onBorrow(cStableCoin.address);
                       },
                     })
