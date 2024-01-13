@@ -20,9 +20,13 @@
   justify-content: center;
   align-items: center;
 
-  img {
+  a > img {
     width: 24px;
   }
+}
+
+.menu {
+  display: none;
 }
 
 .activity {
@@ -141,13 +145,39 @@
     display: none;
   }
   .nav-links {
-    display: none;
+    position: absolute;
+    top: 60px;
+    height: calc(100% - 60px);
+    width: 100%;
+    background-color: var(--card-background-color);
+    z-index: 1;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid var(--border-stroke-color);
+  }
+  //   data attribute which data-menu-open is set to true
+  .nav-links[data-menu-open="true"] {
+    transform: translateX(0);
+  }
+
+  .nav-links[data-menu-open="false"] {
+    transform: translateX(-100%);
+  }
+
+  .nav-link {
+    p {
+      font-size: 24px !important;
+    }
   }
   .btn-grp {
     justify-self: end;
   }
   .wallet-connect {
-    background-color: red;
     justify-content: center;
+  }
+
+  .menu {
+    display: block;
   }
 }
