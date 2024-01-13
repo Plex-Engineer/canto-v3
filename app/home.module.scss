@@ -47,7 +47,8 @@
     height: 100%;
     // background-image: url("/bg.jpg");
 
-    background: repeating-radial-gradient(#000 0 0.0001%, #fff 0 0.0002%) 50% 0/2500px
+    background:
+      repeating-radial-gradient(#000 0 0.0001%, #fff 0 0.0002%) 50% 0/2500px
         2500px,
       repeating-conic-gradient(#000 0 0.0001%, #fff 0 0.0002%) 60% 60%/2500px
         2500px;
@@ -60,6 +61,23 @@
 }
 @keyframes buzz {
   100% {
-    background-position: 50% 0, 60% 50%;
+    background-position:
+      50% 0,
+      60% 50%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .eco-grid {
+    grid-template-columns: repeat(1, minmax(300px, 1fr));
+  }
+  .hero {
+    max-height: calc(60rem);
+  }
+
+  .container {
+    img {
+      width: 100%;
+    }
   }
 }
