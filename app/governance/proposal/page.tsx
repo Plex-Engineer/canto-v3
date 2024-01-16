@@ -14,7 +14,6 @@ import Icon from "@/components/icon/icon";
 import Button from "@/components/button/button";
 import useProposals from "@/hooks/gov/useProposals";
 import { useState } from "react";
-import { Proposal } from "@/hooks/gov/interfaces/proposal";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Splash from "@/components/splash/splash";
 import { VoteOption } from "@/hooks/gov/interfaces/voteOptions";
@@ -24,7 +23,6 @@ import { NEW_ERROR } from "@/config/interfaces";
 import { VotingInfoBox } from "../components/VotingInfoBox/VotingInfoBox";
 import { TransactionFlowType } from "@/transactions/flows/flowMap";
 import { NewTransactionFlow } from "@/transactions/flows/types";
-import Spacer from "@/components/layout/spacer";
 
 export default function Page() {
   function castVote(proposalId: number, voteOption: VoteOption | null) {
@@ -51,35 +49,6 @@ export default function Page() {
     }
   }
 
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
-  const proposalId = Number(id);
-  const router = useRouter();
-
-  const { txStore, signer, chainId } = useCantoSigner();
-  const { proposals, isProposalsLoading } = useProposals({ chainId: chainId });
-  const [selectedVote, setSelectedVote] = useState<VoteOption | null>(null);
-
-  const [isChecked, setChecked] = useState(false);
-
-  const handleCheck = (voteOption: VoteOption) => {
-    setSelectedVote(voteOption);
-    setChecked(!isChecked);
-  };
-
-  //console.log(selectedVote);
-  if (isProposalsLoading) {
-    return <Splash />;
-  }
-
-  if (!id) {
-    return (
-      <div>
-        <Text font="proto_mono">Proposal ID is missing</Text>
-      </div>
-    );
-  }
-
   function getVotingBoxStyles() {
     if (isActive) {
       return {
@@ -92,6 +61,28 @@ export default function Page() {
       padding: "0px 0px 20px 0px",
     };
   }
+
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const proposalId = Number(id);
+  const router = useRouter();
+
+  const { txStore, signer, chainId } = useCantoSigner();
+  const { proposals, isProposalsLoading } = useProposals({ chainId: chainId });
+  const [selectedVote, setSelectedVote] = useState<VoteOption | null>(null);
+
+  if (isProposalsLoading) {
+    return <Splash />;
+  }
+
+  if (!id) {
+    return (
+      <div>
+        <Text font="proto_mono">Proposal ID is missing</Text>
+      </div>
+    );
+  }
+
   const proposal = proposals.find((p) => p.proposal_id === Number(proposalId));
 
   if (!proposal) {
@@ -108,20 +99,12 @@ export default function Page() {
 
   const votesData = calculateVotePercentages(proposal.final_vote);
 
-  //console.log(votesData);
-
-  // const colorMap = new Map<number,String>();
-  // colorMap.set(1, "rgba(6, 252, 153, 0.5)");
-  // colorMap.set(2, "rgb(252, 81, 81,0.5)");
-  // colorMap.set(3, "rgb(68, 85, 239,0.5)");
-  // colorMap.set(4, "rgb(111, 105, 105,0.5)");
   const amounts = [
     parseFloat(votesData.Yes),
     parseFloat(votesData.No),
     parseFloat(votesData.Veto),
     parseFloat(votesData.Abstain),
   ];
-  //console.log(Math.max(...amounts));
 
   const maxAmountIndex = amounts.indexOf(Math.max(...amounts));
 

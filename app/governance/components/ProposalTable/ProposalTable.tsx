@@ -82,8 +82,6 @@ const ProposalTable = ({ proposals }: TableProps) => {
         );
       }
     }
-
-    //setTotalPages(Math.ceil(filteredProposals.length / pageSize));
   };
   const proposalTitleMap = new Map<string, string>();
   proposalTitleMap.set("All", "ALL PROPOSALS");
@@ -99,7 +97,6 @@ const ProposalTable = ({ proposals }: TableProps) => {
 
     router.push(`/governance/proposal?id=${proposalId}`);
   };
-  //console.log(proposalTitleMap.get(currentFilter));
 
   if (!proposals || proposals.length == 0) {
     return (
@@ -280,26 +277,6 @@ const ProposalTable = ({ proposals }: TableProps) => {
           />
         }
       </div>
-      {/* <div className={styles.paginationContainer}>
-        <div className={styles.paginationButton1}>
-          <Button
-            onClick={handlePrevious}
-            disabled={currentPage == 1}
-            width={100}
-          >
-            Previous
-          </Button>
-        </div>
-        <div className={styles.paginationButton2}>
-          <Button
-            onClick={handleNext}
-            disabled={currentPage == totalPages}
-            width={100}
-          >
-            Next
-          </Button>
-        </div>
-      </div> */}
     </div>
   );
 };

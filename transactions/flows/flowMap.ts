@@ -25,7 +25,7 @@ import { cantoBridgeTx, validateCantoBridgeTxParams } from "../bridge";
 import { StakingTransactionParams } from "@/transactions/staking/interfaces/stakingTxTypes";
 import { stakingTx } from "@/transactions/staking/transactions/staking";
 import { proposalVoteTx } from "@/hooks/gov/transactions/vote";
-import { ProposalVoteTxParams } from "@/hooks/gov/interfaces/voteTxParams";
+import { ProposalVoteTxParams } from "@/transactions/gov/interfaces/voteTxParams";
 
 export enum TransactionFlowType {
   //   // Bridge

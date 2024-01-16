@@ -4,7 +4,7 @@ import Container from "@/components/container/container";
 import { formatBalance } from "@/utils/formatting/balances.utils";
 import Icon from "@/components/icon/icon";
 import { VoteData, calculateVotePercentages } from "@/utils/gov/formatData";
-import RadioButton from "../RadioButton/RadioButton";
+import RadioButton from "../../../../components/RadioButton/RadioButton";
 import { VoteOption } from "@/hooks/gov/interfaces/voteOptions";
 import { useState } from "react";
 
@@ -29,10 +29,7 @@ export function VotingInfoBox({
   isHighest: boolean;
   onClick: () => void;
 }) {
-  //const votesData = calculateVotePercentages(proposal.final_vote);
-
   const [isHovered, setIsHovered] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
   function getVotesInfo(
     value: VoteOption,
     votesData: VoteData
@@ -57,7 +54,6 @@ export function VotingInfoBox({
     }
     return { votePercentage: "", voteAmount: "" };
   }
-  //const color3 = `rgba(${color2},0.5)`;
 
   const getHoverStyle = () => {
     if (isSelected && isActive) {
@@ -71,9 +67,6 @@ export function VotingInfoBox({
     }
     return {};
   };
-  // const getCheckedStyle = ()=>{
-
-  // }
 
   return (
     <div
@@ -97,7 +90,7 @@ export function VotingInfoBox({
             }}
             selectedValue={selectedVote}
             checkedColor={color1}
-          ></RadioButton>{" "}
+          />{" "}
         </div>
       )}
 

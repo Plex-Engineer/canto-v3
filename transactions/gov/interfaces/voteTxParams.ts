@@ -1,4 +1,4 @@
-import { VoteOption } from "./voteOptions";
+import { VoteOption } from "../../../hooks/gov/interfaces/voteOptions";
 
 export interface ProposalVoteTxParams {
   chainId: number;

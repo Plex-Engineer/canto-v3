@@ -13,9 +13,6 @@ interface Props {
 export const RadioButton = (props: Props) => {
   const isSelected = props.value == props.selectedValue;
 
-  //console.log(props.value);
-  //console.log(props.selectedValue);
-
   const getStyles = () => {
     if (props.selectedValue == props.value) {
       return { backgroundColor: props.checkedColor, opacity: 1 };
@@ -33,7 +30,6 @@ export const RadioButton = (props: Props) => {
       className={styles.radioBtn2}
       onClick={handleClick}
       style={getStyles()}
-      // style={{ backgroundColor: isSelected && props.isActive ? props.checkedColor : 'transparent' }}
     ></div>
   );
 };

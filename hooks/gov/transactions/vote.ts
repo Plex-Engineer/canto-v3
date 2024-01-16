@@ -8,11 +8,18 @@ import {
 import { createMsgsVote } from "@/utils/cosmos/transactions/messages/voting/vote";
 //import { createMsgsVote } from "@/utils/cosmos/transactions/messages/voting/vote";
 import { voteOptionToNumber } from "../interfaces/voteOptions";
-import { ProposalVoteTxParams } from "../interfaces/voteTxParams";
+import { ProposalVoteTxParams } from "../../../transactions/gov/interfaces/voteTxParams";
 
 import { ethToCantoAddress } from "@/utils/address/conversion.utils";
-import { Transaction, TransactionDescription, TxCreatorFunctionReturn } from "@/transactions/interfaces/txBase";
-import { CantoFETxType, TX_DESCRIPTIONS } from "@/transactions/interfaces/txDescriptions";
+import {
+  Transaction,
+  TransactionDescription,
+  TxCreatorFunctionReturn,
+} from "@/transactions/interfaces/txBase";
+import {
+  CantoFETxType,
+  TX_DESCRIPTIONS,
+} from "@/transactions/interfaces/txDescriptions";
 
 export async function proposalVoteTx(
   params: ProposalVoteTxParams
@@ -31,15 +38,16 @@ export async function proposalVoteTx(
 
   return NO_ERROR({
     transactions: [
-    _voteTx(
-      params.ethAccount,
-      params.chainId,
-      cantoAddress,
-      params.proposalId,
-      numVoteOption,
-      TX_DESCRIPTIONS.VOTE(params.proposalId, params.voteOption)
-    ),
-  ]});
+      _voteTx(
+        params.ethAccount,
+        params.chainId,
+        cantoAddress,
+        params.proposalId,
+        numVoteOption,
+        TX_DESCRIPTIONS.VOTE(params.proposalId, params.voteOption)
+      ),
+    ],
+  });
 }
 
 /**

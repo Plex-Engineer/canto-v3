@@ -1,9 +1,12 @@
-
 import { MsgVote } from "@buf/cosmos_cosmos-sdk.bufbuild_es/cosmos/gov/v1beta1/tx_pb.js";
 
 import { VOTING_FEE } from "@/config/consts/fees";
 import { generateCosmosEIPTypes } from "@/transactions/cosmos/messages/base";
-import { CosmosNativeMessage, EIP712Message, UnsignedCosmosMessages } from "@/transactions/interfaces/txCosmos";
+import {
+  CosmosNativeMessage,
+  EIP712Message,
+  UnsignedCosmosMessages,
+} from "@/transactions/interfaces/txCosmos";
 
 const MSG_VOTE_TYPES = {
   MsgValue: [

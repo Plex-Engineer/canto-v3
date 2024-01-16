@@ -49,7 +49,7 @@ export default function GovernancePage() {
 
         <Spacer height="40px" />
 
-        <ProposalTable proposals={sorted_proposals}></ProposalTable>
+        <ProposalTable proposals={sorted_proposals} />
         <Spacer height="40px" />
       </div>
     </div>

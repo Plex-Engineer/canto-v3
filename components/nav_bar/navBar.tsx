@@ -51,9 +51,6 @@ const NavBar = () => {
     chainId: signer?.chain.id,
   });
 
-  //console.log(currentPath);
-  //console.log(currentPath == ("/governance" || "/governance/proposal"));
-
   return (
     <div className={styles.container}>
       <div className={styles.logo}>

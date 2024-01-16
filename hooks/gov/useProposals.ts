@@ -5,7 +5,6 @@ import {
 } from "./interfaces/hookParams";
 import { getCantoApiData } from "@/config/api";
 import { Proposal } from "./interfaces/proposal";
-import { NEW_ERROR, errMsg } from "@/config/interfaces";
 
 export default function useProposals(
   params: ProposalHookParams,
@@ -13,10 +12,8 @@ export default function useProposals(
     refetchInterval?: number;
   }
 ): ProposalHookReturn {
-  
-
   // just need to fetch all proposals for this hook
-  const { data: proposals,isLoading } = useQuery(
+  const { data: proposals, isLoading } = useQuery(
     ["proposals", params.chainId],
     async () => {
       const { data: proposals, error } = await getCantoApiData<Proposal[]>(
@@ -24,7 +21,6 @@ export default function useProposals(
         "/v1/gov/proposals"
       );
       if (error) throw error;
-      //const proposalData = JSON.parse(proposals);
       return proposals;
     },
     {
@@ -32,22 +28,12 @@ export default function useProposals(
         // console.log("data", data);
       },
       onError: (error) => {
-        console.log("error", error);
+        console.error("error", error);
       },
     }
   );
-  //console.log(proposals);
-  if(proposals){
-    //console.log(JSON.parse(proposals));
-    return {
-      proposals: proposals,
-      isProposalsLoading: isLoading
-    };
-  }
   return {
-    proposals :[],
-    isProposalsLoading: isLoading
-  }
-
-  
+    proposals: proposals ?? [],
+    isProposalsLoading: isLoading,
+  };
 }

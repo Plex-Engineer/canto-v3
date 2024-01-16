@@ -20,7 +20,7 @@ import {
   CTokenLendingTransactionParams,
 } from "../lending";
 import { StakingTransactionParams } from "@/transactions/staking/interfaces/stakingTxTypes";
-import { ProposalVoteTxParams } from "@/hooks/gov/interfaces/voteTxParams";
+import { ProposalVoteTxParams } from "@/transactions/gov/interfaces/voteTxParams";
 
 // txType is the key for the txMap that will create the Transaction[] list
 export type NewTransactionFlow = {

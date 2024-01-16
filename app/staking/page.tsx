@@ -135,70 +135,6 @@ export default function StakingPage() {
       })
     : [];
 
-  function createStakingParams(
-    chainId: number,
-    ethAccount: string,
-    txType: StakingTxTypes,
-    amount: string,
-    validator1: Validator,
-    validatorNew: Validator
-  ) {
-    if (txType == StakingTxTypes.CLAIM_REWARDS) {
-      return {
-        chainId: chainId,
-        txType: txType,
-        ethAccount: ethAccount,
-        validatorAddresses: allValidatorsAddresses,
-      };
-    }
-    if (
-      txType == StakingTxTypes.DELEGATE ||
-      txType == StakingTxTypes.UNDELEGATE
-    ) {
-      return {
-        chainId: chainId,
-        txType: txType,
-        amount: amount,
-        ethAccount: ethAccount,
-        validatorAddress: validator1?.operator_address,
-        validatorName: validator1?.description.moniker,
-      };
-    }
-    if (txType == StakingTxTypes.REDELEGATE) {
-      if (validatorNew) {
-        return {
-          chainId: chainId,
-          txType: txType,
-          amount: amount,
-          ethAccount: ethAccount,
-          validatorAddress: validator1?.operator_address,
-          validatorName: validator1?.description.moniker,
-          newValidatorAddress: validatorNew?.operator_address,
-        };
-      }
-    }
-  }
-
-  // console.log(userStaking);
-  // console.log(selection);
-  // console.log(transaction);
-
-  const validatorsWithRanks = useMemo(
-    () =>
-      validators
-        .sort((a, b) => (BigInt(a.tokens) < BigInt(b.tokens) ? 1 : -1))
-        .map((validator, index) => ({
-          ...validator,
-          rank: index + 1,
-        })),
-    [validators]
-  );
-
-  // const validatorsWithRanks = validators.map((validator, index) => ({
-  //   ...validator,
-  //   rank: index + 1, // Adding 1 to make the rank start from 1
-  // }));
-
   const activeValidators = useMemo(
     () =>
       validators
@@ -283,9 +219,6 @@ export default function StakingPage() {
     }
   };
 
-  const space = " ";
-  const str = "search...";
-
   const unbondingDelegations: UnbondingDelegation[] =
     userStaking?.unbonding
       ?.map((unbondingEntry) => {
@@ -304,10 +237,6 @@ export default function StakingPage() {
         return entries;
       })
       .flat() || [];
-
-  // console.log(userStaking);
-  // console.log(userStaking?.unbonding);
-  // console.log(unbondingDelegations);
 
   function handleClick(validator: Validator) {
     setSelectedValidator(validator);
@@ -362,11 +291,11 @@ export default function StakingPage() {
                 })}{" "}
               </Text>
             </div>
-            <p>{space}</p>
+            <p> </p>
             <Icon
               themed
               icon={{
-                url: "./tokens/canto.svg",
+                url: "/tokens/canto.svg",
                 size: 24,
               }}
             />
@@ -396,7 +325,7 @@ export default function StakingPage() {
             <Icon
               themed
               icon={{
-                url: "./tokens/canto.svg",
+                url: "/tokens/canto.svg",
                 size: 24,
               }}
             />
@@ -509,40 +438,6 @@ export default function StakingPage() {
       )}
 
       <Container width="100%" className={styles.tableContainer}>
-        {/* <div className={styles.searchBarContainer2}>
-          <div className={styles.searchBarContainer}>
-            <div>
-              <Input
-                height={47}
-                icon="/searchIcon.svg"
-                type="text"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-
-                  handleSearch();
-                  //console.log("inside function");
-                }}
-                placeholder={str[0].toUpperCase() + str.slice(1)}
-              />
-                
-
-            </div>
-            <div style={{display:"flex",flexDirection:"column", justifyContent:"center", alignItems:"center"}}>
-              <Button shadow="none" onClick={() => {}} >
-                <Icon
-                  
-                  themed
-                  icon={{
-                    url: "/searchIcon.svg",
-                    size: 24,
-                  }}
-                />
-              </Button>
-            </div>
-          </div>
-        </div> */}
-
         <Table
           title={
             <div className={styles.tableTitleContainer}>
@@ -560,15 +455,6 @@ export default function StakingPage() {
                 </Text>
               </div>
               <div className={styles.searchBarContainer}>
-                {/* <div className={styles.searchIconContainer}>
-                  <Icon
-                    themed
-                    icon={{
-                      url: "/searchIcon.svg",
-                      size: 24,
-                    }}
-                  />
-                </div> */}
                 <div>
                   <Input
                     height={40}
@@ -581,37 +467,13 @@ export default function StakingPage() {
                       handleSearch();
                       //console.log("inside function");
                     }}
-                    placeholder={str[0].toUpperCase() + str.slice(1)}
+                    placeholder={"Search..."}
                     icon="/searchIcon.svg"
                   />
                 </div>
-                {/* <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Button height={40} shadow="none" onClick={() => {}}>
-                    <Icon
-                      themed
-                      icon={{
-                        url: "/searchIcon.svg",
-                        size: 24,
-                      }}
-                    />
-                  </Button>
-                </div> */}
               </div>
             </div>
           }
-          // secondary={
-          //   <div className={styles.TabRow}>
-          //     <div className={styles.Tab}>ACTIVE VALIDATORS</div>
-          //     <div className={styles.Tab}>INACTIVE VALIDATORS</div>
-          //   </div>
-          // }
           secondary={
             <Container width="25%">
               <ToggleGroup
@@ -700,32 +562,9 @@ export default function StakingPage() {
           isPaginated={true}
         />
 
-        {/* <div className={styles.paginationContainer}>
-          <div className={styles.paginationButton1}>
-            <Button
-              onClick={handlePrevious}
-              disabled={currentPage == 1}
-              width={100}
-            >
-              Previous
-            </Button>
-          </div>
-          <div className={styles.paginationButton2}>
-            <Button
-              onClick={handleNext}
-              disabled={currentPage == totalPages}
-              width={100}
-            >
-              Next
-            </Button>
-          </div>
-        </div> */}
         <Spacer height="80px" />
       </Container>
-      {/* <Container>
-        
-      </Container> */}
-      {/* <BoxedBackground /> */}
+
       <Modal
         width="32rem"
         onClose={() => {
@@ -753,7 +592,7 @@ export default function StakingPage() {
               validatorToRedelegate
             )
           }
-        ></StakingModal>
+        />
       </Modal>
     </div>
   );

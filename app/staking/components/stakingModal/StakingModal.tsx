@@ -1,7 +1,6 @@
 "use client";
 import Container from "@/components/container/container";
 import Spacer from "@/components/layout/spacer";
-import Modal from "@/components/modal/modal";
 import {
   UserUnbondingDelegation,
   Validator,
@@ -12,14 +11,12 @@ import styles from "./StakingModal.module.scss";
 import Text from "@/components/text";
 import Icon from "@/components/icon/icon";
 import { formatBalance } from "@/utils/formatting/balances.utils";
-import Input from "@/components/input/input";
 import Button from "@/components/button/button";
-import { ChangeEvent, SetStateAction, useState } from "react";
-import Tabs from "@/components/tabs/tabs";
+import { useState } from "react";
 import { StakingTxTypes } from "@/transactions/staking/interfaces/stakingTxTypes";
 import { StakingTabs } from "../stakingTab/StakingTabs";
 import { getBalanceForValidator } from "@/hooks/staking/helpers/userStaking";
-import Selector, { Item } from "@/components/selector/selector";
+import Selector from "@/components/selector/selector";
 import Amount from "@/components/amount/amount";
 
 export interface StakingModalParams {
@@ -40,7 +37,7 @@ export interface StakingModalParams {
 }
 export const StakingModal = (props: StakingModalParams) => {
   const [inputAmount, setInputAmount] = useState("");
-  const [maxClicked, setMaxClicked] = useState(false);
+  const [isMaxClicked, setMaxClicked] = useState<boolean>(false);
 
   const [selectedTx, setSelectedTx] = useState<StakingTxTypes>(
     StakingTxTypes.DELEGATE
@@ -77,7 +74,6 @@ export const StakingModal = (props: StakingModalParams) => {
   if (!props.validator) {
     return;
   }
-  //console.log(props.userStaking);
 
   let userDelegationBalance: string | null = "0";
 
@@ -87,7 +83,6 @@ export const StakingModal = (props: StakingModalParams) => {
       props.validator.operator_address
     );
   }
-  //const getUserDelegationBalance =
   const userMaxBalance = userDelegationBalance ? userDelegationBalance : "0";
 
   const userCantoBalance =
@@ -103,8 +98,6 @@ export const StakingModal = (props: StakingModalParams) => {
   const hasUserStaked = userStakedValidatorsAddressList
     ? userStakedValidatorsAddressList.includes(props.validator.operator_address)
     : false;
-
-  const limits = {};
 
   return (
     <Container className={styles.modalContainer}>
@@ -218,37 +211,9 @@ export const StakingModal = (props: StakingModalParams) => {
         <div>
           <Text>Enter Amount</Text>
         </div>
-        <div className={styles.modalInfoRow2}>
-          {/* <div>
-            <Text opacity={0.4}>
-              Balance:{" "}
-              {formatBalance(maxBalance, 18, { commify: true, precision: 2 })}{" "}
-            </Text>
-          </div>
-          <div
-            style={{ cursor: "pointer" }}
-            onClick={() =>
-              setInputAmount(
-                formatBalance(maxBalance, 18, { commify: true, precision: 2 })
-              )
-            }
-          >
-            <Text opacity={1}>(max)</Text>
-          </div> */}
-        </div>
+        <div className={styles.modalInfoRow2}></div>
       </div>
       <div>
-        {/* <Input
-          height={"lg"}
-          type="number"
-          onChange={(e) => {
-            setInputAmount(e.target.value);
-          }}
-          placeholder={Number(0.0).toString()}
-          value={inputAmount.toString()}
-          error={Number(inputAmount) < 0}
-          errorMessage="Amount must be greater than 0"
-        /> */}
         <Amount
           IconUrl={"/canto.svg"}
           title={"CANTO"}
