@@ -16,7 +16,7 @@ import { BridgingMethod } from "@/transactions/bridge";
 import { addTokenBalances } from "@/utils/math";
 import { BridgeToken } from "@/hooks/bridge/interfaces/tokens";
 import FeeButton from "./components/feeButton";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import GravityConfirmationModal from "./components/gravityConfirmationModal";
 import { GRAVITY_BRIDGE } from "@/config/networks";
 
@@ -435,6 +435,26 @@ const formattedFeesForConfirmation = (
             : undefined;
 };
 
+function LoadingTextAnim() {
+  const [value, setValue] = useState("loading fees");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (value === "loading fees...") {
+        setValue("loading fees");
+      } else {
+        setValue(value + ".");
+      }
+    }, 200);
+    return () => clearInterval(interval);
+  });
+  return (
+    <Text font="proto_mono" size="x-sm" className={styles.blink}>
+      {value}
+    </Text>
+  );
+}
+
 // props are return type of useBridgingFees
 const FeesSection = ({
   props,
@@ -450,9 +470,7 @@ const FeesSection = ({
   token: BridgeToken | null;
 }) => {
   return props.isLoading ? (
-    <Text font="proto_mono" size="x-sm">
-      loading fees.....
-    </Text>
+    <LoadingTextAnim />
   ) : props.error !== null ? (
     <Text font="proto_mono" size="x-sm">
       error loading fees {props.error}

@@ -35,7 +35,7 @@ const BridgeInProgress = ({
 }) => {
   const allTxs = [...txs.pending, ...txs.completed];
   return (
-    <Container height="468px" padding="lg" style={{ overflowY: "scroll" }}>
+    <Container height="468px" padding="lg" style={{ overflowY: "auto" }}>
       {allTxs.length > 0 ? (
         <>
           <Text
