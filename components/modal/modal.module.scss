@@ -80,7 +80,6 @@
 
   border-radius: var(--border-radius, 0px);
   animation: enter 0.15s var(--curve) forwards;
-
   @keyframes enter {
     0% {
       opacity: 0;
@@ -134,7 +133,8 @@
   .modal {
     min-width: calc(100% - 2rem) !important;
     width: calc(100% - 2rem) !important;
-    min-height: calc(100% - 2rem) !important;
+    height: 100%;
+    max-height: calc(100dvh - 2rem) !important;
     border-radius: 0px;
 
     margin: 0 1rem;
