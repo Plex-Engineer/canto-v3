@@ -236,7 +236,15 @@ export const LendingModal = (props: Props) => {
           ? [90, 94, 98, 100]
           : null;
     const limitProps = limits
-      ? { limit: { limit: maxAmount, limitName: "Limit" } }
+      ? {
+          limit: {
+            limit:
+              actionType === CTokenLendingTxTypes.BORROW
+                ? percentOfAmount(maxAmount, 98.8).data
+                : maxAmount,
+            limitName: "Limit",
+          },
+        }
       : {};
 
     return (

@@ -77,7 +77,7 @@ const Amount = (props: Props) => {
       validateNonWeiUserInputTokenAmount(
         props.value,
         props.min,
-        props.max,
+        props.limit?.limit ?? props.max,
         props.symbol,
         props.decimals
       ),
