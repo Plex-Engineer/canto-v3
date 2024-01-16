@@ -4,14 +4,7 @@
   max-width: 1400px;
   padding: 2rem 0;
 }
-.container {
-  //   background: repeating-linear-gradient(
-  //     var(--card-background-color),
-  //     var(--card-background-color) 6px,
-  //     rgba(var(--dark-color), 0.04) 6px,
-  //     rgba(var(--dark-color), 0.04) 12px
-  //   );
-}
+
 .eco-grid {
   display: grid;
   gap: 4rem;
@@ -47,16 +40,16 @@
     height: 100%;
     // background-image: url("/bg.jpg");
 
-    background:
-      repeating-radial-gradient(#000 0 0.0001%, #fff 0 0.0002%) 50% 0/2500px
-        2500px,
-      repeating-conic-gradient(#000 0 0.0001%, #fff 0 0.0002%) 60% 60%/2500px
-        2500px;
-    background-blend-mode: difference;
-    animation: buzz 0.2s infinite alternate;
+    // background:
+    //   repeating-radial-gradient(#000 0 0.0001%, #fff 0 0.0002%) 50% 0/2500px
+    //     2500px,
+    //   repeating-conic-gradient(#000 0 0.0001%, #fff 0 0.0002%) 60% 60%/2500px
+    //     2500px;
+    // background-blend-mode: difference;
+    // animation: buzz 0.2s infinite alternate;
     background-repeat: no-repeat;
-    filter: brightness(var(--temp-bg-brightness, 1))
-      opacity(var(--temp-opacity, 0.2));
+    // filter: brightness(var(--temp-bg-brightness, 1))
+    //   opacity(var(--temp-opacity, 0.2));
   }
 }
 @keyframes buzz {
@@ -73,10 +66,27 @@
   }
   .hero {
     max-height: calc(60rem);
+    padding: 2rem 0;
+    gap: 1rem;
+  }
+
+  .hero-logo {
+    max-width: 50dvw;
+  }
+
+  .hero-orb {
+    max-width: 70dvw;
+  }
+
+  .hero::before {
+    background: none;
+    background-color: rgba(var(--dark-color), 0.2);
   }
 
   .container {
+    max-width: 100dvh;
     img {
+      padding: 0;
       width: 100%;
     }
   }
