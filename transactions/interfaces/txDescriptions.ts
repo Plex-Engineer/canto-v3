@@ -106,10 +106,10 @@ export const TX_DESCRIPTIONS = {
     title: "Wrap ETH",
     description: `Wrap ${amount} ETH to WETH`,
   }),
-  VOTE:(proposalId:number,voteOption: VoteOption ) => ({
+  VOTE: (proposalId: number, voteOption: VoteOption) => ({
     title: `Voting for the Proposal ${proposalId}`,
-    description: `Vote for the proposal with the ${voteOption}`
-  })
+    description: `Vote for the proposal with the ${voteOption}`,
+  }),
 };
 
 export enum CantoFETxType {

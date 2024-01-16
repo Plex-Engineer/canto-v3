@@ -22,8 +22,8 @@ import {
   validateClaimDexRewardsComboTxParams,
 } from "@/hooks/pairs/lpCombo/transactions/claimRewards";
 import { cantoBridgeTx, validateCantoBridgeTxParams } from "../bridge";
-import { StakingTransactionParams } from "@/hooks/staking/interfaces/stakingTxTypes";
-import { stakingTx } from "@/hooks/staking/transactions/staking";
+import { StakingTransactionParams } from "@/transactions/staking/interfaces/stakingTxTypes";
+import { stakingTx } from "@/transactions/staking/transactions/staking";
 import { proposalVoteTx } from "@/hooks/gov/transactions/vote";
 import { ProposalVoteTxParams } from "@/hooks/gov/interfaces/voteTxParams";
 
@@ -42,7 +42,6 @@ export enum TransactionFlowType {
   //STAKING
   STAKE_CANTO_TX = "STAKE_CANTO_TX",
   VOTE_TX = "VOTE_TX",
-
 }
 
 export const TRANSACTION_FLOW_MAP: {
@@ -92,7 +91,6 @@ export const TRANSACTION_FLOW_MAP: {
   [TransactionFlowType.VOTE_TX]: {
     tx: async (params: ProposalVoteTxParams) => proposalVoteTx(params),
     validRetry: async (params: ProposalVoteTxParams) =>
-      NO_ERROR({ error: false })
-    
-  }
+      NO_ERROR({ error: false }),
+  },
 };

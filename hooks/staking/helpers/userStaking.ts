@@ -89,18 +89,18 @@ export async function getAllUserStakingData(
   }
 }
 
-export function getBalanceForValidator(userStakings: ValidatorWithDelegations[], validatorAddress: string): string | null {
-  //console.log(userStakings);
-  if(userStakings){
-    console.log(userStakings.length);
-    if(userStakings.length>0){
-      const staking = userStakings.find(stake => stake.operator_address === validatorAddress);
-      //console.log(staking);
-      //console.log(staking?.userDelegation.balance);
+export function getBalanceForValidator(
+  userStakings: ValidatorWithDelegations[],
+  validatorAddress: string
+): string | null {
+  if (userStakings) {
+    if (userStakings.length > 0) {
+      const staking = userStakings.find(
+        (stake) => stake.operator_address === validatorAddress
+      );
       return staking ? staking.userDelegation.balance : null;
     }
     return null;
-    
   }
   return null;
 }

@@ -8,7 +8,7 @@ import { getCantoApiData } from "@/config/api";
 import { Proposal, Proposal2 } from "./interfaces/proposal";
 
 export default function useSingleProposalData(
-  proposalId : number,
+  proposalId: number,
   params: ProposalHookParams,
   options?: {
     refetchInterval?: number;
@@ -24,7 +24,7 @@ export default function useSingleProposalData(
     async () => {
       const { data: proposals, error } = await getCantoApiData<Proposal2>(
         params.chainId,
-        "/v1/gov/proposals/"+proposalId
+        "/v1/gov/proposals/" + proposalId
       );
       if (error) throw error;
       //const proposalData = JSON.parse(proposals);
@@ -35,7 +35,7 @@ export default function useSingleProposalData(
         // console.log("data", data);
       },
       onError: (error) => {
-        console.log("error", error);
+        console.error("error", error);
       },
       refetchInterval: options?.refetchInterval ?? 10000,
     }

@@ -1,14 +1,10 @@
+import { ReturnWithError, Validation } from "@/config/interfaces";
 import {
-  ReturnWithError, Validation,
-  
-} from "@/config/interfaces";
-import {
-  UnbondingDelegationResponse,
   UserUnbondingDelegation,
   Validator,
   ValidatorWithDelegations,
 } from "./validators";
-import { StakingTransactionParams } from "./stakingTxTypes";
+import { StakingTransactionParams } from "../../../transactions/staking/interfaces/stakingTxTypes";
 import { NewTransactionFlow } from "@/transactions/flows/types";
 
 export interface StakingHookInputParams {
@@ -17,7 +13,7 @@ export interface StakingHookInputParams {
 }
 
 export interface StakingHookReturn {
-  isLoading: boolean,
+  isLoading: boolean;
   validators: Validator[];
   apr: string;
   selection: {

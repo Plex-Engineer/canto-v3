@@ -1,20 +1,17 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./ProposalTable.module.scss";
 import { Proposal } from "@/hooks/gov/interfaces/proposal";
 import {
-  formatDate,
   formatProposalStatus,
   formatProposalType,
 } from "@/utils/gov/formatData";
 import Text from "@/components/text";
 import Button from "@/components/button/button";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import Table from "@/components/table/table";
 import Container from "@/components/container/container";
-import Spacer from "@/components/layout/spacer";
 
 interface TableProps {
   proposals: Proposal[];

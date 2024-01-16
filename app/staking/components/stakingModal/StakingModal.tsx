@@ -16,7 +16,7 @@ import Input from "@/components/input/input";
 import Button from "@/components/button/button";
 import { ChangeEvent, SetStateAction, useState } from "react";
 import Tabs from "@/components/tabs/tabs";
-import { StakingTxTypes } from "@/hooks/staking/interfaces/stakingTxTypes";
+import { StakingTxTypes } from "@/transactions/staking/interfaces/stakingTxTypes";
 import { StakingTabs } from "../stakingTab/StakingTabs";
 import { getBalanceForValidator } from "@/hooks/staking/helpers/userStaking";
 import Selector, { Item } from "@/components/selector/selector";

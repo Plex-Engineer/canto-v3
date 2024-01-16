@@ -1,8 +1,5 @@
 import { CANTO_DATA_API_ENDPOINTS, getCantoApiData } from "@/config/api";
-import {
-  Validator,
-  ValidatorWithDelegations,
-} from "./interfaces/validators";
+import { Validator, ValidatorWithDelegations } from "./interfaces/validators";
 import { useQuery } from "react-query";
 import {
   StakingHookInputParams,
@@ -13,16 +10,12 @@ import { useState } from "react";
 import {
   StakingTransactionParams,
   StakingTxTypes,
-} from "./interfaces/stakingTxTypes";
-import {
-  NEW_ERROR,
-  ReturnWithError,
-  Validation,
-} from "@/config/interfaces";
+} from "../../transactions/staking/interfaces/stakingTxTypes";
+import { NEW_ERROR, ReturnWithError, Validation } from "@/config/interfaces";
 
 import { useBalance } from "wagmi";
 
-import { createNewStakingTxFlow } from "./helpers/createNewStakingFlow";
+import { createNewStakingTxFlow } from "../../transactions/staking/interfaces/createNewStakingFlow";
 import { areEqualAddresses } from "@/utils/address";
 import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
 import { NewTransactionFlow } from "@/transactions/flows/types";
@@ -48,11 +41,13 @@ export default function useStaking(
           params.chainId,
           CANTO_DATA_API_ENDPOINTS.stakingApr
         ),
-        getAllUserStakingData(params.chainId, params.userEthAddress ?? ""),
+        getAllUserStakingData(params.chainId, params.userEthAddress ?? " "),
       ]);
 
       // combine user delegation data with validator data
       const userValidators: ValidatorWithDelegations[] = [];
+      if (allValidators.error) throw allValidators.error;
+
       if (userStaking.data && allValidators.data) {
         userStaking.data.delegations.delegation_responses.forEach(
           (delegation) => {
@@ -96,9 +91,8 @@ export default function useStaking(
         //console.log(data);
       },
       onError: (error) => {
-        console.log(error);
+        console.error(error);
       },
-      refetchInterval: options?.refetchInterval ?? 5000,
     }
   );
 
@@ -135,9 +129,7 @@ export default function useStaking(
   ///
   /// External Functions
   ///
-  function validateParams(
-    txParams: StakingTransactionParams
-  ): Validation {
+  function validateParams(txParams: StakingTransactionParams): Validation {
     // make sure userEthAddress is set and same as params
     if (!areEqualAddresses(txParams.ethAccount, params.userEthAddress ?? "")) {
       return {

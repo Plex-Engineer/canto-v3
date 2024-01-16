@@ -32,7 +32,7 @@ import Modal from "@/components/modal/modal";
 import {
   StakingTransactionParams,
   StakingTxTypes,
-} from "@/hooks/staking/interfaces/stakingTxTypes";
+} from "@/transactions/staking/interfaces/stakingTxTypes";
 import { ethToCantoAddress } from "@/utils/address";
 import { NewTransactionFlow } from "@/transactions/flows/types";
 import { TransactionFlowType } from "@/transactions/flows/flowMap";
