@@ -38,6 +38,9 @@ const Selector = (props: Props) => {
     setIsExpanded(false);
   }, [isOpen]);
 
+  const zeroBalanceTokenIndex = props.items.findIndex(
+    (item) => item.secondary === "0"
+  );
   return (
     <>
       <Modal
@@ -61,7 +64,7 @@ const Selector = (props: Props) => {
           <Spacer height="10px" />
 
           <div className={clsx(styles["items-list"])}>
-            {props.items.map((item) => (
+            {props.items.map((item, index) => (
               <Container
                 key={item.name}
                 width="100%"
@@ -70,6 +73,15 @@ const Selector = (props: Props) => {
                 center={{
                   vertical: true,
                 }}
+                style={
+                  zeroBalanceTokenIndex !== 0 && index === zeroBalanceTokenIndex
+                    ? {
+                        marginTop: "10px",
+                        borderTop: "1px solid rgba(var(--dark-color), 0.3)",
+                        paddingTop: "10px",
+                      }
+                    : {}
+                }
                 className={styles.item}
                 onClick={() => {
                   props.onChange(item.id);
