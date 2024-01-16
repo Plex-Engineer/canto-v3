@@ -18,64 +18,72 @@ type AnalyticsTransactionFlowType =
   | BridgingMethodName
   | string;
 
-export type AnalyticsTransactionFlowData =
-  | {
-    // bridge info
-    bridgeFrom: string;
-    bridgeTo: string;
-    bridgeAsset: string;
-    bridgeAmount: string;
-  }
-  | {
-    // canto dex info
-    cantoLp?: string;
-    cantoLpToken1?: string;
-    cantoLpToken2?: string;
-    cantoLpAmount1?: string;
-    cantoLpAmount2?: string;
-    cantoLpBalance1?: string;
-    cantoLpBalance2?: string;
-    cantoLpTokenAmount?: string;
-    cantoLpTokenBalance?: string;
-    cantoLpExpectedAmount1?: string;
-    cantoLpStakedBalance?: string;
-    cantoLpUnstakedBalance?: string;
-    cantoLpExpectedAmount2?: string;
-    cantoLpSlippage?: Number;
-    cantoLpDeadline?: string;
-    cantoLpStakeStatus?: boolean;
-  }
-  | {
-    // ambient info
-    ambientLp?: string;
-    ambientPositionId?: string;
-    ambientLpBaseToken?: string;
-    ambientLpQuoteToken?: string;
-    ambientLpBaseAmount?: string;
-    ambientLpQuoteAmount?: string;
-    ambientLpBaseBalance?: string;
-    ambientLpQuoteBalance?: string;
-    ambientLpCurrentPrice?: string;
-    ambientLpMinRangePrice?: string;
-    ambientLpMaxRangePrice?: string;
-    ambientLpMinExecPrice?: string;
-    ambientLpMaxExecPrice?: string;
-    ambientLpLiquidity?: string;
-    ambientLpExpectedBaseAmount?: string;
-    ambientLpExpectedQuoteAmount?: string;
-    ambientLpFee?: string;
-    ambientLpIsAdvanced?: boolean;
-  }
-  | {
-    // lending info
-    lmToken?: string;
-    lmAmount?: string;
-    lmCollateralStatus?: boolean;
-    lmWalletBalance?: string;
-    lmSuppliedAmount?: string;
-    lmBorrowedAmount?: string;
-    lmAccountLiquidityRemaining?: string;
-  };
+
+export type AnalyticsBridgeData =  {
+  bridgeFrom: string;
+  bridgeTo: string;
+  bridgeAsset: string;
+  bridgeAmount: string;
+}
+
+export type AnalyticsCantoLPData =  {
+  lpType?: string;
+  cantoLp?: string;
+  cantoLpToken1?: string;
+  cantoLpToken2?: string;
+  cantoLpAmount1?: string;
+  cantoLpAmount2?: string;
+  cantoLpBalance1?: string;
+  cantoLpBalance2?: string;
+  cantoLpTokenAmount?: string;
+  cantoLpTokenBalance?: string;
+  cantoLpExpectedAmount1?: string;
+  cantoLpStakedBalance?: string;
+  cantoLpUnstakedBalance?: string;
+  cantoLpExpectedAmount2?: string;
+  cantoLpSlippage?: Number;
+  cantoLpDeadline?: string;
+  cantoLpStakeStatus?: boolean;
+}
+
+type AnalyticsAmbientLPPositionData = {
+  ambientLPPositionId?: string;
+  ambientLpLiquidity?: string;
+  ambientLpMinRangePrice?: string;
+  ambientLpMaxRangePrice?: string;
+}
+
+export type AnalyticsAmbientLPData =  {
+  lpType?: string;
+  ambientLp?: string;
+  ambientLpBaseToken?: string;
+  ambientLpQuoteToken?: string;
+  ambientLpBaseAmount?: string;
+  ambientLpQuoteAmount?: string;
+  ambientLpBaseBalance?: string;
+  ambientLpQuoteBalance?: string;
+  ambientLpCurrentPrice?: string;
+  ambientLpMinExecPrice?: string;
+  ambientLpMaxExecPrice?: string;
+  ambientLpExpectedBaseAmount?: string;
+  ambientLpExpectedQuoteAmount?: string;
+  ambientLpFee?: string;
+  ambientLpIsAdvanced?: boolean;
+  ambientLPPositions?: AnalyticsAmbientLPPositionData[];
+} & AnalyticsAmbientLPPositionData
+
+export type AnalyticsLMData =  {
+  lmType?: string;
+  lmToken?: string;
+  lmAmount?: string;
+  lmCollateralStatus?: boolean;
+  lmWalletBalance?: string;
+  lmSuppliedAmount?: string;
+  lmBorrowedAmount?: string;
+  lmAccountLiquidityRemaining?: string;
+}
+
+export type AnalyticsTransactionFlowData = AnalyticsBridgeData | AnalyticsCantoLPData | AnalyticsAmbientLPData | AnalyticsLMData ;
 
 // tx types (approve/mint/swap/...)
 type AnalyticsTransactionType = CantoFETxType;
@@ -152,7 +160,7 @@ class AnalyticsWrapper {
         addLPClicked: (params: object) => {
           posthog.capture("Add LP Clicked", params);
         },
-        manageLPClicked: (params: object) => {
+        manageLPClicked: (params: AnalyticsCantoLPData | AnalyticsAmbientLPData) => {
           posthog.capture("Manage LP Clicked", params);
         },
         tabSwitched: (tab: string) => {
@@ -180,10 +188,10 @@ class AnalyticsWrapper {
             limit,
           });
         },
-        supplyClicked: (params: object) => {
+        supplyClicked: (params: AnalyticsLMData) => {
           posthog.capture("Supply LM Clicked", params);
         },
-        borrowClicked: (params: object) => {
+        borrowClicked: (params: AnalyticsLMData) => {
           posthog.capture("Borrow LM Clicked", params);
         },
         tabSwitched: (tab: string) => {
