@@ -153,8 +153,12 @@
     z-index: 2000;
     flex-direction: column;
     justify-content: center;
-    transition: all 0.2s ease-in-out;
+    transition: all 0.3s ease-in-out;
     border: 1px solid var(--border-stroke-color);
+  }
+
+  .nav-link {
+    height: 40px;
   }
   //   data attribute which data-menu-open is set to true
   .nav-links[data-menu-open="true"] {

@@ -42,6 +42,7 @@ const NavBar = () => {
     } else {
       Analytics.actions.events.pageOpened("home");
     }
+    isMenuOpen && setIsMenuOpen(false);
   }, [currentPath, signer]);
 
   const balance = useBalance({
