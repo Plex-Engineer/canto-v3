@@ -22,6 +22,7 @@ const ExploreLink = ({ title, description, link, image }: Props) => {
       }
     >
       <Container
+        className={style.explore}
         direction="row"
         gap={20}
         center={{

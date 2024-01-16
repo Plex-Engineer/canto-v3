@@ -97,7 +97,6 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
         }}
         showGravityPortalMsg={toNetwork?.id === GRAVITY_BRIDGE.id}
       />
-
       <section className={styles.container}>
         <div
           className={styles["network-selection"]}

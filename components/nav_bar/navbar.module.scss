@@ -150,7 +150,7 @@
     height: calc(100% - 60px);
     width: 100%;
     background-color: var(--card-background-color);
-    z-index: 1;
+    z-index: 2000;
     flex-direction: column;
     justify-content: center;
     transition: all 0.2s ease-in-out;

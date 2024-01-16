@@ -14,7 +14,6 @@ import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { useBalance } from "wagmi";
 import { useAutoConnect } from "@/provider/useAutoConnect";
 import Icon from "../icon/icon";
-import { url } from "inspector";
 
 const NavBar = () => {
   // This is used to connect safe as wallet,
