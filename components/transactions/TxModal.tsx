@@ -156,11 +156,7 @@ const TransactionModal = () => {
                 transform: currentFlowId ? "translateX(0)" : "translateX(100%)",
               }}
             >
-              <div
-                style={{
-                  position: "absolute",
-                }}
-              >
+              <div>
                 <Container
                   direction="row"
                   gap={20}
