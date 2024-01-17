@@ -15,12 +15,11 @@ import Button from "@/components/button/button";
 import { useState } from "react";
 import { StakingTxTypes } from "@/transactions/staking/interfaces/stakingTxTypes";
 import { StakingTabs } from "../stakingTab/StakingTabs";
-import { getBalanceForValidator } from "@/hooks/staking/helpers/userStaking";
 import Selector from "@/components/selector/selector";
 import Amount from "@/components/amount/amount";
 
 export interface StakingModalParams {
-  validator: Validator | null;
+  validator: ValidatorWithDelegations | null;
   userStaking?: {
     validators: ValidatorWithDelegations[];
     unbonding: UserUnbondingDelegation[];
@@ -77,14 +76,9 @@ export const StakingModal = (props: StakingModalParams) => {
     return;
   }
 
-  let userDelegationBalance: string | null = "0";
+  const userDelegationBalance: string | undefined =
+    props.validator.userDelegation.balance;
 
-  if (props.userStaking?.validators) {
-    userDelegationBalance = getBalanceForValidator(
-      props.userStaking?.validators,
-      props.validator.operator_address
-    );
-  }
   const userMaxBalance = userDelegationBalance ? userDelegationBalance : "0";
 
   const userCantoBalance =

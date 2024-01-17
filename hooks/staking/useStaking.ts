@@ -11,14 +11,22 @@ import {
   StakingTransactionParams,
   StakingTxTypes,
 } from "../../transactions/staking/interfaces/stakingTxTypes";
-import { NEW_ERROR, ReturnWithError, Validation } from "@/config/interfaces";
+import {
+  NEW_ERROR,
+  NO_ERROR,
+  ReturnWithError,
+  Validation,
+} from "@/config/interfaces";
 
 import { useBalance } from "wagmi";
 
 import { createNewStakingTxFlow } from "../../transactions/staking/interfaces/createNewStakingFlow";
-import { areEqualAddresses } from "@/utils/address";
+import { areEqualAddresses, isValidEthAddress } from "@/utils/address";
 import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
 import { NewTransactionFlow } from "@/transactions/flows/types";
+import useCantoSigner from "../helpers/useCantoSigner";
+import { TX_PARAM_ERRORS } from "@/config/consts/errors";
+import { validateStakingTxParams } from "@/transactions/staking/transactions/staking";
 
 export default function useStaking(
   params: StakingHookInputParams,
@@ -111,11 +119,13 @@ export default function useStaking(
   const [selectedValidatorAddress, setSelectedValidatorAddress] = useState<
     string | null
   >(null);
+
   const getValidator = (
     address: string | null
   ): ValidatorWithDelegations | null => {
     if (!address) return null;
     // search for user validator first
+
     const userValidator = staking?.userStaking?.validators.find(
       (validator) => validator.operator_address === address
     );
@@ -128,62 +138,12 @@ export default function useStaking(
       return { ...validator, userDelegation: { balance: "0", rewards: "0" } };
     return null;
   };
-
-  ///
-  /// External Functions
-  ///
-  function validateParams(txParams: StakingTransactionParams): Validation {
-    // make sure userEthAddress is set and same as params
-    if (!areEqualAddresses(txParams.ethAccount, params.userEthAddress ?? "")) {
-      return {
-        error: true,
-        reason: "user eth address is not the same",
-      };
-    }
-    // switch depending on tx type
-    switch (txParams.txType) {
-      case StakingTxTypes.DELEGATE:
-        // amount just has to be less than canto balance
-        return validateNonWeiUserInputTokenAmount(
-          txParams.amount,
-          "0",
-          userCantoBalance?.value.toString() ?? "0",
-          "CANTO",
-          18
-        );
-      case StakingTxTypes.UNDELEGATE:
-      case StakingTxTypes.REDELEGATE: {
-        // just need to make sure amount is less than user delegation balance
-        const validator = getValidator(txParams.validatorAddress);
-        if (
-          !validator ||
-          !(validator as ValidatorWithDelegations).userDelegation
-        )
-          return { error: true, reason: "validator not found" };
-
-        return validateNonWeiUserInputTokenAmount(
-          txParams.amount,
-          "0",
-          (validator as ValidatorWithDelegations).userDelegation?.balance ??
-            "0",
-          "CANTO",
-          18
-        );
-      }
-      case StakingTxTypes.CLAIM_REWARDS: {
-        return { error: false };
-      }
-      default:
-        return { error: true, reason: "tx type not found" };
-    }
-  }
-
   function createNewStakingFlow(
     params: StakingTransactionParams
   ): ReturnWithError<NewTransactionFlow> {
-    const validation = validateParams(params);
+    const validation = validateStakingTxParams(params);
     if (validation.error)
-      return NEW_ERROR("createNewStakingFlow" + validation.reason);
+      return NEW_ERROR("createNewStakingFlow" + validation.error.message);
     return createNewStakingTxFlow(params);
   }
   return {
@@ -195,7 +155,7 @@ export default function useStaking(
       setValidator: setSelectedValidatorAddress,
     },
     transaction: {
-      validateParams,
+      validateStakingTxParams,
       createNewStakingFlow,
     },
     userStaking: {
@@ -205,3 +165,7 @@ export default function useStaking(
     },
   };
 }
+
+///
+/// External Functions
+///

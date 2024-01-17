@@ -86,19 +86,3 @@ export async function getAllUserStakingData(
     return NEW_ERROR("getAllUserStakingData::" + errMsg(err));
   }
 }
-
-export function getBalanceForValidator(
-  userStakings: ValidatorWithDelegations[],
-  validatorAddress: string
-): string | null {
-  if (userStakings) {
-    if (userStakings.length > 0) {
-      const staking = userStakings.find(
-        (stake) => stake.operator_address === validatorAddress
-      );
-      return staking ? staking.userDelegation.balance : null;
-    }
-    return null;
-  }
-  return null;
-}

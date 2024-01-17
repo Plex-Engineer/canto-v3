@@ -2,6 +2,7 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
+  ReturnWithError,
   Validation,
   errMsg,
 } from "@/config/interfaces";
@@ -25,9 +26,10 @@ import {
   TransactionDescription,
   TxCreatorFunctionReturn,
 } from "@/transactions/interfaces";
-import { areEqualAddresses } from "@/utils/address";
+import { areEqualAddresses, isValidEthAddress } from "@/utils/address";
 import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
 import { ValidatorWithDelegations } from "@/hooks/staking/interfaces/validators";
+import { TX_PARAM_ERRORS } from "@/config/consts/errors";
 
 export async function stakingTx(
   txParams: StakingTransactionParams
@@ -180,62 +182,49 @@ const _claimRewardsTx = (
   }),
 });
 
-///
-/// External Functions
-///
-// function validateParams(txParams: StakingTransactionParams): Validation {
-//   // make sure userEthAddress is set and same as params
-//   if (!areEqualAddresses(txParams.ethAccount, params.userEthAddress ?? "")) {
-//     return {
-//       error: true,
-//       reason: "user eth address is not the same",
-//     };
-//   }
-//   // switch depending on tx type
-//   switch (txParams.txType) {
-//     case StakingTxTypes.DELEGATE:
-//       // amount just has to be less than canto balance
-//       return validateNonWeiUserInputTokenAmount(
-//         txParams.amount,
-//         "0",
-//         userCantoBalance?.value.toString() ?? "0",
-//         "CANTO",
-//         18
-//       );
-//     case StakingTxTypes.UNDELEGATE:
-//     case StakingTxTypes.REDELEGATE: {
-//       // just need to make sure amount is less than user delegation balance
-//       const validator = getValidator(txParams.validatorAddress);
-//       if (!validator || !(validator as ValidatorWithDelegations).userDelegation)
-//         return { error: true, reason: "validator not found" };
+export function validateStakingTxParams(
+  txParams: StakingTransactionParams
+): ReturnWithError<Validation> {
+  // make sure userEthAddress is set and same as params
+  if (!isValidEthAddress(txParams.ethAccount)) {
+    return NO_ERROR({
+      error: true,
+      reason: TX_PARAM_ERRORS.PARAM_INVALID("ethAccount"),
+    });
+  }
 
-//       return validateNonWeiUserInputTokenAmount(
-//         txParams.amount,
-//         "0",
-//         (validator as ValidatorWithDelegations).userDelegation?.balance ?? "0",
-//         "CANTO",
-//         18
-//       );
-//     }
-//     default:
-//       return { error: true, reason: "tx type not found" };
-//   }
-// }
+  // switch depending on tx type
+  switch (txParams.txType) {
+    case StakingTxTypes.DELEGATE:
+      // amount just has to be less than canto balance
+      return NO_ERROR({ error: false });
+    case StakingTxTypes.UNDELEGATE:
+      return NO_ERROR({ error: false });
+    case StakingTxTypes.REDELEGATE: {
+      // just need to make sure amount is less than user delegation balance
+      //const validator = getValidator(txParams.validatorAddress, staking);
+      // if (!validator || !(validator as ValidatorWithDelegations).userDelegation)
+      //   return NEW_ERROR("validator not found");
+      if (txParams.validatorAddress == txParams.newValidatorAddress) {
+        return NEW_ERROR("Same validator Addresses provided");
+      }
 
-// const getValidator = (
-//   address: string | null
-// ): ValidatorWithDelegations | null => {
-//   if (!address) return null;
-//   // search for user validator first
-//   const userValidator = staking?.userStaking?.validators.find(
-//     (validator) => validator.operator_address === address
-//   );
-//   if (userValidator) return userValidator;
-//   // search for all validators
-//   const validator = staking?.validators.find(
-//     (validator) => validator.operator_address === address
-//   );
-//   if (validator)
-//     return { ...validator, userDelegation: { balance: "0", rewards: "0" } };
-//   return null;
-// };
+      return NO_ERROR({ error: false });
+      // return validateNonWeiUserInputTokenAmount(
+      //   txParams.amount,
+      //   "0",
+      //   (validator as ValidatorWithDelegations).userDelegation?.balance ?? "0",
+      //   "CANTO",
+      //   18
+      // ).error
+      //   ? NO_ERROR({ error: false })
+      //   : NEW_ERROR("Invalid input amount");
+    }
+
+    case StakingTxTypes.CLAIM_REWARDS: {
+      return NO_ERROR({ error: false });
+    }
+    default:
+      return NEW_ERROR("reason: tx type not found");
+  }
+}

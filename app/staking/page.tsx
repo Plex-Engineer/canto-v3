@@ -61,53 +61,45 @@ export default function StakingPage() {
   ) {
     if (signer) {
       if (txType == StakingTxTypes.REDELEGATE) {
-        const newFlow: NewTransactionFlow = {
-          icon: "/canto.svg",
-          txType: TransactionFlowType.STAKE_CANTO_TX,
-          title: "Stake Canto",
-          params: {
-            chainId: chainId,
-            ethAccount: signer?.account.address ?? "",
-            txType: txType,
-            validatorAddress: validator?.operator_address ?? "",
-            newValidatorAddress: validatorToRedelegate
-              ? validatorToRedelegate.operator_address
-              : "",
-            newValidatorName: validatorToRedelegate?.description.moniker,
-            amount: (
-              convertToBigNumber(inputAmount, 18).data ?? "0"
-            ).toString(),
-            validatorName: validator?.description.moniker ?? "",
-          },
-        };
-        txStore?.addNewFlow({
-          txFlow: newFlow,
-          ethAccount: signer?.account.address,
+        const { data: newFlow, error } = transaction.createNewStakingFlow({
+          chainId: chainId,
+          ethAccount: signer.account.address,
+          txType: StakingTxTypes.REDELEGATE,
+          validatorAddress: validator?.operator_address ?? "",
+          newValidatorAddress: validatorToRedelegate
+            ? validatorToRedelegate.operator_address
+            : "",
+          newValidatorName: validatorToRedelegate?.description.moniker,
+          amount: (convertToBigNumber(inputAmount, 18).data ?? "0").toString(),
+          validatorName: validator?.description.moniker ?? "0",
         });
+        if (error) throw error;
+        if (newFlow) {
+          txStore?.addNewFlow({
+            txFlow: newFlow,
+            ethAccount: signer.account.address,
+          });
+        }
       }
       if (
         txType == StakingTxTypes.DELEGATE ||
         txType == StakingTxTypes.UNDELEGATE
       ) {
-        const newFlow: NewTransactionFlow = {
-          icon: "/canto.svg",
-          txType: TransactionFlowType.STAKE_CANTO_TX,
-          title: "Stake Canto",
-          params: {
-            chainId: chainId,
-            ethAccount: signer?.account.address ?? "",
-            txType: txType,
-            validatorAddress: validator?.operator_address ?? "",
-            amount: (
-              convertToBigNumber(inputAmount, 18).data ?? "0"
-            ).toString(),
-            validatorName: validator?.description.moniker ?? "",
-          },
-        };
-        txStore?.addNewFlow({
-          txFlow: newFlow,
-          ethAccount: signer?.account.address,
+        const { data: newFlow, error } = transaction.createNewStakingFlow({
+          chainId: chainId,
+          ethAccount: signer.account.address,
+          txType: txType,
+          validatorAddress: validator?.operator_address ?? "",
+          amount: (convertToBigNumber(inputAmount, 18).data ?? "0").toString(),
+          validatorName: validator?.description.moniker ?? "0",
         });
+        if (error) throw error;
+        if (newFlow) {
+          txStore?.addNewFlow({
+            txFlow: newFlow,
+            ethAccount: signer.account.address,
+          });
+        }
       }
     }
   }
@@ -119,7 +111,6 @@ export default function StakingPage() {
       chainId: chainId,
       userEthAddress: signer?.account.address,
     });
-
   const allValidatorsAddresses = validators.map((validator) => {
     return validator.operator_address;
   });
@@ -138,7 +129,7 @@ export default function StakingPage() {
           ...validator,
           rank: index + 1,
         })),
-    [validators]
+    [validators.length]
   ); //validatorsWithRanks.filter(v=>v.jailed==false);
   const inActiveValidators = useMemo(
     () =>
@@ -149,11 +140,41 @@ export default function StakingPage() {
           ...validator,
           rank: index + 1,
         })),
-    [validators]
+    [validators.length]
   );
 
+  // const { activeValidators, inActiveValidators } = useMemo(() => {
+  //   return validators.reduce(
+  //     (accumulator, validator) => {
+  //       const { jailed, tokens } = validator;
+  //       const isJailed = jailed === true;
+  //       const sortedValidators = isJailed
+  //         ? accumulator.inActiveValidators
+  //         : accumulator.activeValidators;
+
+  //       const newIndex = sortedValidators.findIndex(
+  //         (v: Validator) => BigInt(tokens) > BigInt(v.tokens)
+  //       );
+
+  //       const newIndexForRank =
+  //         newIndex === -1 ? sortedValidators.length : newIndex;
+
+  //       sortedValidators.splice(newIndexForRank, 0, {
+  //         ...validator,
+  //         rank: newIndexForRank + 1,
+  //       });
+
+  //       return accumulator;
+  //     },
+  //     {
+  //       activeValidators: [],
+  //       inActiveValidators: []
+  //     }
+  //   );
+  // }, [validators]);
+
   const filteredValidators = useMemo(() => {
-    if (searchQuery) {
+    if (searchQuery != "") {
       setCurrentPage(1);
       return currentFilter == "ACTIVE"
         ? activeValidators.filter((validator) =>
@@ -168,17 +189,16 @@ export default function StakingPage() {
           );
     }
     return currentFilter == "ACTIVE" ? activeValidators : inActiveValidators;
-  }, [searchQuery, currentFilter]);
+  }, [searchQuery, currentFilter, activeValidators, inActiveValidators]);
 
   const pageSize = PAGE_NUMBER;
-  const currentValidators = filteredValidators;
 
   const totalPages = useMemo(
-    () => Math.ceil(currentValidators.length / pageSize),
-    [currentValidators.length]
+    () => Math.ceil(filteredValidators.length / pageSize),
+    [filteredValidators.length]
   );
 
-  const paginatedvalidators: Validator[] = currentValidators.slice(
+  const paginatedvalidators: Validator[] = filteredValidators.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
@@ -261,8 +281,14 @@ export default function StakingPage() {
     }
     return NEW_ERROR("signer not available", errMsg("account not connected"));
   }
+  const tabletobeLoaded = isLoading;
 
-  return isLoading ? (
+  // console.log(tabletobeLoaded);
+  // console.log(paginatedvalidators);
+  // console.log(activeValidators);
+  // console.log(filteredValidators);
+
+  return tabletobeLoaded ? (
     <Splash />
   ) : (
     <div className={styles.container}>
@@ -432,129 +458,134 @@ export default function StakingPage() {
         </div>
       )}
 
-      <Container width="100%" className={styles.tableContainer}>
-        <Table
-          title={
-            <div className={styles.tableTitleContainer}>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  width: "33%",
-                }}
-              >
-                <Text font="proto_mono" size="lg">
-                  VALIDATORS
-                </Text>
-              </div>
-              <div className={styles.searchBarContainer}>
-                <div>
-                  <Input
-                    height={40}
-                    type="search"
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      //console.log("inside function");
-                    }}
-                    placeholder={"Search..."}
-                  />
+      {validators.length > 0 && (
+        <Container width="100%" className={styles.tableContainer}>
+          <Table
+            title={
+              <div className={styles.tableTitleContainer}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "33%",
+                  }}
+                >
+                  <Text font="proto_mono" size="lg">
+                    VALIDATORS
+                  </Text>
+                </div>
+                <div className={styles.searchBarContainer}>
+                  <div>
+                    <Input
+                      height={40}
+                      type="search"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        //console.log("inside function");
+                      }}
+                      placeholder={"Search..."}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          }
-          secondary={
-            <Container width="25%">
-              <ToggleGroup
-                options={["ACTIVE", "INACTIVE"]}
-                selected={currentFilter}
-                setSelected={(value) => {
-                  setCurrentFilter(value);
-                  setCurrentPage(1);
-                  setSearchQuery("");
-                }}
-              />
-            </Container>
-          }
-          headers={[
-            {
-              value: (
-                <Text opacity={0.4} font="rm_mono">
-                  Rank
-                </Text>
-              ),
-              ratio: 2,
-            },
-            {
-              value: (
-                <Text opacity={0.4} font="rm_mono">
-                  Name
-                </Text>
-              ),
-              ratio: 6,
-            },
-            { value: <Text opacity={0.4}>Validator Total</Text>, ratio: 4 },
-            {
-              value: (
-                <Text opacity={0.4} font="rm_mono">
-                  Commission %
-                </Text>
-              ),
-              ratio: 3,
-            },
-            {
-              value: (
-                <Text opacity={0.4} font="rm_mono">
-                  Action
-                </Text>
-              ),
-              ratio: 4,
-            },
-          ]}
-          content={
-            paginatedvalidators.length > 0
-              ? [
-                  ...paginatedvalidators.map((validator, index) =>
-                    GenerateValidatorTableRow(validator, index, () =>
-                      handleClick(validator)
-                    )
-                  ),
-                  <div key="Pagination" className={styles.paginationContainer}>
-                    <div className={styles.paginationButton1}>
-                      <Button
-                        onClick={handlePrevious}
-                        disabled={currentPage == 1}
-                        width={100}
-                      >
-                        Previous
-                      </Button>
-                    </div>
-                    <div className={styles.paginationButton2}>
-                      <Button
-                        onClick={handleNext}
-                        disabled={currentPage == totalPages}
-                        width={100}
-                      >
-                        Next
-                      </Button>
-                    </div>
-                  </div>,
-                ]
-              : [
-                  <div key="noData" className={styles.noValidatorContainer}>
-                    <Text font="proto_mono" size="lg">
-                      NO VALIDATORS FOUND
-                    </Text>
-                  </div>,
-                ]
-          }
-          isPaginated={true}
-        />
+            }
+            secondary={
+              <Container width="25%">
+                <ToggleGroup
+                  options={["ACTIVE", "INACTIVE"]}
+                  selected={currentFilter}
+                  setSelected={(value) => {
+                    setCurrentFilter(value);
+                    setCurrentPage(1);
+                    setSearchQuery("");
+                  }}
+                />
+              </Container>
+            }
+            headers={[
+              {
+                value: (
+                  <Text opacity={0.4} font="rm_mono">
+                    Rank
+                  </Text>
+                ),
+                ratio: 2,
+              },
+              {
+                value: (
+                  <Text opacity={0.4} font="rm_mono">
+                    Name
+                  </Text>
+                ),
+                ratio: 6,
+              },
+              { value: <Text opacity={0.4}>Validator Total</Text>, ratio: 4 },
+              {
+                value: (
+                  <Text opacity={0.4} font="rm_mono">
+                    Commission %
+                  </Text>
+                ),
+                ratio: 3,
+              },
+              {
+                value: (
+                  <Text opacity={0.4} font="rm_mono">
+                    Action
+                  </Text>
+                ),
+                ratio: 4,
+              },
+            ]}
+            content={
+              paginatedvalidators.length > 0
+                ? [
+                    ...paginatedvalidators.map((validator, index) =>
+                      GenerateValidatorTableRow(validator, index, () =>
+                        handleClick(validator)
+                      )
+                    ),
+                    <div
+                      key="Pagination"
+                      className={styles.paginationContainer}
+                    >
+                      <div className={styles.paginationButton1}>
+                        <Button
+                          onClick={handlePrevious}
+                          disabled={currentPage == 1}
+                          width={100}
+                        >
+                          Previous
+                        </Button>
+                      </div>
+                      <div className={styles.paginationButton2}>
+                        <Button
+                          onClick={handleNext}
+                          disabled={currentPage == totalPages}
+                          width={100}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>,
+                  ]
+                : [
+                    <div key="noData" className={styles.noValidatorContainer}>
+                      <Text font="proto_mono" size="lg">
+                        NO VALIDATORS FOUND
+                      </Text>
+                    </div>,
+                  ]
+            }
+            isPaginated={true}
+          />
 
-        <Spacer height="80px" />
-      </Container>
+          <Spacer height="80px" />
+        </Container>
+      )}
 
       <Modal
         width="32rem"

@@ -21,7 +21,9 @@ export interface StakingHookReturn {
     setValidator: (address: string | null) => void;
   };
   transaction: {
-    validateParams: (params: StakingTransactionParams) => Validation;
+    validateStakingTxParams: (
+      params: StakingTransactionParams
+    ) => ReturnWithError<Validation>;
     createNewStakingFlow: (
       params: StakingTransactionParams
     ) => ReturnWithError<NewTransactionFlow>;
