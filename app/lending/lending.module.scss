@@ -69,25 +69,19 @@
 
 @media screen and (max-width: 768px) {
   .container {
-    grid-template-areas: 
-    "title"
-    "accountHealth"
-    "highlightCard"
-    "mainContent";
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    margin: 1rem;
+    width: calc(100% - 2rem);
   }
   .grid {
-    flex-direction: column;
-    gap: 0;
+    flex-direction: column-reverse !important;
+    width: calc(100% - 2rem) !important;
   }
-  .title {
-    text-align: center;
+  .highlightCard {
+    flex-direction: column;
   }
   .mainTable {
-    padding-top: 2rem;
+    flex-direction: column;
+    width: calc(100%) !important;
   }
-    
 }
-
 

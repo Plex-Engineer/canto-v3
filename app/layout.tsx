@@ -75,7 +75,7 @@ export default function RootLayout({
           } as React.CSSProperties
         }
       >
-        {/* <DesktopOnly /> */}
+
         <CantoWalletProvider>
           <ReactQueryClientProvider>
             <div className="body">
@@ -106,8 +106,10 @@ export default function RootLayout({
                     isPositive: false,
                   },
                 ]}
-              />
-              <NavBar /> */}
+              /> */}
+              <div />
+              <NavBar />
+
               {children}
               <div id="modal-root"></div>
               <Footer />

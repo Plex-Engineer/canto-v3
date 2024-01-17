@@ -1,10 +1,7 @@
 .container {
   background: var(--card-sub-surface-color, #dfdfdf);
   box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
-
   margin: 0 auto;
-  //   width: 920px;
-  //   height: 320px;
   width: 100%;
   padding-bottom: 1rem;
   position: relative;
@@ -36,4 +33,21 @@
   bottom: 0;
   right: 0;
   transform: translate(16%, 16%);
+}
+
+
+@media screen and (max-width: 768px) {
+    .header  {
+       flex-wrap: wrap;
+       gap: 1rem;
+    }
+
+    .amounts {
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo {
+        transform: translate(20%, -60%);
+    }
 }

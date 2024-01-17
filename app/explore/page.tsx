@@ -14,6 +14,9 @@ export default function OutlinksPage() {
           horizontal: true,
           vertical: true,
         }}
+        style={{
+          padding: "2rem 0",
+        }}
       >
         <div className={style.container}>
           <Text
