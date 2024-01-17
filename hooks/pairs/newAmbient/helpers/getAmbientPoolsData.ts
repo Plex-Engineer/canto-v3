@@ -19,7 +19,7 @@ const poolQueries = (
   userEthAddress?: string
 ): [
   PromiseWithError<AmbientPoolStatsReturn>,
-  PromiseWithError<PoolPositionsReturn>
+  PromiseWithError<PoolPositionsReturn>,
 ] => [
   queryAmbientPoolStats(
     chainId,

@@ -48,7 +48,7 @@ export default function useAmbientPools(
     },
     {
       onError: (error) => {
-        console.log(error);
+        console.error(error);
       },
     }
   );
@@ -89,7 +89,7 @@ export default function useAmbientPools(
       );
       for (const cToken of cTokenData) {
         if (cToken.error) {
-          console.log(cToken.error);
+          console.error(cToken.error);
           continue;
         }
         aprMap[cToken.data.address] = {
