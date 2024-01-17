@@ -26,7 +26,7 @@ export interface StakingHookReturn {
       params: StakingTransactionParams
     ) => ReturnWithError<NewTransactionFlow>;
   };
-  userStaking?: {
+  userStaking: {
     validators: ValidatorWithDelegations[];
     unbonding: UserUnbondingDelegation[];
     cantoBalance: string;

@@ -37,7 +37,7 @@ export interface StakingModalParams {
 }
 export const StakingModal = (props: StakingModalParams) => {
   const [inputAmount, setInputAmount] = useState("");
-  const [isMaxClicked, setMaxClicked] = useState<boolean>(false);
+  //const [isMaxClicked, setMaxClicked] = useState<boolean>(false);
 
   const [selectedTx, setSelectedTx] = useState<StakingTxTypes>(
     StakingTxTypes.DELEGATE
@@ -218,8 +218,7 @@ export const StakingModal = (props: StakingModalParams) => {
           IconUrl={"/canto.svg"}
           title={"CANTO"}
           symbol={"CANTO"}
-          onChange={(val, wasMax) => {
-            wasMax ? setMaxClicked(true) : setMaxClicked(false);
+          onChange={(val) => {
             setInputAmount(val.target.value);
           }}
           decimals={18}

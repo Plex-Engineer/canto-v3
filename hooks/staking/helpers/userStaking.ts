@@ -5,85 +5,83 @@ import {
   errMsg,
 } from "@/config/interfaces";
 import {
-  DelegationResponse,
-  DelegationRewardResponse,
-  UnbondingDelegationResponse,
+  UserStakingReturn,
   ValidatorWithDelegations,
 } from "../interfaces/validators";
 import { ethToCantoAddress } from "@/utils/address";
 import { tryFetch } from "@/utils/async";
 import { getCosmosAPIEndpoint } from "@/utils/networks";
+import * as NETWORKS from "@/config/networks";
+import * as COSMOS_NETWORKS from "@/config/networks/cosmos";
 
 type EndpointType = "delegations" | "unbonding" | "rewards";
+
+const cantoMainnetUserAPIEndpoint = "https://mainnet-user-api.plexnode.wtf"; //process.env.NEXT_PUBLIC_CANTO_USER_API_URL;
+const cantoTestnetUserAPIEndpoint = "https://localhost:9000";
+
+function getUserAPIEndPoint(chainId: number | string) {
+  if (typeof chainId === "number") {
+    // if number is passed in, it must be one of the Canto EVM chains
+    switch (chainId) {
+      case NETWORKS.CANTO_MAINNET_EVM.chainId:
+        return NO_ERROR(cantoMainnetUserAPIEndpoint);
+      case NETWORKS.CANTO_TESTNET_EVM.chainId:
+        return NO_ERROR(cantoTestnetUserAPIEndpoint);
+      default:
+        return NEW_ERROR(
+          "getCosmosUserAPIEndpoint",
+          "Invalid chainId: " + chainId
+        );
+    }
+  } else {
+    return NEW_ERROR(
+      "getCosmosUserAPIEndpoint",
+      "Network not found: " + chainId
+    );
+  }
+}
 
 const endpointUserStaking = (
   chainId: number,
   cantoAddress: string,
-  endpointType: EndpointType
+  endpointType?: string
 ): string => {
   // get cosmos endpoint
-  const { data: endpoint, error } = getCosmosAPIEndpoint(chainId);
-  if (error) return "";
+  const { data: endpoint, error } = getUserAPIEndPoint(chainId);
+  if (error) throw error;
   // get suffix based on endpoint type
-  let suffix = "";
-  switch (endpointType) {
-    case "delegations":
-      suffix = "/cosmos/staking/v1beta1/delegations/" + cantoAddress;
-      break;
-    case "unbonding":
-      suffix =
-        "/cosmos/staking/v1beta1/delegators/" +
-        cantoAddress +
-        "/unbonding_delegations";
-      break;
-    case "rewards":
-      suffix =
-        "/cosmos/distribution/v1beta1/delegators/" + cantoAddress + "/rewards";
-      break;
-    default:
-      return "";
-  }
+  const suffix = "/v1/user/native/" + cantoAddress;
   // return endpoint with suffix
   return endpoint + suffix;
 };
 
 export async function getAllUserStakingData(
   chainId: number,
-  userEthAddress: string
-): PromiseWithError<{
-  delegations: DelegationResponse;
-  unbonding: UnbondingDelegationResponse;
-  rewards: DelegationRewardResponse;
-}> {
+  userEthAddress: string | undefined
+): PromiseWithError<UserStakingReturn> {
   // wrap entire call into try/catch for error handling
   try {
     // convert to canto address
+    if (!userEthAddress)
+      return NO_ERROR({
+        delegations: [],
+        unbondingDelegations: [],
+        rewards: {
+          rewards: [],
+          total: [],
+        },
+      });
     const { data: cantoAddress, error: cantoAddressError } =
       await ethToCantoAddress(userEthAddress);
     if (cantoAddressError) throw cantoAddressError;
 
-    // get all data with await Promise.all
-    const userStakingData = await Promise.all([
-      tryFetch<DelegationResponse>(
-        endpointUserStaking(chainId, cantoAddress, "delegations")
-      ),
-      tryFetch<UnbondingDelegationResponse>(
-        endpointUserStaking(chainId, cantoAddress, "unbonding")
-      ),
-      tryFetch<DelegationRewardResponse>(
-        endpointUserStaking(chainId, cantoAddress, "rewards")
-      ),
-    ]);
-    // check for errors
-    if (userStakingData.some((data) => data.error)) {
-      throw userStakingData.find((data) => data.error)?.error;
-    }
+    const userStakingData = await tryFetch<UserStakingReturn>(
+      endpointUserStaking(chainId, cantoAddress)
+    );
+    if (userStakingData.error) throw userStakingData.error;
+
     // return data
-    return NO_ERROR({
-      delegations: userStakingData[0].data,
-      unbonding: userStakingData[1].data,
-      rewards: userStakingData[2].data,
-    });
+    return NO_ERROR(userStakingData.data);
   } catch (err) {
     return NEW_ERROR("getAllUserStakingData::" + errMsg(err));
   }

@@ -176,12 +176,12 @@ const ProposalTable = ({ proposals }: TableProps) => {
                             justifyContent: "center",
                             height: "80px",
                           }}
+                          onClick={() => handleRowClick(proposal.proposal_id)}
                         >
                           <Container
                             width="10%"
                             key={`name_${index}`}
                             style={{ cursor: "pointer", alignItems: "center" }}
-                            onClick={() => handleRowClick(proposal.proposal_id)}
                           >
                             <Text font="rm_mono" className={styles.tableData}>
                               {proposal.proposal_id}
@@ -192,7 +192,6 @@ const ProposalTable = ({ proposals }: TableProps) => {
                             key={`tokens_${index}`}
                             style={{ cursor: "pointer" }}
                             //direction="row"
-                            onClick={() => handleRowClick(proposal.proposal_id)}
                             className={styles.tableTitleColumn}
 
                             //gap="auto"
@@ -209,7 +208,6 @@ const ProposalTable = ({ proposals }: TableProps) => {
                             width="15%"
                             key={`commission_${index}`}
                             style={{ cursor: "pointer", alignItems: "center" }}
-                            onClick={() => handleRowClick(proposal.proposal_id)}
                           >
                             <Text font="rm_mono" className={styles.tableData}>
                               {formatProposalStatus(proposal.status)}
@@ -219,7 +217,6 @@ const ProposalTable = ({ proposals }: TableProps) => {
                             width="25%"
                             key={`participation_${index}`}
                             style={{ cursor: "pointer", alignItems: "center" }}
-                            onClick={() => handleRowClick(proposal.proposal_id)}
                           >
                             <Text font="rm_mono" className={styles.tableData}>
                               {formatProposalType(proposal.type_url)}
@@ -229,7 +226,6 @@ const ProposalTable = ({ proposals }: TableProps) => {
                             width="20%"
                             key={`delegators_${index}`}
                             style={{ cursor: "pointer", alignItems: "center" }}
-                            onClick={() => handleRowClick(proposal.proposal_id)}
                           >
                             <Text font="rm_mono" className={styles.tableData}>
                               {new Date(

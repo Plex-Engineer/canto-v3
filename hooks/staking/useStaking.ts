@@ -41,48 +41,51 @@ export default function useStaking(
           params.chainId,
           CANTO_DATA_API_ENDPOINTS.stakingApr
         ),
-        getAllUserStakingData(params.chainId, params.userEthAddress ?? " "),
+        getAllUserStakingData(params.chainId, params.userEthAddress),
       ]);
 
       // combine user delegation data with validator data
       const userValidators: ValidatorWithDelegations[] = [];
       if (allValidators.error) throw allValidators.error;
 
-      if (userStaking.data && allValidators.data) {
-        userStaking.data.delegations.delegation_responses.forEach(
-          (delegation) => {
-            const validator = allValidators.data.find(
-              (validator) =>
-                validator.operator_address ===
-                delegation.delegation.validator_address
-            );
-            const rewards =
-              userStaking.data.rewards.rewards
-                .find(
-                  (rew) =>
-                    rew.validator_address ===
-                    delegation.delegation.validator_address
-                )
-                ?.reward.find((balance) => balance.denom === "acanto")
-                ?.amount ?? "0";
-            if (validator) {
-              userValidators.push({
-                ...validator,
-                userDelegation: {
-                  balance: delegation.balance.amount,
-                  rewards: rewards,
-                },
-              });
-            }
+      if (
+        userStaking.data &&
+        userStaking.data.delegations &&
+        userStaking.data.delegations.length > 0 &&
+        allValidators.data
+      ) {
+        userStaking.data.delegations.forEach((delegation) => {
+          const validator = allValidators.data.find(
+            (validator) =>
+              validator.operator_address ===
+              delegation.delegation.validator_address
+          );
+          const rewards =
+            userStaking.data.rewards.rewards
+              .find(
+                (rew) =>
+                  rew.validator_address ===
+                  delegation.delegation.validator_address
+              )
+              ?.reward.find((balance) => balance.denom === "acanto")?.amount ??
+            "0";
+          if (validator) {
+            userValidators.push({
+              ...validator,
+              userDelegation: {
+                balance: delegation.balance.amount,
+                rewards: rewards,
+              },
+            });
           }
-        );
+        });
       }
       return {
         validators: allValidators.data,
         apr: stakingApr.data,
         userStaking: {
           validators: userValidators,
-          unbonding: userStaking.data?.unbonding.unbonding_responses ?? [],
+          unbonding: userStaking.data?.unbondingDelegations ?? [],
         },
       };
     },

@@ -40,7 +40,7 @@ export interface UserUnbondingDelegation {
  * @notice Response type for querying user delegations
  */
 export interface DelegationResponse {
-  delegation_responses: {
+  delegations: {
     balance: {
       denom: string;
       amount: string;
@@ -58,7 +58,7 @@ export interface DelegationResponse {
  * @notice Response type for querying user unbonding delegations
  */
 export interface UnbondingDelegationResponse {
-  unbonding_responses: {
+  unbondingDelegations: {
     delegator_address: string;
     validator_address: string;
     entries: {
@@ -93,4 +93,41 @@ export interface UnbondingDelegation {
   name: string;
   undelegation: string;
   completion_date: string;
+}
+
+export interface UserStakingReturn {
+  delegations: {
+    balance: {
+      denom: string;
+      amount: string;
+    };
+    delegation: {
+      delegator_address: string;
+      shares: string;
+      validator_address: string;
+    };
+  }[];
+  unbondingDelegations: {
+    delegator_address: string;
+    validator_address: string;
+    entries: {
+      creation_height: string;
+      completion_time: string;
+      initial_balance: string;
+      balance: string;
+    }[];
+  }[];
+  rewards: {
+    rewards: {
+      validator_address: string;
+      reward: {
+        denom: string;
+        amount: string;
+      }[];
+    }[];
+    total: {
+      denom: string;
+      amount: string;
+    }[];
+  };
 }

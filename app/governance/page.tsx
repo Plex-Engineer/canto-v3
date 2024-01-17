@@ -23,6 +23,7 @@ export default function GovernancePage() {
       proposals.sort(
         (a: Proposal, b: Proposal) => b.proposal_id - a.proposal_id
       ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [proposals.length]
   );
 

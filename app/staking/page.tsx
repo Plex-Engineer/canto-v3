@@ -43,9 +43,9 @@ import { GetWalletClientResult } from "wagmi/actions";
 import Input from "@/components/input/input";
 
 export default function StakingPage() {
-  const [selectedValidator, setSelectedValidator] = useState<Validator | null>(
-    null
-  );
+  // const [selectedValidator, setSelectedValidator] = useState<Validator | null>(
+  //   null
+  // );
   const [currentFilter, setCurrentFilter] = useState<string>("ACTIVE");
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredValidatorsBySearch, setFilteredValidatorsBySearch] = useState<
@@ -161,10 +161,6 @@ export default function StakingPage() {
   const filteredValidators =
     currentFilter == "ACTIVE" ? activeValidators : inActiveValidators;
 
-  const validatorTitleMap = new Map<string, string>();
-  validatorTitleMap.set("ACTIVE", "VALIDATORS");
-  validatorTitleMap.set("INACTIVE", "VALIDATORS");
-
   const handleSearch = () => {
     const searchQuery2 = searchQuery;
     const filteredListSearch = filteredValidators.filter((validator) =>
@@ -186,8 +182,10 @@ export default function StakingPage() {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-  const hasUserStaked: boolean | undefined =
-    userStaking && userStaking.validators && userStaking.validators.length > 0;
+  const hasUserStaked: boolean =
+    userStaking && userStaking.validators && userStaking.validators.length > 0
+      ? true
+      : false;
 
   const totalStaked: number | undefined = hasUserStaked
     ? userStaking?.validators.reduce((sum, item) => {
@@ -239,11 +237,7 @@ export default function StakingPage() {
       .flat() || [];
 
   function handleClick(validator: Validator) {
-    setSelectedValidator(validator);
-  }
-
-  if (isLoading) {
-    return <Splash></Splash>;
+    selection.setValidator(validator.operator_address);
   }
 
   function handleRewardsClaimClick(
@@ -269,7 +263,9 @@ export default function StakingPage() {
     }
   }
 
-  return (
+  return isLoading ? (
+    <Splash />
+  ) : (
     <div className={styles.container}>
       <Container direction="row" width="100%">
         <div className={styles.infoBoxButton}>
@@ -451,7 +447,7 @@ export default function StakingPage() {
                 }}
               >
                 <Text font="proto_mono" size="lg">
-                  {validatorTitleMap.get(currentFilter)}
+                  VALIDATORS
                 </Text>
               </div>
               <div className={styles.searchBarContainer}>
@@ -568,16 +564,16 @@ export default function StakingPage() {
       <Modal
         width="32rem"
         onClose={() => {
-          setSelectedValidator(null);
+          selection.setValidator(null);
         }}
         title="STAKE"
         closeOnOverlayClick={false}
-        open={selectedValidator != null}
+        open={selection.validator != null}
       >
         <StakingModal
           validators={validators}
           userStaking={userStaking}
-          validator={selectedValidator}
+          validator={selection.validator}
           signer={signer}
           onConfirm={(
             selectedValidator,
