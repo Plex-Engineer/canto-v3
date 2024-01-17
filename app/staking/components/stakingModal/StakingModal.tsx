@@ -10,7 +10,7 @@ import { GetWalletClientResult } from "wagmi/actions";
 import styles from "./StakingModal.module.scss";
 import Text from "@/components/text";
 import Icon from "@/components/icon/icon";
-import { formatBalance } from "@/utils/formatting/balances.utils";
+import { displayAmount } from "@/utils/formatting/balances.utils";
 import Button from "@/components/button/button";
 import { useState } from "react";
 import { StakingTxTypes } from "@/transactions/staking/interfaces/stakingTxTypes";
@@ -42,7 +42,9 @@ export const StakingModal = (props: StakingModalParams) => {
   const [selectedTx, setSelectedTx] = useState<StakingTxTypes>(
     StakingTxTypes.DELEGATE
   );
-  const [activeTab, setActiveTab] = useState("delegate");
+  const [activeTab, setActiveTab] = useState<
+    "delegate" | "undelegate" | "redelegate"
+  >("delegate");
   const [validatorToRedelegate, setValidatorToRedelegate] =
     useState<Validator | null>();
 
@@ -58,7 +60,7 @@ export const StakingModal = (props: StakingModalParams) => {
     };
   });
 
-  const handleTabChange = (tab: string) => {
+  const handleTabChange = (tab: "delegate" | "undelegate" | "redelegate") => {
     setActiveTab(tab);
     setInputAmount("");
     if (tab == "delegate") {
@@ -115,12 +117,12 @@ export const StakingModal = (props: StakingModalParams) => {
         <div style={{ display: "flex", flexDirection: "row" }}>
           <div style={{ marginRight: "5px" }}>
             <Text>
-              {formatBalance(
+              {displayAmount(
                 props.userStaking && props.userStaking.cantoBalance
                   ? props.userStaking.cantoBalance
                   : "0",
                 18,
-                { commify: true, precision: 2 }
+                { commify: true, short: false, precision: 2 }
               )}
             </Text>
           </div>
@@ -141,10 +143,10 @@ export const StakingModal = (props: StakingModalParams) => {
         <div style={{ display: "flex", flexDirection: "row" }}>
           <div style={{ marginRight: "5px" }}>
             <Text>
-              {formatBalance(
+              {displayAmount(
                 userDelegationBalance ? userDelegationBalance : "0",
                 18,
-                { commify: true, precision: 2 }
+                { commify: true, short: false, precision: 2 }
               )}
             </Text>
           </div>
@@ -163,7 +165,7 @@ export const StakingModal = (props: StakingModalParams) => {
       <div className={styles.modalInfoRow}>
         <Text>Commission</Text>
         <Text>
-          {formatBalance(props.validator.commission, -2, {
+          {displayAmount(props.validator.commission, -2, {
             commify: true,
             precision: 2,
           })}
@@ -251,7 +253,11 @@ export const StakingModal = (props: StakingModalParams) => {
               !validatorToRedelegate) ||
             Number(inputAmount) >
               Number(
-                formatBalance(maxBalance, 18, { commify: true, precision: 2 })
+                displayAmount(maxBalance, 18, {
+                  commify: false,
+                  short: false,
+                  precision: 10,
+                })
               )
           }
         >

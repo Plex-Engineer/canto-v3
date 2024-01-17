@@ -2,8 +2,8 @@ import styles from "./StakingTabs.module.scss";
 import Text from "@/components/text";
 
 interface StakingTabsProps {
-  handleTabChange: (txType: string) => void;
-  activeTab: string;
+  handleTabChange: (txType: "delegate" | "undelegate" | "redelegate") => void;
+  activeTab: "delegate" | "undelegate" | "redelegate";
 }
 
 export const StakingTabs = (props: StakingTabsProps) => {

@@ -170,6 +170,9 @@ export default function useStaking(
           18
         );
       }
+      case StakingTxTypes.CLAIM_REWARDS: {
+        return { error: false };
+      }
       default:
         return { error: true, reason: "tx type not found" };
     }

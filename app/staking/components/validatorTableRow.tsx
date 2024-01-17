@@ -3,14 +3,11 @@ import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
 import {
   UnbondingDelegation,
-  UserUnbondingDelegation,
   Validator,
   ValidatorWithDelegations,
 } from "@/hooks/staking/interfaces/validators";
-import BigNumber from "bignumber.js";
 import Text from "@/components/text";
-import { formatBalance } from "@/utils/formatting";
-import { formatTime } from "@/utils/gov/formatData";
+import { displayAmount } from "@/utils/formatting";
 
 export const GenerateValidatorTableRow = (
   validator: Validator,
@@ -30,7 +27,7 @@ export const GenerateValidatorTableRow = (
     gap="auto"
   >
     <Text font="rm_mono">
-      {formatBalance(validator.tokens, 18, { commify: true, short: true })}{" "}
+      {displayAmount(validator.tokens, 18, { commify: true, short: true })}{" "}
     </Text>
     <div> </div>
     <Icon
@@ -44,7 +41,7 @@ export const GenerateValidatorTableRow = (
   </Container>,
   <Container key={`commission_${index}`}>
     <Text font="rm_mono">
-      {formatBalance(validator.commission, -2, { commify: true, precision: 2 })}
+      {displayAmount(validator.commission, -2, { commify: true, precision: 2 })}
       %
     </Text>
   </Container>,
@@ -70,8 +67,9 @@ export const GenerateMyStakingTableRow = (
     gap="auto"
   >
     <Text font="rm_mono">
-      {formatBalance(userStakedValidator.userDelegation.balance, 18, {
+      {displayAmount(userStakedValidator.userDelegation.balance, 18, {
         commify: true,
+        short: false,
       })}{" "}
     </Text>
     <div> </div>
@@ -91,7 +89,7 @@ export const GenerateMyStakingTableRow = (
     gap="auto"
   >
     <Text font="rm_mono">
-      {formatBalance(userStakedValidator?.tokens, 18, {
+      {displayAmount(userStakedValidator?.tokens, 18, {
         commify: true,
         short: true,
       })}{" "}
@@ -108,7 +106,7 @@ export const GenerateMyStakingTableRow = (
   </Container>,
   <Container key={`commission_${index}`}>
     <Text font="rm_mono">
-      {formatBalance(userStakedValidator?.commission, -2, {
+      {displayAmount(userStakedValidator?.commission, -2, {
         commify: true,
         precision: 2,
       })}
@@ -134,7 +132,10 @@ export const GenerateUnbondingDelegationsTableRow = (
     gap="auto"
   >
     <Text font="rm_mono">
-      {formatBalance(userStakedValidator.undelegation, 18, { commify: true })}{" "}
+      {displayAmount(userStakedValidator.undelegation, 18, {
+        commify: true,
+        short: false,
+      })}{" "}
     </Text>
     <div> </div>
     <Icon

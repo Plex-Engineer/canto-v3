@@ -36,28 +36,22 @@ import {
 import { ethToCantoAddress } from "@/utils/address";
 import { NewTransactionFlow } from "@/transactions/flows/types";
 import { TransactionFlowType } from "@/transactions/flows/flowMap";
-import { NEW_ERROR } from "@/config/interfaces";
+import { NEW_ERROR, errMsg } from "@/config/interfaces";
 import Tabs from "@/components/tabs/tabs";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import { GetWalletClientResult } from "wagmi/actions";
 import Input from "@/components/input/input";
+import { PAGE_NUMBER } from "@/config/consts/config";
 
 export default function StakingPage() {
-  // const [selectedValidator, setSelectedValidator] = useState<Validator | null>(
-  //   null
-  // );
   const [currentFilter, setCurrentFilter] = useState<string>("ACTIVE");
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredValidatorsBySearch, setFilteredValidatorsBySearch] = useState<
-    Validator[]
-  >([]);
+  // const [filteredValidatorsBySearch, setFilteredValidatorsBySearch] = useState<
+  //   Validator[]
+  // >([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const [totalPages, setTotalPages] = useState(1);
-
-  // const [selectedTx, setSelectedTx] = useState<StakingTxTypes>(
-  //   StakingTxTypes.DELEGATE
-  // );
+  //const [totalPages, setTotalPages] = useState(1);
 
   function handleStakingTxClick(
     validator: Validator | null,
@@ -158,25 +152,31 @@ export default function StakingPage() {
     [validators]
   );
 
-  const filteredValidators =
-    currentFilter == "ACTIVE" ? activeValidators : inActiveValidators;
+  const filteredValidators = useMemo(() => {
+    if (searchQuery) {
+      setCurrentPage(1);
+      return currentFilter == "ACTIVE"
+        ? activeValidators.filter((validator) =>
+            validator.description.moniker
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          )
+        : inActiveValidators.filter((validator) =>
+            validator.description.moniker
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+    }
+    return currentFilter == "ACTIVE" ? activeValidators : inActiveValidators;
+  }, [searchQuery, currentFilter]);
 
-  const handleSearch = () => {
-    const searchQuery2 = searchQuery;
-    const filteredListSearch = filteredValidators.filter((validator) =>
-      validator.description.moniker
-        .toLowerCase()
-        .includes(searchQuery2.toLowerCase())
-    );
-    setFilteredValidatorsBySearch(filteredListSearch);
-    setCurrentPage(1);
-  };
-  const pageSize = 20;
-  const currentValidators =
-    searchQuery == "" ? filteredValidators : filteredValidatorsBySearch;
-  useEffect(() => {
-    setTotalPages(Math.ceil(currentValidators.length / pageSize));
-  }, [currentValidators.length, pageSize]);
+  const pageSize = PAGE_NUMBER;
+  const currentValidators = filteredValidators;
+
+  const totalPages = useMemo(
+    () => Math.ceil(currentValidators.length / pageSize),
+    [currentValidators.length]
+  );
 
   const paginatedvalidators: Validator[] = currentValidators.slice(
     (currentPage - 1) * pageSize,
@@ -244,23 +244,22 @@ export default function StakingPage() {
     signer: GetWalletClientResult | undefined,
     validatorAddresses: string[]
   ) {
-    if (signer) {
-      const newFlow: NewTransactionFlow = {
-        icon: "/canto.svg",
-        txType: TransactionFlowType.STAKE_CANTO_TX,
-        title: "Rewards",
-        params: {
-          chainId: chainId,
-          ethAccount: signer?.account.address,
-          txType: StakingTxTypes.CLAIM_REWARDS,
-          validatorAddresses: validatorAddresses,
-        },
-      };
-      txStore?.addNewFlow({
-        txFlow: newFlow,
+    if (signer && signer.account) {
+      const { data: newFlow, error } = transaction.createNewStakingFlow({
+        chainId: chainId,
         ethAccount: signer.account.address,
+        txType: StakingTxTypes.CLAIM_REWARDS,
+        validatorAddresses: validatorAddresses,
       });
+      if (error) throw error;
+      if (newFlow) {
+        txStore?.addNewFlow({
+          txFlow: newFlow,
+          ethAccount: signer.account.address,
+        });
+      }
     }
+    return NEW_ERROR("signer not available", errMsg("account not connected"));
   }
 
   return isLoading ? (
@@ -458,7 +457,7 @@ export default function StakingPage() {
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
-                      handleSearch();
+                      //console.log("inside function");
                     }}
                     placeholder={"Search..."}
                   />

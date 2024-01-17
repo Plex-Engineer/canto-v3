@@ -23,6 +23,8 @@ import { NEW_ERROR } from "@/config/interfaces";
 import { VotingInfoBox } from "../components/VotingInfoBox/VotingInfoBox";
 import { TransactionFlowType } from "@/transactions/flows/flowMap";
 import { NewTransactionFlow } from "@/transactions/flows/types";
+import { displayAmount } from "@/utils/formatting";
+import { QUORUM_VALUE, TURNOUT_VALUE } from "@/config/consts/config";
 
 export default function Page() {
   function castVote(proposalId: number, voteOption: VoteOption | null) {
@@ -77,7 +79,7 @@ export default function Page() {
 
   if (!id) {
     return (
-      <div>
+      <div className={styles.noProposalContainer}>
         <Text font="proto_mono">Proposal ID is missing</Text>
       </div>
     );
@@ -169,9 +171,15 @@ export default function Page() {
                   Total Deposit:
                 </Text>
               </div>
-              <div>
+              <div className={styles.displayAmount}>
                 <Text font="proto_mono">
-                  {formatDeposit(proposal.total_deposit[0].amount)}{" "}
+                  {displayAmount(proposal.total_deposit[0].amount, 18, {
+                    commify: true,
+                    short: false,
+                  })}{" "}
+                </Text>
+                <div className={styles.displayAmount}>
+                  <div>&nbsp;</div>
                   <Image
                     src="/tokens/canto.svg"
                     width={16}
@@ -181,7 +189,7 @@ export default function Page() {
                       filter: "invert(var(--dark-mode))",
                     }}
                   />
-                </Text>
+                </div>
               </div>
             </div>
             <div className={styles.proposalInfo}>
@@ -192,7 +200,7 @@ export default function Page() {
               </div>
               <div>
                 <Text font="proto_mono">
-                  {"38.1%"} &nbsp; {"33.4%"}
+                  {TURNOUT_VALUE} &nbsp; {QUORUM_VALUE}
                 </Text>
               </div>
             </div>

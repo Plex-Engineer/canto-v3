@@ -1,7 +1,10 @@
 import Text from "@/components/text";
 import styles from "./VotingInfoBox.module.scss";
 import Container from "@/components/container/container";
-import { formatBalance } from "@/utils/formatting/balances.utils";
+import {
+  displayAmount,
+  formatBalance,
+} from "@/utils/formatting/balances.utils";
 import Icon from "@/components/icon/icon";
 import { VoteData, calculateVotePercentages } from "@/utils/gov/formatData";
 import RadioButton from "../../../../components/RadioButton/RadioButton";
@@ -126,8 +129,9 @@ export function VotingInfoBox({
             }}
           >
             <Text font="proto_mono" opacity={0.4} size="x-sm">
-              {formatBalance(getVotesInfo(value, votesData).voteAmount, 0, {
+              {displayAmount(getVotesInfo(value, votesData).voteAmount, 0, {
                 commify: true,
+                short: false,
               })}
             </Text>
             <Icon

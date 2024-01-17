@@ -208,6 +208,13 @@
         
     }
 
+    .displayAmount{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
     .VotingButton .tooltip {
         visibility: hidden;
         width: 300px;
