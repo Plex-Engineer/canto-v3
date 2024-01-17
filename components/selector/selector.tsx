@@ -73,20 +73,20 @@ const Selector = (props: Props) => {
                 center={{
                   vertical: true,
                 }}
-                style={
-                  zeroBalanceTokenIndex !== 0 && index === zeroBalanceTokenIndex
-                    ? {
-                        marginTop: "10px",
-                        borderTop: "1px solid rgba(var(--dark-color), 0.3)",
-                        paddingTop: "10px",
-                      }
-                    : {}
-                }
                 className={styles.item}
                 onClick={() => {
                   props.onChange(item.id);
                   setIsOpen(false);
                 }}
+                style={
+                  zeroBalanceTokenIndex !== 0 && index === zeroBalanceTokenIndex
+                    ? {
+                        marginTop: "3px",
+                        borderTop: "1px solid rgba(var(--dark-color), 0.3)",
+                        paddingTop: "10px",
+                      }
+                    : {}
+                }
               >
                 <Image src={item.icon} alt={item.name} width={30} height={30} />
                 <Container direction="row" gap={"auto"} width="100%">
