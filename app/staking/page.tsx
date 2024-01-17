@@ -454,17 +454,13 @@ export default function StakingPage() {
                 <div>
                   <Input
                     height={40}
-                    searchicon={true}
-                    type="text"
+                    type="search"
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
-
                       handleSearch();
-                      //console.log("inside function");
                     }}
                     placeholder={"Search..."}
-                    icon="/searchIcon.svg"
                   />
                 </div>
               </div>
