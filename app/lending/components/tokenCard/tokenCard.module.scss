@@ -1,14 +1,29 @@
 .container {
   display: flex;
   flex-direction: column;
-  background-color: rgba(var(--dark-color), 0.9);
-  padding: 1rem;
+  background-color: rgba(var(--light-color), 0.8);
   box-shadow: var(--box-shadow);
-  gap: 1rem;
+  gap: 0.6rem;
   height: 100%;
+
+  header {
+    display: flex;
+    gap: 0.5rem;
+    height: 70px;
+    align-items: center;
+    padding: 0 1rem;
+    background-color: rgba(var(--dark-color), 0.9);
+  }
+
+  section {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+  }
 }
 
 .loading {
-  background-color: red;
   height: 100%;
 }

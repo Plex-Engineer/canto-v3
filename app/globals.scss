@@ -183,3 +183,9 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+hr {
+  border: none;
+  border-top: 1px solid rgba(var(--dark-color), 0.2);
+  width: 100%;
+}

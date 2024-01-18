@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  width: 100%;
+  flex-grow: 1;
+  align-items: flex-end;
+}
+
+.dot {
+  flex-grow: 1;
+  height: 2px;
+  margin: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(var(--dark-color), 0.8),
+    rgba(var(--dark-color), 0.8) 2px,
+    transparent 1px,
+    transparent 10px
+  );
+}
