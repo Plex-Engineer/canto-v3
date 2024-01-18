@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import Table from "@/components/table/table";
 import Container from "@/components/container/container";
+import { Pagination } from "@/components/pagination/Pagination";
 
 interface TableProps {
   proposals: Proposal[];
@@ -72,6 +73,9 @@ const ProposalTable = ({ proposals }: TableProps) => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
+  };
+  const handlePageClick = (index: number) => {
+    setCurrentPage(index);
   };
   // console.log(paginatedProposals);
   // useEffect(() => {
@@ -260,30 +264,15 @@ const ProposalTable = ({ proposals }: TableProps) => {
                         </div>
                       );
                     }),
-                    <div
+                    <Pagination
                       key="pagination"
-                      className={styles.paginationContainer}
-                      style={{ border: "none" }}
-                    >
-                      <div className={styles.paginationButton1}>
-                        <Button
-                          onClick={handlePrevious}
-                          disabled={currentPage == 1}
-                          width={100}
-                        >
-                          Previous
-                        </Button>
-                      </div>
-                      <div className={styles.paginationButton2}>
-                        <Button
-                          onClick={handleNext}
-                          disabled={currentPage == totalPages}
-                          width={100}
-                        >
-                          Next
-                        </Button>
-                      </div>
-                    </div>,
+                      handleNext={handleNext}
+                      handlePrevious={handlePrevious}
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      numbersToDisplay={3}
+                      handlePageClick={handlePageClick}
+                    />,
                   ]
                 : [
                     <div key="noData" className={styles.noProposalContainer}>
