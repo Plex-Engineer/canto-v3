@@ -75,11 +75,10 @@ export default function RootLayout({
           } as React.CSSProperties
         }
       >
-        <DesktopOnly />
         <CantoWalletProvider>
           <ReactQueryClientProvider>
             <div className="body">
-              <InfoBar
+              {/* <InfoBar
                 values={[
                   {
                     name: "contracts w/ CSR enabled:",
@@ -106,7 +105,8 @@ export default function RootLayout({
                     isPositive: false,
                   },
                 ]}
-              />
+              /> */}
+              <div />
               <NavBar />
               {children}
               <div id="modal-root"></div>

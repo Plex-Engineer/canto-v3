@@ -7,11 +7,17 @@ import useBridgeCombo from "./util";
 import BridgeInProgress from "./components/bridgeInProgress";
 import styles from "./bridge.module.scss";
 import useBridgingInProgess from "@/hooks/bridge/useBridgingInProgress";
+import DesktopOnly from "@/components/desktop-only/desktop-only";
 
 export default function BridgePage() {
   const bridgeCombo = useBridgeCombo();
   const { Direction } = bridgeCombo;
   const bridgeProgress = useBridgingInProgess();
+
+  //   if mobile only
+  if (!window.matchMedia("(min-width: 768px)").matches) {
+    return <DesktopOnly />;
+  }
   return (
     <>
       <AnimatedBackground
