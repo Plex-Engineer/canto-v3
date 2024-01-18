@@ -1,0 +1,14 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(var(--dark-color), 0.9);
+  padding: 1rem;
+  box-shadow: var(--box-shadow);
+  gap: 1rem;
+  height: 100%;
+}
+
+.loading {
+  background-color: red;
+  height: 100%;
+}

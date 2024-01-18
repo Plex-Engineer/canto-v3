@@ -5,9 +5,7 @@ import Item from "./item";
 import Icon from "@/components/icon/icon";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { displayAmount } from "@/utils/formatting";
-import Text from "@/components/text";
-import InfoPop from "@/components/infopop/infopop";
-import PopUp from "@/components/popup/popup";
+
 import Container from "@/components/container/container";
 interface Props {
   cToken: CTokenWithUserData;
@@ -65,15 +63,7 @@ const HighlightCard = ({
             value={formattedAmount(
               cToken.userDetails?.balanceOfUnderlying ?? "0"
             )}
-            postChild={
-              <Icon
-                themed
-                icon={{
-                  url: "/tokens/note.svg",
-                  size: 20,
-                }}
-              />
-            }
+            symbol={true}
           />
           {/* <Item
             value={formattedAmount(cToken.userDetails?.balanceOfCToken ?? "0")}
@@ -102,28 +92,12 @@ const HighlightCard = ({
           value={formattedAmount(
             cToken.userDetails?.supplyBalanceInUnderlying ?? "0"
           )}
-          postChild={
-            <Icon
-              themed
-              icon={{
-                url: "/tokens/note.svg",
-                size: 20,
-              }}
-            />
-          }
+          symbol={true}
         />
         <Item
           name="Note Borrowed"
           value={formattedAmount(cToken.userDetails?.borrowBalance ?? "0")}
-          postChild={
-            <Icon
-              themed
-              icon={{
-                url: "/tokens/note.svg",
-                size: 20,
-              }}
-            />
-          }
+          symbol={true}
         />
       </div>
 

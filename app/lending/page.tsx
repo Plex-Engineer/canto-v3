@@ -17,6 +17,7 @@ import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import DesktopOnly from "@/components/desktop-only/desktop-only";
 import AccountHealth from "./components/accountHealth/accountHealth";
+import TokenCard from "./components/tokenCard/tokenCard";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -120,7 +121,15 @@ export default function LendingPage() {
           percent={0.5}
         />
       </div>
-      <div className={styles.highlightCard} />
+      <div className={styles.highlightCard}>
+        <TokenCard
+          cToken={cNote}
+          onClick={() => {
+            //! TODO: confirm what happens when you click on get cNote
+            setCurrentModal(CLMModalTypes.SUPPLY);
+          }}
+        />
+      </div>
       <div className={styles.mainTable}></div>
     </div>
   );
