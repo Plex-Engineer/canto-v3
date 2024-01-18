@@ -1,4 +1,4 @@
-.paginationContainer {
+.Container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -10,61 +10,49 @@
       background: var(--card-sub-surface-color, #dfdfdf);
     }
   }
-  .paginationButton1{
-    margin-right: 5%;
-  }
-  .paginationButton2{
-    margin-left: 5%;
-  }
-  .paginationRow{
+  .Row{
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
   }
 
-  .paginationIconContainer{
+  .IconContainer{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 5px 10px 5px 10px;
     &:hover{
         background-color: var(--border-stroke-color, #b3b3b3); 
         z-index: 1; 
     }
   }
-  .paginationNumbers{
+  .Numbers{
     display: flex;
     flex-direction: row;
-    // padding-right: 5px;
-    // padding-left: 5px;
   }
 
-  .paginationNumber{
+  .Number{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding-right: 5px;
-    padding-left: 5px;
+    padding: 5px 10px 5px 10px;
+    cursor: pointer;
     &:hover{
         background-color: var(--border-stroke-color, #b3b3b3); 
         z-index: 1; 
     }
   }
-  .paginationButton{
+  .Button{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding-right: 5px;
-    padding-left: 5px;
+    padding: 5px 10px 5px 10px;
     &:hover{
         background-color: var(--border-stroke-color, #b3b3b3); 
-        z-index: 1; 
-    }
-    &:focus{
-        background-color: red; 
         z-index: 1; 
     }
   }

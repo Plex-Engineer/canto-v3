@@ -14,15 +14,16 @@ export const Pagination = (props: Props) => {
   return (
     <div
       key="pagination"
-      className={styles.paginationContainer}
+      className={styles.Container}
       style={{ border: "none" }}
     >
-      <div className={styles.paginationRow}>
+      <div className={styles.Row}>
         <div
-          className={styles.paginationIconContainer}
+          className={styles.IconContainer}
           onClick={() => props.handlePageClick(1)}
           style={{
             opacity: props.currentPage == 1 ? "0.4" : "1",
+            cursor: props.currentPage == 1 ? "" : "pointer",
           }}
         >
           <Icon
@@ -34,12 +35,15 @@ export const Pagination = (props: Props) => {
           />
         </div>
         <div
-          className={styles.paginationButton}
+          className={styles.Button}
           onClick={
             props.currentPage > 1
               ? () => props.handlePageClick(props.currentPage - 1)
               : () => {}
           }
+          style={{
+            cursor: props.currentPage == 1 ? "" : "pointer",
+          }}
         >
           <Text
             font="proto_mono"
@@ -50,8 +54,8 @@ export const Pagination = (props: Props) => {
             {"<"}{" "}
           </Text>
         </div>
-        <div className={styles.paginationNumbers}>
-          <div className={styles.paginationNumbers}>
+        <div className={styles.Numbers}>
+          <div className={styles.Numbers}>
             {new Array(props.totalPages)
               .fill(null)
               .map((_, i) => i + 1)
@@ -59,7 +63,7 @@ export const Pagination = (props: Props) => {
                 return (
                   <div
                     key={index}
-                    className={styles.paginationNumber}
+                    className={styles.Number}
                     onClick={() => props.handlePageClick(index)}
                   >
                     <Text
@@ -105,12 +109,15 @@ export const Pagination = (props: Props) => {
         </div>
 
         <div
-          className={styles.paginationButton}
+          className={styles.Button}
           onClick={
             props.currentPage < props.totalPages
               ? () => props.handlePageClick(props.currentPage + 1)
               : () => {}
           }
+          style={{
+            cursor: props.currentPage == props.totalPages ? "" : "pointer",
+          }}
         >
           <Text
             font="proto_mono"
@@ -122,10 +129,11 @@ export const Pagination = (props: Props) => {
           </Text>
         </div>
         <div
-          className={styles.paginationIconContainer}
+          className={styles.IconContainer}
           onClick={() => props.handlePageClick(props.totalPages)}
           style={{
             opacity: props.currentPage == props.totalPages ? "0.4" : "1",
+            cursor: props.currentPage == props.totalPages ? "" : "pointer",
           }}
         >
           <Icon
