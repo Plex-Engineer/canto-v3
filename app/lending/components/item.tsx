@@ -1,10 +1,11 @@
+import Icon from "@/components/icon/icon";
 import styles from "./item.module.scss";
 import Text from "@/components/text";
 
 type ItemProps = {
   name: string | React.ReactNode;
   value: string;
-  postChild?: React.ReactNode;
+  symbol?: React.ReactNode;
   theme?:
     | "primary-light"
     | "primary-dark"
@@ -13,18 +14,37 @@ type ItemProps = {
     | undefined;
 };
 
-const Item = ({ name, value, theme, postChild }: ItemProps) => (
+const Item = ({ name, value, theme, symbol }: ItemProps) => (
   <div className={styles.item}>
     {typeof name === "string" ? (
-      <Text className={styles.title} theme={theme} font="proto_mono">
+      <Text
+        className={styles.title}
+        theme={theme}
+        size="sm"
+        opacity={0.5}
+        font="proto_mono"
+      >
         {name}
       </Text>
     ) : (
       name
     )}
-    <Text className={styles.value} theme={theme} font="proto_mono">
-      {value}{" "}
-      {postChild && <span className={styles.postChild}>{postChild}</span>}
+    <Text theme={theme} size="x-lg" font="proto_mono">
+      {symbol && (
+        <span className={styles.symbol}>
+          {
+            <Icon
+              icon={{
+                url: "/tokens/note.svg",
+                size: 17,
+              }}
+              color="primary"
+              themed
+            />
+          }
+        </span>
+      )}
+      {value}
     </Text>
   </div>
 );

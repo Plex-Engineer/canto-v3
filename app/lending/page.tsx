@@ -8,15 +8,11 @@ import { displayAmount, formatPercent } from "@/utils/formatting";
 import { useLendingCombo } from "./utils";
 import Text from "@/components/text";
 import Container from "@/components/container/container";
-import HighlightCard from "./components/highlightCard";
-import OutlineCard from "./components/outlineCard";
-import Item from "./components/item";
 import LoadingIcon from "@/components/loader/loading";
 import { LendingModal } from "./components/modal/modal";
 import { RWARow, StableCoinRow } from "./components/cTokenRow";
 import { useState } from "react";
 import Spacer from "@/components/layout/spacer";
-import { addTokenBalances, divideBalances } from "@/utils/math";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import DesktopOnly from "@/components/desktop-only/desktop-only";
@@ -87,6 +83,7 @@ export default function LendingPage() {
               value: displayAmount(clmPosition.position.totalSupply, 18, {
                 precision: 2,
               }),
+              symbol: true,
             },
             {
               name: "Borrow Limit",
@@ -97,6 +94,7 @@ export default function LendingPage() {
                   precision: 2,
                 }
               ),
+              symbol: true,
             },
             {
               name: "Net APY",
@@ -107,10 +105,12 @@ export default function LendingPage() {
               value: displayAmount(clmPosition.position.totalBorrow, 18, {
                 precision: 2,
               }),
+              symbol: true,
             },
             {
               name: "Liquidity Remaining",
               value: "TBA",
+              symbol: true,
             },
             {
               name: "Limit Used",
@@ -223,14 +223,14 @@ const CTokenTable = ({
                   })
                 )
               : filteredPairs == "Stablecoins"
-              ? stableTokens.map((cStableCoin) =>
-                  StableCoinRow({
-                    cStableCoin,
-                    onSupply: () => onSupply(cStableCoin.address),
-                    onBorrow: () => onBorrow(cStableCoin.address),
-                  })
-                )
-              : []
+                ? stableTokens.map((cStableCoin) =>
+                    StableCoinRow({
+                      cStableCoin,
+                      onSupply: () => onSupply(cStableCoin.address),
+                      onBorrow: () => onBorrow(cStableCoin.address),
+                    })
+                  )
+                : []
           }
         />
       ) : (

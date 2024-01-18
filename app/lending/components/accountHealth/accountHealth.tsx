@@ -13,19 +13,20 @@ interface Props {
 
 const AccountHealth = (props: Props) => {
   return (
-    <div>
-      <Text size="lg" font="proto_mono">
+    <div className={styles.container}>
+      <Text size="x-lg" font="proto_mono" theme="primary-light">
         {props.title}
       </Text>
+      <div className={styles.separator}></div>
       <div className={styles.items}>
         {props.items.map((item, i) => (
-          <Item key={i} {...item} />
+          <Item key={i} {...item} theme="primary-light" />
         ))}
       </div>
       <div className={styles.bar}>
         <div
           className={styles.fill}
-          style={{ width: `${props.percent}%` }}
+          style={{ width: `${props.percent * 100}%` }}
         ></div>
       </div>
     </div>
