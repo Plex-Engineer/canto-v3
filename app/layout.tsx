@@ -78,7 +78,7 @@ export default function RootLayout({
         <CantoWalletProvider>
           <ReactQueryClientProvider>
             <div className="body">
-              {/* <InfoBar
+              <InfoBar
                 values={[
                   {
                     name: "contracts w/ CSR enabled:",
@@ -105,9 +105,7 @@ export default function RootLayout({
                     isPositive: false,
                   },
                 ]}
-              /> */}
-              <div />
-              <InfoBar values={[]} />
+              />
               <NavBar />
               {children}
               <div id="modal-root"></div>
