@@ -1,5 +1,10 @@
 import { CANTO_DATA_API_ENDPOINTS, getCantoApiData } from "@/config/api";
-import { Validator, ValidatorWithDelegations } from "./interfaces/validators";
+import {
+  UnbondingDelegation,
+  UserUnbondingDelegation,
+  Validator,
+  ValidatorWithDelegations,
+} from "./interfaces/validators";
 import { useQuery } from "react-query";
 import {
   StakingHookInputParams,
@@ -54,6 +59,7 @@ export default function useStaking(
 
       // combine user delegation data with validator data
       const userValidators: ValidatorWithDelegations[] = [];
+      let userUnbondingDelegations: UnbondingDelegation[] = [];
       if (allValidators.error) throw allValidators.error;
 
       if (
@@ -87,13 +93,37 @@ export default function useStaking(
             });
           }
         });
+        if (
+          userStaking.data.unbondingDelegations &&
+          userStaking.data.unbondingDelegations.length > 0
+        ) {
+          userUnbondingDelegations =
+            userStaking.data.unbondingDelegations
+              .map((unbondingEntry: UserUnbondingDelegation) => {
+                const validatorAddress = unbondingEntry.validator_address;
+                const validatorName = allValidators.data?.find(
+                  (e) => e.operator_address === validatorAddress
+                )?.description.moniker;
+                //const validatorName = validatorUnbonded?.description.moniker;
+
+                const entries = unbondingEntry.entries.map((entry: any) => ({
+                  name: validatorName || "",
+                  completion_date: entry.completion_time,
+                  undelegation: entry.balance,
+                }));
+
+                return entries;
+              })
+              .flat() || [];
+        }
       }
       return {
         validators: allValidators.data,
         apr: stakingApr.data,
         userStaking: {
           validators: userValidators,
-          unbonding: userStaking.data?.unbondingDelegations ?? [],
+          unbonding:
+            userUnbondingDelegations.length > 0 ? userUnbondingDelegations : [],
         },
       };
     },

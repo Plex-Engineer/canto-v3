@@ -120,58 +120,42 @@ export default function StakingPage() {
       })
     : [];
 
-  const activeValidators = useMemo(
-    () =>
-      validators
-        .filter((v) => v.jailed == false)
-        .sort((a, b) => (BigInt(a.tokens) < BigInt(b.tokens) ? 1 : -1))
-        .map((validator, index) => ({
-          ...validator,
-          rank: index + 1,
-        })),
-    [validators.length]
-  ); //validatorsWithRanks.filter(v=>v.jailed==false);
-  const inActiveValidators = useMemo(
-    () =>
-      validators
-        .filter((v) => v.jailed == true)
-        .sort((a, b) => (BigInt(a.tokens) < BigInt(b.tokens) ? 1 : -1))
-        .map((validator, index) => ({
-          ...validator,
-          rank: index + 1,
-        })),
-    [validators.length]
-  );
+  const { activeValidators, inActiveValidators } = useMemo(() => {
+    const unsortedActiveValidators: Validator[] = [];
+    const unsortedInActiveValidators: Validator[] = [];
 
-  // const { activeValidators, inActiveValidators } = useMemo(() => {
-  //   return validators.reduce(
-  //     (accumulator, validator) => {
-  //       const { jailed, tokens } = validator;
-  //       const isJailed = jailed === true;
-  //       const sortedValidators = isJailed
-  //         ? accumulator.inActiveValidators
-  //         : accumulator.activeValidators;
+    validators.forEach((validator) => {
+      const isJailed = validator.jailed === true;
+      const unsortedValidators = isJailed
+        ? unsortedInActiveValidators
+        : unsortedActiveValidators;
 
-  //       const newIndex = sortedValidators.findIndex(
-  //         (v: Validator) => BigInt(tokens) > BigInt(v.tokens)
-  //       );
+      unsortedValidators.push(validator);
+    });
 
-  //       const newIndexForRank =
-  //         newIndex === -1 ? sortedValidators.length : newIndex;
+    // Sort active and inactive validators based on tokens
+    const sortedActiveValidators = unsortedActiveValidators.sort((a, b) =>
+      BigInt(a.tokens) < BigInt(b.tokens) ? 1 : -1
+    );
+    const sortedInActiveValidators = unsortedInActiveValidators.sort((a, b) =>
+      BigInt(a.tokens) < BigInt(b.tokens) ? 1 : -1
+    );
 
-  //       sortedValidators.splice(newIndexForRank, 0, {
-  //         ...validator,
-  //         rank: newIndexForRank + 1,
-  //       });
+    // Add ranks based on the sorted order
+    const activeValidators = sortedActiveValidators.map((validator, index) => ({
+      ...validator,
+      rank: index + 1,
+    }));
 
-  //       return accumulator;
-  //     },
-  //     {
-  //       activeValidators: [],
-  //       inActiveValidators: []
-  //     }
-  //   );
-  // }, [validators]);
+    const inActiveValidators = sortedInActiveValidators.map(
+      (validator, index) => ({
+        ...validator,
+        rank: index + 1,
+      })
+    );
+
+    return { activeValidators, inActiveValidators };
+  }, [validators]);
 
   const filteredValidators = useMemo(() => {
     if (searchQuery != "") {
@@ -236,25 +220,6 @@ export default function StakingPage() {
       setCurrentPage(currentPage + 1);
     }
   };
-
-  const unbondingDelegations: UnbondingDelegation[] =
-    userStaking?.unbonding
-      ?.map((unbondingEntry) => {
-        const validatorAddress = unbondingEntry.validator_address;
-        const validatorName = validators?.find(
-          (e) => e.operator_address === validatorAddress
-        )?.description.moniker;
-        //const validatorName = validatorUnbonded?.description.moniker;
-
-        const entries = unbondingEntry.entries.map((entry) => ({
-          name: validatorName || "",
-          completion_date: entry.completion_time,
-          undelegation: entry.balance,
-        }));
-
-        return entries;
-      })
-      .flat() || [];
 
   function handleClick(validator: Validator) {
     selection.setValidator(validator.operator_address);
@@ -449,7 +414,7 @@ export default function StakingPage() {
               },
             ]}
             content={[
-              ...unbondingDelegations.map((userStakingElement, index) =>
+              ...userStaking.unbonding.map((userStakingElement, index) =>
                 GenerateUnbondingDelegationsTableRow(userStakingElement, index)
               ),
             ]}

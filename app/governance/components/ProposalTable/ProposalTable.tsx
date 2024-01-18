@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./ProposalTable.module.scss";
 import { Proposal } from "@/hooks/gov/interfaces/proposal";
 import {
@@ -20,18 +20,42 @@ interface TableProps {
 const ProposalTable = ({ proposals }: TableProps) => {
   const router = useRouter();
   const [currentFilter, setCurrentFilter] = useState<string>("All");
-  const [filteredProposals, setFilteredProposals] =
-    useState<Proposal[]>(proposals);
+  // const [filteredProposals, setFilteredProposals] =
+  //   useState<Proposal[]>(proposals);
 
   const pageSize = 10;
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(
-    Math.ceil(filteredProposals.length / pageSize)
+  // const [totalPages, setTotalPages] = useState(
+  //   Math.ceil(filteredProposals.length / pageSize)
+  // );
+
+  const filteredProposals = useMemo(() => {
+    if (currentFilter == "Active") {
+      return proposals.filter(
+        (proposal) => proposal.status === "PROPOSAL_STATUS_VOTING_PERIOD"
+      );
+    }
+    if (currentFilter == "Passed") {
+      return proposals.filter(
+        (proposal) => proposal.status === "PROPOSAL_STATUS_PASSED"
+      );
+    }
+    if (currentFilter == "Rejected") {
+      return proposals.filter(
+        (proposal) => proposal.status === "PROPOSAL_STATUS_REJECTED"
+      );
+    }
+    return proposals;
+  }, [currentFilter]);
+
+  const totalPages = useMemo(
+    () => Math.ceil(filteredProposals.length / pageSize),
+    [filteredProposals.length]
   );
 
-  useEffect(() => {
-    setTotalPages(Math.ceil(filteredProposals.length / pageSize));
-  }, [filteredProposals.length, pageSize]);
+  // useEffect(() => {
+  //   setTotalPages(Math.ceil(filteredProposals.length / pageSize));
+  // }, [filteredProposals.length, pageSize]);
   //console.log(proposals);
   const paginatedProposals = filteredProposals.slice(
     (currentPage - 1) * pageSize,
@@ -50,39 +74,39 @@ const ProposalTable = ({ proposals }: TableProps) => {
     }
   };
   // console.log(paginatedProposals);
-  useEffect(() => {
-    handleFilterChange(currentFilter);
-    setCurrentPage(1);
-  }, [proposals, currentFilter]);
+  // useEffect(() => {
+  //   handleFilterChange(currentFilter);
+  //   setCurrentPage(1);
+  // }, [proposals, currentFilter]);
 
-  const handleFilterChange = (filter: string) => {
-    setCurrentFilter(filter);
-    if (filter === "All") {
-      setFilteredProposals(proposals);
-    } else {
-      if (filter === "Passed") {
-        setFilteredProposals(
-          proposals.filter(
-            (proposal) => proposal.status === "PROPOSAL_STATUS_PASSED"
-          )
-        );
-      }
-      if (filter === "Rejected") {
-        setFilteredProposals(
-          proposals.filter(
-            (proposal) => proposal.status === "PROPOSAL_STATUS_REJECTED"
-          )
-        );
-      }
-      if (filter === "Active") {
-        setFilteredProposals(
-          proposals.filter(
-            (proposal) => proposal.status === "PROPOSAL_STATUS_VOTING_PERIOD"
-          )
-        );
-      }
-    }
-  };
+  // const handleFilterChange = (filter: string) => {
+  //   setCurrentFilter(filter);
+  //   if (filter === "All") {
+  //     setFilteredProposals(proposals);
+  //   } else {
+  //     if (filter === "Passed") {
+  //       setFilteredProposals(
+  //         proposals.filter(
+  //           (proposal) => proposal.status === "PROPOSAL_STATUS_PASSED"
+  //         )
+  //       );
+  //     }
+  //     if (filter === "Rejected") {
+  //       setFilteredProposals(
+  //         proposals.filter(
+  //           (proposal) => proposal.status === "PROPOSAL_STATUS_REJECTED"
+  //         )
+  //       );
+  //     }
+  //     if (filter === "Active") {
+  //       setFilteredProposals(
+  //         proposals.filter(
+  //           (proposal) => proposal.status === "PROPOSAL_STATUS_VOTING_PERIOD"
+  //         )
+  //       );
+  //     }
+  //   }
+  // };
   const proposalTitleMap = new Map<string, string>();
   proposalTitleMap.set("All", "ALL PROPOSALS");
   proposalTitleMap.set("Active", "ACTIVE PROPOSALS");

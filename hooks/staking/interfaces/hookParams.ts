@@ -1,5 +1,6 @@
 import { ReturnWithError, Validation } from "@/config/interfaces";
 import {
+  UnbondingDelegation,
   UserUnbondingDelegation,
   Validator,
   ValidatorWithDelegations,
@@ -30,7 +31,7 @@ export interface StakingHookReturn {
   };
   userStaking: {
     validators: ValidatorWithDelegations[];
-    unbonding: UserUnbondingDelegation[];
+    unbonding: UnbondingDelegation[];
     cantoBalance: string;
   };
 }

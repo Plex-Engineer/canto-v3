@@ -27,7 +27,10 @@ import {
   stakingTx,
   validateStakingTxParams,
 } from "@/transactions/staking/transactions/staking";
-import { proposalVoteTx } from "@/hooks/gov/transactions/vote";
+import {
+  proposalVoteTx,
+  validateGovTxParams,
+} from "@/transactions/gov/transactions/vote";
 import { ProposalVoteTxParams } from "@/transactions/gov/interfaces/voteTxParams";
 
 export enum TransactionFlowType {
@@ -94,6 +97,6 @@ export const TRANSACTION_FLOW_MAP: {
   [TransactionFlowType.VOTE_TX]: {
     tx: async (params: ProposalVoteTxParams) => proposalVoteTx(params),
     validRetry: async (params: ProposalVoteTxParams) =>
-      NO_ERROR({ error: false }),
+      validateGovTxParams(params),
   },
 };

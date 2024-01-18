@@ -2,6 +2,7 @@
 import Container from "@/components/container/container";
 import Spacer from "@/components/layout/spacer";
 import {
+  UnbondingDelegation,
   UserUnbondingDelegation,
   Validator,
   ValidatorWithDelegations,
@@ -22,7 +23,7 @@ export interface StakingModalParams {
   validator: ValidatorWithDelegations | null;
   userStaking?: {
     validators: ValidatorWithDelegations[];
-    unbonding: UserUnbondingDelegation[];
+    unbonding: UnbondingDelegation[];
     cantoBalance: string;
   };
   signer: GetWalletClientResult | undefined;
