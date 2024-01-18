@@ -81,7 +81,14 @@ const Amount = (props: Props) => {
         props.symbol,
         props.decimals
       ),
-    [props.value, props.max, props.min, props.decimals, props.symbol]
+    [
+      props.value,
+      props.max,
+      props.min,
+      props.decimals,
+      props.symbol,
+      props.limit?.limit,
+    ]
   );
 
   return (
