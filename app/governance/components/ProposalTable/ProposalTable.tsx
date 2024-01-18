@@ -63,54 +63,9 @@ const ProposalTable = ({ proposals }: TableProps) => {
     currentPage * pageSize
   );
 
-  const handlePrevious = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
   const handlePageClick = (index: number) => {
     setCurrentPage(index);
   };
-  // console.log(paginatedProposals);
-  // useEffect(() => {
-  //   handleFilterChange(currentFilter);
-  //   setCurrentPage(1);
-  // }, [proposals, currentFilter]);
-
-  // const handleFilterChange = (filter: string) => {
-  //   setCurrentFilter(filter);
-  //   if (filter === "All") {
-  //     setFilteredProposals(proposals);
-  //   } else {
-  //     if (filter === "Passed") {
-  //       setFilteredProposals(
-  //         proposals.filter(
-  //           (proposal) => proposal.status === "PROPOSAL_STATUS_PASSED"
-  //         )
-  //       );
-  //     }
-  //     if (filter === "Rejected") {
-  //       setFilteredProposals(
-  //         proposals.filter(
-  //           (proposal) => proposal.status === "PROPOSAL_STATUS_REJECTED"
-  //         )
-  //       );
-  //     }
-  //     if (filter === "Active") {
-  //       setFilteredProposals(
-  //         proposals.filter(
-  //           (proposal) => proposal.status === "PROPOSAL_STATUS_VOTING_PERIOD"
-  //         )
-  //       );
-  //     }
-  //   }
-  // };
   const proposalTitleMap = new Map<string, string>();
   proposalTitleMap.set("All", "ALL PROPOSALS");
   proposalTitleMap.set("Active", "ACTIVE PROPOSALS");
@@ -266,8 +221,6 @@ const ProposalTable = ({ proposals }: TableProps) => {
                     }),
                     <Pagination
                       key="pagination"
-                      handleNext={handleNext}
-                      handlePrevious={handlePrevious}
                       currentPage={currentPage}
                       totalPages={totalPages}
                       numbersToDisplay={3}
