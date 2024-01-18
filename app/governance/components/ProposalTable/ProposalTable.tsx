@@ -31,6 +31,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
   // );
 
   const filteredProposals = useMemo(() => {
+    setCurrentPage(1);
     if (currentFilter == "Active") {
       return proposals.filter(
         (proposal) => proposal.status === "PROPOSAL_STATUS_VOTING_PERIOD"
@@ -47,7 +48,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
       );
     }
     return proposals;
-  }, [currentFilter]);
+  }, [currentFilter, proposals]);
 
   const totalPages = useMemo(
     () => Math.ceil(filteredProposals.length / pageSize),
