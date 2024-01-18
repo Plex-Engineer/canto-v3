@@ -107,6 +107,7 @@ export default function RootLayout({
                 ]}
               /> */}
               <div />
+              <InfoBar values={[]} />
               <NavBar />
               {children}
               <div id="modal-root"></div>
