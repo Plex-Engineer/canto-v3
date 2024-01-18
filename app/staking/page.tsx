@@ -43,6 +43,7 @@ import { GetWalletClientResult } from "wagmi/actions";
 import Input from "@/components/input/input";
 import { PAGE_NUMBER } from "@/config/consts/config";
 import { Pagination } from "@/components/pagination/Pagination";
+import { levenshteinDistance } from "@/utils/staking/searchUtils";
 
 export default function StakingPage() {
   const [currentFilter, setCurrentFilter] = useState<string>("ACTIVE");
@@ -162,19 +163,29 @@ export default function StakingPage() {
     if (searchQuery != "") {
       setCurrentPage(1);
       return currentFilter == "ACTIVE"
-        ? activeValidators.filter((validator) =>
-            validator.description.moniker
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase())
-          )
-        : inActiveValidators.filter((validator) =>
-            validator.description.moniker
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase())
-          );
+        ? [...activeValidators]
+            .sort((a, b) => {
+              return levenshteinDistance(searchQuery, a.description.moniker) >
+                levenshteinDistance(searchQuery, b.description.moniker)
+                ? 1
+                : -1;
+            })
+            .filter(
+              (e) => levenshteinDistance(searchQuery, e.description.moniker) < 6
+            )
+        : [...inActiveValidators]
+            .sort((a, b) => {
+              return levenshteinDistance(searchQuery, a.description.moniker) >
+                levenshteinDistance(searchQuery, b.description.moniker)
+                ? 1
+                : -1;
+            })
+            .filter(
+              (e) => levenshteinDistance(searchQuery, e.description.moniker) < 6
+            );
     }
     return currentFilter == "ACTIVE" ? activeValidators : inActiveValidators;
-  }, [searchQuery, currentFilter, activeValidators, inActiveValidators]);
+  }, [searchQuery.length, currentFilter, activeValidators, inActiveValidators]);
 
   const pageSize = PAGE_NUMBER;
 
