@@ -42,6 +42,7 @@ import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import { GetWalletClientResult } from "wagmi/actions";
 import Input from "@/components/input/input";
 import { PAGE_NUMBER } from "@/config/consts/config";
+import { Pagination } from "@/components/pagination/Pagination";
 
 export default function StakingPage() {
   const [currentFilter, setCurrentFilter] = useState<string>("ACTIVE");
@@ -208,17 +209,8 @@ export default function StakingPage() {
         return sum + amountNumber;
       }, 0)
     : 0;
-
-  const handlePrevious = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+  const handlePageClick = (index: number) => {
+    setCurrentPage(index);
   };
 
   function handleClick(validator: Validator) {
@@ -513,29 +505,13 @@ export default function StakingPage() {
                         handleClick(validator)
                       )
                     ),
-                    <div
-                      key="Pagination"
-                      className={styles.paginationContainer}
-                    >
-                      <div className={styles.paginationButton1}>
-                        <Button
-                          onClick={handlePrevious}
-                          disabled={currentPage == 1}
-                          width={100}
-                        >
-                          Previous
-                        </Button>
-                      </div>
-                      <div className={styles.paginationButton2}>
-                        <Button
-                          onClick={handleNext}
-                          disabled={currentPage == totalPages}
-                          width={100}
-                        >
-                          Next
-                        </Button>
-                      </div>
-                    </div>,
+                    <Pagination
+                      key="pagination"
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      numbersToDisplay={3}
+                      handlePageClick={handlePageClick}
+                    />,
                   ]
                 : [
                     <div key="noData" className={styles.noValidatorContainer}>
