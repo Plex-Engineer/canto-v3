@@ -5,7 +5,6 @@ import Text from "@/components/text";
 import styles from "./proposalModal.module.scss";
 import {
   calculateVotePercentages,
-  formatDeposit,
   formatProposalStatus,
   formatProposalType,
   formatTime,
@@ -16,15 +15,17 @@ import useProposals from "@/hooks/gov/useProposals";
 import { useState } from "react";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Splash from "@/components/splash/splash";
-import { VoteOption } from "@/hooks/gov/interfaces/voteOptions";
+import { VoteOption } from "@/transactions/gov";
 import Image from "next/image";
 import { NEW_ERROR } from "@/config/interfaces";
-
 import { VotingInfoBox } from "../components/VotingInfoBox/VotingInfoBox";
 import { TransactionFlowType } from "@/transactions/flows/flowMap";
 import { NewTransactionFlow } from "@/transactions/flows/types";
 import { displayAmount } from "@/utils/formatting";
-import { QUORUM_VALUE, TURNOUT_VALUE } from "@/config/consts/config";
+import {
+  PROPOSAL_QUORUM_VALUE,
+  PROPOSAL_TURNOUT_VALUE,
+} from "@/config/consts/config";
 
 export default function Page() {
   function castVote(proposalId: number, voteOption: VoteOption | null) {
@@ -32,7 +33,6 @@ export default function Page() {
       if (!voteOption) {
         return NEW_ERROR("Please select a vote option");
       }
-      //console.log("cast vote test");
       const newFlow: NewTransactionFlow = {
         icon: "/canto.svg",
         txType: TransactionFlowType.VOTE_TX,
@@ -200,7 +200,7 @@ export default function Page() {
               </div>
               <div>
                 <Text font="proto_mono">
-                  {TURNOUT_VALUE} &nbsp; {QUORUM_VALUE}
+                  {PROPOSAL_TURNOUT_VALUE} &nbsp; {PROPOSAL_QUORUM_VALUE}
                 </Text>
               </div>
             </div>
@@ -248,7 +248,7 @@ export default function Page() {
                 color2="rgba(6, 252, 153, 0.5)"
                 isHighest={maxAmountIndex == 0}
                 onClick={() => setSelectedVote(VoteOption.YES)}
-              ></VotingInfoBox>
+              />
 
               <VotingInfoBox
                 isActive={isActive}
@@ -260,7 +260,7 @@ export default function Page() {
                 color2="rgb(252, 81, 81,0.5)"
                 isHighest={maxAmountIndex == 1}
                 onClick={() => setSelectedVote(VoteOption.NO)}
-              ></VotingInfoBox>
+              />
             </div>
 
             <div className={styles.proposalInfoRow1}>
@@ -274,7 +274,7 @@ export default function Page() {
                 color2="rgb(68, 85, 239,0.5)"
                 isHighest={maxAmountIndex == 2}
                 onClick={() => setSelectedVote(VoteOption.VETO)}
-              ></VotingInfoBox>
+              />
               <VotingInfoBox
                 isActive={isActive}
                 value={VoteOption.ABSTAIN}
@@ -285,7 +285,7 @@ export default function Page() {
                 color2="rgb(111, 105, 105,0.5)"
                 isHighest={maxAmountIndex == 3}
                 onClick={() => setSelectedVote(VoteOption.ABSTAIN)}
-              ></VotingInfoBox>
+              />
             </div>
           </div>
           {isActive && (

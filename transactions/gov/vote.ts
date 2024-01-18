@@ -2,16 +2,12 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
-  ReturnWithError,
   Validation,
   errMsg,
 } from "@/config/interfaces";
-
-import { createMsgsVote } from "@/utils/cosmos/transactions/messages/voting/vote";
-//import { createMsgsVote } from "@/utils/cosmos/transactions/messages/voting/vote";
-import { voteOptionToNumber } from "../../../hooks/gov/interfaces/voteOptions";
-import { ProposalVoteTxParams } from "../interfaces/voteTxParams";
-
+import { createMsgsVote } from "@/transactions/cosmos/messages/voting/vote";
+import { voteOptionToNumber } from "./voteOptions";
+import { ProposalVoteTxParams } from "./voteTxParams";
 import { ethToCantoAddress } from "@/utils/address/conversion.utils";
 import {
   Transaction,
@@ -67,7 +63,7 @@ const _voteTx = (
   description: TransactionDescription
 ): Transaction => ({
   fromAddress: ethAddress,
-  feTxType: CantoFETxType.NONE,
+  feTxType: CantoFETxType.VOTE,
   description,
   chainId: chainId,
   type: "COSMOS",
@@ -80,12 +76,19 @@ const _voteTx = (
 
 export const validateGovTxParams = (
   txParams: ProposalVoteTxParams
-): ReturnWithError<Validation> => {
+): Validation => {
   if (!isValidEthAddress(txParams.ethAccount)) {
-    return NO_ERROR({
+    return {
       error: true,
       reason: TX_PARAM_ERRORS.PARAM_INVALID("ethAccount"),
-    });
+    };
   }
-  return NO_ERROR({ error: false });
+  const numVoteOption = voteOptionToNumber(txParams.voteOption);
+  if (numVoteOption === 0) {
+    return {
+      error: true,
+      reason: TX_PARAM_ERRORS.PARAM_INVALID("voteOption"),
+    };
+  }
+  return { error: false };
 };

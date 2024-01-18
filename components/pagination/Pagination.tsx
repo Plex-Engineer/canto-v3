@@ -1,4 +1,3 @@
-import Button from "../button/button";
 import Icon from "../icon/icon";
 import styles from "./pagination.module.scss";
 import Text from "@/components/text";
@@ -6,20 +5,15 @@ import Text from "@/components/text";
 interface Props {
   currentPage: number;
   totalPages: number;
-  numbersToDisplay?: number;
   handlePageClick: (index: number) => void;
 }
 
 export const Pagination = (props: Props) => {
   return (
-    <div
-      key="pagination"
-      className={styles.Container}
-      style={{ border: "none" }}
-    >
-      <div className={styles.Row}>
+    <div key="pagination" className={styles.container}>
+      <div className={styles.row}>
         <div
-          className={styles.IconContainer}
+          className={styles.iconContainer}
           onClick={() => props.handlePageClick(1)}
           style={{
             opacity: props.currentPage == 1 ? "0.4" : "1",
@@ -35,7 +29,7 @@ export const Pagination = (props: Props) => {
           />
         </div>
         <div
-          className={styles.Button}
+          className={styles.button}
           onClick={
             props.currentPage > 1
               ? () => props.handlePageClick(props.currentPage - 1)
@@ -50,12 +44,11 @@ export const Pagination = (props: Props) => {
             size="lg"
             opacity={props.currentPage == 1 ? 0.4 : 1}
           >
-            {" "}
-            {"<"}{" "}
+            {" < "}
           </Text>
         </div>
-        <div className={styles.Numbers}>
-          <div className={styles.Numbers}>
+        <div className={styles.numbers}>
+          <div className={styles.numbers}>
             {new Array(props.totalPages)
               .fill(null)
               .map((_, i) => i + 1)
@@ -63,7 +56,7 @@ export const Pagination = (props: Props) => {
                 return (
                   <div
                     key={index}
-                    className={styles.Number}
+                    className={styles.number}
                     onClick={() => props.handlePageClick(index)}
                   >
                     <Text
@@ -109,7 +102,7 @@ export const Pagination = (props: Props) => {
         </div>
 
         <div
-          className={styles.Button}
+          className={styles.button}
           onClick={
             props.currentPage < props.totalPages
               ? () => props.handlePageClick(props.currentPage + 1)
@@ -124,12 +117,11 @@ export const Pagination = (props: Props) => {
             size="lg"
             opacity={props.currentPage == props.totalPages ? 0.4 : 1}
           >
-            {" "}
-            {">"}{" "}
+            {" > "}
           </Text>
         </div>
         <div
-          className={styles.IconContainer}
+          className={styles.iconContainer}
           onClick={() => props.handlePageClick(props.totalPages)}
           style={{
             opacity: props.currentPage == props.totalPages ? "0.4" : "1",

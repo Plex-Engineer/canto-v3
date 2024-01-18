@@ -76,7 +76,6 @@ export function calculateVotePercentages(
     Number(noWithVetoVotes % factor) / Number(factor);
 
   const totalVotesBigInt = yesVotes + noVotes + abstainVotes + noWithVetoVotes;
-  const totalVotes = yesNumber + abstainNumber + noNumber + noWithVetoNumber;
 
   if (totalVotesBigInt == 0n) {
     return {
@@ -121,17 +120,6 @@ export function calculateVotePercentages(
     No: noPercentage,
     Veto: noWithVetoPercentage,
   };
-}
-
-export function formatDeposit(amount: string): string {
-  const factor = BigInt(1e18);
-  // Convert the vote counts to BigInts
-  const amountBigInt = BigInt(amount);
-
-  return (
-    Number(amountBigInt / factor) +
-    Number(amountBigInt % factor) / Number(factor)
-  ).toFixed(0);
 }
 
 export function formatTime(input: string): string {

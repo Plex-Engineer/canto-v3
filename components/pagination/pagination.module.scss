@@ -1,62 +1,58 @@
-.Container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    border: "none";
-    padding: 16px 16px 0px 16px;
-    &:hover{
-      background: var(--card-sub-surface-color, #dfdfdf);
-    }
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border: "none";
+  padding: 16px 16px 0px 16px;
+  &:hover {
+    background: var(--card-sub-surface-color, #dfdfdf);
   }
-  .Row{
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-  }
+}
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
 
-  .IconContainer{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 5px 10px 5px 10px;
-    &:hover{
-        background-color: var(--border-stroke-color, #b3b3b3); 
-        z-index: 1; 
-    }
+.iconContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px 5px 10px;
+  &:hover {
+    background-color: var(--border-stroke-color, #b3b3b3);
+    z-index: 1;
   }
-  .Numbers{
-    display: flex;
-    flex-direction: row;
+}
+.numbers {
+  display: flex;
+  flex-direction: row;
+}
+
+.number {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px 5px 10px;
+  cursor: pointer;
+  &:hover {
+    background-color: var(--border-stroke-color, #b3b3b3);
+    z-index: 1;
   }
-
-  .Number{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 5px 10px 5px 10px;
-    cursor: pointer;
-    &:hover{
-        background-color: var(--border-stroke-color, #b3b3b3); 
-        z-index: 1; 
-    }
+}
+.button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px 5px 10px;
+  &:hover {
+    background-color: var(--border-stroke-color, #b3b3b3);
+    z-index: 1;
   }
-  .Button{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 5px 10px 5px 10px;
-    &:hover{
-        background-color: var(--border-stroke-color, #b3b3b3); 
-        z-index: 1; 
-    }
-  }
-
-  
-
-
+}

@@ -12,7 +12,6 @@ import {
   displayAmount,
   formatBalance,
 } from "@/utils/formatting/balances.utils";
-import BigNumber from "bignumber.js";
 import { formatPercent } from "@/utils/formatting";
 import Table from "@/components/table/table";
 import Splash from "@/components/splash/splash";
@@ -21,101 +20,136 @@ import {
   GenerateUnbondingDelegationsTableRow,
   GenerateValidatorTableRow,
 } from "./components/validatorTableRow";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { StakingModal } from "./components/stakingModal/StakingModal";
-import {
-  UnbondingDelegation,
-  Validator,
-} from "@/hooks/staking/interfaces/validators";
+import { Validator } from "@/hooks/staking/interfaces/validators";
 import Modal from "@/components/modal/modal";
-
 import {
   StakingTransactionParams,
   StakingTxTypes,
-} from "@/transactions/staking/interfaces/stakingTxTypes";
-import { ethToCantoAddress } from "@/utils/address";
-import { NewTransactionFlow } from "@/transactions/flows/types";
-import { TransactionFlowType } from "@/transactions/flows/flowMap";
-import { NEW_ERROR, errMsg } from "@/config/interfaces";
-import Tabs from "@/components/tabs/tabs";
+} from "@/transactions/staking";
+import { NEW_ERROR, Validation } from "@/config/interfaces";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import { GetWalletClientResult } from "wagmi/actions";
 import Input from "@/components/input/input";
 import { PAGE_NUMBER } from "@/config/consts/config";
 import { Pagination } from "@/components/pagination/Pagination";
 import { levenshteinDistance } from "@/utils/staking/searchUtils";
+import { WalletClient } from "wagmi";
 
 export default function StakingPage() {
-  const [currentFilter, setCurrentFilter] = useState<string>("ACTIVE");
-  const [searchQuery, setSearchQuery] = useState("");
-  // const [filteredValidatorsBySearch, setFilteredValidatorsBySearch] = useState<
-  //   Validator[]
-  // >([]);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  //const [totalPages, setTotalPages] = useState(1);
-
-  function handleStakingTxClick(
-    validator: Validator | null,
-    inputAmount: string,
-    txType: StakingTxTypes,
-    validatorToRedelegate: Validator | null | undefined
-  ) {
-    if (signer) {
-      if (txType == StakingTxTypes.REDELEGATE) {
-        const { data: newFlow, error } = transaction.createNewStakingFlow({
-          chainId: chainId,
-          ethAccount: signer.account.address,
-          txType: StakingTxTypes.REDELEGATE,
-          validatorAddress: validator?.operator_address ?? "",
-          newValidatorAddress: validatorToRedelegate
-            ? validatorToRedelegate.operator_address
-            : "",
-          newValidatorName: validatorToRedelegate?.description.moniker,
-          amount: (convertToBigNumber(inputAmount, 18).data ?? "0").toString(),
-          validatorName: validator?.description.moniker ?? "0",
-        });
-        if (error) throw error;
-        if (newFlow) {
-          txStore?.addNewFlow({
-            txFlow: newFlow,
-            ethAccount: signer.account.address,
-          });
-        }
-      }
-      if (
-        txType == StakingTxTypes.DELEGATE ||
-        txType == StakingTxTypes.UNDELEGATE
-      ) {
-        const { data: newFlow, error } = transaction.createNewStakingFlow({
-          chainId: chainId,
-          ethAccount: signer.account.address,
-          txType: txType,
-          validatorAddress: validator?.operator_address ?? "",
-          amount: (convertToBigNumber(inputAmount, 18).data ?? "0").toString(),
-          validatorName: validator?.description.moniker ?? "0",
-        });
-        if (error) throw error;
-        if (newFlow) {
-          txStore?.addNewFlow({
-            txFlow: newFlow,
-            ethAccount: signer.account.address,
-          });
-        }
-      }
-    }
-  }
-
+  // connected user info
   const { txStore, signer, chainId } = useCantoSigner();
 
+  // staking hook
   const { isLoading, validators, apr, userStaking, selection, transaction } =
     useStaking({
       chainId: chainId,
       userEthAddress: signer?.account.address,
     });
-  const allValidatorsAddresses = validators.map((validator) => {
-    return validator.operator_address;
-  });
+
+  // handle txs
+  function handleRewardsClaimClick(
+    signer: GetWalletClientResult | undefined,
+    validatorAddresses: string[]
+  ) {
+    if (signer && signer.account) {
+      const newFlow = transaction.newStakingFlow({
+        chainId: chainId,
+        ethAccount: signer.account.address,
+        txType: StakingTxTypes.CLAIM_REWARDS,
+        validatorAddresses: validatorAddresses,
+      });
+      txStore?.addNewFlow({
+        txFlow: newFlow,
+        ethAccount: signer.account.address,
+      });
+    }
+    return NEW_ERROR("signer not available");
+  }
+
+  const stakingTxParams = (
+    signer: WalletClient,
+    inputAmount: string,
+    txType: StakingTxTypes,
+    validatorToRedelegate: Validator | null | undefined
+  ): StakingTransactionParams | null => {
+    return selection.validator
+      ? txType == StakingTxTypes.REDELEGATE
+        ? {
+            chainId: chainId,
+            ethAccount: signer.account.address,
+            txType: StakingTxTypes.REDELEGATE,
+            validator: selection.validator,
+            newValidatorAddress: validatorToRedelegate
+              ? validatorToRedelegate.operator_address
+              : "",
+            newValidatorName: validatorToRedelegate?.description.moniker,
+            amount: (
+              convertToBigNumber(inputAmount, 18).data ?? "0"
+            ).toString(),
+          }
+        : txType == StakingTxTypes.DELEGATE ||
+            txType == StakingTxTypes.UNDELEGATE
+          ? {
+              chainId: chainId,
+              ethAccount: signer.account.address,
+              txType: txType,
+              validator: selection.validator,
+              amount: (
+                convertToBigNumber(inputAmount, 18).data ?? "0"
+              ).toString(),
+              nativeBalance: userStaking?.cantoBalance ?? "0",
+            }
+          : null
+      : null;
+  };
+
+  function handleStakingTxClick(
+    inputAmount: string,
+    txType: StakingTxTypes,
+    validatorToRedelegate: Validator | null | undefined
+  ) {
+    if (signer) {
+      const txParams = stakingTxParams(
+        signer,
+        inputAmount,
+        txType,
+        validatorToRedelegate
+      );
+      if (txParams) {
+        const newFlow = transaction.newStakingFlow(txParams);
+        txStore?.addNewFlow({
+          txFlow: newFlow,
+          ethAccount: signer.account.address,
+        });
+      }
+    }
+  }
+  function canConfirmTx(
+    inputAmount: string,
+    txType: StakingTxTypes,
+    validatorToRedelegate: Validator | null | undefined
+  ): Validation {
+    if (signer) {
+      const txParams = stakingTxParams(
+        signer,
+        inputAmount,
+        txType,
+        validatorToRedelegate
+      );
+      if (txParams) {
+        return transaction.validateTxParams(txParams);
+      }
+    }
+    return { error: true, reason: "signer not available" };
+  }
+
+  // filers and search
+  const [currentFilter, setCurrentFilter] = useState<string>("ACTIVE");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
   const allUserValidatorsAddresses: string[] = userStaking
     ? userStaking.validators.map((validator) => {
         return validator.operator_address;
@@ -185,18 +219,16 @@ export default function StakingPage() {
             );
     }
     return currentFilter == "ACTIVE" ? activeValidators : inActiveValidators;
-  }, [searchQuery.length, currentFilter, activeValidators, inActiveValidators]);
-
-  const pageSize = PAGE_NUMBER;
+  }, [currentFilter, activeValidators, inActiveValidators, searchQuery]);
 
   const totalPages = useMemo(
-    () => Math.ceil(filteredValidators.length / pageSize),
+    () => Math.ceil(filteredValidators.length / PAGE_NUMBER),
     [filteredValidators.length]
   );
 
   const paginatedvalidators: Validator[] = filteredValidators.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
+    (currentPage - 1) * PAGE_NUMBER,
+    currentPage * PAGE_NUMBER
   );
   const hasUserStaked: boolean =
     userStaking && userStaking.validators && userStaking.validators.length > 0
@@ -228,35 +260,7 @@ export default function StakingPage() {
     selection.setValidator(validator.operator_address);
   }
 
-  function handleRewardsClaimClick(
-    signer: GetWalletClientResult | undefined,
-    validatorAddresses: string[]
-  ) {
-    if (signer && signer.account) {
-      const { data: newFlow, error } = transaction.createNewStakingFlow({
-        chainId: chainId,
-        ethAccount: signer.account.address,
-        txType: StakingTxTypes.CLAIM_REWARDS,
-        validatorAddresses: validatorAddresses,
-      });
-      if (error) throw error;
-      if (newFlow) {
-        txStore?.addNewFlow({
-          txFlow: newFlow,
-          ethAccount: signer.account.address,
-        });
-      }
-    }
-    return NEW_ERROR("signer not available", errMsg("account not connected"));
-  }
-  const tabletobeLoaded = isLoading;
-
-  // console.log(tabletobeLoaded);
-  // console.log(paginatedvalidators);
-  // console.log(activeValidators);
-  // console.log(filteredValidators);
-
-  return tabletobeLoaded ? (
+  return isLoading ? (
     <Splash />
   ) : (
     <div className={styles.container}>
@@ -275,9 +279,7 @@ export default function StakingPage() {
           <Container direction="row" center={{ vertical: true }}>
             <div style={{ marginRight: "5px" }}>
               <Text font="proto_mono" size="title">
-                {displayAmount(totalStaked ? totalStaked.toFixed(2) : "0", 0, {
-                  commify: true,
-                })}{" "}
+                {displayAmount(totalStaked ? totalStaked.toFixed(2) : "0", 0)}
               </Text>
             </div>
             <p> </p>
@@ -450,10 +452,7 @@ export default function StakingPage() {
                       height={40}
                       type="search"
                       value={searchQuery}
-                      onChange={(e) => {
-                        setSearchQuery(e.target.value);
-                        //console.log("inside function");
-                      }}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder={"Search..."}
                     />
                   </div>
@@ -520,7 +519,6 @@ export default function StakingPage() {
                       key="pagination"
                       currentPage={currentPage}
                       totalPages={totalPages}
-                      numbersToDisplay={3}
                       handlePageClick={handlePageClick}
                     />,
                   ]
@@ -549,22 +547,14 @@ export default function StakingPage() {
         open={selection.validator != null}
       >
         <StakingModal
-          validators={validators}
-          userStaking={userStaking}
           validator={selection.validator}
-          signer={signer}
-          onConfirm={(
-            selectedValidator,
-            inputAmount,
-            selectedTx,
-            validatorToRedelegate
-          ) =>
-            handleStakingTxClick(
-              selectedValidator,
-              inputAmount,
-              selectedTx,
-              validatorToRedelegate
-            )
+          cantoBalance={userStaking?.cantoBalance ?? "0"}
+          validators={validators}
+          onConfirm={(amount, selectedTx, validatorToRedelegate) =>
+            handleStakingTxClick(amount, selectedTx, validatorToRedelegate)
+          }
+          txValidation={(amount, selectedTx, validatorToRedelegate) =>
+            canConfirmTx(amount, selectedTx, validatorToRedelegate)
           }
         />
       </Modal>

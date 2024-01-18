@@ -15,10 +15,6 @@ interface Props {
 }
 
 const Table = (props: Props) => {
-  //console.log(typeof(props.content));
-
-  const isRowData: boolean = !props.content[0];
-  //const isRowData = typeof(props.content)== React.ReactNode[];
   return (
     <div className={styles.container} style={{ fontSize: props.textSize }}>
       <div className={styles.title}>
@@ -75,9 +71,11 @@ const Table = (props: Props) => {
                 })}
               </div>
             ) : props.isPaginated && props.content.length == index + 1 ? (
-              <div>{row}</div>
+              <div key={"row" + index}>{row}</div>
             ) : (
-              <div className={styles.rowElement}>{row}</div>
+              <div className={styles.rowElement} key={"row" + index}>
+                {row}
+              </div>
             );
           })}
         </div>

@@ -2,19 +2,12 @@ import {
   NEW_ERROR,
   NO_ERROR,
   PromiseWithError,
-  ReturnWithError,
   Validation,
-  errMsg,
 } from "@/config/interfaces";
-import {
-  StakingTransactionParams,
-  StakingTxTypes,
-} from "../interfaces/stakingTxTypes";
-
-import { createMsgsDelegate } from "@/utils/cosmos/transactions/messages/staking/delegate";
-
-import { createMsgsRedelegate } from "@/utils/cosmos/transactions/messages/staking/redelegate";
-import { createMsgsClaimStakingRewards } from "@/utils/cosmos/transactions/messages/staking/claimRewards";
+import { StakingTransactionParams, StakingTxTypes } from "./types";
+import { createMsgsDelegate } from "@/transactions/cosmos/messages/staking/delegate";
+import { createMsgsRedelegate } from "@/transactions/cosmos/messages/staking/redelegate";
+import { createMsgsClaimStakingRewards } from "@/transactions/cosmos/messages/staking/claimRewards";
 import { ethToCantoAddress } from "@/utils/address/conversion.utils";
 import { displayAmount } from "@/utils/formatting/balances.utils";
 import {
@@ -26,10 +19,9 @@ import {
   TransactionDescription,
   TxCreatorFunctionReturn,
 } from "@/transactions/interfaces";
-import { areEqualAddresses, isValidEthAddress } from "@/utils/address";
-import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
-import { ValidatorWithDelegations } from "@/hooks/staking/interfaces/validators";
+import { isValidEthAddress } from "@/utils/address";
 import { TX_PARAM_ERRORS } from "@/config/consts/errors";
+import { validateWeiUserInputTokenAmount } from "@/utils/math";
 
 export async function stakingTx(
   txParams: StakingTransactionParams
@@ -39,7 +31,7 @@ export async function stakingTx(
     txParams.ethAccount
   );
   if (error) {
-    return NEW_ERROR("stakingTx::" + errMsg(error));
+    return NEW_ERROR("stakingTx", error);
   }
   // switch based on tx type
   switch (txParams.txType) {
@@ -50,11 +42,11 @@ export async function stakingTx(
             txParams.ethAccount,
             txParams.chainId,
             cantoAddress,
-            txParams.validatorAddress,
+            txParams.validator.operator_address,
             txParams.amount,
             false,
             TX_DESCRIPTIONS.DELEGATE(
-              txParams.validatorName ?? "",
+              txParams.validator.description.moniker,
               displayAmount(txParams.amount, 18),
               false
             )
@@ -68,11 +60,11 @@ export async function stakingTx(
             txParams.ethAccount,
             txParams.chainId,
             cantoAddress,
-            txParams.validatorAddress,
+            txParams.validator.operator_address,
             txParams.amount,
             txParams.txType === StakingTxTypes.UNDELEGATE,
             TX_DESCRIPTIONS.DELEGATE(
-              txParams.validatorName ?? "",
+              txParams.validator.description.moniker,
               displayAmount(txParams.amount, 18),
               txParams.txType === StakingTxTypes.UNDELEGATE
             )
@@ -86,11 +78,11 @@ export async function stakingTx(
             txParams.ethAccount,
             txParams.chainId,
             cantoAddress,
-            txParams.validatorAddress,
+            txParams.validator.operator_address,
             txParams.newValidatorAddress,
             txParams.amount,
             TX_DESCRIPTIONS.REDELEGATE(
-              txParams.validatorName ?? "",
+              txParams.validator.description.moniker,
               txParams.newValidatorName ?? "",
               displayAmount(txParams.amount, 18)
             )
@@ -128,7 +120,7 @@ const _delegateTx = (
   description: TransactionDescription
 ): Transaction => ({
   fromAddress: ethAddress,
-  feTxType: CantoFETxType.NONE,
+  feTxType: undelegate ? CantoFETxType.UNDELEGATE : CantoFETxType.DELEGATE,
   description,
   chainId: chainId,
   type: "COSMOS",
@@ -153,7 +145,7 @@ const _redelegateTx = (
   fromAddress: ethAddress,
   description,
   chainId: chainId,
-  feTxType: CantoFETxType.NONE,
+  feTxType: CantoFETxType.REDELEGATE,
   type: "COSMOS",
   msg: createMsgsRedelegate({
     delegatorCantoAddress,
@@ -172,7 +164,7 @@ const _claimRewardsTx = (
   description: TransactionDescription
 ): Transaction => ({
   fromAddress: ethAddress,
-  feTxType: CantoFETxType.NONE,
+  feTxType: CantoFETxType.CLAIM_STAKING_REWARDS,
   description,
   chainId: chainId,
   type: "COSMOS",
@@ -184,47 +176,56 @@ const _claimRewardsTx = (
 
 export function validateStakingTxParams(
   txParams: StakingTransactionParams
-): ReturnWithError<Validation> {
+): Validation {
   // make sure userEthAddress is set and same as params
   if (!isValidEthAddress(txParams.ethAccount)) {
-    return NO_ERROR({
+    return {
       error: true,
       reason: TX_PARAM_ERRORS.PARAM_INVALID("ethAccount"),
-    });
+    };
   }
 
   // switch depending on tx type
   switch (txParams.txType) {
     case StakingTxTypes.DELEGATE:
       // amount just has to be less than canto balance
-      return NO_ERROR({ error: false });
+      return validateWeiUserInputTokenAmount(
+        txParams.amount,
+        "1",
+        txParams.nativeBalance,
+        "CANTO",
+        18
+      );
     case StakingTxTypes.UNDELEGATE:
-      return NO_ERROR({ error: false });
-    case StakingTxTypes.REDELEGATE: {
       // just need to make sure amount is less than user delegation balance
-      //const validator = getValidator(txParams.validatorAddress, staking);
-      // if (!validator || !(validator as ValidatorWithDelegations).userDelegation)
-      //   return NEW_ERROR("validator not found");
-      if (txParams.validatorAddress == txParams.newValidatorAddress) {
-        return NEW_ERROR("Same validator Addresses provided");
+      return validateWeiUserInputTokenAmount(
+        txParams.amount,
+        "1",
+        txParams.validator.userDelegation.balance,
+        "CANTO",
+        18
+      );
+    case StakingTxTypes.REDELEGATE: {
+      //make sure newValidatorAddress is different than validatorAddress
+      if (txParams.validator.operator_address == txParams.newValidatorAddress) {
+        return { error: true, reason: "Same validator Addresses provided" };
       }
-
-      return NO_ERROR({ error: false });
-      // return validateNonWeiUserInputTokenAmount(
-      //   txParams.amount,
-      //   "0",
-      //   (validator as ValidatorWithDelegations).userDelegation?.balance ?? "0",
-      //   "CANTO",
-      //   18
-      // ).error
-      //   ? NO_ERROR({ error: false })
-      //   : NEW_ERROR("Invalid input amount");
+      if (txParams.newValidatorAddress == "") {
+        return { error: true, reason: "No validator address provided" };
+      }
+      // make sure amount is less than user delegation balance
+      return validateWeiUserInputTokenAmount(
+        txParams.amount,
+        "1",
+        txParams.validator.userDelegation.balance,
+        "CANTO",
+        18
+      );
     }
-
     case StakingTxTypes.CLAIM_REWARDS: {
-      return NO_ERROR({ error: false });
+      return { error: false };
     }
     default:
-      return NEW_ERROR("reason: tx type not found");
+      return { error: true, reason: "reason: tx type not found" };
   }
 }

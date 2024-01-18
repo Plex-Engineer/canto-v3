@@ -1,4 +1,4 @@
-import { VoteOption } from "@/hooks/gov/interfaces/voteOptions";
+import { VoteOption } from "@/transactions/gov";
 import { CantoDexPair } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
 
@@ -107,8 +107,8 @@ export const TX_DESCRIPTIONS = {
     description: `Wrap ${amount} ETH to WETH`,
   }),
   VOTE: (proposalId: number, voteOption: VoteOption) => ({
-    title: `Voting for the Proposal ${proposalId}`,
-    description: `Vote for the proposal with the ${voteOption}`,
+    title: `Vote for Proposal ${proposalId}`,
+    description: `Vote ${voteOption} for Proposal ${proposalId}`,
   }),
 };
 
@@ -147,4 +147,11 @@ export enum CantoFETxType {
   // LP CANTO DEX
   ADD_LIQUIDITY_CANTO_DEX = "addLiquidityCantoDex",
   REMOVE_LIQUIDITY_CANTO_DEX = "removeLiquidityCantoDex",
+  // GOVERNANCE
+  VOTE = "vote",
+  // STAKING
+  DELEGATE = "delegate",
+  UNDELEGATE = "undelegate",
+  REDELEGATE = "redelegate",
+  CLAIM_STAKING_REWARDS = "claimStakingRewards",
 }

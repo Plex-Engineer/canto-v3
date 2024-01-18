@@ -4,17 +4,10 @@ import {
   PromiseWithError,
   errMsg,
 } from "@/config/interfaces";
-import {
-  UserStakingReturn,
-  ValidatorWithDelegations,
-} from "../interfaces/validators";
+import { UserStakingReturn } from "../interfaces/validators";
 import { ethToCantoAddress } from "@/utils/address";
 import { tryFetch } from "@/utils/async";
-import { getCosmosAPIEndpoint } from "@/utils/networks";
 import * as NETWORKS from "@/config/networks";
-import * as COSMOS_NETWORKS from "@/config/networks/cosmos";
-
-type EndpointType = "delegations" | "unbonding" | "rewards";
 
 const cantoMainnetUserAPIEndpoint = "https://mainnet-user-api.plexnode.wtf"; //process.env.NEXT_PUBLIC_CANTO_USER_API_URL;
 const cantoTestnetUserAPIEndpoint = "https://localhost:9000";
@@ -41,11 +34,7 @@ function getUserAPIEndPoint(chainId: number | string) {
   }
 }
 
-const endpointUserStaking = (
-  chainId: number,
-  cantoAddress: string,
-  endpointType?: string
-): string => {
+const endpointUserStaking = (chainId: number, cantoAddress: string): string => {
   // get cosmos endpoint
   const { data: endpoint, error } = getUserAPIEndPoint(chainId);
   if (error) throw error;

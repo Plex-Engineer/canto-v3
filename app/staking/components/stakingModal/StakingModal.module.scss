@@ -1,25 +1,25 @@
-.modalContainer{
-    //display: flex;
-    //flex-direction: column;
-    display: flex;
+.modalContainer {
+  //display: flex;
+  //flex-direction: column;
+  display: flex;
 }
 
-.spacer{
-    border-bottom: 1px solid gray;
+.spacer {
+  border-bottom: 1px solid gray;
 }
 
-.modalInfoRow{
+.modalInfoRow {
+  display: flex;
+  //padding: auto;
+  height: 7%;
+  flex-direction: row !important;
+  justify-content: space-between;
+  .modalInfoRow2 {
     display: flex;
-    //padding: auto;
-    height: 7%;
     flex-direction: row !important;
-    justify-content:space-between;
-    .modalInfoRow2{
-        display: flex;
-        flex-direction: row !important;
-    }
+  }
 }
-.buttonContainer{
-    display: flex;
-    justify-content: center;
+.buttonContainer {
+  display: flex;
+  justify-content: center;
 }

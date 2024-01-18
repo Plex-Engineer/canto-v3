@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import styles from "./ProposalTable.module.scss";
 import { Proposal } from "@/hooks/gov/interfaces/proposal";
 import {
@@ -7,7 +7,6 @@ import {
   formatProposalType,
 } from "@/utils/gov/formatData";
 import Text from "@/components/text";
-import Button from "@/components/button/button";
 import { useRouter } from "next/navigation";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import Table from "@/components/table/table";
@@ -18,71 +17,55 @@ interface TableProps {
   proposals: Proposal[];
 }
 
+const PAGE_SIZE = 10;
+enum ProposalFilter {
+  ALL = "ALL PROPOSALS",
+  ACTIVE = "ACTIVE PROPOSALS",
+  PASSED = "PASSED PROPOSALS",
+  REJECTED = "REJECTED PROPOSALS",
+}
+
 const ProposalTable = ({ proposals }: TableProps) => {
+  // route to proposal page
   const router = useRouter();
-  const [currentFilter, setCurrentFilter] = useState<string>("All");
-  // const [filteredProposals, setFilteredProposals] =
-  //   useState<Proposal[]>(proposals);
-
-  const pageSize = 10;
-  const [currentPage, setCurrentPage] = useState(1);
-  // const [totalPages, setTotalPages] = useState(
-  //   Math.ceil(filteredProposals.length / pageSize)
-  // );
-
-  const filteredProposals = useMemo(() => {
-    setCurrentPage(1);
-    if (currentFilter == "Active") {
-      return proposals.filter(
-        (proposal) => proposal.status === "PROPOSAL_STATUS_VOTING_PERIOD"
-      );
-    }
-    if (currentFilter == "Passed") {
-      return proposals.filter(
-        (proposal) => proposal.status === "PROPOSAL_STATUS_PASSED"
-      );
-    }
-    if (currentFilter == "Rejected") {
-      return proposals.filter(
-        (proposal) => proposal.status === "PROPOSAL_STATUS_REJECTED"
-      );
-    }
-    return proposals;
-  }, [currentFilter, proposals]);
-
-  const totalPages = useMemo(
-    () => Math.ceil(filteredProposals.length / pageSize),
-    [filteredProposals.length]
-  );
-
-  // useEffect(() => {
-  //   setTotalPages(Math.ceil(filteredProposals.length / pageSize));
-  // }, [filteredProposals.length, pageSize]);
-  //console.log(proposals);
-  const paginatedProposals = filteredProposals.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
-
-  const handlePageClick = (index: number) => {
-    setCurrentPage(index);
-  };
-  const proposalTitleMap = new Map<string, string>();
-  proposalTitleMap.set("All", "ALL PROPOSALS");
-  proposalTitleMap.set("Active", "ACTIVE PROPOSALS");
-  proposalTitleMap.set("Passed", "PASSED PROPOSALS");
-  proposalTitleMap.set("Rejected", "REJECTED PROPOSALS");
-
   const handleRowClick = (proposalId: any) => {
-    // Assuming you have access to the `useRouter` hook here
-    //const router = useRouter();
-
     // Navigate to the appropriate page
-
     router.push(`/governance/proposal?id=${proposalId}`);
   };
 
-  if (!proposals || proposals.length == 0) {
+  // filter proposals
+  const [currentFilter, setCurrentFilter] = useState<ProposalFilter>(
+    ProposalFilter.ALL
+  );
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const filteredProposals = useMemo(() => {
+    setCurrentPage(1);
+    return proposals.filter((proposal) => {
+      switch (currentFilter) {
+        case ProposalFilter.ACTIVE:
+          return proposal.status === "PROPOSAL_STATUS_VOTING_PERIOD";
+        case ProposalFilter.PASSED:
+          return proposal.status === "PROPOSAL_STATUS_PASSED";
+        case ProposalFilter.REJECTED:
+          return proposal.status === "PROPOSAL_STATUS_REJECTED";
+        default:
+          return true;
+      }
+    });
+  }, [currentFilter, proposals]);
+
+  const totalPages = useMemo(
+    () => Math.ceil(filteredProposals.length / PAGE_SIZE),
+    [filteredProposals.length]
+  );
+
+  const paginatedProposals = filteredProposals.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
+  if (proposals.length == 0) {
     return (
       <div>
         <Text font="proto_mono">Loading Proposals...</Text>
@@ -94,14 +77,19 @@ const ProposalTable = ({ proposals }: TableProps) => {
       <div className={styles.table}>
         {
           <Table
-            title={proposalTitleMap.get(currentFilter)}
+            title={currentFilter}
             secondary={
               <Container width="400px">
                 <ToggleGroup
-                  options={["All", "Active", "Passed", "Rejected"]}
-                  selected={currentFilter}
+                  options={Object.values(ProposalFilter).map(
+                    (filter) => filter.split(" ")[0]
+                  )}
+                  selected={currentFilter.split(" ")[0]}
                   setSelected={(value) => {
-                    setCurrentFilter(value);
+                    const proposalFilter = Object.values(ProposalFilter).find(
+                      (filter) => filter.split(" ")[0] === value
+                    );
+                    setCurrentFilter(proposalFilter || ProposalFilter.ALL);
                   }}
                 />
               </Container>
@@ -151,7 +139,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                     ...paginatedProposals.map((proposal, index) => {
                       return (
                         <div
-                          key={`row_${index}`}
+                          key={`row_${index}${proposal.proposal_id}`}
                           style={{
                             display: "flex",
                             flexDirection: "row",
@@ -224,8 +212,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                       key="pagination"
                       currentPage={currentPage}
                       totalPages={totalPages}
-                      numbersToDisplay={3}
-                      handlePageClick={handlePageClick}
+                      handlePageClick={(index) => setCurrentPage(index)}
                     />,
                   ]
                 : [

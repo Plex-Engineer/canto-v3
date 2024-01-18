@@ -1,3 +1,5 @@
+import { ValidatorWithDelegations } from "@/hooks/staking/interfaces/validators";
+
 export enum StakingTxTypes {
   DELEGATE = "Delegate",
   UNDELEGATE = "Undelegate",
@@ -11,14 +13,13 @@ export type StakingTransactionParams = {
 } & (
   | {
       txType: StakingTxTypes.DELEGATE | StakingTxTypes.UNDELEGATE;
-      validatorAddress: string;
+      validator: ValidatorWithDelegations;
       amount: string;
-      validatorName?: string;
+      nativeBalance: string;
     }
   | {
       txType: StakingTxTypes.REDELEGATE;
-      validatorAddress: string;
-      validatorName?: string;
+      validator: ValidatorWithDelegations;
       amount: string;
       newValidatorAddress: string;
       newValidatorName?: string;

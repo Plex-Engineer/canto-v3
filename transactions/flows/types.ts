@@ -19,8 +19,8 @@ import {
   CLMClaimRewardsTxParams,
   CTokenLendingTransactionParams,
 } from "../lending";
-import { StakingTransactionParams } from "@/transactions/staking/interfaces/stakingTxTypes";
-import { ProposalVoteTxParams } from "@/transactions/gov/interfaces/voteTxParams";
+import { StakingTransactionParams } from "../staking";
+import { ProposalVoteTxParams } from "../gov";
 
 // txType is the key for the txMap that will create the Transaction[] list
 export type NewTransactionFlow = {

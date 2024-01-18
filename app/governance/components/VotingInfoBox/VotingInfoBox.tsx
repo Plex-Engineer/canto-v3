@@ -1,14 +1,10 @@
 import Text from "@/components/text";
 import styles from "./VotingInfoBox.module.scss";
 import Container from "@/components/container/container";
-import {
-  displayAmount,
-  formatBalance,
-} from "@/utils/formatting/balances.utils";
+import { displayAmount } from "@/utils/formatting/balances.utils";
 import Icon from "@/components/icon/icon";
-import { VoteData, calculateVotePercentages } from "@/utils/gov/formatData";
-import RadioButton from "../../../../components/RadioButton/RadioButton";
-import { VoteOption } from "@/hooks/gov/interfaces/voteOptions";
+import { VoteData } from "@/utils/gov/formatData";
+import { VoteOption } from "@/transactions/gov";
 import { useState } from "react";
 
 export function VotingInfoBox({
@@ -85,15 +81,14 @@ export function VotingInfoBox({
     >
       {isActive && (
         <div className={styles.radioBtnContainer}>
-          <RadioButton
-            value={value}
-            isActive={isActive}
-            onClick={() => {
-              selectedVote = value;
-            }}
-            selectedValue={selectedVote}
-            checkedColor={color1}
-          />{" "}
+          <div
+            className={styles.radioBtn}
+            style={
+              selectedVote === value
+                ? { backgroundColor: color1, opacity: 1 }
+                : {}
+            }
+          />
         </div>
       )}
 

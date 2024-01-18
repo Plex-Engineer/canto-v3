@@ -2,34 +2,31 @@
 import Container from "@/components/container/container";
 import Spacer from "@/components/layout/spacer";
 import {
-  UnbondingDelegation,
-  UserUnbondingDelegation,
   Validator,
   ValidatorWithDelegations,
 } from "@/hooks/staking/interfaces/validators";
-import { GetWalletClientResult } from "wagmi/actions";
 import styles from "./StakingModal.module.scss";
 import Text from "@/components/text";
 import Icon from "@/components/icon/icon";
 import { displayAmount } from "@/utils/formatting/balances.utils";
 import Button from "@/components/button/button";
-import { useState } from "react";
-import { StakingTxTypes } from "@/transactions/staking/interfaces/stakingTxTypes";
+import { useMemo, useState } from "react";
+import { StakingTxTypes } from "@/transactions/staking";
 import { StakingTabs } from "../stakingTab/StakingTabs";
 import Selector from "@/components/selector/selector";
 import Amount from "@/components/amount/amount";
+import { Validation } from "@/config/interfaces";
 
-export interface StakingModalParams {
+interface StakingModalParams {
   validator: ValidatorWithDelegations | null;
-  userStaking?: {
-    validators: ValidatorWithDelegations[];
-    unbonding: UnbondingDelegation[];
-    cantoBalance: string;
-  };
-  signer: GetWalletClientResult | undefined;
+  cantoBalance: string;
+  txValidation: (
+    amount: string,
+    selectedTx: StakingTxTypes,
+    validatorToRedelegate: Validator | null | undefined
+  ) => Validation;
   onConfirm: (
-    validator: Validator | null,
-    inputAmount: string,
+    amount: string,
     selectedTx: StakingTxTypes,
     validatorToRedelegate: Validator | null | undefined
   ) => void;
@@ -37,7 +34,6 @@ export interface StakingModalParams {
 }
 export const StakingModal = (props: StakingModalParams) => {
   const [inputAmount, setInputAmount] = useState("");
-  //const [isMaxClicked, setMaxClicked] = useState<boolean>(false);
 
   const [selectedTx, setSelectedTx] = useState<StakingTxTypes>(
     StakingTxTypes.DELEGATE
@@ -73,28 +69,21 @@ export const StakingModal = (props: StakingModalParams) => {
       setSelectedTx(StakingTxTypes.REDELEGATE);
     }
   };
+
+  const txValidation = useMemo(
+    () => props.txValidation(inputAmount, selectedTx, validatorToRedelegate),
+    [inputAmount, selectedTx, validatorToRedelegate]
+  );
+
   if (!props.validator) {
     return;
   }
 
-  const userDelegationBalance: string | undefined =
-    props.validator.userDelegation.balance;
-
-  const userMaxBalance = userDelegationBalance ? userDelegationBalance : "0";
-
-  const userCantoBalance =
-    props.userStaking && props.userStaking.cantoBalance
-      ? props.userStaking.cantoBalance
-      : "0";
-
-  const maxBalance =
-    selectedTx == StakingTxTypes.DELEGATE ? userCantoBalance : userMaxBalance;
-  const userStakedValidatorsAddressList = props.userStaking?.validators.map(
-    (validatorWithDelegation) => validatorWithDelegation.operator_address
-  );
-  const hasUserStaked = userStakedValidatorsAddressList
-    ? userStakedValidatorsAddressList.includes(props.validator.operator_address)
-    : false;
+  const userDelegationBalance = props.validator.userDelegation.balance;
+  const maxAmount =
+    selectedTx == StakingTxTypes.DELEGATE
+      ? props.cantoBalance
+      : userDelegationBalance;
 
   return (
     <Container className={styles.modalContainer}>
@@ -112,13 +101,10 @@ export const StakingModal = (props: StakingModalParams) => {
         <div style={{ display: "flex", flexDirection: "row" }}>
           <div style={{ marginRight: "5px" }}>
             <Text>
-              {displayAmount(
-                props.userStaking && props.userStaking.cantoBalance
-                  ? props.userStaking.cantoBalance
-                  : "0",
-                18,
-                { commify: true, short: false, precision: 2 }
-              )}
+              {displayAmount(props.cantoBalance, 18, {
+                short: false,
+                precision: 2,
+              })}
             </Text>
           </div>
           <div
@@ -141,7 +127,7 @@ export const StakingModal = (props: StakingModalParams) => {
               {displayAmount(
                 userDelegationBalance ? userDelegationBalance : "0",
                 18,
-                { commify: true, short: false, precision: 2 }
+                { short: false, precision: 2 }
               )}
             </Text>
           </div>
@@ -168,11 +154,8 @@ export const StakingModal = (props: StakingModalParams) => {
         </Text>
       </div>
       <Spacer height="20px"></Spacer>
-      {hasUserStaked && (
-        <StakingTabs
-          handleTabChange={handleTabChange}
-          activeTab={activeTab}
-        ></StakingTabs>
+      {userDelegationBalance !== "0" && (
+        <StakingTabs handleTabChange={handleTabChange} activeTab={activeTab} />
       )}
       <Spacer height="20px"></Spacer>
       {selectedTx == StakingTxTypes.REDELEGATE && (
@@ -220,9 +203,9 @@ export const StakingModal = (props: StakingModalParams) => {
           }}
           decimals={18}
           value={inputAmount}
-          min={""}
-          max={maxBalance}
-        ></Amount>
+          min={"0"}
+          max={maxAmount}
+        />
       </div>
       <Spacer height="10px" />
       <div style={{ width: "100%" }} className={styles.modalInfoRow}>
@@ -235,26 +218,9 @@ export const StakingModal = (props: StakingModalParams) => {
         <Button
           width="fill"
           onClick={() => {
-            props.onConfirm(
-              props.validator,
-              inputAmount,
-              selectedTx,
-              validatorToRedelegate
-            );
+            props.onConfirm(inputAmount, selectedTx, validatorToRedelegate);
           }}
-          disabled={
-            Number(inputAmount) <= 0 ||
-            (selectedTx == StakingTxTypes.REDELEGATE &&
-              !validatorToRedelegate) ||
-            Number(inputAmount) >
-              Number(
-                displayAmount(maxBalance, 18, {
-                  commify: false,
-                  short: false,
-                  precision: 10,
-                })
-              )
-          }
+          disabled={txValidation.error}
         >
           {selectedTx}
         </Button>

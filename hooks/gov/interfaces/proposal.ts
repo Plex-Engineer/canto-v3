@@ -1,11 +1,5 @@
 export interface Proposal {
   proposal_id: number;
-  // content: {
-  //   "@type": string,
-  //   title: string,
-  //   description: string,
-  //   metadata: Object
-  // };
   title: string;
   description: string;
   type_url: string;
