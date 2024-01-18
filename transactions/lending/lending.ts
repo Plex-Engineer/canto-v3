@@ -235,7 +235,9 @@ export function validateCTokenLendingTxParams(
   return validateWeiUserInputTokenAmount(
     txParams.amount,
     "1",
-    maxAmount,
+    txParams.txType == CTokenLendingTxTypes.BORROW
+      ? percentOfAmount(maxAmount, 98.8).data
+      : maxAmount,
     txParams.cToken.underlying.symbol,
     txParams.cToken.underlying.decimals
   );
