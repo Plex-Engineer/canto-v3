@@ -181,10 +181,13 @@ export default function LendingPage() {
                       {cStableCoin.underlying.symbol}
                     </Text>
                     <Text theme="secondary-dark" size="x-sm">
-                      Balance :
+                      Balance:{" "}
                       {displayAmount(
                         cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
-                        cStableCoin.underlying.decimals
+                        cStableCoin.underlying.decimals,
+                        {
+                          precision: 2,
+                        }
                       )}
                     </Text>
                   </Container>
@@ -193,8 +196,100 @@ export default function LendingPage() {
                 displayAmount(cStableCoin.collateralFactor, 16),
                 displayAmount(
                   cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
-                  cStableCoin.underlying.decimals
+                  cStableCoin.underlying.decimals,
+                  {
+                    precision: 2,
+                  }
                 ),
+              ]),
+            ]}
+          />
+          <Table
+            title="Vivacity"
+            headers={[
+              {
+                value: "Asset",
+                ratio: 3,
+              },
+              {
+                value: "APY",
+                ratio: 2,
+              },
+
+              {
+                value: "Supplied",
+                ratio: 2,
+              },
+              {
+                value: "Rewards",
+                ratio: 2,
+              },
+            ]}
+            content={[
+              ...[...stableCoins].map((cStableCoin) => [
+                <Container
+                  center={{
+                    vertical: true,
+                  }}
+                  width="100%"
+                  direction="row"
+                  gap={10}
+                  style={{
+                    paddingLeft: "30px",
+                  }}
+                  key={"title" + cStableCoin.address}
+                >
+                  <Icon
+                    icon={{ url: cStableCoin.underlying.logoURI, size: 30 }}
+                  />
+                  <Container
+                    style={{
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <Text font="proto_mono">
+                      {cStableCoin.underlying.symbol}
+                    </Text>
+                    <Text theme="secondary-dark" size="x-sm">
+                      Balance:{" "}
+                      {displayAmount(
+                        cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
+                        cStableCoin.underlying.decimals,
+                        {
+                          precision: 2,
+                        }
+                      )}
+                    </Text>
+                  </Container>
+                </Container>,
+                cStableCoin.supplyApy + "%",
+                displayAmount(cStableCoin.collateralFactor, 16),
+                <Text
+                  key={"grp" + cStableCoin.address}
+                  font={"proto_mono"}
+                  style={{
+                    width: "100%",
+                    lineClamp: 1,
+                  }}
+                >
+                  {displayAmount(
+                    cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
+                    cStableCoin.underlying.decimals,
+                    {
+                      precision: 2,
+                    }
+                  )}
+                  <Icon
+                    style={{
+                      marginLeft: "5px",
+                    }}
+                    key={"title" + cStableCoin.address}
+                    icon={{
+                      url: "/tokens/canto.svg",
+                      size: 14,
+                    }}
+                  />
+                </Text>,
               ]),
             ]}
           />
@@ -215,7 +310,7 @@ export default function LendingPage() {
                 ratio: 2,
               },
               {
-                value: "Collateral",
+                value: "Liquidity",
                 ratio: 2,
               },
               {
@@ -225,10 +320,51 @@ export default function LendingPage() {
             ]}
             content={[
               ...stableCoins.map((cStableCoin) => [
-                cStableCoin.underlying.symbol,
-                formatPercent(cStableCoin.supplyApy),
-                "Yes",
-                "test",
+                <Container
+                  center={{
+                    vertical: true,
+                  }}
+                  width="100%"
+                  direction="row"
+                  gap={10}
+                  style={{
+                    paddingLeft: "30px",
+                  }}
+                  key={"title" + cStableCoin.address}
+                >
+                  <Icon
+                    icon={{ url: cStableCoin.underlying.logoURI, size: 30 }}
+                  />
+                  <Container
+                    style={{
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <Text font="proto_mono">
+                      {cStableCoin.underlying.symbol}
+                    </Text>
+                    <Text theme="secondary-dark" size="x-sm">
+                      Balance:{" "}
+                      {displayAmount(
+                        cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
+                        cStableCoin.underlying.decimals,
+                        {
+                          precision: 2,
+                        }
+                      )}
+                    </Text>
+                  </Container>
+                </Container>,
+                cStableCoin.supplyApy + "%",
+                // liquidity
+                displayAmount(cStableCoin.liquidity, 0),
+                displayAmount(
+                  cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
+                  cStableCoin.underlying.decimals,
+                  {
+                    precision: 2,
+                  }
+                ),
               ]),
             ]}
           />

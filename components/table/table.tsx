@@ -15,7 +15,7 @@ const Table = (props: Props) => {
   return (
     <div className={styles.container} style={{ fontSize: props.textSize }}>
       <div className={styles.title}>
-        <Text font="proto_mono" size="lg">
+        <Text font="proto_mono" size="lg" opacity={0.7}>
           {props.title}
         </Text>
         {props.secondary}
