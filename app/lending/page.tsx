@@ -1,7 +1,6 @@
 "use client";
 
 import styles from "./lending.module.scss";
-import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
 import { displayAmount, formatPercent } from "@/utils/formatting";
@@ -18,6 +17,7 @@ import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import DesktopOnly from "@/components/desktop-only/desktop-only";
 import AccountHealth from "./components/accountHealth/accountHealth";
 import TokenCard from "./components/tokenCard/tokenCard";
+import Icon from "@/components/icon/icon";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -46,7 +46,7 @@ export default function LendingPage() {
   const { cNote, rwas, stableCoins } = cTokens;
   const { selectedCToken, setSelectedCToken } = selection;
 
-  if (isLoading) {
+  if (isLoading || cNote === undefined || stableCoins === undefined) {
     return <div className={styles.loading}>loading</div>;
   }
 
@@ -130,14 +130,113 @@ export default function LendingPage() {
           }}
         />
       </div>
-      <div className={styles.mainTable}></div>
+      <div className={styles.mainTable}>
+        <Container gap={12} width="100%">
+          <Text size="x-lg" font="proto_mono">
+            SUPPLY
+          </Text>
+          <Table
+            title="Canto Lending Market"
+            headers={[
+              {
+                value: "Asset",
+                ratio: 3,
+              },
+              {
+                value: "APY",
+                ratio: 2,
+              },
+              {
+                value: "Collateral",
+                ratio: 2,
+              },
+              {
+                value: "Supplied",
+                ratio: 2,
+              },
+            ]}
+            content={[
+              ...[cNote, ...stableCoins, ...rwas].map((cStableCoin) => [
+                <Container
+                  center={{
+                    vertical: true,
+                  }}
+                  width="100%"
+                  direction="row"
+                  gap={10}
+                  style={{
+                    paddingLeft: "30px",
+                  }}
+                  key={"title" + cStableCoin.address}
+                >
+                  <Icon
+                    icon={{ url: cStableCoin.underlying.logoURI, size: 30 }}
+                  />
+                  <Container
+                    style={{
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <Text font="proto_mono">
+                      {cStableCoin.underlying.symbol}
+                    </Text>
+                    <Text theme="secondary-dark" size="x-sm">
+                      Balance :
+                      {displayAmount(
+                        cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
+                        cStableCoin.underlying.decimals
+                      )}
+                    </Text>
+                  </Container>
+                </Container>,
+                cStableCoin.supplyApy + "%",
+                displayAmount(cStableCoin.collateralFactor, 16),
+                displayAmount(
+                  cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
+                  cStableCoin.underlying.decimals
+                ),
+              ]),
+            ]}
+          />
+        </Container>
+        <Container gap={12} width="100%">
+          <Text size="x-lg" font="proto_mono">
+            Borrow
+          </Text>
+          <Table
+            title="Canto Lending Market"
+            headers={[
+              {
+                value: "Asset",
+                ratio: 3,
+              },
+              {
+                value: "APY",
+                ratio: 2,
+              },
+              {
+                value: "Collateral",
+                ratio: 2,
+              },
+              {
+                value: "Borrowed",
+                ratio: 2,
+              },
+            ]}
+            content={[
+              ...stableCoins.map((cStableCoin) => [
+                cStableCoin.underlying.symbol,
+                formatPercent(cStableCoin.supplyApy),
+                "Yes",
+                "test",
+              ]),
+            ]}
+          />
+        </Container>
+      </div>
     </div>
   );
 }
-
-const NoteIcon = () => (
-  <Icon themed icon={{ url: "/tokens/note.svg", size: 20 }} />
-);
 
 const CTokenTable = ({
   title,

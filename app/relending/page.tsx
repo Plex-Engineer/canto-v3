@@ -314,14 +314,14 @@ const CTokenTable = ({
                   })
                 )
               : filteredPairs == "Stablecoins"
-              ? stableTokens.map((cStableCoin) =>
-                  StableCoinRow({
-                    cStableCoin,
-                    onSupply: () => onSupply(cStableCoin.address),
-                    onBorrow: () => onBorrow(cStableCoin.address),
-                  })
-                )
-              : []
+                ? stableTokens.map((cStableCoin) =>
+                    StableCoinRow({
+                      cStableCoin,
+                      onSupply: () => onSupply(cStableCoin.address),
+                      onBorrow: () => onBorrow(cStableCoin.address),
+                    })
+                  )
+                : []
           }
         />
       ) : (
