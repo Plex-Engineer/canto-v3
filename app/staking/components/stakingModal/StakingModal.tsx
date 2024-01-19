@@ -44,17 +44,17 @@ export const StakingModal = (props: StakingModalParams) => {
   const [validatorToRedelegate, setValidatorToRedelegate] =
     useState<Validator | null>();
 
-  const splicedValidators = props.validators.filter(
-    (validator) =>
-      validator.operator_address !== props.validator?.operator_address
-  );
-
-  const dropdownItems = splicedValidators.map((validator) => {
-    return {
-      name: validator.description.moniker,
-      id: validator.operator_address,
-    };
-  });
+  const dropdownItems = props.validators
+    .filter(
+      (validator) =>
+        validator.operator_address !== props.validator?.operator_address
+    )
+    .map((validator) => {
+      return {
+        name: validator.description.moniker,
+        id: validator.operator_address,
+      };
+    });
 
   const handleTabChange = (tab: "delegate" | "undelegate" | "redelegate") => {
     setActiveTab(tab);
