@@ -9,9 +9,13 @@ import { DottedItem } from "../dottedItem/dottedItem";
 
 interface Props {
   cToken?: CTokenWithUserData;
+  items: {
+    key: string;
+    value: string;
+  }[];
   onClick: () => void;
 }
-const TokenCard = ({ cToken }: Props) => {
+const TokenCard = ({ cToken, items }: Props) => {
   if (!cToken) {
     return <div className={styles.loading}></div>;
   }
@@ -44,9 +48,9 @@ const TokenCard = ({ cToken }: Props) => {
       </div>
 
       <Container padding={"sm"} gap={16}>
-        <DottedItem name="Circulating Supply" value="18.0m" />
-        <DottedItem name="Percent Deposited" value="36%" />
-        <DottedItem name="RWA TVl" value="9.8M" />
+        {items.map((item, i) => (
+          <DottedItem key={i} name={item.key} value={item.value} />
+        ))}
       </Container>
     </div>
   );

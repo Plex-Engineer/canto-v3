@@ -66,13 +66,21 @@
   .container {
     margin: 1rem;
     width: calc(100% - 2rem);
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    grid-template-areas:
+      "title "
+      "accountHealth"
+      "highlightCard"
+      "mainContent";
   }
-  .grid {
-    flex-direction: column-reverse !important;
-    width: calc(100% - 2rem) !important;
+
+  .accountHealth {
+    height: 100%;
   }
   .highlightCard {
     flex-direction: column;
+    height: 100%;
   }
   .mainTable {
     flex-direction: column;

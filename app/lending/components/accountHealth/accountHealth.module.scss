@@ -41,3 +41,9 @@
   height: 1px;
   background-color: rgba(var(--light-color), 0.3);
 }
+
+@media screen and (max-width: 768px) {
+  .items {
+    grid-template-columns: 1fr 1fr;
+  }
+}

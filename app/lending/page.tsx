@@ -14,10 +14,10 @@ import { useState } from "react";
 import Spacer from "@/components/layout/spacer";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
-import DesktopOnly from "@/components/desktop-only/desktop-only";
 import AccountHealth from "./components/accountHealth/accountHealth";
 import TokenCard from "./components/tokenCard/tokenCard";
 import Icon from "@/components/icon/icon";
+import { addTokenBalances, divideBalances } from "@/utils/math/tokenMath.utils";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -124,7 +124,34 @@ export default function LendingPage() {
       <div className={styles.highlightCard}>
         <TokenCard
           cToken={cNote}
-          items={{}}
+          items={[
+            {
+              key: "Circulating Supply",
+              value: displayAmount(
+                addTokenBalances(
+                  lendingStats.circulatingNote,
+                  lendingStats.circulatingCNote
+                ),
+                18
+              ),
+            },
+            {
+              key: "Percent Deposited",
+              value: formatPercent(
+                divideBalances(
+                  lendingStats.circulatingCNote,
+                  addTokenBalances(
+                    lendingStats.circulatingNote,
+                    lendingStats.circulatingCNote
+                  )
+                )
+              ),
+            },
+            {
+              key: "RWA TVl",
+              value: displayAmount(lendingStats.valueOfAllRWA, 18),
+            },
+          ]}
           onClick={() => {
             //! TODO: confirm what happens when you click on get cNote
             setCurrentModal(CLMModalTypes.SUPPLY);
