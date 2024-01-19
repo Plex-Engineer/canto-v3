@@ -29,7 +29,13 @@ const ExploreLink = ({ title, description, link, image }: Props) => {
           vertical: true,
         }}
       >
-        <Image height={100} width={100} src={image} alt={title} />
+        {title === "Blank Rasa" ? (
+          <div style={{ backgroundColor: "#FFFFFF" }}>
+            <Image height={100} width={100} src={image} alt={title} />
+          </div>
+        ) : (
+          <Image height={100} width={100} src={image} alt={title} />
+        )}
         <Container>
           <Text size="x-sm">
             <span
