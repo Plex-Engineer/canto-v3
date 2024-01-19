@@ -27,7 +27,6 @@ import { useBlockNumber } from "wagmi";
 import { useEffect, useState} from 'react'
 import { CANTO_MAINNET_EVM } from "@/config/networks";
 import { TimeDisplayValues } from "@/hooks/pairs/newAmbient/interfaces/timeDisplay";
-import { BlockNumber } from "viem";
 export default function Page() {
   const {
     pairs,
@@ -45,14 +44,23 @@ export default function Page() {
     pairNames,
   } = usePool();
 
-//myCode
 
+  let prevBlockNumber=(BigInt(7844908));//need to update after provided
+  const blocksInEpoch=(BigInt(104272))
+  const blockDuration=(5.8);
+  let remBlocksInEpoch=(BigInt(104272));
+  const { data: blockNumber } = useBlockNumber({
+    chainId: CANTO_MAINNET_EVM.chainId,
+    watch: true,
+  });
+  
 const UserAmbientRewardsTimer = (blockNumber:bigint|undefined) => {
+  let remTime=0n;
   if(blockNumber){
     const noOfWeeksToBeAdded = (blockNumber - prevBlockNumber)/blocksInEpoch;
-    setPrevBlockNumber(prevBlockNumber+(noOfWeeksToBeAdded * blocksInEpoch));
-    setRemBlocksInEpoch(prevBlockNumber + blocksInEpoch - blockNumber)
-    setRemTime(remBlocksInEpoch*BigInt(blockDuration*1000))
+    prevBlockNumber=(prevBlockNumber+(noOfWeeksToBeAdded * blocksInEpoch));
+    remBlocksInEpoch=(prevBlockNumber + blocksInEpoch - blockNumber)
+    remTime=(remBlocksInEpoch*BigInt(blockDuration*1000))
   }
   return remTime;
 }
@@ -65,31 +73,25 @@ const getTimerObj = (remTime:bigint):TimeDisplayValues => {
   };
   return stateObj;
 }
-  const { data: blockNumber } = useBlockNumber({
-    chainId: CANTO_MAINNET_EVM.chainId,
-    watch: true,
-  });
-  const [prevBlockNumber,setPrevBlockNumber]=useState<BlockNumber>(BigInt(7844908));//need to update after provided
-  const [blocksInEpoch,setBlocksInEpoch] = useState<BlockNumber>(BigInt(104272))
-  const [blockDuration,setBlockDuration]=useState(5.8);
-  const [remBlocksInEpoch,setRemBlocksInEpoch]=useState<BlockNumber>(BigInt(104272));
-  const [remTime,setRemTime]=useState(remBlocksInEpoch*BigInt(blockDuration*1000));
-
+const [timerObj,setTimerObj]=useState(getTimerObj(0n));
   useEffect(() => {
-    
+    let remTime=(remBlocksInEpoch*BigInt(blockDuration*1000));
+    if(!blockNumber){
+      //set timerObj to loading
+      return;
+    }
+    remTime=UserAmbientRewardsTimer(blockNumber);
     setInterval(() => {
       if(remTime===0n){
-        setRemTime(UserAmbientRewardsTimer(blockNumber));
+        remTime=(UserAmbientRewardsTimer(blockNumber));
       }
-      setRemTime((remTime) => (remTime-BigInt(1000)));
-      
+     remTime=remTime-1000n;
+     setTimerObj(getTimerObj(remTime));
     }, 1000);
-    
-    
-  }, []);
+  }, [blockNumber!=undefined]);
 
-let timerObj=getTimerObj(remTime);
-console.log(timerObj.minutes+":"+timerObj.seconds);
+
+// console.log(timerObj.days+" "+timerObj.hours+" "+timerObj.minutes+" "+timerObj.seconds);
 
   //main content
   return (
