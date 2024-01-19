@@ -77,15 +77,15 @@ const NavBar = () => {
         >
           <Text size="sm">Bridge</Text>
         </Link>
-        {/* <Link
+        <Link
           href="/staking"
           className={clsx(
             styles["nav-link"],
             currentPath == "/staking" && styles.active
           )}
         >
-          <Text>Staking</Text>
-        </Link> */}
+          <Text size="sm">Staking</Text>
+        </Link>
         <Link
           href="/lending"
           className={clsx(
@@ -104,23 +104,15 @@ const NavBar = () => {
         >
           <Text size="sm">Pools</Text>
         </Link>
-        {/* <Link
+
+        <Link
           href="/governance"
           className={clsx(
             styles["nav-link"],
-            currentPath == "/governance" && styles.active
+            currentPath.includes("governance") && styles.active
           )}
         >
-          <Text>Governance</Text>
-        </Link> */}
-        <Link
-          href="/explore"
-          className={clsx(
-            styles["nav-link"],
-            currentPath == "/explore" && styles.active
-          )}
-        >
-          <Text size="sm">Explore</Text>
+          <Text size="sm">Governance</Text>
         </Link>
       </div>
       <div className={styles["btn-grp"]}>

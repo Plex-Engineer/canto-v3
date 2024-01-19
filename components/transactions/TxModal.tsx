@@ -120,7 +120,7 @@ const TransactionModal = () => {
                         <Icon
                           themed
                           icon={{
-                            url: "dropdown.svg",
+                            url: "/dropdown.svg",
                             size: 24,
                           }}
                         />
@@ -156,11 +156,7 @@ const TransactionModal = () => {
                 transform: currentFlowId ? "translateX(0)" : "translateX(100%)",
               }}
             >
-              <div
-                style={{
-                  position: "absolute",
-                }}
-              >
+              <div>
                 <Container
                   direction="row"
                   gap={20}
@@ -182,7 +178,7 @@ const TransactionModal = () => {
                     <Icon
                       themed
                       icon={{
-                        url: "dropdown.svg",
+                        url: "/dropdown.svg",
                         size: 24,
                       }}
                     />
@@ -243,7 +239,7 @@ const TransactionModal = () => {
         <Icon
           themed
           icon={{
-            url: "transactions.svg",
+            url: "/transactions.svg",
             size: 24,
           }}
         />

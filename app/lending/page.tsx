@@ -5,7 +5,6 @@ import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
 import { displayAmount, formatPercent } from "@/utils/formatting";
-import { displayAnalyticsAmount } from "@/utils/analytics";
 import { useLendingCombo } from "./utils";
 import Text from "@/components/text";
 import Container from "@/components/container/container";
@@ -21,6 +20,7 @@ import { addTokenBalances, divideBalances } from "@/utils/math";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import Analytics from "@/provider/analytics";
+import { getAnalyticsLendingMarketTokenInfo } from "@/utils/analytics";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -97,40 +97,26 @@ export default function LendingPage() {
                 cToken={cNote}
                 precisionInValues={2}
                 onSupply={() => {
-                  Analytics.actions.events.lendingMarket.supplyClicked({
-                    lmToken: cNote.underlying.symbol,
-                    lmWalletBalance: displayAnalyticsAmount(
-                      cNote.userDetails?.balanceOfUnderlying ?? "0",
-                      cNote.underlying.decimals
-                    ),
-                    lmSupppliedAmount: displayAnalyticsAmount(
-                      cNote.userDetails?.supplyBalanceInUnderlying ?? "0",
-                      cNote.underlying.decimals
-                    ),
-                    lmLiquidityRemaining: displayAnalyticsAmount(
+                  Analytics.actions.events.lendingMarket.supplyClicked(
+                    getAnalyticsLendingMarketTokenInfo(
+                      "CTOKEN",
+                      cNote,
                       clmPosition.position.liquidity,
-                      18
-                    ),
-                  });
+                      true
+                    )
+                  );
                   setSelectedCToken(cNote.address);
                   setCurrentModal(CLMModalTypes.SUPPLY);
                 }}
                 onBorrow={() => {
-                  Analytics.actions.events.lendingMarket.borrowClicked({
-                    lmToken: cNote.underlying.symbol,
-                    lmWalletBalance: displayAnalyticsAmount(
-                      cNote.userDetails?.balanceOfUnderlying ?? "0",
-                      cNote.underlying.decimals
-                    ),
-                    lmBorrowedAmount: displayAnalyticsAmount(
-                      cNote.userDetails?.borrowBalance ?? "0",
-                      cNote.underlying.decimals
-                    ),
-                    lmLiquidityRemaining: displayAnalyticsAmount(
+                  Analytics.actions.events.lendingMarket.borrowClicked(
+                    getAnalyticsLendingMarketTokenInfo(
+                      "CTOKEN",
+                      cNote,
                       clmPosition.position.liquidity,
-                      18
-                    ),
-                  });
+                      false
+                    )
+                  );
                   setSelectedCToken(cNote.address);
                   setCurrentModal(CLMModalTypes.BORROW);
                 }}
@@ -347,21 +333,14 @@ const CTokenTable = ({
                   RWARow({
                     cRwa,
                     onSupply: () => {
-                      Analytics.actions.events.lendingMarket.supplyClicked({
-                        lmToken: cRwa.underlying.symbol,
-                        lmWalletBalance: displayAnalyticsAmount(
-                          cRwa.userDetails?.balanceOfUnderlying ?? "0",
-                          cRwa.underlying.decimals
-                        ),
-                        lmSupppliedAmount: displayAnalyticsAmount(
-                          cRwa.userDetails?.supplyBalanceInUnderlying ?? "0",
-                          cRwa.underlying.decimals
-                        ),
-                        lmLiquidityRemaining: displayAnalyticsAmount(
+                      Analytics.actions.events.lendingMarket.supplyClicked(
+                        getAnalyticsLendingMarketTokenInfo(
+                          "RWA",
+                          cRwa,
                           liquidity,
-                          18
-                        ),
-                      });
+                          true
+                        )
+                      );
                       onSupply(cRwa.address);
                     },
                   })
@@ -371,40 +350,25 @@ const CTokenTable = ({
                     StableCoinRow({
                       cStableCoin,
                       onSupply: () => {
-                        Analytics.actions.events.lendingMarket.supplyClicked({
-                          lmToken: cStableCoin.underlying.symbol,
-                          lmWalletBalance: displayAnalyticsAmount(
-                            cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
-                            cStableCoin.underlying.decimals
-                          ),
-                          lmSupppliedAmount: displayAnalyticsAmount(
-                            cStableCoin.userDetails
-                              ?.supplyBalanceInUnderlying ?? "0",
-                            cStableCoin.underlying.decimals
-                          ),
-                          lmLiquidityRemaining: displayAnalyticsAmount(
+                        Analytics.actions.events.lendingMarket.supplyClicked(
+                          getAnalyticsLendingMarketTokenInfo(
+                            "CTOKEN",
+                            cStableCoin,
                             liquidity,
-                            18
-                          ),
-                        });
+                            true
+                          )
+                        );
                         onSupply(cStableCoin.address);
                       },
                       onBorrow: () => {
-                        Analytics.actions.events.lendingMarket.borrowClicked({
-                          lmToken: cStableCoin.underlying.symbol,
-                          lmWalletBalance: displayAnalyticsAmount(
-                            cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
-                            cStableCoin.underlying.decimals
-                          ),
-                          lmBorrowedAmount: displayAnalyticsAmount(
-                            cStableCoin.userDetails?.borrowBalance ?? "0",
-                            cStableCoin.underlying.decimals
-                          ),
-                          lmLiquidityRemaining: displayAnalyticsAmount(
+                        Analytics.actions.events.lendingMarket.borrowClicked(
+                          getAnalyticsLendingMarketTokenInfo(
+                            "CTOKEN",
+                            cStableCoin,
                             liquidity,
-                            18
-                          ),
-                        });
+                            false
+                          )
+                        );
                         onBorrow(cStableCoin.address);
                       },
                     })

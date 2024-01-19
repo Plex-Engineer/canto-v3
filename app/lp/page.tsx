@@ -27,6 +27,11 @@ import { useBlockNumber } from "wagmi";
 import { useEffect, useState} from 'react'
 import { CANTO_MAINNET_EVM } from "@/config/networks";
 import { TimeDisplayValues } from "@/hooks/pairs/newAmbient/interfaces/timeDisplay";
+import {
+  getAnalyticsCantoLiquidityPoolInfo,
+  getAnalyticsAmbientLiquidityPoolInfo,
+} from "@/utils/analytics";
+
 export default function Page() {
   const {
     pairs,
@@ -148,32 +153,9 @@ const [timerObj,setTimerObj]=useState(getTimerObj(0n));
                 UserAmbientPairRow({
                   pool,
                   onManage: (poolAddress) => {
-                    const positions = pool.userPositions.map((position) => {
-                      return {
-                        positionId: position.positionId,
-                        liquidity: position.concLiq,
-                        minRangePrice: displayAmount(
-                          getPriceFromTick(position.bidTick),
-                          pool.base.decimals - pool.quote.decimals,
-                          {
-                            short: false,
-                            precision: pool.base.decimals - pool.quote.decimals,
-                          }
-                        ),
-                        maxRangePrice: displayAmount(
-                          getPriceFromTick(position.askTick),
-                          pool.base.decimals - pool.quote.decimals,
-                          {
-                            short: false,
-                            precision: pool.base.decimals - pool.quote.decimals,
-                          }
-                        ),
-                      };
-                    });
-                    Analytics.actions.events.liquidityPool.manageLPClicked({
-                      ambientLp: pool.symbol,
-                      positions,
-                    });
+                    Analytics.actions.events.liquidityPool.manageLPClicked(
+                      getAnalyticsAmbientLiquidityPoolInfo(pool)
+                    );
                     setPair(poolAddress);
                   },
                   rewards: rewards.ambient,
@@ -184,25 +166,9 @@ const [timerObj,setTimerObj]=useState(getTimerObj(0n));
                   pair,
 
                   onManage: (pairAddress) => {
-                    Analytics.actions.events.liquidityPool.manageLPClicked({
-                      cantoLp: pair.symbol,
-                      cantoLpTokenBalance: displayAmount(
-                        pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
-                        pair.decimals,
-                        { short: false, precision: pair.decimals }
-                      ),
-                      cantoLpStakedBalance: displayAmount(
-                        pair.clmData?.userDetails?.supplyBalanceInUnderlying ??
-                          "0",
-                        pair.decimals,
-                        { short: false, precision: pair.decimals }
-                      ),
-                      cantoLpUnstakedBalance: displayAmount(
-                        pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
-                        pair.decimals,
-                        { short: false, precision: pair.decimals }
-                      ),
-                    });
+                    Analytics.actions.events.liquidityPool.manageLPClicked(
+                      getAnalyticsCantoLiquidityPoolInfo(pair)
+                    );
                     setPair(pairAddress);
                   },
                 })
@@ -246,7 +212,13 @@ const [timerObj,setTimerObj]=useState(getTimerObj(0n));
             .map((pool) =>
               GeneralAmbientPairRow({
                 pool,
-                onAddLiquidity: (poolAddress) => setPair(poolAddress),
+                onAddLiquidity: (poolAddress) => {
+                  Analytics.actions.events.liquidityPool.addLPClicked({
+                    lpType: "AMBIENT",
+                    ambientLp: pool.symbol,
+                  });
+                  setPair(poolAddress);
+                },
               })
             ),
           ...sortedCantoDexPairs
@@ -261,6 +233,7 @@ const [timerObj,setTimerObj]=useState(getTimerObj(0n));
                 pair,
                 onAddLiquidity: (pairAddress) => {
                   Analytics.actions.events.liquidityPool.addLPClicked({
+                    lpType: "CANTO",
                     cantoLp: pair.symbol,
                   });
                   setPair(pairAddress);

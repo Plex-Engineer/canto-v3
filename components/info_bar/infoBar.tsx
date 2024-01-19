@@ -13,7 +13,7 @@ interface Props {
 
 const InfoBar = ({ values }: Props) => {
   return (
-    <div className={styles.container}>
+    <div>
       {/* <Marquee delay={1} pauseOnHover speed={20}> */}
       {/* <div className={styles.content}>
           {values.map((value, idx) => (
@@ -53,7 +53,7 @@ const InfoBar = ({ values }: Props) => {
             </div>
           ))}
         </div> */}
-      <Text font="proto_mono" color="var(--text-only-light)" size="sm">
+      {/* <Text font="proto_mono" color="var(--text-only-light)" size="sm">
         For Staking & Governance GO{" "}
         <a
           href="https://v2.canto.io/"
@@ -66,7 +66,7 @@ const InfoBar = ({ values }: Props) => {
           Here
         </a>
         .
-      </Text>
+      </Text> */}
       {/* </Marquee> */}
     </div>
   );
