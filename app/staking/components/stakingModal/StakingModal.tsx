@@ -17,6 +17,13 @@ import Selector from "@/components/selector/selector";
 import Amount from "@/components/amount/amount";
 import { Validation } from "@/config/interfaces";
 import { levenshteinDistance } from "@/utils/staking/searchUtils";
+import { Fee } from "@/transactions/interfaces";
+import {
+  CLAIM_STAKING_REWARD_FEE,
+  DELEGATE_FEE,
+  REDELEGATE_FEE,
+  UNDELEGATE_FEE,
+} from "@/config/consts/fees";
 
 interface StakingModalParams {
   validator: ValidatorWithDelegations | null;
@@ -46,6 +53,21 @@ export const StakingModal = (props: StakingModalParams) => {
     useState<Validator | null>();
   const [searchQuery, setSearchQuery] = useState("");
 
+  const feeMap = (txType: StakingTxTypes) => {
+    switch (txType) {
+      case StakingTxTypes.DELEGATE:
+        return DELEGATE_FEE.amount;
+      case StakingTxTypes.UNDELEGATE:
+        return UNDELEGATE_FEE.amount;
+      case StakingTxTypes.REDELEGATE:
+        return REDELEGATE_FEE.amount;
+      case StakingTxTypes.CLAIM_REWARDS:
+        return CLAIM_STAKING_REWARD_FEE.amount;
+      default:
+        return "0";
+    }
+  };
+
   const dropdownItems =
     searchQuery == ""
       ? props.validators
@@ -69,7 +91,7 @@ export const StakingModal = (props: StakingModalParams) => {
               : -1;
           })
           .filter(
-            (e) => levenshteinDistance(searchQuery, e.description.moniker) < 5
+            (e) => levenshteinDistance(searchQuery, e.description.moniker) < 6
           )
           .map((validator) => {
             return {
@@ -237,6 +259,17 @@ export const StakingModal = (props: StakingModalParams) => {
       <div style={{ width: "100%" }} className={styles.modalInfoRow}>
         <Text size="x-sm" color="#EE4B2B">
           Please Note: Undelegation period is 21 days
+        </Text>
+      </div>
+      <Spacer height="20px" />
+      <div>
+        <Text size="x-sm" font="proto_mono">
+          GAS FEES :{" "}
+          {displayAmount(feeMap(selectedTx), 18, {
+            short: false,
+            commify: false,
+          })}{" "}
+          CANTO
         </Text>
       </div>
       <Spacer height="20px"></Spacer>

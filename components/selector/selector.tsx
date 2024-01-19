@@ -58,17 +58,10 @@ const Selector = (props: Props) => {
           {props.title}
         </Text>
         {props.searchProps && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
-            <Spacer height="30px" />
-            <div>
+          <div className={styles.searchBox}>
+            <div style={{ width: "100%" }}>
               <Input
-                height={40}
+                height={50}
                 type="search"
                 value={props?.searchProps.searchQuery}
                 onChange={(e) =>
