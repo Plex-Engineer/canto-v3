@@ -9,6 +9,7 @@ import styles from "./selector.module.scss";
 import Spacer from "@/components/layout/spacer";
 import clsx from "clsx";
 import LoadingIcon from "../loader/loading";
+import Input from "../input/input";
 
 export interface Item {
   id: string;
@@ -30,6 +31,10 @@ interface Props {
     main: Item;
     items: Item[];
   }[];
+  searchProps?: {
+    searchQuery: string;
+    setSearchQuery: (searchQuery: string) => void;
+  };
 }
 const Selector = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -52,6 +57,23 @@ const Selector = (props: Props) => {
         <Text size="lg" font="proto_mono">
           {props.title}
         </Text>
+        {props.searchProps && (
+          <div className={styles.searchBox}>
+            <div style={{ width: "100%" }}>
+              <Input
+                height={50}
+                type="search"
+                value={props?.searchProps.searchQuery}
+                onChange={(e) =>
+                  props.searchProps
+                    ? props.searchProps.setSearchQuery(e.target.value)
+                    : {}
+                }
+                placeholder={"Search..."}
+              />
+            </div>
+          </div>
+        )}
         <div
           className={styles["scroll-view"]}
           style={{

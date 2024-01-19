@@ -101,14 +101,21 @@ export default function Page() {
 
   const votesData = calculateVotePercentages(proposal.final_vote);
 
-  const amounts = [
+  const maxAmountIndex = [
     parseFloat(votesData.Yes),
     parseFloat(votesData.No),
     parseFloat(votesData.Veto),
     parseFloat(votesData.Abstain),
-  ];
-
-  const maxAmountIndex = amounts.indexOf(Math.max(...amounts));
+  ].indexOf(
+    Math.max(
+      ...[
+        parseFloat(votesData.Yes),
+        parseFloat(votesData.No),
+        parseFloat(votesData.Veto),
+        parseFloat(votesData.Abstain),
+      ]
+    )
+  );
 
   return isProposalsLoading ? (
     <Splash />
