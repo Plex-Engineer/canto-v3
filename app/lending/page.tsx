@@ -110,20 +110,21 @@ export default function LendingPage() {
             },
             {
               name: "Liquidity Remaining",
-              value: "TBA",
+              value: displayAmount(clmPosition.position.liquidity, 18),
               symbol: true,
             },
             {
               name: "Limit Used",
-              value: "TBA",
+              value: clmPosition.general.percentLimitUsed + "%",
             },
           ]}
-          percent={0.5}
+          percent={Number(clmPosition.general.percentLimitUsed) / 100}
         />
       </div>
       <div className={styles.highlightCard}>
         <TokenCard
           cToken={cNote}
+          items={{}}
           onClick={() => {
             //! TODO: confirm what happens when you click on get cNote
             setCurrentModal(CLMModalTypes.SUPPLY);
