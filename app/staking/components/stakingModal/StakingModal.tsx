@@ -16,6 +16,7 @@ import { StakingTabs } from "../stakingTab/StakingTabs";
 import Selector from "@/components/selector/selector";
 import Amount from "@/components/amount/amount";
 import { Validation } from "@/config/interfaces";
+import { levenshteinDistance } from "@/utils/staking/searchUtils";
 
 interface StakingModalParams {
   validator: ValidatorWithDelegations | null;
@@ -43,18 +44,39 @@ export const StakingModal = (props: StakingModalParams) => {
   >("delegate");
   const [validatorToRedelegate, setValidatorToRedelegate] =
     useState<Validator | null>();
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const dropdownItems = props.validators
-    .filter(
-      (validator) =>
-        validator.operator_address !== props.validator?.operator_address
-    )
-    .map((validator) => {
-      return {
-        name: validator.description.moniker,
-        id: validator.operator_address,
-      };
-    });
+  const dropdownItems =
+    searchQuery == ""
+      ? props.validators
+          .filter(
+            (validator) =>
+              validator.operator_address !==
+                props.validator?.operator_address && validator.jailed == false
+          )
+          .map((validator) => {
+            return {
+              name: validator.description.moniker,
+              id: validator.operator_address,
+            };
+          })
+      : [...props.validators]
+          .filter((validator) => validator.jailed == false)
+          .sort((a, b) => {
+            return levenshteinDistance(searchQuery, a.description.moniker) >
+              levenshteinDistance(searchQuery, b.description.moniker)
+              ? 1
+              : -1;
+          })
+          .filter(
+            (e) => levenshteinDistance(searchQuery, e.description.moniker) < 5
+          )
+          .map((validator) => {
+            return {
+              name: validator.description.moniker,
+              id: validator.operator_address,
+            };
+          });
 
   const handleTabChange = (tab: "delegate" | "undelegate" | "redelegate") => {
     setActiveTab(tab);
@@ -181,6 +203,10 @@ export const StakingModal = (props: StakingModalParams) => {
                   (e) => e.operator_address == selectedValidator
                 )
               );
+            }}
+            searchProps={{
+              setSearchQuery: setSearchQuery,
+              searchQuery: searchQuery,
             }}
           />
 
