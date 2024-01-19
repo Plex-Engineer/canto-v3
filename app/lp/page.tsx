@@ -23,7 +23,11 @@ import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import usePool from "./utils";
 import { getPriceFromTick } from "@/utils/ambient";
 import Analytics from "@/provider/analytics";
-
+import { useBlockNumber } from "wagmi";
+import { useEffect, useState} from 'react'
+import { CANTO_MAINNET_EVM } from "@/config/networks";
+import { TimeDisplayValues } from "@/hooks/pairs/newAmbient/interfaces/timeDisplay";
+import { BlockNumber } from "viem";
 export default function Page() {
   const {
     pairs,
@@ -40,6 +44,52 @@ export default function Page() {
     sendClaimRewardsFlow,
     pairNames,
   } = usePool();
+
+//myCode
+
+const UserAmbientRewardsTimer = (blockNumber:bigint|undefined) => {
+  if(blockNumber){
+    const noOfWeeksToBeAdded = (blockNumber - prevBlockNumber)/blocksInEpoch;
+    setPrevBlockNumber(prevBlockNumber+(noOfWeeksToBeAdded * blocksInEpoch));
+    setRemBlocksInEpoch(prevBlockNumber + blocksInEpoch - blockNumber)
+    setRemTime(remBlocksInEpoch*BigInt(blockDuration*1000))
+  }
+  return remTime;
+}
+const getTimerObj = (remTime:bigint):TimeDisplayValues => {
+  const stateObj:TimeDisplayValues = {
+    days: (remTime / BigInt(1000 * 60 * 60 * 24)),
+    hours: ((remTime % BigInt(1000 * 60 * 60 * 24)) / BigInt(1000 * 60 * 60)),
+    minutes: ((remTime % BigInt(1000 * 60 * 60)) / BigInt(1000 * 60)),
+    seconds: ((remTime % BigInt(1000 * 60)) / BigInt(1000))
+  };
+  return stateObj;
+}
+  const { data: blockNumber } = useBlockNumber({
+    chainId: CANTO_MAINNET_EVM.chainId,
+    watch: true,
+  });
+  const [prevBlockNumber,setPrevBlockNumber]=useState<BlockNumber>(BigInt(7844908));//need to update after provided
+  const [blocksInEpoch,setBlocksInEpoch] = useState<BlockNumber>(BigInt(104272))
+  const [blockDuration,setBlockDuration]=useState(5.8);
+  const [remBlocksInEpoch,setRemBlocksInEpoch]=useState<BlockNumber>(BigInt(104272));
+  const [remTime,setRemTime]=useState(remBlocksInEpoch*BigInt(blockDuration*1000));
+
+  useEffect(() => {
+    
+    setInterval(() => {
+      if(remTime===0n){
+        setRemTime(UserAmbientRewardsTimer(blockNumber));
+      }
+      setRemTime((remTime) => (remTime-BigInt(1000)));
+      
+    }, 1000);
+    
+    
+  }, []);
+
+let timerObj=getTimerObj(remTime);
+console.log(timerObj.minutes+":"+timerObj.seconds);
 
   //main content
   return (

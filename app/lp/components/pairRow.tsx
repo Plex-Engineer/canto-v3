@@ -1,3 +1,4 @@
+"use client"
 import Button from "@/components/button/button";
 import Container from "@/components/container/container";
 import Icon from "@/components/icon/icon";
@@ -6,6 +7,7 @@ import PopUp from "@/components/popup/popup";
 import Text from "@/components/text";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
+import { TimeDisplayValues } from "@/hooks/pairs/newAmbient/interfaces/timeDisplay";
 import { concentratedLiquidityTokenAmounts } from "@/utils/ambient";
 import { formatPercent, displayAmount } from "@/utils/formatting";
 import {
@@ -16,6 +18,10 @@ import {
 import BigNumber from "bignumber.js";
 import { HoverPositions } from "./HoverPositions";
 import { estimateTokenAmountsFromLiquidity } from "@/utils/cantoDex";
+import { useBlockNumber } from "wagmi";
+import { CANTO_MAINNET_EVM } from "@/config/networks";
+import {useState, useEffect} from 'react'
+import { BlockNumber } from "viem";
 
 export const UserCantoDexPairRow = ({
   pair,
@@ -301,6 +307,8 @@ export const UserAmbientPairRow = ({
   onManage: (poolAddress: string) => void;
   rewards?: string;
 }) => {
+  //Get block number
+
   let totalValue = "0";
   const allPositionValues = pool.userPositions.map((position) => {
     const tokenAmounts = concentratedLiquidityTokenAmounts(
@@ -355,6 +363,18 @@ export const UserAmbientPairRow = ({
     };
   });
 
+  //Initializing the timer
+
+  // const [remTime,setRemTime]=useState(UserAmbientRewardsTimer());
+  // const [timerObj,setTimerObj]=useState<TimeDisplayValues>(getTimerObj(remTime));
+  // useEffect(() => {
+  //   if(remTime===0n){
+  //     setRemTime(UserAmbientRewardsTimer());
+  //   }
+  //   setInterval(() => setRemTime(remTime-BigInt(1000)), 1000);
+  //   setTimerObj(getTimerObj(remTime));
+  // }, []);
+  // console.log(timerObj.days+" : "+timerObj.hours+" : "+timerObj.minutes+" : "+timerObj.seconds)
   return [
     <Container
       key={pool.address}
@@ -518,3 +538,32 @@ const AprBlock = ({ pool }: { pool: AmbientPool }) => {
     </Container>
   );
 };
+
+// const UserAmbientRewardsTimer = () => {
+//   const blockNumber = 1n;
+//   const [prevBlockNumber,setPrevBlockNumber]=useState<BlockNumber>(BigInt(7844908));//need to update after provided
+//   const [blocksInEpoch,setBlocksInEpoch] = useState<BlockNumber>(BigInt(104272))
+//   const [blockDuration,setBlockDuration]=useState(5.8);
+//   const [remBlocksInEpoch,setRemBlocksInEpoch]=useState<BlockNumber>(BigInt(104272));
+//   const [remTime,setRemTime]=useState(remBlocksInEpoch*BigInt(blockDuration*1000));
+  
+  
+//   if(blockNumber){
+//     const noOfWeeksToBeAdded = (blockNumber - prevBlockNumber)/blocksInEpoch;
+//     setPrevBlockNumber(prevBlockNumber+(noOfWeeksToBeAdded * blocksInEpoch));
+//     setRemBlocksInEpoch(prevBlockNumber + blocksInEpoch - blockNumber)
+//     setRemTime(remBlocksInEpoch*BigInt(blockDuration*1000))
+    
+
+//   }
+//   return remTime;
+// }
+// const getTimerObj = (remTime:bigint):TimeDisplayValues => {
+//   const stateObj:TimeDisplayValues = {
+//     days: (remTime / BigInt(1000 * 60 * 60 * 24)),
+//     hours: ((remTime % BigInt(1000 * 60 * 60 * 24)) / BigInt(1000 * 60 * 60)),
+//     minutes: ((remTime % BigInt(1000 * 60 * 60)) / BigInt(1000 * 60)),
+//     seconds: ((remTime % BigInt(1000 * 60)) / BigInt(1000))
+//   };
+//   return stateObj;
+// }
