@@ -69,20 +69,22 @@ export default function Page() {
     }
     return remTime;
   };
-  const getTimerObj = (remTime: bigint): TimeDisplayValues => {
+  const getTimerObj = (remTime: bigint): string => {
     const stateObj: TimeDisplayValues = {
-      days: remTime / BigInt(1000 * 60 * 60 * 24),
-      hours: (remTime % BigInt(1000 * 60 * 60 * 24)) / BigInt(1000 * 60 * 60),
-      minutes: (remTime % BigInt(1000 * 60 * 60)) / BigInt(1000 * 60),
-      seconds: (remTime % BigInt(1000 * 60)) / BigInt(1000),
+      days: Number(remTime / BigInt(1000 * 60 * 60 * 24)),
+      hours: Number(
+        (remTime % BigInt(1000 * 60 * 60 * 24)) / BigInt(1000 * 60 * 60)
+      ),
+      minutes: Number((remTime % BigInt(1000 * 60 * 60)) / BigInt(1000 * 60)),
+      seconds: Number((remTime % BigInt(1000 * 60)) / BigInt(1000)),
     };
-    return stateObj;
+    return `${stateObj.days} : ${stateObj.hours} : ${stateObj.minutes} : ${stateObj.seconds}`;
   };
   const [timerObj, setTimerObj] = useState(getTimerObj(0n));
   useEffect(() => {
     let remTime = remBlocksInEpoch * BigInt(blockDuration * 1000);
     if (!blockNumber) {
-      //set timerObj to loading
+      setTimerObj("Loading...");
       return;
     }
     remTime = UserAmbientRewardsTimer(blockNumber);
@@ -94,9 +96,6 @@ export default function Page() {
       setTimerObj(getTimerObj(remTime));
     }, 1000);
   }, [blockNumber != undefined]);
-
-  // console.log(timerObj.days+" "+timerObj.hours+" "+timerObj.minutes+" "+timerObj.seconds);
-
   //main content
   return (
     <div className={styles.container}>
@@ -158,6 +157,7 @@ export default function Page() {
                     setPair(poolAddress);
                   },
                   rewards: rewards.ambient,
+                  rewardsTimer: timerObj,
                 })
               ),
               ...pairs.userCantoDex.map((pair) =>

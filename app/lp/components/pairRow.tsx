@@ -295,10 +295,12 @@ export const UserAmbientPairRow = ({
   pool,
   onManage,
   rewards,
+  rewardsTimer,
 }: {
   pool: AmbientPool;
   onManage: (poolAddress: string) => void;
   rewards?: string;
+  rewardsTimer: string;
 }) => {
   let totalValue = "0";
   const allPositionValues = pool.userPositions.map((position) => {
@@ -417,7 +419,7 @@ export const UserAmbientPairRow = ({
       <InfoPop>
         <Container>
           <Text size="sm" theme="secondary-dark">
-            Rewards are released weekly every Thursday at 03:30 AM UTC
+            Rewards will be released in {rewardsTimer}
           </Text>
         </Container>
       </InfoPop>
