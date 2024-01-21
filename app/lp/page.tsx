@@ -23,10 +23,6 @@ import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import usePool from "./utils";
 import { getPriceFromTick } from "@/utils/ambient";
 import Analytics from "@/provider/analytics";
-import { useBlockNumber } from "wagmi";
-import { useEffect, useState } from "react";
-import { CANTO_MAINNET_EVM } from "@/config/networks";
-import { TimeDisplayValues } from "@/hooks/pairs/newAmbient/interfaces/timeDisplay";
 import {
   getAnalyticsCantoLiquidityPoolInfo,
   getAnalyticsAmbientLiquidityPoolInfo,
@@ -47,55 +43,9 @@ export default function Page() {
     sendAmbientTxFlow,
     sendClaimRewardsFlow,
     pairNames,
+    ambientRewardsTimer,
   } = usePool();
 
-  let prevBlockNumber = BigInt(7844908); //need to update after provided
-  const blocksInEpoch = BigInt(104272);
-  const blockDuration = 5.8;
-  let remBlocksInEpoch = BigInt(104272);
-  const { data: blockNumber } = useBlockNumber({
-    chainId: CANTO_MAINNET_EVM.chainId,
-    watch: true,
-  });
-
-  const UserAmbientRewardsTimer = (blockNumber: bigint | undefined) => {
-    let remTime = 0n;
-    if (blockNumber) {
-      const noOfWeeksToBeAdded =
-        (blockNumber - prevBlockNumber) / blocksInEpoch;
-      prevBlockNumber = prevBlockNumber + noOfWeeksToBeAdded * blocksInEpoch;
-      remBlocksInEpoch = prevBlockNumber + blocksInEpoch - blockNumber;
-      remTime = remBlocksInEpoch * BigInt(blockDuration * 1000);
-    }
-    return remTime;
-  };
-  const getTimerObj = (remTime: bigint): string => {
-    const stateObj: TimeDisplayValues = {
-      days: Number(remTime / BigInt(1000 * 60 * 60 * 24)),
-      hours: Number(
-        (remTime % BigInt(1000 * 60 * 60 * 24)) / BigInt(1000 * 60 * 60)
-      ),
-      minutes: Number((remTime % BigInt(1000 * 60 * 60)) / BigInt(1000 * 60)),
-      seconds: Number((remTime % BigInt(1000 * 60)) / BigInt(1000)),
-    };
-    return `${stateObj.days} : ${stateObj.hours} : ${stateObj.minutes} : ${stateObj.seconds}`;
-  };
-  const [timerObj, setTimerObj] = useState(getTimerObj(0n));
-  useEffect(() => {
-    let remTime = remBlocksInEpoch * BigInt(blockDuration * 1000);
-    if (!blockNumber) {
-      setTimerObj("Loading...");
-      return;
-    }
-    remTime = UserAmbientRewardsTimer(blockNumber);
-    setInterval(() => {
-      if (remTime === 0n) {
-        remTime = UserAmbientRewardsTimer(blockNumber);
-      }
-      remTime = remTime - 1000n;
-      setTimerObj(getTimerObj(remTime));
-    }, 1000);
-  }, [blockNumber != undefined]);
   //main content
   return (
     <div className={styles.container}>
@@ -157,7 +107,7 @@ export default function Page() {
                     setPair(poolAddress);
                   },
                   rewards: rewards.ambient,
-                  rewardsTimer: timerObj,
+                  rewardsTimer: ambientRewardsTimer,
                 })
               ),
               ...pairs.userCantoDex.map((pair) =>
