@@ -2,7 +2,7 @@ import { CantoDexTransactionParams } from "@/transactions/pairs/cantoDex";
 import { AmbientTransactionParams } from "@/transactions/pairs/ambient";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import useLP from "@/hooks/pairs/lpCombo/useLP";
-import { useState , useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useBlockNumber } from "wagmi";
 import { CANTO_MAINNET_EVM } from "@/config/networks";
 import { TimeDisplayValues } from "@/hooks/pairs/newAmbient/interfaces/timeDisplay";
