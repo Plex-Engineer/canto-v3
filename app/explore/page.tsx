@@ -46,6 +46,7 @@ export default function OutlinksPage() {
             description="is a platform for discovering and trading NFTs. It features collections such as Canto Longneck, Shnoise, and Dead Ends."
             image="/ecosystem/blankrasa.svg"
             title="Blank Rasa"
+            backgroundColor="#FFFFFF"
           />
 
           <ExploreLink
