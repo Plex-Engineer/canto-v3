@@ -5,7 +5,7 @@ import { getCTokensFromType } from "@/hooks/lending/config/cTokenAddresses";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { UserLMPosition } from "@/hooks/lending/interfaces/userPositions";
 import useLending from "@/hooks/lending/useLending";
-import { CTokenLendingTxTypes } from "@/transactions/lending";
+import { Vivacity, CTokenLendingTxTypes } from "@/transactions/lending";
 import { listIncludesAddress } from "@/utils/address";
 import { getCirculatingCNote, getCirculatingNote } from "@/utils/clm";
 import { addTokenBalances, convertTokenAmountToNote } from "@/utils/math";
@@ -18,6 +18,7 @@ interface LendingComboReturn {
     rwas: CTokenWithUserData[];
     stableCoins: CTokenWithUserData[];
   };
+  vcNote: Vivacity.VCNoteWithUserData | undefined;
   isLoading: boolean;
   clmPosition: {
     position: UserLMPosition;
@@ -39,9 +40,22 @@ interface LendingComboReturn {
       txType: CTokenLendingTxTypes,
       max: boolean
     ) => Validation;
+    performVivacityTx: (
+      amount: string,
+      txType: Vivacity.CTokenLendingTxTypes,
+      max: boolean
+    ) => void;
+    validateVivacityParams: (
+      amount: string,
+      txType: Vivacity.CTokenLendingTxTypes,
+      max: boolean
+    ) => Validation;
   };
   selection: {
-    selectedCToken: CTokenWithUserData | undefined;
+    selectedCToken:
+      | CTokenWithUserData
+      | Vivacity.VCNoteWithUserData
+      | undefined;
     setSelectedCToken: (address: string | null) => void;
   };
   lendingStats: {
@@ -58,11 +72,12 @@ interface LendingComboProps {
 export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
   // params for useLending hook
   const { chainId, signer, txStore } = useCantoSigner();
-  const { cTokens, position, isLoading, transaction, selection } = useLending({
-    chainId,
-    lmType: "lending",
-    userEthAddress: signer?.account.address,
-  });
+  const { cTokens, vcNote, position, isLoading, transaction, selection } =
+    useLending({
+      chainId,
+      lmType: "lending",
+      userEthAddress: signer?.account.address,
+    });
 
   // sorted tokens
   const cNoteAddress = getCTokensFromType(chainId, "cNote");
@@ -136,7 +151,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     const txFlow = transaction.newLendingFlow({
       chainId: chainId,
       ethAccount: signer.account.address,
-      cToken: selection.selectedCToken,
+      cToken: selection.selectedCToken as CTokenWithUserData,
       amount,
       txType,
       max,
@@ -158,11 +173,49 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     return transaction.validateParams({
       chainId: chainId,
       ethAccount: signer.account.address,
-      cToken: selection.selectedCToken,
+      cToken: selection.selectedCToken as CTokenWithUserData,
       amount,
       txType,
       max,
       userPosition: position,
+    });
+  };
+
+  function vivacityLendingTx(
+    amount: string,
+    txType: Vivacity.CTokenLendingTxTypes,
+    max: boolean
+  ) {
+    if (!selection.selectedCToken || !signer) return;
+    const txFlow = transaction.newVivacityLendingFlow({
+      chainId: chainId,
+      ethAccount: signer.account.address,
+      cToken: selection.selectedCToken,
+      amount,
+      txType,
+      max,
+    });
+    txStore?.addNewFlow({
+      txFlow,
+      ethAccount: signer.account.address,
+      onSuccessCallback: props.onSuccessTx,
+    });
+  }
+
+  const validateVivacityParams = (
+    amount: string,
+    txType: Vivacity.CTokenLendingTxTypes,
+    max: boolean
+  ): Validation => {
+    if (!selection.selectedCToken || !signer)
+      return { error: true, reason: TX_PARAM_ERRORS.PARAM_MISSING("Signer") };
+    return transaction.validateVivacityParams({
+      chainId: chainId,
+      ethAccount: signer.account.address,
+      cToken: selection.selectedCToken,
+      amount,
+      txType,
+      max,
     });
   };
 
@@ -172,6 +225,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
       rwas,
       stableCoins,
     },
+    vcNote,
     isLoading,
     clmPosition: {
       position,
@@ -185,6 +239,8 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     transaction: {
       performTx: lendingTx,
       validateParams,
+      performVivacityTx: vivacityLendingTx,
+      validateVivacityParams,
     },
     selection,
     lendingStats: {

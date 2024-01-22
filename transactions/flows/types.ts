@@ -21,6 +21,7 @@ import {
 } from "../lending";
 import { StakingTransactionParams } from "../staking";
 import { ProposalVoteTxParams } from "../gov";
+import {Vivacity} from "@/transactions/lending"
 
 // txType is the key for the txMap that will create the Transaction[] list
 export type NewTransactionFlow = {
@@ -73,6 +74,10 @@ export type NewTransactionFlow = {
       txType: TransactionFlowType.VOTE_TX;
       params: ProposalVoteTxParams;
     }
+  | {
+    txType: TransactionFlowType.VIVACITY_CTOKEN_TX;
+    params: Vivacity.CTokenLendingTransactionParams;
+  }
 );
 
 ///

@@ -5,9 +5,11 @@ import {
 } from "./interfaces/hookParams";
 import { useState } from "react";
 import { getAllUserCLMData } from "./helpers/userClmData";
+import { getVivacityLMData } from "./helpers/vivacityLmData";
 import { areEqualAddresses } from "@/utils/address";
 import { getCTokenAddressesFromChainId } from "./config/cTokenAddresses";
 import {
+  Vivacity,
   newCTokenLendingFlow,
   newClaimCLMRewardsFlow,
   validateCTokenLendingTxParams,
@@ -31,13 +33,23 @@ export default function useLending(
         params.lmType
       );
       if (!cTokenAddresses) throw Error("useLending: chainId not supported");
-      const clmData = await getAllUserCLMData(
+
+      const [clmData, vcNoteData] = await Promise.all([
+        getAllUserCLMData(
         params.userEthAddress ?? "",
         params.chainId,
         cTokenAddresses
-      );
+      ),
+      getVivacityLMData(params.userEthAddress ?? "", params.chainId),
+    ])
       if (clmData.error) throw clmData.error;
-      return clmData.data;
+
+      if (vcNoteData.error) throw vcNoteData.error;
+
+      return {
+        ...clmData.data,
+        vcNote : vcNoteData.data.vcNote
+      };
     },
     {
       onError: (error) => {
@@ -45,6 +57,7 @@ export default function useLending(
       },
       placeholderData: {
         cTokens: [],
+        vcNote: undefined,
         position: undefined,
       },
     }
@@ -58,12 +71,13 @@ export default function useLending(
     string | null
   >(null);
   // get token from constantly updating list of cTokens
-  const selectedCToken = clmData?.cTokens.find((cToken) =>
+  const selectedCToken = selectedCTokenAddress == clmData?.vcNote?.address ? clmData?.vcNote :clmData?.cTokens.find((cToken) =>
     areEqualAddresses(cToken.address, selectedCTokenAddress ?? "")
   );
 
   return {
     cTokens: clmData?.cTokens ?? [],
+    vcNote: clmData?.vcNote ,
     position: clmData?.position ?? {
       liquidity: "0",
       shortfall: "0",
@@ -81,6 +95,8 @@ export default function useLending(
       validateParams: (txParams) => validateCTokenLendingTxParams(txParams),
       newLendingFlow: (txParams) => newCTokenLendingFlow(txParams),
       newClaimRewardsFlow: (txParams) => newClaimCLMRewardsFlow(txParams),
+      validateVivacityParams : (txParams) => Vivacity.validateCTokenLendingTxParams(txParams),
+      newVivacityLendingFlow : (txParams) => Vivacity.newCTokenLendingFlow(txParams),
     },
   };
 }
