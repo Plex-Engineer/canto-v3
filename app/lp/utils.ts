@@ -73,16 +73,16 @@ export default function usePool() {
 
   /** AMBIENT REWARDS TIMER */
 
-  let prevBlockNumber = BigInt(7844908); //need to update after provided
-  const blocksInEpoch = BigInt(104272);
-  const blockDuration = 5.8;
-  let remBlocksInEpoch = BigInt(104272);
   const { data: blockNumber } = useBlockNumber({
     chainId: CANTO_MAINNET_EVM.chainId,
     watch: true,
   });
 
-  const UserAmbientRewardsTimer = (blockNumber: bigint | undefined) => {
+  const UserAmbientRewardsTimer = () => {
+    const blocksInEpoch = BigInt(104272);
+    const blockDuration = 5.8;
+    let prevBlockNumber = BigInt(7844908); //need to update after provided
+    let remBlocksInEpoch = BigInt(104272);
     let remTime = 0n;
     if (blockNumber) {
       const noOfWeeksToBeAdded =
@@ -108,15 +108,14 @@ export default function usePool() {
     getTimerObj(0n)
   );
   useEffect(() => {
-    let remTime = remBlocksInEpoch * BigInt(blockDuration * 1000);
     if (!blockNumber) {
       setAmbientRewardsTimer("Loading...");
       return;
     }
-    remTime = UserAmbientRewardsTimer(blockNumber);
+    let remTime = UserAmbientRewardsTimer();
     setInterval(() => {
       if (remTime === 0n) {
-        remTime = UserAmbientRewardsTimer(blockNumber);
+        remTime = UserAmbientRewardsTimer();
       }
       remTime = remTime - 1000n;
       setAmbientRewardsTimer(getTimerObj(remTime));
