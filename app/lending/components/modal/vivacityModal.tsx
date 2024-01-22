@@ -119,10 +119,7 @@ export const VivacityModal = (props: Props) => {
     const paramCheck = transaction.validateParams(...txParams);
 
     // limits
-    const maxAmount  =  Vivacity.maxAmountForLendingTxModal(
-      actionType,
-      cToken
-    );
+    const maxAmount = Vivacity.maxAmountForLendingTxModal(actionType, cToken);
     // show limit if borrowing or withdrawing
     const limits =
       actionType === Vivacity.CTokenLendingTxTypes.WITHDRAW

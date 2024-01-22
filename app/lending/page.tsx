@@ -94,7 +94,7 @@ export default function LendingPage() {
 
       <Container className={styles.grid} direction="row">
         <Container gap={54}>
-        <div className={styles.highlightCard}>
+          <div className={styles.highlightCard}>
             {isLoading ? (
               <Container
                 width="1000px"
