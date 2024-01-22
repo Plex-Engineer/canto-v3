@@ -298,6 +298,7 @@ const CTokenTable = ({
   onBorrow: (address: string) => void;
 }) => {
   const [filteredPairs, setFilteredPairs] = useState("RWAs");
+
   const headers =
     filteredPairs === "RWAs"
       ? [

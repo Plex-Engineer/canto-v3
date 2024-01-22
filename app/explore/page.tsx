@@ -14,6 +14,9 @@ export default function OutlinksPage() {
           horizontal: true,
           vertical: true,
         }}
+        style={{
+          padding: "2rem 0",
+        }}
       >
         <div className={style.container}>
           <Text
@@ -46,6 +49,7 @@ export default function OutlinksPage() {
             description="is a platform for discovering and trading NFTs. It features collections such as Canto Longneck, Shnoise, and Dead Ends."
             image="/ecosystem/blankrasa.svg"
             title="Blank Rasa"
+            backgroundColor="#FFFFFF"
           />
 
           <ExploreLink

@@ -122,3 +122,46 @@
     right: 0;
   }
 }
+
+@media screen and (max-width: 768px) {
+  .container {
+    width: 100%;
+    max-width: 100vw;
+    height: 62px;
+
+    flex-wrap: wrap;
+    position: relative;
+    .links {
+      flex-wrap: wrap;
+
+      height: calc(56px / 2);
+      border-top: 1px solid var(--border-stoke-dark-color, #999);
+      &:first-of-type {
+        border-top: none;
+      }
+      width: 100%;
+    }
+
+    border-top: 1px solid var(--border-stoke-dark-color, #999);
+    border-bottom: 1px solid var(--border-stoke-dark-color, #999);
+  }
+
+  .links > * {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    a {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
+    &:not(:has(a)) {
+      padding: 0 1rem;
+    }
+  }
+}

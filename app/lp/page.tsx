@@ -21,12 +21,12 @@ import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import usePool from "./utils";
-import { getPriceFromTick } from "@/utils/ambient";
 import Analytics from "@/provider/analytics";
 import {
   getAnalyticsCantoLiquidityPoolInfo,
   getAnalyticsAmbientLiquidityPoolInfo,
 } from "@/utils/analytics";
+import DesktopOnly from "@/components/desktop-only/desktop-only";
 
 export default function Page() {
   const {
@@ -44,6 +44,11 @@ export default function Page() {
     sendClaimRewardsFlow,
     pairNames,
   } = usePool();
+
+  //   if mobile only
+  if (!window.matchMedia("(min-width: 768px)").matches) {
+    return <DesktopOnly />;
+  }
 
   //main content
   return (

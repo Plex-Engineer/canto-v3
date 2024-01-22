@@ -53,7 +53,7 @@ export default function useLending(
     },
     {
       onError: (error) => {
-        console.log(error);
+        console.error(error);
       },
       placeholderData: {
         cTokens: [],

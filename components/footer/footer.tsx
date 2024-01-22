@@ -114,6 +114,7 @@ const StatusText = () => {
     chainId: CANTO_MAINNET_EVM.chainId,
     watch: true,
   });
+
   const [blockString, setBlockString] = useState("Loading....");
   useEffect(() => {
     setBlockString(blockNumber?.toString() ?? "Loading....");
