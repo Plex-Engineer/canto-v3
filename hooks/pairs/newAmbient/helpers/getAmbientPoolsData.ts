@@ -19,7 +19,7 @@ const poolQueries = (
   userEthAddress?: string
 ): [
   PromiseWithError<AmbientPoolStatsReturn>,
-  PromiseWithError<PoolPositionsReturn>
+  PromiseWithError<PoolPositionsReturn>,
 ] => [
   queryAmbientPoolStats(
     chainId,
@@ -106,7 +106,7 @@ export async function getAllAmbientPoolsData(
         totals: {
           noteTvl: tvl,
           apr: {
-            poolApr: ambientAPR("550000000000000000", tvl, cantoPrice ?? "0"),
+            poolApr: ambientAPR("225000000000000000", tvl, cantoPrice ?? "0"),
           },
         },
       };
