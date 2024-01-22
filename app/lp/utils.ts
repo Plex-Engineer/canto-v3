@@ -81,7 +81,7 @@ export default function usePool() {
   const UserAmbientRewardsTimer = () => {
     const blocksInEpoch = BigInt(104272);
     const blockDuration = 5.8;
-    let prevBlockNumber = BigInt(7844908); //need to update after provided
+    let prevBlockNumber = BigInt(7841750);
     let remBlocksInEpoch = BigInt(104272);
     let remTime = 0n;
     if (blockNumber) {
