@@ -95,22 +95,14 @@ export const VivacityModal = (props: Props) => {
   ) {
     const [maxClicked, setMaxClicked] = useState(false);
     const [amount, setAmount] = useState("");
-    const [cTokenAmount, setCTokenAmount] = useState("");
 
     const bnAmount = (
       convertToBigNumber(amount, cToken.underlying.decimals).data ?? "0"
     ).toString();
 
-    const bnCTokenAmount = new BigNumber(cTokenAmount)
-      .multipliedBy(new BigNumber(10).pow(cToken.decimals))
-      .integerValue(BigNumber.ROUND_UP)
-      .toString();
-
     // tx params
     const txParams: [string, Vivacity.CTokenLendingTxTypes, boolean] = [
-      actionType === Vivacity.CTokenLendingTxTypes.SUPPLY
-        ? bnAmount
-        : bnCTokenAmount,
+      bnAmount,
       actionType,
       maxClicked,
     ];
@@ -119,7 +111,7 @@ export const VivacityModal = (props: Props) => {
     const paramCheck = transaction.validateParams(...txParams);
 
     // limits
-    const maxAmount = Vivacity.maxAmountForLendingTxModal(actionType, cToken);
+    const maxAmount = Vivacity.maxAmountForLendingTx(actionType, cToken);
     // show limit if borrowing or withdrawing
     const limits =
       actionType === Vivacity.CTokenLendingTxTypes.WITHDRAW
@@ -129,13 +121,6 @@ export const VivacityModal = (props: Props) => {
       ? { limit: { limit: maxAmount, limitName: "Limit" } }
       : {};
 
-    useEffect(() => {
-      const cTokenAmount = Vivacity.getVCNoteAmountFromNote(
-        amount,
-        cToken.exchangeRate
-      );
-      setCTokenAmount(cTokenAmount);
-    }, [amount]);
     return (
       <div className={styles.content} key={cToken.address + isSupplyModal}>
         <Spacer height="20px" />
@@ -338,14 +323,11 @@ const BorrowLimits = ({
   return (
     <Container gap={20} direction="row">
       {limits.map((limit) => {
-        const limitAmount =
-          limit == 100
-            ? formatBalance(maxBorrow, decimals, { precision: decimals })
-            : formatBalance(
-                percentOfAmount(maxBorrow, limit).data ?? "0",
-                decimals,
-                { precision: decimals }
-              );
+        const limitAmount = formatBalance(
+          percentOfAmount(maxBorrow, limit).data ?? "0",
+          decimals,
+          { precision: decimals }
+        );
 
         return (
           <Text
