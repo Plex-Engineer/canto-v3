@@ -36,5 +36,8 @@ export interface LendingHookReturn {
     newVivacityLendingFlow: (
       txParams: Vivacity.CTokenLendingTransactionParams
     ) => NewTransactionFlow;
+    newVivacityClaimRewardsFlow: (
+      txParams: Vivacity.ClaimRewardsTxParams
+    ) => NewTransactionFlow;
   };
 }

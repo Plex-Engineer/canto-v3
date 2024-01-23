@@ -50,6 +50,7 @@ interface LendingComboReturn {
       txType: Vivacity.CTokenLendingTxTypes,
       max: boolean
     ) => Validation;
+    claimVivacityRewardsTx: () => void;
   };
   selection: {
     selectedCToken:
@@ -219,6 +220,21 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     });
   };
 
+  function claimVivacityRewardsTx() {
+    if (!signer)
+      return { error: true, reason: TX_PARAM_ERRORS.PARAM_MISSING("Signer") };
+    const txFlow = transaction.newVivacityClaimRewardsFlow({
+      chainId: chainId,
+      ethAccount: signer.account.address,
+      estimatedRewards: vcNote?.userDetails?.rewards ?? "0",
+    });
+    txStore?.addNewFlow({
+      txFlow,
+      ethAccount: signer.account.address,
+      onSuccessCallback: props.onSuccessTx,
+    });
+  }
+
   return {
     cTokens: {
       cNote,
@@ -241,6 +257,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
       validateParams,
       performVivacityTx: vivacityLendingTx,
       validateVivacityParams,
+      claimVivacityRewardsTx,
     },
     selection,
     lendingStats: {

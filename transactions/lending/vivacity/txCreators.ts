@@ -1,15 +1,38 @@
-import { VCNOTE_ROUTER_ABI } from "@/config/abis";
+import { VCNOTE_ROUTER_ABI, LENDING_LEDGER_ABI } from "@/config/abis";
 import {
   CantoFETxType,
   Transaction,
   TransactionDescription,
 } from "../../interfaces";
 import { CTokenLendingTxTypes } from "../";
-
+import BigNumber from "bignumber.js";
 /**
  * TRANSACTION CREATORS
  * WILL NOT CHECK FOR VALIDITY OF PARAMS, MUST DO THIS BEFORE USING THESE CONSTRUCTORS
  */
+
+
+
+export const _claimLendingRewardsTx = (
+  chainId: number,
+  userEthAdress: string,
+  lendingLedgerAddress: string,
+  marketAddress: string,
+  description: TransactionDescription
+): Transaction => ({
+  description,
+  feTxType: CantoFETxType.CLAIM_REWARDS_VIVACITY,
+  fromAddress: userEthAdress,
+  chainId: chainId,
+  type: "EVM",
+  target: lendingLedgerAddress,
+  abi: LENDING_LEDGER_ABI,
+  method: "claim",
+  params: [marketAddress, "0", new BigNumber('2').pow(256).minus(1).toString()],
+  value: "0",
+});
+
+
 export const _lendingCTokenTx = (
   lendingTx: CTokenLendingTxTypes,
   chainId: number,

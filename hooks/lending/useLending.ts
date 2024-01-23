@@ -36,19 +36,19 @@ export default function useLending(
 
       const [clmData, vcNoteData] = await Promise.all([
         getAllUserCLMData(
-        params.userEthAddress ?? "",
-        params.chainId,
-        cTokenAddresses
-      ),
-      getVivacityLMData(params.userEthAddress ?? "", params.chainId),
-    ])
+          params.userEthAddress ?? "",
+          params.chainId,
+          cTokenAddresses
+        ),
+        getVivacityLMData(params.userEthAddress ?? "", params.chainId),
+      ])
       if (clmData.error) throw clmData.error;
 
       if (vcNoteData.error) throw vcNoteData.error;
 
       return {
         ...clmData.data,
-        vcNote : vcNoteData.data.vcNote
+        vcNote: vcNoteData.data.vcNote
       };
     },
     {
@@ -71,13 +71,13 @@ export default function useLending(
     string | null
   >(null);
   // get token from constantly updating list of cTokens
-  const selectedCToken = selectedCTokenAddress == clmData?.vcNote?.address ? clmData?.vcNote :clmData?.cTokens.find((cToken) =>
+  const selectedCToken = selectedCTokenAddress == clmData?.vcNote?.address ? clmData?.vcNote : clmData?.cTokens.find((cToken) =>
     areEqualAddresses(cToken.address, selectedCTokenAddress ?? "")
   );
 
   return {
     cTokens: clmData?.cTokens ?? [],
-    vcNote: clmData?.vcNote ,
+    vcNote: clmData?.vcNote,
     position: clmData?.position ?? {
       liquidity: "0",
       shortfall: "0",
@@ -95,8 +95,9 @@ export default function useLending(
       validateParams: (txParams) => validateCTokenLendingTxParams(txParams),
       newLendingFlow: (txParams) => newCTokenLendingFlow(txParams),
       newClaimRewardsFlow: (txParams) => newClaimCLMRewardsFlow(txParams),
-      validateVivacityParams : (txParams) => Vivacity.validateCTokenLendingTxParams(txParams),
-      newVivacityLendingFlow : (txParams) => Vivacity.newCTokenLendingFlow(txParams),
+      validateVivacityParams: (txParams) => Vivacity.validateCTokenLendingTxParams(txParams),
+      newVivacityLendingFlow: (txParams) => Vivacity.newCTokenLendingFlow(txParams),
+      newVivacityClaimRewardsFlow: (txParams) => Vivacity.newClaimRewardsFlow(txParams),
     },
   };
 }

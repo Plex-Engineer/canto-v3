@@ -21,7 +21,7 @@ import {
 } from "../lending";
 import { StakingTransactionParams } from "../staking";
 import { ProposalVoteTxParams } from "../gov";
-import {Vivacity} from "@/transactions/lending"
+import { Vivacity } from "@/transactions/lending"
 
 // txType is the key for the txMap that will create the Transaction[] list
 export type NewTransactionFlow = {
@@ -36,49 +36,53 @@ export type NewTransactionFlow = {
     icon: string;
   }[];
 } & (
-  | {
+    | {
       txType: TransactionFlowType.BRIDGE;
       params: BridgeTransactionParams;
     }
-  | {
+    | {
       txType: TransactionFlowType.AMBIENT_LIQUIDITY_TX;
       params: AmbientTransactionParams;
     }
-  | {
+    | {
       txType: TransactionFlowType.AMBIENT_CLAIM_REWARDS_TX;
       params: AmbientClaimRewardsTxParams;
     }
-  | {
+    | {
       txType:
-        | TransactionFlowType.CANTO_DEX_LP_TX
-        | TransactionFlowType.CANTO_DEX_STAKE_LP_TX;
+      | TransactionFlowType.CANTO_DEX_LP_TX
+      | TransactionFlowType.CANTO_DEX_STAKE_LP_TX;
       params: CantoDexTransactionParams;
     }
-  | {
+    | {
       txType: TransactionFlowType.LP_COMBO_CLAIM_REWARDS_TX;
       params: ClaimDexComboRewardsParams;
     }
-  | {
+    | {
       txType: TransactionFlowType.CLM_CTOKEN_TX;
       params: CTokenLendingTransactionParams;
     }
-  | {
+    | {
       txType: TransactionFlowType.CLM_CLAIM_REWARDS_TX;
       params: CLMClaimRewardsTxParams;
     }
-  | {
+    | {
       txType: TransactionFlowType.STAKE_CANTO_TX;
       params: StakingTransactionParams;
     }
-  | {
+    | {
       txType: TransactionFlowType.VOTE_TX;
       params: ProposalVoteTxParams;
     }
-  | {
-    txType: TransactionFlowType.VIVACITY_CTOKEN_TX;
-    params: Vivacity.CTokenLendingTransactionParams;
-  }
-);
+    | {
+      txType: TransactionFlowType.VIVACITY_CTOKEN_TX;
+      params: Vivacity.CTokenLendingTransactionParams;
+    }
+    | {
+      txType: TransactionFlowType.VIVACITY_CLAIM_REWARDS_TX;
+      params: Vivacity.ClaimRewardsTxParams;
+    }
+  );
 
 ///
 /// Transaction Flows will include multiple transactions
