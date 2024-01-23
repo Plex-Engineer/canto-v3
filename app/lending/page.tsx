@@ -209,7 +209,7 @@ export default function LendingPage() {
                       {cStableCoin.underlying.symbol}
                     </Text>
                     <Text theme="secondary-dark" size="x-sm">
-                      Balance:{" "}
+                      Bal:{" "}
                       {displayAmount(
                         cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
                         cStableCoin.underlying.decimals,

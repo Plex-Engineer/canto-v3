@@ -37,7 +37,7 @@ const TokenCard = ({ cToken, items }: Props) => {
           <Item name="supply apy" symbol value={cToken.supplyApy + "%"} />
           <Item name="borrow apy" symbol value={cToken.borrowApy + "%"} />
         </Container>
-        <Button fontFamily="proto_mono">Get note</Button>
+        <Button fontFamily="proto_mono">Get {cToken.underlying.symbol}</Button>
       </section>
       <div
         style={{

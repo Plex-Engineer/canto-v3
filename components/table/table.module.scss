@@ -64,10 +64,10 @@
 
 @media screen and (max-width: 768px) {
   .row {
-    grid-template-columns: repeat(3, 1fr) !important;
+    // grid-template-columns: repeat(4, 1fr) !important;
 
-    height: 200px !important;
-    width: 100% !important;
+    // height: 80px !important;
+    // width: 100% !important;
     & > div {
       border-bottom: 1px dotted rgba(var(--dark-color), 0.1);
       &:last-child {
@@ -82,14 +82,15 @@
       }
     }
   }
-  .header {
-    grid-template-columns: repeat(3, 1fr) !important;
-    height: 200px !important;
+  .header,
+  .row {
+    grid-template-columns: repeat(4, 1fr) !important;
+    height: 80px !important;
     width: 100% !important;
   }
 
   .table {
-    grid-template-rows: 200px 1fr;
+    grid-template-rows: 80px 1fr;
   }
 
   .container {

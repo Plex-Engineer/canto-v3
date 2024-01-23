@@ -40,7 +40,6 @@ const Text = styled.p<Props>`
   font-family: ${(props) =>
     props.font == "proto_mono" ? "var(--proto-mono)" : "var(--rm-mono)"};
   font-weight: ${(props) => props.weight ?? "normal"};
-  font-size: ${(props) => sizes[props.size ?? "md"]}px;
   line-height: 140%;
   letter-spacing: -0.32px;
   color: ${(props) =>
@@ -48,6 +47,13 @@ const Text = styled.p<Props>`
       ? themes[props.theme as keyof typeof themes]
       : themes["primary-dark"]};
   opacity: ${(props) => props.opacity ?? 1};
+
+  @media screen and (max-width: 768px) {
+    font-size: ${(props) =>
+      !props.responsive
+        ? sizes[props.size ?? "md"] - 4
+        : sizes[props.size ?? "md"]}px;
+  }
 `;
 
 export default Text;
