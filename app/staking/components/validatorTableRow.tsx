@@ -61,7 +61,9 @@ export const GenerateMyStakingTableRow = (
   onDelegate: (validator: Validator) => void
 ) => [
   <Container key={`name_${index}`}>
-    <Text font="rm_mono">{userStakedValidator?.description.moniker}</Text>
+    <Text font="rm_mono" size="x-sm">
+      {userStakedValidator?.description.moniker}
+    </Text>
   </Container>,
   <Container
     key={`mystake_${index}`}
@@ -69,7 +71,7 @@ export const GenerateMyStakingTableRow = (
     center={{ horizontal: true, vertical: true }}
     gap="auto"
   >
-    <Text font="rm_mono">
+    <Text font="rm_mono" size="x-sm">
       {displayAmount(userStakedValidator.userDelegation.balance, 18, {
         short: false,
       })}{" "}
@@ -90,7 +92,7 @@ export const GenerateMyStakingTableRow = (
     center={{ horizontal: true, vertical: true }}
     gap="auto"
   >
-    <Text font="rm_mono">
+    <Text font="rm_mono" size="x-sm">
       {displayAmount(userStakedValidator?.tokens, 18, {})}
     </Text>
     <div> </div>
@@ -104,7 +106,7 @@ export const GenerateMyStakingTableRow = (
     />
   </Container>,
   <Container key={`commission_${index}`}>
-    <Text font="rm_mono">
+    <Text font="rm_mono" size="x-sm">
       {displayAmount(userStakedValidator?.commission, -2, {
         precision: 2,
       })}
@@ -121,7 +123,9 @@ export const GenerateUnbondingDelegationsTableRow = (
   index: number
 ) => [
   <Container key={`name_${index}`}>
-    <Text font="rm_mono">{userStakedValidator.name}</Text>
+    <Text font="rm_mono" size="x-sm">
+      {userStakedValidator.name}
+    </Text>
   </Container>,
   <Container
     key={`mystake_${index}`}
@@ -129,7 +133,7 @@ export const GenerateUnbondingDelegationsTableRow = (
     center={{ horizontal: true, vertical: true }}
     gap="auto"
   >
-    <Text font="rm_mono">
+    <Text font="rm_mono" size="x-sm">
       {displayAmount(userStakedValidator.undelegation, 18, {
         short: false,
       })}{" "}
@@ -145,7 +149,7 @@ export const GenerateUnbondingDelegationsTableRow = (
     />
   </Container>,
   <Container key={`name_${index}`}>
-    <Text font="rm_mono">
+    <Text font="rm_mono" size="x-sm">
       {new Date(userStakedValidator.completion_date).toDateString() +
         ", " +
         new Date(userStakedValidator.completion_date).toLocaleTimeString([], {

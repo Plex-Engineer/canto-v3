@@ -406,16 +406,23 @@ export default function StakingPage() {
                     headers={[
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono">
+                          <Text opacity={0.4} font="rm_mono" size="x-sm">
                             Name
                           </Text>
                         ),
                         ratio: 5,
                       },
-                      { value: <Text opacity={0.4}>My Stake</Text>, ratio: 3 },
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono">
+                          <Text opacity={0.4} size="x-sm">
+                            My Stake
+                          </Text>
+                        ),
+                        ratio: 3,
+                      },
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono" size="x-sm">
                             Validator Total
                           </Text>
                         ),
@@ -423,7 +430,7 @@ export default function StakingPage() {
                       },
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono">
+                          <Text opacity={0.4} font="rm_mono" size="x-sm">
                             Commission
                           </Text>
                         ),
@@ -431,7 +438,7 @@ export default function StakingPage() {
                       },
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono">
+                          <Text opacity={0.4} font="rm_mono" size="x-sm">
                             Edit
                           </Text>
                         ),
@@ -465,19 +472,23 @@ export default function StakingPage() {
                     headers={[
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono">
+                          <Text opacity={0.4} font="rm_mono" size="x-sm">
                             Name
                           </Text>
                         ),
                         ratio: 3,
                       },
                       {
-                        value: <Text opacity={0.4}>Undelegation</Text>,
+                        value: (
+                          <Text opacity={0.4} size="x-sm">
+                            Undelegation
+                          </Text>
+                        ),
                         ratio: 2,
                       },
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono">
+                          <Text opacity={0.4} font="rm_mono" size="x-sm">
                             Completion Time
                           </Text>
                         ),
