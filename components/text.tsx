@@ -1,3 +1,5 @@
+import styled from "styled-components";
+
 interface Props {
   font?: "rm_mono" | "proto_mono";
   weight?: "normal" | "bold";
@@ -14,6 +16,7 @@ interface Props {
   className?: string;
   role?: string;
   onClick?: () => void;
+  responsive?: boolean;
 }
 
 const sizes = {
@@ -33,40 +36,18 @@ const themes = {
   "secondary-dark": "var(--text-dark-40-color)",
 };
 
-const Text = ({
-  font,
-  weight,
-  size,
-  children,
-  color,
-  theme,
-  style,
-  opacity,
-  className,
-  role,
-  onClick,
-}: Props) => {
-  return (
-    <p
-      role={role}
-      className={className}
-      onClick={onClick}
-      style={{
-        fontFamily:
-          font == "proto_mono" ? "var(--proto-mono)" : "var(--rm-mono)",
-        opacity: opacity ?? 1,
-        fontWeight: weight,
-        fontSize: sizes[size ?? "md"],
-        lineHeight: "140%",
-        letterSpacing: "-0.32px",
-        color: color == null ? themes[theme ?? "primary-dark"] : color,
-
-        ...style,
-      }}
-    >
-      {children}
-    </p>
-  );
-};
+const Text = styled.p<Props>`
+  font-family: ${(props) =>
+    props.font == "proto_mono" ? "var(--proto-mono)" : "var(--rm-mono)"};
+  font-weight: ${(props) => props.weight ?? "normal"};
+  font-size: ${(props) => sizes[props.size ?? "md"]}px;
+  line-height: 140%;
+  letter-spacing: -0.32px;
+  color: ${(props) =>
+    props.color ?? props.theme != undefined
+      ? themes[props.theme as keyof typeof themes]
+      : themes["primary-dark"]};
+  opacity: ${(props) => props.opacity ?? 1};
+`;
 
 export default Text;
