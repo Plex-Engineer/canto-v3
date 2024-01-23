@@ -15,10 +15,14 @@ export const GenerateValidatorTableRow = (
   onDelegate: (validator: Validator) => void
 ) => [
   <Container key={`name_${index}`}>
-    <Text font="rm_mono">{validator.rank}</Text>
+    <Text font="rm_mono" size="x-sm">
+      {validator.rank}
+    </Text>
   </Container>,
   <Container key={`name_${index}`}>
-    <Text font="rm_mono">{validator.description.moniker}</Text>
+    <Text font="rm_mono" size="x-sm">
+      {validator.description.moniker}
+    </Text>
   </Container>,
   <Container
     key={`tokens_${index}`}
@@ -26,7 +30,9 @@ export const GenerateValidatorTableRow = (
     center={{ horizontal: true, vertical: true }}
     gap="auto"
   >
-    <Text font="rm_mono">{displayAmount(validator.tokens, 18)} </Text>
+    <Text font="rm_mono" size="x-sm">
+      {displayAmount(validator.tokens, 18)}{" "}
+    </Text>
     <div> </div>
     <Icon
       style={{ marginLeft: "5px" }}
@@ -38,7 +44,7 @@ export const GenerateValidatorTableRow = (
     />
   </Container>,
   <Container key={`commission_${index}`}>
-    <Text font="rm_mono">
+    <Text font="rm_mono" size="x-sm">
       {displayAmount(validator.commission, -2, { precision: 2 })}%
     </Text>
   </Container>,
