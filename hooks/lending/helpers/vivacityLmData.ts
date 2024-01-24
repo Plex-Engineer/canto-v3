@@ -128,7 +128,7 @@ export async function getVCNoteData(
     const bnCNoteSupplyRate = new BigNumber(cNoteSupplyRate.result.toString())
     const vcNoteToNoteExchangeRate = bnVCNoteExchangeRate.multipliedBy(bnCNoteExchangeRate).dividedBy(new BigNumber(10).pow(36))
     const combinedSupplyRate = bnVCNoteSupplyRate.plus(bnCNoteSupplyRate).dividedBy(new BigNumber(10).pow(18))
-    const supplyApy = getAPY(Number(combinedSupplyRate.toString()))
+    const supplyApy = getAPY(Number(combinedSupplyRate.toString())).toFixed(2)
     // format results
     const vcNote = {
       address: vcNoteAddress,
