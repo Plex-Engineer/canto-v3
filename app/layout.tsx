@@ -75,7 +75,6 @@ export default function RootLayout({
           } as React.CSSProperties
         }
       >
-
         <CantoWalletProvider>
           <ReactQueryClientProvider>
             <div className="body">
