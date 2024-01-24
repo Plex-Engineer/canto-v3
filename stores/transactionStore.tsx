@@ -18,7 +18,6 @@ import {
   UserTransactionFlowMap,
 } from "@/transactions/flows";
 import {
-  BridgeStatus,
   TransactionStatus,
   TransactionWithStatus,
   CantoFETxType,
@@ -237,9 +236,10 @@ const useTransactionStore = create<TransactionStore>()(
               const network = getNetworkInfoFromChainId(
                 updatedTransactionList[i].tx.chainId
               ).data;
-              const updatedTx = get().getUserTransactionFlows(ethAccount)
-                .find(flow => flow.id === flowToPerform.id)?.transactions
-                .find((_, index) => index === i);
+              const updatedTx = get()
+                .getUserTransactionFlows(ethAccount)
+                .find((flow) => flow.id === flowToPerform.id)
+                ?.transactions.find((_, index) => index === i);
               // check if error (set states before throwing error)
               if (txError || !txResult) {
                 // perform tx will set the state of the tx and flow to error on it's own
@@ -338,7 +338,7 @@ const useTransactionStore = create<TransactionStore>()(
           }
         },
         performTx: async (ethAccount, flowId, txIndex, tx) => {
-          let txHash
+          let txHash;
           try {
             // set pending since about to be signed
             // reset error, hash, and txLink since new tx
@@ -353,7 +353,7 @@ const useTransactionStore = create<TransactionStore>()(
             const { data: txData, error: txError } = await signTransaction(
               tx.tx
             );
-            txHash = txData
+            txHash = txData;
             // if error with signature, set status and throw error
             if (txError) {
               throw txError;
