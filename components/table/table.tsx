@@ -1,3 +1,4 @@
+import React from "react";
 import Text from "../text";
 import styles from "./table.module.scss";
 
@@ -8,7 +9,7 @@ interface Props {
     value: string | React.ReactNode;
     ratio: number;
   }[];
-  content: React.ReactNode[][];
+  content: React.ReactNode[][] | React.ReactNode[];
   textSize?: string;
 }
 const Table = (props: Props) => {
@@ -41,6 +42,10 @@ const Table = (props: Props) => {
         </div>
         <div className={styles.content}>
           {props.content.map((row, index) => {
+            //check if an array has been passed in
+            if (!Array.isArray(row)) {
+              return row;
+            }
             return (
               <div
                 key={index}
