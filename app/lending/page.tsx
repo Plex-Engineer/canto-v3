@@ -10,7 +10,7 @@ import Container from "@/components/container/container";
 import LoadingIcon from "@/components/loader/loading";
 import { LendingModal } from "./components/modal/modal";
 import { RWARow, StableCoinRow } from "./components/cTokenRow";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Spacer from "@/components/layout/spacer";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
@@ -18,6 +18,7 @@ import AccountHealth from "./components/accountHealth/accountHealth";
 import TokenCard from "./components/tokenCard/tokenCard";
 import Icon from "@/components/icon/icon";
 import { addTokenBalances, divideBalances } from "@/utils/math/tokenMath.utils";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -28,6 +29,10 @@ export default function LendingPage() {
   // track current modal type
   const [currentModal, setCurrentModal] = useState<CLMModalTypes>(
     CLMModalTypes.NONE
+  );
+
+  const [currentToggle, setCurrentToggle] = useState<"Supply" | "Borrow">(
+    "Supply"
   );
 
   // get all data from lending combo
@@ -45,6 +50,12 @@ export default function LendingPage() {
   });
   const { cNote, rwas, stableCoins } = cTokens;
   const { selectedCToken, setSelectedCToken } = selection;
+  const [isMobile, setIsMobile] = useState(false);
+  const screen = useScreenSize();
+
+  useEffect(() => {
+    setIsMobile(screen.width < 768);
+  }, [screen.width]);
 
   if (isLoading || cNote === undefined || stableCoins === undefined) {
     return <div className={styles.loading}>loading</div>;
@@ -158,245 +169,266 @@ export default function LendingPage() {
           }}
         />
       </div>
-      <div className={styles.mainTable}>
-        <Container gap={12} width="100%">
-          <Text size="x-lg" font="proto_mono">
-            SUPPLY
-          </Text>
-          <Table
-            title="Canto Lending Market"
-            headers={[
-              {
-                value: "Asset",
-                ratio: 3,
-              },
-              {
-                value: "APY",
-                ratio: 2,
-              },
-              {
-                value: "Collateral",
-                ratio: 2,
-              },
-              {
-                value: "Supplied",
-                ratio: 2,
-              },
-            ]}
-            content={[
-              ...[cNote, ...stableCoins, ...rwas].map((cStableCoin) => [
-                <Container
-                  center={{
-                    vertical: true,
-                  }}
-                  width="100%"
-                  direction="row"
-                  gap={10}
-                  style={{
-                    paddingLeft: "30px",
-                  }}
-                  key={"title" + cStableCoin.address}
-                >
-                  <Icon
-                    icon={{ url: cStableCoin.underlying.logoURI, size: 30 }}
-                  />
-                  <Container
-                    style={{
-                      alignItems: "flex-start",
-                    }}
-                  >
-                    <Text font="proto_mono">
-                      {cStableCoin.underlying.symbol}
-                    </Text>
-                    <Text theme="secondary-dark" size="x-sm">
-                      Bal:{" "}
-                      {displayAmount(
-                        cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
-                        cStableCoin.underlying.decimals,
-                        {
-                          precision: 2,
-                        }
-                      )}
-                    </Text>
-                  </Container>
-                </Container>,
-                cStableCoin.supplyApy + "%",
-                displayAmount(cStableCoin.collateralFactor, 16),
-                displayAmount(
-                  cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
-                  cStableCoin.underlying.decimals,
-                  {
-                    precision: 2,
-                  }
-                ),
-              ]),
-            ]}
-          />
-          <Table
-            title="Vivacity"
-            headers={[
-              {
-                value: "Asset",
-                ratio: 3,
-              },
-              {
-                value: "APY",
-                ratio: 2,
-              },
 
-              {
-                value: "Supplied",
-                ratio: 2,
-              },
-              {
-                value: "Rewards",
-                ratio: 2,
-              },
-            ]}
-            content={[
-              ...[...stableCoins].map((cStableCoin) => [
-                <Container
-                  center={{
-                    vertical: true,
-                  }}
-                  width="100%"
-                  direction="row"
-                  gap={10}
-                  style={{
-                    paddingLeft: "30px",
-                  }}
-                  key={"title" + cStableCoin.address}
-                >
-                  <Icon
-                    icon={{ url: cStableCoin.underlying.logoURI, size: 30 }}
-                  />
+      <div className={styles.mainTable}>
+        {isMobile && (
+          <div>
+            <ToggleGroup
+              options={["Supply", "Borrow"]}
+              selected={currentToggle}
+              setSelected={(value) => {
+                if (value === "Borrow" || value === "Supply")
+                  setCurrentToggle(value);
+                else console.error("invalid toggle value");
+              }}
+            />
+          </div>
+        )}
+        {(!isMobile || currentToggle === "Supply") && (
+          <Container gap={12} width="100%">
+            <Text size="x-lg" font="proto_mono">
+              SUPPLY
+            </Text>
+            <Table
+              title="Canto Lending Market"
+              headers={[
+                {
+                  value: "Asset",
+                  ratio: 3,
+                },
+                {
+                  value: "APY",
+                  ratio: 2,
+                },
+                {
+                  value: "Collateral",
+                  ratio: 2,
+                },
+                {
+                  value: "Supplied",
+                  ratio: 2,
+                },
+              ]}
+              content={[
+                ...[cNote, ...stableCoins, ...rwas].map((cStableCoin) => [
                   <Container
-                    style={{
-                      alignItems: "flex-start",
+                    center={{
+                      vertical: true,
                     }}
+                    width="100%"
+                    direction="row"
+                    gap={10}
+                    style={{
+                      paddingLeft: "30px",
+                    }}
+                    key={"title" + cStableCoin.address}
                   >
-                    <Text font="proto_mono">
-                      {cStableCoin.underlying.symbol}
-                    </Text>
-                    <Text theme="secondary-dark" size="x-sm">
-                      Balance:{" "}
-                      {displayAmount(
-                        cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
-                        cStableCoin.underlying.decimals,
-                        {
-                          precision: 2,
-                        }
-                      )}
-                    </Text>
-                  </Container>
-                </Container>,
-                cStableCoin.supplyApy + "%",
-                displayAmount(cStableCoin.collateralFactor, 16),
-                <Text
-                  key={"grp" + cStableCoin.address}
-                  font={"proto_mono"}
-                  style={{
-                    width: "100%",
-                    lineClamp: 1,
-                  }}
-                >
-                  {displayAmount(
+                    <Icon
+                      icon={{ url: cStableCoin.underlying.logoURI, size: 30 }}
+                    />
+                    <Container
+                      style={{
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <Text font="proto_mono">
+                        {cStableCoin.underlying.symbol}
+                      </Text>
+                      <Text theme="secondary-dark" size="x-sm">
+                        Bal:{" "}
+                        {displayAmount(
+                          cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
+                          cStableCoin.underlying.decimals,
+                          {
+                            precision: 2,
+                          }
+                        )}
+                      </Text>
+                    </Container>
+                  </Container>,
+                  cStableCoin.supplyApy + "%",
+                  displayAmount(cStableCoin.collateralFactor, 16),
+                  displayAmount(
                     cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
                     cStableCoin.underlying.decimals,
                     {
                       precision: 2,
                     }
-                  )}
-                  <Icon
+                  ),
+                ]),
+              ]}
+            />
+            <Table
+              title="Vivacity"
+              headers={[
+                {
+                  value: "Asset",
+                  ratio: 3,
+                },
+                {
+                  value: "APY",
+                  ratio: 2,
+                },
+
+                {
+                  value: "Supplied",
+                  ratio: 2,
+                },
+                {
+                  value: "Rewards",
+                  ratio: 2,
+                },
+              ]}
+              content={[
+                ...[...stableCoins].map((cStableCoin) => [
+                  <Container
+                    center={{
+                      vertical: true,
+                    }}
+                    width="100%"
+                    direction="row"
+                    gap={10}
                     style={{
-                      marginLeft: "5px",
+                      paddingLeft: "30px",
                     }}
                     key={"title" + cStableCoin.address}
-                    icon={{
-                      url: "/tokens/canto.svg",
-                      size: 14,
-                    }}
-                  />
-                </Text>,
-              ]),
-            ]}
-          />
-        </Container>
-        <Container gap={12} width="100%">
-          <Text size="x-lg" font="proto_mono">
-            Borrow
-          </Text>
-          <Table
-            title="Canto Lending Market"
-            headers={[
-              {
-                value: "Asset",
-                ratio: 3,
-              },
-              {
-                value: "APY",
-                ratio: 2,
-              },
-              {
-                value: "Liquidity",
-                ratio: 2,
-              },
-              {
-                value: "Borrowed",
-                ratio: 2,
-              },
-            ]}
-            content={[
-              ...stableCoins.map((cStableCoin) => [
-                <Container
-                  center={{
-                    vertical: true,
-                  }}
-                  width="100%"
-                  direction="row"
-                  gap={10}
-                  style={{
-                    paddingLeft: "30px",
-                  }}
-                  key={"title" + cStableCoin.address}
-                >
-                  <Icon
-                    icon={{ url: cStableCoin.underlying.logoURI, size: 30 }}
-                  />
-                  <Container
+                  >
+                    <Icon
+                      icon={{ url: cStableCoin.underlying.logoURI, size: 30 }}
+                    />
+                    <Container
+                      style={{
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <Text font="proto_mono">
+                        {cStableCoin.underlying.symbol}
+                      </Text>
+                      <Text theme="secondary-dark" size="x-sm">
+                        Bal:{" "}
+                        {displayAmount(
+                          cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
+                          cStableCoin.underlying.decimals,
+                          {
+                            precision: 2,
+                          }
+                        )}
+                      </Text>
+                    </Container>
+                  </Container>,
+                  cStableCoin.supplyApy + "%",
+                  displayAmount(cStableCoin.collateralFactor, 16),
+                  <Text
+                    key={"grp" + cStableCoin.address}
+                    font={"proto_mono"}
                     style={{
-                      alignItems: "flex-start",
+                      width: "100%",
+                      lineClamp: 1,
                     }}
                   >
-                    <Text font="proto_mono">
-                      {cStableCoin.underlying.symbol}
-                    </Text>
-                    <Text theme="secondary-dark" size="x-sm">
-                      Balance:{" "}
-                      {displayAmount(
-                        cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
-                        cStableCoin.underlying.decimals,
-                        {
-                          precision: 2,
-                        }
-                      )}
-                    </Text>
-                  </Container>
-                </Container>,
-                cStableCoin.supplyApy + "%",
-                // liquidity
-                displayAmount(cStableCoin.liquidity, 0),
-                displayAmount(
-                  cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
-                  cStableCoin.underlying.decimals,
-                  {
-                    precision: 2,
-                  }
-                ),
-              ]),
-            ]}
-          />
-        </Container>
+                    {displayAmount(
+                      cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
+                      cStableCoin.underlying.decimals,
+                      {
+                        precision: 2,
+                      }
+                    )}
+                    <Icon
+                      style={{
+                        marginLeft: "5px",
+                      }}
+                      key={"title" + cStableCoin.address}
+                      icon={{
+                        url: "/tokens/canto.svg",
+                        size: 14,
+                      }}
+                    />
+                  </Text>,
+                ]),
+              ]}
+            />
+          </Container>
+        )}
+        {(!isMobile || currentToggle === "Borrow") && (
+          <Container gap={12} width="100%">
+            <Text size="x-lg" font="proto_mono">
+              Borrow
+            </Text>
+            <Table
+              title="Canto Lending Market"
+              headers={[
+                {
+                  value: "Asset",
+                  ratio: 3,
+                },
+                {
+                  value: "APY",
+                  ratio: 2,
+                },
+                {
+                  value: "Liquidity",
+                  ratio: 2,
+                },
+                {
+                  value: "Borrowed",
+                  ratio: 2,
+                },
+              ]}
+              content={[
+                ...stableCoins.map((cStableCoin) => [
+                  <Container
+                    center={{
+                      vertical: true,
+                    }}
+                    width="100%"
+                    direction="row"
+                    gap={10}
+                    style={{
+                      paddingLeft: "30px",
+                    }}
+                    key={"title" + cStableCoin.address}
+                  >
+                    <Icon
+                      icon={{
+                        url: cStableCoin.underlying.logoURI,
+                        size: 30,
+                      }}
+                    />
+                    <Container
+                      style={{
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <Text font="proto_mono">
+                        {cStableCoin.underlying.symbol}
+                      </Text>
+                      <Text theme="secondary-dark" size="x-sm">
+                        Bal:{" "}
+                        {displayAmount(
+                          cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
+                          cStableCoin.underlying.decimals,
+                          {
+                            precision: 2,
+                          }
+                        )}
+                      </Text>
+                    </Container>
+                  </Container>,
+                  cStableCoin.supplyApy + "%",
+                  // liquidity
+                  displayAmount(cStableCoin.liquidity, 0),
+                  displayAmount(
+                    cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
+                    cStableCoin.underlying.decimals,
+                    {
+                      precision: 2,
+                    }
+                  ),
+                ]),
+              ]}
+            />
+          </Container>
+        )}
       </div>
     </div>
   );
