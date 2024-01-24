@@ -19,14 +19,14 @@ type AnalyticsTransactionFlowType =
   | string;
 
 
-export type AnalyticsBridgeData =  {
+export type AnalyticsBridgeData = {
   bridgeFrom: string;
   bridgeTo: string;
   bridgeAsset: string;
   bridgeAmount: string;
 }
 
-export type AnalyticsCantoLPData =  {
+export type AnalyticsCantoLPData = {
   lpType?: string;
   cantoLp?: string;
   cantoLpToken1?: string;
@@ -53,7 +53,7 @@ type AnalyticsAmbientLPPositionData = {
   ambientLpMaxRangePrice?: string;
 }
 
-export type AnalyticsAmbientLPData =  {
+export type AnalyticsAmbientLPData = {
   lpType?: string;
   ambientLp?: string;
   ambientLpBaseToken?: string;
@@ -72,7 +72,7 @@ export type AnalyticsAmbientLPData =  {
   ambientLPPositions?: AnalyticsAmbientLPPositionData[];
 } & AnalyticsAmbientLPPositionData
 
-export type AnalyticsLMData =  {
+export type AnalyticsLMData = {
   lmType?: string;
   lmToken?: string;
   lmAmount?: string;
@@ -83,7 +83,7 @@ export type AnalyticsLMData =  {
   lmAccountLiquidityRemaining?: string;
 }
 
-export type AnalyticsTransactionFlowData = AnalyticsBridgeData | AnalyticsCantoLPData | AnalyticsAmbientLPData | AnalyticsLMData ;
+export type AnalyticsTransactionFlowData = AnalyticsBridgeData | AnalyticsCantoLPData | AnalyticsAmbientLPData | AnalyticsLMData;
 
 // tx types (approve/mint/swap/...)
 type AnalyticsTransactionType = CantoFETxType;
@@ -101,6 +101,7 @@ type AnalyticsTransactionFlowParams = AnalyticsTransactionFlowInfo & {
   txType?: AnalyticsTransactionType;
   txNetwork?: string;
   txSuccess?: boolean;
+  txHash?: string;
   txRetryTimeInSeconds?: Number;
   txsGenerateError?: string;
   txError?: string;
