@@ -4,8 +4,9 @@ import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import useLP from "@/hooks/pairs/lpCombo/useLP";
 import { useState, useEffect } from "react";
 import { useBlockNumber } from "wagmi";
+import { fetchBlockNumber } from "@wagmi/core";
 import { CANTO_MAINNET_EVM } from "@/config/networks";
-import { TimeDisplayValues } from "@/hooks/pairs/newAmbient/interfaces/timeDisplay";
+
 export default function usePool() {
   const { txStore, signer, chainId } = useCantoSigner();
   const connectedEthAccount = signer?.account.address ?? "";
@@ -72,13 +73,11 @@ export default function usePool() {
   }
 
   /** AMBIENT REWARDS TIMER */
-
-  const { data: blockNumber } = useBlockNumber({
-    chainId: CANTO_MAINNET_EVM.chainId,
-    watch: true,
-  });
-
-  const UserAmbientRewardsTimer = () => {
+  const [rewardTime, setRewardTime] = useState(0n);
+  const getRewardsTime = async (): Promise<bigint> => {
+    const blockNumber = await fetchBlockNumber({
+      chainId: CANTO_MAINNET_EVM.chainId,
+    });
     const blocksInEpoch = BigInt(104272);
     const blockDuration = 5.8;
     let prevBlockNumber = BigInt(7841750);
@@ -91,36 +90,14 @@ export default function usePool() {
       remBlocksInEpoch = prevBlockNumber + blocksInEpoch - blockNumber;
       remTime = remBlocksInEpoch * BigInt(blockDuration * 1000);
     }
-    return remTime;
+    return BigInt(Date.now()) + remTime;
   };
-  const getTimerObj = (remTime: bigint): string => {
-    const stateObj: TimeDisplayValues = {
-      days: Number(remTime / BigInt(1000 * 60 * 60 * 24)),
-      hours: Number(
-        (remTime % BigInt(1000 * 60 * 60 * 24)) / BigInt(1000 * 60 * 60)
-      ),
-      minutes: Number((remTime % BigInt(1000 * 60 * 60)) / BigInt(1000 * 60)),
-      seconds: Number((remTime % BigInt(1000 * 60)) / BigInt(1000)),
-    };
-    return `${stateObj.days} : ${stateObj.hours} : ${stateObj.minutes} : ${stateObj.seconds}`;
-  };
-  const [ambientRewardsTimer, setAmbientRewardsTimer] = useState(
-    getTimerObj(0n)
-  );
   useEffect(() => {
-    if (!blockNumber) {
-      setAmbientRewardsTimer("Loading...");
-      return;
+    async function setRewards() {
+      setRewardTime(await getRewardsTime());
     }
-    let remTime = UserAmbientRewardsTimer();
-    setInterval(() => {
-      if (remTime === 0n) {
-        remTime = UserAmbientRewardsTimer();
-      }
-      remTime = remTime - 1000n;
-      setAmbientRewardsTimer(getTimerObj(remTime));
-    }, 1000);
-  }, [blockNumber != undefined]);
+    setRewards();
+  }, []);
 
   /** REWARDS */
 
@@ -143,6 +120,7 @@ export default function usePool() {
     isLoading,
     pairs,
     rewards,
+    rewardTime,
     filteredPairs,
     setFilteredPairs,
     selectedPair,
@@ -154,6 +132,5 @@ export default function usePool() {
     sendAmbientTxFlow,
     sendClaimRewardsFlow,
     pairNames,
-    ambientRewardsTimer,
   };
 }
