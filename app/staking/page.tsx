@@ -264,278 +264,315 @@ export default function StakingPage() {
     <Splash />
   ) : (
     <div className={styles.container}>
-      <Container direction="row" width="100%">
-        <div className={styles.infoBoxButton}>
-          <div className={styles.TitleStaking}>
-            <Text size="title" font="proto_mono">
-              STAKING
-            </Text>
-          </div>
-        </div>
-        <div className={styles.infoBox}>
-          <div>
-            <Text font="rm_mono">Total Staked </Text>
-          </div>
-          <Container direction="row" center={{ vertical: true }}>
-            <div style={{ marginRight: "5px" }}>
-              <Text font="proto_mono" size="title">
-                {displayAmount(totalStaked ? totalStaked.toFixed(2) : "0", 0)}
-              </Text>
-            </div>
-            <p> </p>
-            <Icon
-              themed
-              icon={{
-                url: "/tokens/canto.svg",
-                size: 24,
-              }}
-            />
-          </Container>
-        </div>
-        <div className={styles.infoBox}>
-          <div>
-            <Text font="rm_mono">APR</Text>
-          </div>
-          <Container direction="row" center={{ vertical: true }}>
-            <Text font="proto_mono" size="title">
-              {formatPercent((parseFloat(apr) / 100).toString())}
-            </Text>
-          </Container>
-        </div>
-        <div className={styles.infoBox}>
-          <div>
-            <Text font="rm_mono">Rewards</Text>
-          </div>
-          <Container direction="row" center={{ vertical: true }}>
-            <div style={{ marginRight: "5px" }}>
-              <Text font="proto_mono" size="title">
-                {totalRewards?.toFixed(5)}{" "}
-              </Text>
-              <Text> </Text>
-            </div>
-            <Icon
-              themed
-              icon={{
-                url: "/tokens/canto.svg",
-                size: 24,
-              }}
-            />
-          </Container>
-        </div>
-        <div className={styles.infoBoxButton}>
-          <div className={styles.ClaimBtn}>
-            <Button
-              width={500}
-              height="large"
-              onClick={() =>
-                handleRewardsClaimClick(signer, allUserValidatorsAddresses)
-              }
-              disabled={!signer || !hasUserStaked}
-            >
-              Claim Staking Rewards
-            </Button>
-          </div>
-        </div>
-      </Container>
-      <Spacer height="40px" />
-
-      {hasUserStaked && userStaking && (
-        <div className={styles.tableContainer}>
-          <Container width="100%">
-            <div className={styles.tableContainer2}>
-              <Table
-                title="My Staking"
-                headers={[
-                  {
-                    value: (
-                      <Text opacity={0.4} font="rm_mono">
-                        Name
-                      </Text>
-                    ),
-                    ratio: 5,
-                  },
-                  { value: <Text opacity={0.4}>My Stake</Text>, ratio: 3 },
-                  {
-                    value: (
-                      <Text opacity={0.4} font="rm_mono">
-                        Validator Total
-                      </Text>
-                    ),
-                    ratio: 3,
-                  },
-                  {
-                    value: (
-                      <Text opacity={0.4} font="rm_mono">
-                        Commission
-                      </Text>
-                    ),
-                    ratio: 3,
-                  },
-                  {
-                    value: (
-                      <Text opacity={0.4} font="rm_mono">
-                        Edit
-                      </Text>
-                    ),
-                    ratio: 3,
-                  },
-                ]}
-                content={[
-                  ...userStaking.validators.map((userStakingElement, index) =>
-                    GenerateMyStakingTableRow(userStakingElement, index, () =>
-                      handleClick(userStakingElement)
-                    )
-                  ),
-                ]}
-              />
-            </div>
-          </Container>
-          <Spacer height="40px" />
-        </div>
-      )}
-      <Spacer height="40px" />
-
-      {userStaking && userStaking.unbonding.length > 0 && (
-        <div className={styles.tableContainer2}>
-          <Table
-            title="Unbonding Delegations"
-            headers={[
-              {
-                value: (
-                  <Text opacity={0.4} font="rm_mono">
-                    Name
-                  </Text>
-                ),
-                ratio: 3,
-              },
-              { value: <Text opacity={0.4}>Undelegation</Text>, ratio: 2 },
-              {
-                value: (
-                  <Text opacity={0.4} font="rm_mono">
-                    Completion Time
-                  </Text>
-                ),
-                ratio: 5,
-              },
-            ]}
-            content={[
-              ...userStaking.unbonding.map((userStakingElement, index) =>
-                GenerateUnbondingDelegationsTableRow(userStakingElement, index)
-              ),
-            ]}
-          />
-          <Spacer height="40px" />
-        </div>
-      )}
-
-      {validators.length > 0 && (
-        <Container width="100%" className={styles.tableContainer}>
-          <Table
-            title={
-              <div className={styles.tableTitleContainer}>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: "33%",
-                  }}
-                >
-                  <Text font="proto_mono" size="lg">
-                    VALIDATORS
-                  </Text>
+      <div>
+        <Spacer height="20px" />
+      </div>
+      <Text size="x-lg" font="proto_mono" className={styles.title}>
+        STAKING
+      </Text>
+      <div>
+        <Spacer height="20px" />
+      </div>
+      <div className={styles.stakingInfoContainer}>
+        <div className={styles.Tables}>
+          {hasUserStaked && userStaking && (
+            <div className={styles.tableContainer}>
+              <Container width="100%">
+                <div className={styles.tableContainer2}>
+                  <Table
+                    title="My Staking"
+                    headers={[
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Name
+                          </Text>
+                        ),
+                        ratio: 5,
+                      },
+                      {
+                        value: <Text opacity={0.4}>My Stake</Text>,
+                        ratio: 3,
+                      },
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Validator Total
+                          </Text>
+                        ),
+                        ratio: 3,
+                      },
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Commission
+                          </Text>
+                        ),
+                        ratio: 3,
+                      },
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Edit
+                          </Text>
+                        ),
+                        ratio: 3,
+                      },
+                    ]}
+                    content={[
+                      ...userStaking.validators.map(
+                        (userStakingElement, index) =>
+                          GenerateMyStakingTableRow(
+                            userStakingElement,
+                            index,
+                            () => handleClick(userStakingElement)
+                          )
+                      ),
+                    ]}
+                  />
                 </div>
-                <div className={styles.searchBarContainer}>
-                  <div>
-                    <Input
-                      height={40}
-                      type="search"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder={"Search..."}
-                    />
-                  </div>
+              </Container>
+              <Spacer height="32px" />
+            </div>
+          )}
+          {validators.length > 0 && (
+            <div className={styles.tableContainer}>
+              <Container width="100%">
+                <div className={styles.tableContainer2}>
+                  <Table
+                    title={
+                      <div className={styles.tableTitleContainer}>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            width: "33%",
+                          }}
+                        >
+                          <Text font="proto_mono" size="lg">
+                            VALIDATORS
+                          </Text>
+                        </div>
+                        <div className={styles.searchBarContainer}>
+                          <div>
+                            <Input
+                              height={40}
+                              type="search"
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              placeholder={"Search..."}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    }
+                    secondary={
+                      <Container width="25%">
+                        <ToggleGroup
+                          options={["ACTIVE", "INACTIVE"]}
+                          selected={currentFilter}
+                          setSelected={(value) => {
+                            setCurrentFilter(value);
+                            setCurrentPage(1);
+                            setSearchQuery("");
+                          }}
+                        />
+                      </Container>
+                    }
+                    headers={[
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Rank
+                          </Text>
+                        ),
+                        ratio: 2,
+                      },
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Name
+                          </Text>
+                        ),
+                        ratio: 6,
+                      },
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Validator Total
+                          </Text>
+                        ),
+                        ratio: 4,
+                      },
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Commission
+                          </Text>
+                        ),
+                        ratio: 3,
+                      },
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Action
+                          </Text>
+                        ),
+                        ratio: 4,
+                      },
+                    ]}
+                    content={
+                      paginatedvalidators.length > 0
+                        ? [
+                            ...paginatedvalidators.map((validator, index) =>
+                              GenerateValidatorTableRow(validator, index, () =>
+                                handleClick(validator)
+                              )
+                            ),
+                            <Pagination
+                              key="pagination"
+                              currentPage={currentPage}
+                              totalPages={totalPages}
+                              handlePageClick={handlePageClick}
+                            />,
+                          ]
+                        : [
+                            <div
+                              key="noData"
+                              className={styles.noValidatorContainer}
+                            >
+                              <Text font="proto_mono" size="lg">
+                                NO VALIDATORS FOUND
+                              </Text>
+                            </div>,
+                          ]
+                    }
+                    isPaginated={true}
+                  />
                 </div>
+              </Container>
+
+              <Spacer height="32px" />
+            </div>
+          )}
+          {userStaking && userStaking.unbonding.length > 0 && (
+            <div className={styles.tableContainer}>
+              <Container width="100%">
+                <div className={styles.tableContainer2}>
+                  <Table
+                    title="Unbonding Delegations"
+                    headers={[
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Name
+                          </Text>
+                        ),
+                        ratio: 3,
+                      },
+                      {
+                        value: <Text opacity={0.4}>Undelegation</Text>,
+                        ratio: 2,
+                      },
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Completion Time
+                          </Text>
+                        ),
+                        ratio: 5,
+                      },
+                    ]}
+                    content={[
+                      ...userStaking.unbonding.map(
+                        (userStakingElement, index) =>
+                          GenerateUnbondingDelegationsTableRow(
+                            userStakingElement,
+                            index
+                          )
+                      ),
+                    ]}
+                  />
+                </div>
+              </Container>
+              <Spacer height="40px" />
+            </div>
+          )}
+        </div>
+        <div className={styles.stakingInfoCard}>
+          <Container direction="column" width="100%" height="100%">
+            <div className={styles.infoBox}>
+              <div>
+                <Text font="rm_mono">Total Staked </Text>
               </div>
-            }
-            secondary={
-              <Container width="25%">
-                <ToggleGroup
-                  options={["ACTIVE", "INACTIVE"]}
-                  selected={currentFilter}
-                  setSelected={(value) => {
-                    setCurrentFilter(value);
-                    setCurrentPage(1);
-                    setSearchQuery("");
+              <Container direction="row" center={{ vertical: true }}>
+                <div style={{ marginRight: "5px" }}>
+                  <Text font="proto_mono" size="title">
+                    {displayAmount(
+                      totalStaked ? totalStaked.toFixed(2) : "0",
+                      0
+                    )}
+                  </Text>
+                </div>
+                <p> </p>
+                <Icon
+                  themed
+                  icon={{
+                    url: "/tokens/canto.svg",
+                    size: 24,
                   }}
                 />
               </Container>
-            }
-            headers={[
-              {
-                value: (
-                  <Text opacity={0.4} font="rm_mono">
-                    Rank
+            </div>
+            <div className={styles.infoBox}>
+              <div>
+                <Text font="rm_mono">APR</Text>
+              </div>
+              <Container direction="row" center={{ vertical: true }}>
+                <Text font="proto_mono" size="title">
+                  {formatPercent((parseFloat(apr) / 100).toString())}
+                </Text>
+              </Container>
+            </div>
+            <div className={styles.infoBox}>
+              <div>
+                <Text font="rm_mono">Rewards</Text>
+              </div>
+              <Container direction="row" center={{ vertical: true }}>
+                <div style={{ marginRight: "5px" }}>
+                  <Text font="proto_mono" size="title">
+                    {totalRewards?.toFixed(5)}{" "}
                   </Text>
-                ),
-                ratio: 2,
-              },
-              {
-                value: (
-                  <Text opacity={0.4} font="rm_mono">
-                    Name
-                  </Text>
-                ),
-                ratio: 6,
-              },
-              { value: <Text opacity={0.4}>Validator Total</Text>, ratio: 4 },
-              {
-                value: (
-                  <Text opacity={0.4} font="rm_mono">
-                    Commission %
-                  </Text>
-                ),
-                ratio: 3,
-              },
-              {
-                value: (
-                  <Text opacity={0.4} font="rm_mono">
-                    Action
-                  </Text>
-                ),
-                ratio: 4,
-              },
-            ]}
-            content={
-              paginatedvalidators.length > 0
-                ? [
-                    ...paginatedvalidators.map((validator, index) =>
-                      GenerateValidatorTableRow(validator, index, () =>
-                        handleClick(validator)
-                      )
-                    ),
-                    <Pagination
-                      key="pagination"
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      handlePageClick={handlePageClick}
-                    />,
-                  ]
-                : [
-                    <div key="noData" className={styles.noValidatorContainer}>
-                      <Text font="proto_mono" size="lg">
-                        NO VALIDATORS FOUND
-                      </Text>
-                    </div>,
-                  ]
-            }
-            isPaginated={true}
-          />
-
-          <Spacer height="80px" />
-        </Container>
-      )}
+                  <Text> </Text>
+                </div>
+                <Icon
+                  themed
+                  icon={{
+                    url: "/tokens/canto.svg",
+                    size: 24,
+                  }}
+                />
+              </Container>
+            </div>
+            <div className={styles.infoBoxButton}>
+              <div className={styles.ClaimBtn}>
+                <Button
+                  width={500}
+                  height="large"
+                  onClick={() =>
+                    handleRewardsClaimClick(signer, allUserValidatorsAddresses)
+                  }
+                  disabled={!signer || !hasUserStaked}
+                >
+                  Claim Staking Rewards
+                </Button>
+              </div>
+            </div>
+          </Container>
+        </div>
+      </div>
 
       <Modal
         width="32rem"
