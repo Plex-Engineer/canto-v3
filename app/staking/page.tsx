@@ -275,6 +275,66 @@ export default function StakingPage() {
       </div>
       <div className={styles.stakingInfoContainer}>
         <div className={styles.Tables}>
+          {hasUserStaked && userStaking && (
+            <div className={styles.tableContainer}>
+              <Container width="100%">
+                <div className={styles.tableContainer2}>
+                  <Table
+                    title="My Staking"
+                    headers={[
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Name
+                          </Text>
+                        ),
+                        ratio: 5,
+                      },
+                      {
+                        value: <Text opacity={0.4}>My Stake</Text>,
+                        ratio: 3,
+                      },
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Validator Total
+                          </Text>
+                        ),
+                        ratio: 3,
+                      },
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Commission
+                          </Text>
+                        ),
+                        ratio: 3,
+                      },
+                      {
+                        value: (
+                          <Text opacity={0.4} font="rm_mono">
+                            Edit
+                          </Text>
+                        ),
+                        ratio: 3,
+                      },
+                    ]}
+                    content={[
+                      ...userStaking.validators.map(
+                        (userStakingElement, index) =>
+                          GenerateMyStakingTableRow(
+                            userStakingElement,
+                            index,
+                            () => handleClick(userStakingElement)
+                          )
+                      ),
+                    ]}
+                  />
+                </div>
+              </Container>
+              <Spacer height="32px" />
+            </div>
+          )}
           {validators.length > 0 && (
             <div className={styles.tableContainer}>
               <Container width="100%">
@@ -394,66 +454,6 @@ export default function StakingPage() {
                 </div>
               </Container>
 
-              <Spacer height="32px" />
-            </div>
-          )}
-          {hasUserStaked && userStaking && (
-            <div className={styles.tableContainer}>
-              <Container width="100%">
-                <div className={styles.tableContainer2}>
-                  <Table
-                    title="My Staking"
-                    headers={[
-                      {
-                        value: (
-                          <Text opacity={0.4} font="rm_mono">
-                            Name
-                          </Text>
-                        ),
-                        ratio: 5,
-                      },
-                      {
-                        value: <Text opacity={0.4}>My Stake</Text>,
-                        ratio: 3,
-                      },
-                      {
-                        value: (
-                          <Text opacity={0.4} font="rm_mono">
-                            Validator Total
-                          </Text>
-                        ),
-                        ratio: 3,
-                      },
-                      {
-                        value: (
-                          <Text opacity={0.4} font="rm_mono">
-                            Commission
-                          </Text>
-                        ),
-                        ratio: 3,
-                      },
-                      {
-                        value: (
-                          <Text opacity={0.4} font="rm_mono">
-                            Edit
-                          </Text>
-                        ),
-                        ratio: 3,
-                      },
-                    ]}
-                    content={[
-                      ...userStaking.validators.map(
-                        (userStakingElement, index) =>
-                          GenerateMyStakingTableRow(
-                            userStakingElement,
-                            index,
-                            () => handleClick(userStakingElement)
-                          )
-                      ),
-                    ]}
-                  />
-                </div>
-              </Container>
               <Spacer height="32px" />
             </div>
           )}
