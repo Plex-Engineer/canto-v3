@@ -324,7 +324,7 @@ export default function StakingPage() {
                     headers={[
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono" size="x-sm">
+                          <Text opacity={0.4} font="rm_mono">
                             Rank
                           </Text>
                         ),
@@ -332,7 +332,7 @@ export default function StakingPage() {
                       },
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono" size="x-sm">
+                          <Text opacity={0.4} font="rm_mono">
                             Name
                           </Text>
                         ),
@@ -340,7 +340,7 @@ export default function StakingPage() {
                       },
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono" size="x-sm">
+                          <Text opacity={0.4} font="rm_mono">
                             Validator Total
                           </Text>
                         ),
@@ -348,15 +348,15 @@ export default function StakingPage() {
                       },
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono" size="x-sm">
-                            Commission %
+                          <Text opacity={0.4} font="rm_mono">
+                            Commission
                           </Text>
                         ),
                         ratio: 3,
                       },
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono" size="x-sm">
+                          <Text opacity={0.4} font="rm_mono">
                             Action
                           </Text>
                         ),
@@ -394,7 +394,7 @@ export default function StakingPage() {
                 </div>
               </Container>
 
-              <Spacer height="80px" />
+              <Spacer height="32px" />
             </div>
           )}
           {hasUserStaked && userStaking && (
@@ -406,23 +406,19 @@ export default function StakingPage() {
                     headers={[
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono" size="x-sm">
+                          <Text opacity={0.4} font="rm_mono">
                             Name
                           </Text>
                         ),
                         ratio: 5,
                       },
                       {
-                        value: (
-                          <Text opacity={0.4} size="x-sm">
-                            My Stake
-                          </Text>
-                        ),
+                        value: <Text opacity={0.4}>My Stake</Text>,
                         ratio: 3,
                       },
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono" size="x-sm">
+                          <Text opacity={0.4} font="rm_mono">
                             Validator Total
                           </Text>
                         ),
@@ -430,7 +426,7 @@ export default function StakingPage() {
                       },
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono" size="x-sm">
+                          <Text opacity={0.4} font="rm_mono">
                             Commission
                           </Text>
                         ),
@@ -438,7 +434,7 @@ export default function StakingPage() {
                       },
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono" size="x-sm">
+                          <Text opacity={0.4} font="rm_mono">
                             Edit
                           </Text>
                         ),
@@ -458,11 +454,9 @@ export default function StakingPage() {
                   />
                 </div>
               </Container>
-              <Spacer height="40px" />
+              <Spacer height="32px" />
             </div>
           )}
-          <Spacer height="40px" />
-
           {userStaking && userStaking.unbonding.length > 0 && (
             <div className={styles.tableContainer}>
               <Container width="100%">
@@ -472,23 +466,19 @@ export default function StakingPage() {
                     headers={[
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono" size="x-sm">
+                          <Text opacity={0.4} font="rm_mono">
                             Name
                           </Text>
                         ),
                         ratio: 3,
                       },
                       {
-                        value: (
-                          <Text opacity={0.4} size="x-sm">
-                            Undelegation
-                          </Text>
-                        ),
+                        value: <Text opacity={0.4}>Undelegation</Text>,
                         ratio: 2,
                       },
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono" size="x-sm">
+                          <Text opacity={0.4} font="rm_mono">
                             Completion Time
                           </Text>
                         ),
@@ -505,9 +495,9 @@ export default function StakingPage() {
                       ),
                     ]}
                   />
-                  <Spacer height="40px" />
                 </div>
               </Container>
+              <Spacer height="40px" />
             </div>
           )}
         </div>

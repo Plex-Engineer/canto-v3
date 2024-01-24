@@ -15,14 +15,10 @@ export const GenerateValidatorTableRow = (
   onDelegate: (validator: Validator) => void
 ) => [
   <Container key={`name_${index}`}>
-    <Text font="rm_mono" size="x-sm">
-      {validator.rank}
-    </Text>
+    <Text font="rm_mono">{validator.rank}</Text>
   </Container>,
   <Container key={`name_${index}`}>
-    <Text font="rm_mono" size="x-sm">
-      {validator.description.moniker}
-    </Text>
+    <Text font="rm_mono">{validator.description.moniker}</Text>
   </Container>,
   <Container
     key={`tokens_${index}`}
@@ -30,9 +26,7 @@ export const GenerateValidatorTableRow = (
     center={{ horizontal: true, vertical: true }}
     gap="auto"
   >
-    <Text font="rm_mono" size="x-sm">
-      {displayAmount(validator.tokens, 18)}{" "}
-    </Text>
+    <Text font="rm_mono">{displayAmount(validator.tokens, 18)} </Text>
     <div> </div>
     <Icon
       style={{ marginLeft: "5px" }}
@@ -44,7 +38,7 @@ export const GenerateValidatorTableRow = (
     />
   </Container>,
   <Container key={`commission_${index}`}>
-    <Text font="rm_mono" size="x-sm">
+    <Text font="rm_mono">
       {displayAmount(validator.commission, -2, { precision: 2 })}%
     </Text>
   </Container>,
@@ -61,9 +55,7 @@ export const GenerateMyStakingTableRow = (
   onDelegate: (validator: Validator) => void
 ) => [
   <Container key={`name_${index}`}>
-    <Text font="rm_mono" size="x-sm">
-      {userStakedValidator?.description.moniker}
-    </Text>
+    <Text font="rm_mono">{userStakedValidator?.description.moniker}</Text>
   </Container>,
   <Container
     key={`mystake_${index}`}
@@ -71,7 +63,7 @@ export const GenerateMyStakingTableRow = (
     center={{ horizontal: true, vertical: true }}
     gap="auto"
   >
-    <Text font="rm_mono" size="x-sm">
+    <Text font="rm_mono">
       {displayAmount(userStakedValidator.userDelegation.balance, 18, {
         short: false,
       })}{" "}
@@ -92,7 +84,7 @@ export const GenerateMyStakingTableRow = (
     center={{ horizontal: true, vertical: true }}
     gap="auto"
   >
-    <Text font="rm_mono" size="x-sm">
+    <Text font="rm_mono">
       {displayAmount(userStakedValidator?.tokens, 18, {})}
     </Text>
     <div> </div>
@@ -106,7 +98,7 @@ export const GenerateMyStakingTableRow = (
     />
   </Container>,
   <Container key={`commission_${index}`}>
-    <Text font="rm_mono" size="x-sm">
+    <Text font="rm_mono">
       {displayAmount(userStakedValidator?.commission, -2, {
         precision: 2,
       })}
@@ -123,9 +115,7 @@ export const GenerateUnbondingDelegationsTableRow = (
   index: number
 ) => [
   <Container key={`name_${index}`}>
-    <Text font="rm_mono" size="x-sm">
-      {userStakedValidator.name}
-    </Text>
+    <Text font="rm_mono">{userStakedValidator.name}</Text>
   </Container>,
   <Container
     key={`mystake_${index}`}
@@ -133,7 +123,7 @@ export const GenerateUnbondingDelegationsTableRow = (
     center={{ horizontal: true, vertical: true }}
     gap="auto"
   >
-    <Text font="rm_mono" size="x-sm">
+    <Text font="rm_mono">
       {displayAmount(userStakedValidator.undelegation, 18, {
         short: false,
       })}{" "}
@@ -149,7 +139,7 @@ export const GenerateUnbondingDelegationsTableRow = (
     />
   </Container>,
   <Container key={`name_${index}`}>
-    <Text font="rm_mono" size="x-sm">
+    <Text font="rm_mono">
       {new Date(userStakedValidator.completion_date).toDateString() +
         ", " +
         new Date(userStakedValidator.completion_date).toLocaleTimeString([], {
