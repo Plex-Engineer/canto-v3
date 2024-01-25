@@ -15,7 +15,7 @@ interface Props {
   }[];
   onClick: () => void;
 }
-const TokenCard = ({ cToken, items }: Props) => {
+const TokenCard = ({ cToken, items, onClick }: Props) => {
   if (!cToken) {
     return <div className={styles.loading}></div>;
   }
@@ -37,7 +37,9 @@ const TokenCard = ({ cToken, items }: Props) => {
           <Item name="supply apy" symbol value={cToken.supplyApy + "%"} />
           <Item name="borrow apy" symbol value={cToken.borrowApy + "%"} />
         </Container>
-        <Button fontFamily="proto_mono">Get {cToken.underlying.symbol}</Button>
+        <Button fontFamily="proto_mono" onClick={onClick}>
+          Get {cToken.underlying.symbol}
+        </Button>
       </section>
       <div
         style={{

@@ -164,8 +164,8 @@ export default function LendingPage() {
             },
           ]}
           onClick={() => {
-            //! TODO: confirm what happens when you click on get cNote
-            setCurrentModal(CLMModalTypes.SUPPLY);
+            setSelectedCToken(cNote.address);
+            setCurrentModal(CLMModalTypes.BORROW);
           }}
         />
       </div>
