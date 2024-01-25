@@ -35,7 +35,7 @@ const NavBar = () => {
 
   useEffect(() => {
     let url = window.origin + currentPath;
-    if(searchParams.toString()){
+    if (searchParams.toString()) {
       url += `?${searchParams.toString()}`;
     }
     if (currentPath == "/bridge") {
