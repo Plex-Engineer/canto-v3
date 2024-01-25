@@ -60,6 +60,7 @@
 				"icon": "/icons/canto.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			},
 			{
@@ -72,6 +73,7 @@
 				"icon": "/icons/cNote.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			},
 			{
@@ -84,6 +86,7 @@
 				"icon": "/icons/note.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			},
 			{
@@ -96,6 +99,7 @@
 				"icon": "/icons/cadence.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": false,
 				"bridgeMethods": ["2"]
 			}
 		],
@@ -110,6 +114,7 @@
 				"icon": "/icons/canto.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			},
 			{
@@ -122,6 +127,7 @@
 				"icon": "/icons/cNote.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			}
 		],
@@ -461,6 +467,7 @@
 				"icon": "/icons/canto.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			},
 			{
@@ -473,6 +480,7 @@
 				"icon": "/icons/cNote.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			}
 		],
@@ -487,6 +495,7 @@
 				"icon": "/icons/canto.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			},
 			{
@@ -499,6 +508,7 @@
 				"icon": "/icons/cNote.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			}
 		],
@@ -513,6 +523,7 @@
 				"icon": "/icons/canto.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			},
 			{
@@ -525,6 +536,7 @@
 				"icon": "/icons/cNote.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			}
 		],
@@ -539,6 +551,7 @@
 				"icon": "/icons/canto.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			},
 			{
@@ -551,6 +564,7 @@
 				"icon": "/icons/cNote.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			}
 		],
@@ -565,6 +579,7 @@
 				"icon": "/icons/canto.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			},
 			{
@@ -577,6 +592,7 @@
 				"icon": "/icons/cNote.svg",
 				"isOFT": true,
 				"isOFTProxy": false,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": ["2"]
 			}
 		]

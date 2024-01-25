@@ -20,6 +20,7 @@
 				"icon": "/icons/canto.svg",
 				"isOFT": true,
 				"isOFTProxy": true,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": [
 					{
 						"chainId": "eth-mainnet",
@@ -42,6 +43,7 @@
 				"isOFT": true,
 				"isOFTProxy": true,
 				"oftUnderlyingAddress": "0xEe602429Ef7eCe0a13e4FfE8dBC16e101049504C",
+				"oftHasAdapterParams": true,
 				"bridgeMethods": [
 					{
 						"chainId": "eth-mainnet",
@@ -64,6 +66,7 @@
 				"isOFT": true,
 				"isOFTProxy": true,
 				"oftUnderlyingAddress": "0x4e71A2E537B7f9D9413D3991D37958c0b5e1e503",
+				"oftHasAdapterParams": true,
 				"bridgeMethods": [
 					{
 						"chainId": "eth-mainnet",
@@ -82,6 +85,7 @@
 				"isOFT": true,
 				"isOFTProxy": true,
 				"oftUnderlyingAddress": "0x8F20150205165C31D9b29C55a7B01F4911396306",
+				"oftHasAdapterParams": false,
 				"bridgeMethods": [
 					{
 						"chainId": "eth-mainnet",
@@ -577,6 +581,7 @@
 				"icon": "/icons/canto.svg",
 				"isOFT": true,
 				"isOFTProxy": true,
+				"oftHasAdapterParams": true,
 				"bridgeMethods": [
 					{
 						"chainId": "mumbai-testnet",
@@ -611,6 +616,7 @@
 				"isOFT": true,
 				"isOFTProxy": true,
 				"oftUnderlyingAddress": "0x04E52476d318CdF739C38BD41A922787D441900c",
+				"oftHasAdapterParams": true,
 				"bridgeMethods": [
 					{
 						"chainId": "mumbai-testnet",
