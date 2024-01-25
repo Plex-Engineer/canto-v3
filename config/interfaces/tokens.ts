@@ -22,6 +22,7 @@ export interface IBCToken extends Omit<ERC20Token, "address"> {
 export interface OFTToken extends ERC20Token {
   isOFT: true;
   isOFTProxy: boolean;
+  oftHasAdapterParams: boolean;
   oftUnderlyingAddress?: string; // if proxy is true and this is undefined, then it is a proxy to the native token
 }
 
