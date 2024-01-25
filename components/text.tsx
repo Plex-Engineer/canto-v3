@@ -43,9 +43,11 @@ const Text = styled.p<Props>`
   line-height: 140%;
   letter-spacing: -0.32px;
   color: ${(props) =>
-    props.color ?? props.theme != undefined
-      ? themes[props.theme as keyof typeof themes]
-      : themes["primary-dark"]};
+    props.color
+      ? props.color
+      : props.theme != undefined
+        ? themes[props.theme as keyof typeof themes]
+        : themes["primary-dark"]};
   opacity: ${(props) => props.opacity ?? 1};
 
   @media screen and (max-width: 768px) {

@@ -14,13 +14,13 @@ interface Props {
 const AccountHealth = (props: Props) => {
   return (
     <div className={styles.container}>
-      <Text size="x-lg" font="proto_mono" theme="primary-light">
+      <Text size="x-lg" font="proto_mono" color="#ddd">
         {props.title}
       </Text>
       <div className={styles.separator}></div>
       <div className={styles.items}>
         {props.items.map((item, i) => (
-          <Item key={i} {...item} theme="primary-light" />
+          <Item key={i} {...item} />
         ))}
       </div>
       <div className={styles.bar}>

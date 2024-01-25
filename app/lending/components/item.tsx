@@ -19,7 +19,7 @@ const Item = ({ name, value, theme, symbol }: ItemProps) => (
     {typeof name === "string" ? (
       <Text
         className={styles.title}
-        theme={theme}
+        color="#ddd"
         size="sm"
         opacity={0.5}
         font="proto_mono"
@@ -29,7 +29,7 @@ const Item = ({ name, value, theme, symbol }: ItemProps) => (
     ) : (
       name
     )}
-    <Text theme={theme} size="x-lg" font="proto_mono">
+    <Text color="#ddd" size="x-lg" font="proto_mono">
       {symbol && (
         <span className={styles.symbol}>
           {
@@ -39,7 +39,9 @@ const Item = ({ name, value, theme, symbol }: ItemProps) => (
                 size: 17,
               }}
               color="primary"
-              themed
+              style={{
+                filter: "invert(1)",
+              }}
             />
           }
         </span>

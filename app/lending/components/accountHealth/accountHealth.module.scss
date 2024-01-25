@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  background-color: rgba(var(--dark-color), 0.9);
+  background-color: #222222;
   padding: 1rem;
   box-shadow: var(--box-shadow);
   gap: 1rem;
@@ -21,15 +21,15 @@
   height: 16px;
   background: repeating-linear-gradient(
     90deg,
-    rgba(var(--light-color), 0.25),
-    rgba(var(--light-color), 0.25) 1px,
+    #666,
+    #666 1px,
     transparent 1px,
     transparent 10px
   );
 
   margin: 1rem 0;
   .fill {
-    background: var(--card-primary-color-opp);
+    background: var(--canto-color);
     height: calc(100% + 0.6rem);
     transform: translateY(-0.3rem);
     width: 50%;
