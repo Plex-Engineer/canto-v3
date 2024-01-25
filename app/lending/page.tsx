@@ -354,7 +354,7 @@ export default function LendingPage() {
                     <Icon
                       style={{
                         marginLeft: "5px",
-                        marginTop: "2px",
+                        paddingTop: "2px",
                       }}
                       key={"title" + cStableCoin.address}
                       icon={{
