@@ -26,6 +26,7 @@ import {
   getAnalyticsCantoLiquidityPoolInfo,
   getAnalyticsAmbientLiquidityPoolInfo,
 } from "@/utils/analytics";
+import DesktopOnly from "@/components/desktop-only/desktop-only";
 
 export default function Page() {
   const {
@@ -44,6 +45,11 @@ export default function Page() {
     pairNames,
     rewardTime,
   } = usePool();
+
+  //   if mobile only
+  if (!window.matchMedia("(min-width: 768px)").matches) {
+    return <DesktopOnly />;
+  }
 
   //main content
   return (
