@@ -209,6 +209,12 @@ export default function LendingPage() {
                   ratio: 2,
                 },
               ]}
+              onRowsClick={[cNote, ...stableCoins, ...rwas].map(
+                (cStableCoin) => () => {
+                  setSelectedCToken(cStableCoin.address);
+                  setCurrentModal(CLMModalTypes.SUPPLY);
+                }
+              )}
               content={[
                 ...[cNote, ...stableCoins, ...rwas].map((cStableCoin) => [
                   <Container
@@ -222,6 +228,14 @@ export default function LendingPage() {
                       paddingLeft: "30px",
                     }}
                     key={"title" + cStableCoin.address}
+                    onClick={
+                      cStableCoin.address !== cNote.address
+                        ? () => {
+                            setSelectedCToken(cStableCoin.address);
+                            setCurrentModal(CLMModalTypes.SUPPLY);
+                          }
+                        : undefined
+                    }
                   >
                     <Icon
                       icon={{ url: cStableCoin.underlying.logoURI, size: 30 }}
@@ -279,6 +293,10 @@ export default function LendingPage() {
                   ratio: 2,
                 },
               ]}
+              onRowsClick={stableCoins.map((cStableCoin) => () => {
+                setSelectedCToken(cStableCoin.address);
+                setCurrentModal(CLMModalTypes.SUPPLY);
+              })}
               content={[
                 ...[...stableCoins].map((cStableCoin) => [
                   <Container
@@ -374,6 +392,10 @@ export default function LendingPage() {
                   ratio: 2,
                 },
               ]}
+              onRowsClick={stableCoins.map((cStableCoin) => () => {
+                setSelectedCToken(cStableCoin.address);
+                setCurrentModal(CLMModalTypes.BORROW);
+              })}
               content={[
                 ...stableCoins.map((cStableCoin) => [
                   <Container

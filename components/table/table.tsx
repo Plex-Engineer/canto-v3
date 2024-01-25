@@ -11,6 +11,7 @@ interface Props {
   }[];
   content: React.ReactNode[][] | React.ReactNode[];
   textSize?: string;
+  onRowsClick?: (() => void)[];
 }
 const Table = (props: Props) => {
   return (
@@ -56,7 +57,11 @@ const Table = (props: Props) => {
                       return `${header.ratio}fr`;
                     })
                     .join(" "),
+                  cursor: props.onRowsClick ? "pointer" : undefined,
                 }}
+                onClick={
+                  props.onRowsClick ? props.onRowsClick[index] : undefined
+                }
               >
                 {row.map((cell, index) => {
                   return (
