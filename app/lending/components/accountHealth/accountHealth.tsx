@@ -20,7 +20,7 @@ const AccountHealth = (props: Props) => {
       <div className={styles.separator}></div>
       <div className={styles.items}>
         {props.items.map((item, i) => (
-          <Item key={i} {...item} />
+          <Item color="#ddd" key={i} {...item} />
         ))}
       </div>
       <div className={styles.bar}>

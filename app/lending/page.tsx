@@ -354,12 +354,14 @@ export default function LendingPage() {
                     <Icon
                       style={{
                         marginLeft: "5px",
+                        marginTop: "2px",
                       }}
                       key={"title" + cStableCoin.address}
                       icon={{
                         url: "/tokens/canto.svg",
                         size: 14,
                       }}
+                      themed
                     />
                   </Text>,
                 ]),

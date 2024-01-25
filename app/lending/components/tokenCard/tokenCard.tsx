@@ -28,14 +28,24 @@ const TokenCard = ({ cToken, items, onClick }: Props) => {
             size: 24,
           }}
         />
-        <Text size="x-lg" font="proto_mono" theme="primary-light">
+        <Text size="x-lg" font="proto_mono" color="#ddd">
           {cToken.underlying.symbol}
         </Text>
       </header>
       <section>
         <Container direction="row" gap={70}>
-          <Item name="supply apy" symbol value={cToken.supplyApy + "%"} />
-          <Item name="borrow apy" symbol value={cToken.borrowApy + "%"} />
+          <Item
+            color="#333"
+            name="supply apy"
+            symbol
+            value={cToken.supplyApy + "%"}
+          />
+          <Item
+            color="#333"
+            name="borrow apy"
+            symbol
+            value={cToken.borrowApy + "%"}
+          />
         </Container>
         <Button fontFamily="proto_mono" onClick={onClick}>
           Get {cToken.underlying.symbol}
@@ -46,7 +56,7 @@ const TokenCard = ({ cToken, items, onClick }: Props) => {
           padding: "0 20px",
         }}
       >
-        <hr />
+        <hr color="#aaa" />
       </div>
 
       <Container padding={"sm"} gap={16}>

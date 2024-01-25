@@ -42,6 +42,7 @@ const Text = styled.p<Props>`
   font-weight: ${(props) => props.weight ?? "normal"};
   line-height: 140%;
   letter-spacing: -0.32px;
+  font-size: ${(props) => sizes[props.size ?? "md"]}px;
   color: ${(props) =>
     props.color
       ? props.color

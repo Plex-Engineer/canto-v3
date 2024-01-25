@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  background-color: rgba(var(--light-color), 0.8);
+  background-color: #dfdfdf;
   box-shadow: var(--box-shadow);
   gap: 0.6rem;
   height: 100%;
@@ -12,7 +12,7 @@
     height: 70px;
     align-items: center;
     padding: 0 1rem;
-    background-color: rgba(var(--dark-color), 0.9);
+    background-color: #222;
   }
 
   section {

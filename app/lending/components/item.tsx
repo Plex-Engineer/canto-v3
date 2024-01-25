@@ -12,14 +12,17 @@ type ItemProps = {
     | "secondary-light"
     | "secondary-dark"
     | undefined;
+
+  color: string;
 };
 
-const Item = ({ name, value, theme, symbol }: ItemProps) => (
+const Item = ({ name, value, theme, symbol, color }: ItemProps) => (
   <div className={styles.item}>
     {typeof name === "string" ? (
       <Text
         className={styles.title}
-        color="#ddd"
+        color={color}
+        theme={theme}
         size="sm"
         opacity={0.5}
         font="proto_mono"
@@ -29,7 +32,7 @@ const Item = ({ name, value, theme, symbol }: ItemProps) => (
     ) : (
       name
     )}
-    <Text color="#ddd" size="x-lg" font="proto_mono">
+    <Text color={color} theme={theme} size="x-lg" font="proto_mono">
       {symbol && (
         <span className={styles.symbol}>
           {
@@ -39,9 +42,14 @@ const Item = ({ name, value, theme, symbol }: ItemProps) => (
                 size: 17,
               }}
               color="primary"
-              style={{
-                filter: "invert(1)",
-              }}
+              style={
+                theme
+                  ? {}
+                  : {
+                      filter: color == "#ddd" ? "invert(1)" : "",
+                    }
+              }
+              themed={theme ? true : false}
             />
           }
         </span>
