@@ -9,12 +9,10 @@ import { useLendingCombo } from "./utils";
 import Text from "@/components/text";
 import Container from "@/components/container/container";
 import HighlightCard from "./components/highlightCard";
-import VivacityCard from "./components/vivacityCard";
 import OutlineCard from "./components/outlineCard";
 import Item from "./components/item";
 import LoadingIcon from "@/components/loader/loading";
 import { LendingModal } from "./components/modal/modal";
-import { VivacityModal } from "./components/modal/vivacityModal";
 import { RWARow, StableCoinRow } from "./components/cTokenRow";
 import { useState } from "react";
 import Spacer from "@/components/layout/spacer";
@@ -39,7 +37,6 @@ export default function LendingPage() {
   // get all data from lending combo
   const {
     cTokens,
-    vcNote,
     clmPosition,
     transaction,
     selection,
@@ -52,6 +49,7 @@ export default function LendingPage() {
   });
   const { cNote, rwas, stableCoins } = cTokens;
   const { selectedCToken, setSelectedCToken } = selection;
+
   if (isLoading) {
     return <div className={styles.loading}>loading</div>;
   }
@@ -68,7 +66,7 @@ export default function LendingPage() {
         title="Lending"
         width="32rem"
       >
-        {selectedCToken && selectedCToken.symbol !== "vcNOTE" && (
+        {selectedCToken && (
           <LendingModal
             isSupplyModal={currentModal === CLMModalTypes.SUPPLY}
             position={clmPosition.position}
@@ -76,17 +74,6 @@ export default function LendingPage() {
             transaction={{
               performTx: transaction.performTx,
               validateParams: transaction.validateParams,
-            }}
-          />
-        )}
-
-        {selectedCToken && selectedCToken.symbol === "vcNOTE" && (
-          <VivacityModal
-            isSupplyModal={currentModal === CLMModalTypes.SUPPLY}
-            cToken={selectedCToken as Vivacity.VCNoteWithUserData}
-            transaction={{
-              performTx: transaction.performVivacityTx,
-              validateParams: transaction.validateVivacityParams,
             }}
           />
         )}
@@ -139,32 +126,6 @@ export default function LendingPage() {
               <Text>No Supply Tokens Found</Text>
             )}
           </div>
-          <div className={styles.highlightCard}>
-            {isLoading ? (
-              <Container
-                width="1000px"
-                height="300px"
-                center={{
-                  horizontal: true,
-                  vertical: true,
-                }}
-              >
-                <LoadingIcon />
-              </Container>
-            ) : vcNote ? (
-              <VivacityCard
-                cToken={vcNote as CTokenWithUserData}
-                precisionInValues={2}
-                onSupply={() => {
-                  setSelectedCToken(vcNote.address);
-                  setCurrentModal(CLMModalTypes.SUPPLY);
-                }}
-              />
-            ) : (
-              <Text>No Supply Tokens Found</Text>
-            )}
-          </div>
-
           <CTokenTable
             isLoading={isLoading}
             stableTokens={stableCoins.sort((a, b) =>
