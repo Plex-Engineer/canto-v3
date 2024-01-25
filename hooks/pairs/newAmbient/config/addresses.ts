@@ -9,10 +9,6 @@ const AMBIENT_ADDRESSES = {
     mainnet: "0x9290c893ce949fe13ef3355660d07de0fb793618",
     testnet: "0xd9bac85f6ac9fBFd2559A4Ac2883c635C29Feb4b",
   },
-  rewardLedger: {
-    mainnet: "0x00325777c82C1E3E4B22208Bc1C769f19B2B67Ba",
-    testnet: "0x6f5985723EBF98d4A200845C680a7e33bD183a80",
-  },
 } as const;
 
 export function getAmbientAddress(

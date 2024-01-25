@@ -3,6 +3,7 @@ import {
   PoolPositionsReturn,
   queryAmbientPoolStats,
   queryPoolPositions,
+  queryUserAmbientRewards,
 } from "./ambientApi";
 import { getAmbientPoolsFromChainId } from "../config/ambientPools";
 import { AmbientPool, BaseAmbientPool } from "../interfaces/ambientPools";
@@ -19,7 +20,8 @@ const poolQueries = (
   userEthAddress?: string
 ): [
   PromiseWithError<AmbientPoolStatsReturn>,
-  PromiseWithError<PoolPositionsReturn>
+  PromiseWithError<PoolPositionsReturn>,
+  PromiseWithError<string>, // rewards
 ] => [
   queryAmbientPoolStats(
     chainId,
@@ -38,6 +40,9 @@ const poolQueries = (
     : Promise.resolve(
         NO_ERROR({ data: [], provenance: { hostname: "", serveTime: 0 } })
       ),
+  userEthAddress
+    ? queryUserAmbientRewards(chainId, userEthAddress, pool.rewardsLedger)
+    : Promise.resolve(NO_ERROR("0")),
 ];
 
 export async function getAllAmbientPoolsData(
@@ -48,7 +53,9 @@ export async function getAllAmbientPoolsData(
   const poolData = await Promise.all(
     pools.map((pool) => Promise.all(poolQueries(chainId, pool, userEthAddress)))
   );
-  if (poolData.some((data) => data[0].error || data[1].error)) {
+  if (
+    poolData.some((data) => data[0].error || data[1].error || data[2].error)
+  ) {
     return NEW_ERROR("getAllAmbientPoolsData: error fetching data");
   }
   // get wcanto price
@@ -63,6 +70,7 @@ export async function getAllAmbientPoolsData(
     poolData.map((dataArray, idx) => {
       const stats = dataArray[0].data.data;
       const userPositions = dataArray[1].data.data;
+      const rewards = dataArray[2].data;
 
       // convert into strings without scientific notation
       const statsObj = {
@@ -103,10 +111,11 @@ export async function getAllAmbientPoolsData(
         ...pools[idx],
         stats: statsObj,
         userPositions: userPosArray,
+        userRewards: rewards,
         totals: {
           noteTvl: tvl,
           apr: {
-            poolApr: ambientAPR("550000000000000000", tvl, cantoPrice ?? "0"),
+            poolApr: ambientAPR("225000000000000000", tvl, cantoPrice ?? "0"),
           },
         },
       };
