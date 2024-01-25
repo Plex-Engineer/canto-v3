@@ -25,7 +25,6 @@
     "@rive-app/react-canvas": "^4.5.3",
     "autoprefixer": "10.4.14",
     "bignumber.js": "^9.1.1",
-    "caniuse-lite": "^1.0.30001580",
     "clsx": "^2.0.0",
     "encoding": "^0.1.13",
     "eslint": "8.45.0",
