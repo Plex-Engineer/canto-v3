@@ -17,10 +17,7 @@ type LayerZeroFees = {
     feeInBridgeToken: boolean;
   };
 };
-type FeeTier = {
-  fee: string;
-  usdValueFormatted: string;
-};
+
 type GravityBridgeFees = {
   method: BridgingMethod.GRAVITY_BRIDGE;
 } & (
@@ -28,11 +25,12 @@ type GravityBridgeFees = {
   | {
       direction: "out";
       description: string;
+      feeTokenPriceFormatted?: string;
       chainFeePercent: number;
       bridgeFeeOptions: {
-        slow: FeeTier;
-        medium: FeeTier;
-        fast: FeeTier;
+        slow: string;
+        medium: string;
+        fast: string;
       };
       gasFees: TransactionGasFee[];
     }

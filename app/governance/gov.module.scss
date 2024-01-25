@@ -1,0 +1,75 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1200px !important;
+  margin: 2rem auto;
+  border-top: 1px solid var(--primary-90-color);
+  //   border-bottom: 1px solid var(--primary-90-color);
+  position: relative;
+  padding-top: 2rem;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: calc(100% - 1px);
+    height: 10px;
+    border-left: 1px solid var(--primary-90-color);
+    border-right: 1px solid var(--primary-90-color);
+  }
+}
+
+.active {
+  opacity: 1;
+  position: relative;
+  &::before {
+    content: "";
+    top: 0;
+    right: 0;
+    display: block;
+    position: absolute;
+    width: 10px;
+    transform: translate(20%, -80%) scale(1, 1);
+    height: 10px;
+    border-right: 2px solid var(--primary-dark-color);
+    border-top: 2px solid var(--primary-dark-color);
+  }
+  &::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    content: "";
+    display: block;
+    width: 10px;
+    transform: translate(-20%, 90%) scale(1, 1);
+    height: 10px;
+    border-left: 2px solid var(--primary-dark-color);
+    border-bottom: 2px solid var(--primary-dark-color);
+  }
+}
+
+.header {
+  display: flex;
+  direction: row !important;
+  justify-content: space-between;
+  width: 100% !important;
+  //align-items: center;
+
+  .title {
+    font-size: 32px !important;
+    text-align: left;
+    width: 50%;
+    //max-width: 50% !important;
+  }
+  .middleText {
+    /* This will center the text in its flex container */
+    width: 20% !important;
+    //max-width: 20% !important;
+  }
+  .stakingButton {
+    width: 20% !important;
+    flex: 0 0 auto; /* This will prevent the button from growing and will be sized according to its content */
+  }
+}

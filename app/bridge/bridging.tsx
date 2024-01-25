@@ -16,7 +16,7 @@ import { BridgingMethod } from "@/transactions/bridge";
 import { addTokenBalances } from "@/utils/math";
 import { BridgeToken } from "@/hooks/bridge/interfaces/tokens";
 import FeeButton from "./components/feeButton";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import GravityConfirmationModal from "./components/gravityConfirmationModal";
 import { GRAVITY_BRIDGE } from "@/config/networks";
 
@@ -97,7 +97,6 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
         }}
         showGravityPortalMsg={toNetwork?.id === GRAVITY_BRIDGE.id}
       />
-
       <section className={styles.container}>
         <div
           className={styles["network-selection"]}
@@ -308,15 +307,19 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
         </div>
 
         <Spacer height="20px" />
-        <FeesSection
-          props={fees}
-          fees={{
-            totalChainFee,
-            selected: selectedGBridgeFee,
-            setSelected: setSelectedGBridgeFee,
-          }}
-          token={token}
-        />
+        {bridge.direction === "out" ? (
+          <FeesSection
+            props={fees}
+            fees={{
+              totalChainFee,
+              selected: selectedGBridgeFee,
+              setSelected: setSelectedGBridgeFee,
+            }}
+            token={token}
+          />
+        ) : (
+          <Spacer height="20px" />
+        )}
         <Spacer height="20px" />
 
         <Button
@@ -435,6 +438,26 @@ const formattedFeesForConfirmation = (
             : undefined;
 };
 
+function LoadingTextAnim() {
+  const [value, setValue] = useState("loading fees");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (value === "loading fees...") {
+        setValue("loading fees");
+      } else {
+        setValue(value + ".");
+      }
+    }, 200);
+    return () => clearInterval(interval);
+  });
+  return (
+    <Text font="proto_mono" size="x-sm" className={styles.blink}>
+      {value}
+    </Text>
+  );
+}
+
 // props are return type of useBridgingFees
 const FeesSection = ({
   props,
@@ -450,9 +473,7 @@ const FeesSection = ({
   token: BridgeToken | null;
 }) => {
   return props.isLoading ? (
-    <Text font="proto_mono" size="x-sm">
-      loading fees.....
-    </Text>
+    <LoadingTextAnim />
   ) : props.error !== null ? (
     <Text font="proto_mono" size="x-sm">
       error loading fees {props.error}
@@ -470,64 +491,58 @@ const FeesSection = ({
           <>
             <Container direction="row" gap={10}>
               <FeeButton
-                key={props.bridgeFeeOptions.slow.fee}
-                onClick={() =>
-                  fees.setSelected(props.bridgeFeeOptions.slow.fee)
-                }
+                key={props.bridgeFeeOptions.slow}
+                onClick={() => fees.setSelected(props.bridgeFeeOptions.slow)}
                 title="slow"
                 subtext={"1 - 5 days"}
                 subtext2={"Batched transfer"}
                 tokenSymbol={token?.symbol ?? ""}
                 tokenAmount={displayAmount(
                   addTokenBalances(
-                    props.bridgeFeeOptions.slow.fee,
+                    props.bridgeFeeOptions.slow,
                     fees.totalChainFee
                   ),
                   token?.decimals ?? 0,
                   { maxSmallBalance: undefined }
                 )}
-                tokenValueUSD={props.bridgeFeeOptions.slow.usdValueFormatted}
-                active={fees.selected === props.bridgeFeeOptions.slow.fee}
+                tokenPrice={props.feeTokenPriceFormatted}
+                active={fees.selected === props.bridgeFeeOptions.slow}
               />
               <FeeButton
-                key={props.bridgeFeeOptions.medium.fee}
-                onClick={() =>
-                  fees.setSelected(props.bridgeFeeOptions.medium.fee)
-                }
+                key={props.bridgeFeeOptions.medium}
+                onClick={() => fees.setSelected(props.bridgeFeeOptions.medium)}
                 title="medium"
                 subtext={"4 hours - 3 days"}
                 subtext2={"Batched transfer"}
                 tokenSymbol={token?.symbol ?? ""}
                 tokenAmount={displayAmount(
                   addTokenBalances(
-                    props.bridgeFeeOptions.medium.fee,
+                    props.bridgeFeeOptions.medium,
                     fees.totalChainFee
                   ),
                   token?.decimals ?? 0,
                   { maxSmallBalance: undefined }
                 )}
-                tokenValueUSD={props.bridgeFeeOptions.medium.usdValueFormatted}
-                active={fees.selected === props.bridgeFeeOptions.medium.fee}
+                tokenPrice={props.feeTokenPriceFormatted}
+                active={fees.selected === props.bridgeFeeOptions.medium}
               />
               <FeeButton
-                key={props.bridgeFeeOptions.fast.fee}
-                onClick={() =>
-                  fees.setSelected(props.bridgeFeeOptions.fast.fee)
-                }
+                key={props.bridgeFeeOptions.fast}
+                onClick={() => fees.setSelected(props.bridgeFeeOptions.fast)}
                 title="fast"
                 subtext={"30 minutes"}
                 subtext2={"Individual transfer"}
                 tokenSymbol={token?.symbol ?? ""}
                 tokenAmount={displayAmount(
                   addTokenBalances(
-                    props.bridgeFeeOptions.fast.fee,
+                    props.bridgeFeeOptions.fast,
                     fees.totalChainFee
                   ),
                   token?.decimals ?? 0,
                   { maxSmallBalance: undefined }
                 )}
-                tokenValueUSD={props.bridgeFeeOptions.fast.usdValueFormatted}
-                active={fees.selected === props.bridgeFeeOptions.fast.fee}
+                tokenPrice={props.feeTokenPriceFormatted}
+                active={fees.selected === props.bridgeFeeOptions.fast}
               />
             </Container>
             <Text font="proto_mono" size="x-sm">

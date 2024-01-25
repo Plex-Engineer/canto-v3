@@ -1,0 +1,171 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  max-width: 1400px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  height: 1px;
+  border-top: 1px solid var(--primary-90-color);
+  //   border-bottom: 1px solid var(--primary-90-color);
+
+  position: relative;
+  padding-top: 10px;
+  border-right: 1px solid var(--primary-90-color);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0%;
+    right: 20%;
+    width: 20%;
+    height: 10px;
+    border-left: 1px solid var(--primary-90-color);
+    border-right: 1px solid var(--primary-90-color);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    //right: 25%;
+    transform: translateX(-50%);
+    width: 20%;
+    height: 10px;
+    border-left: 1px solid var(--primary-90-color);
+    border-right: 1px solid var(--primary-90-color);
+  }
+}
+
+.title {
+  font-size: 32px !important;
+  text-align: left;
+  width: 100%;
+  max-width: 1500px;
+}
+
+.infoBox {
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.infoBoxButton {
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.ClaimBtn {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.paginationContainer {
+  max-width: 1200px;
+  min-width: 400px;
+  background: var(--card-sub-surface-color, #dfdfdf);
+  //box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  //border: 1px solid var(--border-stroke-color);
+  //align-items: start;
+  //align-items: center;
+  //margin: 20px 20px 20px 20px;
+  //margin: 0 auto;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px 16px 0px 16px;
+  .paginationButton1 {
+    //margin-left: 10%;
+    margin-right: 5%;
+  }
+  .paginationButton2 {
+    margin-left: 5%;
+    //margin-right: 10%;
+  }
+}
+
+.searchBarContainer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin-left: 30%;
+  justify-content: right;
+  //padding: 10%;
+  //background-color: red;
+
+  //justify-content: flex-end;
+}
+.searchIconContainer{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid var(--border-stroke-color, #b3b3b3);
+  border-right: none;
+  padding-left: 5px;
+}
+
+.tableSecondaryContent {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.tableTitleContainer {
+  width: 55%;
+  display: flex;
+  flex-direction: row;
+}
+.tableContainer {
+  //display: flex;
+  //width: 100% !important;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0 5% 0 5%;
+
+  //align-items: flex-start;
+  //background: var(--card-sub-surface-color, #dfdfdf);
+  //padding: 10px;
+  //z-index: 1;
+  //box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
+}
+
+.tableContainer2 {
+  width: 100%;
+}
+
+.TabRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  border-right: 1px solid var(--primary-90-color);
+
+  .Tab {
+    height: 40px;
+    border-right: 1px solid var(--primary-90-color);
+  }
+}
+
+.noValidatorContainer{
+  justify-content: center;
+  align-items: center;
+  margin-top: 100px;
+  margin-bottom: 100px;
+  text-align: center;
+  flex-grow: 1;
+}

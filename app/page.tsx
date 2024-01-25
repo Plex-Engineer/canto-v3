@@ -18,6 +18,7 @@ export default function Home() {
     >
       <section className={styles.hero}>
         <Icon
+          className={styles["hero-logo"]}
           icon={{
             url: "/cantoo.svg",
             size: {
@@ -29,6 +30,7 @@ export default function Home() {
         />
         <Glitch>
           <Icon
+            className={styles["hero-orb"]}
             style={{
               opacity: 0.5,
               height: "47vh",
@@ -43,13 +45,7 @@ export default function Home() {
             themed
           />
         </Glitch>
-        <Container
-          direction="row"
-          gap={30}
-          style={{
-            zIndex: 1,
-          }}
-        >
+        <Container direction="row" gap={30}>
           <Link href="/bridge">
             <Button width={280}>Bridge To Canto</Button>
           </Link>

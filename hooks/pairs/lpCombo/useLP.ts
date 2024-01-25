@@ -103,6 +103,18 @@ export default function useLP(props: UseLPProps): UseLPReturn {
     };
     // need wCanto for importing token
     const wCantoAddress = getCantoCoreAddress(props.chainId, "wcanto");
+
+    // get ambient pools that have rewards
+    const ambientRewardsPools = [];
+    for (const pool of ambient.ambientPools) {
+      if (pool.userRewards !== "0") {
+        ambientRewardsPools.push({
+          estimatedRewards: pool.userRewards,
+          rewardsLedgerAddress: pool.rewardsLedger,
+          poolName: `${pool.base.symbol}-${pool.quote.symbol}`,
+        });
+      }
+    }
     return {
       title: "Claim Rewards",
       icon: "/icons/canto.svg",
@@ -112,7 +124,7 @@ export default function useLP(props: UseLPProps): UseLPReturn {
           ...userParams,
           estimatedRewards: cantoDex.position.totalRewards,
         },
-        ambientParams: { ...userParams, estimatedRewards: ambient.rewards },
+        ambientParams: { ...userParams, rewards: ambientRewardsPools },
       },
       tokenMetadata: wCantoAddress
         ? [
@@ -138,8 +150,11 @@ export default function useLP(props: UseLPProps): UseLPReturn {
     },
     rewards: {
       cantoDex: cantoDex.position.totalRewards,
-      ambient: ambient.rewards,
-      total: addTokenBalances(cantoDex.position.totalRewards, ambient.rewards),
+      ambient: ambient.totalRewards,
+      total: addTokenBalances(
+        cantoDex.position.totalRewards,
+        ambient.totalRewards
+      ),
     },
     selection: {
       pair: getPair(selectedPairId ?? "").data,

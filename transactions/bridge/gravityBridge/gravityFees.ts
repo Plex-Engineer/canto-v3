@@ -1,7 +1,13 @@
+import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
-import { ETH_MAINNET, GRAVITY_BRIDGE } from "@/config/networks";
+import {
+  CANTO_MAINNET_EVM,
+  ETH_MAINNET,
+  GRAVITY_BRIDGE,
+} from "@/config/networks";
+import { areEqualAddresses } from "@/utils/address";
 import { tryFetch } from "@/utils/async";
-import { displayAmount } from "@/utils/formatting";
+import { getSwapAmountFromAmount } from "@/utils/tokens";
 import BigNumber from "bignumber.js";
 import Web3 from "web3";
 
@@ -25,16 +31,12 @@ export async function getGravityChainFeeInPercent(): PromiseWithError<number> {
  * fast: instant (750k eth gas worth)
  * @dev will use prices on canto
  */
-type FeeTier = {
-  fee: string;
-  usdValueFormatted: string;
-};
 export async function getGravityBridgeFeesFromToken(
   tokenAddress: string
 ): PromiseWithError<{
-  slow: FeeTier;
-  medium: FeeTier;
-  fast: FeeTier;
+  slow: string;
+  medium: string;
+  fast: string;
 }> {
   try {
     // get current gas price on ETH mainnet
@@ -42,43 +44,34 @@ export async function getGravityBridgeFeesFromToken(
       await new Web3(ETH_MAINNET.rpcUrl).eth.getGasPrice()
     ).toString();
 
-    // get ETH price in USD
-    const { data: ethPriceInUSD, error: ethPriceInUSDError } =
-      await getEthPriceInUSDC();
-    if (ethPriceInUSDError) throw ethPriceInUSDError;
-
-    // get gravity token data
-    const gravityToken = gravityTokens[tokenAddress];
-    if (!gravityToken || !(gravityToken.isETH || gravityToken.stable))
-      throw new Error("token unavailable");
+    // get weth address
+    const wethAddress = getCantoCoreAddress(CANTO_MAINNET_EVM.chainId, "weth");
+    if (!wethAddress) throw new Error("no weth address");
 
     // get ratio of token price (tokens/eth)
-    const decimalFactor = new BigNumber(10).pow(18 - gravityToken.decimals);
-    const tokenToEthRatio = gravityToken.isETH
-      ? new BigNumber(1)
-      : new BigNumber(ethPriceInUSD).div(decimalFactor);
+    let tokenToEthRatio: BigNumber;
+    if (areEqualAddresses(tokenAddress, wethAddress)) {
+      tokenToEthRatio = new BigNumber(1);
+    } else {
+      // get amount of tokens from swapping 1 ETH for token
+      const { data: swapPrice, error: swapPriceError } =
+        await getSwapAmountFromAmount(
+          "1000000000000000000",
+          wethAddress,
+          tokenAddress
+        );
+      if (swapPriceError) throw swapPriceError;
+      tokenToEthRatio = new BigNumber(swapPrice).div(1e18);
+    }
 
-    const feeTier = (fee: number) => {
-      const feeInToken = tokenToEthRatio
+    const feeTier = (fee: number) =>
+      tokenToEthRatio
         .multipliedBy(currentGasPrice)
         .multipliedBy(fee)
-        .integerValue();
+        .integerValue()
+        .toString();
 
-      return {
-        fee: feeInToken.toString(),
-        usdValueFormatted: displayAmount(
-          gravityToken.stable
-            ? feeInToken.toString()
-            : feeInToken.multipliedBy(ethPriceInUSD).toString(),
-          gravityToken.decimals,
-          {
-            precision: 2,
-          }
-        ),
-      };
-    };
-
-    // return fee tiers with USD prices
+    // get estimates for fees by speed
     return NO_ERROR({
       slow: feeTier(50000),
       medium: feeTier(400000),
@@ -87,53 +80,4 @@ export async function getGravityBridgeFeesFromToken(
   } catch (err) {
     return NEW_ERROR("getGravityBridgeFeesFromToken", err);
   }
-}
-
-const gravityTokens: {
-  [key: string]: {
-    symbol: string;
-    stable: boolean;
-    decimals: number;
-    isETH: boolean;
-  };
-} = {
-  "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd": {
-    symbol: "USDC",
-    stable: true,
-    decimals: 6,
-    isETH: false,
-  },
-  "0xd567B3d7B8FE3C79a1AD8dA978812cfC4Fa05e75": {
-    symbol: "USDT",
-    stable: true,
-    decimals: 6,
-    isETH: false,
-  },
-  "0x5FD55A1B9FC24967C4dB09C513C3BA0DFa7FF687": {
-    symbol: "WETH",
-    stable: false,
-    decimals: 18,
-    isETH: true,
-  },
-  "0xc71aAf8e486e3F33841BB56Ca3FD2aC3fa8D29a8": {
-    symbol: "WSTETH",
-    stable: false,
-    decimals: 18,
-    isETH: true,
-  },
-} as const;
-
-async function getEthPriceInUSDC(): PromiseWithError<string> {
-  const { data, error } = await tryFetch<{ usdPriceFormatted: string }>(
-    "https://deep-index.moralis.io/api/v2.2/erc20/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2/price?chain=eth",
-    {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "X-API-KEY": process.env.NEXT_PUBLIC_ETH_PRICE_KEY as string,
-      },
-    }
-  );
-  if (error) return NEW_ERROR("getEthPriceInUSDC", error);
-  return NO_ERROR(data.usdPriceFormatted);
 }

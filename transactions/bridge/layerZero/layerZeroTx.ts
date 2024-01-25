@@ -118,12 +118,16 @@ export async function bridgeLayerZeroTx(
     }
 
     /** check adapter params */
-    const { data: needsAdapterParams, error: needsAdapterParamsError } =
-      await checkUseAdapterParams(
-        txParams.token.chainId,
-        txParams.token.address
-      );
-    if (needsAdapterParamsError) throw needsAdapterParamsError;
+    let needsAdapterParams = true;
+    if (txParams.token.oftHasAdapterParams) {
+      const { data: adapterParams, error: adapterParamsError } =
+        await checkUseAdapterParams(
+          txParams.token.chainId,
+          txParams.token.address
+        );
+      if (adapterParamsError) throw adapterParamsError;
+      needsAdapterParams = adapterParams;
+    }
 
     /** push LZ tx */
     txList.push(

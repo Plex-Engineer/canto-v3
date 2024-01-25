@@ -7,7 +7,6 @@ import { AmbientPool } from "./interfaces/ambientPools";
 import { getAllAmbientPoolsData } from "./helpers/getAmbientPoolsData";
 import useTokenBalances from "@/hooks/helpers/useTokenBalances";
 import { getUniqueUnderlyingTokensFromPairs } from "./helpers/underlyingTokens";
-import { queryUserAmbientRewards } from "./helpers/ambientApi";
 import { useEffect, useState } from "react";
 import { CANTO_DATA_API_ENDPOINTS, getCantoApiData } from "@/config/api";
 import { CToken } from "@/hooks/lending/interfaces/tokens";
@@ -16,6 +15,7 @@ import {
   newAmbientLPTxFlow,
   validateAmbientLiquidityTxParams,
 } from "@/transactions/pairs/ambient";
+import { addTokenBalances } from "@/utils/math";
 
 export default function useAmbientPools(
   params: AmbientHookInputParams
@@ -27,28 +27,24 @@ export default function useAmbientPools(
   // use query for all ambient pool data
   const { data: ambient, isLoading } = useQuery(
     ["ambient pools", params.chainId, params.userEthAddress],
-    async (): Promise<{ pools: AmbientPool[]; rewards: string }> => {
+    async (): Promise<{ pools: AmbientPool[]; totalRewards: string }> => {
       const pools = await getAllAmbientPoolsData(
         params.chainId,
         params.userEthAddress
       );
       if (pools.error) throw pools.error;
-      let rewards = "0";
-      if (params.userEthAddress) {
-        const rewardsQuery = await queryUserAmbientRewards(
-          params.chainId,
-          params.userEthAddress
-        );
-        rewards = rewardsQuery.data ?? "0";
-      }
+      const totalRewards = pools.data.reduce(
+        (acc, pool) => addTokenBalances(acc, pool.userRewards),
+        "0"
+      );
       return {
         pools: pools.data,
-        rewards,
+        totalRewards: totalRewards,
       };
     },
     {
       onError: (error) => {
-        console.log(error);
+        console.error(error);
       },
     }
   );
@@ -89,7 +85,7 @@ export default function useAmbientPools(
       );
       for (const cToken of cTokenData) {
         if (cToken.error) {
-          console.log(cToken.error);
+          console.error(cToken.error);
           continue;
         }
         aprMap[cToken.data.address] = {
@@ -151,7 +147,7 @@ export default function useAmbientPools(
 
   return {
     isLoading,
-    rewards: ambient?.rewards ?? "0",
+    totalRewards: ambient?.totalRewards ?? "0",
     ambientPools: poolsWithBalances,
     transaction: {
       validateParams: (txParams) => validateAmbientLiquidityTxParams(txParams),

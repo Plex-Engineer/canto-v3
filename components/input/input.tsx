@@ -6,6 +6,7 @@ import Button from "../button/button";
 import { displayAmount, formatBalance } from "@/utils/formatting";
 import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
 import { Validation } from "@/config/interfaces";
+import Icon from "../icon/icon";
 
 // if amount is true then add more required props
 type InputProps = {
@@ -38,10 +39,7 @@ type InputProps = {
       tokenMax: string;
     }
   | {
-      type: "text";
-    }
-  | {
-      type: "number";
+      type: "text" | "search" | "number";
     }
 );
 
@@ -92,6 +90,7 @@ const Input = (props: InputProps) => {
           )}
         </Text>
       </label>
+
       <section>
         <input
           type={props.type}
@@ -150,8 +149,15 @@ const Input = (props: InputProps) => {
             MAX
           </Button>
         )}
+        {props.type === "search" && (
+          <Icon
+            icon={{
+              url: "/search.svg",
+            }}
+            className={styles["search-icon"]}
+          />
+        )}
       </section>
-
       <span
         className={styles["error-message"]}
         style={{

@@ -16,6 +16,7 @@ import {
 import BigNumber from "bignumber.js";
 import { HoverPositions } from "./HoverPositions";
 import { estimateTokenAmountsFromLiquidity } from "@/utils/cantoDex";
+
 export const UserCantoDexPairRow = ({
   pair,
   onManage,
@@ -403,9 +404,26 @@ export const UserAmbientPairRow = ({
         </Container>
       </InfoPop>
     </Container>,
-    <Text key={pool.symbol + "rewards"}>
-      {displayAmount(rewards ?? "0", 18)}
-    </Text>,
+    <Container
+      key={pool.address + " value"}
+      direction="row"
+      center={{
+        horizontal: true,
+        vertical: true,
+      }}
+      gap={10}
+    >
+      <Text key={pool.symbol + "rewards"}>
+        {displayAmount(rewards ?? "0", 18)}
+      </Text>
+      <InfoPop>
+        <Container>
+          <Text size="sm" theme="secondary-dark">
+            Rewards are released weekly every Thursday at 03:30 AM UTC
+          </Text>
+        </Container>
+      </InfoPop>
+    </Container>,
     <Container key={"action"} direction="row" center={{ horizontal: true }}>
       <Button
         color="secondary"
