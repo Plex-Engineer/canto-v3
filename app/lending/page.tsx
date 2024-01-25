@@ -21,6 +21,7 @@ import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import Analytics from "@/provider/analytics";
 import { getAnalyticsLendingMarketTokenInfo } from "@/utils/analytics";
+import DesktopOnly from "@/components/desktop-only/desktop-only";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
