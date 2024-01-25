@@ -21,7 +21,6 @@ import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import usePool from "./utils";
-import { getPriceFromTick } from "@/utils/ambient";
 import Analytics from "@/provider/analytics";
 import {
   getAnalyticsCantoLiquidityPoolInfo,
@@ -43,7 +42,7 @@ export default function Page() {
     sendAmbientTxFlow,
     sendClaimRewardsFlow,
     pairNames,
-    ambientRewardsTimer,
+    rewardTime,
   } = usePool();
 
   //main content
@@ -107,7 +106,7 @@ export default function Page() {
                     setPair(poolAddress);
                   },
                   rewards: rewards.ambient,
-                  rewardsTimer: ambientRewardsTimer,
+                  rewardTime: rewardTime,
                 })
               ),
               ...pairs.userCantoDex.map((pair) =>
