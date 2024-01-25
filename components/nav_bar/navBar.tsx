@@ -3,7 +3,7 @@ import Link from "next/link";
 import styles from "./navbar.module.scss";
 import Text from "../text";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { clsx } from "clsx";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TransactionModal from "../transactions/TxModal";
@@ -20,6 +20,7 @@ const NavBar = () => {
   // if the app is opened in the safe context.
   useAutoConnect();
   const currentPath = usePathname();
+  const searchParams = useSearchParams();
   const { signer } = useCantoSigner();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   useEffect(() => {
@@ -33,19 +34,27 @@ const NavBar = () => {
   }, [signer]);
 
   useEffect(() => {
+    let url = window.origin + currentPath;
+    if(searchParams.toString()){
+      url += `?${searchParams.toString()}`;
+    }
     if (currentPath == "/bridge") {
-      Analytics.actions.events.pageOpened("bridge");
+      Analytics.actions.events.pageOpened("bridge", url);
     } else if (currentPath == "/lending") {
-      Analytics.actions.events.pageOpened("lending");
+      Analytics.actions.events.pageOpened("lending", url);
     } else if (currentPath == "/lp") {
-      Analytics.actions.events.pageOpened("lp interface");
+      Analytics.actions.events.pageOpened("lp interface", url);
     } else if (currentPath == "/explore") {
-      Analytics.actions.events.pageOpened("explore");
+      Analytics.actions.events.pageOpened("explore", url);
+    } else if (currentPath == "/staking") {
+      Analytics.actions.events.pageOpened("staking", url);
+    } else if (currentPath == "/governance") {
+      Analytics.actions.events.pageOpened("governance", url);
     } else {
-      Analytics.actions.events.pageOpened("home");
+      Analytics.actions.events.pageOpened("home", url);
     }
     isMenuOpen && setIsMenuOpen(false);
-  }, [currentPath, signer]);
+  }, [currentPath, searchParams, signer]);
 
   const balance = useBalance({
     address: signer?.account.address,
