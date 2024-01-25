@@ -9,7 +9,6 @@ import {
   TX_DESCRIPTIONS,
   TxCreatorFunctionReturn,
 } from "@/transactions/interfaces";
-import { getAmbientAddress } from "@/hooks/pairs/newAmbient/config/addresses";
 import { TX_PARAM_ERRORS } from "@/config/consts/errors";
 import { _ambientClaimRewardsTx } from "./txCreators";
 import { displayAmount } from "@/utils/formatting";
@@ -24,29 +23,19 @@ export function claimAmbientRewardsTx(
   if (error) return NEW_ERROR("claimAmbientRewardsTx", error);
   if (validation.error) return NEW_ERROR("claimAmbientRewardsTx", error);
 
-  const rewardsLedgerAddress = getAmbientAddress(
-    txParams.chainId,
-    "rewardLedger"
-  );
-  if (!rewardsLedgerAddress) {
-    return NEW_ERROR(
-      "claimAmbientRewardsTx",
-      TX_PARAM_ERRORS.PARAM_INVALID("chainId")
-    );
-  }
   return NO_ERROR({
-    transactions: [
+    transactions: txParams.rewards.map((rewObj) =>
       _ambientClaimRewardsTx(
         txParams.chainId,
         txParams.ethAccount,
-        rewardsLedgerAddress,
+        rewObj.rewardsLedgerAddress,
         TX_DESCRIPTIONS.CLAIM_REWARDS(
-          displayAmount(txParams.estimatedRewards, 18),
+          displayAmount(rewObj.estimatedRewards, 18),
           "CANTO",
-          "Ambient"
+          `Ambient ${rewObj.poolName}`
         )
-      ),
-    ],
+      )
+    ),
   });
 }
 // nothing to validate for claming rewards retry

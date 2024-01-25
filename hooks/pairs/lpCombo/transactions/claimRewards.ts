@@ -35,10 +35,7 @@ export async function claimDexRewardsComboTx(
       if (clmError) throw clmError;
       txList.push(...clmRewards.transactions);
     }
-    if (
-      params.ambientParams &&
-      params.ambientParams?.estimatedRewards !== "0"
-    ) {
+    if (params.ambientParams && params.ambientParams?.rewards.length !== 0) {
       const { data: ambientRewards, error: ambientError } =
         claimAmbientRewardsTx(params.ambientParams);
       if (ambientError) throw ambientError;

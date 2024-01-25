@@ -130,7 +130,7 @@ export default function Page() {
                     });
                     setPair(poolAddress);
                   },
-                  rewards: rewards.ambient,
+                  rewards: pool.userRewards,
                 })
               ),
               ...pairs.userCantoDex.map((pair) =>

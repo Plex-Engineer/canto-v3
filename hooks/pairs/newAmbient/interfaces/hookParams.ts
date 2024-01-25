@@ -13,7 +13,7 @@ export interface AmbientHookInputParams {
 export interface AmbientHookReturn {
   isLoading: boolean;
   ambientPools: AmbientPool[];
-  rewards: string;
+  totalRewards: string;
   transaction: {
     validateParams: (txParams: AmbientTransactionParams) => Validation;
     newAmbientPoolTxFlow: (
