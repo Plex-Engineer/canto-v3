@@ -106,3 +106,13 @@
   font-size: 0.8em;
   color: var(--text-light-color);
 }
+
+.blink {
+  animation: blinker 0.7s ease infinite;
+
+  @keyframes blinker {
+    50% {
+      opacity: 0.6;
+    }
+  }
+}

@@ -39,6 +39,7 @@ export async function getAllUserCLMData(
   const filteredCTokens = generalCTokens.data.filter((cToken) =>
     listIncludesAddress(cTokenAddresses, cToken.address)
   );
+
   // return general data if no user
   if (!userEthAddress) {
     return NO_ERROR({

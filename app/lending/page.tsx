@@ -19,6 +19,7 @@ import Spacer from "@/components/layout/spacer";
 import { addTokenBalances, divideBalances } from "@/utils/math";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
+import DesktopOnly from "@/components/desktop-only/desktop-only";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -238,12 +239,13 @@ const CTokenTable = ({
   onBorrow: (address: string) => void;
 }) => {
   const [filteredPairs, setFilteredPairs] = useState("RWAs");
+
   const headers =
     filteredPairs === "RWAs"
       ? [
           { value: "Asset", ratio: 1 },
           { value: "Balance", ratio: 1 },
-          { value: "APY", ratio: 1 },
+          { value: "APR", ratio: 1 },
           { value: "Supplied", ratio: 1 },
           { value: "Collateral Factor", ratio: 1 },
           { value: "Liquidity", ratio: 1 },

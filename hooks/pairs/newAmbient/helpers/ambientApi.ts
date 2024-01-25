@@ -7,7 +7,6 @@ import {
 import { tryFetch } from "@/utils/async";
 import { newContractInstance } from "@/utils/evm";
 import { isCantoChainId } from "@/utils/networks";
-import { getAmbientAddress } from "../config/addresses";
 import { AMBIENT_REWARD_LEDGER_ABI } from "@/config/abis";
 
 const MAINNET_AMBIENT_API_URL = process.env.NEXT_PUBLIC_AMBIENT_API_URL;
@@ -216,13 +215,10 @@ export function queryAllUserPositions(
 
 export async function queryUserAmbientRewards(
   chainId: number,
-  userEthAddress: string
+  userEthAddress: string,
+  ledgerAddress: string
 ): PromiseWithError<string> {
   try {
-    // get ledger address
-    const ledgerAddress = getAmbientAddress(chainId, "rewardLedger");
-    if (!ledgerAddress) throw Error("ledger address not found");
-
     // get ambient rewards ledger contract
     const { data: rewardsLedger, error } = newContractInstance<
       typeof AMBIENT_REWARD_LEDGER_ABI
@@ -234,6 +230,7 @@ export async function queryUserAmbientRewards(
       .call();
     return NO_ERROR(rewards.toString());
   } catch (err) {
-    return NEW_ERROR("queryUserAmbientRewards", err);
+    // rewards ledger may return a revert if user has no rewards so return zero in case of error
+    return NO_ERROR("0");
   }
 }

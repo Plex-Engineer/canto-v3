@@ -8,11 +8,12 @@ import { clsx } from "clsx";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import TransactionModal from "../transactions/TxModal";
 import ThemeButton from "../footer/components/footerButton";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Analytics from "@/provider/analytics";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { useBalance } from "wagmi";
 import { useAutoConnect } from "@/provider/useAutoConnect";
+import Icon from "../icon/icon";
 
 const NavBar = () => {
   // This is used to connect safe as wallet,
@@ -20,7 +21,7 @@ const NavBar = () => {
   useAutoConnect();
   const currentPath = usePathname();
   const { signer } = useCantoSigner();
-
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   useEffect(() => {
     if (signer?.account.address) {
       Analytics.actions.people.registerWallet(signer.account.address);
@@ -41,6 +42,7 @@ const NavBar = () => {
     } else {
       Analytics.actions.events.pageOpened("home");
     }
+    isMenuOpen && setIsMenuOpen(false);
   }, [currentPath, signer]);
 
   const balance = useBalance({
@@ -52,6 +54,20 @@ const NavBar = () => {
   return (
     <div className={styles.container}>
       <div className={styles.logo}>
+        <button
+          className={styles.menu}
+          onClick={() => {
+            setIsMenuOpen(!isMenuOpen);
+          }}
+        >
+          <Icon
+            icon={{
+              url: "/menu.svg",
+              size: 56,
+            }}
+            themed
+          />
+        </button>
         <Link href="/">
           <Image
             src="/tokens/canto.svg"
@@ -65,7 +81,7 @@ const NavBar = () => {
         </Link>
       </div>
 
-      <div className={styles["nav-links"]}>
+      <div className={styles["nav-links"]} data-menu-open={isMenuOpen}>
         <Link
           href="/bridge"
           className={clsx(
