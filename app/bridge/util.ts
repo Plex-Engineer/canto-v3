@@ -1,3 +1,4 @@
+import { TX_ERROR_TYPES } from "@/config/consts/errors";
 import { BaseNetwork, Validation } from "@/config/interfaces";
 import { maxBridgeAmountForToken } from "@/hooks/bridge/helpers/amounts";
 import { BridgeHookReturn } from "@/hooks/bridge/interfaces/hookParams";
@@ -12,8 +13,10 @@ import { convertToBigNumber } from "@/utils/formatting";
 import { connectToKeplr } from "@/utils/keplr";
 import { percentOfAmount, validateWeiUserInputTokenAmount } from "@/utils/math";
 import { getNetworkInfoFromChainId, isCosmosNetwork } from "@/utils/networks";
+import BigNumber from "bignumber.js";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { useBalance } from "wagmi";
 
 // this code sets the signer address, and the addresses for the bridge in and bridge out
 // it also gets the network info from the chain id
@@ -106,7 +109,7 @@ export default function useBridgeCombo(): BridgeComboReturn {
   ///
 
   // bridge hooks
-  const { txStore, signer } = useCantoSigner();
+  const { txStore, signer, chainId: cantoChainId } = useCantoSigner();
   const connectedEthAddress = signer?.account.address ?? "";
   const currentChainId = signer?.chain.id;
 
@@ -190,6 +193,11 @@ export default function useBridgeCombo(): BridgeComboReturn {
   /// TRANSACTIONS
   ///
 
+  const { data: cantoBalance } = useBalance({
+    chainId: cantoChainId,
+    address: connectedEthAddress as `0x${string}`,
+  });
+
   // get max bridge amount (estimation)
   const maxBridgeAmount = maxBridgeAmountForToken(
     bridge.selections.token,
@@ -199,6 +207,22 @@ export default function useBridgeCombo(): BridgeComboReturn {
 
   // pre-confirm check (will check all data except for user input address for IBC out)
   const preConfirmCheck = (): Validation => {
+    // check for enough native tokens if using LZ bridge
+    if (
+      bridgeFees.ready &&
+      bridgeFees.method === BridgingMethod.LAYER_ZERO &&
+      bridge.direction === "out" &&
+      cantoBalance?.value !== undefined
+    ) {
+      if (
+        new BigNumber(bridgeFees.lzFee.amount).gt(cantoBalance.value.toString())
+      ) {
+        return {
+          error: true,
+          reason: TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_LZ,
+        };
+      }
+    }
     // validate amount
     const amountCheck = validateWeiUserInputTokenAmount(
       amountAsBigNumberString,
