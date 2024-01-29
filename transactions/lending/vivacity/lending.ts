@@ -46,7 +46,7 @@ export async function cTokenLendingTx(
         const vcNoteRouterAddress = getVivacityAddress(txParams.chainId, "vcNoteRouter")
 
         // calculate amount of vcNote from note amount and exchange rate (required for withdraw transaction)
-        const vcNoteAmount = getVCNoteAmountFromNote(txParams.amount, txParams.cToken.exchangeRate);
+        const vcNoteAmount = getVCNoteAmountFromNote(txParams.amount, txParams.cToken.exchangeRate, txParams.cToken.userDetails.balanceOfCToken);
         /** create approval txs */
         if (txParams.txType === CTokenLendingTxTypes.SUPPLY) {
             const approvalAmount = txParams.amount;
@@ -69,7 +69,7 @@ export async function cTokenLendingTx(
         }
         else if (txParams.txType === CTokenLendingTxTypes.WITHDRAW) {
             const approvalAmount = txParams.max && txParams.cToken.userDetails.supplyBalanceInUnderlying ===
-                txParams.amount ? txParams.cToken.userDetails.balanceOfCToken : getVCNoteAmountFromNote(txParams.amount, txParams.cToken.exchangeRate);
+                txParams.amount ? txParams.cToken.userDetails.balanceOfCToken : vcNoteAmount;
             const { data: allowanceTxs, error: allowanceError } =
                 await createApprovalTxs(
                     txParams.chainId,

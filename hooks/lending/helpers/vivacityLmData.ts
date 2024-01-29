@@ -5,7 +5,7 @@ import {
   errMsg,
 } from "@/config/interfaces";
 import { isValidEthAddress } from "@/utils/address";
-import { CERC20_ABI, ERC20_ABI, CNOTE_ABI, VCNOTE_ABI } from "@/config/abis";
+import { CERC20_ABI, ERC20_ABI, CNOTE_ABI, VCNOTE_ABI, LENDING_LEDGER_REWARDS_ABI } from "@/config/abis";
 import { multicall } from "wagmi/actions";
 import BigNumber from "bignumber.js";
 import { getVivacityAddress } from "@/config/consts/vivacityAddresses";
@@ -92,17 +92,12 @@ export async function getVCNoteData(
         functionName: "exchangeRateCurrent",
       },
       {
-        address: vcNoteAddress as `0x${string}`,
-        abi: VCNOTE_ABI,
-        functionName: "supplyRatePerBlock",
-      },
-      {
         address: cNoteAddress as `0x${string}`,
         abi: CNOTE_ABI,
         functionName: "supplyRatePerBlock",
       }
     ] as const;
-    const [vcNoteExchangeRateCurrent, cNoteExchangeRateCurrent, vcNoteSupplyRate, cNoteSupplyRate] = await multicall({
+    const [vcNoteExchangeRateCurrent, cNoteExchangeRateCurrent, cNoteSupplyRate] = await multicall({
       chainId,
       contracts: contractCalls,
     });
@@ -112,11 +107,9 @@ export async function getVCNoteData(
       !(
         vcNoteExchangeRateCurrent &&
         cNoteExchangeRateCurrent &&
-        vcNoteSupplyRate &&
         cNoteSupplyRate &&
         vcNoteExchangeRateCurrent.status === "success" &&
         cNoteExchangeRateCurrent.status === "success" &&
-        vcNoteSupplyRate.status === "success" &&
         cNoteSupplyRate.status === "success"
       )
     ) {
@@ -124,18 +117,17 @@ export async function getVCNoteData(
     }
     const bnVCNoteExchangeRate = new BigNumber(vcNoteExchangeRateCurrent.result.toString())
     const bnCNoteExchangeRate = new BigNumber(cNoteExchangeRateCurrent.result.toString())
-    const bnVCNoteSupplyRate = new BigNumber(vcNoteSupplyRate.result.toString())
     const bnCNoteSupplyRate = new BigNumber(cNoteSupplyRate.result.toString())
     const vcNoteToNoteExchangeRate = bnVCNoteExchangeRate.multipliedBy(bnCNoteExchangeRate).dividedBy(new BigNumber(10).pow(36))
-    const combinedSupplyRate = bnVCNoteSupplyRate.plus(bnCNoteSupplyRate).dividedBy(new BigNumber(10).pow(18))
-    const supplyApy = getAPY(Number(combinedSupplyRate.toString())).toFixed(2)
+    const cNoteSupplyRateFormatted = bnCNoteSupplyRate.dividedBy(new BigNumber(10).pow(18)).toString()
+    const supplyApyRounded = Math.ceil(getAPY(Number(cNoteSupplyRateFormatted))* 100)/100
     // format results
     const vcNote = {
       address: vcNoteAddress,
       decimals: 18,
       name: "Vivacity Collateralized NOTE",
       symbol: "vcNOTE",
-      supplyApy: supplyApy.toString(),
+      supplyApy: supplyApyRounded.toString(),
       exchangeRate: vcNoteToNoteExchangeRate.toString(),
       price: "1000000000000000000",
       underlying: {
@@ -168,13 +160,14 @@ export async function getUserVCNoteData(
       throw Error("getUserVCNoteData: invalid userEthAddress");
     }
     // get all addresses depending on chainId
-    const [noteAddress, cNoteAddress, vcNoteAddress] = [
+    const [noteAddress, cNoteAddress, vcNoteAddress, lendingLedgerRewardsAddress] = [
       getCantoCoreAddress(chainId, "note"),
       getCantoCoreAddress(chainId, "cNote"),
       getVivacityAddress(chainId, "vcNote"),
+      getVivacityAddress(chainId, "lendingLedgerRewards"),
     ];
     // make sure addresses exist
-    if (!noteAddress || !cNoteAddress || !vcNoteAddress) {
+    if (!noteAddress || !cNoteAddress || !vcNoteAddress || !lendingLedgerRewardsAddress) {
       throw Error("getUserVCNoteData: chainId not supported");
     }
 
@@ -213,8 +206,19 @@ export async function getUserVCNoteData(
           userEthAddress,
         ],
       },
+      {
+        address: lendingLedgerRewardsAddress as `0x${string}`,
+        abi: LENDING_LEDGER_REWARDS_ABI,
+        functionName: "estimatedRewards",
+        args :  [
+          vcNoteAddress as `0x${string}`,
+          userEthAddress,
+          0n,
+          2n ** 256n - 1n,
+        ],
+      },
     ] as const;
-    const [balanceOfUnderlyingNote, underlyingAllowanceNote, balanceOfVCNote, cNoteSupplyBalance] = await multicall({
+    const [balanceOfUnderlyingNote, underlyingAllowanceNote, balanceOfVCNote, cNoteSupplyBalance, lendingLedgerRewards] = await multicall({
       chainId,
       contracts: contractCalls,
     });
@@ -240,7 +244,7 @@ export async function getUserVCNoteData(
       cTokenAddress: vcNoteAddress,
       balanceOfCToken: balanceOfVCNote.result.toString(),
       balanceOfUnderlying: balanceOfUnderlyingNote.result.toString(),
-      rewards: "0",
+      rewards: lendingLedgerRewards.result?.toString() ?? "0",
       supplyBalanceInUnderlying: cNoteSupplyBalance.result.toString(),
       underlyingAllowance: underlyingAllowanceNote.result.toString(),
     };

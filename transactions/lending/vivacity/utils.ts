@@ -18,13 +18,19 @@ export function maxAmountForLendingTx(
 
 /**
  * @notice Gets VCNote amount equivalent to given note amount
- * @param {string} amount amount of note
+ * @param {string} noteAmount amount of note
  * @param {string} exchangeRate exchange rate from vcNote to note
+ * @param {string} vcNoteBalance balance of vcNote
  * @returns {string}
  */
-  export function getVCNoteAmountFromNote(amount : string, exchangeRate:string):string{
-    const bnAmount = new BigNumber(amount)
+  export function getVCNoteAmountFromNote(noteAmount : string, exchangeRate:string, vcNoteBalance: string):string{
+    const bnNoteAmount = new BigNumber(noteAmount)
     const bnExchangeRate = new BigNumber(exchangeRate)
-    const bnVCNoteAmount = bnAmount.dividedBy(bnExchangeRate)
-    return bnVCNoteAmount.integerValue(BigNumber.ROUND_UP).toString()
+    const bnVCNoteBalance = new BigNumber(vcNoteBalance)
+    let bnVCNoteAmount = bnNoteAmount.dividedBy(bnExchangeRate)
+    bnVCNoteAmount = bnVCNoteAmount.integerValue(BigNumber.ROUND_UP)
+    if(bnVCNoteAmount.isGreaterThan(bnVCNoteBalance)){
+      bnVCNoteAmount = bnVCNoteBalance
+    }
+    return bnVCNoteAmount.toString()
   }
