@@ -34,6 +34,7 @@ const HighlightCard = ({
       />
       <div className={styles.header}>
         <Item
+          color="primary-dark"
           name={
             <Icon
               icon={{
@@ -46,11 +47,13 @@ const HighlightCard = ({
           theme="primary-light"
         />
         <Item
+          color="primary-dark"
           name="Supply APY"
           value={cToken.supplyApy + "%"}
           theme="primary-light"
         />
         <Item
+          color="primary-dark"
           name="Borrow APY"
           value={cToken.borrowApy + "%"}
           theme="primary-light"
@@ -59,6 +62,7 @@ const HighlightCard = ({
       <div className={styles.amounts}>
         <Container width="100%" gap={10}>
           <Item
+            color="primary-dark"
             name={cToken.underlying.symbol + " Balance"}
             value={formattedAmount(
               cToken.userDetails?.balanceOfUnderlying ?? "0"
@@ -88,6 +92,7 @@ const HighlightCard = ({
           />*/}
         </Container>
         <Item
+          color="primary-dark"
           name="Note Supplied"
           value={formattedAmount(
             cToken.userDetails?.supplyBalanceInUnderlying ?? "0"
@@ -95,6 +100,7 @@ const HighlightCard = ({
           symbol={true}
         />
         <Item
+          color="primary-dark"
           name="Note Borrowed"
           value={formattedAmount(cToken.userDetails?.borrowBalance ?? "0")}
           symbol={true}
