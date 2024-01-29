@@ -8,6 +8,7 @@ import BridgeInProgress from "./components/bridgeInProgress";
 import styles from "./bridge.module.scss";
 import useBridgingInProgess from "@/hooks/bridge/useBridgingInProgress";
 import DesktopOnly from "@/components/desktop-only/desktop-only";
+import Recovery from "./components/recovery";
 
 export default function BridgePage() {
   const bridgeCombo = useBridgeCombo();
@@ -66,6 +67,10 @@ export default function BridgePage() {
                     setTxBridgeStatus={bridgeProgress.setTxBridgeStatus}
                   />
                 ),
+              },
+              {
+                title: "RECOVERY",
+                content: <Recovery key={"recovery"} />,
               },
             ]}
           />
