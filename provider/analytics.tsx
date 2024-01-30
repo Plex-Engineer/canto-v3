@@ -20,6 +20,7 @@ type AnalyticsTransactionFlowType =
 
 
 export type AnalyticsBridgeData = {
+  bridgeDirection: string;
   bridgeFrom: string;
   bridgeTo: string;
   bridgeAsset: string;
@@ -129,9 +130,10 @@ class AnalyticsWrapper {
       },
     },
     events: {
-      pageOpened: (pageName: string) => {
+      pageOpened: (pageName: string, currentUrl: string) => {
         posthog.capture("$pageview", {
-          pageName: pageName,
+          pageName,
+          '$current_url': currentUrl,
         });
       },
       connections: {

@@ -21,7 +21,7 @@ import {
   CTokenLendingTransactionParams,
 } from "@/transactions/lending";
 import { ClaimDexComboRewardsParams } from "@/hooks/pairs/lpCombo/transactions/claimRewards";
-import { getNetworkInfoFromChainId } from "@/utils/networks";
+import { getNetworkInfoFromChainId, isCantoChainId } from "@/utils/networks";
 import { displayAmount, formatPercent } from "../formatting";
 import { addTokenBalances } from "@/utils/math";
 import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
@@ -81,6 +81,7 @@ function getBridgeTransactionFlowData(
   bridgeTxParams: BridgeTransactionParams
 ): AnalyticsTransactionFlowData {
   return {
+    bridgeDirection: isCantoChainId(Number(bridgeTxParams.from.chainId)) ? "OUT" : "IN",
     bridgeFrom: getNetworkInfoFromChainId(bridgeTxParams.from.chainId).data
       .name,
     bridgeTo: getNetworkInfoFromChainId(bridgeTxParams.to.chainId).data.name,
