@@ -335,7 +335,7 @@ export default function StakingPage() {
                           (e) =>
                             Number(
                               formatBalance(e.userDelegation.balance, 18)
-                            ) > 0.001
+                            ) > 0.0000001
                         )
                         .map((userStakingElement, index) =>
                           GenerateMyStakingTableRow(
