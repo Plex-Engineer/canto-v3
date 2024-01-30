@@ -36,7 +36,6 @@ import { PAGE_NUMBER } from "@/config/consts/config";
 import { Pagination } from "@/components/pagination/Pagination";
 import { levenshteinDistance } from "@/utils/staking/searchUtils";
 import { WalletClient } from "wagmi";
-import BigNumber from "bignumber.js";
 
 export default function StakingPage() {
   // connected user info
