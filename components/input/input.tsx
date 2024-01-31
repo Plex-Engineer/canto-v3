@@ -119,6 +119,7 @@ const Input = (props: InputProps) => {
           required={props.required}
           autoComplete="off"
           style={{
+            textAlign: props.type === "search" ? "left" : "right",
             height: getHeight(props.height),
             backgroundColor:
               props.error || inputError.error

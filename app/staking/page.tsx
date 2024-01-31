@@ -297,7 +297,7 @@ export default function StakingPage() {
                       {
                         value: (
                           <Text opacity={0.4} font="rm_mono">
-                            Validator Total
+                            Total Stake
                           </Text>
                         ),
                         ratio: 3,
@@ -311,11 +311,7 @@ export default function StakingPage() {
                         ratio: 3,
                       },
                       {
-                        value: (
-                          <Text opacity={0.4} font="rm_mono">
-                            Edit
-                          </Text>
-                        ),
+                        value: <div />,
                         ratio: 3,
                       },
                     ]}
@@ -401,7 +397,7 @@ export default function StakingPage() {
                       {
                         value: (
                           <Text opacity={0.4} font="rm_mono">
-                            Validator Total
+                            Total Stake
                           </Text>
                         ),
                         ratio: 4,
@@ -415,11 +411,7 @@ export default function StakingPage() {
                         ratio: 3,
                       },
                       {
-                        value: (
-                          <Text opacity={0.4} font="rm_mono">
-                            Action
-                          </Text>
-                        ),
+                        value: <div />,
                         ratio: 4,
                       },
                     ]}
