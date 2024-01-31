@@ -1,13 +1,5 @@
 "use client";
-
-import React from "react";
-
-//TODO: add more display formats
-
-interface Props {
-  endTimestamp: bigint;
-  displayFormat?: "dd:hh:mm:ss";
-}
+import { useState, useEffect } from "react";
 
 function getTimeLeft(endTimestamp: bigint): bigint {
   const timeLeft = endTimestamp - BigInt(Date.now());
@@ -22,12 +14,10 @@ const hour = BigInt(1000 * 60 * 60);
 const minute = BigInt(1000 * 60);
 const second = BigInt(1000);
 
-const Countdown = ({ endTimestamp }: Props) => {
-  const [timeLeft, setTimeLeft] = React.useState<bigint>(
-    getTimeLeft(endTimestamp)
-  );
+const Countdown = ({ endTimestamp }: { endTimestamp: bigint }) => {
+  const [timeLeft, setTimeLeft] = useState<bigint>(getTimeLeft(endTimestamp));
 
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setTimeLeft(getTimeLeft(endTimestamp));
     }, 1000);

@@ -3,7 +3,6 @@ import { AmbientTransactionParams } from "@/transactions/pairs/ambient";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import useLP from "@/hooks/pairs/lpCombo/useLP";
 import { useState, useEffect } from "react";
-import { useBlockNumber } from "wagmi";
 import { fetchBlockNumber } from "@wagmi/core";
 import { CANTO_MAINNET_EVM } from "@/config/networks";
 
@@ -75,26 +74,34 @@ export default function usePool() {
   /** AMBIENT REWARDS TIMER */
   const [rewardTime, setRewardTime] = useState(0n);
   const getRewardsTime = async (): Promise<bigint> => {
-    const blockNumber = await fetchBlockNumber({
-      chainId: CANTO_MAINNET_EVM.chainId,
-    });
+    let remTime = 0n;
     const blocksInEpoch = BigInt(104272);
     const blockDuration = 5.8;
     let prevBlockNumber = BigInt(7841750);
     let remBlocksInEpoch = BigInt(104272);
-    let remTime = 0n;
-    if (blockNumber) {
-      const noOfWeeksToBeAdded =
-        (blockNumber - prevBlockNumber) / blocksInEpoch;
-      prevBlockNumber = prevBlockNumber + noOfWeeksToBeAdded * blocksInEpoch;
-      remBlocksInEpoch = prevBlockNumber + blocksInEpoch - blockNumber;
-      remTime = remBlocksInEpoch * BigInt(blockDuration * 1000);
+    try {
+      const blockNumber = await fetchBlockNumber({
+        chainId: CANTO_MAINNET_EVM.chainId,
+      });
+      if (blockNumber) {
+        const noOfWeeksToBeAdded =
+          (blockNumber - prevBlockNumber) / blocksInEpoch;
+        prevBlockNumber = prevBlockNumber + noOfWeeksToBeAdded * blocksInEpoch;
+        remBlocksInEpoch = prevBlockNumber + blocksInEpoch - blockNumber;
+        remTime = remBlocksInEpoch * BigInt(blockDuration * 1000);
+      }
+    } catch (err) {
+      console.error(err);
     }
     return BigInt(Date.now()) + remTime;
   };
   useEffect(() => {
     async function setRewards() {
-      setRewardTime(await getRewardsTime());
+      try {
+        setRewardTime(await getRewardsTime());
+      } catch (err) {
+        console.error(err);
+      }
     }
     setRewards();
   }, []);
