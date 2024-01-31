@@ -284,9 +284,11 @@ export default function StakingPage() {
                     headers={[
                       {
                         value: (
-                          <Text opacity={0.4} font="rm_mono">
-                            Name
-                          </Text>
+                          <div style={{ width: "300px" }}>
+                            <Text opacity={0.4} font="rm_mono">
+                              Name
+                            </Text>
+                          </div>
                         ),
                         ratio: 5,
                       },
@@ -436,7 +438,7 @@ export default function StakingPage() {
                               className={styles.noValidatorContainer}
                             >
                               <Text font="proto_mono" size="lg">
-                                NO VALIDATORS FOUND
+                                NO {currentFilter} VALIDATORS FOUND
                               </Text>
                             </div>,
                           ]
