@@ -6,6 +6,7 @@ import {
   AnalyticsAmbientLPData,
   AnalyticsCantoLPData,
   AnalyticsLMData,
+  AnalyticsGovernanceData,
 } from "@/provider/analytics";
 import { BridgeTransactionParams } from "@/transactions/bridge/types";
 import {
@@ -29,6 +30,8 @@ import { getDisplayTokenAmountFromRange, getPriceFromTick } from "@/utils/ambien
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
+import { ProposalVoteTxParams } from "@/transactions/gov";
+import { Proposal } from "@/hooks/gov/interfaces/proposal";
 
 export function displayAnalyticsAmount(amount: string, decimals: number){
   return displayAmount(amount, decimals, { short: false, precision: decimals });
@@ -70,6 +73,10 @@ export function getAnalyticsTransactionFlowInfo(
     case TransactionFlowType.CLM_CTOKEN_TX:
       txFlowInfo.txFlowType = flow.params.txType;
       txFlowInfo.txFlowData = getClmCTokenTransactionFlowData(flow.params);
+      break;
+    case TransactionFlowType.VOTE_TX:
+      txFlowInfo.txFlowType = "Vote";
+      txFlowInfo.txFlowData = getProposalVoteTransactionFlowData(flow.params);
       break;
     default:
       return NEW_ERROR("Invalid transaction flow type");
@@ -327,6 +334,16 @@ function getClmCTokenTransactionFlowData(
   }
 }
 
+function getProposalVoteTransactionFlowData(
+  voteTxParams: ProposalVoteTxParams
+): AnalyticsTransactionFlowData {
+  return {
+    govProposalId: voteTxParams.proposalId,
+    govProposalTitle: voteTxParams.proposal?.title,
+    govVoteOption : voteTxParams.voteOption,
+  };
+}
+
 function getLpComboClaimRewardsTransactionFlowType(
   lpComboClaimRewardsTxParams: ClaimDexComboRewardsParams
 ): string | undefined {
@@ -424,4 +441,12 @@ export function getAnalyticsCantoLiquidityPoolInfo(pool : CantoDexPairWithUserCT
       { short: false, precision: pool.decimals }
     ),
   }
+}
+
+export function getAnalyticsProposalInfo(proposalId: any, proposals: Proposal[]) : AnalyticsGovernanceData {
+  const proposal = proposals.find((p) => p.proposal_id === Number(proposalId));
+  return {
+    govProposalId: proposal?.proposal_id,
+    govProposalTitle: proposal?.title,
+  };
 }

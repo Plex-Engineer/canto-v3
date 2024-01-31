@@ -11,6 +11,7 @@ import Button from "@/components/button/button";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Splash from "@/components/splash/splash";
 import { useRouter } from "next/navigation";
+import Analytics from "@/provider/analytics";
 
 export default function GovernancePage() {
   const router = useRouter();
@@ -41,6 +42,7 @@ export default function GovernancePage() {
           </Text>
           <Button
             onClick={() => {
+              Analytics.actions.events.governance.stakingClicked();
               router.push("/staking");
             }}
           >
