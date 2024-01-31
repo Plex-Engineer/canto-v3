@@ -5,13 +5,18 @@ import {
   errMsg,
 } from "@/config/interfaces";
 import { isValidEthAddress } from "@/utils/address";
-import { CERC20_ABI, ERC20_ABI, CNOTE_ABI, VCNOTE_ABI, LENDING_LEDGER_REWARDS_ABI } from "@/config/abis";
+import {
+  CERC20_ABI,
+  ERC20_ABI,
+  CNOTE_ABI,
+  VCNOTE_ABI,
+  LENDING_LEDGER_REWARDS_ABI,
+} from "@/config/abis";
 import { multicall } from "wagmi/actions";
 import BigNumber from "bignumber.js";
 import { getVivacityAddress } from "@/config/consts/vivacityAddresses";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { Vivacity } from "@/transactions/lending";
-
 
 /**
  * @notice Gets all user data from clmLens and general api
@@ -43,28 +48,30 @@ export async function getVivacityLMData(
   if (userVCNote.error && userEthAddress) {
     return NEW_ERROR("getVivacityLMData::" + errMsg(userVCNote.error));
   }
-  const bnExchangeRate = new BigNumber(vcNote.data.exchangeRate ?? "0")
-  const bnCTokenBalance = new BigNumber(userVCNote.data.balanceOfCToken ?? "0")
-  const supplyBalanceInUnderlying = bnCTokenBalance.multipliedBy(bnExchangeRate).integerValue(BigNumber.ROUND_DOWN)
+  const bnExchangeRate = new BigNumber(vcNote.data.exchangeRate ?? "0");
+  const bnCTokenBalance = new BigNumber(userVCNote.data.balanceOfCToken ?? "0");
+  const supplyBalanceInUnderlying = bnCTokenBalance
+    .multipliedBy(bnExchangeRate)
+    .integerValue(BigNumber.ROUND_DOWN);
   // since user is present, combine the data
   const combinedVCNoteData = {
     ...vcNote.data,
     userDetails: {
       ...userVCNote.data,
-      supplyBalanceInUnderlying: supplyBalanceInUnderlying.toString()
-    }
-  }
+      supplyBalanceInUnderlying: supplyBalanceInUnderlying.toString(),
+    },
+  };
 
   return NO_ERROR({ vcNote: combinedVCNoteData });
 }
 
 /**
-* @notice Gets note data from vivacity lm 
-* @param {number} chainId Whether to use testnet or mainnet
-* @returns {PromiseWithError<Vivacity.VCNote>}
-*/
+ * @notice Gets note data from vivacity lm
+ * @param {number} chainId Whether to use testnet or mainnet
+ * @returns {PromiseWithError<Vivacity.VCNote>}
+ */
 export async function getVCNoteData(
-  chainId: number,
+  chainId: number
 ): PromiseWithError<Vivacity.VCNote> {
   try {
     // get all addresses depending on chainId
@@ -95,9 +102,13 @@ export async function getVCNoteData(
         address: cNoteAddress as `0x${string}`,
         abi: CNOTE_ABI,
         functionName: "supplyRatePerBlock",
-      }
+      },
     ] as const;
-    const [vcNoteExchangeRateCurrent, cNoteExchangeRateCurrent, cNoteSupplyRate] = await multicall({
+    const [
+      vcNoteExchangeRateCurrent,
+      cNoteExchangeRateCurrent,
+      cNoteSupplyRate,
+    ] = await multicall({
       chainId,
       contracts: contractCalls,
     });
@@ -115,12 +126,21 @@ export async function getVCNoteData(
     ) {
       throw Error("getVCNoteData: multicall error");
     }
-    const bnVCNoteExchangeRate = new BigNumber(vcNoteExchangeRateCurrent.result.toString())
-    const bnCNoteExchangeRate = new BigNumber(cNoteExchangeRateCurrent.result.toString())
-    const bnCNoteSupplyRate = new BigNumber(cNoteSupplyRate.result.toString())
-    const vcNoteToNoteExchangeRate = bnVCNoteExchangeRate.multipliedBy(bnCNoteExchangeRate).dividedBy(new BigNumber(10).pow(36))
-    const cNoteSupplyRateFormatted = bnCNoteSupplyRate.dividedBy(new BigNumber(10).pow(18)).toString()
-    const supplyApyRounded = Math.ceil(getAPY(Number(cNoteSupplyRateFormatted))* 100)/100
+    const bnVCNoteExchangeRate = new BigNumber(
+      vcNoteExchangeRateCurrent.result.toString()
+    );
+    const bnCNoteExchangeRate = new BigNumber(
+      cNoteExchangeRateCurrent.result.toString()
+    );
+    const bnCNoteSupplyRate = new BigNumber(cNoteSupplyRate.result.toString());
+    const vcNoteToNoteExchangeRate = bnVCNoteExchangeRate
+      .multipliedBy(bnCNoteExchangeRate)
+      .dividedBy(new BigNumber(10).pow(36));
+    const cNoteSupplyRateFormatted = bnCNoteSupplyRate
+      .dividedBy(new BigNumber(10).pow(18))
+      .toString();
+    const supplyApyRounded =
+      Math.ceil(getAPY(Number(cNoteSupplyRateFormatted)) * 100) / 100;
     // format results
     const vcNote = {
       address: vcNoteAddress,
@@ -133,10 +153,11 @@ export async function getVCNoteData(
       underlying: {
         address: noteAddress,
         decimals: 18,
-        logoURI: "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/note.svg",
+        logoURI:
+          "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/note.svg",
         name: "Note",
-        symbol: "NOTE"
-      }
+        symbol: "NOTE",
+      },
     };
 
     return NO_ERROR(vcNote);
@@ -146,28 +167,38 @@ export async function getVCNoteData(
 }
 
 /**
- * @notice Gets user vcNote data from vivacity lm 
+ * @notice Gets user vcNote data from vivacity lm
  * @param {string} userEthAddress Ethereum address of user
  * @param {number} chainId Whether to use testnet or mainnet
  * @returns {PromiseWithError<Vivacity.UserVCNoteDetails>}
  */
 export async function getUserVCNoteData(
   userEthAddress: string,
-  chainId: number,
+  chainId: number
 ): PromiseWithError<Vivacity.UserVCNoteDetails> {
   try {
     if (!isValidEthAddress(userEthAddress)) {
       throw Error("getUserVCNoteData: invalid userEthAddress");
     }
     // get all addresses depending on chainId
-    const [noteAddress, cNoteAddress, vcNoteAddress, lendingLedgerRewardsAddress] = [
+    const [
+      noteAddress,
+      cNoteAddress,
+      vcNoteAddress,
+      lendingLedgerRewardsAddress,
+    ] = [
       getCantoCoreAddress(chainId, "note"),
       getCantoCoreAddress(chainId, "cNote"),
       getVivacityAddress(chainId, "vcNote"),
       getVivacityAddress(chainId, "lendingLedgerRewards"),
     ];
     // make sure addresses exist
-    if (!noteAddress || !cNoteAddress || !vcNoteAddress || !lendingLedgerRewardsAddress) {
+    if (
+      !noteAddress ||
+      !cNoteAddress ||
+      !vcNoteAddress ||
+      !lendingLedgerRewardsAddress
+    ) {
       throw Error("getUserVCNoteData: chainId not supported");
     }
 
@@ -177,40 +208,31 @@ export async function getUserVCNoteData(
         address: noteAddress,
         abi: ERC20_ABI,
         functionName: "balanceOf",
-        args: [
-          userEthAddress,
-        ],
+        args: [userEthAddress],
       },
       {
         address: noteAddress,
         abi: ERC20_ABI,
         functionName: "allowance",
-        args: [
-          userEthAddress,
-          vcNoteAddress as `0x${string}`
-        ],
+        args: [userEthAddress, vcNoteAddress as `0x${string}`],
       },
       {
         address: vcNoteAddress as `0x${string}`,
         abi: CERC20_ABI,
         functionName: "balanceOf",
-        args: [
-          userEthAddress,
-        ],
+        args: [userEthAddress],
       },
       {
         address: vcNoteAddress as `0x${string}`,
         abi: CERC20_ABI,
         functionName: "balanceOfUnderlying",
-        args: [
-          userEthAddress,
-        ],
+        args: [userEthAddress],
       },
       {
         address: lendingLedgerRewardsAddress as `0x${string}`,
         abi: LENDING_LEDGER_REWARDS_ABI,
         functionName: "estimatedRewards",
-        args :  [
+        args: [
           vcNoteAddress as `0x${string}`,
           userEthAddress,
           0n,
@@ -218,7 +240,13 @@ export async function getUserVCNoteData(
         ],
       },
     ] as const;
-    const [balanceOfUnderlyingNote, underlyingAllowanceNote, balanceOfVCNote, cNoteSupplyBalance, lendingLedgerRewards] = await multicall({
+    const [
+      balanceOfUnderlyingNote,
+      underlyingAllowanceNote,
+      balanceOfVCNote,
+      cNoteSupplyBalance,
+      lendingLedgerRewards,
+    ] = await multicall({
       chainId,
       contracts: contractCalls,
     });
@@ -254,8 +282,6 @@ export async function getUserVCNoteData(
     return NEW_ERROR("getUserVCNoteData: " + errMsg(err));
   }
 }
-
-
 
 const secondsPerBlock = 5.8;
 const blocksPerDay = 86400 / secondsPerBlock;

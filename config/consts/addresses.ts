@@ -21,7 +21,7 @@ const CANTO_CORE_ADDRESSES = {
     mainnet: "0x03957b7D741F0788163e8E382B1Bd7944BcDd560",
     testnet: "0x33c2E2FA0588789119EbDF892eB1e2aDdDcbc8c4",
   },
-  note:{
+  note: {
     mainnet: "0x4e71A2E537B7f9D9413D3991D37958c0b5e1e503",
     testnet: "0x03F734Bd9847575fDbE9bEaDDf9C166F880B5E5f",
   },

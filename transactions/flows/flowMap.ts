@@ -24,7 +24,7 @@ import {
 import { cantoBridgeTx, validateCantoBridgeTxParams } from "../bridge";
 import { stakingTx, validateStakingTxParams } from "../staking";
 import { proposalVoteTx, validateGovTxParams } from "../gov";
-import { Vivacity } from "@/transactions/lending"
+import { Vivacity } from "@/transactions/lending";
 
 export enum TransactionFlowType {
   //   // Bridge
@@ -95,10 +95,12 @@ export const TRANSACTION_FLOW_MAP: {
   },
   [TransactionFlowType.VIVACITY_CTOKEN_TX]: {
     tx: async (params) => Vivacity.cTokenLendingTx(params),
-    validRetry: async (params) => Vivacity.validateCTokenLendingRetryTxParams(params),
+    validRetry: async (params) =>
+      Vivacity.validateCTokenLendingRetryTxParams(params),
   },
   [TransactionFlowType.VIVACITY_CLAIM_REWARDS_TX]: {
     tx: async (params) => Vivacity.clmClaimRewardsTx(params),
-    validRetry: async (params) => Vivacity.validateClmClaimRewardsRetryTx(params),
+    validRetry: async (params) =>
+      Vivacity.validateClmClaimRewardsRetryTx(params),
   },
 };

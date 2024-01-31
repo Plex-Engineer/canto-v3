@@ -11,8 +11,6 @@ import BigNumber from "bignumber.js";
  * WILL NOT CHECK FOR VALIDITY OF PARAMS, MUST DO THIS BEFORE USING THESE CONSTRUCTORS
  */
 
-
-
 export const _claimLendingRewardsTx = (
   chainId: number,
   userEthAdress: string,
@@ -28,10 +26,9 @@ export const _claimLendingRewardsTx = (
   target: lendingLedgerAddress,
   abi: LENDING_LEDGER_ABI,
   method: "claim",
-  params: [marketAddress, "0", new BigNumber('2').pow(256).minus(1).toString()],
+  params: [marketAddress, "0", new BigNumber("2").pow(256).minus(1).toString()],
   value: "0",
 });
-
 
 export const _lendingCTokenTx = (
   lendingTx: CTokenLendingTxTypes,
@@ -41,10 +38,7 @@ export const _lendingCTokenTx = (
   vcNoteRouterAddress: string,
   description: TransactionDescription
 ): Transaction => {
-  const txDetails = methodAndParamsFromLendingTxType(
-    lendingTx,
-    amount,
-  );
+  const txDetails = methodAndParamsFromLendingTxType(lendingTx, amount);
   return {
     description,
     feTxType: txDetails.feTxType,
@@ -81,7 +75,6 @@ export const _withdrawAllCTokenTx = (
   value: "0",
 });
 
-
 /**
  * @notice creates a transaction for lending
  * @param {CTokenLendingTxTypes} txType type of lending tx
@@ -89,7 +82,7 @@ export const _withdrawAllCTokenTx = (
  */
 function methodAndParamsFromLendingTxType(
   txType: CTokenLendingTxTypes,
-  amount: string,
+  amount: string
 ): {
   feTxType: CantoFETxType;
   method: string;

@@ -43,22 +43,26 @@ export const TX_DESCRIPTIONS = {
     amount: string
   ) => ({
     title: `${txType} ${tokenSymbol}`,
-    description: `${txType} ${amount} ${tokenSymbol} ${txType === CTokenLendingTxTypes.SUPPLY ||
-        txType === CTokenLendingTxTypes.REPAY
+    description: `${txType} ${amount} ${tokenSymbol} ${
+      txType === CTokenLendingTxTypes.SUPPLY ||
+      txType === CTokenLendingTxTypes.REPAY
         ? "to"
         : "from"
-      } the lending market`,
+    } the lending market`,
   }),
   CTOKEN_COLLATERALIZE: (tokenSymbol: string, collateralize: boolean) => ({
-    title: `${collateralize ? "Collateralize" : "Decollateralize"
-      } ${tokenSymbol}`,
-    description: `${collateralize ? "Collateralize" : "Decollateralize"
-      } ${tokenSymbol} in the lending market`,
+    title: `${
+      collateralize ? "Collateralize" : "Decollateralize"
+    } ${tokenSymbol}`,
+    description: `${
+      collateralize ? "Collateralize" : "Decollateralize"
+    } ${tokenSymbol} in the lending market`,
   }),
   DELEGATE: (validatorName: string, amount: string, undelegate: boolean) => ({
     title: `${undelegate ? "Undelegate from" : "Delegate to"} ${validatorName}`,
-    description: `${undelegate ? "Undelegate" : "Delegate"} ${amount} CANTO ${undelegate ? "from" : "to"
-      } ${validatorName}`,
+    description: `${undelegate ? "Undelegate" : "Delegate"} ${amount} CANTO ${
+      undelegate ? "from" : "to"
+    } ${validatorName}`,
   }),
   REDELEGATE: (
     validatorName: string,
@@ -86,8 +90,9 @@ export const TX_DESCRIPTIONS = {
     deposit: boolean
   ) => ({
     title: `${deposit ? "Wrap" : "Unwrap"} ${tokenSymbol}`,
-    description: `${deposit ? "Wrap" : "Unwrap"} ${amount} ${tokenSymbol} ${deposit ? "to" : "from"
-      } ${tokenSymbol} OFT`,
+    description: `${deposit ? "Wrap" : "Unwrap"} ${amount} ${tokenSymbol} ${
+      deposit ? "to" : "from"
+    } ${tokenSymbol} OFT`,
   }),
   REMOVE_AMBIENT_CONC_LIQ: () => ({
     title: "Remove Concentrated Liquidity",

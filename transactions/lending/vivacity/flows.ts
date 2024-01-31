@@ -1,7 +1,7 @@
 import {
   CTokenLendingTransactionParams,
   CTokenLendingTxTypes,
-  ClaimRewardsTxParams
+  ClaimRewardsTxParams,
 } from ".";
 import { NewTransactionFlow, TransactionFlowType } from "../../flows";
 
@@ -11,23 +11,23 @@ export const newCTokenLendingFlow = (
   const tokenMetadata =
     txParams.txType === CTokenLendingTxTypes.SUPPLY
       ? [
-        {
-          chainId: txParams.chainId,
-          address: txParams.cToken.address,
-          symbol: txParams.cToken.symbol,
-          decimals: txParams.cToken.decimals,
-          icon: txParams.cToken.underlying.logoURI,
-        },
-      ]
+          {
+            chainId: txParams.chainId,
+            address: txParams.cToken.address,
+            symbol: txParams.cToken.symbol,
+            decimals: txParams.cToken.decimals,
+            icon: txParams.cToken.underlying.logoURI,
+          },
+        ]
       : [
-        {
-          chainId: txParams.chainId,
-          address: txParams.cToken.underlying.address,
-          symbol: txParams.cToken.underlying.symbol,
-          decimals: txParams.cToken.underlying.decimals,
-          icon: txParams.cToken.underlying.logoURI,
-        },
-      ];
+          {
+            chainId: txParams.chainId,
+            address: txParams.cToken.underlying.address,
+            symbol: txParams.cToken.underlying.symbol,
+            decimals: txParams.cToken.underlying.decimals,
+            icon: txParams.cToken.underlying.logoURI,
+          },
+        ];
   return {
     title: txParams.txType + " " + txParams.cToken.underlying.symbol,
     icon: txParams.cToken.underlying.logoURI,
@@ -36,8 +36,6 @@ export const newCTokenLendingFlow = (
     tokenMetadata,
   };
 };
-
-
 
 export const newClaimRewardsFlow = (
   txParams: ClaimRewardsTxParams
@@ -49,4 +47,3 @@ export const newClaimRewardsFlow = (
     params: txParams,
   };
 };
-

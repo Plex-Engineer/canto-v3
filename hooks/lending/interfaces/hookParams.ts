@@ -4,10 +4,10 @@ import { LendingMarketType } from "../config/cTokenAddresses";
 import {
   CLMClaimRewardsTxParams,
   CTokenLendingTransactionParams,
+  Vivacity,
 } from "@/transactions/lending";
 import { Validation } from "@/config/interfaces";
 import { NewTransactionFlow } from "@/transactions/flows";
-import { Vivacity } from "@/transactions/lending";
 
 export interface LendingHookInputParams {
   chainId: number;
@@ -21,7 +21,10 @@ export interface LendingHookReturn {
   position: UserLMPosition;
   isLoading: boolean;
   selection: {
-    selectedCToken: CTokenWithUserData | Vivacity.VCNoteWithUserData | undefined;
+    selectedCToken:
+      | CTokenWithUserData
+      | Vivacity.VCNoteWithUserData
+      | undefined;
     setSelectedCToken: (cTokenAddress: string | null) => void;
   };
   transaction: {
@@ -32,7 +35,9 @@ export interface LendingHookReturn {
     newClaimRewardsFlow: (
       txParams: CLMClaimRewardsTxParams
     ) => NewTransactionFlow;
-    validateVivacityParams: (txParams: Vivacity.CTokenLendingTransactionParams) => Validation;
+    validateVivacityParams: (
+      txParams: Vivacity.CTokenLendingTransactionParams
+    ) => Validation;
     newVivacityLendingFlow: (
       txParams: Vivacity.CTokenLendingTransactionParams
     ) => NewTransactionFlow;

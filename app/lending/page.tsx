@@ -21,7 +21,6 @@ import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import Analytics from "@/provider/analytics";
 import { getAnalyticsLendingMarketTokenInfo } from "@/utils/analytics";
-import { Vivacity } from "@/transactions/lending";
 
 enum CLMModalTypes {
   SUPPLY = "supply",

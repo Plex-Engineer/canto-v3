@@ -30,8 +30,8 @@ export async function clmClaimRewardsTx(
     // get all addresses for tx
     const [marketAddress, lendingLedgerAddress] = [
       getVivacityAddress(txParams.chainId, "vcNoteRouter"),
-      getVivacityAddress(txParams.chainId, "lendingLedger")
-    ]
+      getVivacityAddress(txParams.chainId, "lendingLedger"),
+    ];
     // check for errors
     if (!(marketAddress && lendingLedgerAddress))
       throw new Error("chainId not supported");

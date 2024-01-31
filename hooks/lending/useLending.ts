@@ -41,14 +41,14 @@ export default function useLending(
           cTokenAddresses
         ),
         getVivacityLMData(params.userEthAddress ?? "", params.chainId),
-      ])
+      ]);
       if (clmData.error) throw clmData.error;
 
       if (vcNoteData.error) throw vcNoteData.error;
 
       return {
         ...clmData.data,
-        vcNote: vcNoteData.data.vcNote
+        vcNote: vcNoteData.data.vcNote,
       };
     },
     {
@@ -71,9 +71,12 @@ export default function useLending(
     string | null
   >(null);
   // get token from constantly updating list of cTokens
-  const selectedCToken = selectedCTokenAddress == clmData?.vcNote?.address ? clmData?.vcNote : clmData?.cTokens.find((cToken) =>
-    areEqualAddresses(cToken.address, selectedCTokenAddress ?? "")
-  );
+  const selectedCToken =
+    selectedCTokenAddress == clmData?.vcNote?.address
+      ? clmData?.vcNote
+      : clmData?.cTokens.find((cToken) =>
+          areEqualAddresses(cToken.address, selectedCTokenAddress ?? "")
+        );
 
   return {
     cTokens: clmData?.cTokens ?? [],
@@ -95,9 +98,12 @@ export default function useLending(
       validateParams: (txParams) => validateCTokenLendingTxParams(txParams),
       newLendingFlow: (txParams) => newCTokenLendingFlow(txParams),
       newClaimRewardsFlow: (txParams) => newClaimCLMRewardsFlow(txParams),
-      validateVivacityParams: (txParams) => Vivacity.validateCTokenLendingTxParams(txParams),
-      newVivacityLendingFlow: (txParams) => Vivacity.newCTokenLendingFlow(txParams),
-      newVivacityClaimRewardsFlow: (txParams) => Vivacity.newClaimRewardsFlow(txParams),
+      validateVivacityParams: (txParams) =>
+        Vivacity.validateCTokenLendingTxParams(txParams),
+      newVivacityLendingFlow: (txParams) =>
+        Vivacity.newCTokenLendingFlow(txParams),
+      newVivacityClaimRewardsFlow: (txParams) =>
+        Vivacity.newClaimRewardsFlow(txParams),
     },
   };
 }
