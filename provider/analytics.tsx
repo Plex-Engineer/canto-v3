@@ -6,6 +6,7 @@ import { CantoFETxType } from "@/transactions/interfaces";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
 import { CantoDexTxTypes } from "@/transactions/pairs/cantoDex";
 import { AmbientTxType } from "@/transactions/pairs/ambient";
+import { StakingTxTypes } from "@/transactions/staking";
 import posthog from "posthog-js";
 
 // (BRIDGE/LP/LENDING/...)
@@ -16,6 +17,7 @@ type AnalyticsTransactionFlowType =
   | AmbientTxType
   | CTokenLendingTxTypes
   | BridgingMethodName
+  | StakingTxTypes
   | string;
 
 
@@ -84,7 +86,15 @@ export type AnalyticsLMData = {
   lmAccountLiquidityRemaining?: string;
 }
 
-export type AnalyticsTransactionFlowData = AnalyticsBridgeData | AnalyticsCantoLPData | AnalyticsAmbientLPData | AnalyticsLMData;
+export type AnalyticsStakingData = {
+  stakingValidator?: string;
+  stakingAmount?: string;
+  stakingDelegation?: string;
+  stakingWalletBalance?: string;
+  stakingNewValidator?: string;
+}
+
+export type AnalyticsTransactionFlowData = AnalyticsBridgeData | AnalyticsCantoLPData | AnalyticsAmbientLPData | AnalyticsLMData | AnalyticsStakingData;
 
 // tx types (approve/mint/swap/...)
 type AnalyticsTransactionType = CantoFETxType;
@@ -202,6 +212,19 @@ class AnalyticsWrapper {
             tab,
           });
         },
+      },
+      staking:{
+        delegateClicked: (params: AnalyticsStakingData) => {
+          posthog.capture("Delegate Stake Clicked", params);
+        },
+        manageClicked: (params: AnalyticsStakingData) => {
+          posthog.capture("Manage Stake Clicked", params);
+        },
+        tabSwitched: (tab : string) =>{
+          posthog.capture("Staking Tab Switched", {
+            tab,
+          });
+        }
       },
       transactionFlows: {
         started: (params: AnalyticsTransactionFlowParams) => {

@@ -6,6 +6,7 @@ import {
   AnalyticsAmbientLPData,
   AnalyticsCantoLPData,
   AnalyticsLMData,
+  AnalyticsStakingData,
 } from "@/provider/analytics";
 import { BridgeTransactionParams } from "@/transactions/bridge/types";
 import {
@@ -29,6 +30,8 @@ import { getDisplayTokenAmountFromRange, getPriceFromTick } from "@/utils/ambien
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
+import { StakingTransactionParams, StakingTxTypes } from "@/transactions/staking";
+import { Validator, ValidatorWithDelegations } from "@/hooks/staking/interfaces/validators";
 
 export function displayAnalyticsAmount(amount: string, decimals: number){
   return displayAmount(amount, decimals, { short: false, precision: decimals });
@@ -71,6 +74,10 @@ export function getAnalyticsTransactionFlowInfo(
       txFlowInfo.txFlowType = flow.params.txType;
       txFlowInfo.txFlowData = getClmCTokenTransactionFlowData(flow.params);
       break;
+    case TransactionFlowType.STAKE_CANTO_TX:
+    txFlowInfo.txFlowType = flow.params.txType;
+    txFlowInfo.txFlowData = getStakingTransactionFlowData(flow.params);
+    break;
     default:
       return NEW_ERROR("Invalid transaction flow type");
   }
@@ -327,6 +334,55 @@ function getClmCTokenTransactionFlowData(
   }
 }
 
+function getStakingTransactionFlowData(
+  stakingTxParams: StakingTransactionParams
+): AnalyticsTransactionFlowData {
+
+  switch (stakingTxParams.txType) {
+    case StakingTxTypes.DELEGATE || StakingTxTypes.UNDELEGATE:
+      return {
+        stakingValidator: stakingTxParams.validator.description.moniker,
+        stakingDelegation: displayAnalyticsAmount(
+          stakingTxParams.validator.userDelegation.balance ??
+          "0",
+          18
+        ),
+        stakingAmount: displayAnalyticsAmount(
+          stakingTxParams.amount ??
+          "0",
+          18
+        ),
+        stakingWalletBalance: displayAnalyticsAmount(
+          stakingTxParams.nativeBalance ??
+          "0",
+          18
+        ),
+      };
+    case StakingTxTypes.REDELEGATE: {
+      return {
+        stakingValidator: stakingTxParams.validator.description.moniker,
+        stakingDelegation: displayAnalyticsAmount(
+          stakingTxParams.validator.userDelegation.balance ??
+          "0",
+          18
+        ),
+        stakingAmount: displayAnalyticsAmount(
+          stakingTxParams.amount ??
+          "0",
+          18
+        ),
+        stakingNewValidator: stakingTxParams.newValidatorName
+      };
+    }
+    case StakingTxTypes.CLAIM_REWARDS:
+      return {};
+    default:
+      return {};
+  }
+}
+
+
+
 function getLpComboClaimRewardsTransactionFlowType(
   lpComboClaimRewardsTxParams: ClaimDexComboRewardsParams
 ): string | undefined {
@@ -424,4 +480,17 @@ export function getAnalyticsCantoLiquidityPoolInfo(pool : CantoDexPairWithUserCT
       { short: false, precision: pool.decimals }
     ),
   }
+}
+
+
+
+export function getAnalyticsStakingInfo(validator : Validator, delegation : string) : AnalyticsStakingData {
+  return {
+    stakingValidator: validator.description.moniker,
+    stakingDelegation: displayAnalyticsAmount(
+      delegation ??
+      "0",
+      18
+    ),
+  };
 }
