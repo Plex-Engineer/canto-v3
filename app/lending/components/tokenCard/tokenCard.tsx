@@ -56,7 +56,7 @@ const TokenCard = ({ cToken, items, onClick }: Props) => {
           padding: "0 20px",
         }}
       >
-        <hr color="#aaa" />
+        <hr color="#f0f0f0" />
       </div>
 
       <Container padding={"sm"} gap={16}>

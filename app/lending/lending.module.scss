@@ -7,9 +7,9 @@
   margin: 10px 0;
   border-top: 1px solid var(--primary-90-color);
   position: relative;
-  padding-top: 2rem;
+  padding-top: 1rem;
   grid-template-columns: 1fr 0.7fr;
-  gap: 2rem;
+  gap: 1rem;
   grid-template-areas:
     "title title"
     "accountHealth highlightCard"
