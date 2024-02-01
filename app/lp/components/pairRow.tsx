@@ -16,7 +16,7 @@ import {
 import BigNumber from "bignumber.js";
 import { HoverPositions } from "./HoverPositions";
 import { estimateTokenAmountsFromLiquidity } from "@/utils/cantoDex";
-
+import Countdown from "@/components/timer/countdown";
 export const UserCantoDexPairRow = ({
   pair,
   onManage,
@@ -296,10 +296,12 @@ export const UserAmbientPairRow = ({
   pool,
   onManage,
   rewards,
+  rewardTime,
 }: {
   pool: AmbientPool;
   onManage: (poolAddress: string) => void;
   rewards?: string;
+  rewardTime: bigint;
 }) => {
   let totalValue = "0";
   const allPositionValues = pool.userPositions.map((position) => {
@@ -354,7 +356,6 @@ export const UserAmbientPairRow = ({
       },
     };
   });
-
   return [
     <Container
       key={pool.address}
@@ -419,7 +420,7 @@ export const UserAmbientPairRow = ({
       <InfoPop>
         <Container>
           <Text size="sm" theme="secondary-dark">
-            Rewards are released weekly every Thursday at 03:30 AM UTC
+            Rewards will be released in <Countdown endTimestamp={rewardTime} />
           </Text>
         </Container>
       </InfoPop>
