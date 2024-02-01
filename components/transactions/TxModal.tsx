@@ -74,7 +74,7 @@ const TransactionModal = () => {
             }}
           >
             <Container height="300px">
-              <Splash height="300px" width="300px" />
+              <Splash height="300px" width="300px" themed />
             </Container>
             <Text size="lg" font="proto_mono">
               loading...

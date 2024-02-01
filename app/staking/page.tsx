@@ -261,7 +261,7 @@ export default function StakingPage() {
   }
 
   return isLoading ? (
-    <Splash />
+    <Splash themed />
   ) : (
     <div className={styles.container}>
       <div>

@@ -28,7 +28,7 @@ export default function GovernancePage() {
   );
 
   return isProposalsLoading ? (
-    <Splash />
+    <Splash themed />
   ) : (
     <div>
       <div className={styles.container}>
