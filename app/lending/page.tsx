@@ -21,6 +21,7 @@ import { addTokenBalances, divideBalances } from "@/utils/math/tokenMath.utils";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 import Splash from "@/components/splash/splash";
 import Separator from "@/components/Separator/separator";
+import clsx from "clsx";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -67,7 +68,7 @@ export default function LendingPage() {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={clsx(styles.container, "separator")}>
       <Text size="x-lg" font="proto_mono" className={styles.title}>
         Lending
       </Text>
@@ -177,7 +178,7 @@ export default function LendingPage() {
         />
       </div>
 
-      <div className={styles.mainTable}>
+      <div className={clsx(styles.mainTable, "separator")}>
         {isMobile && (
           <div>
             <ToggleGroup

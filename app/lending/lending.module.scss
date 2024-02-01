@@ -10,21 +10,16 @@
   padding-top: 1rem;
   grid-template-columns: 1fr 0.7fr;
   gap: 1rem;
+  &::after {
+    height: 9px;
+    border-right: 1px solid var(--primary-90-color);
+    position: absolute;
+    left: 58.6%;
+  }
   grid-template-areas:
     "title title"
     "accountHealth highlightCard"
     "mainContent mainContent";
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: -1px;
-    left: 0;
-    width: calc(100% - 1px);
-    height: 10px;
-    border-left: 1px solid var(--primary-90-color);
-    border-right: 1px solid var(--primary-90-color);
-  }
 }
 
 .title {
@@ -45,9 +40,15 @@
 
 .mainTable {
   grid-area: mainContent;
-  //   height: 1000px;
   display: flex;
   gap: 1.5rem;
+  padding: 1rem 0;
+  margin-top: 1rem;
+
+  &::after {
+    height: 9px;
+    border-right: 1px solid var(--primary-90-color);
+  }
 }
 
 .accountHealth {

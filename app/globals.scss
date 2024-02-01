@@ -189,3 +189,45 @@ hr {
   border-top: 1px solid rgba(var(--dark-color), 0.2);
   width: 100%;
 }
+
+.separator {
+  display: flex;
+  width: 100%;
+  border-top: 1px solid var(--primary-90-color);
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: calc(100% - 1px);
+    height: 10px;
+    border-left: 1px solid var(--primary-90-color);
+    border-right: 1px solid var(--primary-90-color);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 10px;
+    // border-left: 1px solid var(--primary-90-color);
+  }
+
+  //   animation: loading 1.4s infinite ease-in;
+  animation-delay: 0;
+
+  @keyframes loading {
+    to {
+      width: 100%;
+      opacity: 1;
+    }
+    from {
+      width: 10%;
+      opacity: 0;
+    }
+  }
+}
