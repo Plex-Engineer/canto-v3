@@ -54,7 +54,6 @@ export default function LendingPage() {
   const { selectedCToken, setSelectedCToken } = selection;
   const [isMobile, setIsMobile] = useState(false);
   const screen = useScreenSize();
-
   useEffect(() => {
     setIsMobile(screen.width < 768);
   }, [screen.width]);
@@ -170,8 +169,10 @@ export default function LendingPage() {
             },
           ]}
           onClick={() => {
-            setSelectedCToken(cNote.address);
-            setCurrentModal(CLMModalTypes.BORROW);
+            window.open(
+              "https://app.slingshot.finance/swap/Canto/NOTE",
+              "_blank"
+            );
           }}
         />
       </div>
@@ -267,7 +268,7 @@ export default function LendingPage() {
                     </Container>
                   </Container>,
                   cStableCoin.supplyApy + "%",
-                  displayAmount(cStableCoin.collateralFactor, 16),
+                  displayAmount(cStableCoin.collateralFactor, 16) + "%",
                   displayAmount(
                     cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
                     cStableCoin.underlying.decimals,

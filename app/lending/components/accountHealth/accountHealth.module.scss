@@ -33,6 +33,7 @@
     height: calc(100% + 0.6rem);
     transform: translateY(-0.3rem);
     width: 50%;
+    transition: background-color 0.3s ease-in-out;
   }
 }
 

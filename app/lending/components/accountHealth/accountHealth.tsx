@@ -12,6 +12,15 @@ interface Props {
 }
 
 const AccountHealth = (props: Props) => {
+  function getColor() {
+    if (props.percent < 0.95) {
+      return "green";
+    } else if (props.percent < 0.98) {
+      return "yellow";
+    }
+    return "red";
+  }
+
   return (
     <div className={styles.container}>
       <Text size="x-lg" font="proto_mono" color="#ddd">
@@ -26,7 +35,10 @@ const AccountHealth = (props: Props) => {
       <div className={styles.bar}>
         <div
           className={styles.fill}
-          style={{ width: `${props.percent * 100}%` }}
+          style={{
+            width: `${props.percent * 100}%`,
+            backgroundColor: getColor(),
+          }}
         ></div>
       </div>
     </div>
