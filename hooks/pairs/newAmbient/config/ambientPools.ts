@@ -26,6 +26,7 @@ const MAINNET_AMBIENT_POOLS: BaseAmbientPool[] = [
     symbol: "cNOTE / USDC",
     logoURI: "/icons/cNoteUSDCLP.svg",
     stable: true,
+    rewardsLedger: "0x00325777c82C1E3E4B22208Bc1C769f19B2B67Ba",
   },
   {
     base: {
@@ -51,6 +52,7 @@ const MAINNET_AMBIENT_POOLS: BaseAmbientPool[] = [
     logoURI:
       "https://raw.githubusercontent.com/Plex-Engineer/public-assets/main/icons/tokens/LP/NoteUSDCLP.svg",
     stable: true,
+    rewardsLedger: "0x554209512B8d1148eBA7D91cCabf3ea7C790c042",
   },
 ];
 const TESTNET_AMBIENT_POOLS: BaseAmbientPool[] = [
@@ -77,6 +79,7 @@ const TESTNET_AMBIENT_POOLS: BaseAmbientPool[] = [
     symbol: "cNoteUSDCLP",
     logoURI: "/icons/cNoteUSDCLP.svg",
     stable: true,
+    rewardsLedger: "0x6f5985723EBF98d4A200845C680a7e33bD183a80",
   },
 ];
 

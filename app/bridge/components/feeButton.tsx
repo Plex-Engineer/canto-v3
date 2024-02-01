@@ -1,7 +1,6 @@
 import Text from "@/components/text";
 import style from "./feeButton.module.scss";
 import clsx from "clsx";
-import BigNumber from "bignumber.js";
 
 interface Props {
   title: string;
@@ -10,7 +9,7 @@ interface Props {
 
   tokenSymbol: string;
   tokenAmount: string;
-  tokenPrice?: string;
+  tokenValueUSD: string;
   onClick?: () => void;
   active?: boolean;
 }
@@ -21,13 +20,10 @@ const FeeButton = ({
   subtext2,
   tokenSymbol,
   tokenAmount,
-  tokenPrice,
+  tokenValueUSD,
   onClick,
   active,
 }: Props) => {
-  const tokenUSDValue = tokenPrice
-    ? new BigNumber(tokenAmount).times(tokenPrice).toFixed(2)
-    : "unavailable";
   return (
     <div
       className={clsx(style.container, active && style.active)}
@@ -55,7 +51,7 @@ const FeeButton = ({
       <div className={style.divider} />
       <Text font="proto_mono">{`${tokenAmount} ${tokenSymbol}`}</Text>
       <Text size="x-sm" theme="secondary-dark">
-        {"$" + tokenUSDValue}
+        {"$" + tokenValueUSD}
       </Text>
     </div>
   );
