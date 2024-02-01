@@ -74,7 +74,7 @@ export default function Page() {
   const [selectedVote, setSelectedVote] = useState<VoteOption | null>(null);
 
   if (isProposalsLoading) {
-    return <Splash />;
+    return <Splash themed />;
   }
 
   if (!id) {
@@ -118,7 +118,7 @@ export default function Page() {
   );
 
   return isProposalsLoading ? (
-    <Splash />
+    <Splash themed />
   ) : (
     <div className={styles.proposalContainer}>
       <div className={styles.proposalHeaderContainer}>

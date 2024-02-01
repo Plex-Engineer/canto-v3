@@ -5,6 +5,7 @@
   max-width: 1400px;
   margin: 10px auto;
   //height: 1px;
+  height: 1px;
   border-top: 1px solid var(--primary-90-color);
   position: relative;
   padding-top: 10px;
@@ -128,12 +129,14 @@
 }
 
 .tableTitleContainer {
-  width: 72%;
+  width: 100%;
+  margin-right: 1rem;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
 }
 .tableContainer {
-  margin-right: 2%;
+  margin-right: 1rem;
 }
 
 .tableContainer2 {

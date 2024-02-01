@@ -6,6 +6,7 @@ export interface BaseAmbientPool {
   quote: AmbientPoolToken;
   poolIdx: number;
   stable: boolean;
+  rewardsLedger: string;
 }
 interface AmbientPoolToken {
   address: string;
@@ -33,6 +34,7 @@ export interface AmbientPool extends BaseAmbientPool {
     feeRate: number;
   };
   userPositions: AmbientUserPosition[];
+  userRewards: string;
   totals: {
     noteTvl: string;
     apr: {

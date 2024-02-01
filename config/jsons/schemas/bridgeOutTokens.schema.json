@@ -113,6 +113,10 @@
                 "oftUnderlyingAddress": {
                     "description": "address of the underlying token for an OFT",
                     "type": "string"
+                },
+                "oftHasAdapterParams": {
+                    "description": "if the OFT has the useAdapterParams function",
+                    "type": "boolean"
                 }
             },
             "additionalProperties": false,
@@ -134,7 +138,8 @@
                     "ibcDenom"
                 ],
                 "isOFT": [
-                    "isOFTProxy"
+                    "isOFTProxy",
+                    "oftHasAdapterParams"
                 ]
             }
         }
