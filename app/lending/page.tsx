@@ -19,6 +19,8 @@ import TokenCard from "./components/tokenCard/tokenCard";
 import Icon from "@/components/icon/icon";
 import { addTokenBalances, divideBalances } from "@/utils/math/tokenMath.utils";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
+import Splash from "@/components/splash/splash";
+import Separator from "@/components/Separator/separator";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -58,7 +60,11 @@ export default function LendingPage() {
   }, [screen.width]);
 
   if (isLoading || cNote === undefined || stableCoins === undefined) {
-    return <div className={styles.loading}>loading</div>;
+    return (
+      <div className={styles.loading}>
+        <Splash />
+      </div>
+    );
   }
 
   return (
