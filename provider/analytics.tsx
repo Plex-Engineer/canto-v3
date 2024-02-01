@@ -20,14 +20,13 @@ type AnalyticsTransactionFlowType =
   | StakingTxTypes
   | string;
 
-
 export type AnalyticsBridgeData = {
   bridgeDirection: string;
   bridgeFrom: string;
   bridgeTo: string;
   bridgeAsset: string;
   bridgeAmount: string;
-}
+};
 
 export type AnalyticsCantoLPData = {
   lpType?: string;
@@ -47,14 +46,14 @@ export type AnalyticsCantoLPData = {
   cantoLpSlippage?: Number;
   cantoLpDeadline?: string;
   cantoLpStakeStatus?: boolean;
-}
+};
 
 type AnalyticsAmbientLPPositionData = {
   ambientLPPositionId?: string;
   ambientLpLiquidity?: string;
   ambientLpMinRangePrice?: string;
   ambientLpMaxRangePrice?: string;
-}
+};
 
 export type AnalyticsAmbientLPData = {
   lpType?: string;
@@ -73,7 +72,7 @@ export type AnalyticsAmbientLPData = {
   ambientLpFee?: string;
   ambientLpIsAdvanced?: boolean;
   ambientLPPositions?: AnalyticsAmbientLPPositionData[];
-} & AnalyticsAmbientLPPositionData
+} & AnalyticsAmbientLPPositionData;
 
 export type AnalyticsLMData = {
   lmType?: string;
@@ -84,7 +83,7 @@ export type AnalyticsLMData = {
   lmSuppliedAmount?: string;
   lmBorrowedAmount?: string;
   lmAccountLiquidityRemaining?: string;
-}
+};
 
 export type AnalyticsStakingData = {
   stakingValidator?: string;
@@ -92,9 +91,14 @@ export type AnalyticsStakingData = {
   stakingDelegation?: string;
   stakingWalletBalance?: string;
   stakingNewValidator?: string;
-}
+};
 
-export type AnalyticsTransactionFlowData = AnalyticsBridgeData | AnalyticsCantoLPData | AnalyticsAmbientLPData | AnalyticsLMData | AnalyticsStakingData;
+export type AnalyticsTransactionFlowData =
+  | AnalyticsBridgeData
+  | AnalyticsCantoLPData
+  | AnalyticsAmbientLPData
+  | AnalyticsLMData
+  | AnalyticsStakingData;
 
 // tx types (approve/mint/swap/...)
 type AnalyticsTransactionType = CantoFETxType;
@@ -143,7 +147,7 @@ class AnalyticsWrapper {
       pageOpened: (pageName: string, currentUrl: string) => {
         posthog.capture("$pageview", {
           pageName,
-          '$current_url': currentUrl,
+          $current_url: currentUrl,
         });
       },
       connections: {
@@ -157,7 +161,7 @@ class AnalyticsWrapper {
       },
       themeChanged: (theme: string) => {
         posthog.capture("Theme Changed", {
-          theme
+          theme,
         });
       },
       transactionModalOpened: () => {
@@ -173,7 +177,9 @@ class AnalyticsWrapper {
         addLPClicked: (params: object) => {
           posthog.capture("Add LP Clicked", params);
         },
-        manageLPClicked: (params: AnalyticsCantoLPData | AnalyticsAmbientLPData) => {
+        manageLPClicked: (
+          params: AnalyticsCantoLPData | AnalyticsAmbientLPData
+        ) => {
           posthog.capture("Manage LP Clicked", params);
         },
         tabSwitched: (tab: string) => {
@@ -213,18 +219,18 @@ class AnalyticsWrapper {
           });
         },
       },
-      staking:{
+      staking: {
         delegateClicked: (params: AnalyticsStakingData) => {
           posthog.capture("Delegate Stake Clicked", params);
         },
         manageClicked: (params: AnalyticsStakingData) => {
           posthog.capture("Manage Stake Clicked", params);
         },
-        tabSwitched: (tab : string) =>{
+        tabSwitched: (tab: string) => {
           posthog.capture("Staking Tab Switched", {
             tab,
           });
-        }
+        },
       },
       transactionFlows: {
         started: (params: AnalyticsTransactionFlowParams) => {
