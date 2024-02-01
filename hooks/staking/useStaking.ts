@@ -84,7 +84,7 @@ export default function useStaking(
 
       const userUnbondingDelegations: UnbondingDelegation[] =
         userStaking.data.unbondingDelegations
-          .map((unbondingEntry) => {
+          ?.map((unbondingEntry) => {
             const validatorName = allValidators.data.find(
               (val) => val.operator_address === unbondingEntry.validator_address
             )?.description.moniker;
@@ -94,7 +94,7 @@ export default function useStaking(
               undelegation: entry.balance,
             }));
           })
-          .flat();
+          .flat() ?? [];
 
       return {
         validators: allValidators.data,
