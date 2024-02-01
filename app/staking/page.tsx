@@ -437,9 +437,11 @@ export default function StakingPage() {
                               key="noData"
                               className={styles.noValidatorContainer}
                             >
-                              <Text font="proto_mono" size="lg">
-                                NO {currentFilter} VALIDATORS FOUND
-                              </Text>
+                              <Container>
+                                <Text font="proto_mono" size="lg">
+                                  NO {currentFilter} VALIDATORS FOUND
+                                </Text>
+                              </Container>
                             </div>,
                           ]
                     }

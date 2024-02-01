@@ -14,6 +14,8 @@ import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { useBalance } from "wagmi";
 import { useAutoConnect } from "@/provider/useAutoConnect";
 import Icon from "../icon/icon";
+import MoreOptionsModal from "../../components/navBarModal/navBarModal";
+import Modal from "../modal/modal";
 
 const NavBar = () => {
   // This is used to connect safe as wallet,
@@ -23,6 +25,20 @@ const NavBar = () => {
   const searchParams = useSearchParams();
   const { signer } = useCantoSigner();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
+
+  const handleMoreClick = () => {
+    setIsMoreModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsMoreModalOpen(false);
+  };
+
+  const handleMoreOptionSelect = (option: any) => {
+    // Handle the option selection (e.g., navigate to the selected link)
+    setIsMoreModalOpen(false);
+  };
   useEffect(() => {
     if (signer?.account.address) {
       Analytics.actions.people.registerWallet(signer.account.address);
@@ -149,6 +165,20 @@ const NavBar = () => {
         >
           <Text size="sm">Explore</Text>
         </Link>
+        <div className={styles["nav-link"]} onClick={handleMoreClick}>
+          <Text size="sm">More</Text>
+          {isMoreModalOpen && (
+            <Modal
+              open={isMoreModalOpen}
+              onClose={() => setIsMoreModalOpen(false)}
+            >
+              <MoreOptionsModal
+                onClose={() => setIsMoreModalOpen(false)}
+                onSelect={handleMoreOptionSelect}
+              />
+            </Modal>
+          )}
+        </div>
       </div>
       <div className={styles["btn-grp"]}>
         <div className={styles.theme}>

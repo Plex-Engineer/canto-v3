@@ -1,0 +1,31 @@
+/* moreOptionsModal.module.scss */
+.modalContainer {
+    position: absolute;
+    top: 100%; /* Adjust this value as needed */
+    left: 0; /* Adjust this value as needed */
+    background-color: #fff; /* Background color */
+    border: 1px solid #ccc; /* Border */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Box shadow */
+    padding: 10px; /* Adjust padding as needed */
+    z-index: 1000; /* Ensure it's on top of other elements */
+  }
+  
+  .modalContent {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .modalContent a {
+    text-decoration: none;
+    color: #333; /* Link color */
+    padding: 8px 0; /* Adjust padding as needed */
+  }
+  
+  .closeButton {
+    background-color: #eee; /* Button background color */
+    border: none;
+    padding: 8px; /* Adjust padding as needed */
+    cursor: pointer;
+    margin-top: 10px; /* Adjust margin as needed */
+  }
+  
