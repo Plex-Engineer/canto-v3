@@ -9,7 +9,7 @@ export default function HomePage() {
         Home Page
       </Text>
 
-      <Splash />
+      <Splash themed />
     </div>
   );
 }
