@@ -36,6 +36,7 @@ import { PAGE_NUMBER } from "@/config/consts/config";
 import { Pagination } from "@/components/pagination/Pagination";
 import { levenshteinDistance } from "@/utils/staking/searchUtils";
 import { WalletClient } from "wagmi";
+import Analytics from "@/provider/analytics";
 
 export default function StakingPage() {
   // connected user info
@@ -374,6 +375,7 @@ export default function StakingPage() {
                           options={["ACTIVE", "INACTIVE"]}
                           selected={currentFilter}
                           setSelected={(value) => {
+                            Analytics.actions.events.staking.tabSwitched(value);
                             setCurrentFilter(value);
                             setCurrentPage(1);
                             setSearchQuery("");
