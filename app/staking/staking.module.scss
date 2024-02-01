@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 10px 6% 0 6%;
+  max-width: 1400px;
+  margin: 10px auto;
   height: 1px;
   border-top: 1px solid var(--primary-90-color);
   padding-top: 10px;
@@ -46,9 +47,10 @@
 }
 
 .stakingInfoContainer{
+  width: 100%;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-between;  
 
   .Tables{
     flex: 1;
@@ -63,6 +65,7 @@
   .stakingInfoCard{
     background: var(--card-sub-surface-color, #dfdfdf);
     box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
+    border: 1px solid var(--border-stroke-color);
     display: flex;
     flex-direction: column;
     height: 400px;
@@ -114,12 +117,14 @@
 }
 
 .tableTitleContainer {
-  width: 55%;
+  width: 100%;
+  margin-right: 1rem;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
 }
 .tableContainer {
-  margin-right: 2%;
+  margin-right: 1rem;
 }
 
 .tableContainer2 {

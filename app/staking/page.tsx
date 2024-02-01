@@ -268,9 +268,19 @@ export default function StakingPage() {
       <div>
         <Spacer height="20px" />
       </div>
-      <Text size="x-lg" font="proto_mono" className={styles.title}>
-        STAKING
-      </Text>
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          flexDirection: "row",
+          justifyContent: "flex-start",
+        }}
+      >
+        <Text size="x-lg" font="proto_mono" className={styles.title}>
+          STAKING
+        </Text>
+      </div>
+
       <div>
         <Spacer height="20px" />
       </div>
@@ -321,14 +331,20 @@ export default function StakingPage() {
                       },
                     ]}
                     content={[
-                      ...userStaking.validators.map(
-                        (userStakingElement, index) =>
+                      ...userStaking.validators
+                        .filter(
+                          (e) =>
+                            Number(
+                              formatBalance(e.userDelegation.balance, 18)
+                            ) > 0.0000001
+                        )
+                        .map((userStakingElement, index) =>
                           GenerateMyStakingTableRow(
                             userStakingElement,
                             index,
                             () => handleClick(userStakingElement)
                           )
-                      ),
+                        ),
                     ]}
                   />
                 </div>
@@ -359,7 +375,7 @@ export default function StakingPage() {
                         <div className={styles.searchBarContainer}>
                           <div>
                             <Input
-                              height={40}
+                              height={38}
                               type="search"
                               value={searchQuery}
                               onChange={(e) => setSearchQuery(e.target.value)}
