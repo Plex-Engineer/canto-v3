@@ -56,9 +56,9 @@ export function getLMTotalsFromCTokens(
       // }
       // get the apr in $note
       const supplyAprInNote = new BigNumber(
-        Number(cToken.supplyApy)
+        Number(cToken.supplyApr)
       ).multipliedBy(supplyInNote);
-      const borrowAprInNote = new BigNumber(cToken.borrowApy).multipliedBy(
+      const borrowAprInNote = new BigNumber(cToken.borrowApr).multipliedBy(
         borrowInNote
       );
       // add to totals
@@ -83,7 +83,7 @@ export function getLMTotalsFromCTokens(
   let avgApr = new BigNumber(0);
   // check if division by zero will happen
   if (totals.totalSupply.isGreaterThan(0)) {
-    avgApr = totals.cummulativeApr.div(totals.totalSupply.minus(totals.totalBorrow)).div(100).div(365).plus(1).pow(365).minus(1).multipliedBy(100);
+    avgApr = totals.cummulativeApr.div(totals.totalSupply.minus(totals.totalBorrow));
   }
   return errorInLoop
     ? NEW_ERROR("getLMTotalsFromCTokens: " + errorReaons.join(", "))

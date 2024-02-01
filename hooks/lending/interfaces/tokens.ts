@@ -1,6 +1,7 @@
 export interface CToken {
   address: string;
   borrowApy: string;
+  borrowApr: string;
   borrowCap: string;
   cash: string;
   collateralFactor: string;
@@ -13,6 +14,7 @@ export interface CToken {
   name: string;
   price: string;
   supplyApy: string;
+  supplyApr: string;
   symbol: string;
   underlying: {
     address: string;

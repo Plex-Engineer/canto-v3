@@ -36,8 +36,8 @@ export const RWARow = ({
       cRwa.underlying.decimals
     )}
   </Text>,
-  <Text theme="primary-dark" key={cRwa.name + "cToken.supplyApy"}>
-    {Number(cRwa.supplyApy).toFixed(2) + "%"}
+  <Text theme="primary-dark" key={cRwa.name + "cToken.supplyApr"}>
+    {Number(cRwa.supplyApr).toFixed(2) + "%"}
   </Text>,
   <Text theme="primary-dark" key={cRwa.name + "cToken.ubalance"}>
     {displayAmount(
@@ -119,18 +119,18 @@ export const StableCoinRow = ({
     <Text
       size="sm"
       theme="primary-dark"
-      key={cStableCoin.name + "cToken.supplyApy"}
+      key={cStableCoin.name + "cToken.supplyApr"}
     >
-      {`${Number(cStableCoin.supplyApy)}%`}
+      {`${Number(cStableCoin.supplyApr)}%`}
     </Text>
     <InfoPop>
       <Container gap={6}>
         <Container gap={"auto"} direction="row">
           <Text font="proto_mono" size="x-sm">
-            supply apy:
+            supply apr:
           </Text>
           <Text font="proto_mono" size="x-sm">
-            {`${Number(cStableCoin.supplyApy).toFixed(2)}%`}
+            {`${Number(cStableCoin.supplyApr).toFixed(2)}%`}
           </Text>
         </Container>
         <Container gap={"auto"} direction="row">
@@ -162,7 +162,7 @@ export const StableCoinRow = ({
     theme="primary-dark"
     key={cStableCoin.name + "cToken.borrowApr"}
   >
-    {Number(cStableCoin.borrowApy).toFixed(2) + "%"}
+    {Number(cStableCoin.borrowApr).toFixed(2) + "%"}
   </Text>,
   <Text
     size="sm"

@@ -135,14 +135,14 @@ export const LendingModal = (props: Props) => {
         {/* might need to change this in future for showing it on more tokens */}
         {isSupply && cToken.symbol.toLowerCase() == "cnote" && (
           <>
-            <ModalItem name="Supply APR" value={cToken.supplyApy + "%"} />
+            <ModalItem name="Supply APR" value={cToken.supplyApr + "%"} />
             <ModalItem name="Dist APR" value={cToken.distApy + "%"} />
           </>
         )}
 
         {!isSupply && (
           <>
-            <ModalItem name="Borrow APR" value={cToken.borrowApy + "%"} />
+            <ModalItem name="Borrow APR" value={cToken.borrowApr + "%"} />
           </>
         )}
 
