@@ -84,6 +84,37 @@
   //   }
 }
 
+.moreLink{
+  padding: 0 1rem;
+  opacity: 0.4;
+  transition:
+    opacity 0.1s,
+    transform 0.3s;
+
+  &:hover {
+    opacity: 1;
+    // transform: translateY(4.7px);
+  }
+  .popUp{
+    opacity: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    //height: 100px;
+    width: 150px;
+    background: var(--card-sub-surface-color, #dfdfdf);
+    border: 1px solid var(--border-stroke-color);
+    border-radius: 10%;
+    position: absolute;
+    top: 50px;
+    z-index: 10000;
+
+    &:focus {
+      opacity: 0;
+    }
+  }
+}
+
 .active {
   opacity: 1;
   position: relative;
@@ -185,3 +216,29 @@
     display: block;
   }
 }
+
+
+
+.moreButtonContainer{
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+}
+
+.optionsContainer{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  border-radius: 10%;
+  cursor: pointer;
+
+}
+
+.optionsContainer:hover {
+  border-radius: 10%;
+  background-color: var(--border-stroke-color, #b3b3b3);
+  z-index: 1;
+}
+

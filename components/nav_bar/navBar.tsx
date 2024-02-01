@@ -26,19 +26,29 @@ const NavBar = () => {
   const { signer } = useCantoSigner();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<string>("");
+  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
 
   const handleMoreClick = () => {
-    setIsMoreModalOpen(true);
+    setIsMoreModalOpen((current) => !current);
   };
 
   const handleModalClose = () => {
     setIsMoreModalOpen(false);
   };
 
-  const handleMoreOptionSelect = (option: any) => {
+  const handleMoreOptionSelect = (option: string) => {
     // Handle the option selection (e.g., navigate to the selected link)
-    setIsMoreModalOpen(false);
+    //setIsMoreModalOpen(false);
+    setSelectedOption(option);
   };
+  useEffect(() => {
+    // This effect will run after the component has been re-rendered
+    if (selectedOption) {
+      setIsMoreModalOpen(false);
+      // Additional logic or navigation here if needed
+    }
+  }, [selectedOption]);
   useEffect(() => {
     if (signer?.account.address) {
       Analytics.actions.people.registerWallet(signer.account.address);
@@ -118,15 +128,7 @@ const NavBar = () => {
         >
           <Text size="sm">Bridge</Text>
         </Link>
-        <Link
-          href="/staking"
-          className={clsx(
-            styles["nav-link"],
-            currentPath == "/staking" && styles.active
-          )}
-        >
-          <Text size="sm">Staking</Text>
-        </Link>
+
         <Link
           href="/lending"
           className={clsx(
@@ -145,17 +147,6 @@ const NavBar = () => {
         >
           <Text size="sm">Pools</Text>
         </Link>
-
-        <Link
-          href="/governance"
-          className={clsx(
-            styles["nav-link"],
-            currentPath.includes("governance") && styles.active
-          )}
-        >
-          <Text size="sm">Governance</Text>
-        </Link>
-
         <Link
           href="/explore"
           className={clsx(
@@ -165,9 +156,91 @@ const NavBar = () => {
         >
           <Text size="sm">Explore</Text>
         </Link>
-        <div className={styles["nav-link"]} onClick={handleMoreClick}>
-          <Text size="sm">More</Text>
+        {currentPath == "/staking" && (
+          <Link
+            href="/staking"
+            className={clsx(
+              styles["nav-link"],
+              currentPath == "/staking" && styles.active
+            )}
+          >
+            <Text size="sm">Staking</Text>
+          </Link>
+        )}
+        {currentPath == "/governance" && (
+          <Link
+            href="/governance"
+            className={clsx(
+              styles["nav-link"],
+              currentPath.includes("governance") && styles.active
+            )}
+          >
+            <Text size="sm">Governance</Text>
+          </Link>
+        )}
+
+        {/* {selectedOption != "" && (
+          <div>
+            <Link
+              href={"/" + selectedOption}
+              className={clsx(
+                styles["nav-link"],
+                currentPath.includes(selectedOption) && styles.active
+              )}
+            >
+              <Text size="sm">
+                {selectedOption.charAt(0).toUpperCase() +
+                  selectedOption.slice(1)}
+              </Text>
+            </Link>
+          </div>
+        )} */}
+        <div className={styles.moreLink} onClick={handleMoreClick}>
+          <div className={styles.moreButtonContainer}>
+            <Text size="sm">More</Text>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Icon
+                icon={{
+                  url: "/dropdown.svg",
+                  size: 18,
+                }}
+                themed
+              />
+            </div>
+          </div>
           {isMoreModalOpen && (
+            <div className={styles.popUp}>
+              {currentPath != "/staking" && (
+                <div
+                  className={styles.optionsContainer}
+                  onClick={() => handleMoreOptionSelect("staking")}
+                >
+                  <Link href="/staking" className={clsx(styles["nav-link"])}>
+                    <Text size="sm">Staking</Text>
+                  </Link>
+                </div>
+              )}
+              {currentPath != "/governance" && (
+                <div
+                  className={styles.optionsContainer}
+                  onClick={() => handleMoreOptionSelect("governance")}
+                >
+                  <Link href="/governance" className={clsx(styles["nav-link"])}>
+                    <Text size="sm">Governance</Text>
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* {isMoreModalOpen && (
             <Modal
               open={isMoreModalOpen}
               onClose={() => setIsMoreModalOpen(false)}
@@ -177,7 +250,7 @@ const NavBar = () => {
                 onSelect={handleMoreOptionSelect}
               />
             </Modal>
-          )}
+          )} */}
         </div>
       </div>
       <div className={styles["btn-grp"]}>
