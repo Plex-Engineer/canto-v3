@@ -8,6 +8,7 @@ export interface CToken {
   compSupplyState: string;
   decimals: number;
   distApy: string;
+  distApr: string;
   exchangeRate: string;
   isListed: boolean;
   liquidity: string;

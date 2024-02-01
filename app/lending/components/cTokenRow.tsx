@@ -135,10 +135,10 @@ export const StableCoinRow = ({
         </Container>
         <Container gap={"auto"} direction="row">
           <Text font="proto_mono" size="x-sm">
-            distribution apy:
+            distribution apr:
           </Text>
           <Text font="proto_mono" size="x-sm">
-            {`${Number(cStableCoin.distApy).toFixed(2)}%`}
+            {`${Number(cStableCoin.distApr).toFixed(2)}%`}
           </Text>
         </Container>
       </Container>
