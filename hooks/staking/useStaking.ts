@@ -58,7 +58,7 @@ export default function useStaking(
       const userValidators: ValidatorWithDelegations[] = [];
 
       // go through each user delegation
-      userStaking.data.delegations.forEach((delegation) => {
+      userStaking.data.delegations?.forEach((delegation) => {
         const validator = allValidators.data.find(
           (val) =>
             val.operator_address === delegation.delegation.validator_address
