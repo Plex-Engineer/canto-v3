@@ -5,6 +5,7 @@ import Rive from "@rive-app/react-canvas";
 interface Props {
   height?: string;
   width?: string;
+  color?: "primary" | "accent" | "dark";
 }
 const Splash = (props: Props) => {
   //   if mobile only
@@ -23,6 +24,12 @@ const Splash = (props: Props) => {
           src="anims/loading.riv"
           stateMachines={["loop"]}
           style={{
+            filter:
+              props.color == "primary"
+                ? "invert(var(--light-mode))"
+                : props.color == "accent"
+                  ? "invert(0)"
+                  : "invert(var(--dark-mode))",
             height: "400px",
             width: "400px",
           }}
@@ -46,6 +53,12 @@ const Splash = (props: Props) => {
         src="anims/loading.riv"
         stateMachines={["loop"]}
         style={{
+          filter:
+            props.color == "primary"
+              ? "invert(var(--light-mode))"
+              : props.color == "accent"
+                ? "invert(0)"
+                : "invert(var(--dark-mode))",
           height: props.height || "800px",
           width: props.width || "800px",
         }}
