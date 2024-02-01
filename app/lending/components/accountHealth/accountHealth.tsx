@@ -14,11 +14,11 @@ interface Props {
 const AccountHealth = (props: Props) => {
   function getColor() {
     if (props.percent < 0.95) {
-      return "green";
+      return "#03FD99";
     } else if (props.percent < 0.98) {
-      return "yellow";
+      return "#E8CE49";
     }
-    return "red";
+    return "#D22E49";
   }
 
   return (
