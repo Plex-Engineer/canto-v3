@@ -12,8 +12,10 @@ import {
 import { getAllUserStakingData } from "./helpers/userStaking";
 import { useState } from "react";
 import { useBalance } from "wagmi";
-import { validateStakingTxParams } from "@/transactions/staking/staking";
-import { newStakingFlow } from "@/transactions/staking";
+import {
+  validateStakingTxParams,
+  newStakingFlow,
+} from "@/transactions/staking";
 
 export default function useStaking(
   params: StakingHookInputParams,

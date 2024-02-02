@@ -3,8 +3,9 @@ import {
   ProposalHookParams,
   ProposalHookReturn,
 } from "./interfaces/hookParams";
-import { getCantoApiData } from "@/config/api";
+import { CANTO_DATA_API_ENDPOINTS, getCantoApiData } from "@/config/api";
 import { Proposal } from "./interfaces/proposal";
+import { newVoteFlow } from "@/transactions/gov";
 
 export default function useProposals(
   params: ProposalHookParams,
@@ -18,7 +19,7 @@ export default function useProposals(
     async () => {
       const { data: proposals, error } = await getCantoApiData<Proposal[]>(
         params.chainId,
-        "/v1/gov/proposals"
+        CANTO_DATA_API_ENDPOINTS.allProposals
       );
       if (error) throw error;
       return proposals;
@@ -35,5 +36,6 @@ export default function useProposals(
   return {
     proposals: proposals ?? [],
     isProposalsLoading: isLoading,
+    newVoteFlow: (txParams) => newVoteFlow(txParams),
   };
 }

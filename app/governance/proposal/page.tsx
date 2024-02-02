@@ -19,8 +19,6 @@ import { VoteOption } from "@/transactions/gov";
 import Image from "next/image";
 import { NEW_ERROR } from "@/config/interfaces";
 import { VotingInfoBox } from "../components/VotingInfoBox/VotingInfoBox";
-import { TransactionFlowType } from "@/transactions/flows/flowMap";
-import { NewTransactionFlow } from "@/transactions/flows/types";
 import { displayAmount } from "@/utils/formatting";
 import {
   PROPOSAL_QUORUM_VALUE,
@@ -28,22 +26,24 @@ import {
 } from "@/config/consts/config";
 
 export default function Page() {
+  // signer information
+  const { txStore, signer, chainId } = useCantoSigner();
+  // get proposals
+  const { proposals, isProposalsLoading, newVoteFlow } = useProposals({
+    chainId: chainId,
+  });
+  // transaction
   function castVote(proposalId: number, voteOption: VoteOption | null) {
     if (signer) {
       if (!voteOption) {
         return NEW_ERROR("Please select a vote option");
       }
-      const newFlow: NewTransactionFlow = {
-        icon: "/canto.svg",
-        txType: TransactionFlowType.VOTE_TX,
-        title: "Voting",
-        params: {
-          chainId: chainId,
-          ethAccount: signer?.account.address ?? "",
-          proposalId: proposalId,
-          voteOption: voteOption,
-        },
-      };
+      const newFlow = newVoteFlow({
+        chainId: chainId,
+        ethAccount: signer.account.address,
+        proposalId: proposalId,
+        voteOption: voteOption,
+      });
       txStore?.addNewFlow({
         txFlow: newFlow,
         ethAccount: signer.account.address,
@@ -69,8 +69,6 @@ export default function Page() {
   const proposalId = Number(id);
   const router = useRouter();
 
-  const { txStore, signer, chainId } = useCantoSigner();
-  const { proposals, isProposalsLoading } = useProposals({ chainId: chainId });
   const [selectedVote, setSelectedVote] = useState<VoteOption | null>(null);
 
   if (isProposalsLoading) {
