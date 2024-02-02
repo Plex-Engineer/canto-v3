@@ -191,7 +191,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     const txFlow = transaction.newVivacityLendingFlow({
       chainId: chainId,
       ethAccount: signer.account.address,
-      cToken: selection.selectedCToken,
+      cToken: selection.selectedCToken as Vivacity.VCNoteWithUserData,
       amount,
       txType,
       max,
@@ -213,7 +213,7 @@ export function useLendingCombo(props: LendingComboProps): LendingComboReturn {
     return transaction.validateVivacityParams({
       chainId: chainId,
       ethAccount: signer.account.address,
-      cToken: selection.selectedCToken,
+      cToken: selection.selectedCToken as Vivacity.VCNoteWithUserData,
       amount,
       txType,
       max,
