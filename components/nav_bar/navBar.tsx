@@ -26,26 +26,7 @@ const NavBar = () => {
   const { signer } = useCantoSigner();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
-  const moreContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleMoreClick = () => {
-    setIsMoreModalOpen((current) => !current);
-  };
-  const handleDocumentClick = (event: MouseEvent) => {
-    // Check if the click is outside the More button and the popup container
-    if (
-      moreContainerRef.current &&
-      !moreContainerRef.current.contains(event.target as Node)
-    ) {
-      setIsMoreModalOpen(false);
-    }
-  };
-  useEffect(() => {
-    document.addEventListener("click", handleDocumentClick);
-    return () => {
-      document.removeEventListener("click", handleDocumentClick);
-    };
-  }, []);
   useEffect(() => {
     if (signer?.account.address) {
       Analytics.actions.people.registerWallet(signer.account.address);
@@ -177,9 +158,8 @@ const NavBar = () => {
         )}
         <div
           className={styles.moreLink}
-          onClick={() => handleMoreClick()}
-          ref={moreContainerRef}
-          // onMouseLeave={() => setIsMoreModalOpen(false)}
+          onMouseEnter={() => setIsMoreModalOpen(true)}
+          onMouseLeave={() => setIsMoreModalOpen(false)}
         >
           <div className={styles.moreButtonContainer}>
             <Text size="sm">More</Text>
@@ -189,12 +169,14 @@ const NavBar = () => {
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
+                paddingLeft: "4px",
+                paddingTop: "2px",
               }}
             >
               <Icon
                 icon={{
                   url: "/dropdown.svg",
-                  size: 18,
+                  size: 16,
                 }}
                 themed
               />
@@ -203,24 +185,27 @@ const NavBar = () => {
           {isMoreModalOpen && (
             <div className={styles.popUp}>
               {currentPath != "/staking" && (
-                <div
-                  className={styles.optionsContainer1}
-                  // onClick={() => handleMoreOptionSelect("staking")}
+                <Link
+                  href="/staking"
+                  className={clsx(styles["optionsContainer1"])}
+                  onClick={() => setIsMoreModalOpen(false)}
                 >
-                  <Link href="/staking" className={clsx(styles["nav-link"])}>
+                  <div>
                     <Text size="sm">Staking</Text>
-                  </Link>
-                </div>
+                  </div>
+                </Link>
               )}
               {currentPath != "/governance" && (
-                <div
-                  className={styles.optionsContainer2}
-                  // onClick={() => handleMoreOptionSelect("governance")}
+                <Link
+                  href="/governance"
+                  className={clsx(styles["optionsContainer1"])}
+                  onClick={() => setIsMoreModalOpen(false)}
+                  style={{ borderBottom: "none" }}
                 >
-                  <Link href="/governance" className={clsx(styles["nav-link"])}>
+                  <div>
                     <Text size="sm">Governance</Text>
-                  </Link>
-                </div>
+                  </div>
+                </Link>
               )}
             </div>
           )}
