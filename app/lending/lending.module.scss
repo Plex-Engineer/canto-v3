@@ -68,12 +68,17 @@
     margin: 1rem;
     width: calc(100% - 2rem);
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1rem;
+    padding-top: 1rem;
     grid-template-areas:
       "title "
       "accountHealth"
       "highlightCard"
       "mainContent";
+
+    &::after {
+      display: none;
+    }
   }
 
   .accountHealth {
@@ -86,5 +91,9 @@
   .mainTable {
     flex-direction: column;
     width: calc(100%) !important;
+    padding-top: 2.5rem;
+    &::after {
+      display: none;
+    }
   }
 }
