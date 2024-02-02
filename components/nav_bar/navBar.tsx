@@ -163,16 +163,7 @@ const NavBar = () => {
         >
           <div className={styles.moreButtonContainer}>
             <Text size="sm">More</Text>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingLeft: "4px",
-                paddingTop: "2px",
-              }}
-            >
+            <div className={styles.dropdown}>
               <Icon
                 icon={{
                   url: "/dropdown.svg",

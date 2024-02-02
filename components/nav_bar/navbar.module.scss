@@ -241,12 +241,18 @@
 
 }
 .optionsContainer1:hover {
-  // border-radius: 20px 20px 0 0;
   background-color: var(--border-stroke-color, #b3b3b3);
   z-index: 1;
   opacity: 1;
 }
 
+.dropdown{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 0 0 4px;
+}
 
 
 
