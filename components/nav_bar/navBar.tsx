@@ -14,8 +14,6 @@ import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { useBalance } from "wagmi";
 import { useAutoConnect } from "@/provider/useAutoConnect";
 import Icon from "../icon/icon";
-import MoreOptionsModal from "../../components/navBarModal/navBarModal";
-import Modal from "../modal/modal";
 
 const NavBar = () => {
   // This is used to connect safe as wallet,
