@@ -31,7 +31,7 @@ const Countdown = ({ endTimestamp }: { endTimestamp: bigint }) => {
 
   return (
     <>
-      {`${days.toString()} : ${hours.toString()} : ${minutes.toString()} : ${seconds.toString()}`}
+      {`${days.toString()} Days : ${hours.toString()} Hours : ${minutes.toString()} Minutes : ${seconds.toString()} Seconds`}
     </>
   );
 };
