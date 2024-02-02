@@ -84,6 +84,8 @@
   //   }
 }
 
+
+
 .active {
   opacity: 1;
   position: relative;
@@ -185,3 +187,72 @@
     display: block;
   }
 }
+
+.moreLink{
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 50px;
+  
+}
+
+.popUp{
+  opacity: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 150px;
+  background: var(--card-sub-surface-color, #dfdfdf);
+  border: 1px solid var(--border-stroke-color);
+  position: absolute;
+  top: 50px;
+  margin-left: -10px;
+  z-index: 10000;
+}
+
+
+.moreButtonContainer{
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+  opacity: 0.4;
+  transition:
+    opacity 0.1s,
+    transform 0.3s;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.optionsContainer1{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-stroke-color);
+  opacity: 0.4;
+  &:hover {
+    opacity: 1;
+  }
+
+}
+.optionsContainer1:hover {
+  background-color: var(--border-stroke-color, #b3b3b3);
+  z-index: 1;
+  opacity: 1;
+}
+
+.dropdown{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 0 0 4px;
+}
+
+
+

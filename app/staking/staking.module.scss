@@ -3,151 +3,45 @@
   flex-direction: column;
   align-items: center;
   max-width: 1400px;
+  width: 100vw;
   margin: 10px auto;
-  height: 1px;
   border-top: 1px solid var(--primary-90-color);
+  position: relative;
   padding-top: 10px;
-  
-  border-right: 1px solid var(--primary-90-color);
-  border-left: 1px solid var(--primary-90-color);
-}
-
-.title {
-  font-size: 32px !important;
-  text-align: left;
-  width: 100%;
-  //max-width: 1500px;
-}
-
-
-
-.ClaimBtn {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-}
-
-.paginationContainer {
-  background: var(--card-sub-surface-color, #dfdfdf);
-  //box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  width: 100%;
-  margin: 0 auto;
-  padding: 16px 16px 0px 16px;
-  .paginationButton1 {
-    //margin-left: 10%;
-    margin-right: 5%;
-  }
-  .paginationButton2 {
-    margin-left: 5%;
-    //margin-right: 10%;
-  }
-}
-
-.stakingInfoContainer{
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;  
-
-  .Tables{
-    flex: 1;
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-    width: 75%;
-    justify-content: left;
-    //align-items: flex-start;
-  }
-
-  .stakingInfoCard{
-    background: var(--card-sub-surface-color, #dfdfdf);
-    box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
-    border: 1px solid var(--border-stroke-color);
-    display: flex;
-    flex-direction: column;
-    height: 400px;
-    width: 25%;
-    padding: 24px;
-    position: sticky;
-    flex-shrink: 0;
-    top: 20px;
-    margin-top: 0;
-    .infoBox {
-      display: flex;
-      flex-direction: column;
-      height: 25%;
-      margin-top: 12px;
-      margin-bottom: 12px;
-    }
-    .infoBoxButton {
-      display: flex;
-      flex-direction: column;
-      height: 25%;
-      justify-content: center;
-      margin-top: 12px;
-      margin-bottom: 12px;
-    }
-  }
-
-}
-.searchBarContainer {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  margin-left: 30%;
-  justify-content: right;
-}
-.searchIconContainer{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid var(--border-stroke-color, #b3b3b3);
-  border-right: none;
-  padding-left: 5px;
-}
-
-.tableSecondaryContent {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-}
-
-.tableTitleContainer {
-  width: 100%;
-  margin-right: 1rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-.tableContainer {
-  margin-right: 1rem;
-}
-
-.tableContainer2 {
-  width: 100%;
-}
-
-.TabRow {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  border-right: 1px solid var(--primary-90-color);
-
-  .Tab {
-    height: 40px;
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: calc(100% - 1px);
+    height: 10px;
+    border-left: 1px solid var(--primary-90-color);
     border-right: 1px solid var(--primary-90-color);
   }
 }
 
-.noValidatorContainer{
-  justify-content: center;
-  align-items: center;
-  margin-top: 100px;
-  margin-bottom: 100px;
-  text-align: center;
-  flex-grow: 1;
+.title {
+  font-size: 32px !important;
+  width: 100%;
+}
+
+.infoCard {
+  background: var(--card-sub-surface-color, #dfdfdf);
+  box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
+  border: 1px solid var(--border-stroke-color);
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+  padding: 24px;
+  position: sticky;
+  top: 20px;
+  margin-top: 0;
+  width: 340px;
+  .infoBox {
+    display: flex;
+    flex-direction: column;
+    height: 25%;
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
 }

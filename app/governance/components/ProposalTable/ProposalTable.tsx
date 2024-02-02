@@ -218,7 +218,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                 : [
                     <div key="noData" className={styles.noProposalContainer}>
                       <Text font="proto_mono" size="lg">
-                        NO {currentFilter} PROPOSALS FOUND
+                        NO {currentFilter} FOUND
                       </Text>
                     </div>,
                   ]

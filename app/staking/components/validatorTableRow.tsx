@@ -20,7 +20,9 @@ export const GenerateValidatorTableRow = (
     <Text font="rm_mono">{validator.rank}</Text>
   </Container>,
   <Container key={`name_${index}`}>
-    <Text font="rm_mono">{validator.description.moniker}</Text>
+    <div style={{ width: "300px" }}>
+      <Text font="rm_mono">{validator.description.moniker}</Text>
+    </div>
   </Container>,
   <Container
     key={`tokens_${index}`}
