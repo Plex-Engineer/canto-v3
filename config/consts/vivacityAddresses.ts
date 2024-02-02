@@ -17,6 +17,10 @@ const VIVACITY_ADDRESSES = {
     mainnet: "0x85156B45B3C0F40f724637ebfEB035aFB29BD083",
     testnet: "0x94D288543c566Fc20d46A26be9c94Da79ebbcecD",
   },
+  gaugeController:{
+    mainnet: "0x46970b45d114420A71A3d76AA6c398173118C2b8",
+    testnet: "0xc0395538ee9144a2A3acc2C9AD6329bFFe12AF22",
+  },
   lendingLedgerRewards: {
     mainnet: "0x8dB102d2089113f6681B216C40c45b84d99E27FF",
     testnet: "0xA5a149a0782573a9404Dda00F9A9aC802261cEc9",

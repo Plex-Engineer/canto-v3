@@ -10,6 +10,8 @@ import {
   ERC20_ABI,
   CNOTE_ABI,
   VCNOTE_ABI,
+  LENDING_LEDGER_READ_ONLY_ABI,
+  GAUGE_CONTROLLER_ABI,
   LENDING_LEDGER_REWARDS_ABI,
 } from "@/config/abis";
 import { multicall } from "wagmi/actions";
@@ -17,6 +19,7 @@ import BigNumber from "bignumber.js";
 import { getVivacityAddress } from "@/config/consts/vivacityAddresses";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
 import { Vivacity } from "@/transactions/lending";
+import { getTokenPriceInUSDC } from "@/utils/tokens";
 
 /**
  * @notice Gets all user data from clmLens and general api
@@ -75,17 +78,22 @@ export async function getVCNoteData(
 ): PromiseWithError<Vivacity.VCNote> {
   try {
     // get all addresses depending on chainId
-    const [noteAddress, cNoteAddress, vcNoteAddress] = [
+    const [noteAddress, cNoteAddress, vcNoteAddress, lendingLedgerAddress, gaugeControllerAddress] = [
       getCantoCoreAddress(chainId, "note"),
       getCantoCoreAddress(chainId, "cNote"),
       getVivacityAddress(chainId, "vcNote"),
+      getVivacityAddress(chainId, "lendingLedger"),
+      getVivacityAddress(chainId, "gaugeController"),
     ];
 
     // make sure addresses exist
-    if (!noteAddress || !cNoteAddress || !vcNoteAddress) {
+    if (!noteAddress || !cNoteAddress || !vcNoteAddress || !lendingLedgerAddress || !gaugeControllerAddress) {
       throw Error("getVCNoteData: chainId not supported");
     }
-
+    const WEEK = 604800
+    const currTimestamp = Math.floor(new Date().getTime()/1000)
+    const currEpoch = Math.floor(currTimestamp / WEEK) * WEEK 
+    const prevEpoch = currEpoch - WEEK
     // use multicall to save eth calls to node
     const contractCalls = [
       {
@@ -103,12 +111,26 @@ export async function getVCNoteData(
         abi: CNOTE_ABI,
         functionName: "supplyRatePerBlock",
       },
+      {
+        address: vcNoteAddress as `0x${string}`,
+        abi: VCNOTE_ABI,
+        functionName: "totalSupply",
+      },
+      {
+        address: gaugeControllerAddress as `0x${string}`,
+        abi: GAUGE_CONTROLLER_ABI,
+        functionName: "gauge_relative_weight",
+        args:[vcNoteAddress as `0x${string}`, BigInt(currTimestamp)],
+      },
+      {
+        address: lendingLedgerAddress as `0x${string}`,
+        abi: LENDING_LEDGER_READ_ONLY_ABI,
+        functionName: "rewardInformation",
+        args:[BigInt(prevEpoch)],
+      },
     ] as const;
-    const [
-      vcNoteExchangeRateCurrent,
-      cNoteExchangeRateCurrent,
-      cNoteSupplyRate,
-    ] = await multicall({
+
+    const [vcNoteExchangeRateCurrent, cNoteExchangeRateCurrent, cNoteSupplyRate, vcNoteTotalSupply, vivacityMarketWeight, rewards] = await multicall({
       chainId,
       contracts: contractCalls,
     });
@@ -119,9 +141,15 @@ export async function getVCNoteData(
         vcNoteExchangeRateCurrent &&
         cNoteExchangeRateCurrent &&
         cNoteSupplyRate &&
+        vcNoteTotalSupply &&
+        vivacityMarketWeight &&
+        rewards &&
         vcNoteExchangeRateCurrent.status === "success" &&
         cNoteExchangeRateCurrent.status === "success" &&
-        cNoteSupplyRate.status === "success"
+        cNoteSupplyRate.status === "success" &&
+        vcNoteTotalSupply.status === "success" &&
+        vivacityMarketWeight.status === "success" &&
+        rewards.status === "success"
       )
     ) {
       throw Error("getVCNoteData: multicall error");
@@ -141,6 +169,13 @@ export async function getVCNoteData(
       .toString();
     const supplyApyRounded =
       Math.ceil(getAPY(Number(cNoteSupplyRateFormatted)) * 100) / 100;
+    const bnVivacityMarketWeight = new BigNumber(vivacityMarketWeight.result.toString()).dividedBy(new BigNumber(10).pow(18));
+    const bnTotalRewards = new BigNumber(rewards.result[1].toString())
+    const vivacityRewardsPerWeek = bnTotalRewards.multipliedBy(bnVivacityMarketWeight).integerValue()
+    const bnVcNoteTotalSupply = new BigNumber(vcNoteTotalSupply.result.toString())
+    const noteTvl =  bnVcNoteTotalSupply.multipliedBy(vcNoteToNoteExchangeRate).toString()
+    const {data:cantoApr} = await getVivacityAPR(chainId, vivacityRewardsPerWeek, noteTvl)
+    const cantoAprRounded =   Math.ceil(Number(cantoApr ?? "0") * 100) / 100
     // format results
     const vcNote = {
       address: vcNoteAddress,
@@ -148,6 +183,7 @@ export async function getVCNoteData(
       name: "Vivacity Collateralized NOTE",
       symbol: "vcNOTE",
       supplyApy: supplyApyRounded.toString(),
+      cantoApr: cantoAprRounded.toString(), 
       exchangeRate: vcNoteToNoteExchangeRate.toString(),
       price: "1000000000000000000",
       underlying: {
@@ -285,6 +321,7 @@ export async function getUserVCNoteData(
 
 const secondsPerBlock = 5.8;
 const blocksPerDay = 86400 / secondsPerBlock;
+const blocksPerWeek = 604800 / secondsPerBlock;
 const daysPerYear = 365;
 
 function getAPY(blockRate: number): number {
@@ -292,3 +329,36 @@ function getAPY(blockRate: number): number {
     (Math.pow(Number(blockRate) * blocksPerDay + 1, daysPerYear) - 1) * 100
   );
 }
+
+async function getVivacityAPR(
+  chainId: number,
+  cantoPerWeek: BigNumber,
+  noteTvl: string
+): PromiseWithError<string>{
+  // get wcanto, note price
+  const [wcantoAddress, noteAddress] = [
+    getCantoCoreAddress(chainId, "wcanto"),
+    getCantoCoreAddress(chainId, "note"),
+  ];
+  if (!wcantoAddress || !noteAddress) {
+    return NEW_ERROR("getVivacityAPR: chainId not supported");
+  }
+  const [cantoPrice, notePrice] = await Promise.all([
+    getTokenPriceInUSDC(wcantoAddress, 18),
+    getTokenPriceInUSDC(noteAddress, 18),
+  ]);
+  
+  if (cantoPrice.error || notePrice.error) {
+    return NEW_ERROR("getVivacityAPR: cannot get price");
+  }
+
+  const cantoPerBlock = cantoPerWeek.dividedBy(blocksPerWeek)
+  const blocksPerYear = new BigNumber(blocksPerDay * daysPerYear);
+  const apr = blocksPerYear
+    .multipliedBy(cantoPerBlock)
+    .multipliedBy(cantoPrice.data)
+    .dividedBy(noteTvl)
+    .dividedBy(notePrice.data);
+  return NO_ERROR(apr.multipliedBy(100).toString())
+}
+

@@ -1,6 +1,33 @@
 /**
     lendinLedger Contract ABI
  */
+export const LENDING_LEDGER_READ_ONLY_ABI = [
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "rewardInformation",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "set",
+        type: "bool",
+      },
+      {
+        internalType: "uint248",
+        name: "amount",
+        type: "uint248",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+] as const;
+
 export const LENDING_LEDGER_ABI = [
   {
     inputs: [

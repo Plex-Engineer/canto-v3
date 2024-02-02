@@ -5,6 +5,7 @@ export interface VCNote {
   name: string;
   price: string;
   supplyApy: string;
+  cantoApr : string;
   symbol: string;
   underlying: {
     address: string;
