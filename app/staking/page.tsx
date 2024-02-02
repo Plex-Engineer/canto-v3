@@ -273,8 +273,8 @@ export default function StakingPage() {
         STAKING
       </Text>
       <Spacer height="20px" />
-      <Container direction="row" gap={20}>
-        <Container gap={20}>
+      <Container direction="row" gap={20} width="100%">
+        <Container gap={20} width="100%">
           {hasUserStaked && userStaking && (
             <Table
               title="My Staking"
