@@ -320,7 +320,12 @@ export default function StakingPage() {
                     (e) =>
                       Number(formatBalance(e.userDelegation.balance, 18)) >
                       0.0000001
-                  ).sort((a,b)=> b.userDelegation.balance.localeCompare(a.userDelegation.balance))
+                  )
+                  .sort((a, b) =>
+                    b.userDelegation.balance.localeCompare(
+                      a.userDelegation.balance
+                    )
+                  )
                   .map((userStakingElement, index) =>
                     GenerateMyStakingTableRow(userStakingElement, index, () =>
                       handleClick(userStakingElement)
