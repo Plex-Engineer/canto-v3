@@ -275,6 +275,41 @@ export default function StakingPage() {
       <Spacer height="20px" />
       <Container direction="row" gap={20} width="100%">
         <Container gap={20} width="100%">
+          {userStaking && userStaking.unbonding.length > 0 && (
+            <Table
+              title="Unbonding Delegations"
+              headers={[
+                {
+                  value: (
+                    <Text opacity={0.4} font="rm_mono">
+                      Name
+                    </Text>
+                  ),
+                  ratio: 3,
+                },
+                {
+                  value: <Text opacity={0.4}>Undelegation</Text>,
+                  ratio: 2,
+                },
+                {
+                  value: (
+                    <Text opacity={0.4} font="rm_mono">
+                      Completion Time
+                    </Text>
+                  ),
+                  ratio: 5,
+                },
+              ]}
+              content={[
+                ...userStaking.unbonding.map((userStakingElement, index) =>
+                  GenerateUnbondingDelegationsTableRow(
+                    userStakingElement,
+                    index
+                  )
+                ),
+              ]}
+            />
+          )}
           {hasUserStaked && userStaking && (
             <Table
               title="My Staking"
@@ -326,41 +361,6 @@ export default function StakingPage() {
                       handleClick(userStakingElement)
                     )
                   ),
-              ]}
-            />
-          )}
-          {userStaking && userStaking.unbonding.length > 0 && (
-            <Table
-              title="Unbonding Delegations"
-              headers={[
-                {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Name
-                    </Text>
-                  ),
-                  ratio: 3,
-                },
-                {
-                  value: <Text opacity={0.4}>Undelegation</Text>,
-                  ratio: 2,
-                },
-                {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Completion Time
-                    </Text>
-                  ),
-                  ratio: 5,
-                },
-              ]}
-              content={[
-                ...userStaking.unbonding.map((userStakingElement, index) =>
-                  GenerateUnbondingDelegationsTableRow(
-                    userStakingElement,
-                    index
-                  )
-                ),
               ]}
             />
           )}
@@ -469,7 +469,7 @@ export default function StakingPage() {
             />
           )}
         </Container>
-        <div className={styles.infoCard}>
+        <Container className={styles.infoCard}>
           <Container direction="column" width="100%" height="100%">
             <div className={styles.infoBox}>
               <div>
@@ -533,10 +533,10 @@ export default function StakingPage() {
               }
               disabled={!signer || !hasUserStaked}
             >
-              Claim Staking Rewards
+              Claim Rewards
             </Button>
           </Container>
-        </div>
+        </Container>
       </Container>
 
       <Modal
