@@ -307,15 +307,19 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
         </div>
 
         <Spacer height="20px" />
-        <FeesSection
-          props={fees}
-          fees={{
-            totalChainFee,
-            selected: selectedGBridgeFee,
-            setSelected: setSelectedGBridgeFee,
-          }}
-          token={token}
-        />
+        {bridge.direction === "out" ? (
+          <FeesSection
+            props={fees}
+            fees={{
+              totalChainFee,
+              selected: selectedGBridgeFee,
+              setSelected: setSelectedGBridgeFee,
+            }}
+            token={token}
+          />
+        ) : (
+          <Spacer height="20px" />
+        )}
         <Spacer height="20px" />
 
         <Button

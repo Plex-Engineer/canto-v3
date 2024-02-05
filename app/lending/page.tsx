@@ -19,7 +19,8 @@ import Spacer from "@/components/layout/spacer";
 import { addTokenBalances, divideBalances } from "@/utils/math";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
-import DesktopOnly from "@/components/desktop-only/desktop-only";
+import Analytics from "@/provider/analytics";
+import { getAnalyticsLendingMarketTokenInfo } from "@/utils/analytics";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -96,10 +97,26 @@ export default function LendingPage() {
                 cToken={cNote}
                 precisionInValues={2}
                 onSupply={() => {
+                  Analytics.actions.events.lendingMarket.supplyClicked(
+                    getAnalyticsLendingMarketTokenInfo(
+                      "CTOKEN",
+                      cNote,
+                      clmPosition.position.liquidity,
+                      true
+                    )
+                  );
                   setSelectedCToken(cNote.address);
                   setCurrentModal(CLMModalTypes.SUPPLY);
                 }}
                 onBorrow={() => {
+                  Analytics.actions.events.lendingMarket.borrowClicked(
+                    getAnalyticsLendingMarketTokenInfo(
+                      "CTOKEN",
+                      cNote,
+                      clmPosition.position.liquidity,
+                      false
+                    )
+                  );
                   setSelectedCToken(cNote.address);
                   setCurrentModal(CLMModalTypes.BORROW);
                 }}
@@ -117,6 +134,7 @@ export default function LendingPage() {
             rwas={rwas.sort((a, b) =>
               a.underlying.symbol.localeCompare(b.underlying.symbol)
             )}
+            liquidity={clmPosition.position.liquidity}
             onSupply={(address) => {
               setSelectedCToken(address);
               setCurrentModal(CLMModalTypes.SUPPLY);
@@ -179,7 +197,7 @@ export default function LendingPage() {
                 })}
                 postChild={<NoteIcon />}
               /> */}
-              <Item name="Net APY" value={clmPosition.general.netApr + "%"} />
+              <Item name="Net APR" value={clmPosition.general.netApr + "%"} />
               <Item
                 name="Percent Limit Used"
                 value={clmPosition.general.percentLimitUsed + "%"}
@@ -228,6 +246,7 @@ const CTokenTable = ({
   isLoading,
   stableTokens,
   rwas,
+  liquidity,
   onSupply,
   onBorrow,
 }: {
@@ -235,6 +254,7 @@ const CTokenTable = ({
   isLoading: boolean;
   stableTokens: CTokenWithUserData[];
   rwas: CTokenWithUserData[];
+  liquidity: string;
   onSupply: (address: string) => void;
   onBorrow: (address: string) => void;
 }) => {
@@ -258,7 +278,7 @@ const CTokenTable = ({
             value: (
               <span>
                 Supply
-                <br /> APY
+                <br /> APR
               </span>
             ),
             ratio: 1,
@@ -268,7 +288,7 @@ const CTokenTable = ({
             value: (
               <span>
                 Borrow
-                <br /> APY
+                <br /> APR
               </span>
             ),
             ratio: 1,
@@ -301,6 +321,7 @@ const CTokenTable = ({
                 options={["RWAs", "Stablecoins"]}
                 selected={filteredPairs}
                 setSelected={(value) => {
+                  Analytics.actions.events.lendingMarket.tabSwitched(value);
                   setFilteredPairs(value);
                 }}
               />
@@ -312,15 +333,45 @@ const CTokenTable = ({
               ? rwas.map((cRwa) =>
                   RWARow({
                     cRwa,
-                    onSupply: () => onSupply(cRwa.address),
+                    onSupply: () => {
+                      Analytics.actions.events.lendingMarket.supplyClicked(
+                        getAnalyticsLendingMarketTokenInfo(
+                          "RWA",
+                          cRwa,
+                          liquidity,
+                          true
+                        )
+                      );
+                      onSupply(cRwa.address);
+                    },
                   })
                 )
               : filteredPairs == "Stablecoins"
                 ? stableTokens.map((cStableCoin) =>
                     StableCoinRow({
                       cStableCoin,
-                      onSupply: () => onSupply(cStableCoin.address),
-                      onBorrow: () => onBorrow(cStableCoin.address),
+                      onSupply: () => {
+                        Analytics.actions.events.lendingMarket.supplyClicked(
+                          getAnalyticsLendingMarketTokenInfo(
+                            "CTOKEN",
+                            cStableCoin,
+                            liquidity,
+                            true
+                          )
+                        );
+                        onSupply(cStableCoin.address);
+                      },
+                      onBorrow: () => {
+                        Analytics.actions.events.lendingMarket.borrowClicked(
+                          getAnalyticsLendingMarketTokenInfo(
+                            "CTOKEN",
+                            cStableCoin,
+                            liquidity,
+                            false
+                          )
+                        );
+                        onBorrow(cStableCoin.address);
+                      },
                     })
                   )
                 : []

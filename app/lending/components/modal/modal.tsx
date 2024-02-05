@@ -135,14 +135,14 @@ export const LendingModal = (props: Props) => {
         {/* might need to change this in future for showing it on more tokens */}
         {isSupply && cToken.symbol.toLowerCase() == "cnote" && (
           <>
-            <ModalItem name="Supply APR" value={cToken.supplyApy + "%"} />
-            <ModalItem name="Dist APR" value={cToken.distApy + "%"} />
+            <ModalItem name="Supply APR" value={cToken.supplyApr + "%"} />
+            <ModalItem name="Dist APR" value={cToken.distApr + "%"} />
           </>
         )}
 
         {!isSupply && (
           <>
-            <ModalItem name="Borrow APR" value={cToken.borrowApy + "%"} />
+            <ModalItem name="Borrow APR" value={cToken.borrowApr + "%"} />
           </>
         )}
 
@@ -236,7 +236,15 @@ export const LendingModal = (props: Props) => {
           ? [90, 94, 98, 100]
           : null;
     const limitProps = limits
-      ? { limit: { limit: maxAmount, limitName: "Limit" } }
+      ? {
+          limit: {
+            limit:
+              actionType === CTokenLendingTxTypes.BORROW
+                ? percentOfAmount(maxAmount, 98.8).data
+                : maxAmount,
+            limitName: "Limit",
+          },
+        }
       : {};
 
     return (
