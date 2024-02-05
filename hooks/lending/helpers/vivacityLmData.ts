@@ -120,7 +120,7 @@ export async function getVCNoteData(
         address: gaugeControllerAddress as `0x${string}`,
         abi: GAUGE_CONTROLLER_ABI,
         functionName: "gauge_relative_weight",
-        args:[vcNoteAddress as `0x${string}`, BigInt(currTimestamp)],
+        args:[vcNoteAddress as `0x${string}`, BigInt(prevEpoch)],
       },
       {
         address: lendingLedgerAddress as `0x${string}`,
