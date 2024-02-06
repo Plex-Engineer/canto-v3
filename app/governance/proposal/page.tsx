@@ -112,7 +112,7 @@ export default function Page() {
   const VoteBox = ({ option, idx }: { option: VoteOption; idx: number }) => (
     <VotingInfoBox
       key={option}
-      isActive={!isActive}
+      isActive={isActive}
       percentage={votesData[option].percentage}
       amount={votesData[option].amount}
       value={option}
