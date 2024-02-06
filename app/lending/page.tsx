@@ -304,12 +304,12 @@ export default function LendingPage() {
                   ratio: 2,
                 },
               ]}
-              onRowsClick={stableCoins.map((cStableCoin) => () => {
-                setSelectedCToken(cStableCoin.address);
+              onRowsClick={stableCoins.map((supplyToken) => () => {
+                setSelectedCToken(supplyToken.address);
                 setCurrentModal(CLMModalTypes.SUPPLY);
               })}
               content={[
-                ...[...stableCoins].map((cStableCoin) => [
+                ...[...stableCoins].map((supplyToken) => [
                   <Container
                     center={{
                       vertical: true,
@@ -320,10 +320,10 @@ export default function LendingPage() {
                     style={{
                       paddingLeft: "30px",
                     }}
-                    key={"title" + cStableCoin.address}
+                    key={"title" + supplyToken.address}
                   >
                     <Icon
-                      icon={{ url: cStableCoin.underlying.logoURI, size: 30 }}
+                      icon={{ url: supplyToken.underlying.logoURI, size: 30 }}
                     />
                     <Container
                       style={{
@@ -331,13 +331,13 @@ export default function LendingPage() {
                       }}
                     >
                       <Text font="proto_mono">
-                        {cStableCoin.underlying.symbol}
+                        {supplyToken.underlying.symbol}
                       </Text>
                       <Text theme="secondary-dark" size="x-sm">
                         Bal:{" "}
                         {displayAmount(
-                          cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
-                          cStableCoin.underlying.decimals,
+                          supplyToken.userDetails?.balanceOfUnderlying ?? "0",
+                          supplyToken.underlying.decimals,
                           {
                             precision: 2,
                           }
@@ -345,10 +345,10 @@ export default function LendingPage() {
                       </Text>
                     </Container>
                   </Container>,
-                  cStableCoin.supplyApy + "%",
-                  displayAmount(cStableCoin.collateralFactor, 16),
+                  supplyToken.supplyApy + "%",
+                  displayAmount(supplyToken.collateralFactor, 16),
                   <Text
-                    key={"grp" + cStableCoin.address}
+                    key={"grp" + supplyToken.address}
                     font={"proto_mono"}
                     style={{
                       width: "100%",
@@ -356,8 +356,8 @@ export default function LendingPage() {
                     }}
                   >
                     {displayAmount(
-                      cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
-                      cStableCoin.underlying.decimals,
+                      supplyToken.userDetails?.supplyBalanceInUnderlying ?? "0",
+                      supplyToken.underlying.decimals,
                       {
                         precision: 2,
                       }
@@ -367,7 +367,7 @@ export default function LendingPage() {
                         marginLeft: "5px",
                         paddingTop: "2px",
                       }}
-                      key={"title" + cStableCoin.address}
+                      key={"title" + supplyToken.address}
                       icon={{
                         url: "/tokens/canto.svg",
                         size: 14,
@@ -405,12 +405,14 @@ export default function LendingPage() {
                   ratio: 2,
                 },
               ]}
-              onRowsClick={[...stableCoins, cNote].map((cStableCoin) => () => {
-                setSelectedCToken(cStableCoin.address);
-                setCurrentModal(CLMModalTypes.BORROW);
-              })}
+              onRowsClick={[...stableCoins, cNote].map(
+                (borrowedToken) => () => {
+                  setSelectedCToken(borrowedToken.address);
+                  setCurrentModal(CLMModalTypes.BORROW);
+                }
+              )}
               content={[
-                ...[...stableCoins, cNote].map((cStableCoin) => [
+                ...[...stableCoins, cNote].map((borrowedToken) => [
                   <Container
                     center={{
                       vertical: true,
@@ -421,11 +423,11 @@ export default function LendingPage() {
                     style={{
                       paddingLeft: "30px",
                     }}
-                    key={"title" + cStableCoin.address}
+                    key={"title" + borrowedToken.address}
                   >
                     <Icon
                       icon={{
-                        url: cStableCoin.underlying.logoURI,
+                        url: borrowedToken.underlying.logoURI,
                         size: 30,
                       }}
                     />
@@ -435,13 +437,13 @@ export default function LendingPage() {
                       }}
                     >
                       <Text font="proto_mono">
-                        {cStableCoin.underlying.symbol}
+                        {borrowedToken.underlying.symbol}
                       </Text>
                       <Text theme="secondary-dark" size="x-sm">
                         Bal:{" "}
                         {displayAmount(
-                          cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
-                          cStableCoin.underlying.decimals,
+                          borrowedToken.userDetails?.balanceOfCToken ?? "0",
+                          borrowedToken.underlying.decimals,
                           {
                             precision: 2,
                           }
@@ -449,15 +451,17 @@ export default function LendingPage() {
                       </Text>
                     </Container>
                   </Container>,
-                  cStableCoin.supplyApy + "%",
-                  displayAmount(cStableCoin.liquidity, 0),
-                  cStableCoin.userDetails?.supplyBalanceInUnderlying == null ||
-                  cStableCoin.userDetails?.supplyBalanceInUnderlying === "0"
+                  borrowedToken.borrowApy + "%",
+                  displayAmount(
+                    borrowedToken.liquidity,
+                    borrowedToken.decimals
+                  ),
+                  borrowedToken.userDetails?.borrowBalance == null ||
+                  borrowedToken.userDetails?.borrowBalance === "0"
                     ? "-"
                     : displayAmount(
-                        cStableCoin.userDetails?.supplyBalanceInUnderlying ??
-                          "0",
-                        cStableCoin.underlying.decimals,
+                        borrowedToken.userDetails?.borrowBalance ?? "0",
+                        borrowedToken.underlying.decimals,
                         {
                           precision: 2,
                         }
@@ -471,123 +475,3 @@ export default function LendingPage() {
     </div>
   );
 }
-
-const CTokenTable = ({
-  title,
-  isLoading,
-  stableTokens,
-  rwas,
-  onSupply,
-  onBorrow,
-}: {
-  title?: string;
-  isLoading: boolean;
-  stableTokens: CTokenWithUserData[];
-  rwas: CTokenWithUserData[];
-  onSupply: (address: string) => void;
-  onBorrow: (address: string) => void;
-}) => {
-  const [filteredPairs, setFilteredPairs] = useState("RWAs");
-
-  const headers =
-    filteredPairs === "RWAs"
-      ? [
-          { value: "Asset", ratio: 1 },
-          { value: "Balance", ratio: 1 },
-          { value: "APR", ratio: 1 },
-          { value: "Supplied", ratio: 1 },
-          { value: "Collateral Factor", ratio: 1 },
-          { value: "Liquidity", ratio: 1 },
-          { value: "Manage", ratio: 1 },
-        ]
-      : [
-          { value: "Asset", ratio: 1 },
-          { value: "Balance", ratio: 1 },
-          {
-            value: (
-              <span>
-                Supply
-                <br /> APY
-              </span>
-            ),
-            ratio: 1,
-          },
-          { value: "Supplied", ratio: 1 },
-          {
-            value: (
-              <span>
-                Borrow
-                <br /> APY
-              </span>
-            ),
-            ratio: 1,
-          },
-          { value: "Borrowed", ratio: 1 },
-          { value: "Liquidity", ratio: 1 },
-          { value: "Manage", ratio: 2 },
-        ];
-
-  return (
-    <div className={styles.mainTable}>
-      {isLoading ? (
-        <Container
-          width="1000px"
-          height="200px"
-          center={{
-            horizontal: true,
-            vertical: true,
-          }}
-        >
-          <LoadingIcon />
-        </Container>
-      ) : stableTokens.length > 0 ? (
-        <Table
-          title={title}
-          textSize={filteredPairs === "Stablecoins" ? "14px" : "14px"}
-          secondary={
-            <Container width="320px">
-              <ToggleGroup
-                options={["RWAs", "Stablecoins"]}
-                selected={filteredPairs}
-                setSelected={(value) => {
-                  setFilteredPairs(value);
-                }}
-              />
-            </Container>
-          }
-          headers={headers}
-          content={
-            filteredPairs == "RWAs"
-              ? rwas.map((cRwa) =>
-                  RWARow({
-                    cRwa,
-                    onSupply: () => onSupply(cRwa.address),
-                  })
-                )
-              : filteredPairs == "Stablecoins"
-                ? stableTokens.map((cStableCoin) =>
-                    StableCoinRow({
-                      cStableCoin,
-                      onSupply: () => onSupply(cStableCoin.address),
-                      onBorrow: () => onBorrow(cStableCoin.address),
-                    })
-                  )
-                : []
-          }
-        />
-      ) : (
-        <Container
-          width="1000px"
-          height="200px"
-          center={{
-            horizontal: true,
-            vertical: true,
-          }}
-          backgroundColor="var(--card-sub-surface-color)"
-        >
-          <Text theme="secondary-dark">No {title} tokens available</Text>
-        </Container>
-      )}
-    </div>
-  );
-};
