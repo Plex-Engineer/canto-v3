@@ -20,7 +20,6 @@ import Icon from "@/components/icon/icon";
 import { addTokenBalances, divideBalances } from "@/utils/math/tokenMath.utils";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 import Splash from "@/components/splash/splash";
-import Separator from "@/components/Separator/separator";
 import clsx from "clsx";
 
 enum CLMModalTypes {

@@ -17,6 +17,8 @@ const AccountHealth = (props: Props) => {
       return "#03FD99";
     } else if (props.percent < 0.98) {
       return "#E8CE49";
+    } else if (props.percent < 0.99) {
+      return "#e87349";
     }
     return "#D22E49";
   }
