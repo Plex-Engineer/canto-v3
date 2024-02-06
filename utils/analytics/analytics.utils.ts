@@ -267,7 +267,8 @@ function getCantoDexTransactionFlowData(
         ),
       };
 
-    case CantoDexTxTypes.STAKE || CantoDexTxTypes.UNSTAKE:
+    case CantoDexTxTypes.STAKE:
+    case CantoDexTxTypes.UNSTAKE:
       return {
         ...pairData,
         cantoLpTokenAmount: displayAnalyticsAmount(
@@ -314,7 +315,8 @@ function getClmCTokenTransactionFlowData(
     ),
   };
   switch (clmCTokenTxParams.txType) {
-    case CTokenLendingTxTypes.SUPPLY || CTokenLendingTxTypes.WITHDRAW:
+    case CTokenLendingTxTypes.SUPPLY:
+    case CTokenLendingTxTypes.WITHDRAW:
       return {
         ...cTokenData,
         lmCollateralStatus: clmCTokenTxParams.cToken.userDetails?.isCollateral,
@@ -324,7 +326,8 @@ function getClmCTokenTransactionFlowData(
           clmCTokenTxParams.cToken.underlying.decimals
         ),
       };
-    case CTokenLendingTxTypes.BORROW || CTokenLendingTxTypes.REPAY:
+    case CTokenLendingTxTypes.BORROW:
+    case CTokenLendingTxTypes.REPAY:
       return {
         ...cTokenData,
         lmBorrowedAmount: displayAnalyticsAmount(
@@ -332,12 +335,11 @@ function getClmCTokenTransactionFlowData(
           clmCTokenTxParams.cToken.underlying.decimals
         ),
       };
-    case CTokenLendingTxTypes.COLLATERALIZE ||
-      CTokenLendingTxTypes.DECOLLATERALIZE: {
+    case CTokenLendingTxTypes.COLLATERALIZE:
+    case CTokenLendingTxTypes.DECOLLATERALIZE:
       return {
         lmToken: clmCTokenTxParams.cToken.underlying.symbol,
       };
-    }
     default:
       return {};
   }
@@ -347,7 +349,8 @@ function getStakingTransactionFlowData(
   stakingTxParams: StakingTransactionParams
 ): AnalyticsTransactionFlowData {
   switch (stakingTxParams.txType) {
-    case StakingTxTypes.DELEGATE || StakingTxTypes.UNDELEGATE:
+    case StakingTxTypes.DELEGATE:
+    case StakingTxTypes.UNDELEGATE:
       return {
         stakingValidator: stakingTxParams.validator.description.moniker,
         stakingDelegation: displayAnalyticsAmount(
@@ -363,7 +366,7 @@ function getStakingTransactionFlowData(
           18
         ),
       };
-    case StakingTxTypes.REDELEGATE: {
+    case StakingTxTypes.REDELEGATE:
       return {
         stakingValidator: stakingTxParams.validator.description.moniker,
         stakingDelegation: displayAnalyticsAmount(
@@ -376,7 +379,6 @@ function getStakingTransactionFlowData(
         ),
         stakingNewValidator: stakingTxParams.newValidatorName,
       };
-    }
     case StakingTxTypes.CLAIM_REWARDS:
       return {};
     default:
