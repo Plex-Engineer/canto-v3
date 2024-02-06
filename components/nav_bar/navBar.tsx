@@ -155,7 +155,9 @@ const NavBar = () => {
               styles["nav-link"],
               currentPath.includes("governance") && styles.active
             )}
-            onClick={() => Analytics.actions.events.clickedNavLink("Governance")}
+            onClick={() =>
+              Analytics.actions.events.clickedNavLink("Governance")
+            }
           >
             <Text size="sm">Governance</Text>
           </Link>
