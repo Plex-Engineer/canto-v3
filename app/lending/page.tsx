@@ -61,10 +61,23 @@ export default function LendingPage() {
   if (isLoading || cNote === undefined || stableCoins === undefined) {
     return (
       <div className={styles.loading}>
-        <Splash />
+        <LoadingIcon />
       </div>
     );
   }
+
+  const supplyTokens = [cNote, ...stableCoins, ...rwas].sort((a, b) => {
+    return (
+      Number(b.userDetails?.supplyBalanceInUnderlying) -
+      Number(a.userDetails?.supplyBalanceInUnderlying)
+    );
+  });
+  const borrowedTokens = [...stableCoins, cNote].sort((a, b) => {
+    return (
+      Number(b.userDetails?.borrowBalance) -
+      Number(a.userDetails?.borrowBalance)
+    );
+  });
 
   return (
     <div className={clsx(styles.container, "separator")}>
@@ -216,14 +229,12 @@ export default function LendingPage() {
                   ratio: 2,
                 },
               ]}
-              onRowsClick={[cNote, ...stableCoins, ...rwas].map(
-                (cStableCoin) => () => {
-                  setSelectedCToken(cStableCoin.address);
-                  setCurrentModal(CLMModalTypes.SUPPLY);
-                }
-              )}
+              onRowsClick={supplyTokens.map((cStableCoin) => () => {
+                setSelectedCToken(cStableCoin.address);
+                setCurrentModal(CLMModalTypes.SUPPLY);
+              })}
               content={[
-                ...[cNote, ...stableCoins, ...rwas].map((cStableCoin) => [
+                ...supplyTokens.map((cStableCoin) => [
                   <Container
                     center={{
                       vertical: true,
@@ -405,14 +416,12 @@ export default function LendingPage() {
                   ratio: 2,
                 },
               ]}
-              onRowsClick={[...stableCoins, cNote].map(
-                (borrowedToken) => () => {
-                  setSelectedCToken(borrowedToken.address);
-                  setCurrentModal(CLMModalTypes.BORROW);
-                }
-              )}
+              onRowsClick={borrowedTokens.map((borrowedToken) => () => {
+                setSelectedCToken(borrowedToken.address);
+                setCurrentModal(CLMModalTypes.BORROW);
+              })}
               content={[
-                ...[...stableCoins, cNote].map((borrowedToken) => [
+                ...borrowedTokens.map((borrowedToken) => [
                   <Container
                     center={{
                       vertical: true,
