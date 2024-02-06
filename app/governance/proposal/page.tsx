@@ -19,31 +19,38 @@ import { VoteOption } from "@/transactions/gov";
 import Image from "next/image";
 import { NEW_ERROR } from "@/config/interfaces";
 import { VotingInfoBox } from "../components/VotingInfoBox/VotingInfoBox";
-import { TransactionFlowType } from "@/transactions/flows/flowMap";
-import { NewTransactionFlow } from "@/transactions/flows/types";
 import { displayAmount } from "@/utils/formatting";
 import {
   PROPOSAL_QUORUM_VALUE,
   PROPOSAL_TURNOUT_VALUE,
 } from "@/config/consts/config";
 
+const VOTE_OPTION_COLORS = {
+  [VoteOption.YES]: "rgb(6, 252, 153)",
+  [VoteOption.NO]: "rgb(252, 81, 81)",
+  [VoteOption.VETO]: "rgb(68, 85, 239)",
+  [VoteOption.ABSTAIN]: "rgb(111, 105, 105)",
+};
+
 export default function Page() {
+  // signer information
+  const { txStore, signer, chainId } = useCantoSigner();
+  // get proposals
+  const { proposals, isProposalsLoading, newVoteFlow } = useProposals({
+    chainId: chainId,
+  });
+  // transaction
   function castVote(proposalId: number, voteOption: VoteOption | null) {
     if (signer) {
       if (!voteOption) {
         return NEW_ERROR("Please select a vote option");
       }
-      const newFlow: NewTransactionFlow = {
-        icon: "/canto.svg",
-        txType: TransactionFlowType.VOTE_TX,
-        title: "Voting",
-        params: {
-          chainId: chainId,
-          ethAccount: signer?.account.address ?? "",
-          proposalId: proposalId,
-          voteOption: voteOption,
-        },
-      };
+      const newFlow = newVoteFlow({
+        chainId: chainId,
+        ethAccount: signer.account.address,
+        proposalId: proposalId,
+        voteOption: voteOption,
+      });
       txStore?.addNewFlow({
         txFlow: newFlow,
         ethAccount: signer.account.address,
@@ -51,30 +58,15 @@ export default function Page() {
     }
   }
 
-  function getVotingBoxStyles() {
-    if (isActive) {
-      return {
-        height: "70%",
-        padding: "10px 0px 0px 0px",
-      };
-    }
-    return {
-      height: "100%",
-      padding: "0px 0px 20px 0px",
-    };
-  }
-
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const proposalId = Number(id);
   const router = useRouter();
 
-  const { txStore, signer, chainId } = useCantoSigner();
-  const { proposals, isProposalsLoading } = useProposals({ chainId: chainId });
   const [selectedVote, setSelectedVote] = useState<VoteOption | null>(null);
 
   if (isProposalsLoading) {
-    return <Splash />;
+    return <Splash themed />;
   }
 
   if (!id) {
@@ -102,23 +94,37 @@ export default function Page() {
   const votesData = calculateVotePercentages(proposal.final_vote);
 
   const maxAmountIndex = [
-    parseFloat(votesData.Yes),
-    parseFloat(votesData.No),
-    parseFloat(votesData.Veto),
-    parseFloat(votesData.Abstain),
+    parseFloat(votesData[VoteOption.YES].percentage),
+    parseFloat(votesData[VoteOption.NO].percentage),
+    parseFloat(votesData[VoteOption.VETO].percentage),
+    parseFloat(votesData[VoteOption.ABSTAIN].percentage),
   ].indexOf(
     Math.max(
       ...[
-        parseFloat(votesData.Yes),
-        parseFloat(votesData.No),
-        parseFloat(votesData.Veto),
-        parseFloat(votesData.Abstain),
+        parseFloat(votesData[VoteOption.YES].percentage),
+        parseFloat(votesData[VoteOption.NO].percentage),
+        parseFloat(votesData[VoteOption.VETO].percentage),
+        parseFloat(votesData[VoteOption.ABSTAIN].percentage),
       ]
     )
   );
 
+  const VoteBox = ({ option, idx }: { option: VoteOption; idx: number }) => (
+    <VotingInfoBox
+      key={option}
+      isActive={isActive}
+      percentage={votesData[option].percentage}
+      amount={votesData[option].amount}
+      value={option}
+      isSelected={selectedVote == option}
+      color={VOTE_OPTION_COLORS[option]}
+      isHighest={maxAmountIndex == idx}
+      onClick={() => setSelectedVote(option)}
+    />
+  );
+
   return isProposalsLoading ? (
-    <Splash />
+    <Splash themed />
   ) : (
     <div className={styles.proposalContainer}>
       <div className={styles.proposalHeaderContainer}>
@@ -242,57 +248,26 @@ export default function Page() {
         <div className={styles.proposalCardContainer2}>
           <div
             className={styles.proposalInfoBoxVoting}
-            style={getVotingBoxStyles()}
+            style={
+              isActive
+                ? {
+                    height: "70%",
+                    padding: "10px 0px 0px 0px",
+                  }
+                : {
+                    height: "100%",
+                    padding: "0px 0px 20px 0px",
+                  }
+            }
           >
             <div className={styles.proposalInfoRow1}>
-              <VotingInfoBox
-                isActive={isActive}
-                value={VoteOption.YES}
-                selectedVote={selectedVote}
-                votesData={votesData}
-                isSelected={selectedVote == VoteOption.YES}
-                color1="rgba(6, 252, 153,1)"
-                color2="rgba(6, 252, 153, 0.5)"
-                isHighest={maxAmountIndex == 0}
-                onClick={() => setSelectedVote(VoteOption.YES)}
-              />
-
-              <VotingInfoBox
-                isActive={isActive}
-                value={VoteOption.NO}
-                selectedVote={selectedVote}
-                votesData={votesData}
-                isSelected={selectedVote == VoteOption.NO}
-                color1="rgb(252, 81, 81,1)"
-                color2="rgb(252, 81, 81,0.5)"
-                isHighest={maxAmountIndex == 1}
-                onClick={() => setSelectedVote(VoteOption.NO)}
-              />
+              <VoteBox option={VoteOption.YES} idx={0} />
+              <VoteBox option={VoteOption.NO} idx={1} />
             </div>
 
             <div className={styles.proposalInfoRow1}>
-              <VotingInfoBox
-                isActive={isActive}
-                value={VoteOption.VETO}
-                selectedVote={selectedVote}
-                votesData={votesData}
-                isSelected={selectedVote == VoteOption.VETO}
-                color1="rgb(68, 85, 239,1)"
-                color2="rgb(68, 85, 239,0.5)"
-                isHighest={maxAmountIndex == 2}
-                onClick={() => setSelectedVote(VoteOption.VETO)}
-              />
-              <VotingInfoBox
-                isActive={isActive}
-                value={VoteOption.ABSTAIN}
-                selectedVote={selectedVote}
-                votesData={votesData}
-                isSelected={selectedVote == VoteOption.ABSTAIN}
-                color1="rgb(111, 105, 105,1)"
-                color2="rgb(111, 105, 105,0.5)"
-                isHighest={maxAmountIndex == 3}
-                onClick={() => setSelectedVote(VoteOption.ABSTAIN)}
-              />
+              <VoteBox option={VoteOption.VETO} idx={2} />
+              <VoteBox option={VoteOption.ABSTAIN} idx={3} />
             </div>
           </div>
           {isActive && (

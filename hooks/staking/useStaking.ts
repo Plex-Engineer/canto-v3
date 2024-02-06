@@ -12,8 +12,10 @@ import {
 import { getAllUserStakingData } from "./helpers/userStaking";
 import { useState } from "react";
 import { useBalance } from "wagmi";
-import { validateStakingTxParams } from "@/transactions/staking/staking";
-import { newStakingFlow } from "@/transactions/staking";
+import {
+  validateStakingTxParams,
+  newStakingFlow,
+} from "@/transactions/staking";
 
 export default function useStaking(
   params: StakingHookInputParams,
@@ -56,45 +58,53 @@ export default function useStaking(
 
       // combine user delegation data with validator data
       const userValidators: ValidatorWithDelegations[] = [];
-
+      // console.log(userStaking);
       // go through each user delegation
-      userStaking.data.delegations.forEach((delegation) => {
-        const validator = allValidators.data.find(
-          (val) =>
-            val.operator_address === delegation.delegation.validator_address
-        );
-        const rewards =
-          userStaking.data.rewards.rewards
-            .find(
-              (rew) =>
-                rew.validator_address ===
-                delegation.delegation.validator_address
-            )
-            ?.reward?.find((bal) => bal.denom === "acanto")?.amount ?? "0";
-        if (validator) {
-          userValidators.push({
-            ...validator,
-            userDelegation: {
-              balance: delegation.balance.amount,
-              rewards: rewards,
-            },
-          });
-        }
-      });
+      if (
+        userStaking.data.delegations &&
+        userStaking.data.delegations.length > 0
+      ) {
+        userStaking.data.delegations.forEach((delegation) => {
+          const validator = allValidators.data.find(
+            (val) =>
+              val.operator_address === delegation.delegation.validator_address
+          );
+          const rewards =
+            userStaking.data.rewards.rewards
+              .find(
+                (rew) =>
+                  rew.validator_address ===
+                  delegation.delegation.validator_address
+              )
+              ?.reward?.find((bal) => bal.denom === "acanto")?.amount ?? "0";
+          if (validator) {
+            userValidators.push({
+              ...validator,
+              userDelegation: {
+                balance: delegation.balance.amount,
+                rewards: rewards,
+              },
+            });
+          }
+        });
+      }
 
-      const userUnbondingDelegations: UnbondingDelegation[] =
-        userStaking.data.unbondingDelegations
-          .map((unbondingEntry) => {
-            const validatorName = allValidators.data.find(
-              (val) => val.operator_address === unbondingEntry.validator_address
-            )?.description.moniker;
-            return unbondingEntry.entries.map((entry) => ({
-              name: validatorName ?? "",
-              completion_date: entry.completion_time,
-              undelegation: entry.balance,
-            }));
-          })
-          .flat();
+      const userUnbondingDelegations: UnbondingDelegation[] = userStaking.data
+        .unbondingDelegations
+        ? userStaking.data.unbondingDelegations
+            .map((unbondingEntry) => {
+              const validatorName = allValidators.data.find(
+                (val) =>
+                  val.operator_address === unbondingEntry.validator_address
+              )?.description.moniker;
+              return unbondingEntry.entries.map((entry) => ({
+                name: validatorName ?? "",
+                completion_date: entry.completion_time,
+                undelegation: entry.balance,
+              }));
+            })
+            .flat()
+        : [];
 
       return {
         validators: allValidators.data,

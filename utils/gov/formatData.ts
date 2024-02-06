@@ -1,3 +1,5 @@
+import { VoteOption } from "@/transactions/gov";
+
 const proposalTypes = {
   "/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal": "Software Upgrade",
   "/cosmos.params.v1beta1.ParameterChangeProposal": "Parameter Change",
@@ -41,14 +43,22 @@ interface FinalTallyResult {
 }
 
 export interface VoteData {
-  YesAmount: string;
-  NoAmount: string;
-  AbstainAmount: string;
-  VetoAmount: string;
-  Yes: string;
-  Abstain: string;
-  No: string;
-  Veto: string;
+  [VoteOption.YES]: {
+    amount: string;
+    percentage: string;
+  };
+  [VoteOption.ABSTAIN]: {
+    amount: string;
+    percentage: string;
+  };
+  [VoteOption.NO]: {
+    amount: string;
+    percentage: string;
+  };
+  [VoteOption.VETO]: {
+    amount: string;
+    percentage: string;
+  };
 }
 
 export function calculateVotePercentages(
@@ -79,14 +89,22 @@ export function calculateVotePercentages(
 
   if (totalVotesBigInt == 0n) {
     return {
-      YesAmount: "0",
-      NoAmount: "0",
-      AbstainAmount: "0",
-      VetoAmount: "0",
-      Yes: "0",
-      Abstain: "0",
-      No: "0",
-      Veto: "0",
+      [VoteOption.YES]: {
+        amount: "0",
+        percentage: "0",
+      },
+      [VoteOption.ABSTAIN]: {
+        amount: "0",
+        percentage: "0",
+      },
+      [VoteOption.NO]: {
+        amount: "0",
+        percentage: "0",
+      },
+      [VoteOption.VETO]: {
+        amount: "0",
+        percentage: "0",
+      },
     };
   }
 
@@ -111,14 +129,22 @@ export function calculateVotePercentages(
   const noWithVetoString = noWithVetoNumber.toFixed(2);
 
   return {
-    YesAmount: yesString,
-    NoAmount: noString,
-    AbstainAmount: abstainString,
-    VetoAmount: noWithVetoString,
-    Yes: yesPercentage,
-    Abstain: abstainPercentage,
-    No: noPercentage,
-    Veto: noWithVetoPercentage,
+    [VoteOption.YES]: {
+      amount: yesString,
+      percentage: yesPercentage,
+    },
+    [VoteOption.ABSTAIN]: {
+      amount: abstainString,
+      percentage: abstainPercentage,
+    },
+    [VoteOption.NO]: {
+      amount: noString,
+      percentage: noPercentage,
+    },
+    [VoteOption.VETO]: {
+      amount: noWithVetoString,
+      percentage: noWithVetoPercentage,
+    },
   };
 }
 

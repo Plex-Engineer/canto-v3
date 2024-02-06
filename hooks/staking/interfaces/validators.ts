@@ -32,8 +32,8 @@ export interface UnbondingDelegation {
 }
 
 export interface UserStakingReturn {
-  delegations: DelegationResponse[];
-  unbondingDelegations: UnbondingDelegationResponse[];
+  delegations: DelegationResponse[] | null;
+  unbondingDelegations: UnbondingDelegationResponse[] | null;
   rewards: DelegationRewardResponse;
 }
 

@@ -10,11 +10,9 @@ import Spacer from "@/components/layout/spacer";
 import Button from "@/components/button/button";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Splash from "@/components/splash/splash";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function GovernancePage() {
-  const router = useRouter();
-
   const { chainId } = useCantoSigner();
   const { proposals, isProposalsLoading } = useProposals({ chainId: chainId });
 
@@ -28,7 +26,7 @@ export default function GovernancePage() {
   );
 
   return isProposalsLoading ? (
-    <Splash />
+    <Splash themed />
   ) : (
     <div>
       <div className={styles.container}>
@@ -39,13 +37,9 @@ export default function GovernancePage() {
           <Text size="sm" opacity={0.4} className={styles.middleText}>
             Stake your $CANTO to participate in governance
           </Text>
-          <Button
-            onClick={() => {
-              router.push("/staking");
-            }}
-          >
-            Go to Staking
-          </Button>
+          <Link href="/staking">
+            <Button>Go to Staking</Button>
+          </Link>
         </div>
 
         <Spacer height="40px" />

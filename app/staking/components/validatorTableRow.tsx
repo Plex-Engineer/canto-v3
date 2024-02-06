@@ -8,6 +8,8 @@ import {
 } from "@/hooks/staking/interfaces/validators";
 import Text from "@/components/text";
 import { displayAmount } from "@/utils/formatting";
+import Analytics from "@/provider/analytics";
+import { getAnalyticsStakingInfo } from "@/utils/analytics";
 
 export const GenerateValidatorTableRow = (
   validator: Validator,
@@ -18,7 +20,9 @@ export const GenerateValidatorTableRow = (
     <Text font="rm_mono">{validator.rank}</Text>
   </Container>,
   <Container key={`name_${index}`}>
-    <Text font="rm_mono">{validator.description.moniker}</Text>
+    <div style={{ width: "300px" }}>
+      <Text font="rm_mono">{validator.description.moniker}</Text>
+    </div>
   </Container>,
   <Container
     key={`tokens_${index}`}
@@ -43,7 +47,15 @@ export const GenerateValidatorTableRow = (
     </Text>
   </Container>,
   <Container key={`button_${index}`}>
-    <Button onClick={() => onDelegate(validator)} disabled={validator.jailed}>
+    <Button
+      onClick={() => {
+        Analytics.actions.events.staking.delegateClicked(
+          getAnalyticsStakingInfo(validator, "0")
+        );
+        onDelegate(validator);
+      }}
+      disabled={validator.jailed}
+    >
       DELEGATE
     </Button>
   </Container>,
@@ -106,7 +118,19 @@ export const GenerateMyStakingTableRow = (
     </Text>
   </Container>,
   <Container key={`buttonManage_${index}`}>
-    <Button onClick={() => onDelegate(userStakedValidator)}>MANAGE</Button>
+    <Button
+      onClick={() => {
+        Analytics.actions.events.staking.manageClicked(
+          getAnalyticsStakingInfo(
+            userStakedValidator,
+            userStakedValidator.userDelegation.balance
+          )
+        );
+        onDelegate(userStakedValidator);
+      }}
+    >
+      MANAGE
+    </Button>
   </Container>,
 ];
 
