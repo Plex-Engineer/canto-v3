@@ -270,13 +270,17 @@ export default function LendingPage() {
                   </Container>,
                   cStableCoin.supplyApy + "%",
                   displayAmount(cStableCoin.collateralFactor, 16) + "%",
-                  displayAmount(
-                    cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
-                    cStableCoin.underlying.decimals,
-                    {
-                      precision: 2,
-                    }
-                  ),
+                  cStableCoin.userDetails?.supplyBalanceInUnderlying == null ||
+                  cStableCoin.userDetails?.supplyBalanceInUnderlying === "0"
+                    ? "-"
+                    : displayAmount(
+                        cStableCoin.userDetails?.supplyBalanceInUnderlying ??
+                          "0",
+                        cStableCoin.underlying.decimals,
+                        {
+                          precision: 2,
+                        }
+                      ),
                 ]),
               ]}
             />
@@ -402,12 +406,12 @@ export default function LendingPage() {
                   ratio: 2,
                 },
               ]}
-              onRowsClick={stableCoins.map((cStableCoin) => () => {
+              onRowsClick={[...stableCoins, cNote].map((cStableCoin) => () => {
                 setSelectedCToken(cStableCoin.address);
                 setCurrentModal(CLMModalTypes.BORROW);
               })}
               content={[
-                ...stableCoins.map((cStableCoin) => [
+                ...[...stableCoins, cNote].map((cStableCoin) => [
                   <Container
                     center={{
                       vertical: true,
@@ -447,15 +451,18 @@ export default function LendingPage() {
                     </Container>
                   </Container>,
                   cStableCoin.supplyApy + "%",
-                  // liquidity
                   displayAmount(cStableCoin.liquidity, 0),
-                  displayAmount(
-                    cStableCoin.userDetails?.supplyBalanceInUnderlying ?? "0",
-                    cStableCoin.underlying.decimals,
-                    {
-                      precision: 2,
-                    }
-                  ),
+                  cStableCoin.userDetails?.supplyBalanceInUnderlying == null ||
+                  cStableCoin.userDetails?.supplyBalanceInUnderlying === "0"
+                    ? "-"
+                    : displayAmount(
+                        cStableCoin.userDetails?.supplyBalanceInUnderlying ??
+                          "0",
+                        cStableCoin.underlying.decimals,
+                        {
+                          precision: 2,
+                        }
+                      ),
                 ]),
               ]}
             />
