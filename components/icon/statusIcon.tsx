@@ -17,9 +17,9 @@ const StatusIcon = (props: Props) => {
       icon={{
         url:
           props.status === "SUCCESS"
-            ? "check.svg"
+            ? "/check.svg"
             : props.status === "ERROR"
-              ? "close.svg"
+              ? "/close.svg"
               : "",
         size: props.size,
       }}

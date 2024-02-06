@@ -18,6 +18,10 @@
     background: transparent;
   }
 
+
+
+
+
   //   &::before,
   //   &::after {
   //     top: 40px;
@@ -99,4 +103,8 @@
 .expanded {
   transform: translateX(-100%);
   transition: transform 0.3s ease-out;
+}
+
+.searchBox {
+  padding: 16px 16px 0px 16px;
 }

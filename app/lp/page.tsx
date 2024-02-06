@@ -21,8 +21,11 @@ import Rewards from "./components/rewards";
 import Container from "@/components/container/container";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import usePool from "./utils";
-import { getPriceFromTick } from "@/utils/ambient";
 import Analytics from "@/provider/analytics";
+import {
+  getAnalyticsCantoLiquidityPoolInfo,
+  getAnalyticsAmbientLiquidityPoolInfo,
+} from "@/utils/analytics";
 import DesktopOnly from "@/components/desktop-only/desktop-only";
 
 export default function Page() {
@@ -102,32 +105,9 @@ export default function Page() {
                 UserAmbientPairRow({
                   pool,
                   onManage: (poolAddress) => {
-                    const positions = pool.userPositions.map((position) => {
-                      return {
-                        positionId: position.positionId,
-                        liquidity: position.concLiq,
-                        minRangePrice: displayAmount(
-                          getPriceFromTick(position.bidTick),
-                          pool.base.decimals - pool.quote.decimals,
-                          {
-                            short: false,
-                            precision: pool.base.decimals - pool.quote.decimals,
-                          }
-                        ),
-                        maxRangePrice: displayAmount(
-                          getPriceFromTick(position.askTick),
-                          pool.base.decimals - pool.quote.decimals,
-                          {
-                            short: false,
-                            precision: pool.base.decimals - pool.quote.decimals,
-                          }
-                        ),
-                      };
-                    });
-                    Analytics.actions.events.liquidityPool.manageLPClicked({
-                      ambientLp: pool.symbol,
-                      positions,
-                    });
+                    Analytics.actions.events.liquidityPool.manageLPClicked(
+                      getAnalyticsAmbientLiquidityPoolInfo(pool)
+                    );
                     setPair(poolAddress);
                   },
                   rewards: pool.userRewards,
@@ -138,25 +118,9 @@ export default function Page() {
                   pair,
 
                   onManage: (pairAddress) => {
-                    Analytics.actions.events.liquidityPool.manageLPClicked({
-                      cantoLp: pair.symbol,
-                      cantoLpTokenBalance: displayAmount(
-                        pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
-                        pair.decimals,
-                        { short: false, precision: pair.decimals }
-                      ),
-                      cantoLpStakedBalance: displayAmount(
-                        pair.clmData?.userDetails?.supplyBalanceInUnderlying ??
-                          "0",
-                        pair.decimals,
-                        { short: false, precision: pair.decimals }
-                      ),
-                      cantoLpUnstakedBalance: displayAmount(
-                        pair.clmData?.userDetails?.balanceOfUnderlying ?? "0",
-                        pair.decimals,
-                        { short: false, precision: pair.decimals }
-                      ),
-                    });
+                    Analytics.actions.events.liquidityPool.manageLPClicked(
+                      getAnalyticsCantoLiquidityPoolInfo(pair)
+                    );
                     setPair(pairAddress);
                   },
                 })
@@ -200,7 +164,13 @@ export default function Page() {
             .map((pool) =>
               GeneralAmbientPairRow({
                 pool,
-                onAddLiquidity: (poolAddress) => setPair(poolAddress),
+                onAddLiquidity: (poolAddress) => {
+                  Analytics.actions.events.liquidityPool.addLPClicked({
+                    lpType: "AMBIENT",
+                    ambientLp: pool.symbol,
+                  });
+                  setPair(poolAddress);
+                },
               })
             ),
           ...sortedCantoDexPairs
@@ -215,6 +185,7 @@ export default function Page() {
                 pair,
                 onAddLiquidity: (pairAddress) => {
                   Analytics.actions.events.liquidityPool.addLPClicked({
+                    lpType: "CANTO",
                     cantoLp: pair.symbol,
                   });
                   setPair(pairAddress);

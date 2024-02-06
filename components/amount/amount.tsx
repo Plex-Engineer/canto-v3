@@ -77,11 +77,18 @@ const Amount = (props: Props) => {
       validateNonWeiUserInputTokenAmount(
         props.value,
         props.min,
-        props.max,
+        props.limit?.limit ?? props.max,
         props.symbol,
         props.decimals
       ),
-    [props.value, props.max, props.min, props.decimals, props.symbol]
+    [
+      props.value,
+      props.max,
+      props.min,
+      props.decimals,
+      props.symbol,
+      props.limit?.limit,
+    ]
   );
 
   return (

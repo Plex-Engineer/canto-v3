@@ -10,13 +10,20 @@ import {
   rainbowWallet,
   walletConnectWallet,
 } from "@rainbow-me/rainbowkit/wallets";
-import { Chain, configureChains, createConfig, WagmiConfig } from "wagmi";
+import {
+  Chain,
+  configureChains,
+  createConfig,
+  useChainId,
+  WagmiConfig,
+} from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import * as EVM_CHAINS from "@/config/networks/evm";
 import { cantoTheme } from "./util";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { SafeConnector } from "wagmi/connectors/safe";
+import { getNetworkInfoFromChainId } from "@/utils/networks";
 
 const formattedChains: Chain[] = [...Object.values(EVM_CHAINS)].map(
   (network) => {
@@ -91,10 +98,16 @@ const wagmiConfig = createConfig({
   publicClient,
 });
 
-const CustomAvatar: AvatarComponent = () => {
+const CustomAvatar: AvatarComponent = ({ ensImage }) => {
+  const chainId = useChainId();
+
+  const chainIcon = useMemo(() => {
+    const { data: chainInfo, error } = getNetworkInfoFromChainId(chainId);
+    return error ? undefined : chainInfo.icon;
+  }, [chainId]);
   return (
     <Image
-      src="networks/canto.svg"
+      src={chainIcon ?? "networks/canto.svg"}
       style={{
         width: "100%",
         height: "100%",
@@ -109,20 +122,28 @@ const CustomAvatar: AvatarComponent = () => {
 interface RainbowProviderProps {
   children: React.ReactNode;
 }
-const CantoWalletProvider = ({ children }: RainbowProviderProps) => {
+
+const RainbowProvider = ({ children }: RainbowProviderProps) => {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  return (
+    <RainbowKitProvider
+      avatar={CustomAvatar}
+      chains={chains}
+      modalSize="wide"
+      theme={cantoTheme}
+      initialChain={EVM_CHAINS.CANTO_MAINNET_EVM.chainId}
+    >
+      {mounted && children}
+    </RainbowKitProvider>
+  );
+};
+
+const CantoWalletProvider = ({ children }: RainbowProviderProps) => {
   return (
     <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider
-        avatar={CustomAvatar}
-        chains={chains}
-        modalSize="wide"
-        theme={cantoTheme}
-        initialChain={EVM_CHAINS.CANTO_MAINNET_EVM.chainId}
-      >
-        {mounted && children}
-      </RainbowKitProvider>
+      <RainbowProvider>{children}</RainbowProvider>
     </WagmiConfig>
   );
 };

@@ -11,7 +11,7 @@ const LoadingIcon = ({ size, className }: Props) => {
     <Icon
       themed
       icon={{
-        url: "loader.svg",
+        url: "/loader.svg",
         size: size,
       }}
       className={clsx(styles.anim, className)}

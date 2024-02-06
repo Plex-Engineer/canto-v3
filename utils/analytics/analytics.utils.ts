@@ -3,6 +3,9 @@ import { getBridgeMethodInfo } from "@/transactions/bridge";
 import {
   AnalyticsTransactionFlowInfo,
   AnalyticsTransactionFlowData,
+  AnalyticsAmbientLPData,
+  AnalyticsCantoLPData,
+  AnalyticsLMData,
 } from "@/provider/analytics";
 import { BridgeTransactionParams } from "@/transactions/bridge/types";
 import {
@@ -18,14 +21,18 @@ import {
   CTokenLendingTransactionParams,
 } from "@/transactions/lending";
 import { ClaimDexComboRewardsParams } from "@/hooks/pairs/lpCombo/transactions/claimRewards";
-import { getNetworkInfoFromChainId } from "@/utils/networks";
+import { getNetworkInfoFromChainId, isCantoChainId } from "@/utils/networks";
 import { displayAmount, formatPercent } from "../formatting";
 import { addTokenBalances } from "@/utils/math";
 import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
 import { getDisplayTokenAmountFromRange, getPriceFromTick } from "@/utils/ambient";
+import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
+import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
+import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 
-const displayAnalyticsAmount = (amount: string, decimals: number) =>
-  displayAmount(amount, decimals, { short: false, precision: decimals });
+export function displayAnalyticsAmount(amount: string, decimals: number){
+  return displayAmount(amount, decimals, { short: false, precision: decimals });
+}
 
 export function getAnalyticsTransactionFlowInfo(
   flow: NewTransactionFlow,
@@ -74,6 +81,7 @@ function getBridgeTransactionFlowData(
   bridgeTxParams: BridgeTransactionParams
 ): AnalyticsTransactionFlowData {
   return {
+    bridgeDirection: isCantoChainId(Number(bridgeTxParams.from.chainId)) ? "OUT" : "IN",
     bridgeFrom: getNetworkInfoFromChainId(bridgeTxParams.from.chainId).data
       .name,
     bridgeTo: getNetworkInfoFromChainId(bridgeTxParams.to.chainId).data.name,
@@ -91,7 +99,7 @@ function getAmbientLiquidityTransactionFlowData(
 ): AnalyticsTransactionFlowData {
   const poolData = {
     ambientLp: ambientLiquidityTxParams.pool.symbol,
-    ambientPositionId: ambientLiquidityTxParams.positionId,
+    ambientLPPositionId: ambientLiquidityTxParams.positionId,
     ambientLpBaseToken: ambientLiquidityTxParams.pool.base.symbol,
     ambientLpQuoteToken: ambientLiquidityTxParams.pool.quote.symbol,
     ambientLpCurrentPrice: displayAnalyticsAmount(
@@ -333,5 +341,87 @@ function getLpComboClaimRewardsTransactionFlowType(
     return "Claim Ambient Rewards";
   } else {
     return undefined;
+  }
+}
+
+export function getAnalyticsLendingMarketTokenInfo(lmType: string, cToken: CTokenWithUserData, liquidity: string, isSupply: boolean): AnalyticsLMData {
+  const cTokenData = {
+    lmToken: cToken.underlying.symbol,
+    lmWalletBalance: displayAnalyticsAmount(
+      cToken.userDetails?.balanceOfUnderlying ?? "0",
+      cToken.underlying.decimals
+    ),
+    lmAccountLiquidityRemaining: displayAnalyticsAmount(
+      liquidity,
+      18
+    ),
+  }
+  if(isSupply){
+    return {
+      ...cTokenData,
+      lmSuppliedAmount: displayAnalyticsAmount(
+        cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
+        cToken.underlying.decimals
+      ),
+    }
+  }
+  return {
+    ...cTokenData,
+    lmBorrowedAmount: displayAnalyticsAmount(
+      cToken.userDetails?.borrowBalance ?? "0",
+      cToken.underlying.decimals
+    ),
+  }
+}
+
+export function getAnalyticsAmbientLiquidityPoolInfo(pool : AmbientPool) : AnalyticsAmbientLPData {
+ const positions = pool.userPositions.map((position) => ({
+  ambientLPPositionId: position.positionId,
+  ambientLpLiquidity: position.concLiq,
+  ambientLpMinRangePrice: displayAmount(
+    getPriceFromTick(position.bidTick),
+    pool.base.decimals - pool.quote.decimals,
+    {
+      short: false,
+      precision: pool.base.decimals - pool.quote.decimals,
+    }
+  ),
+  ambientLpMaxRangePrice: displayAmount(
+    getPriceFromTick(position.askTick),
+    pool.base.decimals - pool.quote.decimals,
+    {
+      short: false,
+      precision: pool.base.decimals - pool.quote.decimals,
+    }
+  ),
+}));
+
+return {
+  lpType: "AMBIENT",
+  ambientLp : pool.symbol,
+  ambientLPPositions: positions,
+}
+}
+
+export function getAnalyticsCantoLiquidityPoolInfo(pool : CantoDexPairWithUserCTokenData) : AnalyticsCantoLPData {
+  return {
+    lpType: "CANTO",
+    cantoLp: pool.symbol,
+    cantoLpTokenBalance: displayAmount(
+      pool.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+      pool.decimals,
+      { short: false, precision: pool.decimals }
+    ),
+    cantoLpStakedBalance: displayAmount(
+      pool.clmData?.userDetails?.supplyBalanceInUnderlying ??
+        "0",
+        pool.decimals,
+      { short: false, precision: pool.decimals }
+    ),
+    cantoLpUnstakedBalance: displayAmount(
+      pool.clmData?.userDetails?.balanceOfUnderlying ?? "0",
+      pool.decimals,
+      { short: false, precision: pool.decimals }
+    ),
   }
 }

@@ -1,9 +1,8 @@
-import React from "react";
 import Text from "../text";
 import styles from "./table.module.scss";
 
 interface Props {
-  title?: string;
+  title?: string | React.ReactNode;
   secondary?: React.ReactNode;
   headers: {
     value: string | React.ReactNode;
@@ -13,6 +12,7 @@ interface Props {
   textSize?: string;
   onRowsClick?: (() => void)[];
 }
+
 const Table = (props: Props) => {
   return (
     <div className={styles.container} style={{ fontSize: props.textSize }}>
