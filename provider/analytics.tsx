@@ -117,6 +117,7 @@ type AnalyticsTransactionFlowParams = AnalyticsTransactionFlowInfo & {
   txNetwork?: string;
   txSuccess?: boolean;
   txHash?: string;
+  txTimeInSeconds?: Number;
   txRetryTimeInSeconds?: Number;
   txsGenerateError?: string;
   txError?: string;
@@ -158,6 +159,11 @@ class AnalyticsWrapper {
             posthog.capture("Wallet Disconnected");
           }
         },
+      },
+      clickedNavLink: (link : string)=>{
+        posthog.capture("Clicked Nav Link", {
+          link,
+        });
       },
       themeChanged: (theme: string) => {
         posthog.capture("Theme Changed", {
