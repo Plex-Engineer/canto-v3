@@ -470,7 +470,6 @@ export default function StakingPage() {
                       </Container>,
                     ]
               }
-              isPaginated={true}
             />
           )}
         </Container>
