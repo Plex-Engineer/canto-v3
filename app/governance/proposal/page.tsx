@@ -24,6 +24,7 @@ import {
   PROPOSAL_QUORUM_VALUE,
   PROPOSAL_TURNOUT_VALUE,
 } from "@/config/consts/config";
+import VoteBarGraph from "../components/votingChart/voteGraph";
 
 const VOTE_OPTION_COLORS = {
   [VoteOption.YES]: "rgb(6, 252, 153)",
@@ -244,6 +245,13 @@ export default function Page() {
               </div>
             </div>
           </div>
+          <VoteBarGraph
+            yesVotes={50}
+            noVotes={20}
+            abstainVotes={10}
+            vetoVotes={5}
+            size={200} // Specify the size of the component
+          />
         </div>
         <div className={styles.proposalCardContainer2}>
           <div
