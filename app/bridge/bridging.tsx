@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import GravityConfirmationModal from "./components/gravityConfirmationModal";
 import { GRAVITY_BRIDGE } from "@/config/networks";
 import { TX_ERROR_TYPES } from "@/config/consts/errors";
+import BigNumber from "bignumber.js";
 
 const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
@@ -266,10 +267,15 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
                         ? -1
                         : 1;
                     }
-                    return (a.balance ? a.balance : 0) >
-                      (b.balance ? b.balance : 0)
-                      ? -1
-                      : 1;
+                    const aBig = new BigNumber(a.balance ? a.balance : 0);
+                    const bBig = new BigNumber(b.balance ? b.balance : 0);
+                    const aFormatted = aBig.dividedBy(
+                      new BigNumber(10).pow(a.decimals)
+                    );
+                    const bFormatted = bBig.dividedBy(
+                      new BigNumber(10).pow(b.decimals)
+                    );
+                    return bFormatted.minus(aFormatted).toNumber();
                   })}
                 onChange={(tokenId) => bridge.setState("token", tokenId)}
               />
