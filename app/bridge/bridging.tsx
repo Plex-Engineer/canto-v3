@@ -262,19 +262,19 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
                     ),
                   }))
                   .sort((a, b) => {
-                    if (Number(a.secondary) === Number(b.secondary)) {
+                    const aBigNumber = new BigNumber(a.balance ? a.balance : 0);
+                    const bBigNumber = new BigNumber(b.balance ? b.balance : 0);
+                    const aFormatted = aBigNumber.dividedBy(
+                      new BigNumber(10).pow(a.decimals)
+                    );
+                    const bFormatted = bBigNumber.dividedBy(
+                      new BigNumber(10).pow(b.decimals)
+                    );
+                    if (aFormatted === bFormatted) {
                       return b.name.toLowerCase() > a.name.toLowerCase()
                         ? -1
                         : 1;
                     }
-                    const aBig = new BigNumber(a.balance ? a.balance : 0);
-                    const bBig = new BigNumber(b.balance ? b.balance : 0);
-                    const aFormatted = aBig.dividedBy(
-                      new BigNumber(10).pow(a.decimals)
-                    );
-                    const bFormatted = bBig.dividedBy(
-                      new BigNumber(10).pow(b.decimals)
-                    );
                     return bFormatted.minus(aFormatted).toNumber();
                   })}
                 onChange={(tokenId) => bridge.setState("token", tokenId)}
