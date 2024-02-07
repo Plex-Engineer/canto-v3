@@ -65,6 +65,8 @@ export function displayAmount(
     short: true,
     maxSmallBalance: 0.001,
   };
+  //   if 0, return 0.00
+  if (amount === "0" && options?.precision == 2) return "0.00";
   return formatBalance(amount, decimals, { ...defaultOptions, ...options });
 }
 

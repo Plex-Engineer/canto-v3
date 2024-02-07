@@ -107,6 +107,7 @@ export default function RootLayout({
                 ]}
               /> */}
               <NavBar />
+
               {children}
               <div id="modal-root"></div>
               <Footer />

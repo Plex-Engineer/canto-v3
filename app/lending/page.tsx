@@ -1,26 +1,26 @@
 "use client";
 
 import styles from "./lending.module.scss";
-import Icon from "@/components/icon/icon";
 import Modal from "@/components/modal/modal";
 import Table from "@/components/table/table";
 import { displayAmount, formatPercent } from "@/utils/formatting";
 import { useLendingCombo } from "./utils";
 import Text from "@/components/text";
 import Container from "@/components/container/container";
-import HighlightCard from "./components/highlightCard";
-import OutlineCard from "./components/outlineCard";
-import Item from "./components/item";
 import LoadingIcon from "@/components/loader/loading";
 import { LendingModal } from "./components/modal/modal";
 import { RWARow, StableCoinRow } from "./components/cTokenRow";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Spacer from "@/components/layout/spacer";
-import { addTokenBalances, divideBalances } from "@/utils/math";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
-import Analytics from "@/provider/analytics";
-import { getAnalyticsLendingMarketTokenInfo } from "@/utils/analytics";
+import AccountHealth from "./components/accountHealth/accountHealth";
+import TokenCard from "./components/tokenCard/tokenCard";
+import Icon from "@/components/icon/icon";
+import { addTokenBalances, divideBalances } from "@/utils/math/tokenMath.utils";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
+import Splash from "@/components/splash/splash";
+import clsx from "clsx";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -31,6 +31,10 @@ export default function LendingPage() {
   // track current modal type
   const [currentModal, setCurrentModal] = useState<CLMModalTypes>(
     CLMModalTypes.NONE
+  );
+
+  const [currentToggle, setCurrentToggle] = useState<"Supply" | "Borrow">(
+    "Supply"
   );
 
   // get all data from lending combo
@@ -48,13 +52,35 @@ export default function LendingPage() {
   });
   const { cNote, rwas, stableCoins } = cTokens;
   const { selectedCToken, setSelectedCToken } = selection;
+  const [isMobile, setIsMobile] = useState(false);
+  const screen = useScreenSize();
+  useEffect(() => {
+    setIsMobile(screen.width < 768);
+  }, [screen.width]);
 
-  if (isLoading) {
-    return <div className={styles.loading}>loading</div>;
+  if (isLoading || cNote === undefined || stableCoins === undefined) {
+    return (
+      <div className={styles.loading}>
+        <LoadingIcon />
+      </div>
+    );
   }
 
+  const supplyTokens = [cNote, ...stableCoins, ...rwas].sort((a, b) => {
+    return (
+      Number(b.userDetails?.supplyBalanceInUnderlying) -
+      Number(a.userDetails?.supplyBalanceInUnderlying)
+    );
+  });
+  const borrowedTokens = [...stableCoins, cNote].sort((a, b) => {
+    return (
+      Number(b.userDetails?.borrowBalance) -
+      Number(a.userDetails?.borrowBalance)
+    );
+  });
+
   return (
-    <div className={styles.container}>
+    <div className={clsx(styles.container, "separator")}>
       <Text size="x-lg" font="proto_mono" className={styles.title}>
         Lending
       </Text>
@@ -78,318 +104,383 @@ export default function LendingPage() {
         )}
       </Modal>
 
-      <Container className={styles.grid} direction="row">
-        <Container gap={54}>
-          <div className={styles.highlightCard}>
-            {isLoading ? (
-              <Container
-                width="1000px"
-                height="300px"
-                center={{
-                  horizontal: true,
-                  vertical: true,
-                }}
-              >
-                <LoadingIcon />
-              </Container>
-            ) : cNote ? (
-              <HighlightCard
-                cToken={cNote}
-                precisionInValues={2}
-                onSupply={() => {
-                  Analytics.actions.events.lendingMarket.supplyClicked(
-                    getAnalyticsLendingMarketTokenInfo(
-                      "CTOKEN",
-                      cNote,
-                      clmPosition.position.liquidity,
-                      true
-                    )
-                  );
-                  setSelectedCToken(cNote.address);
-                  setCurrentModal(CLMModalTypes.SUPPLY);
-                }}
-                onBorrow={() => {
-                  Analytics.actions.events.lendingMarket.borrowClicked(
-                    getAnalyticsLendingMarketTokenInfo(
-                      "CTOKEN",
-                      cNote,
-                      clmPosition.position.liquidity,
-                      false
-                    )
-                  );
-                  setSelectedCToken(cNote.address);
-                  setCurrentModal(CLMModalTypes.BORROW);
-                }}
-              />
-            ) : (
-              <Text>No Supply Tokens Found</Text>
-            )}
-          </div>
-
-          <CTokenTable
-            isLoading={isLoading}
-            stableTokens={stableCoins.sort((a, b) =>
-              a.underlying.symbol.localeCompare(b.underlying.symbol)
-            )}
-            rwas={rwas.sort((a, b) =>
-              a.underlying.symbol.localeCompare(b.underlying.symbol)
-            )}
-            liquidity={clmPosition.position.liquidity}
-            onSupply={(address) => {
-              setSelectedCToken(address);
-              setCurrentModal(CLMModalTypes.SUPPLY);
-            }}
-            onBorrow={(address) => {
-              setSelectedCToken(address);
-              setCurrentModal(CLMModalTypes.BORROW);
-            }}
-          />
-          <Spacer height="20px" />
-        </Container>
-
-        <Container gap={20}>
-          <div className={styles.widget1}>
-            <OutlineCard>
-              <Item
-                name="Total Note"
-                value={displayAmount(
+      <div className={styles.accountHealth}>
+        <AccountHealth
+          title="Account Health"
+          items={[
+            {
+              name: "Supplied",
+              value: displayAmount(clmPosition.position.totalSupply, 18, {
+                precision: 2,
+              }),
+              symbol: true,
+            },
+            {
+              name: "Borrow Limit",
+              value: displayAmount(
+                clmPosition.general.maxAccountLiquidity,
+                18,
+                {
+                  precision: 2,
+                }
+              ),
+              symbol: true,
+            },
+            {
+              name: "Net APY",
+              value: clmPosition.general.netApr + "%",
+            },
+            {
+              name: "Borrowed",
+              value: displayAmount(clmPosition.position.totalBorrow, 18, {
+                precision: 2,
+              }),
+              symbol: true,
+            },
+            {
+              name: "Liquidity Remaining",
+              value: displayAmount(clmPosition.position.liquidity, 18),
+              symbol: true,
+            },
+            {
+              name: "Limit Used",
+              value: clmPosition.general.percentLimitUsed + "%",
+            },
+          ]}
+          percent={Number(clmPosition.general.percentLimitUsed) / 100}
+        />
+      </div>
+      <div className={styles.highlightCard}>
+        <TokenCard
+          cToken={cNote}
+          items={[
+            {
+              key: "Circulating Supply",
+              value: displayAmount(
+                addTokenBalances(
+                  lendingStats.circulatingNote,
+                  lendingStats.circulatingCNote
+                ),
+                18
+              ),
+            },
+            {
+              key: "Percent Deposited",
+              value: formatPercent(
+                divideBalances(
+                  lendingStats.circulatingCNote,
                   addTokenBalances(
                     lendingStats.circulatingNote,
                     lendingStats.circulatingCNote
-                  ),
-                  18
-                )}
-                postChild={<NoteIcon />}
-              />
-              <Item
-                name="Percent Note Deposited"
-                value={formatPercent(
-                  divideBalances(
-                    lendingStats.circulatingCNote,
-                    addTokenBalances(
-                      lendingStats.circulatingNote,
-                      lendingStats.circulatingCNote
-                    )
                   )
-                )}
-              />
-              <Item
-                name="Price of cNote"
-                value={displayAmount(lendingStats.cNotePrice, 18, {
-                  precision: 4,
-                })}
-                postChild={<NoteIcon />}
-              />
-              <Item
-                name="Value of rwas on canto"
-                value={displayAmount(lendingStats.valueOfAllRWA, 18)}
-                postChild={<NoteIcon />}
-              />
-            </OutlineCard>
-          </div>
+                )
+              ),
+            },
+            {
+              key: "RWA TVl",
+              value: displayAmount(lendingStats.valueOfAllRWA, 18),
+            },
+          ]}
+          onClick={() => {
+            window.open(
+              "https://app.slingshot.finance/swap/Canto/NOTE",
+              "_blank"
+            );
+          }}
+        />
+      </div>
 
-          <div className={styles.widget2}>
-            <OutlineCard>
-              {/* <Item
-                name="Outstanding Debt"
-                value={displayAmount(clmPosition.general.outstandingDebt, 18, {
-                  precision: 2,
-                })}
-                postChild={<NoteIcon />}
-              /> */}
-              <Item name="Net APR" value={clmPosition.general.netApr + "%"} />
-              <Item
-                name="Percent Limit Used"
-                value={clmPosition.general.percentLimitUsed + "%"}
-              />
-              <Item
-                name="Borrow Limit"
-                value={displayAmount(
-                  clmPosition.general.maxAccountLiquidity,
-                  18,
-                  {
-                    precision: 2,
-                  }
-                )}
-                postChild={<NoteIcon />}
-              />
-              {/* Item for Total Borrowed */}
-              <Item
-                name="Total Borrowed"
-                value={displayAmount(clmPosition.position.totalBorrow, 18, {
-                  precision: 2,
-                })}
-                postChild={<NoteIcon />}
-              />
-              {/* Item for Total Supplied */}
-              <Item
-                name="Total Supplied"
-                value={displayAmount(clmPosition.position.totalSupply, 18, {
-                  precision: 2,
-                })}
-                postChild={<NoteIcon />}
-              />
-            </OutlineCard>
+      <div className={clsx(styles.mainTable, "separator")}>
+        {isMobile && (
+          <div>
+            <ToggleGroup
+              options={["Supply", "Borrow"]}
+              selected={currentToggle}
+              setSelected={(value) => {
+                if (value === "Borrow" || value === "Supply")
+                  setCurrentToggle(value);
+                else console.error("invalid toggle value");
+              }}
+            />
           </div>
-        </Container>
-      </Container>
+        )}
+        {(!isMobile || currentToggle === "Supply") && (
+          <Container gap={12} width="100%">
+            <Text size="x-lg" font="proto_mono">
+              SUPPLY
+            </Text>
+            <Table
+              title="Canto Lending Market"
+              headers={[
+                {
+                  value: "Asset",
+                  ratio: 3,
+                },
+                {
+                  value: "APY",
+                  ratio: 2,
+                },
+                {
+                  value: "Collateral",
+                  ratio: 2,
+                },
+                {
+                  value: "Supplied",
+                  ratio: 2,
+                },
+              ]}
+              onRowsClick={supplyTokens.map((cStableCoin) => () => {
+                setSelectedCToken(cStableCoin.address);
+                setCurrentModal(CLMModalTypes.SUPPLY);
+              })}
+              content={[
+                ...supplyTokens.map((cStableCoin) => [
+                  <Container
+                    center={{
+                      vertical: true,
+                    }}
+                    width="100%"
+                    direction="row"
+                    gap={10}
+                    style={{
+                      paddingLeft: "30px",
+                    }}
+                    key={"title" + cStableCoin.address}
+                    onClick={
+                      cStableCoin.address !== cNote.address
+                        ? () => {
+                            setSelectedCToken(cStableCoin.address);
+                            setCurrentModal(CLMModalTypes.SUPPLY);
+                          }
+                        : undefined
+                    }
+                  >
+                    <Icon
+                      icon={{ url: cStableCoin.underlying.logoURI, size: 30 }}
+                    />
+                    <Container
+                      style={{
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <Text font="proto_mono">
+                        {cStableCoin.underlying.symbol}
+                      </Text>
+                      <Text theme="secondary-dark" size="x-sm">
+                        Bal:{" "}
+                        {displayAmount(
+                          cStableCoin.userDetails?.balanceOfUnderlying ?? "0",
+                          cStableCoin.underlying.decimals,
+                          {
+                            precision: 2,
+                          }
+                        )}
+                      </Text>
+                    </Container>
+                  </Container>,
+                  cStableCoin.supplyApy + "%",
+                  displayAmount(cStableCoin.collateralFactor, 16) + "%",
+                  cStableCoin.userDetails?.supplyBalanceInUnderlying == null ||
+                  cStableCoin.userDetails?.supplyBalanceInUnderlying === "0"
+                    ? "-"
+                    : displayAmount(
+                        cStableCoin.userDetails?.supplyBalanceInUnderlying ??
+                          "0",
+                        cStableCoin.underlying.decimals,
+                        {
+                          precision: 2,
+                        }
+                      ),
+                ]),
+              ]}
+            />
+            <Table
+              title="Vivacity"
+              headers={[
+                {
+                  value: "Asset",
+                  ratio: 3,
+                },
+                {
+                  value: "APY",
+                  ratio: 2,
+                },
+
+                {
+                  value: "Supplied",
+                  ratio: 2,
+                },
+                {
+                  value: "Rewards",
+                  ratio: 2,
+                },
+              ]}
+              onRowsClick={stableCoins.map((supplyToken) => () => {
+                setSelectedCToken(supplyToken.address);
+                setCurrentModal(CLMModalTypes.SUPPLY);
+              })}
+              content={[
+                ...[...stableCoins].map((supplyToken) => [
+                  <Container
+                    center={{
+                      vertical: true,
+                    }}
+                    width="100%"
+                    direction="row"
+                    gap={10}
+                    style={{
+                      paddingLeft: "30px",
+                    }}
+                    key={"title" + supplyToken.address}
+                  >
+                    <Icon
+                      icon={{ url: supplyToken.underlying.logoURI, size: 30 }}
+                    />
+                    <Container
+                      style={{
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <Text font="proto_mono">
+                        {supplyToken.underlying.symbol}
+                      </Text>
+                      <Text theme="secondary-dark" size="x-sm">
+                        Bal:{" "}
+                        {displayAmount(
+                          supplyToken.userDetails?.balanceOfUnderlying ?? "0",
+                          supplyToken.underlying.decimals,
+                          {
+                            precision: 2,
+                          }
+                        )}
+                      </Text>
+                    </Container>
+                  </Container>,
+                  supplyToken.supplyApy + "%",
+                  displayAmount(supplyToken.collateralFactor, 16),
+                  <Text
+                    key={"grp" + supplyToken.address}
+                    font={"proto_mono"}
+                    style={{
+                      width: "100%",
+                      lineClamp: 1,
+                    }}
+                  >
+                    {displayAmount(
+                      supplyToken.userDetails?.supplyBalanceInUnderlying ?? "0",
+                      supplyToken.underlying.decimals,
+                      {
+                        precision: 2,
+                      }
+                    )}
+                    <Icon
+                      style={{
+                        marginLeft: "5px",
+                        paddingTop: "2px",
+                      }}
+                      key={"title" + supplyToken.address}
+                      icon={{
+                        url: "/tokens/canto.svg",
+                        size: 14,
+                      }}
+                      themed
+                    />
+                  </Text>,
+                ]),
+              ]}
+            />
+          </Container>
+        )}
+        {(!isMobile || currentToggle === "Borrow") && (
+          <Container gap={12} width="100%">
+            <Text size="x-lg" font="proto_mono">
+              Borrow
+            </Text>
+            <Table
+              title="Canto Lending Market"
+              headers={[
+                {
+                  value: "Asset",
+                  ratio: 3,
+                },
+                {
+                  value: "APY",
+                  ratio: 2,
+                },
+                {
+                  value: "Liquidity",
+                  ratio: 2,
+                },
+                {
+                  value: "Borrowed",
+                  ratio: 2,
+                },
+              ]}
+              onRowsClick={borrowedTokens.map((borrowedToken) => () => {
+                setSelectedCToken(borrowedToken.address);
+                setCurrentModal(CLMModalTypes.BORROW);
+              })}
+              content={[
+                ...borrowedTokens.map((borrowedToken) => [
+                  <Container
+                    center={{
+                      vertical: true,
+                    }}
+                    width="100%"
+                    direction="row"
+                    gap={10}
+                    style={{
+                      paddingLeft: "30px",
+                    }}
+                    key={"title" + borrowedToken.address}
+                  >
+                    <Icon
+                      icon={{
+                        url: borrowedToken.underlying.logoURI,
+                        size: 30,
+                      }}
+                    />
+                    <Container
+                      style={{
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <Text font="proto_mono">
+                        {borrowedToken.underlying.symbol}
+                      </Text>
+                      <Text theme="secondary-dark" size="x-sm">
+                        Bal:{" "}
+                        {displayAmount(
+                          borrowedToken.userDetails?.balanceOfCToken ?? "0",
+                          borrowedToken.underlying.decimals,
+                          {
+                            precision: 2,
+                          }
+                        )}
+                      </Text>
+                    </Container>
+                  </Container>,
+                  borrowedToken.borrowApy + "%",
+                  displayAmount(
+                    borrowedToken.liquidity,
+                    borrowedToken.decimals
+                  ),
+                  borrowedToken.userDetails?.borrowBalance == null ||
+                  borrowedToken.userDetails?.borrowBalance === "0"
+                    ? "-"
+                    : displayAmount(
+                        borrowedToken.userDetails?.borrowBalance ?? "0",
+                        borrowedToken.underlying.decimals,
+                        {
+                          precision: 2,
+                        }
+                      ),
+                ]),
+              ]}
+            />
+          </Container>
+        )}
+      </div>
     </div>
   );
 }
-
-const NoteIcon = () => (
-  <Icon themed icon={{ url: "/tokens/note.svg", size: 20 }} />
-);
-
-const CTokenTable = ({
-  title,
-  isLoading,
-  stableTokens,
-  rwas,
-  liquidity,
-  onSupply,
-  onBorrow,
-}: {
-  title?: string;
-  isLoading: boolean;
-  stableTokens: CTokenWithUserData[];
-  rwas: CTokenWithUserData[];
-  liquidity: string;
-  onSupply: (address: string) => void;
-  onBorrow: (address: string) => void;
-}) => {
-  const [filteredPairs, setFilteredPairs] = useState("RWAs");
-
-  const headers =
-    filteredPairs === "RWAs"
-      ? [
-          { value: "Asset", ratio: 1 },
-          { value: "Balance", ratio: 1 },
-          { value: "APR", ratio: 1 },
-          { value: "Supplied", ratio: 1 },
-          { value: "Collateral Factor", ratio: 1 },
-          { value: "Liquidity", ratio: 1 },
-          { value: "Manage", ratio: 1 },
-        ]
-      : [
-          { value: "Asset", ratio: 1 },
-          { value: "Balance", ratio: 1 },
-          {
-            value: (
-              <span>
-                Supply
-                <br /> APR
-              </span>
-            ),
-            ratio: 1,
-          },
-          { value: "Supplied", ratio: 1 },
-          {
-            value: (
-              <span>
-                Borrow
-                <br /> APR
-              </span>
-            ),
-            ratio: 1,
-          },
-          { value: "Borrowed", ratio: 1 },
-          { value: "Liquidity", ratio: 1 },
-          { value: "Manage", ratio: 2 },
-        ];
-
-  return (
-    <div className={styles.mainTable}>
-      {isLoading ? (
-        <Container
-          width="1000px"
-          height="200px"
-          center={{
-            horizontal: true,
-            vertical: true,
-          }}
-        >
-          <LoadingIcon />
-        </Container>
-      ) : stableTokens.length > 0 ? (
-        <Table
-          title={title}
-          textSize={filteredPairs === "Stablecoins" ? "14px" : "14px"}
-          secondary={
-            <Container width="320px">
-              <ToggleGroup
-                options={["RWAs", "Stablecoins"]}
-                selected={filteredPairs}
-                setSelected={(value) => {
-                  Analytics.actions.events.lendingMarket.tabSwitched(value);
-                  setFilteredPairs(value);
-                }}
-              />
-            </Container>
-          }
-          headers={headers}
-          content={
-            filteredPairs == "RWAs"
-              ? rwas.map((cRwa) =>
-                  RWARow({
-                    cRwa,
-                    onSupply: () => {
-                      Analytics.actions.events.lendingMarket.supplyClicked(
-                        getAnalyticsLendingMarketTokenInfo(
-                          "RWA",
-                          cRwa,
-                          liquidity,
-                          true
-                        )
-                      );
-                      onSupply(cRwa.address);
-                    },
-                  })
-                )
-              : filteredPairs == "Stablecoins"
-                ? stableTokens.map((cStableCoin) =>
-                    StableCoinRow({
-                      cStableCoin,
-                      onSupply: () => {
-                        Analytics.actions.events.lendingMarket.supplyClicked(
-                          getAnalyticsLendingMarketTokenInfo(
-                            "CTOKEN",
-                            cStableCoin,
-                            liquidity,
-                            true
-                          )
-                        );
-                        onSupply(cStableCoin.address);
-                      },
-                      onBorrow: () => {
-                        Analytics.actions.events.lendingMarket.borrowClicked(
-                          getAnalyticsLendingMarketTokenInfo(
-                            "CTOKEN",
-                            cStableCoin,
-                            liquidity,
-                            false
-                          )
-                        );
-                        onBorrow(cStableCoin.address);
-                      },
-                    })
-                  )
-                : []
-          }
-        />
-      ) : (
-        <Container
-          width="1000px"
-          height="200px"
-          center={{
-            horizontal: true,
-            vertical: true,
-          }}
-          backgroundColor="var(--card-sub-surface-color)"
-        >
-          <Text theme="secondary-dark">No {title} tokens available</Text>
-        </Container>
-      )}
-    </div>
-  );
-};
