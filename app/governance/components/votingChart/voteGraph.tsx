@@ -1,4 +1,7 @@
 import React from "react";
+import styles from "./voteGraph.module.scss";
+import Text from "@/components/text";
+import Icon from "@/components/icon/icon";
 
 interface VoteBarGraphProps {
   yesVotes: number;
@@ -15,16 +18,13 @@ const VoteBarGraph = ({
   vetoVotes,
   size,
 }: VoteBarGraphProps) => {
-  // Calculate the total number of votes
   const totalVotes = yesVotes + noVotes + abstainVotes + vetoVotes;
 
-  // Calculate the percentage of votes for each option
   const yesPercentage = (yesVotes / totalVotes) * 100;
   const noPercentage = (noVotes / totalVotes) * 100;
   const abstainPercentage = (abstainVotes / totalVotes) * 100;
   const vetoPercentage = (vetoVotes / totalVotes) * 100;
 
-  // Calculate the height of each bar based on the percentage of votes
   const yesHeight = (yesPercentage * size) / 100;
   const noHeight = (noPercentage * size) / 100;
   const abstainHeight = (abstainPercentage * size) / 100;
@@ -32,26 +32,87 @@ const VoteBarGraph = ({
 
   return (
     <div
+      className={styles.statsContainer}
       style={{
-        width: size,
         height: size,
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
       }}
     >
-      <div
-        style={{ height: yesHeight, backgroundColor: "green", flexGrow: 1 }}
-      ></div>
-      <div
-        style={{ height: noHeight, backgroundColor: "red", flexGrow: 1 }}
-      ></div>
-      <div
-        style={{ height: abstainHeight, backgroundColor: "blue", flexGrow: 1 }}
-      ></div>
-      <div
-        style={{ height: vetoHeight, backgroundColor: "yellow", flexGrow: 1 }}
-      ></div>
+      <div className={styles.statsHeader}>
+        <Text font="proto_mono">Voting Stats</Text>
+      </div>
+      <div className={styles.graphContainer}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column-reverse",
+          }}
+        >
+          <div className={styles.amountInfo}>YES</div>
+          <div
+            className={styles.graph}
+            style={{
+              height: yesHeight,
+            }}
+          ></div>
+          <div className={styles.amountInfo}>
+            <div>
+              <Text>{yesVotes} </Text>
+            </div>
+            <div className={styles.icon}>
+              <Icon
+                icon={{
+                  url: "/tokens/canto.svg",
+                  size: {
+                    width: 14,
+                    height: 14,
+                  },
+                }}
+                themed
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column-reverse",
+          }}
+        >
+          <div
+            className={styles.graph}
+            style={{
+              height: noHeight,
+            }}
+          ></div>
+          <div></div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column-reverse",
+          }}
+        >
+          <div
+            className={styles.graph}
+            style={{
+              height: abstainHeight,
+            }}
+          ></div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column-reverse",
+          }}
+        >
+          <div
+            className={styles.graph}
+            style={{
+              height: vetoHeight,
+            }}
+          ></div>
+        </div>
+      </div>
     </div>
   );
 };

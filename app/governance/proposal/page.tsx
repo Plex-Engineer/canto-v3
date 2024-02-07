@@ -25,6 +25,7 @@ import {
   PROPOSAL_TURNOUT_VALUE,
 } from "@/config/consts/config";
 import VoteBarGraph from "../components/votingChart/voteGraph";
+import Spacer from "@/components/layout/spacer";
 
 const VOTE_OPTION_COLORS = {
   [VoteOption.YES]: "rgb(6, 252, 153)",
@@ -113,7 +114,7 @@ export default function Page() {
   const VoteBox = ({ option, idx }: { option: VoteOption; idx: number }) => (
     <VotingInfoBox
       key={option}
-      isActive={!isActive}
+      isActive={isActive}
       percentage={votesData[option].percentage}
       amount={votesData[option].amount}
       value={option}
@@ -245,50 +246,61 @@ export default function Page() {
               </div>
             </div>
           </div>
-          <VoteBarGraph
-            yesVotes={50}
-            noVotes={20}
-            abstainVotes={10}
-            vetoVotes={5}
-            size={200} // Specify the size of the component
-          />
         </div>
-        <div className={styles.proposalCardContainer2}>
-          <div
-            className={styles.proposalInfoBoxVoting}
-            style={
-              isActive
-                ? {
-                    height: "70%",
-                    padding: "10px 0px 0px 0px",
-                  }
-                : {
-                    height: "100%",
-                    padding: "0px 0px 20px 0px",
-                  }
-            }
-          >
-            <div className={styles.proposalInfoRow1}>
-              <VoteBox option={VoteOption.YES} idx={0} />
-              <VoteBox option={VoteOption.NO} idx={1} />
-            </div>
+        <div className={styles.graphAndVoteContainer}>
+          <div className={styles.proposalCardContainer2}>
+            <div
+              className={styles.proposalInfoBoxVoting}
+              style={
+                isActive
+                  ? {
+                      height: "70%",
+                      padding: "10px 0px 0px 0px",
+                    }
+                  : {
+                      height: "100%",
+                      padding: "0px 0px 20px 0px",
+                    }
+              }
+            >
+              <div className={styles.proposalInfoRow1}>
+                <VoteBox option={VoteOption.YES} idx={0} />
+                <VoteBox option={VoteOption.NO} idx={1} />
+              </div>
 
-            <div className={styles.proposalInfoRow1}>
-              <VoteBox option={VoteOption.VETO} idx={2} />
-              <VoteBox option={VoteOption.ABSTAIN} idx={3} />
+              <div className={styles.proposalInfoRow1}>
+                <VoteBox option={VoteOption.VETO} idx={2} />
+                <VoteBox option={VoteOption.ABSTAIN} idx={3} />
+              </div>
             </div>
+            {isActive && (
+              <div className={styles.VotingButton}>
+                <Button
+                  width={400}
+                  disabled={!isActive}
+                  onClick={() => castVote(proposal.proposal_id, selectedVote)}
+                >
+                  Vote
+                </Button>
+              </div>
+            )}
           </div>
-          {isActive && (
-            <div className={styles.VotingButton}>
-              <Button
-                width={400}
-                disabled={!isActive}
-                onClick={() => castVote(proposal.proposal_id, selectedVote)}
-              >
-                Vote
-              </Button>
-            </div>
-          )}
+          <div>
+            <Spacer height="30px" />
+          </div>
+
+          <div className={styles.graphContainer}>
+            <VoteBarGraph
+              yesVotes={50}
+              noVotes={20}
+              abstainVotes={10}
+              vetoVotes={5}
+              size={422}
+            />
+          </div>
+          <div>
+            <Spacer height="50px" />
+          </div>
         </div>
       </div>
     </div>
