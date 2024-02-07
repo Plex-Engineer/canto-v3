@@ -26,6 +26,7 @@ import {
 } from "@/config/consts/config";
 import VoteBarGraph from "../components/votingChart/voteGraph";
 import Spacer from "@/components/layout/spacer";
+import useStaking from "@/hooks/staking/useStaking";
 
 const VOTE_OPTION_COLORS = {
   [VoteOption.YES]: "rgb(6, 252, 153)",
@@ -41,6 +42,12 @@ export default function Page() {
   const { proposals, isProposalsLoading, newVoteFlow } = useProposals({
     chainId: chainId,
   });
+
+  const { isLoading, validators, apr, userStaking, selection, transaction } =
+    useStaking({
+      chainId: chainId,
+      userEthAddress: signer?.account.address,
+    });
   // transaction
   function castVote(proposalId: number, voteOption: VoteOption | null) {
     if (signer) {
@@ -130,29 +137,52 @@ export default function Page() {
   ) : (
     <div className={styles.proposalContainer}>
       <div className={styles.proposalHeaderContainer}>
-        <div className={styles.proposalCard1}>
+        <div
+          className={styles.backButtonContainer}
+          onClick={() => {
+            router.push("/governance");
+          }}
+        >
+          <div className={styles.backButton}>
+            <Icon
+              icon={{
+                url: "/dropdown.svg",
+                size: 22,
+              }}
+              themed
+            />
+          </div>
+        </div>
+        <div className={styles.headerCard}>
           <div
-            className={styles.backButtonContainer}
-            onClick={() => {
-              router.push("/governance");
+            style={{
+              borderRight:
+                proposal.status == "PROPOSAL_STATUS_VOTING_PERIOD"
+                  ? "none"
+                  : "1px solid",
+              padding: "10px",
             }}
           >
-            <div className={styles.backButton}>
-              <Icon
-                icon={{
-                  url: "/dropdown.svg",
-                  size: 22,
-                }}
-                themed
-              />
-            </div>
-          </div>
-          <div style={{ borderRight: "1px solid", padding: "10px" }}>
             <Text>#{proposal.proposal_id}</Text>
           </div>
-          <div style={{ padding: "10px" }}>
-            <Text>{formatProposalStatus(proposal.status)}</Text>
-          </div>
+          {!(proposal.status == "PROPOSAL_STATUS_VOTING_PERIOD") && (
+            <div style={{ padding: "10px" }} className={styles.headerColumn2}>
+              <div className={styles.circleContainer}>
+                <div
+                  className={styles.circle}
+                  style={{
+                    backgroundColor:
+                      proposal.status == "PROPOSAL_STATUS_PASSED"
+                        ? "green"
+                        : "red",
+                  }}
+                />
+              </div>
+              <div>
+                <Text>{formatProposalStatus(proposal.status)}</Text>
+              </div>
+            </div>
+          )}
         </div>
         <div style={{ padding: "10px 0px 10px 0px" }}>
           <Text font="proto_mono" size="x-lg">
@@ -164,17 +194,19 @@ export default function Page() {
           <Text opacity={0.4}>{proposal.description}</Text>
         </div>
       </div>
-
       <div className={styles.proposalInfoContainer}>
         <div className={styles.graphAndVoteContainer}>
           {isActive && (
             <div className={styles.proposalCardContainer1}>
+              <div className={styles.detailsHeader}>
+                <Text font="proto_mono">Select an option to vote</Text>
+              </div>
               <div
-                className={styles.proposalInfoBoxVoting}
+                className={styles.votingBox}
                 style={
                   isActive
                     ? {
-                        height: "70%",
+                        height: "100%",
                         padding: "10px 0px 0px 0px",
                       }
                     : {
@@ -192,18 +224,24 @@ export default function Page() {
                   <VoteBox option={VoteOption.VETO} idx={2} />
                   <VoteBox option={VoteOption.ABSTAIN} idx={3} />
                 </div>
-              </div>
-              {isActive && (
-                <div className={styles.VotingButton}>
-                  <Button
-                    width={400}
-                    disabled={!isActive}
-                    onClick={() => castVote(proposal.proposal_id, selectedVote)}
-                  >
-                    Vote
-                  </Button>
+
+                <div className={styles.proposalInfoRow1}>
+                  <div className={styles.VotingButton}>
+                    <Button
+                      width={200}
+                      disabled={
+                        !isActive
+                        //userStaking.validators.length > 0
+                      }
+                      onClick={() =>
+                        castVote(proposal.proposal_id, selectedVote)
+                      }
+                    >
+                      Vote
+                    </Button>
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
           )}
           <div>
@@ -278,7 +316,7 @@ export default function Page() {
                 </Text>
               </div>
             </div>
-            <div className={styles.proposalInfoTimeline}>
+            <div className={styles.proposalInfoTimeLine}>
               <div style={{ marginBottom: "10px" }}>
                 <Text font="rm_mono" opacity={0.3}>
                   Voting Timeline
@@ -288,7 +326,7 @@ export default function Page() {
                 <div className={styles.circleContainer}>
                   <div className={styles.circle} />
                 </div>
-                <div>
+                <div className={styles.txt}>
                   <Text font="rm_mono">Proposal Created on &nbsp;</Text>
                 </div>
                 <div>
@@ -300,7 +338,7 @@ export default function Page() {
                 <div className={styles.circleContainer}>
                   <div className={styles.circle} />
                 </div>
-                <div>
+                <div className={styles.txt}>
                   <Text font="rm_mono">Voting Ended on &nbsp;</Text>
                 </div>
                 <div>

@@ -21,15 +21,16 @@ const VoteBarGraph = ({
 }: VoteBarGraphProps) => {
   const totalVotes = yesVotes + noVotes + abstainVotes + vetoVotes;
 
-  const yesPercentage = (yesVotes / totalVotes) * 60;
-  const noPercentage = (noVotes / totalVotes) * 60;
-  const abstainPercentage = (abstainVotes / totalVotes) * 60;
-  const vetoPercentage = (vetoVotes / totalVotes) * 60;
+  const yesPercentage = totalVotes > 0 ? (yesVotes / totalVotes) * 100 : 0;
+  const noPercentage = totalVotes > 0 ? (noVotes / totalVotes) * 100 : 0;
+  const abstainPercentage =
+    totalVotes > 0 ? (abstainVotes / totalVotes) * 100 : 0;
+  const vetoPercentage = totalVotes > 0 ? (vetoVotes / totalVotes) * 100 : 0;
 
-  const yesHeight = (yesPercentage * size) / 100;
-  const noHeight = (noPercentage * size) / 100;
-  const abstainHeight = (abstainPercentage * size) / 100;
-  const vetoHeight = (vetoPercentage * size) / 100;
+  const yesHeight = (yesPercentage * size) / 150; //150 is to make the bar occupy at max 2/3rd of the total height of the container if an option get 100% votes
+  const noHeight = (noPercentage * size) / 150;
+  const abstainHeight = (abstainPercentage * size) / 150;
+  const vetoHeight = (vetoPercentage * size) / 150;
 
   //console.log(abstainHeight);
 
@@ -40,13 +41,16 @@ const VoteBarGraph = ({
       </div>
       <div className={styles.graphContainer}>
         <div className={styles.barContainer}>
-          <div className={styles.voteInfo}>YES</div>
-          <div
-            className={styles.graph}
-            style={{
-              height: yesHeight,
-            }}
-          ></div>
+          {/* <div className={styles.voteInfo}>YES</div> */}
+          {yesHeight > 0 && (
+            <div
+              className={styles.graph}
+              style={{
+                height: yesHeight,
+              }}
+            />
+          )}
+
           <div className={styles.amountInfo}>
             <div>
               <Text size="x-sm">
@@ -66,14 +70,23 @@ const VoteBarGraph = ({
               />
             </div>
           </div>
+          {yesHeight == 0 && (
+            <div
+              style={{
+                height: 200,
+              }}
+            />
+          )}
         </div>
         <div className={styles.barContainer}>
-          <div
-            className={styles.graph}
-            style={{
-              height: noHeight,
-            }}
-          ></div>
+          {noHeight > 0 && (
+            <div
+              className={styles.graph}
+              style={{
+                height: noHeight,
+              }}
+            ></div>
+          )}
           <div className={styles.amountInfo}>
             <div>
               <Text size="x-sm">
@@ -93,14 +106,59 @@ const VoteBarGraph = ({
               />
             </div>
           </div>
+          {noHeight == 0 && (
+            <div
+              style={{
+                height: 200,
+              }}
+            />
+          )}
         </div>
         <div className={styles.barContainer}>
-          <div
-            className={styles.graph}
-            style={{
-              height: abstainHeight,
-            }}
-          ></div>
+          {vetoHeight > 0 && (
+            <div
+              className={styles.graph}
+              style={{
+                height: vetoHeight,
+              }}
+            ></div>
+          )}
+          <div className={styles.amountInfo}>
+            <div>
+              <Text size="x-sm">
+                {formatBalance(vetoVotes.toString(), 0, { short: true })}{" "}
+              </Text>
+            </div>
+            <div className={styles.icon}>
+              <Icon
+                icon={{
+                  url: "/tokens/canto.svg",
+                  size: {
+                    width: 12,
+                    height: 12,
+                  },
+                }}
+                themed
+              />
+            </div>
+          </div>
+          {vetoHeight == 0 && (
+            <div
+              style={{
+                height: 200,
+              }}
+            />
+          )}
+        </div>
+        <div className={styles.barContainer}>
+          {abstainHeight > 0 && (
+            <div
+              className={styles.graph}
+              style={{
+                height: abstainHeight,
+              }}
+            ></div>
+          )}
           <div className={styles.amountInfo}>
             <div>
               <Text size="x-sm">
@@ -120,31 +178,76 @@ const VoteBarGraph = ({
               />
             </div>
           </div>
+          {abstainHeight == 0 && (
+            <div
+              style={{
+                height: 200,
+              }}
+            />
+          )}
         </div>
-        <div className={styles.barContainer}>
-          <div
-            className={styles.graph}
-            style={{
-              height: vetoHeight,
-            }}
-          ></div>
-          <div className={styles.amountInfo}>
+      </div>
+      <div className={styles.inforow}>
+        <div className={styles.voteOption}>
+          <div className={styles.circleContainer}>
+            <div
+              className={styles.circle}
+              style={{ backgroundColor: "green" }}
+            />
+          </div>
+          <div className={styles.option}>
+            <Text font="proto_mono" size="xx-sm">
+              YES ({yesPercentage.toFixed(1)}%)
+            </Text>
+          </div>
+        </div>
+        <div className={styles.voteOption}>
+          <div className={styles.circleContainer}>
+            <div className={styles.circle} style={{ backgroundColor: "red" }} />
+          </div>
+          <div className={styles.option}>
+            <Text font="proto_mono" size="xx-sm">
+              NO ({noPercentage.toFixed(1)}%)
+            </Text>
+          </div>
+        </div>
+        <div className={styles.voteOption}>
+          <div className={styles.circleContainer}>
+            <div
+              className={styles.circle}
+              style={{ backgroundColor: "purple" }}
+            />
+          </div>
+          <div className={styles.option}>
             <div>
-              <Text size="x-sm">
-                {formatBalance(vetoVotes.toString(), 0, { short: true })}{" "}
+              <Text font="proto_mono" size="xx-sm">
+                VETO
               </Text>
             </div>
-            <div className={styles.icon}>
-              <Icon
-                icon={{
-                  url: "/tokens/canto.svg",
-                  size: {
-                    width: 12,
-                    height: 12,
-                  },
-                }}
-                themed
-              />
+            <div>
+              <Text font="proto_mono" size="xx-sm">
+                ({vetoPercentage.toFixed(1)}%)
+              </Text>
+            </div>
+          </div>
+        </div>
+        <div className={styles.voteOption}>
+          <div className={styles.circleContainer}>
+            <div
+              className={styles.circle}
+              style={{ backgroundColor: "yellow" }}
+            />
+          </div>
+          <div className={styles.option}>
+            <div>
+              <Text font="proto_mono" size="xx-sm">
+                ABSTAIN
+              </Text>
+            </div>
+            <div>
+              <Text font="proto_mono" size="xx-sm">
+                ({abstainPercentage.toFixed(1)}%)
+              </Text>
             </div>
           </div>
         </div>

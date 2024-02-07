@@ -41,6 +41,7 @@
         justify-content: center;
         margin-bottom: 20px;
         padding: 5px 5px 5px 5px;
+        width: 90px;
         //padding: 5px;
         border-radius: 2px;
         background-color: var(--graph-fill-color, #D0D0D0);
@@ -54,9 +55,41 @@
    .barContainer{
     display: flex;
     flex-direction: column-reverse;
-    width: 20%;
-    padding-right: 5%;
+    //height: 60%;
+    width: 25%;
+    //padding-right: 5%;
    }
+}
 
-    
+.inforow{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 10px 20px 20px 20px;
+    .voteOption{
+        display: flex;
+        flex-direction: row;
+        justify-content: left;
+        width: 25%;
+        //margin-right: 5%;
+        .circleContainer{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-right: 5px;
+            .circle{
+                height: 10px;
+                width: 10px;
+                border-radius: 50%;
+                //background-color: var(--graph-fill-color, #D0D0D0);
+            }
+        }
+        .option{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+    }
 }
