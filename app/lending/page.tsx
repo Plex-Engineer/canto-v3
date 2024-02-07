@@ -9,17 +9,18 @@ import Text from "@/components/text";
 import Container from "@/components/container/container";
 import LoadingIcon from "@/components/loader/loading";
 import { LendingModal } from "./components/modal/modal";
-import { RWARow, StableCoinRow } from "./components/cTokenRow";
 import { useEffect, useState } from "react";
 import Spacer from "@/components/layout/spacer";
-import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import AccountHealth from "./components/accountHealth/accountHealth";
 import TokenCard from "./components/tokenCard/tokenCard";
 import Icon from "@/components/icon/icon";
-import { addTokenBalances, divideBalances } from "@/utils/math/tokenMath.utils";
+import {
+  addTokenBalances,
+  divideBalances,
+  greaterThan,
+} from "@/utils/math/tokenMath.utils";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
-import Splash from "@/components/splash/splash";
 import clsx from "clsx";
 
 enum CLMModalTypes {
@@ -66,18 +67,26 @@ export default function LendingPage() {
     );
   }
 
-  const supplyTokens = [cNote, ...stableCoins, ...rwas].sort((a, b) => {
-    return (
-      Number(b.userDetails?.supplyBalanceInUnderlying) -
-      Number(a.userDetails?.supplyBalanceInUnderlying)
-    );
-  });
-  const borrowedTokens = [...stableCoins, cNote].sort((a, b) => {
-    return (
-      Number(b.userDetails?.borrowBalance) -
-      Number(a.userDetails?.borrowBalance)
-    );
-  });
+  const supplyTokens = [cNote, ...stableCoins, ...rwas].sort((a, b) =>
+    greaterThan(
+      a.userDetails?.supplyBalanceInUnderlying ?? "0",
+      b.userDetails?.supplyBalanceInUnderlying ?? "0",
+      a.decimals,
+      b.decimals
+    )
+      ? -1
+      : 1
+  );
+  const borrowedTokens = [...stableCoins, cNote].sort((a, b) =>
+    greaterThan(
+      a.userDetails?.borrowBalance ?? "0",
+      b.userDetails?.borrowBalance ?? "0",
+      a.decimals,
+      b.decimals
+    )
+      ? -1
+      : 1
+  );
 
   return (
     <div className={clsx(styles.container, "separator")}>
@@ -127,7 +136,7 @@ export default function LendingPage() {
               symbol: true,
             },
             {
-              name: "Net APY",
+              name: "Net APR",
               value: clmPosition.general.netApr + "%",
             },
             {
@@ -139,7 +148,9 @@ export default function LendingPage() {
             },
             {
               name: "Liquidity Remaining",
-              value: displayAmount(clmPosition.position.liquidity, 18),
+              value: displayAmount(clmPosition.position.liquidity, 18, {
+                precision: 2,
+              }),
               symbol: true,
             },
             {
@@ -217,7 +228,7 @@ export default function LendingPage() {
                   ratio: 3,
                 },
                 {
-                  value: "APY",
+                  value: "APR",
                   ratio: 2,
                 },
                 {
@@ -278,7 +289,7 @@ export default function LendingPage() {
                       </Text>
                     </Container>
                   </Container>,
-                  cStableCoin.supplyApy + "%",
+                  cStableCoin.supplyApr + "%",
                   displayAmount(cStableCoin.collateralFactor, 16) + "%",
                   cStableCoin.userDetails?.supplyBalanceInUnderlying == null ||
                   cStableCoin.userDetails?.supplyBalanceInUnderlying === "0"
@@ -291,101 +302,6 @@ export default function LendingPage() {
                           precision: 2,
                         }
                       ),
-                ]),
-              ]}
-            />
-            <Table
-              title="Vivacity"
-              headers={[
-                {
-                  value: "Asset",
-                  ratio: 3,
-                },
-                {
-                  value: "APY",
-                  ratio: 2,
-                },
-
-                {
-                  value: "Supplied",
-                  ratio: 2,
-                },
-                {
-                  value: "Rewards",
-                  ratio: 2,
-                },
-              ]}
-              onRowsClick={stableCoins.map((supplyToken) => () => {
-                setSelectedCToken(supplyToken.address);
-                setCurrentModal(CLMModalTypes.SUPPLY);
-              })}
-              content={[
-                ...[...stableCoins].map((supplyToken) => [
-                  <Container
-                    center={{
-                      vertical: true,
-                    }}
-                    width="100%"
-                    direction="row"
-                    gap={10}
-                    style={{
-                      paddingLeft: "30px",
-                    }}
-                    key={"title" + supplyToken.address}
-                  >
-                    <Icon
-                      icon={{ url: supplyToken.underlying.logoURI, size: 30 }}
-                    />
-                    <Container
-                      style={{
-                        alignItems: "flex-start",
-                      }}
-                    >
-                      <Text font="proto_mono">
-                        {supplyToken.underlying.symbol}
-                      </Text>
-                      <Text theme="secondary-dark" size="x-sm">
-                        Bal:{" "}
-                        {displayAmount(
-                          supplyToken.userDetails?.balanceOfUnderlying ?? "0",
-                          supplyToken.underlying.decimals,
-                          {
-                            precision: 2,
-                          }
-                        )}
-                      </Text>
-                    </Container>
-                  </Container>,
-                  supplyToken.supplyApy + "%",
-                  displayAmount(supplyToken.collateralFactor, 16),
-                  <Text
-                    key={"grp" + supplyToken.address}
-                    font={"proto_mono"}
-                    style={{
-                      width: "100%",
-                      lineClamp: 1,
-                    }}
-                  >
-                    {displayAmount(
-                      supplyToken.userDetails?.supplyBalanceInUnderlying ?? "0",
-                      supplyToken.underlying.decimals,
-                      {
-                        precision: 2,
-                      }
-                    )}
-                    <Icon
-                      style={{
-                        marginLeft: "5px",
-                        paddingTop: "2px",
-                      }}
-                      key={"title" + supplyToken.address}
-                      icon={{
-                        url: "/tokens/canto.svg",
-                        size: 14,
-                      }}
-                      themed
-                    />
-                  </Text>,
                 ]),
               ]}
             />
@@ -404,7 +320,7 @@ export default function LendingPage() {
                   ratio: 3,
                 },
                 {
-                  value: "APY",
+                  value: "APR",
                   ratio: 2,
                 },
                 {
@@ -451,7 +367,7 @@ export default function LendingPage() {
                       <Text theme="secondary-dark" size="x-sm">
                         Bal:{" "}
                         {displayAmount(
-                          borrowedToken.userDetails?.balanceOfCToken ?? "0",
+                          borrowedToken.userDetails?.balanceOfUnderlying ?? "0",
                           borrowedToken.underlying.decimals,
                           {
                             precision: 2,
@@ -460,11 +376,8 @@ export default function LendingPage() {
                       </Text>
                     </Container>
                   </Container>,
-                  borrowedToken.borrowApy + "%",
-                  displayAmount(
-                    borrowedToken.liquidity,
-                    borrowedToken.decimals
-                  ),
+                  borrowedToken.borrowApr + "%",
+                  displayAmount(borrowedToken.liquidity, 0),
                   borrowedToken.userDetails?.borrowBalance == null ||
                   borrowedToken.userDetails?.borrowBalance === "0"
                     ? "-"

@@ -36,15 +36,15 @@ const TokenCard = ({ cToken, items, onClick }: Props) => {
         <Container direction="row" gap={70}>
           <Item
             color="#333"
-            name="supply apy"
+            name="supply apr"
             symbol
-            value={cToken.supplyApy + "%"}
+            value={cToken.supplyApr + "%"}
           />
           <Item
             color="#333"
-            name="borrow apy"
+            name="borrow apr"
             symbol
-            value={cToken.borrowApy + "%"}
+            value={cToken.borrowApr + "%"}
           />
         </Container>
         <Button fontFamily="proto_mono" onClick={onClick}>

@@ -1,7 +1,7 @@
 import styles from "./highlightCard.module.scss";
 import Button from "@/components/button/button";
 import Image from "next/image";
-import Item from "./item";
+import Item from "../item";
 import Icon from "@/components/icon/icon";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { displayAmount } from "@/utils/formatting";
