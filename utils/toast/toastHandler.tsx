@@ -14,7 +14,7 @@ export function toastHandler(
       toast(message, {
         theme: document.body.classList.contains("dark") ? "dark" : "light",
         position: "top-right",
-        autoClose: autoClose ?? 500000,
+        autoClose: autoClose ?? 5000,
         toastId: toastId,
         hideProgressBar: false,
         closeOnClick: true,
