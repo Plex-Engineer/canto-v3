@@ -222,6 +222,7 @@ export default function LendingPage() {
             </Text>
             <Table
               title="Canto Lending Market"
+              headerFont="proto_mono"
               headers={[
                 {
                   value: "Asset",
@@ -314,6 +315,7 @@ export default function LendingPage() {
             </Text>
             <Table
               title="Canto Lending Market"
+              headerFont="proto_mono"
               headers={[
                 {
                   value: "Asset",

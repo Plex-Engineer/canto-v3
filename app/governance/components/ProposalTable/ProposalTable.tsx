@@ -94,40 +94,25 @@ const ProposalTable = ({ proposals }: TableProps) => {
                 />
               </Container>
             }
+            headerFont="rm_mono"
             headers={
               filteredProposals.length != 0 || filteredProposals
                 ? [
                     {
-                      value: (
-                        <Text opacity={0.4} font="rm_mono">
-                          ID
-                        </Text>
-                      ),
+                      value: "ID",
                       ratio: 2,
                     },
-                    { value: <Text opacity={0.4}>Title</Text>, ratio: 6 },
+                    { value: "Title", ratio: 6 },
                     {
-                      value: (
-                        <Text opacity={0.4} font="rm_mono">
-                          Status
-                        </Text>
-                      ),
+                      value: "Status",
                       ratio: 3,
                     },
                     {
-                      value: (
-                        <Text opacity={0.4} font="rm_mono">
-                          Type
-                        </Text>
-                      ),
+                      value: "Type",
                       ratio: 5,
                     },
                     {
-                      value: (
-                        <Text opacity={0.4} font="rm_mono">
-                          Voting Date
-                        </Text>
-                      ),
+                      value: "Voting Date",
                       ratio: 4,
                     },
                   ]

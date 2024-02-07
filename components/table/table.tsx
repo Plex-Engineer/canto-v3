@@ -4,6 +4,7 @@ import styles from "./table.module.scss";
 interface Props {
   title?: string | React.ReactNode;
   secondary?: React.ReactNode;
+  headerFont: "proto_mono" | "rm_mono";
   headers: {
     value: string | React.ReactNode;
     ratio: number;
@@ -35,9 +36,9 @@ const Table = (props: Props) => {
         >
           {props.headers.map((header, index) => {
             return (
-              <div key={index} className={styles.cell}>
+              <Text key={index} className={styles.cell} font={props.headerFont}>
                 {header.value}
-              </div>
+              </Text>
             );
           })}
         </div>

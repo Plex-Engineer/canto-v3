@@ -26,14 +26,13 @@
 
 .header {
   display: grid;
-  opacity: 0.5;
   grid-template-columns: repeat(6, 1fr);
   border-bottom: 1px solid var(--border-stroke-color);
 
   .cell {
-    font-size: 14px;
-    font-weight: 600;
-    opacity: 0.6;
+    // font-size: 14px;
+    // font-weight: 600;
+    opacity: 0.4;
   }
 }
 
