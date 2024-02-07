@@ -266,7 +266,10 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
                         ? -1
                         : 1;
                     }
-                    return Number(a.secondary) > Number(b.secondary) ? -1 : 1;
+                    return (a.balance ? a.balance : 0) >
+                      (b.balance ? b.balance : 0)
+                      ? -1
+                      : 1;
                   })}
                 onChange={(tokenId) => bridge.setState("token", tokenId)}
               />
