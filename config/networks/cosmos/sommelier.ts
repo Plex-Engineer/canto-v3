@@ -15,6 +15,7 @@ export const SOMMELIER: CosmosNetwork = {
   isTestChain: false,
   rpcUrl: "https://sommelier-rpc.lavenderfive.com",
   restEndpoint: "https://sommelier-api.polkachu.com",
+  latestBlockEndpoint: "/cosmos/base/tendermint/v1beta1",
   addressPrefix: "somm",
   checkAddress: function (address) {
     return checkCosmosAddress(this.addressPrefix)(address);
