@@ -8,6 +8,8 @@ import CantoWalletProvider from "@/provider/rainbowProvider";
 import localFont from "next/font/local";
 import DesktopOnly from "@/components/desktop-only/desktop-only";
 import { ReactQueryClientProvider } from "@/provider/reactQueryProvider";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const rm_mono = localFont({
   src: "../fonts/rm-mono-regular.ttf",
@@ -113,6 +115,7 @@ export default function RootLayout({
             </div>
           </ReactQueryClientProvider>
         </CantoWalletProvider>
+        <ToastContainer />
       </body>
     </html>
   );

@@ -83,6 +83,8 @@ a {
   --light-mode: 1;
   --box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
   --temp-bg-brightness: 1;
+  --toast-success-color: #05de87;
+  --toast-failure-color: #ff4141;
 }
 
 .dim {
@@ -115,6 +117,8 @@ a {
   --dark-mode: 1;
   --light-mode: 0;
   --box-shadow: 0;
+  --toast-success-color: #05de87;
+  --toast-failure-color: #ff4141;
 }
 
 .dark2 {
@@ -146,8 +150,9 @@ a {
   --dark-mode: 1;
   --light-mode: 0;
   --box-shadow: 0;
-
   --temp-bg-brightness: 1;
+  --toast-success-color: #05de87;
+  --toast-failure-color: #ff4141;
 }
 
 .dark {
@@ -190,6 +195,8 @@ a {
   --light-mode: 0;
   --box-shadow: 0;
   ---temp-opacity: 1;
+  --toast-success-color: #05de87;
+  --toast-failure-color: #ff4141;
 }
 
 * {
@@ -244,6 +251,18 @@ body {
 .column {
   display: flex;
   flex-direction: column;
+}
+
+.toast-error {
+  --toastify-color-progress-light: var(--toast-failure-color);
+  --toastify-color-progress-dark: var(--toast-failure-color);
+  --toastify-toast-bd-radius: 0;
+}
+
+.toast-success {
+  --toastify-color-progress-light: var(--toast-success-color);
+  --toastify-color-progress-dark: var(--toast-success-color);
+  --toastify-toast-bd-radius: 0;
 }
 
 /* clears the ‘X’ from Internet Explorer */
