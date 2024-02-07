@@ -16,9 +16,10 @@ import { BridgingMethod } from "@/transactions/bridge";
 import { addTokenBalances } from "@/utils/math";
 import { BridgeToken } from "@/hooks/bridge/interfaces/tokens";
 import FeeButton from "./components/feeButton";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import GravityConfirmationModal from "./components/gravityConfirmationModal";
 import { GRAVITY_BRIDGE } from "@/config/networks";
+import { TX_ERROR_TYPES } from "@/config/consts/errors";
 
 const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
@@ -316,11 +317,15 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
               setSelected: setSelectedGBridgeFee,
             }}
             token={token}
+            notEnoughNativeBalance={
+              Confirmation.preConfirmCheck.error &&
+              Confirmation.preConfirmCheck.reason ===
+                TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_LZ
+            }
           />
         ) : (
           <Spacer height="20px" />
         )}
-        <Spacer height="20px" />
 
         <Button
           width="fill"
@@ -463,6 +468,7 @@ const FeesSection = ({
   props,
   fees,
   token,
+  notEnoughNativeBalance,
 }: {
   props: BridgingFeesReturn;
   fees: {
@@ -471,6 +477,7 @@ const FeesSection = ({
     totalChainFee: string;
   };
   token: BridgeToken | null;
+  notEnoughNativeBalance: boolean;
 }) => {
   return props.isLoading ? (
     <LoadingTextAnim />
@@ -482,7 +489,15 @@ const FeesSection = ({
     <>
       {props.method === BridgingMethod.LAYER_ZERO &&
         props.direction === "out" && (
-          <Text font="proto_mono" size="x-sm">
+          <Text
+            font="proto_mono"
+            size="x-sm"
+            color={
+              notEnoughNativeBalance
+                ? " var(--extra-failure-color, #ff0000)"
+                : ""
+            }
+          >
             Gas Fee: {props.lzFee.formattedAmount}
           </Text>
         )}
@@ -491,58 +506,64 @@ const FeesSection = ({
           <>
             <Container direction="row" gap={10}>
               <FeeButton
-                key={props.bridgeFeeOptions.slow}
-                onClick={() => fees.setSelected(props.bridgeFeeOptions.slow)}
+                key={props.bridgeFeeOptions.slow.fee}
+                onClick={() =>
+                  fees.setSelected(props.bridgeFeeOptions.slow.fee)
+                }
                 title="slow"
                 subtext={"1 - 5 days"}
                 subtext2={"Batched transfer"}
                 tokenSymbol={token?.symbol ?? ""}
                 tokenAmount={displayAmount(
                   addTokenBalances(
-                    props.bridgeFeeOptions.slow,
+                    props.bridgeFeeOptions.slow.fee,
                     fees.totalChainFee
                   ),
                   token?.decimals ?? 0,
                   { maxSmallBalance: undefined }
                 )}
-                tokenPrice={props.feeTokenPriceFormatted}
-                active={fees.selected === props.bridgeFeeOptions.slow}
+                tokenValueUSD={props.bridgeFeeOptions.slow.usdValueFormatted}
+                active={fees.selected === props.bridgeFeeOptions.slow.fee}
               />
               <FeeButton
-                key={props.bridgeFeeOptions.medium}
-                onClick={() => fees.setSelected(props.bridgeFeeOptions.medium)}
+                key={props.bridgeFeeOptions.medium.fee}
+                onClick={() =>
+                  fees.setSelected(props.bridgeFeeOptions.medium.fee)
+                }
                 title="medium"
                 subtext={"4 hours - 3 days"}
                 subtext2={"Batched transfer"}
                 tokenSymbol={token?.symbol ?? ""}
                 tokenAmount={displayAmount(
                   addTokenBalances(
-                    props.bridgeFeeOptions.medium,
+                    props.bridgeFeeOptions.medium.fee,
                     fees.totalChainFee
                   ),
                   token?.decimals ?? 0,
                   { maxSmallBalance: undefined }
                 )}
-                tokenPrice={props.feeTokenPriceFormatted}
-                active={fees.selected === props.bridgeFeeOptions.medium}
+                tokenValueUSD={props.bridgeFeeOptions.medium.usdValueFormatted}
+                active={fees.selected === props.bridgeFeeOptions.medium.fee}
               />
               <FeeButton
-                key={props.bridgeFeeOptions.fast}
-                onClick={() => fees.setSelected(props.bridgeFeeOptions.fast)}
+                key={props.bridgeFeeOptions.fast.fee}
+                onClick={() =>
+                  fees.setSelected(props.bridgeFeeOptions.fast.fee)
+                }
                 title="fast"
                 subtext={"30 minutes"}
                 subtext2={"Individual transfer"}
                 tokenSymbol={token?.symbol ?? ""}
                 tokenAmount={displayAmount(
                   addTokenBalances(
-                    props.bridgeFeeOptions.fast,
+                    props.bridgeFeeOptions.fast.fee,
                     fees.totalChainFee
                   ),
                   token?.decimals ?? 0,
                   { maxSmallBalance: undefined }
                 )}
-                tokenPrice={props.feeTokenPriceFormatted}
-                active={fees.selected === props.bridgeFeeOptions.fast}
+                tokenValueUSD={props.bridgeFeeOptions.fast.usdValueFormatted}
+                active={fees.selected === props.bridgeFeeOptions.fast.fee}
               />
             </Container>
             <Text font="proto_mono" size="x-sm">

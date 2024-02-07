@@ -6,6 +6,7 @@ import {
   AnalyticsAmbientLPData,
   AnalyticsCantoLPData,
   AnalyticsLMData,
+  AnalyticsStakingData,
 } from "@/provider/analytics";
 import { BridgeTransactionParams } from "@/transactions/bridge/types";
 import {
@@ -21,16 +22,24 @@ import {
   CTokenLendingTransactionParams,
 } from "@/transactions/lending";
 import { ClaimDexComboRewardsParams } from "@/hooks/pairs/lpCombo/transactions/claimRewards";
-import { getNetworkInfoFromChainId } from "@/utils/networks";
+import { getNetworkInfoFromChainId, isCantoChainId } from "@/utils/networks";
 import { displayAmount, formatPercent } from "../formatting";
 import { addTokenBalances } from "@/utils/math";
 import { NEW_ERROR, NO_ERROR, ReturnWithError } from "@/config/interfaces";
-import { getDisplayTokenAmountFromRange, getPriceFromTick } from "@/utils/ambient";
+import {
+  getDisplayTokenAmountFromRange,
+  getPriceFromTick,
+} from "@/utils/ambient";
 import { CantoDexPairWithUserCTokenData } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
+import {
+  StakingTransactionParams,
+  StakingTxTypes,
+} from "@/transactions/staking";
+import { Validator } from "@/hooks/staking/interfaces/validators";
 
-export function displayAnalyticsAmount(amount: string, decimals: number){
+export function displayAnalyticsAmount(amount: string, decimals: number) {
   return displayAmount(amount, decimals, { short: false, precision: decimals });
 }
 
@@ -38,7 +47,7 @@ export function getAnalyticsTransactionFlowInfo(
   flow: NewTransactionFlow,
   flowId: string
 ): ReturnWithError<AnalyticsTransactionFlowInfo> {
-  let txFlowInfo: AnalyticsTransactionFlowInfo = {
+  const txFlowInfo: AnalyticsTransactionFlowInfo = {
     txFlowId: flowId,
     txFlowCategory: flow.txType,
     txCount: 0,
@@ -71,6 +80,10 @@ export function getAnalyticsTransactionFlowInfo(
       txFlowInfo.txFlowType = flow.params.txType;
       txFlowInfo.txFlowData = getClmCTokenTransactionFlowData(flow.params);
       break;
+    case TransactionFlowType.STAKE_CANTO_TX:
+      txFlowInfo.txFlowType = flow.params.txType;
+      txFlowInfo.txFlowData = getStakingTransactionFlowData(flow.params);
+      break;
     default:
       return NEW_ERROR("Invalid transaction flow type");
   }
@@ -81,6 +94,9 @@ function getBridgeTransactionFlowData(
   bridgeTxParams: BridgeTransactionParams
 ): AnalyticsTransactionFlowData {
   return {
+    bridgeDirection: isCantoChainId(Number(bridgeTxParams.from.chainId))
+      ? "OUT"
+      : "IN",
     bridgeFrom: getNetworkInfoFromChainId(bridgeTxParams.from.chainId).data
       .name,
     bridgeTo: getNetworkInfoFromChainId(bridgeTxParams.to.chainId).data.name,
@@ -104,7 +120,7 @@ function getAmbientLiquidityTransactionFlowData(
     ambientLpCurrentPrice: displayAnalyticsAmount(
       ambientLiquidityTxParams.pool.stats.lastPriceSwap.toString(),
       ambientLiquidityTxParams.pool.base.decimals -
-        ambientLiquidityTxParams.pool.quote.decimals 
+        ambientLiquidityTxParams.pool.quote.decimals
     ),
     ambientLpMinRangePrice: displayAnalyticsAmount(
       getPriceFromTick(ambientLiquidityTxParams.lowerTick),
@@ -133,8 +149,14 @@ function getAmbientLiquidityTransactionFlowData(
   if (ambientLiquidityTxParams.txType === AmbientTxType.ADD_CONC_LIQUIDITY) {
     // add liquidity
     const nonWeiAmount = ambientLiquidityTxParams.isAmountBase
-    ? displayAnalyticsAmount(ambientLiquidityTxParams.amount , ambientLiquidityTxParams.pool.base.decimals)
-    : displayAnalyticsAmount(ambientLiquidityTxParams.amount , ambientLiquidityTxParams.pool.quote.decimals)
+      ? displayAnalyticsAmount(
+          ambientLiquidityTxParams.amount,
+          ambientLiquidityTxParams.pool.base.decimals
+        )
+      : displayAnalyticsAmount(
+          ambientLiquidityTxParams.amount,
+          ambientLiquidityTxParams.pool.quote.decimals
+        );
     const otherTokenAmount = getDisplayTokenAmountFromRange(
       nonWeiAmount,
       ambientLiquidityTxParams.isAmountBase,
@@ -143,12 +165,8 @@ function getAmbientLiquidityTransactionFlowData(
       ambientLiquidityTxParams.pool
     );
     const [baseAmount, quoteAmount] = [
-      ambientLiquidityTxParams.isAmountBase
-        ? nonWeiAmount
-        : otherTokenAmount,
-      ambientLiquidityTxParams.isAmountBase
-        ? otherTokenAmount
-        : nonWeiAmount
+      ambientLiquidityTxParams.isAmountBase ? nonWeiAmount : otherTokenAmount,
+      ambientLiquidityTxParams.isAmountBase ? otherTokenAmount : nonWeiAmount,
     ];
 
     const [baseBalance, quoteBalance] = [
@@ -169,25 +187,24 @@ function getAmbientLiquidityTransactionFlowData(
       ambientLpBaseBalance: baseBalance,
       ambientLpQuoteBalance: quoteBalance,
     };
-  } else {
-    // remove liquidity
-    const [ambientLpExpectedBaseAmount , ambientLpExpectedQuoteAmount] = [
-      displayAnalyticsAmount(
-        ambientLiquidityTxParams.expectedBaseAmount ?? "0",
-        ambientLiquidityTxParams.pool.base.decimals
-      ),
-      displayAnalyticsAmount(
-        ambientLiquidityTxParams.expectedQuoteAmount ?? "0",
-        ambientLiquidityTxParams.pool.quote.decimals
-      ),
-    ];
-    return {
-      ...poolData,
-      ambientLpLiquidity: ambientLiquidityTxParams.liquidity,
-      ambientLpExpectedBaseAmount,
-      ambientLpExpectedQuoteAmount,
-    };
   }
+  // remove liquidity
+  const [ambientLpExpectedBaseAmount, ambientLpExpectedQuoteAmount] = [
+    displayAnalyticsAmount(
+      ambientLiquidityTxParams.expectedBaseAmount ?? "0",
+      ambientLiquidityTxParams.pool.base.decimals
+    ),
+    displayAnalyticsAmount(
+      ambientLiquidityTxParams.expectedQuoteAmount ?? "0",
+      ambientLiquidityTxParams.pool.quote.decimals
+    ),
+  ];
+  return {
+    ...poolData,
+    ambientLpLiquidity: ambientLiquidityTxParams.liquidity,
+    ambientLpExpectedBaseAmount,
+    ambientLpExpectedQuoteAmount,
+  };
 }
 
 function getCantoDexTransactionFlowData(
@@ -206,6 +223,11 @@ function getCantoDexTransactionFlowData(
       cantoDexTxParams.pair.token2.decimals
     ),
   };
+  const lpTokenBlance = addTokenBalances(
+    cantoDexTxParams.pair.clmData?.userDetails?.supplyBalanceInUnderlying ??
+      "0",
+    cantoDexTxParams.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0"
+  );
   switch (cantoDexTxParams.txType) {
     case CantoDexTxTypes.ADD_LIQUIDITY:
       return {
@@ -223,11 +245,6 @@ function getCantoDexTransactionFlowData(
         cantoLpStakeStatus: cantoDexTxParams.stake,
       };
     case CantoDexTxTypes.REMOVE_LIQUIDITY:
-      const lpTokenBlance = addTokenBalances(
-        cantoDexTxParams.pair.clmData?.userDetails?.supplyBalanceInUnderlying ??
-          "0",
-        cantoDexTxParams.pair.clmData?.userDetails?.balanceOfUnderlying ?? "0"
-      );
       return {
         ...pairData,
         cantoLpTokenAmount: displayAnalyticsAmount(
@@ -250,7 +267,8 @@ function getCantoDexTransactionFlowData(
         ),
       };
 
-    case CantoDexTxTypes.STAKE || CantoDexTxTypes.UNSTAKE:
+    case CantoDexTxTypes.STAKE:
+    case CantoDexTxTypes.UNSTAKE:
       return {
         ...pairData,
         cantoLpTokenAmount: displayAnalyticsAmount(
@@ -297,7 +315,8 @@ function getClmCTokenTransactionFlowData(
     ),
   };
   switch (clmCTokenTxParams.txType) {
-    case CTokenLendingTxTypes.SUPPLY || CTokenLendingTxTypes.WITHDRAW:
+    case CTokenLendingTxTypes.SUPPLY:
+    case CTokenLendingTxTypes.WITHDRAW:
       return {
         ...cTokenData,
         lmCollateralStatus: clmCTokenTxParams.cToken.userDetails?.isCollateral,
@@ -307,7 +326,8 @@ function getClmCTokenTransactionFlowData(
           clmCTokenTxParams.cToken.underlying.decimals
         ),
       };
-    case CTokenLendingTxTypes.BORROW || CTokenLendingTxTypes.REPAY:
+    case CTokenLendingTxTypes.BORROW:
+    case CTokenLendingTxTypes.REPAY:
       return {
         ...cTokenData,
         lmBorrowedAmount: displayAnalyticsAmount(
@@ -315,12 +335,52 @@ function getClmCTokenTransactionFlowData(
           clmCTokenTxParams.cToken.underlying.decimals
         ),
       };
-    case CTokenLendingTxTypes.COLLATERALIZE ||
-      CTokenLendingTxTypes.DECOLLATERALIZE: {
+    case CTokenLendingTxTypes.COLLATERALIZE:
+    case CTokenLendingTxTypes.DECOLLATERALIZE:
       return {
         lmToken: clmCTokenTxParams.cToken.underlying.symbol,
       };
-    }
+    default:
+      return {};
+  }
+}
+
+function getStakingTransactionFlowData(
+  stakingTxParams: StakingTransactionParams
+): AnalyticsTransactionFlowData {
+  switch (stakingTxParams.txType) {
+    case StakingTxTypes.DELEGATE:
+    case StakingTxTypes.UNDELEGATE:
+      return {
+        stakingValidator: stakingTxParams.validator.description.moniker,
+        stakingDelegation: displayAnalyticsAmount(
+          stakingTxParams.validator.userDelegation.balance ?? "0",
+          18
+        ),
+        stakingAmount: displayAnalyticsAmount(
+          stakingTxParams.amount ?? "0",
+          18
+        ),
+        stakingWalletBalance: displayAnalyticsAmount(
+          stakingTxParams.nativeBalance ?? "0",
+          18
+        ),
+      };
+    case StakingTxTypes.REDELEGATE:
+      return {
+        stakingValidator: stakingTxParams.validator.description.moniker,
+        stakingDelegation: displayAnalyticsAmount(
+          stakingTxParams.validator.userDelegation.balance ?? "0",
+          18
+        ),
+        stakingAmount: displayAnalyticsAmount(
+          stakingTxParams.amount ?? "0",
+          18
+        ),
+        stakingNewValidator: stakingTxParams.newValidatorName,
+      };
+    case StakingTxTypes.CLAIM_REWARDS:
+      return {};
     default:
       return {};
   }
@@ -338,31 +398,32 @@ function getLpComboClaimRewardsTransactionFlowType(
     return "Claim Canto Rewards";
   } else if (lpComboClaimRewardsTxParams.ambientParams) {
     return "Claim Ambient Rewards";
-  } else {
-    return undefined;
   }
+  return undefined;
 }
 
-export function getAnalyticsLendingMarketTokenInfo(lmType: string, cToken: CTokenWithUserData, liquidity: string, isSupply: boolean): AnalyticsLMData {
+export function getAnalyticsLendingMarketTokenInfo(
+  lmType: string,
+  cToken: CTokenWithUserData,
+  liquidity: string,
+  isSupply: boolean
+): AnalyticsLMData {
   const cTokenData = {
     lmToken: cToken.underlying.symbol,
     lmWalletBalance: displayAnalyticsAmount(
       cToken.userDetails?.balanceOfUnderlying ?? "0",
       cToken.underlying.decimals
     ),
-    lmAccountLiquidityRemaining: displayAnalyticsAmount(
-      liquidity,
-      18
-    ),
-  }
-  if(isSupply){
+    lmAccountLiquidityRemaining: displayAnalyticsAmount(liquidity, 18),
+  };
+  if (isSupply) {
     return {
       ...cTokenData,
       lmSuppliedAmount: displayAnalyticsAmount(
         cToken.userDetails?.supplyBalanceInUnderlying ?? "0",
         cToken.underlying.decimals
       ),
-    }
+    };
   }
   return {
     ...cTokenData,
@@ -370,39 +431,43 @@ export function getAnalyticsLendingMarketTokenInfo(lmType: string, cToken: CToke
       cToken.userDetails?.borrowBalance ?? "0",
       cToken.underlying.decimals
     ),
-  }
+  };
 }
 
-export function getAnalyticsAmbientLiquidityPoolInfo(pool : AmbientPool) : AnalyticsAmbientLPData {
- const positions = pool.userPositions.map((position) => ({
-  ambientLPPositionId: position.positionId,
-  ambientLpLiquidity: position.concLiq,
-  ambientLpMinRangePrice: displayAmount(
-    getPriceFromTick(position.bidTick),
-    pool.base.decimals - pool.quote.decimals,
-    {
-      short: false,
-      precision: pool.base.decimals - pool.quote.decimals,
-    }
-  ),
-  ambientLpMaxRangePrice: displayAmount(
-    getPriceFromTick(position.askTick),
-    pool.base.decimals - pool.quote.decimals,
-    {
-      short: false,
-      precision: pool.base.decimals - pool.quote.decimals,
-    }
-  ),
-}));
+export function getAnalyticsAmbientLiquidityPoolInfo(
+  pool: AmbientPool
+): AnalyticsAmbientLPData {
+  const positions = pool.userPositions.map((position) => ({
+    ambientLPPositionId: position.positionId,
+    ambientLpLiquidity: position.concLiq,
+    ambientLpMinRangePrice: displayAmount(
+      getPriceFromTick(position.bidTick),
+      pool.base.decimals - pool.quote.decimals,
+      {
+        short: false,
+        precision: pool.base.decimals - pool.quote.decimals,
+      }
+    ),
+    ambientLpMaxRangePrice: displayAmount(
+      getPriceFromTick(position.askTick),
+      pool.base.decimals - pool.quote.decimals,
+      {
+        short: false,
+        precision: pool.base.decimals - pool.quote.decimals,
+      }
+    ),
+  }));
 
-return {
-  lpType: "AMBIENT",
-  ambientLp : pool.symbol,
-  ambientLPPositions: positions,
-}
+  return {
+    lpType: "AMBIENT",
+    ambientLp: pool.symbol,
+    ambientLPPositions: positions,
+  };
 }
 
-export function getAnalyticsCantoLiquidityPoolInfo(pool : CantoDexPairWithUserCTokenData) : AnalyticsCantoLPData {
+export function getAnalyticsCantoLiquidityPoolInfo(
+  pool: CantoDexPairWithUserCTokenData
+): AnalyticsCantoLPData {
   return {
     lpType: "CANTO",
     cantoLp: pool.symbol,
@@ -412,9 +477,8 @@ export function getAnalyticsCantoLiquidityPoolInfo(pool : CantoDexPairWithUserCT
       { short: false, precision: pool.decimals }
     ),
     cantoLpStakedBalance: displayAmount(
-      pool.clmData?.userDetails?.supplyBalanceInUnderlying ??
-        "0",
-        pool.decimals,
+      pool.clmData?.userDetails?.supplyBalanceInUnderlying ?? "0",
+      pool.decimals,
       { short: false, precision: pool.decimals }
     ),
     cantoLpUnstakedBalance: displayAmount(
@@ -422,5 +486,15 @@ export function getAnalyticsCantoLiquidityPoolInfo(pool : CantoDexPairWithUserCT
       pool.decimals,
       { short: false, precision: pool.decimals }
     ),
-  }
+  };
+}
+
+export function getAnalyticsStakingInfo(
+  validator: Validator,
+  delegation: string
+): AnalyticsStakingData {
+  return {
+    stakingValidator: validator.description.moniker,
+    stakingDelegation: displayAnalyticsAmount(delegation ?? "0", 18),
+  };
 }

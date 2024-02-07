@@ -38,5 +38,9 @@ export type AmbientRemoveConcentratedLiquidityParams = BaseConcLiqParams & {
 export type AmbientClaimRewardsTxParams = {
   chainId: number;
   ethAccount: string;
-  estimatedRewards: string; // estimation before distribution of rewards, only used for drip purposes (all rewards will be claimed)
+  rewards: {
+    estimatedRewards: string; // estimation before distribution of rewards, only used for drip purposes (all rewards will be claimed)
+    rewardsLedgerAddress: string;
+    poolName: string;
+  }[];
 };

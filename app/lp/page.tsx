@@ -43,6 +43,7 @@ export default function Page() {
     sendAmbientTxFlow,
     sendClaimRewardsFlow,
     pairNames,
+    rewardTime,
   } = usePool();
 
   //   if mobile only
@@ -111,6 +112,7 @@ export default function Page() {
                     setPair(poolAddress);
                   },
                   rewards: rewards.ambient,
+                  rewardTime: rewardTime,
                 })
               ),
               ...pairs.userCantoDex.map((pair) =>

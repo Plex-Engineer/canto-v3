@@ -6,6 +6,7 @@ import { CantoFETxType } from "@/transactions/interfaces";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
 import { CantoDexTxTypes } from "@/transactions/pairs/cantoDex";
 import { AmbientTxType } from "@/transactions/pairs/ambient";
+import { StakingTxTypes } from "@/transactions/staking";
 import posthog from "posthog-js";
 
 // (BRIDGE/LP/LENDING/...)
@@ -16,15 +17,16 @@ type AnalyticsTransactionFlowType =
   | AmbientTxType
   | CTokenLendingTxTypes
   | BridgingMethodName
+  | StakingTxTypes
   | string;
 
-
 export type AnalyticsBridgeData = {
+  bridgeDirection: string;
   bridgeFrom: string;
   bridgeTo: string;
   bridgeAsset: string;
   bridgeAmount: string;
-}
+};
 
 export type AnalyticsCantoLPData = {
   lpType?: string;
@@ -44,14 +46,14 @@ export type AnalyticsCantoLPData = {
   cantoLpSlippage?: Number;
   cantoLpDeadline?: string;
   cantoLpStakeStatus?: boolean;
-}
+};
 
 type AnalyticsAmbientLPPositionData = {
   ambientLPPositionId?: string;
   ambientLpLiquidity?: string;
   ambientLpMinRangePrice?: string;
   ambientLpMaxRangePrice?: string;
-}
+};
 
 export type AnalyticsAmbientLPData = {
   lpType?: string;
@@ -70,7 +72,7 @@ export type AnalyticsAmbientLPData = {
   ambientLpFee?: string;
   ambientLpIsAdvanced?: boolean;
   ambientLPPositions?: AnalyticsAmbientLPPositionData[];
-} & AnalyticsAmbientLPPositionData
+} & AnalyticsAmbientLPPositionData;
 
 export type AnalyticsLMData = {
   lmType?: string;
@@ -81,9 +83,22 @@ export type AnalyticsLMData = {
   lmSuppliedAmount?: string;
   lmBorrowedAmount?: string;
   lmAccountLiquidityRemaining?: string;
-}
+};
 
-export type AnalyticsTransactionFlowData = AnalyticsBridgeData | AnalyticsCantoLPData | AnalyticsAmbientLPData | AnalyticsLMData;
+export type AnalyticsStakingData = {
+  stakingValidator?: string;
+  stakingAmount?: string;
+  stakingDelegation?: string;
+  stakingWalletBalance?: string;
+  stakingNewValidator?: string;
+};
+
+export type AnalyticsTransactionFlowData =
+  | AnalyticsBridgeData
+  | AnalyticsCantoLPData
+  | AnalyticsAmbientLPData
+  | AnalyticsLMData
+  | AnalyticsStakingData;
 
 // tx types (approve/mint/swap/...)
 type AnalyticsTransactionType = CantoFETxType;
@@ -102,6 +117,7 @@ type AnalyticsTransactionFlowParams = AnalyticsTransactionFlowInfo & {
   txNetwork?: string;
   txSuccess?: boolean;
   txHash?: string;
+  txTimeInSeconds?: Number;
   txRetryTimeInSeconds?: Number;
   txsGenerateError?: string;
   txError?: string;
@@ -129,9 +145,10 @@ class AnalyticsWrapper {
       },
     },
     events: {
-      pageOpened: (pageName: string) => {
+      pageOpened: (pageName: string, currentUrl: string) => {
         posthog.capture("$pageview", {
-          pageName: pageName,
+          pageName,
+          $current_url: currentUrl,
         });
       },
       connections: {
@@ -143,9 +160,14 @@ class AnalyticsWrapper {
           }
         },
       },
+      clickedNavLink: (link : string)=>{
+        posthog.capture("Clicked Nav Link", {
+          link,
+        });
+      },
       themeChanged: (theme: string) => {
         posthog.capture("Theme Changed", {
-          theme
+          theme,
         });
       },
       transactionModalOpened: () => {
@@ -161,7 +183,9 @@ class AnalyticsWrapper {
         addLPClicked: (params: object) => {
           posthog.capture("Add LP Clicked", params);
         },
-        manageLPClicked: (params: AnalyticsCantoLPData | AnalyticsAmbientLPData) => {
+        manageLPClicked: (
+          params: AnalyticsCantoLPData | AnalyticsAmbientLPData
+        ) => {
           posthog.capture("Manage LP Clicked", params);
         },
         tabSwitched: (tab: string) => {
@@ -197,6 +221,19 @@ class AnalyticsWrapper {
         },
         tabSwitched: (tab: string) => {
           posthog.capture("LM Tab Switched", {
+            tab,
+          });
+        },
+      },
+      staking: {
+        delegateClicked: (params: AnalyticsStakingData) => {
+          posthog.capture("Delegate Stake Clicked", params);
+        },
+        manageClicked: (params: AnalyticsStakingData) => {
+          posthog.capture("Manage Stake Clicked", params);
+        },
+        tabSwitched: (tab: string) => {
+          posthog.capture("Staking Tab Switched", {
             tab,
           });
         },
