@@ -57,7 +57,6 @@ const NavBar = () => {
     }
     isMenuOpen && setIsMenuOpen(false);
   }, [currentPath, searchParams, signer]);
-
   const balance = useBalance({
     address: signer?.account.address,
     watch: true,
@@ -135,21 +134,16 @@ const NavBar = () => {
         {currentPath == "/staking" && (
           <Link
             href="/staking"
-            className={clsx(
-              styles["nav-link"],
-              currentPath == "/staking" && styles.active
-            )}
+            className={clsx(styles["nav-link"], styles.active)}
           >
             <Text size="sm">Staking</Text>
           </Link>
         )}
-        {currentPath == "/governance" && (
+        {(currentPath == "/governance" ||
+          currentPath == "/governance/proposal") && (
           <Link
             href="/governance"
-            className={clsx(
-              styles["nav-link"],
-              currentPath.includes("governance") && styles.active
-            )}
+            className={clsx(styles["nav-link"], styles.active)}
           >
             <Text size="sm">Governance</Text>
           </Link>

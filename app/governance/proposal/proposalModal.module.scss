@@ -1,11 +1,23 @@
 .proposalContainer {
-  display: flex;
-  flex-direction: column !important ;
-  //justify-content: space-between;
-  //width: 100% !important;
-  //flex-wrap: wrap !important;
-  //background-color: blue;
-  padding: 20px 20px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 1400px !important;
+    margin: 10px auto;
+    border-top: 1px solid var(--primary-90-color);
+    position: relative;
+    padding-top: 2rem;
+  
+    &::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      left: 0;
+      width: calc(100% - 1px);
+      height: 10px;
+      border-left: 1px solid var(--primary-90-color);
+      border-right: 1px solid var(--primary-90-color);
+    }
 
   .proposalHeaderContainer {
     padding: 10px 0px 20px 10px;
@@ -29,89 +41,186 @@
     background-color: var(--border-stroke-color, #b3b3b3);
     z-index: 1; // Ensure the row appears above the others
   }
-  .proposalCardContainer {
+  .proposalInfoContainer {
     padding: 10px 0px 0px 0px;
     display: flex !important;
     flex-direction: row !important;
-
-    height: 400px;
+    width: 100%;
+    //height: 400px;
 
     //justify-content: space-between !important;
-  }
-  .proposalCardContainer1 {
-    display: flex;
-    flex-direction: column !important;
-    justify-content: space-between;
-    //background-color: green;
-    // width: 50% !important;
-    //height: 100%;
-    width: 50%;
-    height: 60%;
-  }
-  .graphAndVoteContainer{
-    width: 50%;
-    display: flex;
-    flex-direction: column ;
-    justify-content: space-between;
+
+    .graphAndVoteContainer{
+      width: 50%;
+      display: flex;
+      flex-direction: column ;
+      //justify-content: space-between;
+      margin-right: 30px;
+      .proposalCardContainer1 {
+        display: flex;
+        flex-direction: column !important;
+        justify-content: space-between;
+        //background-color: blue;
+        height: 60%;
+        box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
+        .proposalInfoBoxVoting {
+          background-color: var(--card-sub-surface-color, #dfdfdf);
+          height: fit-content;
+          .proposalInfoVoting {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            border: 1px solid var(--border-stroke-color, #b3b3b3);
+            border-radius: 5px;
+            padding: 10px;
+            height: 100%;
+            width: 48%;
+          }
+          .proposalInfoVoting:hover {
+            background-color: #afe0cc;
+          }
+          .proposalInfoRow1 {
+            display: flex;
+            flex-direction: row !important;
+            justify-content: space-between;
+            height: 45%;
+            margin: 15px 30px 0px 30px;
+            .radioBtnContainer {
+              display: flex;
+              align-items: center;
+              margin: 0px 17px 0px 15px;
+            }
+          }
+          .votingInfoRow1 {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            width: 50%;
+            .circle {
+              width: 7px; 
+              height: 7px; 
+              border-radius: 50%;
+            }
+          }
+          .votingInfoRow2 {
+            .infoRow1First {
+              display: flex;
+              flex-direction: row;
+              height: 50%;
+              justify-content: flex-end;
+              width: 100%;
+            }
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: right;
+            align-items: center;
+          }
+        }
+        
+      }
+      .graphContainer{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        background-color: var(--card-sub-surface-color, #dfdfdf);
+        box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
+      }
+    }
+
+
     .proposalCardContainer2 {
+      height: 500px;
       display: flex;
       flex-direction: column !important;
-      justify-content: space-between;
-      //background-color: blue;
-      height: 60%;
-      
-      //background-color: var(--card-sub-surface-color, #dfdfdf);
-      box-shadow: 3px 3px 0px 0px rgba(17, 17, 17, 0.15);
-  
-      // background-color: red;
-      
-    }
-    .graphContainer{
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
+      margin-top: 30px;
+      width: 50%;
+      border: 1px solid var(--border-stroke-color, #b3b3b3);
+      box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
       background-color: var(--card-sub-surface-color, #dfdfdf);
+      .detailsHeader{
+        width: 100%;
+        padding: 20px 0px 20px 20px;
+        border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
+      }
+    
+    
+      .proposalInfoBox {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        //background-color: var(--card-sub-surface-color, #dfdfdf);
+        margin: 0px 20px 0px 0px;
+        padding: 20px 20px 20px 20px;
+        .proposalInfo {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          margin-bottom: 20px;
+          //overflow: ;
+          .displayAmount {
+            display: flex;
+            flex-direction: row;
+            justify-content: left;
+            align-items: center;
+            .icon{
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              padding-left: 2px;
+          }
+          }
+        }
+        
+      }
+      .proposalInfoTimeLine {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin: 20px 20px 0px 0px;
+        padding: 15px;
+        .proposalInfo2 {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          //overflow: ;
+        }
+        
+        
+      }
+      .separator{
+        height: 5rem;
+        //padding-left: 60px;
+        margin-left: 4px;
+        border-left: 2px solid var(--graph-fill-color, #D0D0D0);
+
+      }
+      .timeLine{
+        display: flex;
+        flex-direction: row;
+        //height: 2rem;
+        //margin-top: 20px;
+        .circleContainer{
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          margin-right: 10px;
+        }
+        .circle{
+          height: 10px;
+          width: 10px;
+          border-radius: 50%;
+          background-color: var(--graph-fill-color, #D0D0D0);
+        }
+      }
     }
+    
   }
   
-  .proposalInfoBox {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background-color: var(--card-sub-surface-color, #dfdfdf);
-    margin: 0px 20px 0px 0px;
-    height: 57%;
-    box-shadow: 3px 3px 0px 0px rgba(17, 17, 17, 0.15);
-    padding: 20px 20px 20px 20px;
-    //align-items: center;
-    //justify-content: space-between;
-    //margin: 10% 10% 10% 10%;
-    .proposalInfo {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      //overflow: ;
-    }
-  }
-  .proposalInfoBox2 {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background-color: var(--card-sub-surface-color, #dfdfdf);
-    margin: 0px 20px 0px 0px;
-    height: 38%;
-    box-shadow: 3px 3px 0px 0px rgba(17, 17, 17, 0.15);
-    padding: 15px;
-    //align-items: center;
-    //justify-content: space-between;
-    //margin: 10% 10% 10% 10%;
-    .proposalInfo2 {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      //overflow: ;
-    }
-  }
+  
+  
+  
   .proposalInfoBoxVoting {
     background-color: var(--card-sub-surface-color, #dfdfdf);
     //height: 500px;
@@ -204,12 +313,7 @@
     align-items: center;
   }
 
-  .displayAmount {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-  }
+  
 
   .VotingButton .tooltip {
     visibility: hidden;

@@ -165,13 +165,73 @@ export default function Page() {
         </div>
       </div>
 
-      <div className={styles.proposalCardContainer}>
-        <div className={styles.proposalCardContainer1}>
+      <div className={styles.proposalInfoContainer}>
+        <div className={styles.graphAndVoteContainer}>
+          {isActive && (
+            <div className={styles.proposalCardContainer1}>
+              <div
+                className={styles.proposalInfoBoxVoting}
+                style={
+                  isActive
+                    ? {
+                        height: "70%",
+                        padding: "10px 0px 0px 0px",
+                      }
+                    : {
+                        height: "100%",
+                        padding: "0px 0px 20px 0px",
+                      }
+                }
+              >
+                <div className={styles.proposalInfoRow1}>
+                  <VoteBox option={VoteOption.YES} idx={0} />
+                  <VoteBox option={VoteOption.NO} idx={1} />
+                </div>
+
+                <div className={styles.proposalInfoRow1}>
+                  <VoteBox option={VoteOption.VETO} idx={2} />
+                  <VoteBox option={VoteOption.ABSTAIN} idx={3} />
+                </div>
+              </div>
+              {isActive && (
+                <div className={styles.VotingButton}>
+                  <Button
+                    width={400}
+                    disabled={!isActive}
+                    onClick={() => castVote(proposal.proposal_id, selectedVote)}
+                  >
+                    Vote
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+          <div>
+            <Spacer height="30px" />
+          </div>
+
+          <div className={styles.graphContainer}>
+            <VoteBarGraph
+              yesVotes={Number(votesData[VoteOption.YES].amount)}
+              noVotes={Number(votesData[VoteOption.NO].amount)}
+              abstainVotes={Number(votesData[VoteOption.ABSTAIN].amount)}
+              vetoVotes={Number(votesData[VoteOption.VETO].amount)}
+              size={422}
+            />
+          </div>
+          <div>
+            <Spacer height="50px" />
+          </div>
+        </div>
+        <div className={styles.proposalCardContainer2}>
+          <div className={styles.detailsHeader}>
+            <Text font="proto_mono">Proposal Details</Text>
+          </div>
           <div className={styles.proposalInfoBox}>
             <div className={styles.proposalInfo}>
               <div>
                 <Text font="proto_mono" opacity={0.3}>
-                  Type:
+                  Type
                 </Text>
               </div>
               <div>
@@ -183,7 +243,7 @@ export default function Page() {
             <div className={styles.proposalInfo}>
               <div>
                 <Text font="proto_mono" opacity={0.3}>
-                  Total Deposit:
+                  Total Deposit
                 </Text>
               </div>
               <div className={styles.displayAmount}>
@@ -193,8 +253,7 @@ export default function Page() {
                     short: false,
                   })}{" "}
                 </Text>
-                <div className={styles.displayAmount}>
-                  <div>&nbsp;</div>
+                <div className={styles.icon}>
                   <Image
                     src="/tokens/canto.svg"
                     width={16}
@@ -210,7 +269,7 @@ export default function Page() {
             <div className={styles.proposalInfo}>
               <div>
                 <Text font="proto_mono" opacity={0.3}>
-                  Turnout / Quorum:{" "}
+                  Turnout / Quorum{" "}
                 </Text>
               </div>
               <div>
@@ -219,87 +278,38 @@ export default function Page() {
                 </Text>
               </div>
             </div>
-          </div>
-          <div className={styles.proposalInfoBox2}>
-            <div className={styles.proposalInfo2}>
-              <div>
-                <Text font="proto_mono" opacity={0.3}>
-                  Submit Time:
+            <div className={styles.proposalInfoTimeline}>
+              <div style={{ marginBottom: "10px" }}>
+                <Text font="rm_mono" opacity={0.3}>
+                  Voting Timeline
                 </Text>
               </div>
-              <div>
-                <Text font="proto_mono">
-                  {formatTime(proposal.submit_time)}
-                </Text>
+              <div className={styles.timeLine}>
+                <div className={styles.circleContainer}>
+                  <div className={styles.circle} />
+                </div>
+                <div>
+                  <Text font="rm_mono">Proposal Created on &nbsp;</Text>
+                </div>
+                <div>
+                  <Text font="rm_mono">{formatTime(proposal.submit_time)}</Text>
+                </div>
+              </div>
+              <div className={styles.separator} />
+              <div className={styles.timeLine}>
+                <div className={styles.circleContainer}>
+                  <div className={styles.circle} />
+                </div>
+                <div>
+                  <Text font="rm_mono">Voting Ended on &nbsp;</Text>
+                </div>
+                <div>
+                  <Text font="rm_mono">
+                    {formatTime(proposal.voting_end_time)}
+                  </Text>
+                </div>
               </div>
             </div>
-            <div className={styles.proposalInfo2}>
-              <div>
-                <Text font="proto_mono" opacity={0.3}>
-                  Voting End Time:
-                </Text>
-              </div>
-              <div>
-                <Text font="proto_mono">
-                  {formatTime(proposal.voting_end_time)}
-                </Text>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className={styles.graphAndVoteContainer}>
-          <div className={styles.proposalCardContainer2}>
-            <div
-              className={styles.proposalInfoBoxVoting}
-              style={
-                isActive
-                  ? {
-                      height: "70%",
-                      padding: "10px 0px 0px 0px",
-                    }
-                  : {
-                      height: "100%",
-                      padding: "0px 0px 20px 0px",
-                    }
-              }
-            >
-              <div className={styles.proposalInfoRow1}>
-                <VoteBox option={VoteOption.YES} idx={0} />
-                <VoteBox option={VoteOption.NO} idx={1} />
-              </div>
-
-              <div className={styles.proposalInfoRow1}>
-                <VoteBox option={VoteOption.VETO} idx={2} />
-                <VoteBox option={VoteOption.ABSTAIN} idx={3} />
-              </div>
-            </div>
-            {isActive && (
-              <div className={styles.VotingButton}>
-                <Button
-                  width={400}
-                  disabled={!isActive}
-                  onClick={() => castVote(proposal.proposal_id, selectedVote)}
-                >
-                  Vote
-                </Button>
-              </div>
-            )}
-          </div>
-          <div>
-            <Spacer height="30px" />
-          </div>
-
-          <div className={styles.graphContainer}>
-            <VoteBarGraph
-              yesVotes={50}
-              noVotes={20}
-              abstainVotes={10}
-              vetoVotes={5}
-              size={422}
-            />
-          </div>
-          <div>
-            <Spacer height="50px" />
           </div>
         </div>
       </div>

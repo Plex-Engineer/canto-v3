@@ -83,6 +83,8 @@ a {
   --light-mode: 1;
   --box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
   --temp-bg-brightness: 1;
+  --graph-fill-color: #D0D0D0;
+  
 }
 
 .dim {
@@ -115,6 +117,7 @@ a {
   --dark-mode: 1;
   --light-mode: 0;
   --box-shadow: 0;
+  --graph-fill-color: #D0D0D0;
 }
 
 .dark2 {
@@ -148,6 +151,7 @@ a {
   --box-shadow: 0;
 
   --temp-bg-brightness: 1;
+  --graph-fill-color: #4B4B4B;
 }
 
 .dark {
@@ -190,6 +194,7 @@ a {
   --light-mode: 0;
   --box-shadow: 0;
   ---temp-opacity: 1;
+  --graph-fill-color: #4B4B4B;
 }
 
 * {
