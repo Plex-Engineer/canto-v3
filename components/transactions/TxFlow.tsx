@@ -49,16 +49,19 @@ const TxFlow = (props: Props) => {
     checkRetryParams();
   }, [props.txFlow?.status]);
 
-
-
-  useEffect(()=>{
-    if(props.txFlow?.status == "ERROR"){
-      toast.add({ toastId: new Date().getTime().toString(), message: "Transaction failed "});
+  useEffect(() => {
+    if (props.txFlow?.status == "ERROR") {
+      toast.add({
+        toastId: new Date().getTime().toString(),
+        message: "Transaction failed ",
+      });
+    } else if (props.txFlow?.status == "SUCCESS") {
+      toast.add({
+        toastId: new Date().getTime().toString(),
+        message: "Transaction successful ",
+      });
     }
-    else if(props.txFlow?.status == "SUCCESS"){
-      toast.add({ toastId: new Date().getTime().toString(), message: "Transaction successful "});
-    }
-  },[props.txFlow?.status])
+  }, [props.txFlow?.status]);
 
   return (
     <div className={styles.container}>

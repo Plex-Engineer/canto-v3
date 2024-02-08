@@ -76,7 +76,7 @@ export default function RootLayout({
           } as React.CSSProperties
         }
       >
-       <div id="toast-root"></div>
+        <div id="toast-root"></div>
         <CantoWalletProvider>
           <ReactQueryClientProvider>
             <ToastContainer>

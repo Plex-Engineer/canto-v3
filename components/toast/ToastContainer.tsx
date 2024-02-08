@@ -1,6 +1,6 @@
 import { ToastContext } from "./ToastContext";
 import { Toast } from "./Toast";
-import { useState} from "react";
+import { useState } from "react";
 import ReactDOM from "react-dom";
 import styles from "./container.module.scss";
 export interface ToastItem {
@@ -35,9 +35,8 @@ export const ToastContainer = ({ children }: Props) => {
         message,
         autoClose,
         autoCloseDuration,
-      } ,
+      },
     ]);
-
   };
 
   const dismiss = (id: string) => {
@@ -45,23 +44,22 @@ export const ToastContainer = ({ children }: Props) => {
       currentToasts.filter((toast) => toast.toastId !== id)
     );
   };
-  const contextValue = { add }
-    return (
-      <ToastContext.Provider value={contextValue}>
-        {children}
-        {ReactDOM.createPortal(
-          <div className={`${styles["toast-container"]} ${styles["top-right"]}`}>
-            {toasts.map((toast) => (
-              <Toast
-                key={toast.toastId}
-                onClose={() => dismiss(toast.toastId)}
-                toast ={toast}
-              />
-            ))}
-          </div>,
-          document.querySelector("#toast-root")!
-        )}
-      </ToastContext.Provider>
-    );
-  
+  const contextValue = { add };
+  return (
+    <ToastContext.Provider value={contextValue}>
+      {children}
+      {ReactDOM.createPortal(
+        <div className={`${styles["toast-container"]} ${styles["top-right"]}`}>
+          {toasts.map((toast) => (
+            <Toast
+              key={toast.toastId}
+              onClose={() => dismiss(toast.toastId)}
+              toast={toast}
+            />
+          ))}
+        </div>,
+        document.querySelector("#toast-root")!
+      )}
+    </ToastContext.Provider>
+  );
 };
