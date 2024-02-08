@@ -12,6 +12,7 @@ interface Props {
   content: React.ReactNode[][] | React.ReactNode[];
   textSize?: string;
   isPaginated?: boolean;
+  isGovTable?: boolean;
 }
 
 const Table = (props: Props) => {
@@ -73,7 +74,11 @@ const Table = (props: Props) => {
             ) : props.isPaginated && props.content.length == index + 1 ? (
               <div key={"row" + index}>{row}</div>
             ) : (
-              <div className={styles.rowElement} key={"row" + index}>
+              <div
+                className={styles.rowElement}
+                key={"row" + index}
+                style={props.isGovTable ? { height: "120px" } : {}}
+              >
                 {row}
               </div>
             );
