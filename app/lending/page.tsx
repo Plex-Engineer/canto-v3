@@ -23,6 +23,7 @@ import {
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 import clsx from "clsx";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
+import Splash from "@/components/splash/splash";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
@@ -83,7 +84,7 @@ export default function LendingPage() {
   if (isLoading || cNote === undefined || stableCoins === undefined) {
     return (
       <div className={styles.loading}>
-        <LoadingIcon />
+        <Splash themed />
       </div>
     );
   }
