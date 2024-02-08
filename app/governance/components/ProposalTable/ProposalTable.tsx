@@ -236,10 +236,18 @@ const ProposalTable = ({ proposals }: TableProps) => {
         </div>
       ) : (
         <div className={styles.noActiveProposalContainer}>
-          <Text font="rm_mono">
-            There are no active proposals currently, you’ll find them here if
-            any
-          </Text>
+          <div className={styles.circleContainer}>
+            <div
+              className={styles.circle}
+              style={{ height: "10px", width: "10px" }}
+            />
+          </div>
+          <div style={{ paddingLeft: "20px" }}>
+            <Text font="rm_mono">
+              There are no active proposals currently, you’ll find them here if
+              any
+            </Text>
+          </div>
         </div>
       )}
       <div>
@@ -333,6 +341,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                                 <Text
                                   font="rm_mono"
                                   className={styles.tableData}
+                                  size="x-sm"
                                 >
                                   {proposal.proposal_id}
                                 </Text>
@@ -348,6 +357,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                                 <Text
                                   font="rm_mono"
                                   className={styles.tableData}
+                                  size="x-sm"
                                 >
                                   {formatProposalType(proposal.type_url)}
                                 </Text>
@@ -372,42 +382,115 @@ const ProposalTable = ({ proposals }: TableProps) => {
                           <Container
                             direction="column"
                             width="20%"
+                            height="100%"
                             key={`status_${index}`}
-                            style={{ cursor: "pointer", alignItems: "center" }}
+                            style={{
+                              cursor: "pointer",
+                              alignItems: "left",
+                              justifyContent: "space-around",
+                            }}
                           >
                             <Container
-                              direction="row"
-                              width="100%"
+                              direction="column"
                               style={{
                                 marginBottom: "10px",
-                                justifyContent: "flex-start",
+                                justifyContent: "left",
+                                alignItems: "left",
+                                marginLeft: "50px",
+                                marginTop: "10px",
                               }}
                             >
-                              <Text opacity={0.4}>Status</Text>
-                            </Container>
-                            <Container
-                              direction="row"
-                              className={styles.proposalStatus}
-                            >
-                              <div className={styles.circleContainer}>
-                                <div
-                                  className={styles.circle}
-                                  style={{
-                                    backgroundColor:
-                                      proposal.status ==
-                                      "PROPOSAL_STATUS_PASSED"
-                                        ? "#01BD09"
-                                        : "#EF4444",
-                                  }}
-                                />
-                              </div>
-                              <Text font="rm_mono" className={styles.tableData}>
-                                {formatProposalStatus(proposal.status)}
-                              </Text>
+                              <Container
+                                direction="row"
+                                width="100%"
+                                style={{
+                                  justifyContent: "flex-start",
+                                  marginBottom: "10px",
+                                }}
+                              >
+                                <Text opacity={0.4} size="x-sm" font="rm_mono">
+                                  Status
+                                </Text>
+                              </Container>
+
+                              <Container
+                                direction="row"
+                                className={styles.proposalStatus}
+                              >
+                                <div className={styles.circleContainer}>
+                                  <div
+                                    className={styles.circle}
+                                    style={{
+                                      backgroundColor:
+                                        proposal.status ==
+                                        "PROPOSAL_STATUS_PASSED"
+                                          ? "#01BD09"
+                                          : "#EF4444",
+                                    }}
+                                  />
+                                </div>
+                                <Text
+                                  font="rm_mono"
+                                  className={styles.tableData}
+                                  size="x-sm"
+                                >
+                                  {formatProposalStatus(proposal.status)}
+                                </Text>
+                              </Container>
                             </Container>
                           </Container>
-
                           <Container
+                            direction="column"
+                            width="30%"
+                            height="100%"
+                            key={`status_${index}`}
+                            style={{
+                              cursor: "pointer",
+                              alignItems: "left",
+                              justifyContent: "space-around",
+                            }}
+                          >
+                            <Container
+                              direction="column"
+                              //width="100%"
+                              style={{
+                                marginBottom: "10px",
+                                marginLeft: "50px",
+                                justifyContent: "left",
+                                alignItems: "left",
+                                marginTop: "10px",
+                              }}
+                            >
+                              <Container
+                                direction="row"
+                                width="100%"
+                                style={{
+                                  justifyContent: "flex-start",
+                                  marginBottom: "10px",
+                                }}
+                              >
+                                <Text opacity={0.4} size="x-sm" font="rm_mono">
+                                  Voting Date
+                                </Text>
+                              </Container>
+
+                              <Container
+                                direction="row"
+                                className={styles.proposalVotingDate}
+                              >
+                                <Text
+                                  font="rm_mono"
+                                  className={styles.tableData}
+                                  size="x-sm"
+                                >
+                                  {new Date(
+                                    proposal.voting_end_time
+                                  ).toDateString()}
+                                </Text>
+                              </Container>
+                            </Container>
+                          </Container>
+                          {/* <Container
                             width="30%"
                             key={`votingdate_${index}`}
                             style={{ cursor: "pointer", alignItems: "center" }}
@@ -417,7 +500,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                                 proposal.voting_end_time
                               ).toDateString()}
                             </Text>
-                          </Container>
+                          </Container> */}
                           <Container
                             width="10%"
                             key={`votingdate_${index}`}

@@ -7,12 +7,9 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    //max-width: 250px;
     text-align: left;
     justify-content: left;
     align-items: flex-start;
-    //justify-content: center;
-    //align-items: center;
   }
 
   .toggleGroupContainer {
@@ -53,24 +50,33 @@
     .proposalStatus{
       display: flex;
       flex-direction: row;
-      padding: 10px;
+      padding: 4px 12px 4px 12px;
+      width: fit-content;
       border-radius: 4px;
       border: 1px solid var(--border-stroke-color, #b3b3b3);
       background-color: var(--card-background-color, #c1c1c1);
     }
-    .circleContainer{
+    .proposalVotingDate{
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin-right: 5px;
-      .circle{
-          height: 10px;
-          width: 10px;
-          border-radius: 50%;
-          //background-color: var(--graph-fill-color, #D0D0D0);
-      }
+      flex-direction: row;
+      padding: 4px 12px 4px 0px;
+      width: fit-content;
+    }
+    
   }
+  .circleContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 5px;
+    //background-color: red;
+    .circle{
+        height: 6px;
+        width: 6px;
+        border-radius: 50%;
+        background-color: var(--card-background-color, #c1c1c1);
+    }
   }
   .paginationContainer {
     display: flex;
@@ -104,8 +110,9 @@
   }
   .noActiveProposalContainer{
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
     height: 5rem;
     background-color: var(--card-sub-surface-color, #dfdfdf);
     padding-left: 30px;
@@ -120,14 +127,3 @@
   }
 }
 
-.row {
-  height: 90px;
-  transition: all 0.3s ease; // Smooth transition for hover effects
-  position: relative; // Ensure the z-index works correctly
-  border-left: 1px solid var(--border-stroke-color, #b3b3b3);
-  border-right: 1px solid var(--border-stroke-color, #b3b3b3);
-}
-.row:hover {
-  background-color: var(--border-stroke-color, #b3b3b3);
-  z-index: 1; // Ensure the row appears above the others
-}
