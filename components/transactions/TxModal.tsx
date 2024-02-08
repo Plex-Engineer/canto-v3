@@ -13,9 +13,10 @@ import Splash from "../splash/splash";
 import { dateToMomentsAgo } from "@/utils/formatting";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Analytics from "@/provider/analytics";
-
+import { useToast } from "@/components/toast";
 const TransactionModal = () => {
   // set modal open state
+  const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
   // state for current selected flow
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
@@ -37,6 +38,7 @@ const TransactionModal = () => {
     if (transactionFlows) {
       transactionFlows.forEach((flow) => {
         if (flow.status === "POPULATING") {
+          toast.add({ toastId: new Date().getTime().toString(), message: "Transaction started" });
           setIsOpen(true);
           setCurrentFlowId(flow.id);
           // close bridge/lp/lm confirmation modals

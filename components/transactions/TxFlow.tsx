@@ -15,6 +15,7 @@ import {
 import { importERC20Token } from "@/utils/tokens";
 import InfoPop from "../infopop/infopop";
 import Analytics from "@/provider/analytics";
+import { useToast } from "@/components/toast";
 
 interface Props {
   txFlow?: TransactionFlow;
@@ -28,6 +29,7 @@ const TxFlow = (props: Props) => {
     valid: boolean;
     error: string | undefined;
   }>({ valid: false, error: undefined });
+  const toast = useToast();
   useEffect(() => {
     async function checkRetryParams() {
       if (props.txFlow?.status === "ERROR") {
@@ -46,6 +48,17 @@ const TxFlow = (props: Props) => {
     }
     checkRetryParams();
   }, [props.txFlow?.status]);
+
+
+
+  useEffect(()=>{
+    if(props.txFlow?.status == "ERROR"){
+      toast.add({ toastId: new Date().getTime().toString(), message: "Transaction failed "});
+    }
+    else if(props.txFlow?.status == "SUCCESS"){
+      toast.add({ toastId: new Date().getTime().toString(), message: "Transaction successful "});
+    }
+  },[props.txFlow?.status])
 
   return (
     <div className={styles.container}>

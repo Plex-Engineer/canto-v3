@@ -1,0 +1,19 @@
+.toast {
+  font-family:"var(--proto-mono)";
+  width: 200px;
+  box-sizing: border-box;
+  padding: 8px;
+  margin-bottom: 16px;
+  position: relative;
+  background: white;
+}
+
+.toast-success{
+  color: "var(--toast-success-color)";
+  border: "2px solid var(--toast-success-color)";
+}
+
+.toast-error{
+  color: "var(--toast-error-color)";
+  border: "2px solid var(--toast-error-color)";
+}

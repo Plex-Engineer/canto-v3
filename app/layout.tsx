@@ -8,8 +8,7 @@ import CantoWalletProvider from "@/provider/rainbowProvider";
 import localFont from "next/font/local";
 import DesktopOnly from "@/components/desktop-only/desktop-only";
 import { ReactQueryClientProvider } from "@/provider/reactQueryProvider";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "@/components/toast";
 
 const rm_mono = localFont({
   src: "../fonts/rm-mono-regular.ttf",
@@ -77,10 +76,12 @@ export default function RootLayout({
           } as React.CSSProperties
         }
       >
+       <div id="toast-root"></div>
         <CantoWalletProvider>
           <ReactQueryClientProvider>
-            <div className="body">
-              {/* <InfoBar
+            <ToastContainer>
+              <div className="body">
+                {/* <InfoBar
                 values={[
                   {
                     name: "contracts w/ CSR enabled:",
@@ -108,14 +109,14 @@ export default function RootLayout({
                   },
                 ]}
               /> */}
-              <NavBar />
-              {children}
-              <div id="modal-root"></div>
-              <Footer />
-            </div>
+                <NavBar />
+                {children}
+                <div id="modal-root"></div>
+                <Footer />
+              </div>
+            </ToastContainer>
           </ReactQueryClientProvider>
         </CantoWalletProvider>
-        <ToastContainer />
       </body>
     </html>
   );
