@@ -2,7 +2,7 @@
 import Spacer from "@/components/layout/spacer";
 import Selector from "@/components/selector/selector";
 import Text from "@/components/text";
-import { displayAmount, formatBalance } from "@/utils/formatting";
+import { displayAmount, formatBalance, sortTokens } from "@/utils/formatting";
 import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";
 import Input from "@/components/input/input";
@@ -251,8 +251,8 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
                         id: "",
                       }
                 }
-                items={bridge.allOptions.tokens
-                  .map((token) => ({
+                items={sortTokens(
+                  bridge.allOptions.tokens.map((token) => ({
                     ...token,
                     name: token.name.length > 24 ? token.symbol : token.name,
                     secondary: displayAmount(
@@ -260,20 +260,7 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
                       token.decimals
                     ),
                   }))
-                  .sort((a, b) => {
-                    const x = Number(
-                      formatBalance(a.balance ? a.balance : "0", a.decimals)
-                    );
-                    const y = Number(
-                      formatBalance(b.balance ? b.balance : "0", b.decimals)
-                    );
-                    if (x === y) {
-                      return b.name.toLowerCase() > a.name.toLowerCase()
-                        ? -1
-                        : 1;
-                    }
-                    return y - x;
-                  })}
+                )}
                 onChange={(tokenId) => bridge.setState("token", tokenId)}
               />
               <Container width="100%">
