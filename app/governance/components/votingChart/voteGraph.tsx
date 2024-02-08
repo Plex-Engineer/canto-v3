@@ -221,14 +221,12 @@ const VoteBarGraph = ({
           <div className={styles.option}>
             <div>
               <Text font="proto_mono" size="xx-sm">
-                VETO
+                VETO ({vetoPercentage.toFixed(1)}%)
               </Text>
             </div>
-            <div>
-              <Text font="proto_mono" size="xx-sm">
-                ({vetoPercentage.toFixed(1)}%)
-              </Text>
-            </div>
+            {/* <div>
+              <Text font="proto_mono" size="xx-sm"></Text>
+            </div> */}
           </div>
         </div>
         <div className={styles.voteOption}>
@@ -241,14 +239,14 @@ const VoteBarGraph = ({
           <div className={styles.option}>
             <div>
               <Text font="proto_mono" size="xx-sm">
-                ABSTAIN
+                ABSTAIN ({abstainPercentage.toFixed(1)}%)
               </Text>
             </div>
-            <div>
+            {/* <div>
               <Text font="proto_mono" size="xx-sm">
                 ({abstainPercentage.toFixed(1)}%)
               </Text>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

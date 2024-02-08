@@ -268,7 +268,7 @@ export default function Page() {
           <div className={styles.proposalInfoBox}>
             <div className={styles.proposalInfo}>
               <div>
-                <Text font="proto_mono" opacity={0.3}>
+                <Text font="rm_mono" opacity={0.3}>
                   Type
                 </Text>
               </div>
@@ -280,18 +280,13 @@ export default function Page() {
             </div>
             <div className={styles.proposalInfo}>
               <div>
-                <Text font="proto_mono" opacity={0.3}>
-                  Total Deposit
+                <Text font="rm_mono" opacity={0.3}>
+                  Turnout
                 </Text>
               </div>
               <div className={styles.displayAmount}>
-                <Text font="proto_mono">
-                  {displayAmount(proposal.total_deposit[0].amount, 18, {
-                    commify: true,
-                    short: false,
-                  })}{" "}
-                </Text>
-                <div className={styles.icon}>
+                <Text font="proto_mono">{PROPOSAL_TURNOUT_VALUE}</Text>
+                {/* <div className={styles.icon}>
                   <Image
                     src="/tokens/canto.svg"
                     width={16}
@@ -301,19 +296,17 @@ export default function Page() {
                       filter: "invert(var(--dark-mode))",
                     }}
                   />
-                </div>
+                </div> */}
               </div>
             </div>
             <div className={styles.proposalInfo}>
               <div>
-                <Text font="proto_mono" opacity={0.3}>
-                  Turnout / Quorum{" "}
+                <Text font="rm_mono" opacity={0.3}>
+                  Quorum{" "}
                 </Text>
               </div>
               <div>
-                <Text font="proto_mono">
-                  {PROPOSAL_TURNOUT_VALUE} &nbsp; {PROPOSAL_QUORUM_VALUE}
-                </Text>
+                <Text font="proto_mono">{PROPOSAL_QUORUM_VALUE}</Text>
               </div>
             </div>
             <div className={styles.proposalInfoTimeLine}>
