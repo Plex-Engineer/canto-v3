@@ -278,25 +278,18 @@ export default function StakingPage() {
           {userStaking && userStaking.unbonding.length > 0 && (
             <Table
               title="Unbonding Delegations"
+              headerFont="rm_mono"
               headers={[
                 {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Name
-                    </Text>
-                  ),
+                  value: "Name",
                   ratio: 3,
                 },
                 {
-                  value: <Text opacity={0.4}>Undelegation</Text>,
+                  value: "Undelegation",
                   ratio: 2,
                 },
                 {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Completion Time
-                    </Text>
-                  ),
+                  value: "Completion Time",
                   ratio: 5,
                 },
               ]}
@@ -313,35 +306,22 @@ export default function StakingPage() {
           {hasUserStaked && userStaking && (
             <Table
               title="My Staking"
+              headerFont="rm_mono"
               headers={[
                 {
-                  value: (
-                    <div style={{ width: "300px" }}>
-                      <Text opacity={0.4} font="rm_mono">
-                        Name
-                      </Text>
-                    </div>
-                  ),
+                  value: "Name",
                   ratio: 5,
                 },
                 {
-                  value: <Text opacity={0.4}>My Stake</Text>,
+                  value: "My Stake",
                   ratio: 3,
                 },
                 {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Total Stake
-                    </Text>
-                  ),
+                  value: "Total Stake",
                   ratio: 3,
                 },
                 {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Commission
-                    </Text>
-                  ),
+                  value: "Commission",
                   ratio: 3,
                 },
                 {
@@ -402,37 +382,22 @@ export default function StakingPage() {
                   </Container>
                 </Container>
               }
+              headerFont="rm_mono"
               headers={[
                 {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Rank
-                    </Text>
-                  ),
+                  value: "Rank",
                   ratio: 2,
                 },
                 {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Name
-                    </Text>
-                  ),
+                  value: "Name",
                   ratio: 6,
                 },
                 {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Total Stake
-                    </Text>
-                  ),
+                  value: "Total Stake",
                   ratio: 4,
                 },
                 {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Commission
-                    </Text>
-                  ),
+                  value: "Commission",
                   ratio: 3,
                 },
                 {
@@ -470,7 +435,6 @@ export default function StakingPage() {
                       </Container>,
                     ]
               }
-              isPaginated={true}
             />
           )}
         </Container>

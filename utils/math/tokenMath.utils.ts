@@ -128,21 +128,25 @@ export function divideBalances(numerator: string, denominator: string): string {
 
 /**
  * @notice compares token balances
- * @dev must be from the same token to keep decimals
- * @param {string} amount1 first amount to compare
- * @param {string} amount2 second amount to compare
- * @returns {ReturnWithError<boolean>} true if amount1 is greater than amount2
+ * @dev if from the same token don't need to account for decimals
+ * @param {string} amount1 first amount to compare in wei
+ * @param {number} decimals1 decimals of first amount
+ * @param {string} amount2 second amount to compare in wei
+ * @param {number} decimals2 decimals of second amount
+ * @returns {boolean} true if amount1 is greater than amount2
  */
 export function greaterThan(
   amount1: string,
-  amount2: string
-): ReturnWithError<boolean> {
+  amount2: string,
+  decimals1?: number,
+  decimals2?: number
+): boolean {
   const [amount1BN, amount2BN] = [
-    convertToBigNumber(amount1),
-    convertToBigNumber(amount2),
+    convertToBigNumber(amount1, decimals1 ? -decimals1 : decimals1),
+    convertToBigNumber(amount2, decimals2 ? -decimals2 : decimals2),
   ];
-  if (amount1BN.error || amount2BN.error) return NEW_ERROR("Invalid amounts");
-  return NO_ERROR(amount1BN.data.gt(amount2BN.data));
+  if (amount1BN.error || amount2BN.error) return false;
+  return amount1BN.data.gt(amount2BN.data);
 }
 
 /**

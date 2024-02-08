@@ -1,75 +1,10 @@
 .tableContainer {
   width: 100% !important;
 
-  .rowTitle {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    //max-width: 250px;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .toggleGroupContainer {
-    padding-bottom: 10px;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    .toggleGroup {
-      width: 30%;
-    }
-  }
   .table {
     width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
-    .tableHeader {
-      padding: 0.5rem;
-      text-align: left;
-      border-top: 1px solid var(--border-stroke-color, #b3b3b3);
-      box-sizing: border-box;
-    }
-    .tableData {
-      //padding: 0.5rem;
-      text-align: left;
-      box-sizing: border-box;
-      font-size: 16;
-      font-family: "Proto Mono";
-      font-weight: "400";
-    }
-    .tableTitleColumn {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      padding-left: 10px;
-      padding-right: 10px;
-    }
-  }
-  .paginationContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    border: "none";
-    padding: 16px 16px 0px 16px;
-    &:hover {
-      background: var(--card-sub-surface-color, #dfdfdf);
-    }
-  }
-  .paginationButton1 {
-    margin-right: 5%;
-  }
-  .paginationButton2 {
-    margin-left: 5%;
-  }
-
-  .emptyProposals {
-    padding: 20px;
   }
   .noProposalContainer {
     justify-content: center;
@@ -80,15 +15,23 @@
     flex-grow: 1;
   }
 }
-
-.row {
-  height: 90px;
-  transition: all 0.3s ease; // Smooth transition for hover effects
-  position: relative; // Ensure the z-index works correctly
-  border-left: 1px solid var(--border-stroke-color, #b3b3b3);
-  border-right: 1px solid var(--border-stroke-color, #b3b3b3);
+.tableData {
+  //padding: 0.5rem;
+  text-align: left;
+  box-sizing: border-box;
+  font-size: 16;
+  font-family: var(--rm-mono);
+  font-weight: "400000";
 }
-.row:hover {
-  background-color: var(--border-stroke-color, #b3b3b3);
-  z-index: 1; // Ensure the row appears above the others
+
+.rowTitle {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  //max-width: 250px;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
 }

@@ -1,13 +1,11 @@
 import styles from "./highlightCard.module.scss";
 import Button from "@/components/button/button";
 import Image from "next/image";
-import Item from "./item";
+import Item from "../item";
 import Icon from "@/components/icon/icon";
 import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 import { displayAmount } from "@/utils/formatting";
-import Text from "@/components/text";
-import InfoPop from "@/components/infopop/infopop";
-import PopUp from "@/components/popup/popup";
+
 import Container from "@/components/container/container";
 import BigNumber from "bignumber.js";
 
@@ -47,6 +45,7 @@ const HighlightCard = ({
       />
       <div className={styles.header}>
         <Item
+          color="primary-dark"
           name={
             <Icon
               icon={{
@@ -59,32 +58,27 @@ const HighlightCard = ({
           theme="primary-light"
         />
         <Item
-          name="Supply APR"
-          value={cToken.supplyApr + "%"}
+          color="primary-dark"
+          name="Supply APY"
+          value={cToken.supplyApy + "%"}
           theme="primary-light"
         />
         <Item
-          name="Borrow APR"
-          value={cToken.borrowApr + "%"}
+          color="primary-dark"
+          name="Borrow APY"
+          value={cToken.borrowApy + "%"}
           theme="primary-light"
         />
       </div>
       <div className={styles.amounts}>
         <Container width="100%" gap={10}>
           <Item
+            color="primary-dark"
             name={cToken.underlying.symbol + " Balance"}
             value={formattedAmount(
               cToken.userDetails?.balanceOfUnderlying ?? "0"
             )}
-            postChild={
-              <Icon
-                themed
-                icon={{
-                  url: "/tokens/note.svg",
-                  size: 20,
-                }}
-              />
-            }
+            symbol={true}
           />
           {/* <Item
             value={formattedAmount(cToken.userDetails?.balanceOfCToken ?? "0")}
@@ -109,32 +103,18 @@ const HighlightCard = ({
           />*/}
         </Container>
         <Item
+          color="primary-dark"
           name="Note Supplied"
           value={formattedSupplyAmount(
             cToken.userDetails?.supplyBalanceInUnderlying ?? "0"
           )}
-          postChild={
-            <Icon
-              themed
-              icon={{
-                url: "/tokens/note.svg",
-                size: 20,
-              }}
-            />
-          }
+          symbol={true}
         />
         <Item
+          color="primary-dark"
           name="Note Borrowed"
           value={formattedAmount(cToken.userDetails?.borrowBalance ?? "0")}
-          postChild={
-            <Icon
-              themed
-              icon={{
-                url: "/tokens/note.svg",
-                size: 20,
-              }}
-            />
-          }
+          symbol={true}
         />
       </div>
 
