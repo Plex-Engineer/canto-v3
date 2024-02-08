@@ -261,18 +261,18 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
                     ),
                   }))
                   .sort((a, b) => {
-                    const aFormatted = Number(
+                    const x = Number(
                       formatBalance(a.balance ? a.balance : "0", a.decimals)
                     );
-                    const bFormatted = Number(
+                    const y = Number(
                       formatBalance(b.balance ? b.balance : "0", b.decimals)
                     );
-                    if (aFormatted === bFormatted) {
+                    if (x === y) {
                       return b.name.toLowerCase() > a.name.toLowerCase()
                         ? -1
                         : 1;
                     }
-                    return bFormatted - aFormatted;
+                    return y - x;
                   })}
                 onChange={(tokenId) => bridge.setState("token", tokenId)}
               />
