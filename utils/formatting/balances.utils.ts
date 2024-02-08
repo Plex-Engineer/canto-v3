@@ -38,6 +38,8 @@ export function convertToBigNumber(
  * @param {boolean} commify whether to commify the balance
  * @param {boolean} short whether to display a short balance
  * @param {number} maxSmallBalance the max balance to display before shortening (<maxSmallBalance)
+ * @param {string} minBigBalance the min balance to display before shortening to infinite (>minBigBalance)
+ * @dev minBigBalance is string since number cannot support very large numbers
  */
 interface FormatBalanceOptions {
   symbol?: string;
@@ -45,6 +47,7 @@ interface FormatBalanceOptions {
   commify?: boolean;
   short?: boolean;
   maxSmallBalance?: number;
+  minBigBalance?: string;
 }
 
 /**
@@ -64,7 +67,10 @@ export function displayAmount(
     commify: true,
     short: true,
     maxSmallBalance: 0.001,
+    minBigBalance: BigNumber(10).pow(20).toString(),
   };
+  //   if 0, return 0.00
+  if (amount === "0" && options?.precision == 2) return "0.00";
   return formatBalance(amount, decimals, { ...defaultOptions, ...options });
 }
 
@@ -80,13 +86,14 @@ export function formatBalance(
   options?: FormatBalanceOptions
 ): string {
   // set this to avoid scientific notation
-  BigNumber.set({ EXPONENTIAL_AT: 35 });
+  BigNumber.set({ EXPONENTIAL_AT: 60 });
   const {
     symbol = undefined,
     precision = undefined,
     commify = false,
     short = false,
     maxSmallBalance = undefined,
+    minBigBalance = undefined,
   } = options || {};
   const bnAmount = new BigNumber(amount);
   // make sure greater than zero
@@ -121,9 +128,14 @@ export function formatBalance(
   let finalAmount = truncatedAmount;
   let suffix = "";
   if (short) {
-    // check if the balance is less than 0.001 and return <0.001
+    // check if the balance is less than maxSmallBalance : or greater than minBigBalance
     if (maxSmallBalance && Number(truncatedAmount) < maxSmallBalance) {
       finalAmount = `<${maxSmallBalance}`;
+    } else if (
+      minBigBalance &&
+      Number(truncatedAmount) > Number(minBigBalance)
+    ) {
+      return "∞";
     } else {
       const { shortAmount, suffix: _suffix } = formatBigBalance(
         truncatedAmount,

@@ -38,7 +38,7 @@ const Tabs = (props: Props) => {
             disabled={tab.isDisabled}
             className={clsx(styles.tab, activeTab === index && styles.active)}
           >
-            <Text font="proto_mono" size="sm">
+            <Text font="proto_mono" size="sm" theme={"primary-dark"}>
               {tab.title}
             </Text>
             {tab.extraTitle}
