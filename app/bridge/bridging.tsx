@@ -2,7 +2,7 @@
 import Spacer from "@/components/layout/spacer";
 import Selector from "@/components/selector/selector";
 import Text from "@/components/text";
-import { displayAmount } from "@/utils/formatting";
+import { displayAmount, formatBalance } from "@/utils/formatting";
 import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";
 import Input from "@/components/input/input";
@@ -20,7 +20,6 @@ import { useEffect, useState } from "react";
 import GravityConfirmationModal from "./components/gravityConfirmationModal";
 import { GRAVITY_BRIDGE } from "@/config/networks";
 import { TX_ERROR_TYPES } from "@/config/consts/errors";
-import BigNumber from "bignumber.js";
 
 const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
@@ -262,20 +261,18 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
                     ),
                   }))
                   .sort((a, b) => {
-                    const aBigNumber = new BigNumber(a.balance ? a.balance : 0);
-                    const bBigNumber = new BigNumber(b.balance ? b.balance : 0);
-                    const aFormatted = aBigNumber.dividedBy(
-                      new BigNumber(10).pow(a.decimals)
+                    const aFormatted = Number(
+                      formatBalance(a.balance ? a.balance : "0", a.decimals)
                     );
-                    const bFormatted = bBigNumber.dividedBy(
-                      new BigNumber(10).pow(b.decimals)
+                    const bFormatted = Number(
+                      formatBalance(b.balance ? b.balance : "0", b.decimals)
                     );
                     if (aFormatted === bFormatted) {
                       return b.name.toLowerCase() > a.name.toLowerCase()
                         ? -1
                         : 1;
                     }
-                    return bFormatted.minus(aFormatted).toNumber();
+                    return bFormatted - aFormatted;
                   })}
                 onChange={(tokenId) => bridge.setState("token", tokenId)}
               />
