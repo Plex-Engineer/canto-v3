@@ -288,13 +288,13 @@ async function removeLiquidity(
       txParams.pair.clmData.userDetails.balanceOfUnderlying
     );
 
-    if (greaterThan(unstakeAmount, "0").data) {
+    if (greaterThan(unstakeAmount, "0")) {
       // make sure user has enough to unstake
       if (
         greaterThan(
           unstakeAmount,
           txParams.pair.clmData.userDetails.supplyBalanceInUnderlying
-        ).data
+        )
       )
         throw new Error("user does not have enough LP to unstake");
 

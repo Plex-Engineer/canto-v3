@@ -16,9 +16,10 @@ import { BridgingMethod } from "@/transactions/bridge";
 import { addTokenBalances } from "@/utils/math";
 import { BridgeToken } from "@/hooks/bridge/interfaces/tokens";
 import FeeButton from "./components/feeButton";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import GravityConfirmationModal from "./components/gravityConfirmationModal";
 import { GRAVITY_BRIDGE } from "@/config/networks";
+import { TX_ERROR_TYPES } from "@/config/consts/errors";
 
 const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
@@ -316,11 +317,15 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
               setSelected: setSelectedGBridgeFee,
             }}
             token={token}
+            notEnoughNativeBalance={
+              Confirmation.preConfirmCheck.error &&
+              Confirmation.preConfirmCheck.reason ===
+                TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_LZ
+            }
           />
         ) : (
           <Spacer height="20px" />
         )}
-        <Spacer height="20px" />
 
         <Button
           width="fill"
@@ -463,6 +468,7 @@ const FeesSection = ({
   props,
   fees,
   token,
+  notEnoughNativeBalance,
 }: {
   props: BridgingFeesReturn;
   fees: {
@@ -471,6 +477,7 @@ const FeesSection = ({
     totalChainFee: string;
   };
   token: BridgeToken | null;
+  notEnoughNativeBalance: boolean;
 }) => {
   return props.isLoading ? (
     <LoadingTextAnim />
@@ -482,7 +489,15 @@ const FeesSection = ({
     <>
       {props.method === BridgingMethod.LAYER_ZERO &&
         props.direction === "out" && (
-          <Text font="proto_mono" size="x-sm">
+          <Text
+            font="proto_mono"
+            size="x-sm"
+            color={
+              notEnoughNativeBalance
+                ? " var(--extra-failure-color, #ff0000)"
+                : ""
+            }
+          >
             Gas Fee: {props.lzFee.formattedAmount}
           </Text>
         )}

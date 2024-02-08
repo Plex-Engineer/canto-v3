@@ -133,7 +133,7 @@ export const LendingModal = (props: Props) => {
     return (
       <Container className={styles.card} padding="md" width="100%">
         {/* might need to change this in future for showing it on more tokens */}
-        {isSupply && cToken.symbol.toLowerCase() == "cnote" && (
+        {isSupply && (
           <>
             <ModalItem name="Supply APR" value={cToken.supplyApr + "%"} />
             <ModalItem name="Dist APR" value={cToken.distApr + "%"} />

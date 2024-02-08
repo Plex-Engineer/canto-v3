@@ -240,6 +240,9 @@ const useTransactionStore = create<TransactionStore>()(
                 .getUserTransactionFlows(ethAccount)
                 .find((flow) => flow.id === flowToPerform.id)
                 ?.transactions.find((_, index) => index === i);
+              const startTimestamp = updatedTx?.startTimestamp ?? new Date().getTime()
+              const endTimestamp = updatedTx?.timestamp ?? new Date().getTime()
+              const txTimeInSeconds = Math.floor( (endTimestamp-startTimestamp) / 1000)
               // check if error (set states before throwing error)
               if (txError || !txResult) {
                 // perform tx will set the state of the tx and flow to error on it's own
@@ -254,6 +257,7 @@ const useTransactionStore = create<TransactionStore>()(
                     txSuccess: false,
                     txHash: updatedTx?.hash,
                     txError: txError?.message.split(":").pop() ?? "",
+                    txTimeInSeconds
                   });
                 }
                 throw txError;
@@ -265,9 +269,10 @@ const useTransactionStore = create<TransactionStore>()(
                   txType: updatedTransactionList[i].tx.feTxType,
                   txNetwork: network.isTestChain
                     ? network.name
-                    : network.name + "Mainnet",
+                    : network.name + " Mainnet",
                   txSuccess: true,
                   txHash: updatedTx?.hash,
+                  txTimeInSeconds
                 });
               }
             }
@@ -347,6 +352,7 @@ const useTransactionStore = create<TransactionStore>()(
               error: undefined,
               hash: undefined,
               txLink: undefined,
+              startTimestamp: new Date().getTime(),
               timestamp: undefined,
             });
             // request signature and receive txHash once signed
