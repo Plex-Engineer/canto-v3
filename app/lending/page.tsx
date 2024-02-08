@@ -22,11 +22,32 @@ import {
 } from "@/utils/math/tokenMath.utils";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 import clsx from "clsx";
+import { CTokenWithUserData } from "@/hooks/lending/interfaces/tokens";
 
 enum CLMModalTypes {
   SUPPLY = "supply",
   BORROW = "borrow",
   NONE = "none",
+}
+
+function sortCTokens(
+  a: CTokenWithUserData,
+  b: CTokenWithUserData,
+  sortBy: "supplyBalanceInUnderlying" | "borrowBalance"
+) {
+  // sort by prop first
+  if (a.userDetails?.[sortBy] !== "0" || b.userDetails?.[sortBy] !== "0") {
+    return greaterThan(
+      a.userDetails?.[sortBy] ?? "0",
+      b.userDetails?.[sortBy] ?? "0",
+      a.decimals,
+      b.decimals
+    )
+      ? -1
+      : 1;
+  }
+  // if no balance, sort by symbol
+  return a.underlying.symbol.localeCompare(b.underlying.symbol);
 }
 export default function LendingPage() {
   // track current modal type
@@ -68,24 +89,10 @@ export default function LendingPage() {
   }
 
   const supplyTokens = [cNote, ...stableCoins, ...rwas].sort((a, b) =>
-    greaterThan(
-      a.userDetails?.supplyBalanceInUnderlying ?? "0",
-      b.userDetails?.supplyBalanceInUnderlying ?? "0",
-      a.decimals,
-      b.decimals
-    )
-      ? -1
-      : 1
+    sortCTokens(a, b, "supplyBalanceInUnderlying")
   );
   const borrowedTokens = [...stableCoins, cNote].sort((a, b) =>
-    greaterThan(
-      a.userDetails?.borrowBalance ?? "0",
-      b.userDetails?.borrowBalance ?? "0",
-      a.decimals,
-      b.decimals
-    )
-      ? -1
-      : 1
+    sortCTokens(a, b, "borrowBalance")
   );
 
   return (
