@@ -73,12 +73,10 @@ export function VotingInfoBox({
             justifyContent: "space-around",
           }}
         >
-          {" "}
-          <div
-            style={{ backgroundColor: color, margin: "10px 5px 0px 10px" }}
-          ></div>{" "}
           <div>
-            <Text font="proto_mono">{value}</Text>
+            <Text font="proto_mono" size="sm">
+              {value}
+            </Text>
           </div>
         </div>
       </div>
@@ -97,13 +95,13 @@ export function VotingInfoBox({
             <Text font="proto_mono" opacity={0.4} size="x-sm">
               {displayAmount(amount, 0, {
                 commify: true,
-                short: false,
+                short: true,
               })}
             </Text>
             <Icon
               icon={{
                 url: "/tokens/canto.svg",
-                size: 16,
+                size: 14,
               }}
               themed={true}
             />
