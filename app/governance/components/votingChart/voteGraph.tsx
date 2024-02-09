@@ -3,6 +3,7 @@ import styles from "./voteGraph.module.scss";
 import Text from "@/components/text";
 import Icon from "@/components/icon/icon";
 import { formatBalance } from "@/utils/formatting";
+import Container from "@/components/container/container";
 
 interface VoteBarGraphProps {
   yesVotes: number;
@@ -12,7 +13,7 @@ interface VoteBarGraphProps {
   size: number;
 }
 
-const VoteBarGraph = ({
+export const VoteBarGraph = ({
   yesVotes,
   noVotes,
   abstainVotes,
@@ -31,8 +32,6 @@ const VoteBarGraph = ({
   const noHeight = (noPercentage * size) / 150;
   const abstainHeight = (abstainPercentage * size) / 150;
   const vetoHeight = (vetoPercentage * size) / 150;
-
-  //console.log(abstainHeight);
 
   return (
     <div className={styles.statsContainer}>
@@ -242,11 +241,6 @@ const VoteBarGraph = ({
                 ABSTAIN ({abstainPercentage.toFixed(1)}%)
               </Text>
             </div>
-            {/* <div>
-              <Text font="proto_mono" size="xx-sm">
-                ({abstainPercentage.toFixed(1)}%)
-              </Text>
-            </div> */}
           </div>
         </div>
       </div>
@@ -254,4 +248,194 @@ const VoteBarGraph = ({
   );
 };
 
-export default VoteBarGraph;
+export const VoteGraphBox = ({
+  yesVotes,
+  noVotes,
+  abstainVotes,
+  vetoVotes,
+  size,
+}: VoteBarGraphProps) => {
+  const totalVotes = yesVotes + noVotes + abstainVotes + vetoVotes;
+
+  const yesPercentage = totalVotes > 0 ? (yesVotes / totalVotes) * 100 : 0;
+  const noPercentage = totalVotes > 0 ? (noVotes / totalVotes) * 100 : 0;
+  const abstainPercentage =
+    totalVotes > 0 ? (abstainVotes / totalVotes) * 100 : 0;
+  const vetoPercentage = totalVotes > 0 ? (vetoVotes / totalVotes) * 100 : 0;
+
+  const yesHeight = (yesPercentage * size) / 150; //150 is to make the bar occupy at max 2/3rd of the total height of the container if an option get 100% votes
+  const noHeight = (noPercentage * size) / 150;
+  const abstainHeight = (abstainPercentage * size) / 150;
+  const vetoHeight = (vetoPercentage * size) / 150;
+  const getColor = (index: number): string => {
+    switch (index) {
+      case 0:
+        return "green";
+      case 1:
+        return "red";
+      case 2:
+        return "blue";
+      case 3:
+        return "yellow";
+      default:
+        return "white";
+    }
+  };
+  const getVoteOption = (index: number): string => {
+    switch (index) {
+      case 0:
+        return "YES";
+      case 1:
+        return "NO";
+      case 2:
+        return "VETO";
+      case 3:
+        return "ABSTAIN";
+      default:
+        return "";
+    }
+  };
+  const maxHeight = Math.max(
+    ...[yesHeight, noHeight, abstainHeight, vetoHeight]
+  );
+  const maxPercentage = Math.max(
+    ...[yesPercentage, noPercentage, abstainPercentage, vetoPercentage]
+  );
+  const maxIndex = [yesHeight, noHeight, abstainHeight, vetoHeight].indexOf(
+    maxHeight
+  );
+  return totalVotes > 0 ? (
+    <div>
+      <Container direction="row">
+        <Container
+          direction="row"
+          width="44px"
+          height="30px"
+          style={{
+            //background: "blue",
+            marginRight: "6px",
+            marginBottom: "4px",
+          }}
+          className={styles.barGraph}
+        >
+          <Container
+            direction="column"
+            style={{
+              justifyContent: "flex-end",
+            }}
+          >
+            <Container
+              width="8px"
+              height={((yesVotes / totalVotes) * 30).toString() + "px"}
+              style={{
+                background: yesHeight == maxHeight ? getColor(0) : "",
+                marginRight: "4px",
+              }}
+              className={styles.bar}
+            >
+              <div></div>
+            </Container>
+          </Container>
+          <Container
+            direction="column"
+            style={{
+              justifyContent: "flex-end",
+            }}
+          >
+            <Container
+              width="8px"
+              height={((noVotes / totalVotes) * 30).toString() + "px"}
+              style={{
+                background: noHeight == maxHeight ? getColor(1) : "",
+                marginRight: "4px",
+              }}
+              className={styles.bar}
+            >
+              <div></div>
+            </Container>{" "}
+          </Container>
+          <Container
+            direction="column"
+            style={{
+              justifyContent: "flex-end",
+            }}
+          >
+            <div>
+              <Container
+                //direction=""
+
+                width="8px"
+                height={((vetoVotes / totalVotes) * 30).toString() + "px"}
+                style={{
+                  background: vetoHeight == maxHeight ? getColor(2) : "",
+                  marginRight: "4px",
+                }}
+                className={styles.bar}
+              >
+                <div></div>
+              </Container>
+            </div>{" "}
+          </Container>
+          <Container
+            direction="column"
+            style={{
+              justifyContent: "flex-end",
+            }}
+          >
+            <Container
+              width="8px"
+              height={((abstainVotes / totalVotes) * 30).toString() + "px"}
+              style={{
+                background: abstainHeight == maxHeight ? getColor(3) : "",
+                marginRight: "4px",
+              }}
+              className={styles.bar}
+            >
+              <div></div>
+            </Container>{" "}
+          </Container>
+        </Container>
+        <Container
+          direction="row"
+          style={{
+            alignItems: "flex-start",
+            height: "30px",
+            padding: "4px 0 4px 0",
+            marginTop: "10px",
+          }}
+        >
+          <Container height="100%" style={{ paddingRight: "4px" }}>
+            <Text font="proto_mono" size="x-sm">
+              {maxPercentage.toFixed(1)}%{" "}
+            </Text>
+          </Container>
+          <Container
+            height="100%"
+            style={{ paddingRight: "4px", alignItems: "center" }}
+          >
+            <Text opacity={0.4} font="rm_mono" size="x-sm">
+              {" "}
+              {getVoteOption(maxIndex)}
+            </Text>
+          </Container>
+        </Container>
+      </Container>
+    </div>
+  ) : (
+    <div>
+      <Container>
+        <div className={styles.circleContainer}>
+          <div
+            className={styles.circle}
+            style={{
+              backgroundColor: "#01BD09",
+            }}
+          />
+        </div>
+        <Text font="rm_mono" className={styles.tableData} size="x-sm">
+          {"ACTIVE"}
+        </Text>
+      </Container>
+    </div>
+  );
+};

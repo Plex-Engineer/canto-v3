@@ -14,6 +14,8 @@ import Container from "@/components/container/container";
 import { Pagination } from "@/components/pagination/Pagination";
 import Spacer from "@/components/layout/spacer";
 import Icon from "@/components/icon/icon";
+import { formatBalance } from "@/utils/formatting";
+import { VoteGraphBox } from "../votingChart/voteGraph";
 
 interface TableProps {
   proposals: Proposal[];
@@ -84,64 +86,90 @@ const ProposalTable = ({ proposals }: TableProps) => {
         <div className={styles.table}>
           {
             <Table
-              title={currentFilter}
-              secondary={
-                <Container width="400px">
-                  <ToggleGroup
-                    options={Object.values(ProposalFilter).map(
-                      (filter) => filter.split(" ")[0]
-                    )}
-                    selected={currentFilter.split(" ")[0]}
-                    setSelected={(value) => {
-                      const proposalFilter = Object.values(ProposalFilter).find(
-                        (filter) => filter.split(" ")[0] === value
-                      );
-                      setCurrentFilter(proposalFilter || ProposalFilter.ALL);
-                    }}
-                  />
-                </Container>
-              }
+              title="Active Proposals"
+              // secondary={
+              //   <Container width="400px">
+              //     <ToggleGroup
+              //       options={Object.values(ProposalFilter).map(
+              //         (filter) => filter.split(" ")[0]
+              //       )}
+              //       selected={currentFilter.split(" ")[0]}
+              //       setSelected={(value) => {
+              //         const proposalFilter = Object.values(ProposalFilter).find(
+              //           (filter) => filter.split(" ")[0] === value
+              //         );
+              //         setCurrentFilter(proposalFilter || ProposalFilter.ALL);
+              //       }}
+              //     />
+              //   </Container>
+              // }
               headers={
-                filteredProposals.length != 0 || filteredProposals
+                activeProposals.length != 0 || activeProposals
                   ? [
                       {
-                        value: (
-                          <Text opacity={0.4} font="rm_mono">
-                            ID
-                          </Text>
-                        ),
+                        value: <div></div>,
+                        ratio: 4,
+                      },
+                      {
+                        value: <div></div>,
                         ratio: 2,
                       },
-                      { value: <Text opacity={0.4}>Title</Text>, ratio: 6 },
+
                       {
-                        value: (
-                          <Text opacity={0.4} font="rm_mono">
-                            Status
-                          </Text>
-                        ),
+                        value: <div></div>,
                         ratio: 3,
                       },
                       {
-                        value: (
-                          <Text opacity={0.4} font="rm_mono">
-                            Type
-                          </Text>
-                        ),
-                        ratio: 5,
-                      },
-                      {
-                        value: (
-                          <Text opacity={0.4} font="rm_mono">
-                            Voting Date
-                          </Text>
-                        ),
-                        ratio: 4,
+                        value: <div></div>,
+                        ratio: 1,
                       },
                     ]
                   : []
               }
+              isGovTable={true}
               content={[
                 ...activeProposals.map((proposal, index) => {
+                  const totalVotes =
+                    Number(
+                      formatBalance(proposal.final_vote.yes, 18, {
+                        precision: 2,
+                      })
+                    ) +
+                    Number(
+                      formatBalance(proposal.final_vote.no, 18, {
+                        precision: 2,
+                      })
+                    ) +
+                    Number(
+                      formatBalance(proposal.final_vote.no_with_veto, 18, {
+                        precision: 2,
+                      })
+                    ) +
+                    Number(
+                      formatBalance(proposal.final_vote.abstain, 18, {
+                        precision: 2,
+                      })
+                    );
+                  const yesVotes = Number(
+                    formatBalance(proposal.final_vote.yes, 18, {
+                      precision: 2,
+                    })
+                  );
+                  const noVotes = Number(
+                    formatBalance(proposal.final_vote.no, 18, {
+                      precision: 2,
+                    })
+                  );
+                  const vetoVotes = Number(
+                    formatBalance(proposal.final_vote.no_with_veto, 18, {
+                      precision: 2,
+                    })
+                  );
+                  const abstainVotes = Number(
+                    formatBalance(proposal.final_vote.abstain, 18, {
+                      precision: 2,
+                    })
+                  );
                   return (
                     <div
                       key={`row_${index}${proposal.proposal_id}`}
@@ -151,84 +179,206 @@ const ProposalTable = ({ proposals }: TableProps) => {
                         cursor: "pointer",
                         alignItems: "center",
                         justifyContent: "center",
-                        height: "80px",
+                        height: "120px",
                       }}
+                      className={styles.activeProposalRow}
                       onClick={() => handleRowClick(proposal.proposal_id)}
                     >
                       <Container
-                        width="10%"
+                        direction="column"
+                        width="40%"
                         key={`name_${index}`}
-                        style={{
-                          cursor: "pointer",
-                          alignItems: "center",
-                        }}
+                        style={{ cursor: "pointer", alignItems: "left" }}
                       >
-                        <Text font="rm_mono" className={styles.tableData}>
-                          {proposal.proposal_id}
-                        </Text>
-                      </Container>
-                      <Container
-                        width="30%"
-                        key={`tokens_${index}`}
-                        style={{ cursor: "pointer" }}
-                        //direction="row"
-                        className={styles.tableTitleColumn}
-
-                        //gap="auto"
-                      >
-                        <Text
-                          font="rm_mono"
-                          size="sm"
-                          className={styles.rowTitle}
+                        <Container
+                          direction="row"
+                          style={{
+                            justifyContent: "flex-start",
+                            width: "100%",
+                            paddingLeft: "10px",
+                            marginBottom: "20px",
+                            opacity: 0.4,
+                          }}
                         >
-                          {proposal.title}
-                        </Text>
+                          <Container
+                            style={{
+                              alignItems: "center",
+                              marginLeft: "10px",
+                              paddingRight: "40px",
+                              borderRight: "2px solid",
+                            }}
+                          >
+                            <Text
+                              font="rm_mono"
+                              className={styles.tableData}
+                              size="x-sm"
+                            >
+                              {proposal.proposal_id}
+                            </Text>
+                          </Container>
+                          <Container
+                            key={`type_${index}`}
+                            style={{
+                              cursor: "pointer",
+                              alignItems: "center",
+                              marginLeft: "40px",
+                            }}
+                          >
+                            <Text
+                              font="rm_mono"
+                              className={styles.tableData}
+                              size="x-sm"
+                            >
+                              {formatProposalType(proposal.type_url)}
+                            </Text>
+                          </Container>
+                        </Container>
+                        <Container
+                          key={`title_${index}`}
+                          style={{ cursor: "pointer" }}
+                          //direction="row"
+                          className={styles.tableTitleColumn}
+
+                          //gap="auto"
+                        >
+                          <div className={styles.rowTitle}>
+                            <Text font="rm_mono" size="sm">
+                              {proposal.title}
+                            </Text>
+                          </div>
+                        </Container>
                       </Container>
+
                       <Container
-                        width="15%"
-                        key={`commission_${index}`}
-                        style={{
-                          cursor: "pointer",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Text font="rm_mono" className={styles.tableData}>
-                          {formatProposalStatus(proposal.status)}
-                        </Text>
-                      </Container>
-                      <Container
-                        width="25%"
-                        key={`participation_${index}`}
-                        style={{
-                          cursor: "pointer",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Text font="rm_mono" className={styles.tableData}>
-                          {formatProposalType(proposal.type_url)}
-                        </Text>
-                      </Container>
-                      <Container
+                        direction="column"
                         width="20%"
-                        key={`delegators_${index}`}
+                        height="100%"
+                        key={`status_${index}`}
+                        style={{
+                          cursor: "pointer",
+                          alignItems: "left",
+                          justifyContent: "space-around",
+                        }}
+                      >
+                        <Container
+                          direction="column"
+                          style={{
+                            marginBottom: "10px",
+                            justifyContent: "left",
+                            alignItems: "left",
+                            marginLeft: "50px",
+                            marginTop: "10px",
+                          }}
+                        >
+                          <Container
+                            direction="row"
+                            width="100%"
+                            style={{
+                              justifyContent: "flex-start",
+                            }}
+                          >
+                            <Text opacity={0.4} size="x-sm" font="rm_mono">
+                              Vote Status
+                            </Text>
+                          </Container>
+
+                          <Container direction="row">
+                            <Container>
+                              <VoteGraphBox
+                                yesVotes={yesVotes}
+                                noVotes={noVotes}
+                                vetoVotes={vetoVotes}
+                                abstainVotes={abstainVotes}
+                                size={40}
+                              />
+                            </Container>
+                          </Container>
+                        </Container>
+                      </Container>
+                      <Container
+                        direction="column"
+                        width="30%"
+                        height="100%"
+                        key={`status_${index}`}
+                        style={{
+                          cursor: "pointer",
+                          alignItems: "left",
+                          justifyContent: "space-around",
+                        }}
+                      >
+                        <Container
+                          direction="column"
+                          //width="100%"
+                          style={{
+                            marginBottom: "10px",
+                            marginLeft: "50px",
+                            justifyContent: "left",
+                            alignItems: "left",
+                            marginTop: "10px",
+                          }}
+                        >
+                          <Container
+                            direction="row"
+                            width="100%"
+                            style={{
+                              justifyContent: "flex-start",
+                              marginBottom: "10px",
+                            }}
+                          >
+                            <Text opacity={0.4} size="x-sm" font="rm_mono">
+                              Voting Date
+                            </Text>
+                          </Container>
+
+                          <Container
+                            direction="row"
+                            className={styles.proposalVotingDate}
+                            height="30px"
+                          >
+                            <Text
+                              font="rm_mono"
+                              className={styles.tableData}
+                              size="x-sm"
+                            >
+                              {new Date(
+                                proposal.voting_end_time
+                              ).toDateString()}
+                            </Text>
+                          </Container>
+                        </Container>
+                      </Container>
+                      {/* <Container
+                            width="30%"
+                            key={`votingdate_${index}`}
+                            style={{ cursor: "pointer", alignItems: "center" }}
+                          >
+                            <Text font="rm_mono" className={styles.tableData}>
+                              {new Date(
+                                proposal.voting_end_time
+                              ).toDateString()}
+                            </Text>
+                          </Container> */}
+                      <Container
+                        width="10%"
+                        key={`votingdate_${index}`}
                         style={{
                           cursor: "pointer",
                           alignItems: "center",
                         }}
                       >
-                        <Text font="rm_mono" className={styles.tableData}>
-                          {new Date(proposal.voting_end_time).toDateString()}
-                        </Text>
+                        <div className={styles.backButton}>
+                          <Icon
+                            icon={{
+                              url: "/dropdown.svg",
+                              size: 22,
+                            }}
+                            themed
+                          />
+                        </div>
                       </Container>
                     </div>
                   );
                 }),
-                <Pagination
-                  key="pagination"
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  handlePageClick={(index) => setCurrentPage(index)}
-                />,
               ]}
               isPaginated={true}
             />
@@ -318,7 +468,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                             direction="column"
                             width="40%"
                             key={`name_${index}`}
-                            style={{ cursor: "pointer", alignItems: "center" }}
+                            style={{ cursor: "pointer", alignItems: "left" }}
                           >
                             <Container
                               direction="row"

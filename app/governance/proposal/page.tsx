@@ -24,9 +24,10 @@ import {
   PROPOSAL_QUORUM_VALUE,
   PROPOSAL_TURNOUT_VALUE,
 } from "@/config/consts/config";
-import VoteBarGraph from "../components/votingChart/voteGraph";
+
 import Spacer from "@/components/layout/spacer";
 import useStaking from "@/hooks/staking/useStaking";
+import { VoteBarGraph } from "../components/votingChart/voteGraph";
 
 const VOTE_OPTION_COLORS = {
   [VoteOption.YES]: "rgb(6, 252, 153)",

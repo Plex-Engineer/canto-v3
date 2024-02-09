@@ -82,7 +82,7 @@
                 height: 7px;
                 width: 7px;
                 border-radius: 50%;
-                //background-color: var(--graph-fill-color, #D0D0D0);
+                background-color: var(--graph-fill-color, #D0D0D0);
             }
         }
         .option{
@@ -91,5 +91,12 @@
             align-items: center;
             justify-content: center;
         }
+    }
+}
+
+.barGraph{
+    border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
+    .bar{
+        background-color: var(--graph-fill, #D0D0D0);
     }
 }
