@@ -2,7 +2,7 @@
 import Spacer from "@/components/layout/spacer";
 import Selector from "@/components/selector/selector";
 import Text from "@/components/text";
-import { displayAmount, formatBalance, sortTokens } from "@/utils/formatting";
+import { displayAmount, sortTokens } from "@/utils/formatting";
 import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";
 import Input from "@/components/input/input";
