@@ -72,19 +72,7 @@
         justify-content: left;
         width: 25%;
         //margin-right: 5%;
-        .circleContainer{
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin-right: 5px;
-            .circle{
-                height: 7px;
-                width: 7px;
-                border-radius: 50%;
-                background-color: var(--graph-fill-color, #D0D0D0);
-            }
-        }
+        
         .option{
             display: flex;
             flex-direction: row;
@@ -98,5 +86,34 @@
     border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
     .bar{
         background-color: var(--graph-fill, #D0D0D0);
+        
     }
+}
+.circleContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 5px;
+    .circle{
+        height: 7px;
+        width: 7px;
+        border-radius: 50%;
+        background-color: var(--graph-fill-color, #D0D0D0);
+    }
+    .circleBlink{
+        height: 7px;
+        width: 7px;
+        border-radius: 50%;
+        background-color: var(--graph-fill-color, #D0D0D0);
+        animation: blink 0.5s infinite alternate;
+    }
+    @keyframes blink {
+        0% {
+          opacity: 1; /* Start with full opacity */
+        }
+        100% {
+          opacity: 0; /* End with no opacity (invisible) */
+        }
+      }
 }

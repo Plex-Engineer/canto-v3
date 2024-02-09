@@ -306,93 +306,95 @@ export const VoteGraphBox = ({
   );
   return totalVotes > 0 ? (
     <div>
-      <Container direction="row">
+      <Container direction="row" height="40px">
         <Container
-          direction="row"
-          width="44px"
-          height="30px"
+          height="40px"
           style={{
             //background: "blue",
             marginRight: "6px",
-            marginBottom: "4px",
+            paddingBottom: "10px",
           }}
-          className={styles.barGraph}
         >
           <Container
-            direction="column"
-            style={{
-              justifyContent: "flex-end",
-            }}
+            className={styles.barGraph}
+            direction="row"
+            height="30px"
+            width="44px"
           >
             <Container
-              width="8px"
-              height={((yesVotes / totalVotes) * 30).toString() + "px"}
+              direction="column"
               style={{
-                background: yesHeight == maxHeight ? getColor(0) : "",
-                marginRight: "4px",
+                justifyContent: "flex-end",
               }}
-              className={styles.bar}
             >
-              <div></div>
-            </Container>
-          </Container>
-          <Container
-            direction="column"
-            style={{
-              justifyContent: "flex-end",
-            }}
-          >
-            <Container
-              width="8px"
-              height={((noVotes / totalVotes) * 30).toString() + "px"}
-              style={{
-                background: noHeight == maxHeight ? getColor(1) : "",
-                marginRight: "4px",
-              }}
-              className={styles.bar}
-            >
-              <div></div>
-            </Container>{" "}
-          </Container>
-          <Container
-            direction="column"
-            style={{
-              justifyContent: "flex-end",
-            }}
-          >
-            <div>
               <Container
-                //direction=""
-
                 width="8px"
-                height={((vetoVotes / totalVotes) * 30).toString() + "px"}
+                height={((yesVotes / totalVotes) * 30).toString() + "px"}
                 style={{
-                  background: vetoHeight == maxHeight ? getColor(2) : "",
+                  background: yesHeight == maxHeight ? getColor(0) : "",
                   marginRight: "4px",
                 }}
                 className={styles.bar}
               >
                 <div></div>
               </Container>
-            </div>{" "}
-          </Container>
-          <Container
-            direction="column"
-            style={{
-              justifyContent: "flex-end",
-            }}
-          >
+            </Container>
             <Container
-              width="8px"
-              height={((abstainVotes / totalVotes) * 30).toString() + "px"}
+              direction="column"
               style={{
-                background: abstainHeight == maxHeight ? getColor(3) : "",
-                marginRight: "4px",
+                justifyContent: "flex-end",
               }}
-              className={styles.bar}
             >
-              <div></div>
-            </Container>{" "}
+              <Container
+                width="8px"
+                height={((noVotes / totalVotes) * 30).toString() + "px"}
+                style={{
+                  background: noHeight == maxHeight ? getColor(1) : "",
+                  marginRight: "4px",
+                }}
+                className={styles.bar}
+              >
+                <div></div>
+              </Container>{" "}
+            </Container>
+            <Container
+              direction="column"
+              style={{
+                justifyContent: "flex-end",
+              }}
+            >
+              <div>
+                <Container
+                  width="8px"
+                  height={((vetoVotes / totalVotes) * 30).toString() + "px"}
+                  style={{
+                    background: vetoHeight == maxHeight ? getColor(2) : "",
+                    marginRight: "4px",
+                  }}
+                  className={styles.bar}
+                >
+                  <div></div>
+                </Container>
+              </div>{" "}
+            </Container>
+            <Container
+              direction="column"
+              style={{
+                justifyContent: "flex-end",
+              }}
+            >
+              <Container
+                width="8px"
+                height={((abstainVotes / totalVotes) * 30).toString() + "px"}
+                style={{
+                  background: abstainHeight == maxHeight ? getColor(3) : "",
+                  marginRight: "4px",
+                }}
+                className={styles.bar}
+              >
+                <div></div>
+              </Container>{" "}
+            </Container>
           </Container>
         </Container>
         <Container
@@ -423,10 +425,10 @@ export const VoteGraphBox = ({
     </div>
   ) : (
     <div>
-      <Container>
+      <Container direction="row">
         <div className={styles.circleContainer}>
           <div
-            className={styles.circle}
+            className={styles.circleBlink}
             style={{
               backgroundColor: "#01BD09",
             }}

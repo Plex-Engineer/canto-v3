@@ -16,6 +16,7 @@ import Spacer from "@/components/layout/spacer";
 import Icon from "@/components/icon/icon";
 import { formatBalance } from "@/utils/formatting";
 import { VoteGraphBox } from "../votingChart/voteGraph";
+import ProposalVotingEndTime from "../VotingTime/ProposalVotingEndTime";
 
 interface TableProps {
   proposals: Proposal[];
@@ -204,7 +205,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                             style={{
                               alignItems: "center",
                               marginLeft: "10px",
-                              paddingRight: "40px",
+                              paddingRight: "15px",
                               borderRight: "2px solid",
                             }}
                           >
@@ -221,7 +222,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                             style={{
                               cursor: "pointer",
                               alignItems: "center",
-                              marginLeft: "40px",
+                              marginLeft: "15px",
                             }}
                           >
                             <Text
@@ -275,6 +276,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                             width="100%"
                             style={{
                               justifyContent: "flex-start",
+                              //marginBottom: "10px",
                             }}
                           >
                             <Text opacity={0.4} size="x-sm" font="rm_mono">
@@ -326,7 +328,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                             }}
                           >
                             <Text opacity={0.4} size="x-sm" font="rm_mono">
-                              Voting Date
+                              Time left to Vote
                             </Text>
                           </Container>
 
@@ -340,9 +342,9 @@ const ProposalTable = ({ proposals }: TableProps) => {
                               className={styles.tableData}
                               size="x-sm"
                             >
-                              {new Date(
-                                proposal.voting_end_time
-                              ).toDateString()}
+                              <ProposalVotingEndTime
+                                endTime={new Date(proposal.voting_end_time)}
+                              />
                             </Text>
                           </Container>
                         </Container>
@@ -393,10 +395,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
             />
           </div>
           <div style={{ paddingLeft: "20px" }}>
-            <Text font="rm_mono">
-              There are no active proposals currently, you’ll find them here if
-              any
-            </Text>
+            <Text font="rm_mono">There are currently no active proposals</Text>
           </div>
         </div>
       )}
@@ -484,7 +483,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                                 style={{
                                   alignItems: "center",
                                   marginLeft: "10px",
-                                  paddingRight: "40px",
+                                  paddingRight: "15px",
                                   borderRight: "2px solid",
                                 }}
                               >
@@ -501,7 +500,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                                 style={{
                                   cursor: "pointer",
                                   alignItems: "center",
-                                  marginLeft: "40px",
+                                  marginLeft: "15px",
                                 }}
                               >
                                 <Text
