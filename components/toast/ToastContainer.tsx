@@ -5,8 +5,9 @@ import ReactDOM from "react-dom";
 import styles from "./container.module.scss";
 export interface ToastItem {
   toastId: string;
-  success: boolean;
-  message: string;
+  success: boolean | undefined;
+  primary: string;
+  secondary?: string;
   autoClose: boolean;
   autoCloseDuration: number;
 }
@@ -21,8 +22,9 @@ export const ToastContainer = ({ children }: Props) => {
   const add = (toast: Partial<ToastItem>) => {
     const {
       toastId = new Date().getTime().toString(),
-      success = true,
-      message = "Sample Toast",
+      success,
+      primary = "Default toast message",
+      secondary,
       autoClose = false,
       autoCloseDuration = 10000,
     } = toast;
@@ -32,7 +34,8 @@ export const ToastContainer = ({ children }: Props) => {
       {
         toastId,
         success,
-        message,
+        primary,
+        secondary,
         autoClose,
         autoCloseDuration,
       },

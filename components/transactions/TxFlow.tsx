@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styles from "./transactions.module.scss";
 import Image from "next/image";
 import Text from "../text";
@@ -16,6 +16,7 @@ import { importERC20Token } from "@/utils/tokens";
 import InfoPop from "../infopop/infopop";
 import Analytics from "@/provider/analytics";
 import { useToast } from "@/components/toast";
+import useStaking from "@/hooks/staking/useStaking";
 
 interface Props {
   txFlow?: TransactionFlow;
@@ -29,6 +30,10 @@ const TxFlow = (props: Props) => {
     valid: boolean;
     error: string | undefined;
   }>({ valid: false, error: undefined });
+
+  const [inProgress, setInProgress] = useState<boolean>(
+    !(props.txFlow?.status === "ERROR" || props.txFlow?.status === "SUCCESS")
+  );
   const toast = useToast();
   useEffect(() => {
     async function checkRetryParams() {
@@ -50,16 +55,20 @@ const TxFlow = (props: Props) => {
   }, [props.txFlow?.status]);
 
   useEffect(() => {
-    if (props.txFlow?.status == "ERROR") {
-      toast.add({
-        toastId: new Date().getTime().toString(),
-        message: "Transaction failed ",
-      });
-    } else if (props.txFlow?.status == "SUCCESS") {
-      toast.add({
-        toastId: new Date().getTime().toString(),
-        message: "Transaction successful ",
-      });
+    if (inProgress) {
+      if (props.txFlow?.status == "ERROR") {
+        toast.add({
+          toastId: new Date().getTime().toString(),
+          primary: props.txFlow.title + " failed",
+          success: false,
+        });
+      } else if (props.txFlow?.status == "SUCCESS") {
+        toast.add({
+          toastId: new Date().getTime().toString(),
+          primary: props.txFlow.title + " successful",
+          success: true,
+        });
+      }
     }
   }, [props.txFlow?.status]);
 
@@ -163,6 +172,7 @@ const TxFlow = (props: Props) => {
                       txRetryTimeInSeconds: timeDifferenceInSeconds,
                     });
                   }
+                  setInProgress(true);
                   props.onRetry();
                 }}
                 width="fill"

@@ -1,24 +1,12 @@
 .toast-container {
   position: fixed;
-  padding: 4px;
-  width: 320px;
+  padding: 4px 2px;
+  width: 410px;
   margin: 10px;
-  z-index: 999;
+  z-index: 1000;
 }
 
-.top-left {
-  top: 0;
-  left: 0;
-}
 .top-right {
   top: 0;
-  right: 0;
-}
-.bottom-left {
-  bottom: 0;
-  left: 0;
-}
-.bottom-right {
-  bottom: 0;
   right: 0;
 }

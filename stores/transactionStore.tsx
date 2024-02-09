@@ -27,7 +27,6 @@ import {
 import { signTransaction, waitForTransaction } from "@/transactions/signTx";
 import Analytics from "@/provider/analytics";
 import { getAnalyticsTransactionFlowInfo } from "@/utils/analytics";
-import { toastHandler } from "@/utils/toast";
 
 // only save last 100 flows for each user to save space
 const USER_FLOW_LIMIT = 100;
@@ -249,9 +248,6 @@ const useTransactionStore = create<TransactionStore>()(
               if (txError || !txResult) {
                 // perform tx will set the state of the tx and flow to error on it's own
                 // log error to analytics if it exists
-                if(flowToPerform.txType === TransactionFlowType.BRIDGE){
-                  toastHandler(flowToPerform.title + " unsuccessful", false,  new Date().getTime());
-                }
                 if (flowToPerform.analyticsTransactionFlowInfo) {
                   Analytics.actions.events.transactionFlows.transaction({
                     ...flowToPerform.analyticsTransactionFlowInfo,
@@ -334,9 +330,6 @@ const useTransactionStore = create<TransactionStore>()(
             get().updateTxFlow(ethAccount, flowToPerform.id, {
               status: "SUCCESS",
             });
-            if(flowToPerform.txType === TransactionFlowType.BRIDGE){
-              toastHandler(flowToPerform.title + " successful", true,  new Date().getTime());
-            }
             // save tx to analytics
             if (flowToPerform.analyticsTransactionFlowInfo) {
               Analytics.actions.events.transactionFlows.success(

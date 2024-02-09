@@ -38,10 +38,6 @@ const TransactionModal = () => {
     if (transactionFlows) {
       transactionFlows.forEach((flow) => {
         if (flow.status === "POPULATING") {
-          toast.add({
-            toastId: new Date().getTime().toString(),
-            message: "Transaction started",
-          });
           setIsOpen(true);
           setCurrentFlowId(flow.id);
           // close bridge/lp/lm confirmation modals
