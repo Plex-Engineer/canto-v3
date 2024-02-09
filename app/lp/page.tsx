@@ -111,7 +111,6 @@ export default function Page() {
                     );
                     setPair(poolAddress);
                   },
-                  rewards: rewards.ambient,
                   rewardTime: rewardTime,
                 })
               ),

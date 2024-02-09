@@ -295,12 +295,10 @@ export const GeneralAmbientPairRow = ({
 export const UserAmbientPairRow = ({
   pool,
   onManage,
-  rewards,
   rewardTime,
 }: {
   pool: AmbientPool;
   onManage: (poolAddress: string) => void;
-  rewards?: string;
   rewardTime: bigint;
 }) => {
   let totalValue = "0";
@@ -415,7 +413,7 @@ export const UserAmbientPairRow = ({
       gap={10}
     >
       <Text key={pool.symbol + "rewards"}>
-        {displayAmount(rewards ?? "0", 18)}
+        {displayAmount(pool.userRewards ?? "0", 18)}
       </Text>
       <InfoPop>
         <Container>
