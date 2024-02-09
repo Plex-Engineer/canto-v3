@@ -59,13 +59,13 @@ const TxFlow = (props: Props) => {
     if (props.txFlow?.txType == TransactionFlowType.BRIDGE && inProgress) {
       if (props.txFlow?.status == "ERROR") {
         toast.add({
-          toastId: new Date().getTime().toString(),
+          toastID: new Date().getTime().toString(),
           primary: props.txFlow.title + " failed",
           success: false,
         });
       } else if (props.txFlow?.status == "SUCCESS") {
         toast.add({
-          toastId: new Date().getTime().toString(),
+          toastID: new Date().getTime().toString(),
           primary: props.txFlow.title + " successful",
           success: true,
         });

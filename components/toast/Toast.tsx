@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect } from "react";
 import Text from "../text";
 import styles from "./toast.module.scss";
 import { ToastItem } from "./ToastContainer";
@@ -12,27 +12,29 @@ interface Props {
 
 export const Toast = ({ toast, onClose }: Props) => {
   const ref = React.useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    if (!toast.autoClose || !toast.autoCloseDuration) return;
+    if (toast.duration == undefined) return;
+
     const timeout = setTimeout(() => {
       handleClose();
-    }, toast.autoCloseDuration);
+    }, toast.duration);
     return () => clearTimeout(timeout);
-  }, []);
+  }, [toast.duration]);
 
   function handleClose() {
     ref.current?.classList.add(styles["toast-close-animation"]);
     setTimeout(() => {
       onClose();
-    }, 400);
+    }, 500);
   }
 
   return (
     <div
       className={`${styles["toast"]}  ${
-        toast.success == null
+        toast.state == "neutral"
           ? styles["toast-neutral"]
-          : toast.success
+          : toast.state == "success"
             ? styles["toast-success"]
             : styles["toast-error"]
       }`}
@@ -42,9 +44,9 @@ export const Toast = ({ toast, onClose }: Props) => {
         className={styles["toast-icon"]}
         icon={{
           url:
-            toast.success == null
+            toast.state == "neutral"
               ? "/neutral.svg"
-              : toast.success === true
+              : toast.state === "success"
                 ? "/success.svg"
                 : "/error.svg",
           size: {

@@ -6,8 +6,12 @@ import Icon from "@/components/icon/icon";
 import Button from "@/components/button/button";
 import Link from "next/link";
 import Glitch from "@/components/glitch/glitch";
+import { useToast } from "@/components/toast";
+import Spacer from "@/components/layout/spacer";
 
 export default function Home() {
+  const toast = useToast();
+
   return (
     <Container
       className={styles.container}
@@ -160,6 +164,39 @@ export default function Home() {
           />
         </div>
       </section> */}
+
+      <Button
+        onClick={() => {
+          toast.add({
+            primary: "Hello World",
+            state: "success",
+          });
+        }}
+      >
+        click me
+      </Button>
+      <Button
+        onClick={() => {
+          toast.add({
+            primary: "Hello World",
+            state: "failure",
+          });
+        }}
+      >
+        click me
+      </Button>
+      <Button
+        onClick={() => {
+          toast.add({
+            primary: "Hello World",
+            secondary: "This is a secondary message",
+            duration: 1000,
+          });
+        }}
+      >
+        click me
+      </Button>
+      <Spacer height="100px" />
     </Container>
   );
 }
