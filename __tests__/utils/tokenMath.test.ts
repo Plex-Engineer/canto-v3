@@ -1,6 +1,7 @@
 import {
   convertNoteAmountToToken,
   convertTokenAmountToNote,
+  greaterThan,
 } from "@/utils/math";
 import BigNumber from "bignumber.js";
 
@@ -94,6 +95,67 @@ describe("test tokenMath", () => {
         expect(error).toBeNull();
         expect(data).toEqual(new BigNumber(token.expectedTokenAmount));
       }
+    });
+  });
+
+  it("correctly identifies which value is greater in a comparison", () => {
+    const amounts = [
+      {
+        amount1: "1000000000000000000",
+        amount2: "1000000000000000000",
+        expected: false,
+      },
+      {
+        amount1: "1000000000000000000",
+        amount2: "1000000000000000001",
+        expected: false,
+      },
+      {
+        amount1: "1000000000000000001",
+        amount2: "1000000000000000000",
+        expected: true,
+      },
+      {
+        amount1: "1000000000000000000",
+        amount2: "some error",
+        expected: false,
+      },
+      {
+        amount1: "some error",
+        amount2: "1000000000000000000",
+        expected: false,
+      },
+      {
+        amount1: "1000000000000000001",
+        decimals1: 18,
+        amount2: "1000000000000000000",
+        decimals2: 18,
+        expected: true,
+      },
+      {
+        amount1: "1000000000000000001",
+        decimals1: 18,
+        amount2: "2000000",
+        decimals2: 6,
+        expected: false,
+      },
+      {
+        amount1: "1000000000000000001",
+        decimals1: 6,
+        amount2: "2000000",
+        decimals2: 18,
+        expected: true,
+      },
+    ];
+    amounts.forEach((amount) => {
+      expect(
+        greaterThan(
+          amount.amount1,
+          amount.amount2,
+          amount.decimals1,
+          amount.decimals2
+        )
+      ).toEqual(amount.expected);
     });
   });
 });
