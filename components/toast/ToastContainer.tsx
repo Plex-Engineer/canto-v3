@@ -26,7 +26,7 @@ export const ToastContainer = ({ children }: Props) => {
       primary = "Default toast message",
       secondary,
       autoClose = false,
-      autoCloseDuration = 10000,
+      autoCloseDuration = 5000,
     } = toast;
 
     return setToasts((currentToasts) => [

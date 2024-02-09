@@ -84,8 +84,6 @@ a {
   --box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
   --temp-bg-brightness: 1;
   --toast-secondary-text-color: rgba(36, 36, 36, 0.50);
-
-
 }
 
 .dim {
@@ -249,18 +247,6 @@ body {
 .column {
   display: flex;
   flex-direction: column;
-}
-
-.toast-error {
-  --toastify-color-progress-light: var(--toast-failure-color);
-  --toastify-color-progress-dark: var(--toast-failure-color);
-  --toastify-toast-bd-radius: 0;
-}
-
-.toast-success {
-  --toastify-color-progress-light: var(--toast-success-color);
-  --toastify-color-progress-dark: var(--toast-success-color);
-  --toastify-toast-bd-radius: 0;
 }
 
 /* clears the ‘X’ from Internet Explorer */

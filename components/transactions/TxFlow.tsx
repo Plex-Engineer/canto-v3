@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./transactions.module.scss";
 import Image from "next/image";
 import Text from "../text";
@@ -17,7 +17,6 @@ import { importERC20Token } from "@/utils/tokens";
 import InfoPop from "../infopop/infopop";
 import Analytics from "@/provider/analytics";
 import { useToast } from "@/components/toast";
-import useStaking from "@/hooks/staking/useStaking";
 
 interface Props {
   txFlow?: TransactionFlow;
@@ -62,12 +61,16 @@ const TxFlow = (props: Props) => {
           toastId: new Date().getTime().toString(),
           primary: props.txFlow.title + " failed",
           success: false,
+          autoClose: true,
+          autoCloseDuration: 5000,
         });
       } else if (props.txFlow?.status == "SUCCESS") {
         toast.add({
           toastId: new Date().getTime().toString(),
           primary: props.txFlow.title + " successful",
           success: true,
+          autoClose: true,
+          autoCloseDuration: 5000,
         });
       }
     }
