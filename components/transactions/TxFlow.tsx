@@ -11,6 +11,7 @@ import {
   TRANSACTION_FLOW_MAP,
   TX_PLACEHOLDER,
   TransactionFlow,
+  TransactionFlowType,
 } from "@/transactions/flows";
 import { importERC20Token } from "@/utils/tokens";
 import InfoPop from "../infopop/infopop";
@@ -55,7 +56,7 @@ const TxFlow = (props: Props) => {
   }, [props.txFlow?.status]);
 
   useEffect(() => {
-    if (inProgress) {
+    if (props.txFlow?.txType == TransactionFlowType.BRIDGE && inProgress) {
       if (props.txFlow?.status == "ERROR") {
         toast.add({
           toastId: new Date().getTime().toString(),
