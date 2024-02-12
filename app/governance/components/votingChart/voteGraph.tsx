@@ -223,9 +223,6 @@ export const VoteBarGraph = ({
                 VETO ({vetoPercentage.toFixed(1)}%)
               </Text>
             </div>
-            {/* <div>
-              <Text font="proto_mono" size="xx-sm"></Text>
-            </div> */}
           </div>
         </div>
         <div className={styles.voteOption}>
@@ -248,6 +245,48 @@ export const VoteBarGraph = ({
   );
 };
 
+export const VoteBar = ({
+  height,
+  maxHeight,
+  index,
+}: {
+  height: number;
+  maxHeight: number;
+  index: number;
+}) => {
+  const getColor = (index: number): string => {
+    switch (index) {
+      case 0:
+        return "green";
+      case 1:
+        return "red";
+      case 2:
+        return "blue";
+      case 3:
+        return "yellow";
+      default:
+        return "white";
+    }
+  };
+  return (
+    <Container
+      direction="column"
+      style={{
+        justifyContent: "flex-end",
+      }}
+    >
+      <Container
+        width="8px"
+        height={height.toString() + "px"}
+        backgroundColor={height == maxHeight ? getColor(index) : ""}
+        className={styles.bar}
+      >
+        <div></div>
+      </Container>
+    </Container>
+  );
+};
+
 export const VoteGraphBox = ({
   yesVotes,
   noVotes,
@@ -263,24 +302,6 @@ export const VoteGraphBox = ({
     totalVotes > 0 ? (abstainVotes / totalVotes) * 100 : 0;
   const vetoPercentage = totalVotes > 0 ? (vetoVotes / totalVotes) * 100 : 0;
 
-  const yesHeight = (yesPercentage * size) / 150; //150 is to make the bar occupy at max 2/3rd of the total height of the container if an option get 100% votes
-  const noHeight = (noPercentage * size) / 150;
-  const abstainHeight = (abstainPercentage * size) / 150;
-  const vetoHeight = (vetoPercentage * size) / 150;
-  const getColor = (index: number): string => {
-    switch (index) {
-      case 0:
-        return "green";
-      case 1:
-        return "red";
-      case 2:
-        return "blue";
-      case 3:
-        return "yellow";
-      default:
-        return "white";
-    }
-  };
   const getVoteOption = (index: number): string => {
     switch (index) {
       case 0:
@@ -295,15 +316,17 @@ export const VoteGraphBox = ({
         return "";
     }
   };
-  const maxHeight = Math.max(
-    ...[yesHeight, noHeight, abstainHeight, vetoHeight]
-  );
+
   const maxPercentage = Math.max(
     ...[yesPercentage, noPercentage, abstainPercentage, vetoPercentage]
   );
-  const maxIndex = [yesHeight, noHeight, abstainHeight, vetoHeight].indexOf(
-    maxHeight
-  );
+  const maxIndex = [
+    yesPercentage,
+    noPercentage,
+    abstainPercentage,
+    vetoPercentage,
+  ].indexOf(maxPercentage);
+
   return totalVotes > 0 ? (
     <div>
       <Container direction="row" height="40px">
@@ -314,68 +337,26 @@ export const VoteGraphBox = ({
             height="30px"
             width="44px"
           >
-            <Container
-              direction="column"
-              style={{
-                justifyContent: "flex-end",
-              }}
-            >
-              <Container
-                width="8px"
-                height={((yesVotes / totalVotes) * 30).toString() + "px"}
-                backgroundColor={yesHeight == maxHeight ? getColor(0) : ""}
-                className={styles.bar}
-              >
-                <div></div>
-              </Container>
-            </Container>
-            <Container
-              direction="column"
-              style={{
-                justifyContent: "flex-end",
-              }}
-            >
-              <Container
-                width="8px"
-                height={((noVotes / totalVotes) * 30).toString() + "px"}
-                backgroundColor={noHeight == maxHeight ? getColor(1) : ""}
-                className={styles.bar}
-              >
-                <div></div>
-              </Container>{" "}
-            </Container>
-            <Container
-              direction="column"
-              style={{
-                justifyContent: "flex-end",
-              }}
-            >
-              <div>
-                <Container
-                  width="8px"
-                  height={((vetoVotes / totalVotes) * 30).toString() + "px"}
-                  backgroundColor={vetoHeight == maxHeight ? getColor(2) : ""}
-                  className={styles.bar}
-                >
-                  <div></div>
-                </Container>
-              </div>{" "}
-            </Container>
-            <Container
-              direction="column"
-              style={{
-                justifyContent: "flex-end",
-              }}
-            >
-              <Container
-                width="8px"
-                height={((abstainVotes / totalVotes) * 30).toString() + "px"}
-                backgroundColor={abstainHeight == maxHeight ? getColor(3) : ""}
-                className={styles.bar}
-              >
-                <div></div>
-              </Container>{" "}
-            </Container>
+            <VoteBar
+              height={yesPercentage * 30}
+              maxHeight={maxPercentage * 30}
+              index={0}
+            ></VoteBar>
+            <VoteBar
+              height={noPercentage * 30}
+              maxHeight={maxPercentage * 30}
+              index={1}
+            ></VoteBar>
+            <VoteBar
+              height={vetoPercentage * 30}
+              maxHeight={maxPercentage * 30}
+              index={2}
+            ></VoteBar>
+            <VoteBar
+              height={abstainPercentage * 30}
+              maxHeight={maxPercentage * 30}
+              index={3}
+            ></VoteBar>
           </Container>
         </Container>
         <Container
