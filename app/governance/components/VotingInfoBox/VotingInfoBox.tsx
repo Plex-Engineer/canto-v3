@@ -56,15 +56,6 @@ export function VotingInfoBox({
       }}
       style={getHoverStyle()}
     >
-      {isActive && (
-        <div className={styles.radioBtnContainer}>
-          <div
-            className={styles.radioBtn}
-            style={isSelected ? { backgroundColor: color, opacity: 1 } : {}}
-          />
-        </div>
-      )}
-
       <div className={styles.votingInfoRow1}>
         <div
           style={{
@@ -80,10 +71,12 @@ export function VotingInfoBox({
           </div>
         </div>
       </div>
-      <div className={styles.votingInfoRow2}>
-        <div className={styles.infoRow1First}>
-          <Text font="proto_mono">{percentage}%</Text>
-        </div>
+      <Container
+        direction="column"
+        className={styles.votingInfoRow2}
+        width="50%"
+        center={{ vertical: true, horizontal: true }}
+      >
         <div className={styles.infoRow1First}>
           <Container
             direction="row"
@@ -107,7 +100,7 @@ export function VotingInfoBox({
             />
           </Container>
         </div>
-      </div>
+      </Container>
     </div>
   );
 }

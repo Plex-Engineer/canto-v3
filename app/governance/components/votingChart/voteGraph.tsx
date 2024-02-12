@@ -307,14 +307,7 @@ export const VoteGraphBox = ({
   return totalVotes > 0 ? (
     <div>
       <Container direction="row" height="40px">
-        <Container
-          height="40px"
-          style={{
-            //background: "blue",
-            marginRight: "6px",
-            paddingBottom: "10px",
-          }}
-        >
+        <Container height="40px" className={styles.displayVotes}>
           <Container
             className={styles.barGraph}
             direction="row"
@@ -330,10 +323,7 @@ export const VoteGraphBox = ({
               <Container
                 width="8px"
                 height={((yesVotes / totalVotes) * 30).toString() + "px"}
-                style={{
-                  background: yesHeight == maxHeight ? getColor(0) : "",
-                  marginRight: "4px",
-                }}
+                backgroundColor={yesHeight == maxHeight ? getColor(0) : ""}
                 className={styles.bar}
               >
                 <div></div>
@@ -348,10 +338,7 @@ export const VoteGraphBox = ({
               <Container
                 width="8px"
                 height={((noVotes / totalVotes) * 30).toString() + "px"}
-                style={{
-                  background: noHeight == maxHeight ? getColor(1) : "",
-                  marginRight: "4px",
-                }}
+                backgroundColor={noHeight == maxHeight ? getColor(1) : ""}
                 className={styles.bar}
               >
                 <div></div>
@@ -367,10 +354,7 @@ export const VoteGraphBox = ({
                 <Container
                   width="8px"
                   height={((vetoVotes / totalVotes) * 30).toString() + "px"}
-                  style={{
-                    background: vetoHeight == maxHeight ? getColor(2) : "",
-                    marginRight: "4px",
-                  }}
+                  backgroundColor={vetoHeight == maxHeight ? getColor(2) : ""}
                   className={styles.bar}
                 >
                   <div></div>
@@ -386,10 +370,7 @@ export const VoteGraphBox = ({
               <Container
                 width="8px"
                 height={((abstainVotes / totalVotes) * 30).toString() + "px"}
-                style={{
-                  background: abstainHeight == maxHeight ? getColor(3) : "",
-                  marginRight: "4px",
-                }}
+                backgroundColor={abstainHeight == maxHeight ? getColor(3) : ""}
                 className={styles.bar}
               >
                 <div></div>
@@ -425,7 +406,12 @@ export const VoteGraphBox = ({
     </div>
   ) : (
     <div>
-      <Container direction="row">
+      <Container
+        center={{ vertical: true }}
+        direction="row"
+        height="40px"
+        style={{ paddingTop: "10px" }}
+      >
         <div className={styles.circleContainer}>
           <div
             className={styles.circleBlink}
@@ -434,9 +420,11 @@ export const VoteGraphBox = ({
             }}
           />
         </div>
-        <Text font="rm_mono" className={styles.tableData} size="x-sm">
-          {"ACTIVE"}
-        </Text>
+        <Container className={styles.active}>
+          <Text font="proto_mono" className={styles.tableData} size="x-sm">
+            {"ACTIVE"}
+          </Text>
+        </Container>
       </Container>
     </div>
   );

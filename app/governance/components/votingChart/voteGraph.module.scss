@@ -81,14 +81,19 @@
         }
     }
 }
-
-.barGraph{
-    border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
-    .bar{
-        background-color: var(--graph-fill, #D0D0D0);
-        
+.displayVotes{
+    margin-right: 6px;
+    padding-bottom: 10px;
+    .barGraph{
+        border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
+        .bar{
+            background-color: var(--graph-fill, #D0D0D0);
+            margin-right: 4px;
+            
+        }
     }
 }
+
 .circleContainer{
     display: flex;
     flex-direction: column;
@@ -116,4 +121,8 @@
           opacity: 0; /* End with no opacity (invisible) */
         }
       }
+}
+
+.active{
+    padding: 4px 12px 4px 0;
 }

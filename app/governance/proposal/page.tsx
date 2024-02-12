@@ -231,14 +231,15 @@ export default function Page() {
                     <Button
                       width={200}
                       disabled={
-                        !isActive
+                        !isActive ||
                         //userStaking.validators.length > 0
+                        selectedVote == null
                       }
                       onClick={() =>
                         castVote(proposal.proposal_id, selectedVote)
                       }
                     >
-                      Vote
+                      SUBMIT VOTE
                     </Button>
                   </div>
                 </div>
