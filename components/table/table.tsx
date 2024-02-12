@@ -1,32 +1,26 @@
-import React from "react";
 import Text from "../text";
 import styles from "./table.module.scss";
 
 interface Props {
   title?: string | React.ReactNode;
   secondary?: React.ReactNode;
+  headerFont: "proto_mono" | "rm_mono";
   headers: {
     value: string | React.ReactNode;
     ratio: number;
   }[];
   content: React.ReactNode[][] | React.ReactNode[];
   textSize?: string;
-  isPaginated?: boolean;
+  onRowsClick?: (() => void)[];
 }
 
 const Table = (props: Props) => {
   return (
     <div className={styles.container} style={{ fontSize: props.textSize }}>
       <div className={styles.title}>
-        {/* <div font="proto_mono" size="lg"> */}
-        {typeof props.title === "string" ? (
-          <Text font="proto_mono" size="lg">
-            {props.title}
-          </Text>
-        ) : (
-          React.isValidElement(props.title) && props.title
-        )}
-
+        <Text font="proto_mono" size="lg" opacity={0.7}>
+          {props.title}
+        </Text>
         {props.secondary}
       </div>
       <div className={styles.table}>
@@ -42,15 +36,19 @@ const Table = (props: Props) => {
         >
           {props.headers.map((header, index) => {
             return (
-              <div key={index} className={styles.cell}>
+              <Text key={index} className={styles.cell} font={props.headerFont}>
                 {header.value}
-              </div>
+              </Text>
             );
           })}
         </div>
         <div className={styles.content}>
           {props.content.map((row, index) => {
-            return Array.isArray(row) ? (
+            //check if an array has been passed in
+            if (!Array.isArray(row)) {
+              return row;
+            }
+            return (
               <div
                 key={index}
                 className={styles.row}
@@ -60,7 +58,11 @@ const Table = (props: Props) => {
                       return `${header.ratio}fr`;
                     })
                     .join(" "),
+                  cursor: props.onRowsClick ? "pointer" : undefined,
                 }}
+                onClick={
+                  props.onRowsClick ? props.onRowsClick[index] : undefined
+                }
               >
                 {row.map((cell, index) => {
                   return (
@@ -69,12 +71,6 @@ const Table = (props: Props) => {
                     </div>
                   );
                 })}
-              </div>
-            ) : props.isPaginated && props.content.length == index + 1 ? (
-              <div key={"row" + index}>{row}</div>
-            ) : (
-              <div className={styles.rowElement} key={"row" + index}>
-                {row}
               </div>
             );
           })}

@@ -48,13 +48,12 @@ const TransactionModal = () => {
           (flow.status === "SUCCESS" || flow.status === "ERROR")
         ) {
           toast.add({
-            toastId: new Date().getTime().toString(),
+            toastID: new Date().getTime().toString(),
             primary: `${flow.title} ${
               flow.status === "SUCCESS" ? "successful" : "failed"
             }`,
-            success: flow.status === "SUCCESS",
-            autoClose: true,
-            autoCloseDuration: 5000,
+            state: flow.status === "SUCCESS" ? "success" : "failure",
+            duration: 5000,
           });
           txStore?.updateTxFlow(signer?.account.address ?? "", flow.id, {
             inProgress: false,
