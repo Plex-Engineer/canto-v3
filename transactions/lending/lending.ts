@@ -145,7 +145,7 @@ export async function cTokenLendingTx(
         greaterThan(
           txParams.cToken.userDetails.balanceOfUnderlying,
           txParams.cToken.userDetails.borrowBalance
-        ).data
+        )
       ) {
         // change the amount to max uint
         txParams.amount = MAX_UINT256;
@@ -235,7 +235,9 @@ export function validateCTokenLendingTxParams(
   return validateWeiUserInputTokenAmount(
     txParams.amount,
     "1",
-    maxAmount,
+    txParams.txType == CTokenLendingTxTypes.BORROW
+      ? percentOfAmount(maxAmount, 98.8).data
+      : maxAmount,
     txParams.cToken.underlying.symbol,
     txParams.cToken.underlying.decimals
   );

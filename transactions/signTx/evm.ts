@@ -62,18 +62,12 @@ export async function signEVMTransaction(
       150
     );
     if (gasError) throw gasError;
-    // if user doesn't sign in 30 seconds, throw timeout error
-    const { data: transaction, error: timeoutError } =
-      await asyncCallWithTimeout<TransactionReceipt>(
-        async () =>
-          await contractInstance.methods[tx.method](...(tx.params as [])).send({
-            from: tx.fromAddress,
-            value: tx.value,
-            gas: gasLimit,
-          }),
-        90000
-      );
-    if (timeoutError) throw timeoutError;
+
+    const transaction = await contractInstance.methods[tx.method](...(tx.params as [])).send({
+      from: tx.fromAddress,
+      value: tx.value,
+      gas: gasLimit,
+    })
     if (!transaction.transactionHash)
       throw new Error("performEVMTransaction: no tx hash");
 

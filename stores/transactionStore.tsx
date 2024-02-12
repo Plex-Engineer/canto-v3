@@ -18,7 +18,6 @@ import {
   UserTransactionFlowMap,
 } from "@/transactions/flows";
 import {
-  BridgeStatus,
   TransactionStatus,
   TransactionWithStatus,
   CantoFETxType,
@@ -237,6 +236,13 @@ const useTransactionStore = create<TransactionStore>()(
               const network = getNetworkInfoFromChainId(
                 updatedTransactionList[i].tx.chainId
               ).data;
+              const updatedTx = get()
+                .getUserTransactionFlows(ethAccount)
+                .find((flow) => flow.id === flowToPerform.id)
+                ?.transactions.find((_, index) => index === i);
+              const startTimestamp = updatedTx?.startTimestamp ?? new Date().getTime()
+              const endTimestamp = updatedTx?.timestamp ?? new Date().getTime()
+              const txTimeInSeconds = Math.floor( (endTimestamp-startTimestamp) / 1000)
               // check if error (set states before throwing error)
               if (txError || !txResult) {
                 // perform tx will set the state of the tx and flow to error on it's own
@@ -247,9 +253,11 @@ const useTransactionStore = create<TransactionStore>()(
                     txType: updatedTransactionList[i].tx.feTxType,
                     txNetwork: network.isTestChain
                       ? network.name
-                      : network.name + "Mainnet",
+                      : network.name + " Mainnet",
                     txSuccess: false,
+                    txHash: updatedTx?.hash,
                     txError: txError?.message.split(":").pop() ?? "",
+                    txTimeInSeconds
                   });
                 }
                 throw txError;
@@ -261,8 +269,10 @@ const useTransactionStore = create<TransactionStore>()(
                   txType: updatedTransactionList[i].tx.feTxType,
                   txNetwork: network.isTestChain
                     ? network.name
-                    : network.name + "Mainnet",
+                    : network.name + " Mainnet",
                   txSuccess: true,
+                  txHash: updatedTx?.hash,
+                  txTimeInSeconds
                 });
               }
             }
@@ -333,6 +343,7 @@ const useTransactionStore = create<TransactionStore>()(
           }
         },
         performTx: async (ethAccount, flowId, txIndex, tx) => {
+          let txHash;
           try {
             // set pending since about to be signed
             // reset error, hash, and txLink since new tx
@@ -341,12 +352,14 @@ const useTransactionStore = create<TransactionStore>()(
               error: undefined,
               hash: undefined,
               txLink: undefined,
+              startTimestamp: new Date().getTime(),
               timestamp: undefined,
             });
             // request signature and receive txHash once signed
-            const { data: txHash, error: txError } = await signTransaction(
+            const { data: txData, error: txError } = await signTransaction(
               tx.tx
             );
+            txHash = txData;
             // if error with signature, set status and throw error
             if (txError) {
               throw txError;
@@ -398,6 +411,7 @@ const useTransactionStore = create<TransactionStore>()(
             // something failed, so set the flow and tx to failure
             get().setTxStatus(ethAccount, flowId, txIndex, {
               status: "ERROR",
+              hash: txHash,
               error: "useTransactionStore::performFlow:" + errMsg(err),
               timestamp: new Date().getTime(),
             });

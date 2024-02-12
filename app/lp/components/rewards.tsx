@@ -42,7 +42,7 @@ const Rewards = (props: Props) => {
           </Text>
           <Icon
             icon={{
-              url: "./tokens/canto.svg",
+              url: "/tokens/canto.svg",
               size: 24,
             }}
           />

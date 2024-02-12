@@ -28,7 +28,11 @@ export default function useBridgingInProgess() {
       if (flow.txType === TransactionFlowType.BRIDGE) {
         // separate txs with bridge flag and status of pending
         flow.transactions.forEach((tx, idx) => {
-          if (tx.tx.bridge && tx.tx.bridge.showInProgress) {
+          if (
+            tx.status !== "ERROR" &&
+            tx.tx.bridge &&
+            tx.tx.bridge.showInProgress
+          ) {
             tx.tx.bridge.lastStatus === "PENDING" ||
             tx.tx.bridge.lastStatus === "NONE"
               ? pendingTxs.push({ ...tx, txIndex: idx, flowId: flow.id })

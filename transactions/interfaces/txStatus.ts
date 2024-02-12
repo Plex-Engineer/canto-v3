@@ -14,6 +14,7 @@ export interface TransactionWithStatus {
   hash?: string;
   error?: string;
   txLink?: string;
+  startTimestamp?: number;
   timestamp?: number;
 }
 

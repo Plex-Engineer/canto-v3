@@ -9,10 +9,11 @@ import styles from "./selector.module.scss";
 import Spacer from "@/components/layout/spacer";
 import clsx from "clsx";
 import LoadingIcon from "../loader/loading";
+import Input from "../input/input";
 
 export interface Item {
   id: string;
-  icon: string;
+  icon?: string;
   name: string;
   secondary?: number | string;
 }
@@ -30,6 +31,10 @@ interface Props {
     main: Item;
     items: Item[];
   }[];
+  searchProps?: {
+    searchQuery: string;
+    setSearchQuery: (searchQuery: string) => void;
+  };
 }
 const Selector = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,17 +43,37 @@ const Selector = (props: Props) => {
     setIsExpanded(false);
   }, [isOpen]);
 
+  const zeroBalanceTokenIndex = props.items.findIndex(
+    (item) => item.secondary === "0"
+  );
   return (
     <>
       <Modal
         open={isOpen}
         onClose={() => setIsOpen(false)}
-        width="30rem"
+        width="32rem"
         height="36rem"
       >
         <Text size="lg" font="proto_mono">
           {props.title}
         </Text>
+        {props.searchProps && (
+          <div className={styles.searchBox}>
+            <div style={{ width: "100%" }}>
+              <Input
+                height={50}
+                type="search"
+                value={props?.searchProps.searchQuery}
+                onChange={(e) =>
+                  props.searchProps
+                    ? props.searchProps.setSearchQuery(e.target.value)
+                    : {}
+                }
+                placeholder={"Search..."}
+              />
+            </div>
+          </div>
+        )}
         <div
           className={styles["scroll-view"]}
           style={{
@@ -61,7 +86,7 @@ const Selector = (props: Props) => {
           <Spacer height="10px" />
 
           <div className={clsx(styles["items-list"])}>
-            {props.items.map((item) => (
+            {props.items.map((item, index) => (
               <Container
                 key={item.name}
                 width="100%"
@@ -75,8 +100,24 @@ const Selector = (props: Props) => {
                   props.onChange(item.id);
                   setIsOpen(false);
                 }}
+                style={
+                  zeroBalanceTokenIndex !== 0 && index === zeroBalanceTokenIndex
+                    ? {
+                        marginTop: "3px",
+                        borderTop: "1px solid rgba(var(--dark-color), 0.3)",
+                        paddingTop: "10px",
+                      }
+                    : {}
+                }
               >
-                <Image src={item.icon} alt={item.name} width={30} height={30} />
+                {item.icon && (
+                  <Image
+                    src={item.icon}
+                    alt={item.name}
+                    width={30}
+                    height={30}
+                  />
+                )}
                 <Container direction="row" gap={"auto"} width="100%">
                   <Text size="md" font="proto_mono">
                     {item.name}
@@ -103,12 +144,14 @@ const Selector = (props: Props) => {
                       setIsExpanded(!isExpanded);
                     }}
                   >
-                    <Image
-                      src={group.main.icon}
-                      alt={group.main.name}
-                      width={30}
-                      height={30}
-                    />
+                    {group.main.icon && (
+                      <Image
+                        src={group.main.icon}
+                        alt={group.main.name}
+                        width={30}
+                        height={30}
+                      />
+                    )}
                     <Text size="md" font="proto_mono">
                       {group.main.name} {group.main.secondary}
                     </Text>
@@ -122,7 +165,7 @@ const Selector = (props: Props) => {
                       <Icon
                         themed
                         icon={{
-                          url: "dropdown.svg",
+                          url: "/dropdown.svg",
                           size: 24,
                         }}
                       />
@@ -158,7 +201,7 @@ const Selector = (props: Props) => {
                 <Icon
                   themed
                   icon={{
-                    url: "dropdown.svg",
+                    url: "/dropdown.svg",
                     size: 24,
                   }}
                 />
@@ -184,12 +227,14 @@ const Selector = (props: Props) => {
                       setIsOpen(false);
                     }}
                   >
-                    <Image
-                      src={item.icon}
-                      alt={item.name}
-                      width={30}
-                      height={30}
-                    />
+                    {item.icon && (
+                      <Image
+                        src={item.icon}
+                        alt={item.name}
+                        width={30}
+                        height={30}
+                      />
+                    )}
                     <Text size="md" font="proto_mono">
                       {item.name} {item.secondary}
                     </Text>
@@ -231,12 +276,14 @@ const Selector = (props: Props) => {
           {props.activeItem?.icon == "loader.svg" ? (
             <LoadingIcon />
           ) : (
-            <Image
-              src={props.activeItem?.icon ?? ""}
-              alt={props.activeItem?.name + " icon"}
-              width={30}
-              height={30}
-            />
+            props.activeItem?.icon && (
+              <Image
+                src={props.activeItem?.icon ?? ""}
+                alt={props.activeItem?.name + " icon"}
+                width={30}
+                height={30}
+              />
+            )
           )}
           <Text size="md" font="proto_mono">
             {props.activeItem?.name ?? "SELECT ITEM"}
@@ -245,7 +292,7 @@ const Selector = (props: Props) => {
         <Icon
           themed
           icon={{
-            url: "dropdown.svg",
+            url: "/dropdown.svg",
             size: 24,
           }}
         />

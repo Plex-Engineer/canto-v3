@@ -5,6 +5,7 @@ import Rive from "@rive-app/react-canvas";
 interface Props {
   height?: string;
   width?: string;
+  themed?: boolean;
 }
 const Splash = (props: Props) => {
   //   if mobile only
@@ -23,6 +24,7 @@ const Splash = (props: Props) => {
           src="anims/loading.riv"
           stateMachines={["loop"]}
           style={{
+            filter: props.themed ? "invert(var(--dark-mode))" : "",
             height: "400px",
             width: "400px",
           }}
@@ -46,6 +48,7 @@ const Splash = (props: Props) => {
         src="anims/loading.riv"
         stateMachines={["loop"]}
         style={{
+          filter: props.themed ? "invert(var(--dark-mode))" : "",
           height: props.height || "800px",
           width: props.width || "800px",
         }}

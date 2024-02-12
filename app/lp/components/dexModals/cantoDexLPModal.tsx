@@ -53,7 +53,7 @@ export const CantoDexLPModal = (props: ManageCantoDexLPProps) => {
             marginRight: "6px",
           }}
         >
-          <Icon icon={{ url: "./dropdown.svg", size: 24 }} themed />
+          <Icon icon={{ url: "/dropdown.svg", size: 24 }} themed />
         </div>
         <Text font="proto_mono" size="lg">
           Liquidity

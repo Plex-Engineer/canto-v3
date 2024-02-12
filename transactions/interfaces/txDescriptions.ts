@@ -1,3 +1,4 @@
+import { VoteOption } from "@/transactions/gov";
 import { CantoDexPair } from "@/hooks/pairs/cantoDex/interfaces/pairs";
 import { CTokenLendingTxTypes } from "@/transactions/lending";
 
@@ -57,6 +58,24 @@ export const TX_DESCRIPTIONS = {
       collateralize ? "Collateralize" : "Decollateralize"
     } ${tokenSymbol} in the lending market`,
   }),
+  DELEGATE: (validatorName: string, amount: string, undelegate: boolean) => ({
+    title: `${undelegate ? "Undelegate from" : "Delegate to"} ${validatorName}`,
+    description: `${undelegate ? "Undelegate" : "Delegate"} ${amount} CANTO ${
+      undelegate ? "from" : "to"
+    } ${validatorName}`,
+  }),
+  REDELEGATE: (
+    validatorName: string,
+    newValidatorName: string,
+    amount: string
+  ) => ({
+    title: `Redelegate from ${validatorName} to ${newValidatorName}`,
+    description: `Redelegate ${amount} CANTO from ${validatorName} to ${newValidatorName}`,
+  }),
+  CLAIM_STAKING_REWARDS: () => ({
+    title: "Claim Staking Rewards",
+    description: "Claim staking rewards",
+  }),
   DRIP_COMPTROLLER: () => ({
     title: "Drip Comptroller",
     description: "Drip WCANTO rewards to the lending market from the reservoir",
@@ -86,6 +105,10 @@ export const TX_DESCRIPTIONS = {
   WRAP_ETH: (amount: string) => ({
     title: "Wrap ETH",
     description: `Wrap ${amount} ETH to WETH`,
+  }),
+  VOTE: (proposalId: number, voteOption: VoteOption) => ({
+    title: `Vote for Proposal ${proposalId}`,
+    description: `Vote ${voteOption} for Proposal ${proposalId}`,
   }),
 };
 
@@ -124,4 +147,11 @@ export enum CantoFETxType {
   // LP CANTO DEX
   ADD_LIQUIDITY_CANTO_DEX = "addLiquidityCantoDex",
   REMOVE_LIQUIDITY_CANTO_DEX = "removeLiquidityCantoDex",
+  // GOVERNANCE
+  VOTE = "vote",
+  // STAKING
+  DELEGATE = "delegate",
+  UNDELEGATE = "undelegate",
+  REDELEGATE = "redelegate",
+  CLAIM_STAKING_REWARDS = "claimStakingRewards",
 }

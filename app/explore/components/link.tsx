@@ -10,8 +10,15 @@ interface Props {
   description: string;
   link: string;
   image: string;
+  backgroundColor?: string;
 }
-const ExploreLink = ({ title, description, link, image }: Props) => {
+const ExploreLink = ({
+  title,
+  description,
+  link,
+  image,
+  backgroundColor,
+}: Props) => {
   return (
     <a
       className={style.container}
@@ -30,7 +37,13 @@ const ExploreLink = ({ title, description, link, image }: Props) => {
           vertical: true,
         }}
       >
-        <Image height={100} width={100} src={image} alt={title} />
+        <Image
+          height={100}
+          width={100}
+          src={image}
+          alt={title}
+          style={{ backgroundColor: backgroundColor }}
+        />
         <Container>
           <Text size="x-sm">
             <span
