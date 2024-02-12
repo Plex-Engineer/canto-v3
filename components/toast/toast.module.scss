@@ -2,27 +2,28 @@
   display: flex;
   align-items: center;
   padding: 20px;
-  margin-bottom: 16px;
+  //   margin-bottom: 16px;
   background: var(--card-surface-color);
   width: 406px;
   height: 100%;
   animation: bounce_in_right 0.5s ease;
+  overflow: hidden;
 }
 
 .toast-close-animation {
-  animation: bounce-out-right 0.5s ease;
+  animation: bounce-out-right 1s ease;
 }
 
 .toast-success {
-  border: 1px solid #00b56c;
+  border-color: #00b56c;
 }
 
 .toast-neutral {
-  border: 1px solid rgba(var(--dark-color), 0.2);
+  border-color: rgba(var(--dark-color), 0.2);
 }
 
 .toast-error {
-  border: 1px solid #f95050;
+  border-color: #f95050;
 }
 
 .toast-text {
@@ -52,11 +53,15 @@
 @keyframes bounce-out-right {
   30% {
     opacity: 1;
-    transform: translateX(-10px);
+    // transform: translateX(-10px);
+    scale: 1;
+    max-height: 500px;
   }
   to {
     opacity: 0;
-    transform: translateX(500px);
+    // transform: translateX(500px);
+    scale: 0;
+    max-height: 0px;
   }
 }
 

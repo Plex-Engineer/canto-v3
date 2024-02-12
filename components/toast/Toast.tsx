@@ -26,7 +26,7 @@ export const Toast = ({ toast, onClose }: Props) => {
     ref.current?.classList.add(styles["toast-close-animation"]);
     setTimeout(() => {
       onClose();
-    }, 500);
+    }, 1000);
   }
 
   return (
