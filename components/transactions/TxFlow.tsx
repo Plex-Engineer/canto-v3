@@ -61,13 +61,13 @@ const TxFlow = (props: Props) => {
         toast.add({
           toastID: new Date().getTime().toString(),
           primary: props.txFlow.title + " failed",
-          success: false,
+          state: "failure",
         });
       } else if (props.txFlow?.status == "SUCCESS") {
         toast.add({
           toastID: new Date().getTime().toString(),
           primary: props.txFlow.title + " successful",
-          success: true,
+          state: "success",
         });
       }
     }
