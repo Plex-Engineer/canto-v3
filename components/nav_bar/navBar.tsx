@@ -100,6 +100,7 @@ const NavBar = () => {
             styles["nav-link"],
             currentPath == "/bridge" && styles.active
           )}
+          onClick={() => Analytics.actions.events.clickedNavLink("Bridge")}
         >
           <Text size="sm">Bridge</Text>
         </Link>
@@ -110,6 +111,7 @@ const NavBar = () => {
             styles["nav-link"],
             currentPath == "/lending" && styles.active
           )}
+          onClick={() => Analytics.actions.events.clickedNavLink("Lending")}
         >
           <Text size="sm">Lending</Text>
         </Link>
@@ -119,6 +121,7 @@ const NavBar = () => {
             styles["nav-link"],
             currentPath == "/lp" && styles.active
           )}
+          onClick={() => Analytics.actions.events.clickedNavLink("Pools")}
         >
           <Text size="sm">Pools</Text>
         </Link>
@@ -128,6 +131,7 @@ const NavBar = () => {
             styles["nav-link"],
             currentPath == "/explore" && styles.active
           )}
+          onClick={() => Analytics.actions.events.clickedNavLink("Explore")}
         >
           <Text size="sm">Explore</Text>
         </Link>
@@ -135,6 +139,7 @@ const NavBar = () => {
           <Link
             href="/staking"
             className={clsx(styles["nav-link"], styles.active)}
+            onClick={() => Analytics.actions.events.clickedNavLink("Staking")}
           >
             <Text size="sm">Staking</Text>
           </Link>
@@ -144,6 +149,9 @@ const NavBar = () => {
           <Link
             href="/governance"
             className={clsx(styles["nav-link"], styles.active)}
+            onClick={() =>
+              Analytics.actions.events.clickedNavLink("Governance")
+            }
           >
             <Text size="sm">Governance</Text>
           </Link>
@@ -171,7 +179,10 @@ const NavBar = () => {
                 <Link
                   href="/staking"
                   className={clsx(styles["optionsContainer1"])}
-                  onClick={() => setIsMoreModalOpen(false)}
+                  onClick={() => {
+                    setIsMoreModalOpen(false);
+                    Analytics.actions.events.clickedNavLink("Staking");
+                  }}
                 >
                   <div>
                     <Text size="sm">Staking</Text>
@@ -182,7 +193,10 @@ const NavBar = () => {
                 <Link
                   href="/governance"
                   className={clsx(styles["optionsContainer1"])}
-                  onClick={() => setIsMoreModalOpen(false)}
+                  onClick={() => {
+                    setIsMoreModalOpen(false);
+                    Analytics.actions.events.clickedNavLink("Governance");
+                  }}
                   style={{ borderBottom: "none" }}
                 >
                   <div>

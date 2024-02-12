@@ -145,7 +145,7 @@ export async function cTokenLendingTx(
         greaterThan(
           txParams.cToken.userDetails.balanceOfUnderlying,
           txParams.cToken.userDetails.borrowBalance
-        ).data
+        )
       ) {
         // change the amount to max uint
         txParams.amount = MAX_UINT256;

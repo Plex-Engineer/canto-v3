@@ -83,78 +83,12 @@ a {
   --light-mode: 1;
   --box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
   --temp-bg-brightness: 1;
-  --graph-fill-color: #D0D0D0;
-  
-}
-
-.dim {
-  --anim-bg-color: #06fc99;
-  --canto-color: #06fc99;
-  --light-color: 17, 17, 17;
-  --dark-color: 255, 255, 255;
-  --text-only-dark: #222222;
-  --text-only-light: #ffffff;
-  --primary-90-color: #eeeeee;
-  --primary-10-color: #eeeeee31;
-  --text-light-color: #111111;
-  --card-background-color: #303438;
-  --text-light-30-color: #1111114c;
-  --extra-failure-color: #dd3434;
-  --text-dark-30-color: #e1e1e14c;
-  --extra-success-color: #06fc99;
-  --text-light-40-color: #11111166;
-  --card-subtle-color: #282f35;
-  --text-dark-40-color: #e1e1e166;
-  --card-primary-color: #0ee489;
-  --border-optional-color: #ffffff;
-  --extra-shadow: #ffffff;
-  --border-stroke-color: #393d49;
-  --border-stoke-dark-color: #555555;
-  --border-radius: 4px;
-  --text-dark-color: #e1e1e1;
-  --card-sub-surface-color: #23292e;
-  --card-surface-color: #393e43;
-  --dark-mode: 1;
-  --light-mode: 0;
-  --box-shadow: 0;
-  --graph-fill-color: #D0D0D0;
-}
-
-.dark2 {
-  --anim-bg-color: #06fc99;
-
-  --canto-color: #06fc99;
-  --light-color: 17, 17, 17;
-  --dark-color: 255, 255, 255;
-  --text-only-dark: #222222;
-  --text-only-light: #ffffff;
-  --primary-90-color: #eeeeee;
-  --text-light-color: #111111;
-  --card-background-color: #0b0b0b;
-  --text-light-30-color: #1111114c;
-  --extra-failure-color: #ef4444;
-  --text-dark-30-color: #ededed4c;
-  --extra-success-color: #06fc99;
-  --text-light-40-color: #11111166;
-  --card-subtle-color: #ffffff;
-  --text-dark-40-color: #ececec66;
-  --card-primary-color: #0ee489;
-  --border-optional-color: #ffffff00;
-  --extra-shadow: #cdcdcd;
-  --border-stroke-color: #3d3d3d;
-  --border-radius: 40px;
-  --text-dark-color: #ececec;
-  --card-sub-surface-color: #292929;
-  --card-surface-color: #1e1e1e;
-  --dark-mode: 1;
-  --light-mode: 0;
-  --box-shadow: 0;
-
-  --temp-bg-brightness: 1;
-  --graph-fill-color: #4B4B4B;
+  --card-primary-color-opp: #06fc99;
 }
 
 .dark {
+  --card-primary-color-opp: #111111;
+
   --graph-fill: #969696;
   //   --graph-filled: #dcdcdc;
   --graph-filled: #06fc99;
@@ -249,6 +183,53 @@ body {
 .column {
   display: flex;
   flex-direction: column;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid rgba(var(--dark-color), 0.2);
+  width: 100%;
+}
+
+.separator {
+  display: flex;
+  width: 100%;
+  border-top: 1px solid var(--primary-90-color);
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: calc(100% - 1px);
+    height: 10px;
+    border-left: 1px solid var(--primary-90-color);
+    border-right: 1px solid var(--primary-90-color);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 10px;
+  }
+
+  //   animation: loading 1.4s infinite ease-in;
+  animation-delay: 0;
+
+  @keyframes loading {
+    to {
+      width: 100%;
+      opacity: 1;
+    }
+    from {
+      width: 10%;
+      opacity: 0;
+    }
+  }
 }
 
 /* clears the ‘X’ from Internet Explorer */

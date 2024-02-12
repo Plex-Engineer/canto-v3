@@ -275,38 +275,53 @@ export default function StakingPage() {
       <Spacer height="20px" />
       <Container direction="row" gap={20} width="100%">
         <Container gap={20} width="100%">
+          {userStaking && userStaking.unbonding.length > 0 && (
+            <Table
+              title="Unbonding Delegations"
+              headerFont="rm_mono"
+              headers={[
+                {
+                  value: "Name",
+                  ratio: 3,
+                },
+                {
+                  value: "Undelegation",
+                  ratio: 2,
+                },
+                {
+                  value: "Completion Time",
+                  ratio: 5,
+                },
+              ]}
+              content={[
+                ...userStaking.unbonding.map((userStakingElement, index) =>
+                  GenerateUnbondingDelegationsTableRow(
+                    userStakingElement,
+                    index
+                  )
+                ),
+              ]}
+            />
+          )}
           {hasUserStaked && userStaking && (
             <Table
               title="My Staking"
+              headerFont="rm_mono"
               headers={[
                 {
-                  value: (
-                    <div style={{ width: "300px" }}>
-                      <Text opacity={0.4} font="rm_mono">
-                        Name
-                      </Text>
-                    </div>
-                  ),
+                  value: "Name",
                   ratio: 5,
                 },
                 {
-                  value: <Text opacity={0.4}>My Stake</Text>,
+                  value: "My Stake",
                   ratio: 3,
                 },
                 {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Total Stake
-                    </Text>
-                  ),
+                  value: "Total Stake",
                   ratio: 3,
                 },
                 {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Commission
-                    </Text>
-                  ),
+                  value: "Commission",
                   ratio: 3,
                 },
                 {
@@ -321,46 +336,16 @@ export default function StakingPage() {
                       Number(formatBalance(e.userDelegation.balance, 18)) >
                       0.0000001
                   )
+                  .sort((a, b) =>
+                    b.userDelegation.balance.localeCompare(
+                      a.userDelegation.balance
+                    )
+                  )
                   .map((userStakingElement, index) =>
                     GenerateMyStakingTableRow(userStakingElement, index, () =>
                       handleClick(userStakingElement)
                     )
                   ),
-              ]}
-            />
-          )}
-          {userStaking && userStaking.unbonding.length > 0 && (
-            <Table
-              title="Unbonding Delegations"
-              headers={[
-                {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Name
-                    </Text>
-                  ),
-                  ratio: 3,
-                },
-                {
-                  value: <Text opacity={0.4}>Undelegation</Text>,
-                  ratio: 2,
-                },
-                {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Completion Time
-                    </Text>
-                  ),
-                  ratio: 5,
-                },
-              ]}
-              content={[
-                ...userStaking.unbonding.map((userStakingElement, index) =>
-                  GenerateUnbondingDelegationsTableRow(
-                    userStakingElement,
-                    index
-                  )
-                ),
               ]}
             />
           )}
@@ -397,37 +382,22 @@ export default function StakingPage() {
                   </Container>
                 </Container>
               }
+              headerFont="rm_mono"
               headers={[
                 {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Rank
-                    </Text>
-                  ),
+                  value: "Rank",
                   ratio: 2,
                 },
                 {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Name
-                    </Text>
-                  ),
+                  value: "Name",
                   ratio: 6,
                 },
                 {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Total Stake
-                    </Text>
-                  ),
+                  value: "Total Stake",
                   ratio: 4,
                 },
                 {
-                  value: (
-                    <Text opacity={0.4} font="rm_mono">
-                      Commission
-                    </Text>
-                  ),
+                  value: "Commission",
                   ratio: 3,
                 },
                 {
@@ -465,11 +435,10 @@ export default function StakingPage() {
                       </Container>,
                     ]
               }
-              isPaginated={true}
             />
           )}
         </Container>
-        <div className={styles.infoCard}>
+        <Container className={styles.infoCard}>
           <Container direction="column" width="100%" height="100%">
             <div className={styles.infoBox}>
               <div>
@@ -533,10 +502,10 @@ export default function StakingPage() {
               }
               disabled={!signer || !hasUserStaked}
             >
-              Claim Staking Rewards
+              Claim Rewards
             </Button>
           </Container>
-        </div>
+        </Container>
       </Container>
 
       <Modal

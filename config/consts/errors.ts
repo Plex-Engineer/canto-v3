@@ -41,3 +41,7 @@ export const TX_SIGN_ERRORS = {
   INCORRECT_SIGNER: (fromAddress: string, signerAddress: string) =>
     `Incorrect signer. Expected ${fromAddress} but got ${signerAddress}`,
 };
+
+export enum TX_ERROR_TYPES {
+  NOT_ENOUGH_NATIVE_BALANCE_LZ = "Not enough native tokens for Layer Zero fee",
+}
