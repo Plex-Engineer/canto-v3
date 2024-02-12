@@ -15,7 +15,6 @@ import {
   NewTransactionFlow,
   TRANSACTION_FLOW_MAP,
   TransactionFlow,
-  TransactionFlowType,
   UserTransactionFlowMap,
 } from "@/transactions/flows";
 import {

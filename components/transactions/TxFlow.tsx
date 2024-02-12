@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import styles from "./transactions.module.scss";
 import Image from "next/image";
 import Text from "../text";
@@ -11,7 +11,6 @@ import {
   TRANSACTION_FLOW_MAP,
   TX_PLACEHOLDER,
   TransactionFlow,
-  TransactionFlowType,
 } from "@/transactions/flows";
 import { importERC20Token } from "@/utils/tokens";
 import InfoPop from "../infopop/infopop";
