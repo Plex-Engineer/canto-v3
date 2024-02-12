@@ -16,7 +16,6 @@ import {
 import { importERC20Token } from "@/utils/tokens";
 import InfoPop from "../infopop/infopop";
 import Analytics from "@/provider/analytics";
-import { useToast } from "@/components/toast";
 
 interface Props {
   txFlow?: TransactionFlow;
@@ -31,10 +30,6 @@ const TxFlow = (props: Props) => {
     error: string | undefined;
   }>({ valid: false, error: undefined });
 
-  const [inProgress, setInProgress] = useState<boolean>(
-    !(props.txFlow?.status === "ERROR" || props.txFlow?.status === "SUCCESS")
-  );
-  const toast = useToast();
   useEffect(() => {
     async function checkRetryParams() {
       if (props.txFlow?.status === "ERROR") {
@@ -52,24 +47,6 @@ const TxFlow = (props: Props) => {
       }
     }
     checkRetryParams();
-  }, [props.txFlow?.status]);
-
-  useEffect(() => {
-    if (props.txFlow?.txType == TransactionFlowType.BRIDGE && inProgress) {
-      if (props.txFlow?.status == "ERROR") {
-        toast.add({
-          toastID: new Date().getTime().toString(),
-          primary: props.txFlow.title + " failed",
-          state: "failure",
-        });
-      } else if (props.txFlow?.status == "SUCCESS") {
-        toast.add({
-          toastID: new Date().getTime().toString(),
-          primary: props.txFlow.title + " successful",
-          state: "success",
-        });
-      }
-    }
   }, [props.txFlow?.status]);
 
   return (
@@ -172,7 +149,6 @@ const TxFlow = (props: Props) => {
                       txRetryTimeInSeconds: timeDifferenceInSeconds,
                     });
                   }
-                  setInProgress(true);
                   props.onRetry();
                 }}
                 width="fill"

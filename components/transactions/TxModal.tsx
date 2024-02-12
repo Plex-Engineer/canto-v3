@@ -13,6 +13,8 @@ import Splash from "../splash/splash";
 import { dateToMomentsAgo } from "@/utils/formatting";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Analytics from "@/provider/analytics";
+import { TransactionFlow } from "@/transactions/flows";
+import { useToast } from "@/components/toast";
 
 const TransactionModal = () => {
   // set modal open state
@@ -22,6 +24,8 @@ const TransactionModal = () => {
 
   // connected signer
   const { signer, txStore } = useCantoSigner();
+  // toast notifications for txs
+  const toast = useToast();
 
   // get transaction flows for user
   const transactionFlows = txStore?.getUserTransactionFlows(
@@ -34,18 +38,38 @@ const TransactionModal = () => {
 
   // open if transaction is loading in
   useEffect(() => {
+    let currFlow: TransactionFlow | undefined;
     if (transactionFlows) {
       transactionFlows.forEach((flow) => {
-        if (flow.status === "POPULATING") {
-          setIsOpen(true);
-          setCurrentFlowId(flow.id);
-          // close bridge/lp/lm confirmation modals
-          if (flow?.onSuccessCallback) {
-            flow.onSuccessCallback();
-          }
-          return;
+        if (flow.status === "POPULATING" && !currFlow) {
+          currFlow = flow;
+        } else if (
+          flow.inProgress &&
+          (flow.status === "SUCCESS" || flow.status === "ERROR")
+        ) {
+          toast.add({
+            toastId: new Date().getTime().toString(),
+            primary: `${flow.title} ${
+              flow.status === "SUCCESS" ? "successful" : "failed"
+            }`,
+            success: flow.status === "SUCCESS",
+            autoClose: true,
+            autoCloseDuration: 5000,
+          });
+          txStore?.updateTxFlow(signer?.account.address ?? "", flow.id, {
+            inProgress: false,
+          });
         }
       });
+
+      if (currFlow) {
+        setIsOpen(true);
+        setCurrentFlowId(currFlow.id);
+        // close bridge/lp/lm confirmation modals
+        if (currFlow?.onSuccessCallback) {
+          currFlow.onSuccessCallback();
+        }
+      }
     }
   }, [transactionFlows]);
 
