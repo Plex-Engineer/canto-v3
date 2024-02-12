@@ -1,62 +1,56 @@
 import { ToastContext } from "./ToastContext";
 import { Toast } from "./Toast";
 import { useState } from "react";
-import ReactDOM from "react-dom";
+import { createPortal } from "react-dom";
 import styles from "./container.module.scss";
 export interface ToastItem {
-  toastId: string;
-  success: boolean | undefined;
+  toastID?: string;
+  state?: "neutral" | "success" | "failure";
   primary: string;
   secondary?: string;
-  autoClose: boolean;
-  autoCloseDuration: number;
+  duration?: number;
 }
 
-interface Props {
-  children: React.ReactNode;
-}
-
-export const ToastContainer = ({ children }: Props) => {
+export const ToastContainer = ({ children }: { children: React.ReactNode }) => {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const add = (toast: Partial<ToastItem>) => {
+  const add = (toast: ToastItem) => {
     const {
-      toastId = new Date().getTime().toString(),
-      success,
-      primary = "Default toast message",
+      toastID = new Date().getTime().toString(),
+      state = "neutral",
+      primary,
       secondary,
-      autoClose = false,
-      autoCloseDuration = 5000,
+      duration = 5000,
     } = toast;
 
     return setToasts((currentToasts) => [
       ...currentToasts,
       {
-        toastId,
-        success,
+        toastID,
+        state,
         primary,
         secondary,
-        autoClose,
-        autoCloseDuration,
+        duration,
       },
     ]);
   };
 
   const dismiss = (id: string) => {
     setToasts((currentToasts) =>
-      currentToasts.filter((toast) => toast.toastId !== id)
+      currentToasts.filter((toast) => toast.toastID !== id)
     );
   };
+
   const contextValue = { add };
   return (
     <ToastContext.Provider value={contextValue}>
       {children}
-      {ReactDOM.createPortal(
+      {createPortal(
         <div className={`${styles["toast-container"]} ${styles["top-right"]}`}>
           {toasts.map((toast) => (
             <Toast
-              key={toast.toastId}
-              onClose={() => dismiss(toast.toastId)}
+              key={toast.toastID}
+              onClose={() => dismiss(toast.toastID!)}
               toast={toast}
             />
           ))}
