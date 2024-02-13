@@ -125,3 +125,9 @@
   padding: 0 8px;
   border: 1px solid var(--border-stroke-color);
 }
+@media screen and (max-width: 768px) {
+.ambientModalContainer {
+  flex-direction: column !important;
+}
+}
+

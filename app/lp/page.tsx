@@ -80,6 +80,7 @@ export default function Page() {
             pool={selectedPair}
             sendTxFlow={sendAmbientTxFlow}
             verifyParams={validateAmbientTxParams}
+            isMobile={isMobile}
           />
         )}
       </Modal>
