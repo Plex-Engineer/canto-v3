@@ -390,8 +390,7 @@ export const VoteGraphBox = ({
       <Container
         center={{ vertical: true }}
         direction="row"
-        height="40px"
-        style={{ paddingTop: "10px" }}
+        className={styles.proposalStatus}
       >
         <div className={styles.circleContainer}>
           <div
@@ -401,8 +400,8 @@ export const VoteGraphBox = ({
             }}
           />
         </div>
-        <Container className={styles.active}>
-          <Text font="proto_mono" className={styles.tableData} size="x-sm">
+        <Container>
+          <Text font="rm_mono" className={styles.tableData} size="x-sm">
             {"ACTIVE"}
           </Text>
         </Container>

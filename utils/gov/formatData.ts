@@ -148,7 +148,11 @@ export function calculateVotePercentages(
   };
 }
 
-export function formatTime(input: string): string {
+export function formatTime(
+  input: string,
+  includeSeconds?: boolean,
+  includeDay?: boolean
+): string {
   const months = [
     "Jan",
     "Feb",
@@ -179,7 +183,7 @@ export function formatTime(input: string): string {
       ? suffixes[day % 10]
       : suffixes[0];
 
-  return `${months[monthIndex]} ${day}${daySuffix},${year} ${
-    hours % 12 || 12
-  }:${minutes}:${seconds} ${hours >= 12 ? "PM" : "AM"}`;
+  return `${months[monthIndex]} ${day},${year} ${hours % 12 || 12}:${minutes} ${
+    hours >= 12 ? "PM" : "AM"
+  }`;
 }

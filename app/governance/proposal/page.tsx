@@ -270,24 +270,26 @@ export default function Page() {
           <div className={styles.proposalInfoBox}>
             <div className={styles.proposalInfo}>
               <div>
-                <Text font="rm_mono" opacity={0.3}>
+                <Text font="rm_mono" opacity={0.3} size="x-sm">
                   Type
                 </Text>
               </div>
               <div>
-                <Text font="proto_mono">
+                <Text font="proto_mono" size="x-sm">
                   {formatProposalType(proposal.type_url)}
                 </Text>
               </div>
             </div>
             <div className={styles.proposalInfo}>
               <div>
-                <Text font="rm_mono" opacity={0.3}>
+                <Text font="rm_mono" opacity={0.3} size="x-sm">
                   Turnout
                 </Text>
               </div>
               <div className={styles.displayAmount}>
-                <Text font="proto_mono">{PROPOSAL_TURNOUT_VALUE}</Text>
+                <Text font="proto_mono" size="x-sm">
+                  {PROPOSAL_TURNOUT_VALUE}
+                </Text>
                 {/* <div className={styles.icon}>
                   <Image
                     src="/tokens/canto.svg"
@@ -303,17 +305,19 @@ export default function Page() {
             </div>
             <div className={styles.proposalInfo}>
               <div>
-                <Text font="rm_mono" opacity={0.3}>
+                <Text font="rm_mono" opacity={0.3} size="x-sm">
                   Quorum{" "}
                 </Text>
               </div>
               <div>
-                <Text font="proto_mono">{PROPOSAL_QUORUM_VALUE}</Text>
+                <Text font="proto_mono" size="x-sm">
+                  {PROPOSAL_QUORUM_VALUE}
+                </Text>
               </div>
             </div>
             <div className={styles.proposalInfoTimeLine}>
               <div style={{ marginBottom: "10px" }}>
-                <Text font="rm_mono" opacity={0.3}>
+                <Text font="rm_mono" opacity={0.3} size="x-sm">
                   Voting Timeline
                 </Text>
               </div>
@@ -322,10 +326,14 @@ export default function Page() {
                   <div className={styles.circle} />
                 </div>
                 <div className={styles.txt}>
-                  <Text font="rm_mono">Proposal Created on &nbsp;</Text>
+                  <Text font="rm_mono" size="x-sm">
+                    Proposal Created on
+                  </Text>
                 </div>
                 <div>
-                  <Text font="rm_mono">{formatTime(proposal.submit_time)}</Text>
+                  <Text font="rm_mono" size="x-sm">
+                    {formatTime(proposal.submit_time)}
+                  </Text>
                 </div>
               </div>
               <div className={styles.separator} />
@@ -334,10 +342,12 @@ export default function Page() {
                   <div className={styles.circle} />
                 </div>
                 <div className={styles.txt}>
-                  <Text font="rm_mono">Voting Ended on &nbsp;</Text>
+                  <Text font="rm_mono" size="x-sm">
+                    Voting Ended on{" "}
+                  </Text>
                 </div>
                 <div>
-                  <Text font="rm_mono">
+                  <Text font="rm_mono" size="x-sm">
                     {formatTime(proposal.voting_end_time)}
                   </Text>
                 </div>
