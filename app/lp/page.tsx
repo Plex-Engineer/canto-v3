@@ -27,6 +27,8 @@ import {
   getAnalyticsAmbientLiquidityPoolInfo,
 } from "@/utils/analytics";
 import DesktopOnly from "@/components/desktop-only/desktop-only";
+import { useEffect, useState } from "react";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 export default function Page() {
   const {
@@ -50,6 +52,11 @@ export default function Page() {
   // if (!window.matchMedia("(min-width: 768px)").matches) {
   //   return <DesktopOnly />;
   // }
+  const [isMobile, setIsMobile] = useState(false);
+  const screen = useScreenSize();
+  useEffect(() => {
+    setIsMobile(screen.width < 768);
+  }, [screen.width]);
 
   //main content
   return (
@@ -77,7 +84,12 @@ export default function Page() {
         )}
       </Modal>
 
-      <Container className={styles.poolHeader} direction="row" gap={"auto"} width="100%">
+      <Container
+        className={styles.poolHeader}
+        direction="row"
+        gap={"auto"}
+        width="100%"
+      >
         <Text size="x-lg" font="proto_mono" className={styles.title}>
           Pools
         </Text>
@@ -154,8 +166,8 @@ export default function Page() {
           { value: "Pair", ratio: 2 },
           { value: "APR", ratio: 1 },
           { value: "TVL", ratio: 1 },
-          { value: "Type", ratio: 1 },
-          { value: "Action", ratio: 1 },
+          { value: "Type", ratio: 1, hideOnMobile: true },
+          { value: "Action", ratio: 1, hideOnMobile: true },
         ]}
         content={[
           ...pairs.allAmbient
@@ -175,6 +187,7 @@ export default function Page() {
                   });
                   setPair(poolAddress);
                 },
+                isMobile,
               })
             ),
           ...sortedCantoDexPairs
@@ -194,6 +207,7 @@ export default function Page() {
                   });
                   setPair(pairAddress);
                 },
+                isMobile,
               })
             ),
         ]}

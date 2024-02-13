@@ -176,9 +176,11 @@ export const UserCantoDexPairRow = ({
 export const GeneralCantoDexPairRow = ({
   pair,
   onAddLiquidity,
+  isMobile,
 }: {
   pair: CantoDexPairWithUserCTokenData;
   onAddLiquidity: (pairAddress: string) => void;
+  isMobile: boolean;
 }) => [
   <Container
     key={pair.address}
@@ -214,24 +216,30 @@ export const GeneralCantoDexPairRow = ({
       }}
     />
   </Text>,
-  <Text key={pair.address + "type"}>
-    {pair.stable ? "Stable" : "Volatile"}
-  </Text>,
-  <Container
-    key={pair.address + "edit"}
-    direction="row"
-    center={{ horizontal: true }}
-  >
-    <Button onClick={() => onAddLiquidity(pair.address)}>Add LP</Button>
-  </Container>,
+  !isMobile && (
+    <Text key={pair.address + "type"}>
+      {pair.stable ? "Stable" : "Volatile"}
+    </Text>
+  ),
+  !isMobile && (
+    <Container
+      key={pair.address + "edit"}
+      direction="row"
+      center={{ horizontal: true }}
+    >
+      <Button onClick={() => onAddLiquidity(pair.address)}>Add LP</Button>
+    </Container>
+  ),
 ];
 
 export const GeneralAmbientPairRow = ({
   pool,
   onAddLiquidity,
+  isMobile,
 }: {
   pool: AmbientPool;
   onAddLiquidity: (poolAddress: string) => void;
+  isMobile: boolean;
 }) => [
   <Container
     key={pool.address}
@@ -265,31 +273,35 @@ export const GeneralAmbientPairRow = ({
     />
   </Text>,
 
-  <Container
-    key={"popkey"}
-    direction="row"
-    gap={4}
-    center={{
-      horizontal: true,
-      vertical: true,
-    }}
-  >
-    <Text key={pool.address + "type"}>
-      {pool.stable ? "Concentrated" : "Volatile"}
-    </Text>
-
-    <InfoPop>
-      <Text>
-        This is a concentrated liquidity stable pool. The default range will be
-        selected for optimal rewards.
+  !isMobile && (
+    <Container
+      key={"popkey"}
+      direction="row"
+      gap={4}
+      center={{
+        horizontal: true,
+        vertical: true,
+      }}
+    >
+      <Text key={pool.address + "type"}>
+        {pool.stable ? "Concentrated" : "Volatile"}
       </Text>
-    </InfoPop>
-  </Container>,
-  <Container key={"action"} direction="row" center={{ horizontal: true }}>
-    <Button key={"action item"} onClick={() => onAddLiquidity(pool.address)}>
-      Add LP
-    </Button>
-  </Container>,
+
+      <InfoPop>
+        <Text>
+          This is a concentrated liquidity stable pool. The default range will
+          be selected for optimal rewards.
+        </Text>
+      </InfoPop>
+    </Container>
+  ),
+  !isMobile && (
+    <Container key={"action"} direction="row" center={{ horizontal: true }}>
+      <Button key={"action item"} onClick={() => onAddLiquidity(pool.address)}>
+        Add LP
+      </Button>
+    </Container>
+  ),
 ];
 
 export const UserAmbientPairRow = ({

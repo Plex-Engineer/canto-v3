@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import Text from "../text";
 import styles from "./table.module.scss";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 interface Props {
   title?: string | React.ReactNode;
@@ -8,6 +10,7 @@ interface Props {
   headers: {
     value: string | React.ReactNode;
     ratio: number;
+    hideOnMobile?: boolean | undefined;
   }[];
   content: React.ReactNode[][] | React.ReactNode[];
   textSize?: string;
@@ -15,6 +18,11 @@ interface Props {
 }
 
 const Table = (props: Props) => {
+  const [isMobile, setIsMobile] = useState(false);
+  const screen = useScreenSize();
+  useEffect(() => {
+    setIsMobile(screen.width < 768);
+  }, [screen.width]);
   return (
     <div className={styles.container} style={{ fontSize: props.textSize }}>
       <div className={styles.title}>
@@ -24,24 +32,60 @@ const Table = (props: Props) => {
         {props.secondary}
       </div>
       <div className={styles.table}>
-        <div
-          className={styles.header}
-          style={{
-            gridTemplateColumns: props.headers
-              .map((header) => {
-                return `${header.ratio}fr`;
-              })
-              .join(" "),
-          }}
-        >
-          {props.headers.map((header, index) => {
-            return (
-              <Text key={index} className={styles.cell} font={props.headerFont}>
-                {header.value}
-              </Text>
-            );
-          })}
-        </div>
+        {isMobile && (
+          <div
+            className={styles.header}
+            style={{
+              gridTemplateColumns: props.headers
+                .map((header) => {
+                  const ratio = header.hideOnMobile ? 0 : header.ratio;
+                  return `${ratio}fr`;
+                })
+                .join(" "),
+            }}
+          >
+            {props.headers
+              .filter(
+                (header) =>
+                  !header.hideOnMobile || header.hideOnMobile === undefined
+              )
+              .map((header, index) => {
+                return (
+                  <Text
+                    key={index}
+                    className={styles.cell}
+                    font={props.headerFont}
+                  >
+                    {header.value}
+                  </Text>
+                );
+              })}
+          </div>
+        )}
+        {!isMobile && (
+          <div
+            className={styles.header}
+            style={{
+              gridTemplateColumns: props.headers
+                .map((header) => {
+                  return `${header.ratio}fr`;
+                })
+                .join(" "),
+            }}
+          >
+            {props.headers.map((header, index) => {
+              return (
+                <Text
+                  key={index}
+                  className={styles.cell}
+                  font={props.headerFont}
+                >
+                  {header.value}
+                </Text>
+              );
+            })}
+          </div>
+        )}
         <div className={styles.content}>
           {props.content.map((row, index) => {
             //check if an array has been passed in
@@ -55,7 +99,8 @@ const Table = (props: Props) => {
                 style={{
                   gridTemplateColumns: props.headers
                     .map((header) => {
-                      return `${header.ratio}fr`;
+                      const ratio = header.hideOnMobile ? 0 : header.ratio;
+                      return `${ratio}fr`;
                     })
                     .join(" "),
                   cursor: props.onRowsClick ? "pointer" : undefined,
