@@ -47,9 +47,9 @@ export default function Page() {
   } = usePool();
 
   //   if mobile only
-  if (!window.matchMedia("(min-width: 768px)").matches) {
-    return <DesktopOnly />;
-  }
+  // if (!window.matchMedia("(min-width: 768px)").matches) {
+  //   return <DesktopOnly />;
+  // }
 
   //main content
   return (
@@ -77,7 +77,7 @@ export default function Page() {
         )}
       </Modal>
 
-      <Container direction="row" gap={"auto"} width="100%">
+      <Container className={styles.poolHeader} direction="row" gap={"auto"} width="100%">
         <Text size="x-lg" font="proto_mono" className={styles.title}>
           Pools
         </Text>

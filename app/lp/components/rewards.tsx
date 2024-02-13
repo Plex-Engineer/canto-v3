@@ -3,13 +3,21 @@ import styles from "../lp.module.scss";
 import Icon from "@/components/icon/icon";
 import Container from "@/components/container/container";
 import Button from "@/components/button/button";
+import { useEffect, useState } from "react";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 interface Props {
   onClick: () => void;
   value: string;
 }
 
+
 const Rewards = (props: Props) => {
+  const [isMobile, setIsMobile] = useState(false);
+  const screen = useScreenSize();
+  useEffect(() => {
+    setIsMobile(screen.width < 768);
+  }, [screen.width]);
   return (
     <section className={styles.rewards}>
       <div>
@@ -48,10 +56,22 @@ const Rewards = (props: Props) => {
           />
         </Container>
       </div>
-
-      <Button onClick={props.onClick} disabled={Number(props.value) === 0}>
-        Claim
-      </Button>
+      {
+        isMobile && (
+          <Button width={ "fill" } onClick={props.onClick} disabled={Number(props.value) === 0}>
+            Claim
+          </Button>
+        )
+        
+      }
+      {
+        !isMobile && (
+          <Button onClick={props.onClick} disabled={Number(props.value) === 0}>
+            Claim
+          </Button>
+        )
+      }
+     
     </section>
   );
 };
