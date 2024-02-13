@@ -115,16 +115,15 @@
     }
     @keyframes blink {
         0% {
-          opacity: 1; /* Start with full opacity */
+          opacity: 1;
         }
         100% {
-          opacity: 0; /* End with no opacity (invisible) */
+          opacity: 0; 
         }
       }
 }
 
 .proposalStatus{
-    margin-top: 10px;
     display: flex;
     flex-direction: row;
     padding: 4px 12px 4px 12px;

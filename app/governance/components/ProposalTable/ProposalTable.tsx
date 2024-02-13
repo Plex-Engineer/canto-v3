@@ -17,6 +17,7 @@ import Icon from "@/components/icon/icon";
 import { formatBalance } from "@/utils/formatting";
 import { VoteGraphBox } from "../votingChart/voteGraph";
 import ProposalVotingEndTime from "../VotingTime/ProposalVotingEndTime";
+import { generatePaginatedProposalsTableRows } from "./GenerateTableRows";
 
 interface TableProps {
   proposals: Proposal[];
@@ -229,45 +230,57 @@ const ProposalTable = ({ proposals }: TableProps) => {
                     </Container>,
 
                     <Container
-                      key={`status_${index}`}
-                      direction="column"
-                      style={{
-                        marginBottom: "10px",
-                        justifyContent: "left",
-                        alignItems: "left",
-                        marginLeft: "50px",
-                        marginTop: "10px",
-                      }}
-                    >
-                      <Container
-                        direction="row"
-                        width="100%"
-                        style={{
-                          justifyContent: "flex-start",
-                          //marginBottom: "10px",
-                        }}
-                      >
-                        <Text opacity={0.4} size="x-sm" font="rm_mono">
-                          Vote Status
-                        </Text>
-                      </Container>
-
-                      <Container direction="row">
-                        <Container>
-                          <VoteGraphBox
-                            yesVotes={yesVotes}
-                            noVotes={noVotes}
-                            vetoVotes={vetoVotes}
-                            abstainVotes={abstainVotes}
-                            size={40}
-                          />
-                        </Container>
-                      </Container>
-                    </Container>,
-                    <Container
                       direction="column"
                       height="100%"
                       key={`status_${index}`}
+                      style={{
+                        cursor: "pointer",
+                        alignItems: "left",
+                        justifyContent: "center",
+                      }}
+                      width="100%"
+                    >
+                      <Container
+                        direction="column"
+                        style={{
+                          marginBottom: "10px",
+                          justifyContent: "left",
+                          alignItems: "left",
+                          marginLeft: "50px",
+                          marginTop: "10px",
+                        }}
+                      >
+                        <Container
+                          direction="row"
+                          width="100%"
+                          style={{
+                            justifyContent: "flex-start",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          <Text opacity={0.4} size="x-sm" font="rm_mono">
+                            Vote Status
+                          </Text>
+                        </Container>
+
+                        <Container direction="row">
+                          <Container>
+                            <VoteGraphBox
+                              yesVotes={yesVotes}
+                              noVotes={noVotes}
+                              vetoVotes={vetoVotes}
+                              abstainVotes={abstainVotes}
+                              size={40}
+                            />
+                          </Container>
+                        </Container>
+                      </Container>
+                    </Container>,
+
+                    <Container
+                      direction="column"
+                      height="100%"
+                      key={`votingTime_${index}`}
                       style={{
                         cursor: "pointer",
                         alignItems: "left",
@@ -494,6 +507,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                               alignItems: "left",
                               justifyContent: "center",
                             }}
+                            width="100%"
                           >
                             <Container
                               direction="column"
