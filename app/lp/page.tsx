@@ -110,10 +110,24 @@ export default function Page() {
             headers={[
               { value: "Pair", ratio: 2 },
               { value: "APR", ratio: 1 },
-              { value: "Pool Share", ratio: 1 },
+              { value: "Pool Share", ratio: 1, hideOnMobile: true },
               { value: "Value", ratio: 1 },
-              { value: "Rewards", ratio: 1 },
-              { value: "Edit", ratio: 1 },
+              { value: "Rewards", ratio: 1, hideOnMobile: true },
+              { value: "Edit", ratio: 1, hideOnMobile: true },
+            ]}
+            onRowsClick={[
+              ...pairs.userAmbient.map((pool) => () => {
+                Analytics.actions.events.liquidityPool.manageLPClicked(
+                  getAnalyticsAmbientLiquidityPoolInfo(pool)
+                );
+                setPair(pool.address);
+              }),
+              ...pairs.userCantoDex.map((pair) => () => {
+                Analytics.actions.events.liquidityPool.manageLPClicked(
+                  getAnalyticsCantoLiquidityPoolInfo(pair)
+                );
+                setPair(pair.address);
+              }),
             ]}
             content={[
               ...pairs.userAmbient.map((pool) =>
@@ -127,6 +141,7 @@ export default function Page() {
                   },
                   rewards: rewards.ambient,
                   rewardTime: rewardTime,
+                  isMobile,
                 })
               ),
               ...pairs.userCantoDex.map((pair) =>

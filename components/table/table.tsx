@@ -26,14 +26,21 @@ const Table = (props: Props) => {
   return (
     <div className={styles.container} style={{ fontSize: props.textSize }}>
       <div className={styles.title}>
-        <Text
-          font="proto_mono"
-          size="lg"
-          opacity={0.7}
-          className={styles.primaryTitle}
-        >
-          {props.title}
-        </Text>
+        {isMobile && (
+          <Text
+            font="proto_mono"
+            size="lg"
+            opacity={0.7}
+            className={styles.primaryTitle}
+          >
+            {props.title}
+          </Text>
+        )}
+        {!isMobile && (
+          <Text font="proto_mono" size="lg" opacity={0.7}>
+            {props.title}
+          </Text>
+        )}
         {props.secondary}
       </div>
       <div className={styles.table}>
@@ -43,28 +50,26 @@ const Table = (props: Props) => {
             style={{
               gridTemplateColumns: props.headers
                 .map((header) => {
-                  const ratio = header.hideOnMobile ? 0 : header.ratio;
-                  return `${ratio}fr`;
+                  if (header.hideOnMobile) {
+                    return "";
+                  }
+                  return `${header.ratio}fr`;
                 })
                 .join(" "),
             }}
           >
-            {props.headers
-              .filter(
-                (header) =>
-                  !header.hideOnMobile || header.hideOnMobile === undefined
-              )
-              .map((header, index) => {
-                return (
-                  <Text
-                    key={index}
-                    className={styles.cell}
-                    font={props.headerFont}
-                  >
-                    {header.value}
-                  </Text>
-                );
-              })}
+            {props.headers.map((header, index) => {
+              return (
+                <Text
+                  style={{ display: header.hideOnMobile ? "none" : "flex" }}
+                  key={index}
+                  className={styles.cell}
+                  font={props.headerFont}
+                >
+                  {header.value}
+                </Text>
+              );
+            })}
           </div>
         )}
         {!isMobile && (
