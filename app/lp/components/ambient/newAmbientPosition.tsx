@@ -94,7 +94,7 @@ export const NewAmbientPositionModal = ({
       <Container
         direction="row"
         gap={20}
-        className={styles.ambientModalContainer}
+        className={styles.ambientBaseContainer}
       >
         <Container>
           <Container

@@ -126,8 +126,16 @@
   border: 1px solid var(--border-stroke-color);
 }
 @media screen and (max-width: 768px) {
-.ambientModalContainer {
-  flex-direction: column !important;
-}
+  .container{
+    height: 45rem;
+    width: calc( 100vw - 1rem)
+  }
+  .baseContainer{
+    height: 40rem;
+    width: calc( 100vw - 1rem);
+  }
+  .ambientBaseContainer {
+    flex-direction: column !important;
+  }
 }
 
