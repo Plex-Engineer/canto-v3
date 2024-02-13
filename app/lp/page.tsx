@@ -169,6 +169,36 @@ export default function Page() {
           { value: "Type", ratio: 1, hideOnMobile: true },
           { value: "Action", ratio: 1, hideOnMobile: true },
         ]}
+        onRowsClick={[
+          ...pairs.allAmbient
+            .filter(
+              (pool) =>
+                filteredPairs === "all" ||
+                (filteredPairs === "stable" && pool.stable) ||
+                (filteredPairs === "volatile" && !pool.stable)
+            )
+            .map((pool) => () => {
+              Analytics.actions.events.liquidityPool.addLPClicked({
+                lpType: "AMBIENT",
+                ambientLp: pool.symbol,
+              });
+              setPair(pool.address);
+            }),
+          ...sortedCantoDexPairs
+            .filter(
+              (pair) =>
+                filteredPairs === "all" ||
+                (filteredPairs === "stable" && pair.stable) ||
+                (filteredPairs === "volatile" && !pair.stable)
+            )
+            .map((pair) => () => {
+              Analytics.actions.events.liquidityPool.addLPClicked({
+                lpType: "CANTO",
+                cantoLp: pair.symbol,
+              });
+              setPair(pair.address);
+            }),
+        ]}
         content={[
           ...pairs.allAmbient
             .filter(

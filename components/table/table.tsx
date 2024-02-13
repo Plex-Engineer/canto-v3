@@ -99,14 +99,17 @@ const Table = (props: Props) => {
                 style={{
                   gridTemplateColumns: props.headers
                     .map((header) => {
-                      const ratio = header.hideOnMobile ? 0 : header.ratio;
+                      const ratio =
+                        isMobile && header.hideOnMobile ? 0 : header.ratio;
                       return `${ratio}fr`;
                     })
                     .join(" "),
-                  cursor: props.onRowsClick ? "pointer" : undefined,
+                  cursor: isMobile && props.onRowsClick ? "pointer" : undefined,
                 }}
                 onClick={
-                  props.onRowsClick ? props.onRowsClick[index] : undefined
+                  isMobile && props.onRowsClick
+                    ? props.onRowsClick[index]
+                    : undefined
                 }
               >
                 {row.map((cell, index) => {
