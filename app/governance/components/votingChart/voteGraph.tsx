@@ -329,32 +329,27 @@ export const VoteGraphBox = ({
 
   return totalVotes > 0 ? (
     <div>
-      <Container direction="row" height="40px">
-        <Container height="40px" className={styles.displayVotes}>
-          <Container
-            className={styles.barGraph}
-            direction="row"
-            height="30px"
-            width="44px"
-          >
+      <Container direction="row">
+        <Container height="30px" className={styles.displayVotes}>
+          <Container className={styles.barGraph} direction="row" width="44px">
             <VoteBar
-              height={yesPercentage * 30}
-              maxHeight={maxPercentage * 30}
+              height={yesPercentage * 0.3}
+              maxHeight={maxPercentage * 0.3}
               index={0}
             ></VoteBar>
             <VoteBar
-              height={noPercentage * 30}
-              maxHeight={maxPercentage * 30}
+              height={noPercentage * 0.3}
+              maxHeight={maxPercentage * 0.3}
               index={1}
             ></VoteBar>
             <VoteBar
-              height={vetoPercentage * 30}
-              maxHeight={maxPercentage * 30}
+              height={vetoPercentage * 0.3}
+              maxHeight={maxPercentage * 0.3}
               index={2}
             ></VoteBar>
             <VoteBar
-              height={abstainPercentage * 30}
-              maxHeight={maxPercentage * 30}
+              height={abstainPercentage * 0.3}
+              maxHeight={maxPercentage * 0.3}
               index={3}
             ></VoteBar>
           </Container>
@@ -365,7 +360,6 @@ export const VoteGraphBox = ({
             alignItems: "flex-start",
             height: "30px",
             padding: "4px 0 4px 0",
-            marginTop: "10px",
           }}
         >
           <Container height="100%" style={{ paddingRight: "4px" }}>

@@ -25,24 +25,37 @@ const Table = (props: Props) => {
         {props.secondary}
       </div>
       <div className={styles.table}>
-        <div
-          className={styles.header}
-          style={{
-            gridTemplateColumns: props.headers
-              .map((header) => {
-                return `${header.ratio}fr`;
-              })
-              .join(" "),
-          }}
-        >
-          {props.headers.map((header, index) => {
-            return (
-              <Text key={index} className={styles.cell} font={props.headerFont}>
-                {header.value}
-              </Text>
-            );
-          })}
-        </div>
+        {!props.isGovTable ? (
+          <div
+            className={styles.header}
+            style={{
+              gridTemplateColumns: props.headers
+                .map((header) => {
+                  return `${header.ratio}fr`;
+                })
+                .join(" "),
+            }}
+          >
+            {props.headers.map((header, index) => {
+              return (
+                <Text
+                  key={index}
+                  className={styles.cell}
+                  font={props.headerFont}
+                >
+                  {header.value}
+                </Text>
+              );
+            })}
+          </div>
+        ) : (
+          <div
+            style={{
+              borderBottom: "1px solid var(--border-stroke-color)",
+              marginTop: "20px",
+            }}
+          ></div>
+        )}
         <div className={styles.content}>
           {props.content.map((row, index) => {
             //check if an array has been passed in
