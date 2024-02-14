@@ -17,7 +17,6 @@ import Icon from "@/components/icon/icon";
 import { formatBalance } from "@/utils/formatting";
 import { VoteGraphBox } from "../votingChart/voteGraph";
 import ProposalVotingEndTime from "../VotingTime/ProposalVotingEndTime";
-import { generatePaginatedProposalsTableRows } from "./GenerateTableRows";
 
 interface TableProps {
   proposals: Proposal[];
@@ -339,7 +338,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                         alignItems: "center",
                       }}
                     >
-                      <div className={styles.backButton}>
+                      <div className={styles.clickButton}>
                         <Icon
                           icon={{
                             url: "/dropdown.svg",
@@ -606,7 +605,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                             key={`votingdate_${index}`}
                             style={{ cursor: "pointer", alignItems: "center" }}
                           >
-                            <div className={styles.backButton}>
+                            <div className={styles.clickButton}>
                               <Icon
                                 icon={{
                                   url: "/dropdown.svg",

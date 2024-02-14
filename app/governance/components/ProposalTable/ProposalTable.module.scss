@@ -12,25 +12,11 @@
     align-items: flex-start;
   }
 
-  .toggleGroupContainer {
-    padding-bottom: 10px;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    .toggleGroup {
-      width: 30%;
-    }
-  }
   .table {
     width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
-    .tableHeader {
-      padding: 0.5rem;
-      text-align: left;
-      border-top: 1px solid var(--border-stroke-color, #b3b3b3);
-      box-sizing: border-box;
-    }
+    
     .tableData {
       text-align: left;
     }
@@ -71,28 +57,10 @@
         background-color: #5E5E5E;
     }
   }
-  .paginationContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    border: "none";
-    padding: 16px 16px 0px 16px;
-    &:hover {
-      background: var(--card-sub-surface-color, #dfdfdf);
-    }
-  }
-  .paginationButton1 {
-    margin-right: 5%;
-  }
-  .paginationButton2 {
-    margin-left: 5%;
-  }
+  
+  
 
-  .emptyProposals {
-    padding: 20px;
-  }
+  
   .noProposalContainer {
     justify-content: center;
     align-items: center;
@@ -111,16 +79,9 @@
     border: 1px solid var(--border-stroke-color, #b3b3b3);
     padding-left: 30px;
   }
-  .activeProposalRow{
-    border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
-    border-left: 1px solid var(--border-stroke-color, #b3b3b3);
-    border-right: 1px solid var(--border-stroke-color, #b3b3b3);
-  }
-  .backButtonContainer {
-    border-right: 1px solid;
-    padding: 10px;
-  }
-  .backButton {
+  
+  
+  .clickButton {
     height: 100%;
     transform: rotate(270deg);
   }
