@@ -242,6 +242,28 @@ export default function useBridgeCombo(): BridgeComboReturn {
         reason: "Please select a bridge fee",
       };
     }
+
+    if (
+      bridgeFees.ready &&
+      (bridgeFees.method === BridgingMethod.GRAVITY_BRIDGE ||
+        bridgeFees.method === BridgingMethod.IBC) &&
+      bridgeFees.direction === "out" &&
+      cantoBalance?.value !== undefined
+    ) {
+      const gasFee = bridgeFees.gasFees.reduce(
+        (acc, obj) => acc + BigInt(obj.amount),
+        0n
+      );
+      if (cantoBalance.value < gasFee) {
+        return {
+          error: true,
+          reason:
+            bridgeFees.method === BridgingMethod.GRAVITY_BRIDGE
+              ? TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_GRAVITY_BRIDGE
+              : TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_IBC,
+        };
+      }
+    }
     return { error: false };
   };
 
