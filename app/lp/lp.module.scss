@@ -105,24 +105,13 @@
   .container {
     
     margin: 1rem;
-    width: calc(100% - 2rem);
-    grid-template-columns: 1fr;
+    width: calc(100vw - 2rem);
     gap: 1rem;
     padding-top: 1rem;
-    grid-template-areas:
-    "title"
-    "rewards";
-
     &::after {
       display: none;
     }
   }
-  .poolHeader{
-    flex-wrap: wrap;
-    gap: 1rem;
-    width: 100%;
-  }
-  
   .rewards{
     flex-direction: column;
     height: calc(100% - 2rem);

@@ -137,5 +137,9 @@
   .ambientBaseContainer {
     flex-direction: column !important;
   }
+  .ambientContainer {
+    height: 40rem;
+    width: calc( 100vw - 1rem);
+  }
 }
 

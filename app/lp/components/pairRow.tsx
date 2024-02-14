@@ -24,7 +24,7 @@ export const UserCantoDexPairRow = ({
 }: {
   pair: CantoDexPairWithUserCTokenData;
   onManage: (pairAddress: string) => void;
-  isMobile?: boolean;
+  isMobile: boolean;
 }) => {
   if (!pair.clmData?.userDetails) return [];
   // add staked and wallet balance

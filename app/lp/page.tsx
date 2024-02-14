@@ -86,9 +86,8 @@ export default function Page() {
       </Modal>
 
       <Container
-        className={styles.poolHeader}
-        direction="row"
-        gap={"auto"}
+        direction={isMobile ? "column" : "row"}
+        gap={isMobile ? 10 : "auto"}
         width="100%"
       >
         <Text size="x-lg" font="proto_mono" className={styles.title}>
@@ -154,6 +153,7 @@ export default function Page() {
                     );
                     setPair(pairAddress);
                   },
+                  isMobile,
                 })
               ),
             ]}
