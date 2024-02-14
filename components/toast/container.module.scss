@@ -1,0 +1,22 @@
+.toast-container {
+  position: fixed;
+  padding: 4px 2px;
+  width: 410px;
+  margin: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.top-right {
+  top: 0;
+  right: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .toast-container {
+    width: 100%;
+    margin: 0;
+  }
+}

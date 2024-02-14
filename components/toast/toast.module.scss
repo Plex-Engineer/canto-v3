@@ -1,0 +1,73 @@
+.toast {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  //   margin-bottom: 16px;
+  background: var(--card-surface-color);
+  width: 406px;
+  height: 100%;
+  border: 1px solid;
+  animation: bounce_in_right 0.5s ease;
+  overflow: hidden;
+}
+
+.toast-close-animation {
+  animation: bounce-out-right 1s ease;
+}
+
+.toast-success {
+  border-color: #00b56c;
+}
+
+.toast-neutral {
+  border-color: rgba(var(--dark-color), 0.2);
+}
+
+.toast-error {
+  border-color: #f95050;
+}
+
+.toast-text {
+  margin-left: 13px;
+  width: 100%;
+}
+
+.toast-icon {
+  width: 28px;
+}
+
+.toast-close {
+  width: 24px;
+}
+
+@keyframes bounce_in_right {
+  from {
+    opacity: 0;
+    transform: translateX(300px);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounce-out-right {
+  30% {
+    opacity: 1;
+    // transform: translateX(-10px);
+    scale: 1;
+    max-height: 500px;
+  }
+  to {
+    opacity: 0;
+    // transform: translateX(500px);
+    scale: 0;
+    max-height: 0px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .toast {
+    width: 100%;
+  }
+}
