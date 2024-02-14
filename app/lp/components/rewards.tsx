@@ -55,20 +55,13 @@ const Rewards = (props: Props) => {
           />
         </Container>
       </div>
-      {isMobile && (
-        <Button
-          width={"fill"}
-          onClick={props.onClick}
-          disabled={Number(props.value) === 0}
-        >
-          Claim
-        </Button>
-      )}
-      {!isMobile && (
-        <Button onClick={props.onClick} disabled={Number(props.value) === 0}>
-          Claim
-        </Button>
-      )}
+      <Button
+        width={isMobile ? "fill" : undefined}
+        onClick={props.onClick}
+        disabled={Number(props.value) === 0}
+      >
+        Claim
+      </Button>
     </section>
   );
 };
