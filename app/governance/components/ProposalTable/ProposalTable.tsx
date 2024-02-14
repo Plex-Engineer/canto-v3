@@ -53,7 +53,10 @@ const ProposalTable = ({ proposals }: TableProps) => {
         case ProposalFilter.REJECTED:
           return proposal.status === "PROPOSAL_STATUS_REJECTED";
         default:
-          return true;
+          return (
+            proposal.status === "PROPOSAL_STATUS_REJECTED" ||
+            proposal.status === "PROPOSAL_STATUS_PASSED"
+          );
       }
     });
   }, [currentFilter, proposals]);

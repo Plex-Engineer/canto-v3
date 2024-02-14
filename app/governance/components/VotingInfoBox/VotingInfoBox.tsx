@@ -15,6 +15,7 @@ export function VotingInfoBox({
   color,
   isHighest,
   onClick,
+  borderColor,
 }: {
   isActive: boolean;
   percentage: string;
@@ -24,24 +25,32 @@ export function VotingInfoBox({
   color: string;
   isHighest: boolean;
   onClick: () => void;
+  borderColor: string;
 }) {
   const [isHovered, setIsHovered] = useState(false);
 
-  const dimmedColor = color.replace(")", ",0.5)");
+  const dimmedColor = ""; //this should be 50% of color variable
   const getHoverStyle = () => {
     if (isSelected && isActive) {
-      return { backgroundColor: color, cursor: "pointer", opacity: 1 };
+      return {
+        backgroundColor: color,
+        cursor: "pointer",
+        opacity: 1,
+        border: "1px solid",
+        borderColor: borderColor,
+        boxShadow: "var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15))",
+      };
     }
     if (isHovered && isActive) {
       return {
-        backgroundColor: dimmedColor,
+        backgroundColor: color,
         cursor: "pointer",
       };
     }
-    if (isHighest && !isActive) {
-      return { backgroundColor: dimmedColor };
-    }
-    return {};
+
+    return {
+      border: "1px solid var(--border-stroke-color, #b3b3b3)",
+    };
   };
 
   return (

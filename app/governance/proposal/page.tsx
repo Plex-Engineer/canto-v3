@@ -30,10 +30,22 @@ import useStaking from "@/hooks/staking/useStaking";
 import { VoteBarGraph } from "../components/votingChart/voteGraph";
 
 const VOTE_OPTION_COLORS = {
-  [VoteOption.YES]: "rgb(6, 252, 153)",
-  [VoteOption.NO]: "rgb(252, 81, 81)",
-  [VoteOption.VETO]: "rgb(68, 85, 239)",
-  [VoteOption.ABSTAIN]: "rgb(111, 105, 105)",
+  [VoteOption.YES]: [
+    "var(--vote-box-yes-color)",
+    "var(--vote-box-yes-stroke-color)",
+  ],
+  [VoteOption.NO]: [
+    "var(--vote-box-no-color)",
+    "var(--vote-box-no-stroke-color)",
+  ],
+  [VoteOption.VETO]: [
+    "var(--vote-box-veto-color)",
+    "var(--vote-box-veto-stroke-color)",
+  ],
+  [VoteOption.ABSTAIN]: [
+    "var(--vote-box-abstain-color)",
+    "var(--vote-box-abstain-stroke-color)",
+  ],
 };
 
 export default function Page() {
@@ -127,9 +139,10 @@ export default function Page() {
       amount={votesData[option].amount}
       value={option}
       isSelected={selectedVote == option}
-      color={VOTE_OPTION_COLORS[option]}
+      color={VOTE_OPTION_COLORS[option][0]}
       isHighest={maxAmountIndex == idx}
       onClick={() => setSelectedVote(option)}
+      borderColor={VOTE_OPTION_COLORS[option][1]}
     />
   );
 
@@ -185,7 +198,7 @@ export default function Page() {
             </div>
           )}
         </div>
-        <div style={{ padding: "10px 0px 10px 0px" }}>
+        <div style={{ margin: "0px 0px 8px 0px" }}>
           <Text font="proto_mono" size="x-lg">
             {proposal.title}
           </Text>

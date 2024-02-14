@@ -68,7 +68,7 @@
         height: 6px;
         width: 6px;
         border-radius: 50%;
-        background-color: var(--card-background-color, #c1c1c1);
+        background-color: #5E5E5E;
     }
   }
   .paginationContainer {
@@ -107,7 +107,7 @@
     justify-content: flex-start;
     align-items: center;
     height: 5rem;
-    background-color: var(--card-sub-surface-color, #dfdfdf);
+    background-color: var(--no-active-proposal-color,rgba(#dfdfdf, 0.4));
     border: 1px solid var(--border-stroke-color, #b3b3b3);
     padding-left: 30px;
   }
