@@ -164,6 +164,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                   return [
                     <Container
                       direction="column"
+                      width="100%"
                       key={`name_${index}`}
                       style={{ cursor: "pointer", alignItems: "left" }}
                     >
@@ -175,7 +176,6 @@ const ProposalTable = ({ proposals }: TableProps) => {
                           paddingLeft: "10px",
                           marginBottom: "20px",
                           opacity: 0.4,
-                          alignItems: "center",
                         }}
                       >
                         <Container
