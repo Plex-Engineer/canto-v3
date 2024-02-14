@@ -319,8 +319,12 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
             token={token}
             notEnoughNativeBalance={
               Confirmation.preConfirmCheck.error &&
-              Confirmation.preConfirmCheck.reason ===
-                TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_LZ
+              (Confirmation.preConfirmCheck.reason ===
+                TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_LZ ||
+                Confirmation.preConfirmCheck.reason ===
+                  TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_GRAVITY_BRIDGE ||
+                Confirmation.preConfirmCheck.reason ===
+                  TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_IBC)
             }
           />
         ) : (
@@ -566,7 +570,15 @@ const FeesSection = ({
                 active={fees.selected === props.bridgeFeeOptions.fast.fee}
               />
             </Container>
-            <Text font="proto_mono" size="x-sm">
+            <Text
+              font="proto_mono"
+              size="x-sm"
+              color={
+                notEnoughNativeBalance
+                  ? " var(--extra-failure-color, #ff0000)"
+                  : ""
+              }
+            >
               Gas Fee:{" "}
               {displayAmount(
                 Object.values(props.gasFees).reduce(
@@ -580,7 +592,13 @@ const FeesSection = ({
           </>
         )}
       {props.method === BridgingMethod.IBC && props.direction === "out" && (
-        <Text font="proto_mono" size="x-sm">
+        <Text
+          font="proto_mono"
+          size="x-sm"
+          color={
+            notEnoughNativeBalance ? " var(--extra-failure-color, #ff0000)" : ""
+          }
+        >
           Gas Fee:{" "}
           {displayAmount(
             Object.values(props.gasFees).reduce(
