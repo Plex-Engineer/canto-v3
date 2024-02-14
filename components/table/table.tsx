@@ -26,76 +26,45 @@ const Table = (props: Props) => {
   return (
     <div className={styles.container} style={{ fontSize: props.textSize }}>
       <div className={styles.title}>
-        {isMobile && (
-          <Text
-            font="proto_mono"
-            size="lg"
-            opacity={0.7}
-            className={styles.primaryTitle}
-          >
-            {props.title}
-          </Text>
-        )}
-        {!isMobile && (
-          <Text font="proto_mono" size="lg" opacity={0.7}>
-            {props.title}
-          </Text>
-        )}
+        <Text
+          font="proto_mono"
+          size="lg"
+          opacity={0.7}
+          className={isMobile ? styles.primaryTitle : undefined}
+        >
+          {props.title}
+        </Text>
         {props.secondary}
       </div>
       <div className={styles.table}>
-        {isMobile && (
-          <div
-            className={styles.header}
-            style={{
-              gridTemplateColumns: props.headers
-                .map((header) => {
-                  if (header.hideOnMobile) {
-                    return "";
-                  }
-                  return `${header.ratio}fr`;
-                })
-                .join(" "),
-            }}
-          >
-            {props.headers.map((header, index) => {
-              return (
-                <Text
-                  style={{ display: header.hideOnMobile ? "none" : "flex" }}
-                  key={index}
-                  className={styles.cell}
-                  font={props.headerFont}
-                >
-                  {header.value}
-                </Text>
-              );
-            })}
-          </div>
-        )}
-        {!isMobile && (
-          <div
-            className={styles.header}
-            style={{
-              gridTemplateColumns: props.headers
-                .map((header) => {
-                  return `${header.ratio}fr`;
-                })
-                .join(" "),
-            }}
-          >
-            {props.headers.map((header, index) => {
-              return (
-                <Text
-                  key={index}
-                  className={styles.cell}
-                  font={props.headerFont}
-                >
-                  {header.value}
-                </Text>
-              );
-            })}
-          </div>
-        )}
+        <div
+          className={styles.header}
+          style={{
+            gridTemplateColumns: props.headers
+              .map((header) => {
+                if (isMobile && header.hideOnMobile) {
+                  return "";
+                }
+                return `${header.ratio}fr`;
+              })
+              .join(" "),
+          }}
+        >
+          {props.headers.map((header, index) => {
+            return (
+              <Text
+                style={{
+                  display: isMobile && header.hideOnMobile ? "none" : "flex",
+                }}
+                key={index}
+                className={styles.cell}
+                font={props.headerFont}
+              >
+                {header.value}
+              </Text>
+            );
+          })}
+        </div>
         <div className={styles.content}>
           {props.content.map((row, index) => {
             //check if an array has been passed in
