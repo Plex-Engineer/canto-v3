@@ -117,8 +117,9 @@
   }
 
   .title {
-    align-items: flex-start;
+    align-items: center;
     flex-wrap: wrap;
+    height: auto;
   }
   .primaryTitle{
     padding:0.5rem;
