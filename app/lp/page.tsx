@@ -26,8 +26,6 @@ import {
   getAnalyticsCantoLiquidityPoolInfo,
   getAnalyticsAmbientLiquidityPoolInfo,
 } from "@/utils/analytics";
-import DesktopOnly from "@/components/desktop-only/desktop-only";
-import { useEffect, useState } from "react";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 export default function Page() {
@@ -52,11 +50,7 @@ export default function Page() {
   // if (!window.matchMedia("(min-width: 768px)").matches) {
   //   return <DesktopOnly />;
   // }
-  const [isMobile, setIsMobile] = useState(false);
-  const screen = useScreenSize();
-  useEffect(() => {
-    setIsMobile(screen.width < 768);
-  }, [screen.width]);
+  const { isMobile } = useScreenSize();
 
   //main content
   return (
@@ -80,7 +74,7 @@ export default function Page() {
             pool={selectedPair}
             sendTxFlow={sendAmbientTxFlow}
             verifyParams={validateAmbientTxParams}
-            isMobile={isMobile}
+            isMobile
           />
         )}
       </Modal>

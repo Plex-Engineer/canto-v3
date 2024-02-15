@@ -3,7 +3,6 @@ import styles from "../lp.module.scss";
 import Icon from "@/components/icon/icon";
 import Container from "@/components/container/container";
 import Button from "@/components/button/button";
-import { useEffect, useState } from "react";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 interface Props {
@@ -12,11 +11,7 @@ interface Props {
 }
 
 const Rewards = (props: Props) => {
-  const [isMobile, setIsMobile] = useState(false);
-  const screen = useScreenSize();
-  useEffect(() => {
-    setIsMobile(screen.width < 768);
-  }, [screen.width]);
+  const { isMobile } = useScreenSize();
   return (
     <section className={styles.rewards}>
       <div>

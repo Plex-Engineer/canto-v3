@@ -7,9 +7,8 @@ import { displayAmount, formatPercent } from "@/utils/formatting";
 import { useLendingCombo } from "./utils";
 import Text from "@/components/text";
 import Container from "@/components/container/container";
-import LoadingIcon from "@/components/loader/loading";
 import { LendingModal } from "./components/modal/modal";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Spacer from "@/components/layout/spacer";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import AccountHealth from "./components/accountHealth/accountHealth";
@@ -75,11 +74,7 @@ export default function LendingPage() {
   });
   const { cNote, rwas, stableCoins } = cTokens;
   const { selectedCToken, setSelectedCToken } = selection;
-  const [isMobile, setIsMobile] = useState(false);
-  const screen = useScreenSize();
-  useEffect(() => {
-    setIsMobile(screen.width < 768);
-  }, [screen.width]);
+  const { isMobile } = useScreenSize();
 
   if (isLoading || cNote === undefined || stableCoins === undefined) {
     return (

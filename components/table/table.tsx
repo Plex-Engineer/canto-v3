@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import Text from "../text";
 import styles from "./table.module.scss";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
@@ -18,11 +17,8 @@ interface Props {
 }
 
 const Table = (props: Props) => {
-  const [isMobile, setIsMobile] = useState(false);
-  const screen = useScreenSize();
-  useEffect(() => {
-    setIsMobile(screen.width < 768);
-  }, [screen.width]);
+  const { isMobile } = useScreenSize();
+
   return (
     <div className={styles.container} style={{ fontSize: props.textSize }}>
       <div className={styles.title}>
