@@ -49,7 +49,10 @@ const FeeButton = ({
         {subtext2}
       </Text>
       <div className={style.divider} />
-      <Text font="proto_mono">{`${tokenAmount} ${tokenSymbol}`}</Text>
+      <Text
+        font="proto_mono"
+        style={{ textAlign: "center" }}
+      >{`${tokenAmount} ${tokenSymbol}`}</Text>
       <Text size="x-sm" theme="secondary-dark">
         {"$" + tokenValueUSD}
       </Text>
