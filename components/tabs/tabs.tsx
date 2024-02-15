@@ -13,12 +13,15 @@ interface Props {
     isDisabled?: boolean;
     onClick?: () => void;
     content: React.ReactNode;
+    hideOnMobile?: boolean;
   }[];
   height?: string;
   shadows?: boolean;
+  isMobile: boolean;
 }
 const Tabs = (props: Props) => {
   const [activeTab, setActiveTab] = useState(props.defaultIndex ?? 0);
+  const isMobile = props.isMobile;
   return (
     <div
       className={styles.container}
@@ -37,6 +40,7 @@ const Tabs = (props: Props) => {
             }}
             disabled={tab.isDisabled}
             className={clsx(styles.tab, activeTab === index && styles.active)}
+            style={isMobile && tab.hideOnMobile ? { display: "none" } : {}}
           >
             <Text font="proto_mono" size="sm" theme={"primary-dark"}>
               {tab.title}

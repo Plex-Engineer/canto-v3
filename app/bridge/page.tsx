@@ -7,7 +7,8 @@ import useBridgeCombo from "./util";
 import BridgeInProgress from "./components/bridgeInProgress";
 import styles from "./bridge.module.scss";
 import useBridgingInProgess from "@/hooks/bridge/useBridgingInProgress";
-import DesktopOnly from "@/components/desktop-only/desktop-only";
+import { useEffect, useState } from "react";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 export default function BridgePage() {
   const bridgeCombo = useBridgeCombo();
@@ -15,9 +16,15 @@ export default function BridgePage() {
   const bridgeProgress = useBridgingInProgess();
 
   //   if mobile only
-  if (!window.matchMedia("(min-width: 768px)").matches) {
-    return <DesktopOnly />;
-  }
+  // if (!window.matchMedia("(min-width: 768px)").matches) {
+  //   return <DesktopOnly />;
+  // }
+  const [isMobile, setIsMobile] = useState(false);
+  const screen = useScreenSize();
+  useEffect(() => {
+    setIsMobile(screen.width < 768);
+  }, [screen.width]);
+
   return (
     <>
       <AnimatedBackground
@@ -33,7 +40,7 @@ export default function BridgePage() {
         }}
       >
         <Container
-          width="700px"
+          width={isMobile ? "100vw" : "700px"}
           backgroundColor="var(--card-sub-surface-color, #DFDFDF)"
         >
           <Tabs
@@ -66,8 +73,10 @@ export default function BridgePage() {
                     setTxBridgeStatus={bridgeProgress.setTxBridgeStatus}
                   />
                 ),
+                hideOnMobile: true,
               },
             ]}
+            isMobile={isMobile}
           />
         </Container>
       </Container>
