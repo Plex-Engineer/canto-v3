@@ -5,7 +5,8 @@ import Spacer from "@/components/layout/spacer";
 import Modal from "@/components/modal/modal";
 import Text from "@/components/text";
 import { GRAVITY_BRIGDE_EVM } from "@/config/networks";
-import { useState } from "react";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
+import { useEffect, useState } from "react";
 
 interface Props {
   open: boolean;
@@ -20,6 +21,11 @@ const GravityConfirmationModal = ({
   onReselectMethod,
 }: Props) => {
   const [addChainError, setAddChainError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const screen = useScreenSize();
+  useEffect(() => {
+    setIsMobile(screen.width < 768);
+  }, [screen.width]);
   async function handleConfirm() {
     try {
       // check that the user's wallet is actually supported
@@ -73,10 +79,13 @@ const GravityConfirmationModal = ({
       </Text>
       <Spacer height="30px" />
       <Container gap={20} direction="row" center={{ horizontal: true }}>
-        <Button onClick={handleConfirm}>
+        <Button onClick={handleConfirm} height={isMobile ? "large" : undefined}>
           {"I'm using a supported wallet"}
         </Button>{" "}
-        <Button onClick={onReselectMethod}>
+        <Button
+          onClick={onReselectMethod}
+          height={isMobile ? "large" : undefined}
+        >
           {"Use Gravity Bridge Portal"}
         </Button>
       </Container>
