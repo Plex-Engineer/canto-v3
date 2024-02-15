@@ -44,11 +44,8 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
 
   // special modal for gravity bridge out (check for wallet provider custom chains)
   const [gravityModalOpen, setGravityModalOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const screen = useScreenSize();
-  useEffect(() => {
-    setIsMobile(screen.width < 768);
-  }, [screen.width]);
+  const { isMobile } = useScreenSize();
+
   return (
     <>
       <GravityConfirmationModal

@@ -7,18 +7,13 @@ import useBridgeCombo from "./util";
 import BridgeInProgress from "./components/bridgeInProgress";
 import styles from "./bridge.module.scss";
 import useBridgingInProgess from "@/hooks/bridge/useBridgingInProgress";
-import { useEffect, useState } from "react";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 export default function BridgePage() {
   const bridgeCombo = useBridgeCombo();
   const { Direction } = bridgeCombo;
   const bridgeProgress = useBridgingInProgess();
-  const [isMobile, setIsMobile] = useState(false);
-  const screen = useScreenSize();
-  useEffect(() => {
-    setIsMobile(screen.width < 768);
-  }, [screen.width]);
+  const { isMobile } = useScreenSize();
 
   return (
     <>
