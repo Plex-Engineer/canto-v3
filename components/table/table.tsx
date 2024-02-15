@@ -12,7 +12,8 @@ interface Props {
   content: React.ReactNode[][] | React.ReactNode[];
   textSize?: string;
   onRowsClick?: (() => void)[];
-  isGovTable?: boolean;
+  removeHeader?: boolean;
+  rowHeight?: string;
 }
 
 const Table = (props: Props) => {
@@ -24,8 +25,17 @@ const Table = (props: Props) => {
         </Text>
         {props.secondary}
       </div>
-      <div className={styles.table}>
-        {!props.isGovTable ? (
+      <div
+        className={styles.table}
+        style={
+          !props.removeHeader
+            ? {
+                gridTemplateRows: "50px 1fr",
+              }
+            : {}
+        }
+      >
+        {!props.removeHeader ? (
           <div
             className={styles.header}
             style={{
@@ -52,7 +62,7 @@ const Table = (props: Props) => {
           <div
             style={{
               borderBottom: "1px solid var(--border-stroke-color)",
-              marginTop: "20px",
+              height: "20px",
             }}
           ></div>
         )}
@@ -73,7 +83,7 @@ const Table = (props: Props) => {
                     })
                     .join(" "),
                   cursor: props.onRowsClick ? "pointer" : undefined,
-                  height: props.isGovTable ? "120px" : "80px",
+                  height: props.rowHeight ? props.rowHeight : "80px",
                 }}
                 onClick={
                   props.onRowsClick ? props.onRowsClick[index] : undefined

@@ -5,6 +5,19 @@ import { displayAmount } from "@/utils/formatting/balances.utils";
 import Icon from "@/components/icon/icon";
 import { VoteOption } from "@/transactions/gov";
 import { useState } from "react";
+import clsx from "clsx";
+
+interface VotingOptionProps {
+  isActive: boolean;
+  percentage: string;
+  amount: string;
+  value: VoteOption;
+  isSelected: boolean;
+  color: string;
+  isHighest: boolean;
+  onClick: () => void;
+  borderColor: string;
+}
 
 export function VotingInfoBox({
   isActive,
@@ -16,56 +29,28 @@ export function VotingInfoBox({
   isHighest,
   onClick,
   borderColor,
-}: {
-  isActive: boolean;
-  percentage: string;
-  amount: string;
-  value: VoteOption;
-  isSelected: boolean;
-  color: string;
-  isHighest: boolean;
-  onClick: () => void;
-  borderColor: string;
-}) {
-  const [isHovered, setIsHovered] = useState(false);
-
-  const dimmedColor = ""; //this should be 50% of color variable
-  const getHoverStyle = () => {
-    if (isSelected && isActive) {
-      return {
-        backgroundColor: color,
-        cursor: "pointer",
-        opacity: 1,
-        border: "1px solid",
-        borderColor: borderColor,
-        boxShadow: "var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15))",
-      };
-    }
-    if (isHovered && isActive) {
-      return {
-        backgroundColor: color,
-        cursor: "pointer",
-      };
-    }
-
-    return {
-      border: "1px solid var(--border-stroke-color, #b3b3b3)",
-    };
-  };
-
+}: VotingOptionProps) {
   return (
     <div
-      className={styles.proposalInfoVoting}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
-        setIsHovered(false);
-      }}
+      className={clsx(styles.proposalInfoVoting, styles[value])} //styles[value] is to apply different colors based on option type on Hover
       onClick={() => {
         onClick();
       }}
-      style={getHoverStyle()}
+      style={
+        isSelected
+          ? {
+              backgroundColor: color,
+              cursor: "pointer",
+              opacity: 1,
+              border: "1px solid",
+              borderColor: borderColor,
+              boxShadow:
+                "var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15))",
+            }
+          : { border: "1px solid var(--border-stroke-color, #b3b3b3)" }
+      }
     >
-      <div className={styles.votingInfoRow1}>
+      <div className={styles.optionName}>
         <div
           style={{
             display: "flex",
@@ -82,11 +67,11 @@ export function VotingInfoBox({
       </div>
       <Container
         direction="column"
-        className={styles.votingInfoRow2}
+        //className={styles.optionVotes}
         width="50%"
         center={{ vertical: true, horizontal: true }}
       >
-        <div className={styles.infoRow1First}>
+        <div className={styles.optionVotes}>
           <Container
             direction="row"
             gap={6}

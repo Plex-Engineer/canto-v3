@@ -2,37 +2,50 @@
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-
+  cursor: pointer;
   padding: 10px;
   height: 100%;
   width: 48%;
-  .radioBtnContainer {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    vertical-align: middle;
-    margin: 0px 5px 0px 0px;
+  border: 1px solid var(--border-stroke-color, #b3b3b3);
+}
+
+.Yes{
+  &:hover{
+    background-color: var(--vote-box-yes-color);
+  }
+}
+.No{
+  &:hover{
+    background-color: var(--vote-box-no-color);
+  }
+}
+.Veto{
+  &:hover{
+    background-color: var(--vote-box-veto-color);
+  }
+}
+.Abstain{
+  &:hover{
+    background-color: var(--vote-box-abstain-color);
   }
 }
 
 
-.votingInfoRow1 {
+
+
+.optionName{
   display: flex;
   flex-direction: row;
   align-items: center;
   width: 50%;
-  .circle {
-    width: 7px;
-    height: 7px; 
-    border-radius: 50%; /* Make it round */
-  }
 }
 
-.infoRow1First {
+.optionVotes {
   display: flex;
   flex-direction: row;
   height: 50%;
   justify-content: flex-end;
+  //align-items: center;
   width: 100%;
 }
 

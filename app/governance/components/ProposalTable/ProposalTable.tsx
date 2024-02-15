@@ -138,7 +138,8 @@ const ProposalTable = ({ proposals }: TableProps) => {
                     )
                   : undefined
               }
-              isGovTable={true}
+              removeHeader={true}
+              rowHeight="120px"
               content={[
                 ...activeProposals.map((proposal, index) => {
                   const yesVotes = Number(
@@ -421,7 +422,8 @@ const ProposalTable = ({ proposals }: TableProps) => {
                   )
                 : undefined
             }
-            isGovTable={true}
+            removeHeader={true}
+            rowHeight="120px"
             content={
               paginatedProposals.length > 0
                 ? [

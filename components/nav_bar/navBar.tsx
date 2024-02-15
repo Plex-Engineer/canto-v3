@@ -178,7 +178,7 @@ const NavBar = () => {
               {
                 <Link
                   href="/staking"
-                  className={clsx(styles["optionsContainer1"])}
+                  className={clsx(styles["dropdownlink"])}
                   onClick={() => {
                     setIsMoreModalOpen(false);
                     Analytics.actions.events.clickedNavLink("Staking");
@@ -192,7 +192,7 @@ const NavBar = () => {
               {
                 <Link
                   href="/governance"
-                  className={clsx(styles["optionsContainer1"])}
+                  className={clsx(styles["dropdownlink"])}
                   onClick={() => {
                     setIsMoreModalOpen(false);
                     Analytics.actions.events.clickedNavLink("Governance");

@@ -191,7 +191,7 @@ export const VoteBarGraph = ({
           <div className={styles.circleContainer}>
             <div
               className={styles.circle}
-              style={{ backgroundColor: "green" }}
+              style={{ backgroundColor: "#0DFE17" }}
             />
           </div>
           <div className={styles.option}>
@@ -202,7 +202,10 @@ export const VoteBarGraph = ({
         </div>
         <div className={styles.voteOption}>
           <div className={styles.circleContainer}>
-            <div className={styles.circle} style={{ backgroundColor: "red" }} />
+            <div
+              className={styles.circle}
+              style={{ backgroundColor: "#EF4444" }}
+            />
           </div>
           <div className={styles.option}>
             <Text font="proto_mono" size="xx-sm">
@@ -214,7 +217,7 @@ export const VoteBarGraph = ({
           <div className={styles.circleContainer}>
             <div
               className={styles.circle}
-              style={{ backgroundColor: "purple" }}
+              style={{ backgroundColor: "#9747FF" }}
             />
           </div>
           <div className={styles.option}>
@@ -229,7 +232,7 @@ export const VoteBarGraph = ({
           <div className={styles.circleContainer}>
             <div
               className={styles.circle}
-              style={{ backgroundColor: "yellow" }}
+              style={{ backgroundColor: "#EAD42A" }}
             />
           </div>
           <div className={styles.option}>
