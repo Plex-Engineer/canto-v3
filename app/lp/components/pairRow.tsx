@@ -436,34 +436,9 @@ export const UserAmbientPairRow = ({
           vertical: true,
         }}
         gap={10}
-    <Container
-      key={pool.address + " value"}
-      direction="row"
-      center={{
-        horizontal: true,
-        vertical: true,
-      }}
-      gap={10}
-    >
-      <Text key={pool.symbol + "rewards"}>
-        {displayAmount(pool.userRewards ?? "0", 18)}
-      </Text>
-      <InfoPop>
-        <Container>
-          <Text size="sm" theme="secondary-dark">
-            Rewards will be released in <Countdown endTimestamp={rewardTime} />
-          </Text>
-        </Container>
-      </InfoPop>
-    </Container>,
-    <Container key={"action"} direction="row" center={{ horizontal: true }}>
-      <Button
-        color="secondary"
-        key={"action item"}
-        onClick={() => onManage(pool.address)}
       >
         <Text key={pool.symbol + "rewards"}>
-          {displayAmount(rewards ?? "0", 18)}
+          {displayAmount(pool.userRewards ?? "0", 18)}
         </Text>
         <InfoPop>
           <Container>
