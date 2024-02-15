@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import GravityConfirmationModal from "./components/gravityConfirmationModal";
 import { GRAVITY_BRIDGE } from "@/config/networks";
 import { TX_ERROR_TYPES } from "@/config/consts/errors";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 const Bridging = ({ props }: { props: BridgeComboReturn }) => {
   const {
@@ -43,7 +44,11 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
 
   // special modal for gravity bridge out (check for wallet provider custom chains)
   const [gravityModalOpen, setGravityModalOpen] = useState(false);
-
+  const [isMobile, setIsMobile] = useState(false);
+  const screen = useScreenSize();
+  useEffect(() => {
+    setIsMobile(screen.width < 768);
+  }, [screen.width]);
   return (
     <>
       <GravityConfirmationModal
@@ -235,7 +240,11 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
 
           <Container width="100%" gap={14}>
             <Text size="sm">Select Token and Enter Amount</Text>
-            <Container width="100%" direction="row" gap={20}>
+            <Container
+              width="100%"
+              direction={isMobile ? "column" : "row"}
+              gap={isMobile ? 50 : 20}
+            >
               <Selector
                 title="SELECT TOKEN"
                 activeItem={
