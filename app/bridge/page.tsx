@@ -14,11 +14,6 @@ export default function BridgePage() {
   const bridgeCombo = useBridgeCombo();
   const { Direction } = bridgeCombo;
   const bridgeProgress = useBridgingInProgess();
-
-  //   if mobile only
-  // if (!window.matchMedia("(min-width: 768px)").matches) {
-  //   return <DesktopOnly />;
-  // }
   const [isMobile, setIsMobile] = useState(false);
   const screen = useScreenSize();
   useEffect(() => {
@@ -76,7 +71,6 @@ export default function BridgePage() {
                 hideOnMobile: true,
               },
             ]}
-            isMobile={isMobile}
           />
         </Container>
       </Container>

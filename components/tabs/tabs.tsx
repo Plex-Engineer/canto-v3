@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./tabs.module.scss";
 import Text from "../text";
 import clsx from "clsx";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 interface Props {
   defaultIndex?: number;
@@ -17,11 +18,14 @@ interface Props {
   }[];
   height?: string;
   shadows?: boolean;
-  isMobile: boolean;
 }
 const Tabs = (props: Props) => {
   const [activeTab, setActiveTab] = useState(props.defaultIndex ?? 0);
-  const isMobile = props.isMobile;
+  const [isMobile, setIsMobile] = useState(false);
+  const screen = useScreenSize();
+  useEffect(() => {
+    setIsMobile(screen.width < 768);
+  }, [screen.width]);
   return (
     <div
       className={styles.container}
