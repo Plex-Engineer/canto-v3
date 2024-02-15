@@ -2,7 +2,7 @@
 import Spacer from "@/components/layout/spacer";
 import Selector from "@/components/selector/selector";
 import Text from "@/components/text";
-import { displayAmount } from "@/utils/formatting";
+import { displayAmount, sortTokens } from "@/utils/formatting";
 import styles from "./bridge.module.scss";
 import Button from "@/components/button/button";
 import Input from "@/components/input/input";
@@ -251,8 +251,8 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
                         id: "",
                       }
                 }
-                items={bridge.allOptions.tokens
-                  .map((token) => ({
+                items={sortTokens(
+                  bridge.allOptions.tokens.map((token) => ({
                     ...token,
                     name: token.name.length > 24 ? token.symbol : token.name,
                     secondary: displayAmount(
@@ -260,14 +260,7 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
                       token.decimals
                     ),
                   }))
-                  .sort((a, b) => {
-                    if (Number(a.secondary) === Number(b.secondary)) {
-                      return b.name.toLowerCase() > a.name.toLowerCase()
-                        ? -1
-                        : 1;
-                    }
-                    return Number(a.secondary) > Number(b.secondary) ? -1 : 1;
-                  })}
+                )}
                 onChange={(tokenId) => bridge.setState("token", tokenId)}
               />
               <Container width="100%">
@@ -319,8 +312,12 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
             token={token}
             notEnoughNativeBalance={
               Confirmation.preConfirmCheck.error &&
-              Confirmation.preConfirmCheck.reason ===
-                TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_LZ
+              (Confirmation.preConfirmCheck.reason ===
+                TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_LZ ||
+                Confirmation.preConfirmCheck.reason ===
+                  TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_GRAVITY_BRIDGE ||
+                Confirmation.preConfirmCheck.reason ===
+                  TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_IBC)
             }
           />
         ) : (
@@ -566,7 +563,15 @@ const FeesSection = ({
                 active={fees.selected === props.bridgeFeeOptions.fast.fee}
               />
             </Container>
-            <Text font="proto_mono" size="x-sm">
+            <Text
+              font="proto_mono"
+              size="x-sm"
+              color={
+                notEnoughNativeBalance
+                  ? " var(--extra-failure-color, #ff0000)"
+                  : ""
+              }
+            >
               Gas Fee:{" "}
               {displayAmount(
                 Object.values(props.gasFees).reduce(
@@ -580,7 +585,13 @@ const FeesSection = ({
           </>
         )}
       {props.method === BridgingMethod.IBC && props.direction === "out" && (
-        <Text font="proto_mono" size="x-sm">
+        <Text
+          font="proto_mono"
+          size="x-sm"
+          color={
+            notEnoughNativeBalance ? " var(--extra-failure-color, #ff0000)" : ""
+          }
+        >
           Gas Fee:{" "}
           {displayAmount(
             Object.values(props.gasFees).reduce(

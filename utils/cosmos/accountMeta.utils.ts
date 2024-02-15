@@ -1,7 +1,7 @@
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 import { GRAVITY_BRIDGE } from "@/config/networks";
 import { Sender } from "@/transactions/interfaces";
-import { tryFetch } from "@/utils/async";
+import { tryFetch, tryFetchWithRetry } from "@/utils/async";
 import { getCantoCosmosNetwork } from "@/utils/networks";
 
 interface CantoAccountReturn {
@@ -81,9 +81,10 @@ export async function getGravitySenderObj(
 ): PromiseWithError<Sender> {
   try {
     const { data: gravityAccount, error } =
-      await tryFetch<GravityAccountReturn>(
-        `${GRAVITY_BRIDGE.restEndpoint}/cosmos/auth/v1beta1/accounts/${senderGravityAddress}`
-      );
+    await tryFetchWithRetry<GravityAccountReturn>(
+      `${GRAVITY_BRIDGE.restEndpoint}/cosmos/auth/v1beta1/accounts/${senderGravityAddress}`,
+      5
+    );
     if (error) throw error;
     return NO_ERROR({
       accountAddress: gravityAccount.account.address,
