@@ -242,7 +242,7 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
             <Text size="sm">Select Token and Enter Amount</Text>
             <Container
               width="100%"
-              direction={isMobile ? "column" : "row"}
+              direction={!isMobile ? "row" : "column"}
               gap={isMobile ? 50 : 20}
             >
               <Selector
