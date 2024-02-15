@@ -1,5 +1,6 @@
 import Text from "../text";
 import styles from "./table.module.scss";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 interface Props {
   title?: string | React.ReactNode;
@@ -8,6 +9,7 @@ interface Props {
   headers: {
     value: string | React.ReactNode;
     ratio: number;
+    hideOnMobile?: boolean | undefined;
   }[];
   content: React.ReactNode[][] | React.ReactNode[];
   textSize?: string;
@@ -15,10 +17,17 @@ interface Props {
 }
 
 const Table = (props: Props) => {
+  const { isMobile } = useScreenSize();
+
   return (
     <div className={styles.container} style={{ fontSize: props.textSize }}>
       <div className={styles.title}>
-        <Text font="proto_mono" size="lg" opacity={0.7}>
+        <Text
+          font="proto_mono"
+          size="lg"
+          opacity={0.7}
+          className={isMobile ? styles.primaryTitle : undefined}
+        >
           {props.title}
         </Text>
         {props.secondary}
@@ -29,6 +38,9 @@ const Table = (props: Props) => {
           style={{
             gridTemplateColumns: props.headers
               .map((header) => {
+                if (isMobile && header.hideOnMobile) {
+                  return "";
+                }
                 return `${header.ratio}fr`;
               })
               .join(" "),
@@ -36,7 +48,14 @@ const Table = (props: Props) => {
         >
           {props.headers.map((header, index) => {
             return (
-              <Text key={index} className={styles.cell} font={props.headerFont}>
+              <Text
+                style={{
+                  display: isMobile && header.hideOnMobile ? "none" : "flex",
+                }}
+                key={index}
+                className={styles.cell}
+                font={props.headerFont}
+              >
                 {header.value}
               </Text>
             );
@@ -55,13 +74,17 @@ const Table = (props: Props) => {
                 style={{
                   gridTemplateColumns: props.headers
                     .map((header) => {
-                      return `${header.ratio}fr`;
+                      const ratio =
+                        isMobile && header.hideOnMobile ? 0 : header.ratio;
+                      return `${ratio}fr`;
                     })
                     .join(" "),
-                  cursor: props.onRowsClick ? "pointer" : undefined,
+                  cursor: isMobile && props.onRowsClick ? "pointer" : undefined,
                 }}
                 onClick={
-                  props.onRowsClick ? props.onRowsClick[index] : undefined
+                  isMobile && props.onRowsClick
+                    ? props.onRowsClick[index]
+                    : undefined
                 }
               >
                 {row.map((cell, index) => {

@@ -33,11 +33,13 @@ interface NewPositionModalProps {
   pool: AmbientPool;
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
   verifyParams: (params: Partial<AmbientTransactionParams>) => Validation;
+  isMobile?: boolean;
 }
 export const NewAmbientPositionModal = ({
   pool,
   sendTxFlow,
   verifyParams,
+  isMobile,
 }: NewPositionModalProps) => {
   const { base: baseToken, quote: quoteToken } = pool;
   const positionManager = useNewAmbientPositionManager(pool);
@@ -84,8 +86,16 @@ export const NewAmbientPositionModal = ({
     formatPercent(((selectedPrice - currentPrice) / currentPrice).toString());
 
   return (
-    <Container width={showAdvanced ? "64rem" : "32rem"}>
-      <Container direction="row" gap={20}>
+    <Container
+      width={
+        !isMobile ? (showAdvanced ? "64rem" : "32rem") : "calc(100vw - 3rem)"
+      }
+    >
+      <Container
+        direction="row"
+        gap={20}
+        className={styles.ambientBaseContainer}
+      >
         <Container>
           <Container
             direction="row"
