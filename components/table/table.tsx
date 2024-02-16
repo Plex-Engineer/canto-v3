@@ -14,6 +14,8 @@ interface Props {
   content: React.ReactNode[][] | React.ReactNode[];
   textSize?: string;
   onRowsClick?: (() => void)[];
+  removeHeader?: boolean;
+  rowHeight?: string;
 }
 
 const Table = (props: Props) => {
@@ -32,35 +34,53 @@ const Table = (props: Props) => {
         </Text>
         {props.secondary}
       </div>
-      <div className={styles.table}>
-        <div
-          className={styles.header}
-          style={{
-            gridTemplateColumns: props.headers
-              .map((header) => {
-                if (isMobile && header.hideOnMobile) {
-                  return "";
-                }
-                return `${header.ratio}fr`;
-              })
-              .join(" "),
-          }}
-        >
-          {props.headers.map((header, index) => {
-            return (
-              <Text
-                style={{
-                  display: isMobile && header.hideOnMobile ? "none" : "flex",
-                }}
-                key={index}
-                className={styles.cell}
-                font={props.headerFont}
-              >
-                {header.value}
-              </Text>
-            );
-          })}
-        </div>
+      <div
+        className={styles.table}
+        style={
+          !props.removeHeader
+            ? {
+                gridTemplateRows: "50px 1fr",
+              }
+            : {}
+        }
+      >
+        {!props.removeHeader ? (
+          <div
+            className={styles.header}
+            style={{
+              gridTemplateColumns: props.headers
+                .map((header) => {
+                  if (isMobile && header.hideOnMobile) {
+                    return "";
+                  }
+                  return `${header.ratio}fr`;
+                })
+                .join(" "),
+            }}
+          >
+            {props.headers.map((header, index) => {
+              return (
+                <Text
+                  style={{
+                    display: isMobile && header.hideOnMobile ? "none" : "flex",
+                  }}
+                  key={index}
+                  className={styles.cell}
+                  font={props.headerFont}
+                >
+                  {header.value}
+                </Text>
+              );
+            })}
+          </div>
+        ) : (
+          <div
+            style={{
+              borderBottom: "1px solid var(--border-stroke-color)",
+              height: "20px",
+            }}
+          ></div>
+        )}
         <div className={styles.content}>
           {props.content.map((row, index) => {
             //check if an array has been passed in
@@ -80,6 +100,7 @@ const Table = (props: Props) => {
                     })
                     .join(" "),
                   cursor: isMobile && props.onRowsClick ? "pointer" : undefined,
+                  height: props.rowHeight ? props.rowHeight : "80px",
                 }}
                 onClick={
                   isMobile && props.onRowsClick
