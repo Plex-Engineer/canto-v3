@@ -99,13 +99,11 @@ const Table = (props: Props) => {
                       return `${ratio}fr`;
                     })
                     .join(" "),
-                  cursor: isMobile && props.onRowsClick ? "pointer" : undefined,
+                  cursor: props.onRowsClick ? "pointer" : undefined,
                   height: props.rowHeight ? props.rowHeight : "80px",
                 }}
                 onClick={
-                  isMobile && props.onRowsClick
-                    ? props.onRowsClick[index]
-                    : undefined
+                  props.onRowsClick ? props.onRowsClick[index] : undefined
                 }
               >
                 {row.map((cell, index) => {
