@@ -6,27 +6,26 @@ import { formatBalance } from "@/utils/formatting";
 import Container from "@/components/container/container";
 
 interface VoteBarGraphProps {
-  yesVotes: number;
-  noVotes: number;
-  abstainVotes: number;
-  vetoVotes: number;
+  yes: number;
+  no: number;
+  abstain: number;
+  veto: number;
   size: number;
 }
 
 export const VoteBarGraph = ({
-  yesVotes,
-  noVotes,
-  abstainVotes,
-  vetoVotes,
+  yes,
+  no,
+  abstain,
+  veto,
   size,
 }: VoteBarGraphProps) => {
-  const totalVotes = yesVotes + noVotes + abstainVotes + vetoVotes;
+  const totalVotes = yes + no + abstain + veto;
 
-  const yesPercentage = totalVotes > 0 ? (yesVotes / totalVotes) * 100 : 0;
-  const noPercentage = totalVotes > 0 ? (noVotes / totalVotes) * 100 : 0;
-  const abstainPercentage =
-    totalVotes > 0 ? (abstainVotes / totalVotes) * 100 : 0;
-  const vetoPercentage = totalVotes > 0 ? (vetoVotes / totalVotes) * 100 : 0;
+  const yesPercentage = totalVotes > 0 ? (yes / totalVotes) * 100 : 0;
+  const noPercentage = totalVotes > 0 ? (no / totalVotes) * 100 : 0;
+  const abstainPercentage = totalVotes > 0 ? (abstain / totalVotes) * 100 : 0;
+  const vetoPercentage = totalVotes > 0 ? (veto / totalVotes) * 100 : 0;
 
   const yesHeight = (yesPercentage * size) / 150; //150 is to make the bar occupy at max 2/3rd of the total height of the container if an option get 100% votes
   const noHeight = (noPercentage * size) / 150;
@@ -53,7 +52,7 @@ export const VoteBarGraph = ({
           <div className={styles.amountInfo}>
             <div>
               <Text size="x-sm">
-                {formatBalance(yesVotes.toString(), 0, { short: true })}{" "}
+                {formatBalance(yes.toString(), 0, { short: true })}{" "}
               </Text>
             </div>
             <div className={styles.icon}>
@@ -89,7 +88,7 @@ export const VoteBarGraph = ({
           <div className={styles.amountInfo}>
             <div>
               <Text size="x-sm">
-                {formatBalance(noVotes.toString(), 0, { short: true })}{" "}
+                {formatBalance(no.toString(), 0, { short: true })}{" "}
               </Text>
             </div>
             <div className={styles.icon}>
@@ -125,7 +124,7 @@ export const VoteBarGraph = ({
           <div className={styles.amountInfo}>
             <div>
               <Text size="x-sm">
-                {formatBalance(vetoVotes.toString(), 0, { short: true })}{" "}
+                {formatBalance(veto.toString(), 0, { short: true })}{" "}
               </Text>
             </div>
             <div className={styles.icon}>
@@ -161,7 +160,7 @@ export const VoteBarGraph = ({
           <div className={styles.amountInfo}>
             <div>
               <Text size="x-sm">
-                {formatBalance(abstainVotes.toString(), 0, { short: true })}{" "}
+                {formatBalance(abstain.toString(), 0, { short: true })}{" "}
               </Text>
             </div>
             <div className={styles.icon}>
@@ -260,15 +259,15 @@ export const VoteBar = ({
   const getColor = (index: number): string => {
     switch (index) {
       case 0:
-        return "green";
+        return "#12D481";
       case 1:
-        return "red";
+        return "#EF4444";
       case 2:
-        return "blue";
+        return "#A22ED8";
       case 3:
-        return "yellow";
+        return "#F5E98A";
       default:
-        return "white";
+        return "";
     }
   };
   return (
@@ -290,20 +289,13 @@ export const VoteBar = ({
   );
 };
 
-export const VoteGraphBox = ({
-  yesVotes,
-  noVotes,
-  abstainVotes,
-  vetoVotes,
-  size,
-}: VoteBarGraphProps) => {
-  const totalVotes = yesVotes + noVotes + abstainVotes + vetoVotes;
+export const VoteGraphBox = ({ yes, no, abstain, veto }: VoteBarGraphProps) => {
+  const totalVotes = yes + no + abstain + veto;
 
-  const yesPercentage = totalVotes > 0 ? (yesVotes / totalVotes) * 100 : 0;
-  const noPercentage = totalVotes > 0 ? (noVotes / totalVotes) * 100 : 0;
-  const abstainPercentage =
-    totalVotes > 0 ? (abstainVotes / totalVotes) * 100 : 0;
-  const vetoPercentage = totalVotes > 0 ? (vetoVotes / totalVotes) * 100 : 0;
+  const yesPercentage = totalVotes > 0 ? (yes / totalVotes) * 100 : 0;
+  const noPercentage = totalVotes > 0 ? (no / totalVotes) * 100 : 0;
+  const abstainPercentage = totalVotes > 0 ? (abstain / totalVotes) * 100 : 0;
+  const vetoPercentage = totalVotes > 0 ? (veto / totalVotes) * 100 : 0;
 
   const getVoteOption = (index: number): string => {
     switch (index) {

@@ -134,13 +134,10 @@ export default function Page() {
   const VoteBox = ({ option, idx }: { option: VoteOption; idx: number }) => (
     <VotingInfoBox
       key={option}
-      isActive={isActive}
-      percentage={votesData[option].percentage}
       amount={votesData[option].amount}
       value={option}
       isSelected={selectedVote == option}
       color={VOTE_OPTION_COLORS[option][0]}
-      isHighest={maxAmountIndex == idx}
       onClick={() => setSelectedVote(option)}
       borderColor={VOTE_OPTION_COLORS[option][1]}
     />
@@ -265,10 +262,10 @@ export default function Page() {
 
           <div className={styles.graphContainer}>
             <VoteBarGraph
-              yesVotes={Number(votesData[VoteOption.YES].amount)}
-              noVotes={Number(votesData[VoteOption.NO].amount)}
-              abstainVotes={Number(votesData[VoteOption.ABSTAIN].amount)}
-              vetoVotes={Number(votesData[VoteOption.VETO].amount)}
+              yes={Number(votesData[VoteOption.YES].amount)}
+              no={Number(votesData[VoteOption.NO].amount)}
+              abstain={Number(votesData[VoteOption.ABSTAIN].amount)}
+              veto={Number(votesData[VoteOption.VETO].amount)}
               size={422}
             />
           </div>

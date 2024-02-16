@@ -269,10 +269,10 @@ const ProposalTable = ({ proposals }: TableProps) => {
                         <Container direction="row">
                           <Container>
                             <VoteGraphBox
-                              yesVotes={yesVotes}
-                              noVotes={noVotes}
-                              vetoVotes={vetoVotes}
-                              abstainVotes={abstainVotes}
+                              yes={yesVotes}
+                              no={noVotes}
+                              veto={vetoVotes}
+                              abstain={abstainVotes}
                               size={40}
                             />
                           </Container>

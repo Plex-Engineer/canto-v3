@@ -8,25 +8,19 @@ import { useState } from "react";
 import clsx from "clsx";
 
 interface VotingOptionProps {
-  isActive: boolean;
-  percentage: string;
   amount: string;
   value: VoteOption;
   isSelected: boolean;
   color: string;
-  isHighest: boolean;
   onClick: () => void;
   borderColor: string;
 }
 
 export function VotingInfoBox({
-  isActive,
-  percentage,
   amount,
   value,
   isSelected,
   color,
-  isHighest,
   onClick,
   borderColor,
 }: VotingOptionProps) {
@@ -51,19 +45,13 @@ export function VotingInfoBox({
       }
     >
       <div className={styles.optionName}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-around",
-          }}
-        >
+        <Container direction="row">
           <div>
             <Text font="proto_mono" size="sm">
               {value}
             </Text>
           </div>
-        </div>
+        </Container>
       </div>
       <Container
         direction="column"
