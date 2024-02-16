@@ -257,6 +257,7 @@ const useTransactionStore = create<TransactionStore>()(
                     txSuccess: false,
                     txHash: updatedTx?.hash,
                     txError: txError?.message.split(":").pop() ?? "",
+                    txErrorTrace: txError?.message ?? "",
                     txTimeInSeconds
                   });
                 }
