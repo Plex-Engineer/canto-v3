@@ -9,31 +9,28 @@
   border: 1px solid var(--border-stroke-color, #b3b3b3);
 }
 
-.Yes{
-  &:hover{
+.Yes {
+  &:hover {
     background-color: var(--vote-box-yes-color);
   }
 }
-.No{
-  &:hover{
+.No {
+  &:hover {
     background-color: var(--vote-box-no-color);
   }
 }
-.Veto{
-  &:hover{
+.Veto {
+  &:hover {
     background-color: var(--vote-box-veto-color);
   }
 }
-.Abstain{
-  &:hover{
+.Abstain {
+  &:hover {
     background-color: var(--vote-box-abstain-color);
   }
 }
 
-
-
-
-.optionName{
+.optionName {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -48,5 +45,3 @@
   //align-items: center;
   width: 100%;
 }
-
-

@@ -34,7 +34,6 @@ const Table = (props: Props) => {
         </Text>
         {props.secondary}
       </div>
-      {"<<<<<<< venu/eng-1570-voting-option-changes"}
       <div
         className={styles.table}
         style={
@@ -51,6 +50,9 @@ const Table = (props: Props) => {
             style={{
               gridTemplateColumns: props.headers
                 .map((header) => {
+                  if (isMobile && header.hideOnMobile) {
+                    return "";
+                  }
                   return `${header.ratio}fr`;
                 })
                 .join(" "),
@@ -59,6 +61,9 @@ const Table = (props: Props) => {
             {props.headers.map((header, index) => {
               return (
                 <Text
+                  style={{
+                    display: isMobile && header.hideOnMobile ? "none" : "flex",
+                  }}
                   key={index}
                   className={styles.cell}
                   font={props.headerFont}
@@ -76,37 +81,6 @@ const Table = (props: Props) => {
             }}
           ></div>
         )}
-        {"======="}
-      <div className={styles.table}>
-        <div
-          className={styles.header}
-          style={{
-            gridTemplateColumns: props.headers
-              .map((header) => {
-                if (isMobile && header.hideOnMobile) {
-                  return "";
-                }
-                return `${header.ratio}fr`;
-              })
-              .join(" "),
-          }}
-        >
-          {props.headers.map((header, index) => {
-            return (
-              <Text
-                style={{
-                  display: isMobile && header.hideOnMobile ? "none" : "flex",
-                }}
-                key={index}
-                className={styles.cell}
-                font={props.headerFont}
-              >
-                {header.value}
-              </Text>
-            );
-          })}
-        </div>
-        {">>>>>>> release-1.0.0"}
         <div className={styles.content}>
           {props.content.map((row, index) => {
             //check if an array has been passed in

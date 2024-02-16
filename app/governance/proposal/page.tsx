@@ -16,13 +16,11 @@ import { useState } from "react";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Splash from "@/components/splash/splash";
 import { VoteOption } from "@/transactions/gov";
-import Image from "next/image";
 import { NEW_ERROR } from "@/config/interfaces";
 import { VotingInfoBox } from "../components/VotingInfoBox/VotingInfoBox";
-import { displayAmount } from "@/utils/formatting";
 import {
   PROPOSAL_QUORUM_VALUE,
-  PROPOSAL_TURNOUT_VALUE,
+  PROPOSAL_VETO_THRESHOLD,
 } from "@/config/consts/config";
 
 import Spacer from "@/components/layout/spacer";
@@ -56,11 +54,10 @@ export default function Page() {
     chainId: chainId,
   });
 
-  const { isLoading, validators, apr, userStaking, selection, transaction } =
-    useStaking({
-      chainId: chainId,
-      userEthAddress: signer?.account.address,
-    });
+  const { userStaking } = useStaking({
+    chainId: chainId,
+    userEthAddress: signer?.account.address,
+  });
   // transaction
   function castVote(proposalId: number, voteOption: VoteOption | null) {
     if (signer) {
@@ -277,12 +274,12 @@ export default function Page() {
             <div className={styles.proposalInfo}>
               <div>
                 <Text font="rm_mono" opacity={0.3} size="x-sm">
-                  Turnout
+                  Veto
                 </Text>
               </div>
               <div className={styles.displayAmount}>
                 <Text font="proto_mono" size="x-sm">
-                  {PROPOSAL_TURNOUT_VALUE}
+                  {PROPOSAL_VETO_THRESHOLD}
                 </Text>
                 {/* <div className={styles.icon}>
                   <Image

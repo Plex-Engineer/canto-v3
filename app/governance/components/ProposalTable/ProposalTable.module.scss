@@ -16,7 +16,7 @@
     width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
-    
+
     .tableData {
       text-align: left;
     }
@@ -26,7 +26,7 @@
       padding-left: 20px;
       padding-right: 10px;
     }
-    .proposalStatus{
+    .proposalStatus {
       display: flex;
       flex-direction: row;
       padding: 4px 12px 4px 12px;
@@ -35,32 +35,28 @@
       background-color: var(--proposal-status-color, #d8d8d8);
       width: fit-content;
     }
-    .proposalVotingDate{
+    .proposalVotingDate {
       display: flex;
       flex-direction: row;
       padding: 4px 12px 4px 0px;
       width: fit-content;
     }
-    
   }
-  .circleContainer{
+  .circleContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     margin-right: 5px;
     //background-color: red;
-    .circle{
-        height: 6px;
-        width: 6px;
-        border-radius: 50%;
-        background-color: #5E5E5E;
+    .circle {
+      height: 6px;
+      width: 6px;
+      border-radius: 50%;
+      background-color: #5e5e5e;
     }
   }
-  
-  
 
-  
   .noProposalContainer {
     justify-content: center;
     align-items: center;
@@ -69,21 +65,19 @@
     text-align: center;
     flex-grow: 1;
   }
-  .noActiveProposalContainer{
+  .noActiveProposalContainer {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
     height: 5rem;
-    background-color: var(--no-active-proposal-color,rgba(#dfdfdf, 0.4));
+    background-color: var(--no-active-proposal-color, rgba(#dfdfdf, 0.4));
     border: 1px solid var(--border-stroke-color, #b3b3b3);
     padding-left: 30px;
   }
-  
-  
+
   .clickButton {
     height: 100%;
     transform: rotate(270deg);
   }
 }
-

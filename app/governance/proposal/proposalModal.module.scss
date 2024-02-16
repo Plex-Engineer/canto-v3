@@ -1,29 +1,28 @@
 .proposalContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 1400px !important;
-    margin: 10px auto;
-    border-top: 1px solid var(--primary-90-color);
-    position: relative;
-    padding-top: 2rem;
-  
-    &::before {
-      content: "";
-      position: absolute;
-      top: -1px;
-      left: 0;
-      width: calc(100% - 1px);
-      height: 10px;
-      border-left: 1px solid var(--primary-90-color);
-      border-right: 1px solid var(--primary-90-color);
-    }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1400px !important;
+  margin: 10px auto;
+  border-top: 1px solid var(--primary-90-color);
+  position: relative;
+  padding-top: 2rem;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: calc(100% - 1px);
+    height: 10px;
+    border-left: 1px solid var(--primary-90-color);
+    border-right: 1px solid var(--primary-90-color);
+  }
 
   .proposalHeaderContainer {
     padding: 10px 0px 20px 10px;
     width: 100%;
     margin: 0 20px 0 20px;
-
   }
   .headerCard {
     display: flex;
@@ -32,11 +31,10 @@
     width: fit-content;
     margin: 40px 0px 24px 0;
     //border-style: solid ;
-    .headerColumn2{
+    .headerColumn2 {
       display: flex;
       flex-direction: row;
     }
-    
   }
   .backButtonContainer {
     border: 1px solid;
@@ -59,11 +57,11 @@
     width: 100%;
     margin: 0 20px 0 20px;
 
-    .graphAndVoteContainer{
+    .graphAndVoteContainer {
       width: 70%;
       min-width: 500px;
       display: flex;
-      flex-direction: column ;
+      flex-direction: column;
       margin-right: 20px;
       .proposalCardContainer1 {
         display: flex;
@@ -74,12 +72,12 @@
         box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
         height: 360px;
         margin-top: 30px;
-        .detailsHeader{
+        .detailsHeader {
           width: 100%;
           padding: 20px 0px 20px 20px;
           border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
         }
-        .votingBox{
+        .votingBox {
           height: fit-content;
           .proposalInfoVoting {
             display: flex;
@@ -112,8 +110,8 @@
             align-items: center;
             width: 50%;
             .circle {
-              width: 7px; 
-              height: 7px; 
+              width: 7px;
+              height: 7px;
               border-radius: 50%;
             }
           }
@@ -141,9 +139,7 @@
             padding-bottom: 10px;
             align-items: center;
           }
-        
-          
-        
+
           .VotingButton .tooltip {
             visibility: hidden;
             width: 300px;
@@ -159,7 +155,7 @@
             opacity: 1;
             transition: opacity 0.6s;
           }
-        
+
           .VotingButton:hover .tooltip {
             visibility: visible;
             width: 300px;
@@ -174,9 +170,8 @@
             transition: opacity 0.6s;
           }
         }
-        
       }
-      .graphContainer{
+      .graphContainer {
         display: flex;
         flex-direction: row;
         justify-content: center;
@@ -184,7 +179,6 @@
         box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
       }
     }
-
 
     .proposalCardContainer2 {
       height: 500px;
@@ -196,13 +190,12 @@
       border: 1px solid var(--border-stroke-color, #b3b3b3);
       box-shadow: var(--box-shadow, 3px 3px 0px 0px rgba(17, 17, 17, 0.15));
       background-color: var(--card-sub-surface-color, #dfdfdf);
-      .detailsHeader{
+      .detailsHeader {
         width: 100%;
         padding: 20px 0px 20px 20px;
         border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
       }
-    
-    
+
       .proposalInfoBox {
         display: flex;
         flex-direction: column;
@@ -221,20 +214,19 @@
             flex-direction: row;
             justify-content: left;
             align-items: center;
-            .icon{
+            .icon {
               display: flex;
               flex-direction: column;
               justify-content: center;
               padding-left: 2px;
-          }
+            }
           }
         }
-        
       }
       .proposalInfoTimeLine {
         display: flex;
         flex-direction: column;
-        
+
         //justify-content: space-between;
         //margin: 20px 20px 0px 0px;
         //padding: 15px;
@@ -244,48 +236,42 @@
           justify-content: space-between;
           //overflow: ;
         }
-        
-        
       }
-      .separator{
+      .separator {
         height: 5rem;
         //padding-left: 60px;
         margin-left: 4px;
-        border-left: 2px solid var(--graph-fill-color, #D0D0D0);
-
+        border-left: 2px solid var(--graph-fill-color, #d0d0d0);
       }
-      .timeLine{
+      .timeLine {
         display: flex;
         flex-direction: row;
         min-width: 280px;
         //height: 2rem;
         //margin-top: 20px;
 
-        .txt{
+        .txt {
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           padding-right: 5px;
         }
-        
       }
     }
-    
   }
-
 }
-.circleContainer{
+.circleContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   margin-right: 10px;
-  .circle{
+  .circle {
     height: 10px;
     width: 10px;
     border-radius: 50%;
-    background-color: var(--graph-fill-color, #D0D0D0);
+    background-color: var(--graph-fill-color, #d0d0d0);
   }
 }
 .noProposalContainer {
