@@ -57,7 +57,6 @@ const NavBar = () => {
     }
     isMenuOpen && setIsMenuOpen(false);
   }, [currentPath, searchParams, signer]);
-
   const balance = useBalance({
     address: signer?.account.address,
     watch: true,
@@ -136,32 +135,27 @@ const NavBar = () => {
         >
           <Text size="sm">Explore</Text>
         </Link>
-        {currentPath == "/staking" && (
+        {/* {currentPath == "/staking" && (
           <Link
             href="/staking"
-            className={clsx(
-              styles["nav-link"],
-              currentPath == "/staking" && styles.active
-            )}
+            className={clsx(styles["nav-link"], styles.active)}
             onClick={() => Analytics.actions.events.clickedNavLink("Staking")}
           >
             <Text size="sm">Staking</Text>
           </Link>
         )}
-        {currentPath == "/governance" && (
+        {(currentPath == "/governance" ||
+          currentPath == "/governance/proposal") && (
           <Link
             href="/governance"
-            className={clsx(
-              styles["nav-link"],
-              currentPath.includes("governance") && styles.active
-            )}
+            className={clsx(styles["nav-link"], styles.active)}
             onClick={() =>
               Analytics.actions.events.clickedNavLink("Governance")
             }
           >
             <Text size="sm">Governance</Text>
           </Link>
-        )}
+        )} */}
         <div
           className={styles.moreLink}
           onMouseEnter={() => setIsMoreModalOpen(true)}
@@ -181,10 +175,10 @@ const NavBar = () => {
           </div>
           {isMoreModalOpen && (
             <div className={styles.popUp}>
-              {currentPath != "/staking" && (
+              {
                 <Link
                   href="/staking"
-                  className={clsx(styles["optionsContainer1"])}
+                  className={clsx(styles["dropdownlink"])}
                   onClick={() => {
                     setIsMoreModalOpen(false);
                     Analytics.actions.events.clickedNavLink("Staking");
@@ -194,11 +188,11 @@ const NavBar = () => {
                     <Text size="sm">Staking</Text>
                   </div>
                 </Link>
-              )}
-              {currentPath != "/governance" && (
+              }
+              {
                 <Link
                   href="/governance"
-                  className={clsx(styles["optionsContainer1"])}
+                  className={clsx(styles["dropdownlink"])}
                   onClick={() => {
                     setIsMoreModalOpen(false);
                     Analytics.actions.events.clickedNavLink("Governance");
@@ -209,7 +203,7 @@ const NavBar = () => {
                     <Text size="sm">Governance</Text>
                   </div>
                 </Link>
-              )}
+              }
             </div>
           )}
         </div>

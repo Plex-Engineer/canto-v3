@@ -84,6 +84,7 @@ export type NewTransactionFlow = {
 export type TransactionFlow = NewTransactionFlow & {
   id: string;
   status: TransactionStatus; //yes
+  inProgress?: boolean;
   createdAt: number;
   transactions: TransactionWithStatus[]; //yes
   placeholderFlow?: NewTransactionFlowPlaceholder; //yes

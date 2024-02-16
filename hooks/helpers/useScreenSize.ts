@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+const MOBILE_SCREEN_WIDTH_MAX = 768;
+
 const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState({
     width: window.innerWidth,
@@ -22,7 +24,7 @@ const useScreenSize = () => {
     };
   }, []);
 
-  return screenSize;
+  return { screenSize, isMobile: screenSize.width < MOBILE_SCREEN_WIDTH_MAX };
 };
 
 export default useScreenSize;

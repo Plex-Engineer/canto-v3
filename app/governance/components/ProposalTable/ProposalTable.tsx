@@ -2,16 +2,14 @@
 import React, { useMemo, useState } from "react";
 import styles from "./ProposalTable.module.scss";
 import { Proposal } from "@/hooks/gov/interfaces/proposal";
-import {
-  formatProposalStatus,
-  formatProposalType,
-} from "@/utils/gov/formatData";
 import Text from "@/components/text";
 import { useRouter } from "next/navigation";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
 import Table from "@/components/table/table";
 import Container from "@/components/container/container";
 import { Pagination } from "@/components/pagination/Pagination";
+import Spacer from "@/components/layout/spacer";
+import { ProposalRow } from "./ProposalRow";
 
 interface TableProps {
   proposals: Proposal[];
@@ -20,7 +18,6 @@ interface TableProps {
 const PAGE_SIZE = 10;
 enum ProposalFilter {
   ALL = "ALL PROPOSALS",
-  ACTIVE = "ACTIVE PROPOSALS",
   PASSED = "PASSED PROPOSALS",
   REJECTED = "REJECTED PROPOSALS",
 }
@@ -43,17 +40,25 @@ const ProposalTable = ({ proposals }: TableProps) => {
     setCurrentPage(1);
     return proposals.filter((proposal) => {
       switch (currentFilter) {
-        case ProposalFilter.ACTIVE:
-          return proposal.status === "PROPOSAL_STATUS_VOTING_PERIOD";
         case ProposalFilter.PASSED:
           return proposal.status === "PROPOSAL_STATUS_PASSED";
         case ProposalFilter.REJECTED:
           return proposal.status === "PROPOSAL_STATUS_REJECTED";
         default:
-          return true;
+          return (
+            proposal.status === "PROPOSAL_STATUS_REJECTED" ||
+            proposal.status === "PROPOSAL_STATUS_PASSED"
+          );
       }
     });
   }, [currentFilter, proposals]);
+
+  const activeProposals = useMemo(() => {
+    setCurrentPage(1);
+    return proposals.filter((proposal) => {
+      return proposal.status === "PROPOSAL_STATUS_VOTING_PERIOD";
+    });
+  }, [proposals]);
 
   const totalPages = useMemo(
     () => Math.ceil(filteredProposals.length / PAGE_SIZE),
@@ -72,8 +77,69 @@ const ProposalTable = ({ proposals }: TableProps) => {
       </div>
     );
   }
+  const proposalTableHeaders = [
+    {
+      value: "",
+      ratio: 5,
+    },
+    {
+      value: "",
+      ratio: 2,
+    },
+
+    {
+      value: "",
+      ratio: 2,
+    },
+    {
+      value: "",
+      ratio: 1,
+    },
+  ];
   return (
     <div className={styles.tableContainer}>
+      {activeProposals.length > 0 ? (
+        <div className={styles.table}>
+          {
+            <Table
+              title="Active Proposals"
+              headerFont="proto_mono"
+              headers={
+                activeProposals.length != 0 || activeProposals
+                  ? proposalTableHeaders
+                  : []
+              }
+              onRowsClick={
+                activeProposals.length > 0
+                  ? activeProposals.map(
+                      (proposal) => () => handleRowClick(proposal.proposal_id)
+                    )
+                  : undefined
+              }
+              removeHeader={true}
+              rowHeight="120px"
+              content={activeProposals.map((proposal) =>
+                ProposalRow({ proposal, active: true })
+              )}
+            />
+          }
+        </div>
+      ) : (
+        <div className={styles.noActiveProposalContainer}>
+          <div className={styles.circleContainer}>
+            <div
+              className={styles.circle}
+              style={{ height: "10px", width: "10px" }}
+            />
+          </div>
+          <div style={{ paddingLeft: "20px" }}>
+            <Text font="rm_mono">There are currently no active proposals</Text>
+          </div>
+        </div>
+      )}
+      <div>
+        <Spacer height="30px" />
+      </div>
       <div className={styles.table}>
         {
           <Table
@@ -97,25 +163,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
             headerFont="rm_mono"
             headers={
               filteredProposals.length != 0 || filteredProposals
-                ? [
-                    {
-                      value: "ID",
-                      ratio: 2,
-                    },
-                    { value: "Title", ratio: 6 },
-                    {
-                      value: "Status",
-                      ratio: 3,
-                    },
-                    {
-                      value: "Type",
-                      ratio: 5,
-                    },
-                    {
-                      value: "Voting Date",
-                      ratio: 4,
-                    },
-                  ]
+                ? proposalTableHeaders
                 : []
             }
             onRowsClick={
@@ -125,53 +173,19 @@ const ProposalTable = ({ proposals }: TableProps) => {
                   )
                 : undefined
             }
+            removeHeader={true}
+            rowHeight="120px"
             content={
               paginatedProposals.length > 0
                 ? [
-                    ...paginatedProposals.map((proposal, index) => {
-                      return [
-                        <Text
-                          key={`name_${index}`}
-                          font="rm_mono"
-                          className={styles.tableData}
-                        >
-                          {proposal.proposal_id}
-                        </Text>,
-
-                        <Text
-                          key={`tokens_${index}`}
-                          font="rm_mono"
-                          size="sm"
-                          className={styles.rowTitle}
-                        >
-                          {proposal.title}
-                        </Text>,
-
-                        <Text
-                          key={`commission_${index}`}
-                          font="rm_mono"
-                          className={styles.tableData}
-                        >
-                          {formatProposalStatus(proposal.status)}
-                        </Text>,
-
-                        <Text
-                          key={`participation_${index}`}
-                          font="rm_mono"
-                          className={styles.tableData}
-                        >
-                          {formatProposalType(proposal.type_url)}
-                        </Text>,
-
-                        <Text
-                          key={`delegators_${index}`}
-                          font="rm_mono"
-                          className={styles.tableData}
-                        >
-                          {new Date(proposal.voting_end_time).toDateString()}
-                        </Text>,
-                      ];
-                    }),
+                    ...paginatedProposals
+                      .filter(
+                        (proposal) =>
+                          proposal.status != "PROPOSAL_STATUS_VOTING_PERIOD"
+                      )
+                      .map((proposal) =>
+                        ProposalRow({ proposal, active: false })
+                      ),
                     <Pagination
                       key="pagination"
                       currentPage={currentPage}
