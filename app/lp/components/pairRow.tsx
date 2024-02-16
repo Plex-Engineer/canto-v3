@@ -20,9 +20,11 @@ import Countdown from "@/components/timer/countdown";
 export const UserCantoDexPairRow = ({
   pair,
   onManage,
+  isMobile,
 }: {
   pair: CantoDexPairWithUserCTokenData;
   onManage: (pairAddress: string) => void;
+  isMobile: boolean;
 }) => {
   if (!pair.clmData?.userDetails) return [];
   // add staked and wallet balance
@@ -66,7 +68,9 @@ export const UserCantoDexPairRow = ({
       {(pair.clmData?.distApy ?? "0.00") + "%"}
     </Text>,
 
-    <Text key={pair.address + "share"}>{formatPercent(userPoolShare)}</Text>,
+    !isMobile && (
+      <Text key={pair.address + "share"}>{formatPercent(userPoolShare)}</Text>
+    ),
     <Container
       key={pair.address + "value"}
       direction="row"
@@ -123,62 +127,68 @@ export const UserCantoDexPairRow = ({
         </Container>
       </InfoPop>
     </Container>,
-    <Container
-      key={pair.address + "edit"}
-      direction="row"
-      center={{ horizontal: true, vertical: true }}
-      gap={4}
-    >
-      <Text key={pair.address + "rewards"}>
-        {displayAmount(pair.clmData.userDetails.rewards, 18)}
-      </Text>
-      {Number(pair.clmData.userDetails.balanceOfUnderlying) != 0 && (
-        <PopUp
-          content={
-            <Text size="xx-sm">
-              You have{" "}
-              {displayAmount(
-                pair.clmData.userDetails.balanceOfUnderlying,
-                pair.decimals
-              )}{" "}
-              unstaked LP tokens. You must stake them to earn rewards.
-            </Text>
-          }
-          width="300px"
-        >
-          <Icon
-            icon={{
-              url: "/warning.svg",
-              size: 16,
-            }}
-            themed
-            style={{
-              translate: "0 1.5px",
-            }}
-          />
-        </PopUp>
-      )}
-    </Container>,
+    !isMobile && (
+      <Container
+        key={pair.address + "edit"}
+        direction="row"
+        center={{ horizontal: true, vertical: true }}
+        gap={4}
+      >
+        <Text key={pair.address + "rewards"}>
+          {displayAmount(pair.clmData.userDetails.rewards, 18)}
+        </Text>
+        {Number(pair.clmData.userDetails.balanceOfUnderlying) != 0 && (
+          <PopUp
+            content={
+              <Text size="xx-sm">
+                You have{" "}
+                {displayAmount(
+                  pair.clmData.userDetails.balanceOfUnderlying,
+                  pair.decimals
+                )}{" "}
+                unstaked LP tokens. You must stake them to earn rewards.
+              </Text>
+            }
+            width="300px"
+          >
+            <Icon
+              icon={{
+                url: "/warning.svg",
+                size: 16,
+              }}
+              themed
+              style={{
+                translate: "0 1.5px",
+              }}
+            />
+          </PopUp>
+        )}
+      </Container>
+    ),
 
-    <Container
-      key={pair.address + "edit"}
-      direction="row"
-      center={{ horizontal: true, vertical: true }}
-      gap={10}
-    >
-      <Button onClick={() => onManage(pair.address)} color="secondary">
-        Manage LP
-      </Button>
-    </Container>,
+    !isMobile && (
+      <Container
+        key={pair.address + "edit"}
+        direction="row"
+        center={{ horizontal: true, vertical: true }}
+        gap={10}
+      >
+        <Button onClick={() => onManage(pair.address)} color="secondary">
+          Manage LP
+        </Button>
+      </Container>
+    ),
   ];
 };
 
 export const GeneralCantoDexPairRow = ({
   pair,
   onAddLiquidity,
+  isMobile,
 }: {
   pair: CantoDexPairWithUserCTokenData;
   onAddLiquidity: (pairAddress: string) => void;
+  isMobile: boolean;
 }) => [
   <Container
     key={pair.address}
@@ -214,24 +224,30 @@ export const GeneralCantoDexPairRow = ({
       }}
     />
   </Text>,
-  <Text key={pair.address + "type"}>
-    {pair.stable ? "Stable" : "Volatile"}
-  </Text>,
-  <Container
-    key={pair.address + "edit"}
-    direction="row"
-    center={{ horizontal: true }}
-  >
-    <Button onClick={() => onAddLiquidity(pair.address)}>Add LP</Button>
-  </Container>,
+  !isMobile && (
+    <Text key={pair.address + "type"}>
+      {pair.stable ? "Stable" : "Volatile"}
+    </Text>
+  ),
+  !isMobile && (
+    <Container
+      key={pair.address + "edit"}
+      direction="row"
+      center={{ horizontal: true }}
+    >
+      <Button onClick={() => onAddLiquidity(pair.address)}>Add LP</Button>
+    </Container>
+  ),
 ];
 
 export const GeneralAmbientPairRow = ({
   pool,
   onAddLiquidity,
+  isMobile,
 }: {
   pool: AmbientPool;
   onAddLiquidity: (poolAddress: string) => void;
+  isMobile: boolean;
 }) => [
   <Container
     key={pool.address}
@@ -265,43 +281,47 @@ export const GeneralAmbientPairRow = ({
     />
   </Text>,
 
-  <Container
-    key={"popkey"}
-    direction="row"
-    gap={4}
-    center={{
-      horizontal: true,
-      vertical: true,
-    }}
-  >
-    <Text key={pool.address + "type"}>
-      {pool.stable ? "Concentrated" : "Volatile"}
-    </Text>
-
-    <InfoPop>
-      <Text>
-        This is a concentrated liquidity stable pool. The default range will be
-        selected for optimal rewards.
+  !isMobile && (
+    <Container
+      key={"popkey"}
+      direction="row"
+      gap={4}
+      center={{
+        horizontal: true,
+        vertical: true,
+      }}
+    >
+      <Text key={pool.address + "type"}>
+        {pool.stable ? "Concentrated" : "Volatile"}
       </Text>
-    </InfoPop>
-  </Container>,
-  <Container key={"action"} direction="row" center={{ horizontal: true }}>
-    <Button key={"action item"} onClick={() => onAddLiquidity(pool.address)}>
-      Add LP
-    </Button>
-  </Container>,
+
+      <InfoPop>
+        <Text>
+          This is a concentrated liquidity stable pool. The default range will
+          be selected for optimal rewards.
+        </Text>
+      </InfoPop>
+    </Container>
+  ),
+  !isMobile && (
+    <Container key={"action"} direction="row" center={{ horizontal: true }}>
+      <Button key={"action item"} onClick={() => onAddLiquidity(pool.address)}>
+        Add LP
+      </Button>
+    </Container>
+  ),
 ];
 
 export const UserAmbientPairRow = ({
   pool,
   onManage,
-  rewards,
   rewardTime,
+  isMobile,
 }: {
   pool: AmbientPool;
   onManage: (poolAddress: string) => void;
-  rewards?: string;
   rewardTime: bigint;
+  isMobile?: boolean;
 }) => {
   let totalValue = "0";
   const allPositionValues = pool.userPositions.map((position) => {
@@ -375,9 +395,11 @@ export const UserAmbientPairRow = ({
       </Text>
     </Container>,
     <AprBlock key={"apr"} pool={pool} />,
-    <Text key={pool.symbol + "pool share"}>
-      {formatPercent(divideBalances(totalValue, pool.totals.noteTvl))}
-    </Text>,
+    !isMobile && (
+      <Text key={pool.symbol + "pool share"}>
+        {formatPercent(divideBalances(totalValue, pool.totals.noteTvl))}
+      </Text>
+    ),
     <Container
       key={pool.address + " value"}
       direction="row"
@@ -405,35 +427,40 @@ export const UserAmbientPairRow = ({
         </Container>
       </InfoPop>
     </Container>,
-    <Container
-      key={pool.address + " value"}
-      direction="row"
-      center={{
-        horizontal: true,
-        vertical: true,
-      }}
-      gap={10}
-    >
-      <Text key={pool.symbol + "rewards"}>
-        {displayAmount(rewards ?? "0", 18)}
-      </Text>
-      <InfoPop>
-        <Container>
-          <Text size="sm" theme="secondary-dark">
-            Rewards will be released in <Countdown endTimestamp={rewardTime} />
-          </Text>
-        </Container>
-      </InfoPop>
-    </Container>,
-    <Container key={"action"} direction="row" center={{ horizontal: true }}>
-      <Button
-        color="secondary"
-        key={"action item"}
-        onClick={() => onManage(pool.address)}
+    !isMobile && (
+      <Container
+        key={pool.address + " value"}
+        direction="row"
+        center={{
+          horizontal: true,
+          vertical: true,
+        }}
+        gap={10}
       >
-        Manage LP
-      </Button>
-    </Container>,
+        <Text key={pool.symbol + "rewards"}>
+          {displayAmount(pool.userRewards ?? "0", 18)}
+        </Text>
+        <InfoPop>
+          <Container>
+            <Text size="sm" theme="secondary-dark">
+              Rewards will be released in{" "}
+              <Countdown endTimestamp={rewardTime} />
+            </Text>
+          </Container>
+        </InfoPop>
+      </Container>
+    ),
+    !isMobile && (
+      <Container key={"action"} direction="row" center={{ horizontal: true }}>
+        <Button
+          color="secondary"
+          key={"action item"}
+          onClick={() => onManage(pool.address)}
+        >
+          Manage LP
+        </Button>
+      </Container>
+    ),
   ];
 };
 

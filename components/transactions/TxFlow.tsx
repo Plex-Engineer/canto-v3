@@ -28,6 +28,7 @@ const TxFlow = (props: Props) => {
     valid: boolean;
     error: string | undefined;
   }>({ valid: false, error: undefined });
+
   useEffect(() => {
     async function checkRetryParams() {
       if (props.txFlow?.status === "ERROR") {
