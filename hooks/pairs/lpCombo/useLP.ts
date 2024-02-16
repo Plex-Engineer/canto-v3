@@ -70,7 +70,7 @@ export default function useLP(props: UseLPProps): UseLPReturn {
       pair.clmData?.userDetails?.balanceOfCToken !== undefined
   );
   const userAmbientPairs = ambient.ambientPools.filter(
-    (pool) => pool.userPositions.length > 0
+    (pool) => (pool.userPositions.length > 0 || pool.userRewards !== "0")
   );
 
   // create list with all pairs

@@ -3,6 +3,7 @@ import styles from "../lp.module.scss";
 import Icon from "@/components/icon/icon";
 import Container from "@/components/container/container";
 import Button from "@/components/button/button";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 interface Props {
   onClick: () => void;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 const Rewards = (props: Props) => {
+  const { isMobile } = useScreenSize();
   return (
     <section className={styles.rewards}>
       <div>
@@ -48,8 +50,11 @@ const Rewards = (props: Props) => {
           />
         </Container>
       </div>
-
-      <Button onClick={props.onClick} disabled={Number(props.value) === 0}>
+      <Button
+        width={isMobile ? "fill" : undefined}
+        onClick={props.onClick}
+        disabled={Number(props.value) === 0}
+      >
         Claim
       </Button>
     </section>

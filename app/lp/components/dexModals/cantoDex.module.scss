@@ -125,3 +125,21 @@
   padding: 0 8px;
   border: 1px solid var(--border-stroke-color);
 }
+@media screen and (max-width: 768px) {
+  .container{
+    height: 45rem;
+    width: calc( 100vw - 1rem)
+  }
+  .baseContainer{
+    height: 40rem;
+    width: calc( 100vw - 1rem);
+  }
+  .ambientBaseContainer {
+    flex-direction: column !important;
+  }
+  .ambientContainer {
+    height: 40rem;
+    width: calc( 100vw - 1rem);
+  }
+}
+

@@ -97,3 +97,22 @@
     }
   }
 }
+@media screen and (max-width: 768px) {
+  .container {
+    margin: 1rem;
+    width: calc(100vw - 2rem);
+    gap: 1rem;
+    padding-top: 1rem;
+    &::after {
+      display: none;
+    }
+  }
+  .rewards {
+    flex-direction: column;
+    height: calc(100% - 2rem);
+    width: 100%;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 1.5rem, 1rem, 1.5rem, 1rem;
+  }
+}

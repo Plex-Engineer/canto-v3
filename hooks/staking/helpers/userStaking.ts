@@ -9,8 +9,10 @@ import { ethToCantoAddress } from "@/utils/address";
 import { tryFetch } from "@/utils/async";
 import * as NETWORKS from "@/config/networks";
 
-const cantoMainnetUserAPIEndpoint = "https://mainnet-user-api.plexnode.wtf"; //process.env.NEXT_PUBLIC_CANTO_USER_API_URL;
-const cantoTestnetUserAPIEndpoint = "https://localhost:9000";
+const cantoMainnetUserAPIEndpoint =
+  process.env.NEXT_PUBLIC_CANTO_MAINNET_USER_API_URL;
+const cantoTestnetUserAPIEndpoint =
+  process.env.NEXT_PUBLIC_CANTO_TESTNET_USER_API_URL;
 
 function getUserAPIEndPoint(chainId: number | string) {
   if (typeof chainId === "number") {

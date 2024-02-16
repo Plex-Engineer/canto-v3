@@ -26,7 +26,7 @@ import {
   getAnalyticsCantoLiquidityPoolInfo,
   getAnalyticsAmbientLiquidityPoolInfo,
 } from "@/utils/analytics";
-import DesktopOnly from "@/components/desktop-only/desktop-only";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 export default function Page() {
   const {
@@ -47,9 +47,10 @@ export default function Page() {
   } = usePool();
 
   //   if mobile only
-  if (!window.matchMedia("(min-width: 768px)").matches) {
-    return <DesktopOnly />;
-  }
+  // if (!window.matchMedia("(min-width: 768px)").matches) {
+  //   return <DesktopOnly />;
+  // }
+  const { isMobile } = useScreenSize();
 
   //main content
   return (
@@ -73,11 +74,16 @@ export default function Page() {
             pool={selectedPair}
             sendTxFlow={sendAmbientTxFlow}
             verifyParams={validateAmbientTxParams}
+            isMobile
           />
         )}
       </Modal>
 
-      <Container direction="row" gap={"auto"} width="100%">
+      <Container
+        direction={isMobile ? "column" : "row"}
+        gap={isMobile ? 10 : "auto"}
+        width="100%"
+      >
         <Text size="x-lg" font="proto_mono" className={styles.title}>
           Pools
         </Text>
@@ -97,10 +103,24 @@ export default function Page() {
             headers={[
               { value: "Pair", ratio: 2 },
               { value: "APR", ratio: 1 },
-              { value: "Pool Share", ratio: 1 },
+              { value: "Pool Share", ratio: 1, hideOnMobile: true },
               { value: "Value", ratio: 1 },
-              { value: "Rewards", ratio: 1 },
-              { value: "Edit", ratio: 1 },
+              { value: "Rewards", ratio: 1, hideOnMobile: true },
+              { value: "Edit", ratio: 1, hideOnMobile: true },
+            ]}
+            onRowsClick={[
+              ...pairs.userAmbient.map((pool) => () => {
+                Analytics.actions.events.liquidityPool.manageLPClicked(
+                  getAnalyticsAmbientLiquidityPoolInfo(pool)
+                );
+                setPair(pool.address);
+              }),
+              ...pairs.userCantoDex.map((pair) => () => {
+                Analytics.actions.events.liquidityPool.manageLPClicked(
+                  getAnalyticsCantoLiquidityPoolInfo(pair)
+                );
+                setPair(pair.address);
+              }),
             ]}
             content={[
               ...pairs.userAmbient.map((pool) =>
@@ -112,8 +132,8 @@ export default function Page() {
                     );
                     setPair(poolAddress);
                   },
-                  rewards: rewards.ambient,
                   rewardTime: rewardTime,
+                  isMobile,
                 })
               ),
               ...pairs.userCantoDex.map((pair) =>
@@ -126,6 +146,7 @@ export default function Page() {
                     );
                     setPair(pairAddress);
                   },
+                  isMobile,
                 })
               ),
             ]}
@@ -154,8 +175,38 @@ export default function Page() {
           { value: "Pair", ratio: 2 },
           { value: "APR", ratio: 1 },
           { value: "TVL", ratio: 1 },
-          { value: "Type", ratio: 1 },
-          { value: "Action", ratio: 1 },
+          { value: "Type", ratio: 1, hideOnMobile: true },
+          { value: "Action", ratio: 1, hideOnMobile: true },
+        ]}
+        onRowsClick={[
+          ...pairs.allAmbient
+            .filter(
+              (pool) =>
+                filteredPairs === "all" ||
+                (filteredPairs === "stable" && pool.stable) ||
+                (filteredPairs === "volatile" && !pool.stable)
+            )
+            .map((pool) => () => {
+              Analytics.actions.events.liquidityPool.addLPClicked({
+                lpType: "AMBIENT",
+                ambientLp: pool.symbol,
+              });
+              setPair(pool.address);
+            }),
+          ...sortedCantoDexPairs
+            .filter(
+              (pair) =>
+                filteredPairs === "all" ||
+                (filteredPairs === "stable" && pair.stable) ||
+                (filteredPairs === "volatile" && !pair.stable)
+            )
+            .map((pair) => () => {
+              Analytics.actions.events.liquidityPool.addLPClicked({
+                lpType: "CANTO",
+                cantoLp: pair.symbol,
+              });
+              setPair(pair.address);
+            }),
         ]}
         content={[
           ...pairs.allAmbient
@@ -175,6 +226,7 @@ export default function Page() {
                   });
                   setPair(poolAddress);
                 },
+                isMobile,
               })
             ),
           ...sortedCantoDexPairs
@@ -194,6 +246,7 @@ export default function Page() {
                   });
                   setPair(pairAddress);
                 },
+                isMobile,
               })
             ),
         ]}
