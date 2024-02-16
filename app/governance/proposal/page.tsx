@@ -115,23 +115,7 @@ export default function Page() {
 
   const votesData = calculateVotePercentages(proposal.final_vote);
 
-  const maxAmountIndex = [
-    parseFloat(votesData[VoteOption.YES].percentage),
-    parseFloat(votesData[VoteOption.NO].percentage),
-    parseFloat(votesData[VoteOption.VETO].percentage),
-    parseFloat(votesData[VoteOption.ABSTAIN].percentage),
-  ].indexOf(
-    Math.max(
-      ...[
-        parseFloat(votesData[VoteOption.YES].percentage),
-        parseFloat(votesData[VoteOption.NO].percentage),
-        parseFloat(votesData[VoteOption.VETO].percentage),
-        parseFloat(votesData[VoteOption.ABSTAIN].percentage),
-      ]
-    )
-  );
-
-  const VoteBox = ({ option, idx }: { option: VoteOption; idx: number }) => (
+  const VoteBox = ({ option }: { option: VoteOption }) => (
     <VotingInfoBox
       key={option}
       amount={votesData[option].amount}
@@ -227,13 +211,13 @@ export default function Page() {
                 }
               >
                 <div className={styles.proposalInfoRow1}>
-                  <VoteBox option={VoteOption.YES} idx={0} />
-                  <VoteBox option={VoteOption.NO} idx={1} />
+                  <VoteBox option={VoteOption.YES} />
+                  <VoteBox option={VoteOption.NO} />
                 </div>
 
                 <div className={styles.proposalInfoRow1}>
-                  <VoteBox option={VoteOption.VETO} idx={2} />
-                  <VoteBox option={VoteOption.ABSTAIN} idx={3} />
+                  <VoteBox option={VoteOption.VETO} />
+                  <VoteBox option={VoteOption.ABSTAIN} />
                 </div>
 
                 <div className={styles.proposalInfoRow1}>
@@ -242,7 +226,7 @@ export default function Page() {
                       width={200}
                       disabled={
                         !isActive ||
-                        //userStaking.validators.length > 0
+                        userStaking.validators.length > 0 ||
                         selectedVote == null
                       }
                       onClick={() =>

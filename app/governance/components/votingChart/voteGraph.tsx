@@ -132,7 +132,7 @@ export const VoteBarGraph = ({
   );
 };
 
-export const VoteBar = ({
+export const VoteBarSecondary = ({
   height,
   maxHeight,
   index,
@@ -212,26 +212,26 @@ export const VoteGraphBox = ({ yes, no, abstain, veto }: VoteBarGraphProps) => {
       <Container direction="row">
         <Container height="30px" className={styles.displayVotes}>
           <Container className={styles.barGraph} direction="row" width="44px">
-            <VoteBar
+            <VoteBarSecondary
               height={yesPercentage * 0.3}
               maxHeight={maxPercentage * 0.3}
               index={0}
-            ></VoteBar>
-            <VoteBar
+            />
+            <VoteBarSecondary
               height={noPercentage * 0.3}
               maxHeight={maxPercentage * 0.3}
               index={1}
-            ></VoteBar>
-            <VoteBar
+            />
+            <VoteBarSecondary
               height={vetoPercentage * 0.3}
               maxHeight={maxPercentage * 0.3}
               index={2}
-            ></VoteBar>
-            <VoteBar
+            />
+            <VoteBarSecondary
               height={abstainPercentage * 0.3}
               maxHeight={maxPercentage * 0.3}
               index={3}
-            ></VoteBar>
+            />
           </Container>
         </Container>
         <Container
