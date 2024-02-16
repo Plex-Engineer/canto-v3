@@ -226,7 +226,7 @@ export default function Page() {
                       width={200}
                       disabled={
                         !isActive ||
-                        userStaking.validators.length > 0 ||
+                        !(userStaking.validators.length > 0) ||
                         selectedVote == null
                       }
                       onClick={() =>
