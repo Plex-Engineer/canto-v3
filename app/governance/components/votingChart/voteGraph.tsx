@@ -114,17 +114,17 @@ export const VoteBarGraph = ({
         />
         <VoteInfo
           percentage={totalVotes > 0 ? (no / totalVotes) * 100 : 0}
-          name="YES"
-          color="##EF4444"
+          name="NO"
+          color="#EF4444"
         />
         <VoteInfo
           percentage={totalVotes > 0 ? (veto / totalVotes) * 100 : 0}
-          name="YES"
+          name="VETO"
           color="#9747FF"
         />
         <VoteInfo
           percentage={totalVotes > 0 ? (abstain / totalVotes) * 100 : 0}
-          name="YES"
+          name="ABSTAIN"
           color="#EAD42A"
         />
       </div>
