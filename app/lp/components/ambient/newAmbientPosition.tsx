@@ -34,7 +34,6 @@ interface NewPositionModalProps {
   pool: AmbientPool;
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
   verifyParams: (params: Partial<AmbientTransactionParams>) => Validation;
-  isMobile?: boolean;
 }
 export const NewAmbientPositionModal = ({
   pool,
