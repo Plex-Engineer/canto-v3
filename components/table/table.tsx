@@ -37,7 +37,7 @@ const Table = (props: Props) => {
       <div
         className={styles.table}
         style={
-          !props.removeHeader
+          !isMobile && !props.removeHeader
             ? {
                 gridTemplateRows: "50px 1fr",
               }
