@@ -29,6 +29,7 @@ import {
 } from "@/utils/ambient/liquidityControllers";
 import { Validation } from "@/config/interfaces";
 import Analytics from "@/provider/analytics";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 interface NewPositionModalProps {
   pool: AmbientPool;
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
@@ -39,7 +40,6 @@ export const NewAmbientPositionModal = ({
   pool,
   sendTxFlow,
   verifyParams,
-  isMobile,
 }: NewPositionModalProps) => {
   const { base: baseToken, quote: quoteToken } = pool;
   const positionManager = useNewAmbientPositionManager(pool);
@@ -84,7 +84,7 @@ export const NewAmbientPositionModal = ({
 
   const percentDiff = (currentPrice: number, selectedPrice: number) =>
     formatPercent(((selectedPrice - currentPrice) / currentPrice).toString());
-
+  const { isMobile } = useScreenSize();
   return (
     <Container
       width={
