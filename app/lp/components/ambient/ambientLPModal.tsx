@@ -22,6 +22,7 @@ interface AmbientModalProps {
   pool: AmbientPool;
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
   verifyParams: (params: Partial<AmbientTransactionParams>) => Validation;
+  isMobile?: boolean;
 }
 
 export const AmbientModal = (props: AmbientModalProps) => {
@@ -115,6 +116,7 @@ export const AmbientModal = (props: AmbientModalProps) => {
               pool={props.pool}
               sendTxFlow={props.sendTxFlow}
               verifyParams={props.verifyParams}
+              isMobile={props.isMobile}
             />
           </Container>
         )}

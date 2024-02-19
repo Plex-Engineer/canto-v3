@@ -121,6 +121,7 @@ type AnalyticsTransactionFlowParams = AnalyticsTransactionFlowInfo & {
   txRetryTimeInSeconds?: Number;
   txsGenerateError?: string;
   txError?: string;
+  txErrorTrace?: string;
 };
 
 class AnalyticsWrapper {

@@ -155,6 +155,7 @@ const useTransactionStore = create<TransactionStore>()(
             // set the flow status to populating since we are about to populate it with transactions
             get().updateTxFlow(ethAccount, flowToPerform.id, {
               status: "POPULATING",
+              inProgress: true,
             });
 
             // create the new transactions to complete the flow
@@ -257,6 +258,7 @@ const useTransactionStore = create<TransactionStore>()(
                     txSuccess: false,
                     txHash: updatedTx?.hash,
                     txError: txError?.message.split(":").pop() ?? "",
+                    txErrorTrace: txError?.message ?? "",
                     txTimeInSeconds
                   });
                 }
