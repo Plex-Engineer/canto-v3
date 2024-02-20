@@ -19,7 +19,7 @@ import {
   GenerateMyStakingTableRow,
   GenerateUnbondingDelegationsTableRow,
   GenerateValidatorTableRow,
-} from "./components/validatorTableRow";
+} from "./components/tableRows";
 import { useMemo, useState } from "react";
 import { StakingModal } from "./components/stakingModal/StakingModal";
 import { Validator } from "@/hooks/staking/interfaces/validators";
@@ -37,7 +37,7 @@ import { Pagination } from "@/components/pagination/Pagination";
 import { levenshteinDistance } from "@/utils/staking/searchUtils";
 import { WalletClient } from "wagmi";
 import Analytics from "@/provider/analytics";
-import clsx from "clsx";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 export default function StakingPage() {
   // connected user info
@@ -49,7 +49,7 @@ export default function StakingPage() {
       chainId: chainId,
       userEthAddress: signer?.account.address,
     });
-
+  const { isMobile } = useScreenSize();
   // handle txs
   function handleRewardsClaimClick(
     signer: GetWalletClientResult | undefined,
@@ -265,6 +265,7 @@ export default function StakingPage() {
   return isLoading ? (
     <Splash themed />
   ) : (
+    //main content
     <div className={styles.container}>
       <div>
         <Spacer height="20px" />
@@ -273,7 +274,12 @@ export default function StakingPage() {
         STAKING
       </Text>
       <Spacer height="20px" />
-      <Container direction="row" gap={20} width="100%">
+      <Container
+        //direction={isMobile ? "column" : "row"}
+        style={{ flexDirection: isMobile ? "column-reverse" : "row" }}
+        gap={20}
+        width="100%"
+      >
         <Container gap={20} width="100%">
           {userStaking && userStaking.unbonding.length > 0 && (
             <Table
@@ -319,6 +325,7 @@ export default function StakingPage() {
                 {
                   value: "Total Stake",
                   ratio: 3,
+                  hideOnMobile: true,
                 },
                 {
                   value: "Commission",
@@ -327,6 +334,7 @@ export default function StakingPage() {
                 {
                   value: <div />,
                   ratio: 3,
+                  hideOnMobile: true,
                 },
               ]}
               content={[
@@ -342,8 +350,11 @@ export default function StakingPage() {
                     )
                   )
                   .map((userStakingElement, index) =>
-                    GenerateMyStakingTableRow(userStakingElement, index, () =>
-                      handleClick(userStakingElement)
+                    GenerateMyStakingTableRow(
+                      userStakingElement,
+                      index,
+                      () => handleClick(userStakingElement),
+                      isMobile
                     )
                   ),
               ]}
@@ -387,6 +398,7 @@ export default function StakingPage() {
                 {
                   value: "Rank",
                   ratio: 2,
+                  hideOnMobile: true,
                 },
                 {
                   value: "Name",
@@ -403,14 +415,18 @@ export default function StakingPage() {
                 {
                   value: <div />,
                   ratio: 4,
+                  hideOnMobile: true,
                 },
               ]}
               content={
                 paginatedvalidators.length > 0
                   ? [
                       ...paginatedvalidators.map((validator, index) =>
-                        GenerateValidatorTableRow(validator, index, () =>
-                          handleClick(validator)
+                        GenerateValidatorTableRow(
+                          validator,
+                          index,
+                          () => handleClick(validator),
+                          isMobile
                         )
                       ),
                       <Pagination
@@ -438,73 +454,159 @@ export default function StakingPage() {
             />
           )}
         </Container>
-        <Container className={styles.infoCard}>
-          <Container direction="column" width="100%" height="100%">
-            <div className={styles.infoBox}>
-              <div>
-                <Text font="rm_mono">Total Staked </Text>
-              </div>
-              <Container direction="row" center={{ vertical: true }}>
-                <div style={{ marginRight: "5px" }}>
-                  <Text font="proto_mono" size="title">
-                    {displayAmount(
-                      totalStaked ? totalStaked.toFixed(2) : "0",
-                      0
-                    )}
-                  </Text>
+        <Container
+          className={styles.infoCard}
+          width={isMobile ? "100%" : "30%"}
+        >
+          {isMobile ? (
+            <Container direction="column" width="100%" height="100%">
+              <div className={styles.infoBox}>
+                <div>
+                  <Text font="rm_mono">Total Staked </Text>
                 </div>
-                <p> </p>
-                <Icon
-                  themed
-                  icon={{
-                    url: "/tokens/canto.svg",
-                    size: 24,
-                  }}
-                />
-              </Container>
-            </div>
-            <div className={styles.infoBox}>
-              <div>
-                <Text font="rm_mono">APR</Text>
+                <Container direction="row" center={{ vertical: true }}>
+                  <div style={{ marginRight: "5px" }}>
+                    <Text font="proto_mono" size="title">
+                      {displayAmount(
+                        totalStaked ? totalStaked.toFixed(2) : "0",
+                        0
+                      )}
+                    </Text>
+                  </div>
+                  <p> </p>
+                  <Icon
+                    themed
+                    icon={{
+                      url: "/tokens/canto.svg",
+                      size: 24,
+                    }}
+                  />
+                </Container>
               </div>
-              <Container direction="row" center={{ vertical: true }}>
-                <Text font="proto_mono" size="title">
-                  {formatPercent((parseFloat(apr) / 100).toString())}
-                </Text>
-              </Container>
-            </div>
-            <div className={styles.infoBox}>
-              <div>
-                <Text font="rm_mono">Rewards</Text>
-              </div>
-              <Container direction="row" center={{ vertical: true }}>
-                <div style={{ marginRight: "5px" }}>
-                  <Text font="proto_mono" size="title">
-                    {totalRewards?.toFixed(5)}{" "}
-                  </Text>
-                  <Text> </Text>
+              <div className={styles.infoBox}>
+                <div>
+                  <Text font="rm_mono">APR</Text>
                 </div>
-                <Icon
-                  themed
-                  icon={{
-                    url: "/tokens/canto.svg",
-                    size: 24,
-                  }}
-                />
-              </Container>
-            </div>
-            <Spacer height="20px" />
-            <Button
-              width={"fill"}
-              height="large"
-              onClick={() =>
-                handleRewardsClaimClick(signer, allUserValidatorsAddresses)
-              }
-              disabled={!signer || !hasUserStaked}
+                <Container direction="row" center={{ vertical: true }}>
+                  <Text font="proto_mono" size="title">
+                    {formatPercent((parseFloat(apr) / 100).toString())}
+                  </Text>
+                </Container>
+              </div>
+              <div className={styles.infoBox}>
+                <div>
+                  <Text font="rm_mono">Rewards</Text>
+                </div>
+                <Container direction="row" center={{ vertical: true }}>
+                  <div style={{ marginRight: "5px" }}>
+                    <Text font="proto_mono" size="title">
+                      {totalRewards?.toFixed(5)}{" "}
+                    </Text>
+                    <Text> </Text>
+                  </div>
+                  <Icon
+                    themed
+                    icon={{
+                      url: "/tokens/canto.svg",
+                      size: 24,
+                    }}
+                  />
+                </Container>
+              </div>
+              <Spacer height="20px" />
+              <Button
+                width={"fill"}
+                height="large"
+                onClick={() =>
+                  handleRewardsClaimClick(signer, allUserValidatorsAddresses)
+                }
+                disabled={!signer || !hasUserStaked}
+              >
+                Claim Rewards
+              </Button>
+            </Container>
+          ) : (
+            <Container
+              direction="column"
+              width="100%"
+              height="100%"
+              style={{ backgroundColor: "#111111" }}
             >
-              Claim Rewards
-            </Button>
-          </Container>
+              <div className={styles.infoBox}>
+                <div>
+                  <Text font="rm_mono">Total Staked </Text>
+                </div>
+                <Container direction="row" center={{ vertical: true }}>
+                  <div style={{ marginRight: "5px" }}>
+                    <Text font="proto_mono" size="title">
+                      {displayAmount(
+                        totalStaked ? totalStaked.toFixed(2) : "0",
+                        0
+                      )}
+                    </Text>
+                  </div>
+                  <p> </p>
+                  <Icon
+                    themed
+                    icon={{
+                      url: "/tokens/canto.svg",
+                      size: 24,
+                    }}
+                    //color="primary"
+                    // style={
+                    //   theme
+                    //     ? {}
+                    //     : {
+                    //         filter: color == "#ddd" ? "invert(1)" : "",
+                    //       }
+                    // }
+                    //themed={theme ? true : false}
+                  />
+                </Container>
+              </div>
+              <div className={styles.infoBox}>
+                <div>
+                  <Text font="rm_mono">APR</Text>
+                </div>
+                <Container direction="row" center={{ vertical: true }}>
+                  <Text font="proto_mono" size="title">
+                    {formatPercent((parseFloat(apr) / 100).toString())}
+                  </Text>
+                </Container>
+              </div>
+              <div className={styles.infoBox}>
+                <div>
+                  <Text font="rm_mono">Rewards</Text>
+                </div>
+                <Container direction="row" center={{ vertical: true }}>
+                  <div style={{ marginRight: "5px" }}>
+                    <Text font="proto_mono" size="title">
+                      {totalRewards?.toFixed(5)}{" "}
+                    </Text>
+                    <Text> </Text>
+                  </div>
+                  <Icon
+                    themed
+                    icon={{
+                      url: "/tokens/canto.svg",
+                      size: 24,
+                    }}
+                  />
+                </Container>
+              </div>
+              <Spacer height="20px" />
+              <Button
+                width={"fill"}
+                height="large"
+                onClick={() =>
+                  handleRewardsClaimClick(signer, allUserValidatorsAddresses)
+                }
+                disabled={!signer || !hasUserStaked}
+              >
+                Claim Rewards
+              </Button>
+            </Container>
+          )}
         </Container>
       </Container>
 
