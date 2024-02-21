@@ -454,12 +454,27 @@ export default function StakingPage() {
             />
           )}
         </Container>
+
+        {isMobile && (
+          <div>
+            <Spacer height="20px" />
+          </div>
+        )}
         <Container
           className={styles.infoCard}
           width={isMobile ? "100%" : "30%"}
+          style={{
+            backgroundColor: isMobile ? "#222222" : "",
+            position: isMobile ? "relative" : "sticky",
+          }}
         >
-          {isMobile ? (
+          {!isMobile ? (
             <Container direction="column" width="100%" height="100%">
+              <Container>
+                <div>
+                  <Text font="proto_mono">Staking Stats </Text>
+                </div>
+              </Container>
               <div className={styles.infoBox}>
                 <div>
                   <Text font="rm_mono">Total Staked </Text>
@@ -526,19 +541,23 @@ export default function StakingPage() {
               </Button>
             </Container>
           ) : (
-            <Container
-              direction="column"
-              width="100%"
-              height="100%"
-              style={{ backgroundColor: "#111111" }}
-            >
+            <Container direction="column" width="100%" height="100%">
+              <Container>
+                <div>
+                  <Text font="proto_mono" color="#FFFFFF">
+                    Staking Stats{" "}
+                  </Text>
+                </div>
+              </Container>
               <div className={styles.infoBox}>
                 <div>
-                  <Text font="rm_mono">Total Staked </Text>
+                  <Text font="rm_mono" color="#FFFFFF">
+                    Total Staked{" "}
+                  </Text>
                 </div>
                 <Container direction="row" center={{ vertical: true }}>
                   <div style={{ marginRight: "5px" }}>
-                    <Text font="proto_mono" size="title">
+                    <Text font="proto_mono" size="title" color="#FFFFFF">
                       {displayAmount(
                         totalStaked ? totalStaked.toFixed(2) : "0",
                         0
@@ -552,7 +571,7 @@ export default function StakingPage() {
                       url: "/tokens/canto.svg",
                       size: 24,
                     }}
-                    //color="primary"
+                    color="primary"
                     // style={
                     //   theme
                     //     ? {}
@@ -566,21 +585,25 @@ export default function StakingPage() {
               </div>
               <div className={styles.infoBox}>
                 <div>
-                  <Text font="rm_mono">APR</Text>
+                  <Text font="rm_mono" color="#FFFFFF">
+                    APR
+                  </Text>
                 </div>
                 <Container direction="row" center={{ vertical: true }}>
-                  <Text font="proto_mono" size="title">
+                  <Text font="proto_mono" size="title" color="#FFFFFF">
                     {formatPercent((parseFloat(apr) / 100).toString())}
                   </Text>
                 </Container>
               </div>
               <div className={styles.infoBox}>
                 <div>
-                  <Text font="rm_mono">Rewards</Text>
+                  <Text font="rm_mono" color="#FFFFFF">
+                    Rewards
+                  </Text>
                 </div>
                 <Container direction="row" center={{ vertical: true }}>
                   <div style={{ marginRight: "5px" }}>
-                    <Text font="proto_mono" size="title">
+                    <Text font="proto_mono" size="title" color="#FFFFFF">
                       {totalRewards?.toFixed(5)}{" "}
                     </Text>
                     <Text> </Text>
@@ -595,6 +618,7 @@ export default function StakingPage() {
                 </Container>
               </div>
               <Spacer height="20px" />
+
               <Button
                 width={"fill"}
                 height="large"
@@ -602,8 +626,10 @@ export default function StakingPage() {
                   handleRewardsClaimClick(signer, allUserValidatorsAddresses)
                 }
                 disabled={!signer || !hasUserStaked}
+                color="accent"
+                themed={false}
               >
-                Claim Rewards
+                <Text font="proto_mono">Claim Staking Rewards</Text>
               </Button>
             </Container>
           )}

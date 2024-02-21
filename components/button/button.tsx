@@ -20,6 +20,7 @@ export interface ButtonProps {
   disabled?: boolean;
   shadow?: "small" | "medium" | "none";
   buttonProps?: React.JSX.IntrinsicElements["button"];
+  themed?: boolean;
 }
 
 const Button = (props: ButtonProps) => {
@@ -62,15 +63,35 @@ const Button = (props: ButtonProps) => {
 
   const getBGColor = () => {
     if (props.disabled) {
-      return "var(--primary-10-color)";
+      if (props.themed || props.themed == undefined) {
+        return "var(--primary-10-color)";
+      }
+      switch (props.color) {
+        case "primary":
+          return "rgb(#111111, 0.4)";
+        case "secondary":
+          return "rgb(#f1f1f1, 0.4)";
+        case "accent":
+          return "rgb(#06fc99, 0.4)";
+        case undefined:
+          return "var(--primary-10-color)";
+        default:
+          return "var(--primary-10-color)";
+      }
     }
     switch (props.color) {
       case "primary":
-        return "var(--text-dark-color)";
+        return props.themed || props.themed == undefined
+          ? "var(--text-dark-color)"
+          : "#111111";
       case "secondary":
-        return "var(--card-surface-color)";
+        return props.themed || props.themed == undefined
+          ? "var(--card-surface-color)"
+          : "#f1f1f1";
       case "accent":
-        return "var(--extra-success-color)";
+        return props.themed || props.themed == undefined
+          ? "var(--extra-success-color)"
+          : "#06fc99";
       case undefined:
         return "var(--text-dark-color)";
       default:
@@ -80,15 +101,35 @@ const Button = (props: ButtonProps) => {
 
   const getTextColor = () => {
     if (props.disabled) {
-      return "var(--text-dark-40-color)";
+      if (props.themed || props.themed == undefined) {
+        return "var(--primary-10-color)";
+      }
+      switch (props.color) {
+        case "primary":
+          return "rgb(#f1f1f1)";
+        case "secondary":
+          return "rgb(#111111)";
+        case "accent":
+          return "rgb(#212121)";
+        case undefined:
+          return "var(--primary-10-color)";
+        default:
+          return "var(--primary-10-color)";
+      }
     }
     switch (props.color) {
       case "primary":
-        return "var(--text-light-color)";
+        return props.themed || props.themed == undefined
+          ? "var(--text-light-color)"
+          : "#ffffff";
       case "secondary":
-        return "var(--text-dark-color)";
+        return props.themed || props.themed == undefined
+          ? "var(--text-dark-color)"
+          : "#111111";
       case "accent":
-        return "var(--text-only-dark)";
+        return props.themed || props.themed == undefined
+          ? "var(--text-only-dark)"
+          : "#212121";
       case undefined:
         return "var(--text-light-color)";
       default:
