@@ -40,7 +40,7 @@ import {
 import { Validator } from "@/hooks/staking/interfaces/validators";
 
 export function displayAnalyticsAmount(amount: string, decimals: number) {
-  return displayAmount(amount, decimals, { short: false, precision: decimals });
+  return displayAmount(amount, decimals, { short: false, precision: decimals < 0 ? 18 : decimals });
 }
 
 export function getAnalyticsTransactionFlowInfo(

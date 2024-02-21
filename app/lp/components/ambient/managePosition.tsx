@@ -145,11 +145,19 @@ const AddLiquidity = ({
         decimals={pool.base.decimals}
         value={amountBase}
         onChange={(e) => {
-          setLastUpdate("base");
-          setAmountBase(e.target.value);
-          setAmountQuote(
-            positionManager.getAmountFromAmountFormatted(e.target.value, true)
-          );
+          if (
+            Number(pool.stats.lastPriceSwap) <
+            Number(positionManager.getWeiRangePrice(positionValues.lowerPrice))
+          ) {
+            setLastUpdate("quote");
+            setAmountBase("0");
+          } else {
+            setLastUpdate("base");
+            setAmountBase(e.target.value);
+            setAmountQuote(
+              positionManager.getAmountFromAmountFormatted(e.target.value, true)
+            );
+          }
         }}
         IconUrl={pool.base.logoURI}
         title={pool.base.symbol}
@@ -162,11 +170,22 @@ const AddLiquidity = ({
         decimals={pool.quote.decimals}
         value={amountQuote}
         onChange={(e) => {
-          setLastUpdate("quote");
-          setAmountQuote(e.target.value);
-          setAmountBase(
-            positionManager.getAmountFromAmountFormatted(e.target.value, false)
-          );
+          if (
+            Number(pool.stats.lastPriceSwap) >
+            Number(positionManager.getWeiRangePrice(positionValues.upperPrice))
+          ) {
+            setLastUpdate("base");
+            setAmountQuote("0");
+          } else {
+            setLastUpdate("quote");
+            setAmountQuote(e.target.value);
+            setAmountBase(
+              positionManager.getAmountFromAmountFormatted(
+                e.target.value,
+                false
+              )
+            );
+          }
         }}
         IconUrl={pool.quote.logoURI}
         title={pool.quote.symbol}
