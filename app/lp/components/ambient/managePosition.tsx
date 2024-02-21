@@ -146,7 +146,7 @@ const AddLiquidity = ({
         value={amountBase}
         onChange={(e) => {
           if (
-            Number(pool.stats.lastPriceSwap) <
+            Number(pool.stats.lastPriceSwap) <=
             Number(positionManager.getWeiRangePrice(positionValues.lowerPrice))
           ) {
             setLastUpdate("quote");
@@ -171,7 +171,7 @@ const AddLiquidity = ({
         value={amountQuote}
         onChange={(e) => {
           if (
-            Number(pool.stats.lastPriceSwap) >
+            Number(pool.stats.lastPriceSwap) >=
             Number(positionManager.getWeiRangePrice(positionValues.upperPrice))
           ) {
             setLastUpdate("base");
