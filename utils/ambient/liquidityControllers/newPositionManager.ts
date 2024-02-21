@@ -86,7 +86,7 @@ export function useNewAmbientPositionManager(pool: AmbientPool) {
       userInputs.maxRangePrice
     );
 
-    if(isBase && Number(pool.stats.lastPriceSwap) < Number(currentPrices.minPriceWei)){
+    if(isBase && Number(pool.stats.lastPriceSwap) <= Number(currentPrices.minPriceWei)){
       setState({
         amountBase: "0",
         lastUpdated: "quote",
@@ -94,7 +94,7 @@ export function useNewAmbientPositionManager(pool: AmbientPool) {
       return;
     }
 
-    if(!isBase && Number(pool.stats.lastPriceSwap) > Number(currentPrices.maxPriceWei)){
+    if(!isBase && Number(pool.stats.lastPriceSwap) >= Number(currentPrices.maxPriceWei)){
       setState({
         amountQuote: "0",
         lastUpdated: "base",
