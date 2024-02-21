@@ -145,53 +145,36 @@ const AddLiquidity = ({
         decimals={pool.base.decimals}
         value={amountBase}
         onChange={(e) => {
-          if (
-            Number(pool.stats.lastPriceSwap) <=
-            Number(positionManager.getWeiRangePrice(positionValues.lowerPrice))
-          ) {
-            setLastUpdate("quote");
-            setAmountBase("0");
-          } else {
-            setLastUpdate("base");
-            setAmountBase(e.target.value);
-            setAmountQuote(
-              positionManager.getAmountFromAmountFormatted(e.target.value, true)
-            );
-          }
+          setLastUpdate("base");
+          setAmountBase(e.target.value);
+          setAmountQuote(
+            positionManager.getAmountFromAmountFormatted(e.target.value, true)
+          );
         }}
         IconUrl={pool.base.logoURI}
         title={pool.base.symbol}
         min="0"
         max={pool.base.balance ?? "0"}
         symbol={pool.base.symbol}
+        ambientAmountError={Number(pool.stats.lastPriceSwap) <= Number(positionManager.getWeiRangePrice(positionValues.lowerPrice)) && Number(amountBase) !== 0}
       />
       <Spacer height="10px" />
       <Amount
         decimals={pool.quote.decimals}
         value={amountQuote}
         onChange={(e) => {
-          if (
-            Number(pool.stats.lastPriceSwap) >=
-            Number(positionManager.getWeiRangePrice(positionValues.upperPrice))
-          ) {
-            setLastUpdate("base");
-            setAmountQuote("0");
-          } else {
-            setLastUpdate("quote");
-            setAmountQuote(e.target.value);
-            setAmountBase(
-              positionManager.getAmountFromAmountFormatted(
-                e.target.value,
-                false
-              )
-            );
-          }
+          setLastUpdate("quote");
+          setAmountQuote(e.target.value);
+          setAmountBase(
+            positionManager.getAmountFromAmountFormatted(e.target.value, false)
+          );
         }}
         IconUrl={pool.quote.logoURI}
         title={pool.quote.symbol}
         max={pool.quote.balance ?? "0"}
         min="0"
         symbol={pool.quote.symbol}
+        ambientAmountError={Number(pool.stats.lastPriceSwap) >= Number(positionManager.getWeiRangePrice(positionValues.upperPrice)) && Number(amountQuote) !== 0}
       />
       <Spacer height="10px" />
       <Container className={styles.card}>
