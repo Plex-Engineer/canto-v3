@@ -25,7 +25,7 @@ interface Props {
   };
   extraNode?: React.ReactNode;
   maxName?: string;
-  ambientAmountError?: boolean
+  ambientAmountError?: boolean;
 }
 const Amount = (props: Props) => {
   const [focused, setFocused] = useState(false);
@@ -77,13 +77,15 @@ const Amount = (props: Props) => {
   // deal with error inputs
   const inputError = useMemo(
     () =>
-      !props.ambientAmountError ? validateNonWeiUserInputTokenAmount(
-        props.value,
-        props.min,
-        props.limit?.limit ?? props.max,
-        props.symbol,
-        props.decimals
-      ): {error: true, reason: TX_PARAM_ERRORS.AMBIENT_AMOUNT_ERROR()},
+      !props.ambientAmountError
+        ? validateNonWeiUserInputTokenAmount(
+            props.value,
+            props.min,
+            props.limit?.limit ?? props.max,
+            props.symbol,
+            props.decimals
+          )
+        : { error: true, reason: TX_PARAM_ERRORS.AMBIENT_AMOUNT_ERROR() },
     [
       props.value,
       props.max,
@@ -91,7 +93,7 @@ const Amount = (props: Props) => {
       props.decimals,
       props.symbol,
       props.limit?.limit,
-      props.ambientAmountError
+      props.ambientAmountError,
     ]
   );
 
