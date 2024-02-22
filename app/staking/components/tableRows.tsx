@@ -18,20 +18,27 @@ export const GenerateValidatorTableRow = (
   isMobile: boolean
 ) => [
   !isMobile && (
-    <Container key={`name_${index}`}>
+    <Container key={`rank_${index}`}>
       <Text font="rm_mono">{validator.rank}</Text>
     </Container>
   ),
-  <Container key={`name_${index}`}>
-    <div
-      style={{
-        //maxWidth: !isMobile ? "300px" : "150px",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap",
-      }}
-    >
-      <Text font="rm_mono">{validator.description.moniker}</Text>
+  <Container
+    key={`name_${index}`}
+    style={{
+      maxWidth: !isMobile ? "300px" : "150px",
+    }}
+  >
+    <div>
+      <Text
+        font="rm_mono"
+        style={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {validator.description.moniker}
+      </Text>
     </div>
   </Container>,
   <Container
@@ -153,7 +160,8 @@ export const GenerateMyStakingTableRow = (
 
 export const GenerateUnbondingDelegationsTableRow = (
   userStakedValidator: UnbondingDelegation,
-  index: number
+  index: number,
+  isMobile?: boolean
 ) => [
   <Container key={`name_${index}`}>
     <Text font="rm_mono">{userStakedValidator.name}</Text>
@@ -181,16 +189,22 @@ export const GenerateUnbondingDelegationsTableRow = (
   </Container>,
   <Container key={`name_${index}`}>
     <Text font="rm_mono">
-      {new Date(userStakedValidator.completion_date).toDateString() +
-        ", " +
-        new Date(userStakedValidator.completion_date).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        }) +
-        (new Date(userStakedValidator.completion_date).getHours() >= Number(12)
-          ? "PM"
-          : "AM")}
+      {!isMobile
+        ? new Date(userStakedValidator.completion_date).toDateString() +
+          ", " +
+          new Date(userStakedValidator.completion_date).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }) +
+          (new Date(userStakedValidator.completion_date).getHours() >=
+          Number(12)
+            ? "PM"
+            : "AM")
+        : new Date(
+            userStakedValidator.completion_date
+          ).toLocaleDateString()}{" "}
+      {/*this is to reduce the width of the completion time column on mobile */}
     </Text>
   </Container>,
 ];

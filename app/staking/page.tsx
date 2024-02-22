@@ -303,7 +303,8 @@ export default function StakingPage() {
                 ...userStaking.unbonding.map((userStakingElement, index) =>
                   GenerateUnbondingDelegationsTableRow(
                     userStakingElement,
-                    index
+                    index,
+                    isMobile
                   )
                 ),
               ]}
@@ -459,6 +460,7 @@ export default function StakingPage() {
                         )
                       ),
                       <Pagination
+                        isMobile={isMobile}
                         key="pagination"
                         currentPage={currentPage}
                         totalPages={totalPages}
