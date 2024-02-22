@@ -276,7 +276,6 @@ export default function StakingPage() {
       </Text>
       <Spacer height="20px" />
       <Container
-        //direction={isMobile ? "column" : "row"}
         style={{ flexDirection: isMobile ? "column-reverse" : "row" }}
         gap={20}
         width="100%"
@@ -314,6 +313,22 @@ export default function StakingPage() {
             <Table
               title="My Staking"
               headerFont="rm_mono"
+              onRowsClick={
+                isMobile
+                  ? userStaking.validators
+                      .filter(
+                        (e) =>
+                          Number(formatBalance(e.userDelegation.balance, 18)) >
+                          0.0000001
+                      )
+                      .sort((a, b) =>
+                        b.userDelegation.balance.localeCompare(
+                          a.userDelegation.balance
+                        )
+                      )
+                      .map((validator) => () => handleClick(validator))
+                  : undefined
+              }
               headers={[
                 {
                   value: "Name",
@@ -366,8 +381,8 @@ export default function StakingPage() {
               title={"VALIDATORS"}
               onRowsClick={
                 isMobile
-                  ? validators.length > 0
-                    ? validators.map(
+                  ? currentFilter == "ACTIVE"
+                    ? paginatedvalidators.map(
                         (validator) => () => handleClick(validator)
                       )
                     : undefined
@@ -375,21 +390,25 @@ export default function StakingPage() {
               }
               secondary={
                 <Container
-                  direction="row"
+                  //direction={isMobile ? "column" : "row"}
                   gap={20}
                   width="100%"
                   style={{
                     justifyContent: "flex-end",
+                    display: "flex",
+                    flexDirection: isMobile ? "column-reverse" : "row",
                   }}
                 >
-                  <Input
-                    height={38}
-                    type="search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={"Search..."}
-                  />
-                  <Container width="200px">
+                  <Container style={{ padding: isMobile ? "0 8px 0 8px" : "" }}>
+                    <Input
+                      height={38}
+                      type="search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder={"Search..."}
+                    />
+                  </Container>
+                  <Container width={isMobile ? "100%" : "200px"}>
                     <ToggleGroup
                       options={["ACTIVE", "INACTIVE"]}
                       selected={currentFilter}

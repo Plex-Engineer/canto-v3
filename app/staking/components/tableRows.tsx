@@ -23,7 +23,14 @@ export const GenerateValidatorTableRow = (
     </Container>
   ),
   <Container key={`name_${index}`}>
-    <div style={{ width: !isMobile ? "300px" : "auto" }}>
+    <div
+      style={{
+        //maxWidth: !isMobile ? "300px" : "150px",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+      }}
+    >
       <Text font="rm_mono">{validator.description.moniker}</Text>
     </div>
   </Container>,
@@ -31,7 +38,7 @@ export const GenerateValidatorTableRow = (
     key={`tokens_${index}`}
     direction="row"
     center={{ horizontal: true, vertical: true }}
-    gap="auto"
+    //gap="auto"
   >
     <Text font="rm_mono">{displayAmount(validator.tokens, 18)} </Text>
     <div> </div>
