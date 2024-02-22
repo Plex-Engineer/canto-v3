@@ -26,21 +26,21 @@
 }
 
 .infoCard {
-  background: var(--card-sub-surface-color, #dfdfdf);
+  //background: green;
   box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
   border: 1px solid var(--border-stroke-color);
   display: flex;
   flex-direction: column;
   height: 400px;
-  padding: 24px;
+  //padding: 24px;
   top: 20px;
   margin-top: 0;
   .infoBox {
     display: flex;
     flex-direction: column;
-    height: 25%;
-    margin-top: 12px;
-    margin-bottom: 12px;
+    //height: 25%;
+    margin-top: 8px;
+    margin-bottom: 8px;
   }
 }
 

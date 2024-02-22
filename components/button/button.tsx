@@ -68,11 +68,11 @@ const Button = (props: ButtonProps) => {
       }
       switch (props.color) {
         case "primary":
-          return "rgb(#111111, 0.4)";
+          return "#111111";
         case "secondary":
-          return "rgb(#f1f1f1, 0.4)";
+          return "#f1f1f1";
         case "accent":
-          return "rgb(#06fc99, 0.4)";
+          return "#06fc99";
         case undefined:
           return "var(--primary-10-color)";
         default:

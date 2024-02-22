@@ -23,7 +23,7 @@ export const GenerateValidatorTableRow = (
     </Container>
   ),
   <Container key={`name_${index}`}>
-    <div style={{ width: "300px" }}>
+    <div style={{ width: !isMobile ? "300px" : "auto" }}>
       <Text font="rm_mono">{validator.description.moniker}</Text>
     </div>
   </Container>,

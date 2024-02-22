@@ -38,6 +38,7 @@ import { levenshteinDistance } from "@/utils/staking/searchUtils";
 import { WalletClient } from "wagmi";
 import Analytics from "@/provider/analytics";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
+import { getAnalyticsStakingInfo } from "@/utils/analytics";
 
 export default function StakingPage() {
   // connected user info
@@ -363,6 +364,15 @@ export default function StakingPage() {
           {validators.length > 0 && (
             <Table
               title={"VALIDATORS"}
+              onRowsClick={
+                isMobile
+                  ? validators.length > 0
+                    ? validators.map(
+                        (validator) => () => handleClick(validator)
+                      )
+                    : undefined
+                  : undefined
+              }
               secondary={
                 <Container
                   direction="row"
@@ -460,179 +470,126 @@ export default function StakingPage() {
             <Spacer height="20px" />
           </div>
         )}
+
         <Container
           className={styles.infoCard}
           width={isMobile ? "100%" : "30%"}
           style={{
-            backgroundColor: isMobile ? "#222222" : "",
             position: isMobile ? "relative" : "sticky",
           }}
+          height={!isMobile ? "400px" : "300px"}
         >
-          {!isMobile ? (
-            <Container direction="column" width="100%" height="100%">
-              <Container>
-                <div>
-                  <Text font="proto_mono">Staking Stats </Text>
-                </div>
-              </Container>
-              <div className={styles.infoBox}>
-                <div>
-                  <Text font="rm_mono">Total Staked </Text>
-                </div>
-                <Container direction="row" center={{ vertical: true }}>
-                  <div style={{ marginRight: "5px" }}>
-                    <Text font="proto_mono" size="title">
-                      {displayAmount(
-                        totalStaked ? totalStaked.toFixed(2) : "0",
-                        0
-                      )}
-                    </Text>
-                  </div>
-                  <p> </p>
-                  <Icon
-                    themed
-                    icon={{
-                      url: "/tokens/canto.svg",
-                      size: 24,
-                    }}
-                  />
-                </Container>
-              </div>
-              <div className={styles.infoBox}>
-                <div>
-                  <Text font="rm_mono">APR</Text>
-                </div>
-                <Container direction="row" center={{ vertical: true }}>
-                  <Text font="proto_mono" size="title">
-                    {formatPercent((parseFloat(apr) / 100).toString())}
-                  </Text>
-                </Container>
-              </div>
-              <div className={styles.infoBox}>
-                <div>
-                  <Text font="rm_mono">Rewards</Text>
-                </div>
-                <Container direction="row" center={{ vertical: true }}>
-                  <div style={{ marginRight: "5px" }}>
-                    <Text font="proto_mono" size="title">
-                      {totalRewards?.toFixed(5)}{" "}
-                    </Text>
-                    <Text> </Text>
-                  </div>
-                  <Icon
-                    themed
-                    icon={{
-                      url: "/tokens/canto.svg",
-                      size: 24,
-                    }}
-                  />
-                </Container>
-              </div>
-              <Spacer height="20px" />
-              <Button
-                width={"fill"}
-                height="large"
-                onClick={() =>
-                  handleRewardsClaimClick(signer, allUserValidatorsAddresses)
-                }
-                disabled={!signer || !hasUserStaked}
-              >
-                Claim Rewards
-              </Button>
+          <Container
+            direction="column"
+            width="100%"
+            height="100%"
+            backgroundColor="#222222"
+          >
+            <Container
+              style={{
+                borderBottom: "1px solid #3d3d3d",
+                padding: "16px",
+              }}
+            >
+              <Text font="proto_mono" color="#FFFFFF">
+                Staking Stats{" "}
+              </Text>
             </Container>
-          ) : (
-            <Container direction="column" width="100%" height="100%">
-              <Container>
-                <div>
-                  <Text font="proto_mono" color="#FFFFFF">
-                    Staking Stats{" "}
-                  </Text>
-                </div>
-              </Container>
+            <Container style={{ padding: "16px" }}>
               <div className={styles.infoBox}>
-                <div>
-                  <Text font="rm_mono" color="#FFFFFF">
-                    Total Staked{" "}
-                  </Text>
-                </div>
-                <Container direction="row" center={{ vertical: true }}>
-                  <div style={{ marginRight: "5px" }}>
-                    <Text font="proto_mono" size="title" color="#FFFFFF">
-                      {displayAmount(
-                        totalStaked ? totalStaked.toFixed(2) : "0",
-                        0
-                      )}
-                    </Text>
-                  </div>
-                  <p> </p>
-                  <Icon
-                    themed
-                    icon={{
-                      url: "/tokens/canto.svg",
-                      size: 24,
-                    }}
-                    color="primary"
-                    // style={
-                    //   theme
-                    //     ? {}
-                    //     : {
-                    //         filter: color == "#ddd" ? "invert(1)" : "",
-                    //       }
-                    // }
-                    //themed={theme ? true : false}
-                  />
-                </Container>
-              </div>
-              <div className={styles.infoBox}>
-                <div>
-                  <Text font="rm_mono" color="#FFFFFF">
-                    APR
-                  </Text>
-                </div>
-                <Container direction="row" center={{ vertical: true }}>
-                  <Text font="proto_mono" size="title" color="#FFFFFF">
-                    {formatPercent((parseFloat(apr) / 100).toString())}
-                  </Text>
-                </Container>
-              </div>
-              <div className={styles.infoBox}>
-                <div>
-                  <Text font="rm_mono" color="#FFFFFF">
+                <div style={{ marginBottom: "8px" }}>
+                  <Text font="rm_mono" color="#767676" size="x-sm">
                     Rewards
                   </Text>
                 </div>
                 <Container direction="row" center={{ vertical: true }}>
-                  <div style={{ marginRight: "5px" }}>
-                    <Text font="proto_mono" size="title" color="#FFFFFF">
-                      {totalRewards?.toFixed(5)}{" "}
-                    </Text>
-                    <Text> </Text>
-                  </div>
                   <Icon
                     themed
                     icon={{
                       url: "/tokens/canto.svg",
-                      size: 24,
+                      size: isMobile ? 16 : 20,
                     }}
+                    style={{ filter: "invert(1)" }}
                   />
+                  <div style={{ margin: "0 4px 0 4px" }}>
+                    <Text font="proto_mono" size="x-lg" color="#FFFFFF">
+                      {totalRewards?.toFixed(5)}{" "}
+                    </Text>
+                    <Text> </Text>
+                  </div>
                 </Container>
               </div>
+              {/* <Item
+                color="#ddd"
+                {...{
+                  name: "Rewards",
+                  value: displayAmount(
+                    totalStaked ? totalStaked.toFixed(2) : "0",
+                    0
+                  ),
+                  symbol: true,
+                }}
+              /> */}
+              <Container direction={isMobile ? "row" : "column"}>
+                <div
+                  className={styles.infoBox}
+                  style={{ width: isMobile ? "50%" : "" }}
+                >
+                  <div style={{ marginBottom: "8px" }}>
+                    <Text font="rm_mono" color="#767676" size="x-sm">
+                      APR
+                    </Text>
+                  </div>
+                  <Container direction="row" center={{ vertical: true }}>
+                    <Text font="proto_mono" size="lg" color="#FFFFFF">
+                      {formatPercent((parseFloat(apr) / 100).toString())}
+                    </Text>
+                  </Container>
+                </div>
+                <div className={styles.infoBox}>
+                  <div style={{ marginBottom: "8px" }}>
+                    <Text font="rm_mono" color="#767676" size="x-sm">
+                      Total Staked{" "}
+                    </Text>
+                  </div>
+                  <Container direction="row" center={{ vertical: true }}>
+                    <Icon
+                      icon={{
+                        url: "/tokens/canto.svg",
+                        size: isMobile ? 14 : 18,
+                      }}
+                      style={{ filter: "invert(1)" }}
+                      //color="primary"
+                    />
+                    <div style={{ margin: "0 4px 0 4px" }}>
+                      <Text font="proto_mono" size="lg" color="#FFFFFF">
+                        {displayAmount(
+                          totalStaked ? totalStaked.toFixed(2) : "0",
+                          0
+                        )}
+                      </Text>
+                    </div>
+                    <p> </p>
+                  </Container>
+                </div>
+              </Container>
               <Spacer height="20px" />
-
-              <Button
-                width={"fill"}
-                height="large"
-                onClick={() =>
-                  handleRewardsClaimClick(signer, allUserValidatorsAddresses)
-                }
-                disabled={!signer || !hasUserStaked}
-                color="accent"
-                themed={false}
-              >
-                <Text font="proto_mono">Claim Staking Rewards</Text>
-              </Button>
+              <Container>
+                <Button
+                  width={"fill"}
+                  height="large"
+                  onClick={() =>
+                    handleRewardsClaimClick(signer, allUserValidatorsAddresses)
+                  }
+                  disabled={!signer || !hasUserStaked}
+                  color="secondary"
+                  themed={false}
+                >
+                  <Text font="proto_mono">Claim Staking Rewards</Text>
+                </Button>
+              </Container>
             </Container>
-          )}
+          </Container>
         </Container>
       </Container>
 
