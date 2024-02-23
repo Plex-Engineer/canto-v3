@@ -12,6 +12,7 @@ import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import Splash from "@/components/splash/splash";
 import Link from "next/link";
 import Container from "@/components/container/container";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 export default function GovernancePage() {
   const { chainId } = useCantoSigner();
@@ -25,30 +26,36 @@ export default function GovernancePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [proposals.length]
   );
-
+  const { isMobile } = useScreenSize();
   return isProposalsLoading ? (
     <Splash themed />
   ) : (
     <div>
       <div className={styles.container}>
-        <div className={styles.header}>
-          <Text font="proto_mono" className={styles.title}>
-            Governance
-          </Text>
+        <Container
+          className={styles.header}
+          direction={isMobile ? "column" : "row"}
+        >
+          <div>
+            <Text font="proto_mono" className={styles.title}>
+              Governance
+            </Text>
+          </div>
           <Container
             direction="column"
             className={styles.middleText}
             center={{ vertical: true }}
+            style={{ marginTop: isMobile ? "16px" : "" }}
           >
             <Text size="sm" color="#7B7B7B">
               Stake your $CANTO to participate in governance
             </Text>
           </Container>
-        </div>
+        </Container>
 
-        <Spacer height="40px" />
+        <Spacer height="32px" />
 
-        <ProposalTable proposals={sorted_proposals} />
+        <ProposalTable proposals={sorted_proposals} isMobile={isMobile} />
         <Spacer height="40px" />
       </div>
     </div>

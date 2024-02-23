@@ -13,6 +13,7 @@ import { ProposalRow } from "./ProposalRow";
 
 interface TableProps {
   proposals: Proposal[];
+  isMobile: boolean;
 }
 
 const PAGE_SIZE = 10;
@@ -22,7 +23,7 @@ enum ProposalFilter {
   REJECTED = "REJECTED PROPOSALS",
 }
 
-const ProposalTable = ({ proposals }: TableProps) => {
+const ProposalTable = ({ proposals, isMobile }: TableProps) => {
   // route to proposal page
   const router = useRouter();
   const handleRowClick = (proposalId: any) => {
@@ -85,15 +86,18 @@ const ProposalTable = ({ proposals }: TableProps) => {
     {
       value: "",
       ratio: 2,
+      hideOnMobile: true,
     },
 
     {
       value: "",
       ratio: 2,
+      hideOnMobile: true,
     },
     {
       value: "",
       ratio: 1,
+      hideOnMobile: true,
     },
   ];
   return (
@@ -117,9 +121,9 @@ const ProposalTable = ({ proposals }: TableProps) => {
                   : undefined
               }
               removeHeader={true}
-              rowHeight="120px"
+              rowHeight={isMobile ? "180px" : "120px"}
               content={activeProposals.map((proposal) =>
-                ProposalRow({ proposal, active: true })
+                ProposalRow({ proposal, active: true, isMobile })
               )}
             />
           }
@@ -143,22 +147,35 @@ const ProposalTable = ({ proposals }: TableProps) => {
       <div className={styles.table}>
         {
           <Table
-            title={currentFilter}
+            title={
+              !isMobile ? (
+                currentFilter
+              ) : (
+                <Container style={{ marginLeft: "8px" }}>
+                  {currentFilter}
+                </Container>
+              )
+            }
             secondary={
-              <Container width="400px">
-                <ToggleGroup
-                  options={Object.values(ProposalFilter).map(
-                    (filter) => filter.split(" ")[0]
-                  )}
-                  selected={currentFilter.split(" ")[0]}
-                  setSelected={(value) => {
-                    const proposalFilter = Object.values(ProposalFilter).find(
-                      (filter) => filter.split(" ")[0] === value
-                    );
-                    setCurrentFilter(proposalFilter || ProposalFilter.ALL);
-                  }}
-                />
-              </Container>
+              isMobile && (
+                <Container
+                  width={isMobile ? "100%" : "400px"}
+                  style={{ padding: isMobile ? "0 16px 0 16px" : "" }}
+                >
+                  <ToggleGroup
+                    options={Object.values(ProposalFilter).map(
+                      (filter) => filter.split(" ")[0]
+                    )}
+                    selected={currentFilter.split(" ")[0]}
+                    setSelected={(value) => {
+                      const proposalFilter = Object.values(ProposalFilter).find(
+                        (filter) => filter.split(" ")[0] === value
+                      );
+                      setCurrentFilter(proposalFilter || ProposalFilter.ALL);
+                    }}
+                  />
+                </Container>
+              )
             }
             headerFont="rm_mono"
             headers={
@@ -174,7 +191,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                 : undefined
             }
             removeHeader={true}
-            rowHeight="120px"
+            rowHeight={isMobile ? "180px" : "120px"}
             content={
               paginatedProposals.length > 0
                 ? [
@@ -184,9 +201,10 @@ const ProposalTable = ({ proposals }: TableProps) => {
                           proposal.status != "PROPOSAL_STATUS_VOTING_PERIOD"
                       )
                       .map((proposal) =>
-                        ProposalRow({ proposal, active: false })
+                        ProposalRow({ proposal, active: false, isMobile })
                       ),
                     <Pagination
+                      isMobile={isMobile}
                       key="pagination"
                       currentPage={currentPage}
                       totalPages={totalPages}

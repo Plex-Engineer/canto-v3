@@ -50,10 +50,8 @@
 }
 
 .header {
-  display: flex;
-  direction: row !important;
   justify-content: space-between;
-  width: 100% !important;
+  width: 100%;
   //align-items: center;
 
   .title {
@@ -65,4 +63,20 @@
     padding: 10px 16px 10px 16px;
     background-color: var(--card-surface-color, #f1f1f1);
   }
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    border-top: 1px solid var(--border-stroke-color,#b3b3b3);
+    width: calc(100vw);
+    //gap: 1rem;
+    padding: 1rem;
+    &::after {
+      display: none;
+    }
+    &::before {
+      display: none;
+    }
+  }
+
 }
