@@ -432,7 +432,7 @@ export default function StakingPage() {
                 },
                 {
                   value: "Name",
-                  ratio: 6,
+                  ratio: isMobile ? 5 : 6,
                 },
                 {
                   value: "Total Stake",
@@ -540,17 +540,6 @@ export default function StakingPage() {
                   </div>
                 </Container>
               </div>
-              {/* <Item
-                color="#ddd"
-                {...{
-                  name: "Rewards",
-                  value: displayAmount(
-                    totalStaked ? totalStaked.toFixed(2) : "0",
-                    0
-                  ),
-                  symbol: true,
-                }}
-              /> */}
               <Container direction={isMobile ? "row" : "column"}>
                 <div
                   className={styles.infoBox}

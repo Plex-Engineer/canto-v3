@@ -14,7 +14,7 @@ export const Pagination = (props: Props) => {
     <div key="pagination" className={styles.container}>
       <div className={styles.row}>
         <div
-          className={styles.iconContainer}
+          className={styles.icon}
           onClick={() => props.handlePageClick(1)}
           style={{
             opacity: props.currentPage == 1 ? "0.4" : "1",
@@ -30,7 +30,7 @@ export const Pagination = (props: Props) => {
           />
         </div>
         <div
-          className={styles.button}
+          className={styles.icon}
           onClick={
             props.currentPage > 1
               ? () => props.handlePageClick(props.currentPage - 1)
@@ -144,7 +144,7 @@ export const Pagination = (props: Props) => {
         </div>
 
         <div
-          className={styles.button}
+          className={styles.icon}
           onClick={
             props.currentPage < props.totalPages
               ? () => props.handlePageClick(props.currentPage + 1)
@@ -163,7 +163,7 @@ export const Pagination = (props: Props) => {
           </Text>
         </div>
         <div
-          className={styles.iconContainer}
+          className={styles.icon}
           onClick={() => props.handlePageClick(props.totalPages)}
           style={{
             opacity: props.currentPage == props.totalPages ? "0.4" : "1",
