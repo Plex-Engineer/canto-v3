@@ -377,9 +377,29 @@ export default function StakingPage() {
               ]}
             />
           )}
+          {/* {isMobile && (
+            <Container width={isMobile ? "100%" : "200px"}>
+              <ToggleGroup
+                options={["ACTIVE", "INACTIVE"]}
+                selected={currentFilter}
+                setSelected={(value) => {
+                  Analytics.actions.events.staking.tabSwitched(value);
+                  setCurrentFilter(value);
+                  setCurrentPage(1);
+                  setSearchQuery("");
+                }}
+              />
+            </Container>
+          )} */}
           {validators.length > 0 && (
             <Table
-              title={"VALIDATORS"}
+              title={
+                <Container
+                  style={{ padding: isMobile ? "0px 0px 12px 8px" : "0" }}
+                >
+                  VALIDATORS
+                </Container>
+              }
               onRowsClick={
                 isMobile
                   ? currentFilter == "ACTIVE"
@@ -400,7 +420,9 @@ export default function StakingPage() {
                     flexDirection: isMobile ? "column-reverse" : "row",
                   }}
                 >
-                  <Container style={{ padding: isMobile ? "0 8px 0 8px" : "" }}>
+                  <Container
+                    style={{ padding: isMobile ? "0 16px 0 16px" : "" }}
+                  >
                     <Input
                       height={38}
                       type="search"
@@ -409,7 +431,11 @@ export default function StakingPage() {
                       placeholder={"Search..."}
                     />
                   </Container>
-                  <Container width={isMobile ? "100%" : "200px"}>
+
+                  <Container
+                    width={isMobile ? "100%" : "200px"}
+                    style={{ padding: isMobile ? "0 16px 0 16px" : "" }}
+                  >
                     <ToggleGroup
                       options={["ACTIVE", "INACTIVE"]}
                       selected={currentFilter}
@@ -431,7 +457,19 @@ export default function StakingPage() {
                   hideOnMobile: true,
                 },
                 {
-                  value: "Name",
+                  value: !isMobile ? (
+                    "Name"
+                  ) : (
+                    <Container
+                      width="100%"
+                      style={{
+                        textAlign: "left",
+                        paddingLeft: "20px",
+                      }}
+                    >
+                      Name
+                    </Container>
+                  ),
                   ratio: isMobile ? 5 : 6,
                 },
                 {
@@ -519,7 +557,11 @@ export default function StakingPage() {
             <Container style={{ padding: "16px" }}>
               <div className={styles.infoBox}>
                 <div style={{ marginBottom: "8px" }}>
-                  <Text font="rm_mono" color="#767676" size="x-sm">
+                  <Text
+                    font="rm_mono"
+                    color="#767676"
+                    size={isMobile ? "md" : "x-sm"}
+                  >
                     Rewards
                   </Text>
                 </div>
@@ -528,12 +570,16 @@ export default function StakingPage() {
                     themed
                     icon={{
                       url: "/tokens/canto.svg",
-                      size: isMobile ? 16 : 20,
+                      size: 20,
                     }}
                     style={{ filter: "invert(1)" }}
                   />
                   <div style={{ margin: "0 4px 0 4px" }}>
-                    <Text font="proto_mono" size="x-lg" color="#FFFFFF">
+                    <Text
+                      font="proto_mono"
+                      size={isMobile ? "title" : "x-lg"}
+                      color="#FFFFFF"
+                    >
                       {totalRewards?.toFixed(5)}{" "}
                     </Text>
                     <Text> </Text>
@@ -546,19 +592,31 @@ export default function StakingPage() {
                   style={{ width: isMobile ? "50%" : "" }}
                 >
                   <div style={{ marginBottom: "8px" }}>
-                    <Text font="rm_mono" color="#767676" size="x-sm">
+                    <Text
+                      font="rm_mono"
+                      color="#767676"
+                      size={isMobile ? "md" : "x-sm"}
+                    >
                       APR
                     </Text>
                   </div>
                   <Container direction="row" center={{ vertical: true }}>
-                    <Text font="proto_mono" size="lg" color="#FFFFFF">
+                    <Text
+                      font="proto_mono"
+                      size={isMobile ? "x-lg" : "lg"}
+                      color="#FFFFFF"
+                    >
                       {formatPercent((parseFloat(apr) / 100).toString())}
                     </Text>
                   </Container>
                 </div>
                 <div className={styles.infoBox}>
                   <div style={{ marginBottom: "8px" }}>
-                    <Text font="rm_mono" color="#767676" size="x-sm">
+                    <Text
+                      font="rm_mono"
+                      color="#767676"
+                      size={isMobile ? "md" : "x-sm"}
+                    >
                       Total Staked{" "}
                     </Text>
                   </div>
@@ -566,13 +624,17 @@ export default function StakingPage() {
                     <Icon
                       icon={{
                         url: "/tokens/canto.svg",
-                        size: isMobile ? 14 : 18,
+                        size: 18,
                       }}
                       style={{ filter: "invert(1)" }}
                       //color="primary"
                     />
                     <div style={{ margin: "0 4px 0 4px" }}>
-                      <Text font="proto_mono" size="lg" color="#FFFFFF">
+                      <Text
+                        font="proto_mono"
+                        size={isMobile ? "x-lg" : "lg"}
+                        color="#FFFFFF"
+                      >
                         {displayAmount(
                           totalStaked ? totalStaked.toFixed(2) : "0",
                           0
