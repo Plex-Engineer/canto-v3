@@ -536,7 +536,7 @@ export default function StakingPage() {
           style={{
             position: isMobile ? "relative" : "sticky",
           }}
-          height={!isMobile ? "400px" : "300px"}
+          height={!isMobile ? "400px" : "320px"}
         >
           <Container
             direction="column"
@@ -550,7 +550,11 @@ export default function StakingPage() {
                 padding: "16px",
               }}
             >
-              <Text font="proto_mono" color="#FFFFFF">
+              <Text
+                font="proto_mono"
+                color="#FFFFFF"
+                size={isMobile ? "lg" : "sm"}
+              >
                 Staking Stats{" "}
               </Text>
             </Container>
