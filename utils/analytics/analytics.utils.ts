@@ -7,6 +7,7 @@ import {
   AnalyticsCantoLPData,
   AnalyticsLMData,
   AnalyticsStakingData,
+  AnalyticsGovernanceData,
 } from "@/provider/analytics";
 import { BridgeTransactionParams } from "@/transactions/bridge/types";
 import {
@@ -38,6 +39,8 @@ import {
   StakingTxTypes,
 } from "@/transactions/staking";
 import { Validator } from "@/hooks/staking/interfaces/validators";
+import { ProposalVoteTxParams } from "@/transactions/gov";
+import { Proposal } from "@/hooks/gov/interfaces/proposal";
 
 export function displayAnalyticsAmount(amount: string, decimals: number) {
   return displayAmount(amount, decimals, { short: false, precision: decimals });
@@ -83,6 +86,10 @@ export function getAnalyticsTransactionFlowInfo(
     case TransactionFlowType.STAKE_CANTO_TX:
       txFlowInfo.txFlowType = flow.params.txType;
       txFlowInfo.txFlowData = getStakingTransactionFlowData(flow.params);
+      break;
+    case TransactionFlowType.VOTE_TX:
+      txFlowInfo.txFlowType = "Vote";
+      txFlowInfo.txFlowData = getProposalVoteTransactionFlowData(flow.params);
       break;
     default:
       return NEW_ERROR("Invalid transaction flow type");
@@ -386,6 +393,17 @@ function getStakingTransactionFlowData(
   }
 }
 
+
+function getProposalVoteTransactionFlowData(
+  voteTxParams: ProposalVoteTxParams
+): AnalyticsTransactionFlowData {
+  return {
+    govProposalId: voteTxParams.proposalId,
+    govProposalTitle: voteTxParams.proposal?.title,
+    govVoteOption : voteTxParams.voteOption,
+  };
+}
+
 function getLpComboClaimRewardsTransactionFlowType(
   lpComboClaimRewardsTxParams: ClaimDexComboRewardsParams
 ): string | undefined {
@@ -496,5 +514,13 @@ export function getAnalyticsStakingInfo(
   return {
     stakingValidator: validator.description.moniker,
     stakingDelegation: displayAnalyticsAmount(delegation ?? "0", 18),
+  };
+}
+
+export function getAnalyticsProposalInfo(proposalId: any, proposals: Proposal[]) : AnalyticsGovernanceData {
+  const proposal = proposals.find((p) => p.proposal_id === Number(proposalId));
+  return {
+    govProposalId: proposal?.proposal_id,
+    govProposalTitle: proposal?.title,
   };
 }
