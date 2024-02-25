@@ -17,7 +17,7 @@ const cantoMainnetBaseInfo = {
   name: "Canto",
   icon: "/icons/canto.svg",
   isTestChain: false,
-  rpcUrl: "https://canto-rpc.ansybl.io/",
+  rpcUrl: "https://mainnode.plexnode.org:8545",
   nativeCurrency: {
     name: "Canto",
     baseName: "acanto",
