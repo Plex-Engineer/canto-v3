@@ -28,7 +28,7 @@ const Table = (props: Props) => {
           font="proto_mono"
           size="lg"
           opacity={0.7}
-          className={isMobile ? styles.primaryTitle : undefined}
+          className={isMobile ? styles.tableTitle : undefined}
         >
           {props.title}
         </Text>
