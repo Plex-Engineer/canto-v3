@@ -16,7 +16,10 @@ import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 export default function GovernancePage() {
   const { chainId } = useCantoSigner();
+  const { isMobile } = useScreenSize();
   const { proposals, isProposalsLoading } = useProposals({ chainId: chainId });
+
+  //console.log(isMobile);
 
   const sorted_proposals = useMemo(
     () =>
@@ -26,7 +29,7 @@ export default function GovernancePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [proposals.length]
   );
-  const { isMobile } = useScreenSize();
+
   return isProposalsLoading ? (
     <Splash themed />
   ) : (

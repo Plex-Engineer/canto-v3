@@ -27,6 +27,7 @@ import Spacer from "@/components/layout/spacer";
 import useStaking from "@/hooks/staking/useStaking";
 import { VoteBarGraph } from "../components/votingChart/voteGraph";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
+import Container from "@/components/container/container";
 
 const VOTE_OPTION_COLORS = {
   [VoteOption.YES]: [
@@ -129,7 +130,7 @@ export default function Page() {
   return isProposalsLoading ? (
     <Splash themed />
   ) : (
-    <div className={styles.proposalContainer}>
+    <div className={styles.container}>
       <div className={styles.proposalHeaderContainer}>
         <div
           className={styles.backButtonContainer}
@@ -178,7 +179,12 @@ export default function Page() {
             </div>
           )}
         </div>
-        <div style={{ margin: "0px 0px 8px 0px" }}>
+        <div
+          style={{
+            margin: "0px 0px 8px 0px",
+            //maxWidth: isMobile ? "350px" : "",
+          }}
+        >
           <Text font="proto_mono" size="x-lg">
             {proposal.title}
           </Text>
@@ -189,45 +195,72 @@ export default function Page() {
         </div>
       </div>
       <div className={styles.proposalInfoContainer}>
-        <div className={styles.graphAndVoteContainer}>
+        <div
+          className={styles.graphAndVoteContainer}
+          style={{
+            minWidth: isMobile ? "unset" : "500px",
+            width: isMobile ? "100%" : "70%",
+          }}
+        >
           {isActive && (
-            <div className={styles.proposalCardContainer1}>
+            <div className={styles.votingOptionsContainer}>
               <div className={styles.detailsHeader}>
                 <Text font="proto_mono">Select an option to vote</Text>
               </div>
               <div
                 className={styles.votingBox}
-                style={
-                  isActive
-                    ? {
-                        height: "100%",
-                        padding: "10px 0px 0px 0px",
-                      }
-                    : {
-                        height: "100%",
-                        padding: "0px 0px 20px 0px",
-                      }
-                }
+                style={{
+                  height: "100%",
+                  padding: "20px 20px 20px 20px",
+                }}
               >
-                <div className={styles.proposalInfoRow1}>
-                  <VoteBox option={VoteOption.YES} />
-                  <VoteBox option={VoteOption.NO} />
-                </div>
+                <Container
+                  direction={isMobile ? "column" : "row"}
+                  style={{
+                    paddingBottom: " 16px",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Container
+                    style={{
+                      width: isMobile ? "100%" : "50%",
+                      marginRight: isMobile ? "" : "16px",
+                      paddingBottom: isMobile ? "16px" : "0px",
+                    }}
+                  >
+                    <VoteBox option={VoteOption.YES} />{" "}
+                  </Container>
+                  <Container style={{ width: isMobile ? "100%" : "50%" }}>
+                    <VoteBox option={VoteOption.NO} />{" "}
+                  </Container>
+                </Container>
 
-                <div className={styles.proposalInfoRow1}>
-                  <VoteBox option={VoteOption.VETO} />
-                  <VoteBox option={VoteOption.ABSTAIN} />
-                </div>
+                <Container
+                  direction={isMobile ? "column" : "row"}
+                  style={{
+                    paddingBottom: " 16px",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Container
+                    style={{
+                      width: isMobile ? "100%" : "50%",
+                      marginRight: isMobile ? "" : "16px",
+                      paddingBottom: isMobile ? "16px" : "0px",
+                    }}
+                  >
+                    <VoteBox option={VoteOption.VETO} />{" "}
+                  </Container>
+                  <Container style={{ width: isMobile ? "100%" : "50%" }}>
+                    <VoteBox option={VoteOption.ABSTAIN} />{" "}
+                  </Container>
+                </Container>
 
-                <div className={styles.proposalInfoRow1}>
+                <Container>
                   <div className={styles.VotingButton}>
                     <Button
                       width={200}
-                      disabled={
-                        !isActive ||
-                        !(userStaking.validators.length > 0) ||
-                        selectedVote == null
-                      }
+                      disabled={!isActive || selectedVote == null}
                       onClick={() =>
                         castVote(proposal.proposal_id, selectedVote)
                       }
@@ -235,7 +268,15 @@ export default function Page() {
                       SUBMIT VOTE
                     </Button>
                   </div>
-                </div>
+                </Container>
+                {/* {isMobile && (
+                  <div className={styles.proposalInfoRow1}>
+                    <VoteBox option={VoteOption.YES} />{" "}
+                    <VoteBox option={VoteOption.NO} />{" "}
+                    <VoteBox option={VoteOption.VETO} />{" "}
+                    <VoteBox option={VoteOption.ABSTAIN} />
+                  </div>
+                )} */}
               </div>
             </div>
           )}
@@ -250,13 +291,20 @@ export default function Page() {
               abstain={Number(votesData[VoteOption.ABSTAIN].amount)}
               veto={Number(votesData[VoteOption.VETO].amount)}
               size={422}
+              isMobile={isMobile}
             />
           </div>
           <div>
             <Spacer height="50px" />
           </div>
         </div>
-        <div className={styles.proposalCardContainer2}>
+        <div
+          className={styles.proposalCardContainer2}
+          style={{
+            minWidth: isMobile ? "unset" : "360px",
+            width: isMobile ? "100%" : "30%",
+          }}
+        >
           <div className={styles.detailsHeader}>
             <Text font="proto_mono">Proposal Details</Text>
           </div>
@@ -320,7 +368,7 @@ export default function Page() {
                 </div>
                 <div className={styles.txt}>
                   <Text font="rm_mono" size="x-sm">
-                    Proposal Created on
+                    Created on
                   </Text>
                 </div>
                 <div>

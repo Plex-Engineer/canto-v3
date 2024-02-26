@@ -11,15 +11,17 @@ interface VoteBarGraphProps {
   abstain: number;
   veto: number;
   size: number;
+  isMobile?: boolean;
 }
 
 interface BarProps {
   amount: number;
   totalVotes: number;
   size: number;
+  isMobile?: boolean;
 }
 
-const Bar = ({ amount, totalVotes, size }: BarProps) => {
+const Bar = ({ amount, totalVotes, size, isMobile }: BarProps) => {
   const height =
     ((totalVotes > 0 ? (amount / totalVotes) * 100 : 0) * size) / 150; //150 is to make the bar occupy at max 2/3rd of the total height of the container if an option get 100% votes
 
@@ -28,9 +30,10 @@ const Bar = ({ amount, totalVotes, size }: BarProps) => {
       {/* <div className={styles.voteInfo}>YES</div> */}
       {height > 0 && (
         <div
-          className={styles.graph}
+          className={styles.bar}
           style={{
             height: height,
+            width: isMobile ? "24px" : "32px",
           }}
         />
       )}
@@ -92,6 +95,7 @@ export const VoteBarGraph = ({
   abstain,
   veto,
   size,
+  isMobile,
 }: VoteBarGraphProps) => {
   const totalVotes = yes + no + abstain + veto;
 
@@ -101,10 +105,30 @@ export const VoteBarGraph = ({
         <Text font="proto_mono">Voting Stats</Text>
       </div>
       <div className={styles.graphContainer}>
-        <Bar amount={yes} totalVotes={totalVotes} size={size} />
-        <Bar amount={no} totalVotes={totalVotes} size={size} />
-        <Bar amount={veto} totalVotes={totalVotes} size={size} />
-        <Bar amount={abstain} totalVotes={totalVotes} size={size} />
+        <Bar
+          amount={yes}
+          totalVotes={totalVotes}
+          size={size}
+          isMobile={isMobile}
+        />
+        <Bar
+          amount={no}
+          totalVotes={totalVotes}
+          size={size}
+          isMobile={isMobile}
+        />
+        <Bar
+          amount={veto}
+          totalVotes={totalVotes}
+          size={size}
+          isMobile={isMobile}
+        />
+        <Bar
+          amount={abstain}
+          totalVotes={totalVotes}
+          size={size}
+          isMobile={isMobile}
+        />
       </div>
       <div className={styles.inforow}>
         <VoteInfo
@@ -174,7 +198,13 @@ export const VoteBarSecondary = ({
   );
 };
 
-export const VoteGraphBox = ({ yes, no, abstain, veto }: VoteBarGraphProps) => {
+export const VoteGraphBox = ({
+  yes,
+  no,
+  abstain,
+  veto,
+  isMobile,
+}: VoteBarGraphProps) => {
   const totalVotes = yes + no + abstain + veto;
 
   const yesPercentage = totalVotes > 0 ? (yes / totalVotes) * 100 : 0;

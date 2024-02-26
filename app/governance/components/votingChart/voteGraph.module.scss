@@ -17,46 +17,48 @@
   justify-content: space-around;
   margin: 20px 20px 20px 20px;
   border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
-  .graph {
-    cursor: auto;
-    width: 30px;
-    margin-right: 30px;
-    margin-left: 30px;
-    border-radius: 5px 5px 0 0;
-    background-color: var(--graph-fill-color, #d0d0d0);
-    border: 1px solid var(--graph-stroke-color, #b3b3b3);
-    border-bottom: none;
-    //border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
+  .barContainer {
+    display: flex;
+    flex-direction: column-reverse;
+
+    align-items: center;
+    width: 25%;
+    .bar {
+      cursor: auto;
+      margin-right: 30px;
+      margin-left: 30px;
+      border-radius: 5px 5px 0 0;
+      background-color: var(--graph-fill-color, #d0d0d0);
+      border: 1px solid var(--graph-stroke-color, #b3b3b3);
+      border-bottom: none;
+    }
+    .amountInfo {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      align-content: center;
+      margin-bottom: 20px;
+      padding: 4px;
+      width: 50px;
+      border-radius: 2px;
+      background-color: var(--graph-fill-color, #d0d0d0);
+      .icon {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-left: 2px;
+      }
   }
+  
   .voteInfo {
     display: flex;
     flex-direction: row;
     justify-content: center;
   }
-  .amountInfo {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    margin-bottom: 20px;
-    padding: 5px 5px 5px 5px;
-    width: 90px;
-    //padding: 5px;
-    border-radius: 2px;
-    background-color: var(--graph-fill-color, #d0d0d0);
-    .icon {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding-left: 2px;
-    }
+  
   }
-  .barContainer {
-    display: flex;
-    flex-direction: column-reverse;
-    //height: 60%;
-    width: 25%;
-    //padding-right: 5%;
-  }
+  
 }
 
 .inforow {

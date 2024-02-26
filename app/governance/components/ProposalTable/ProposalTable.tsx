@@ -163,25 +163,23 @@ const ProposalTable = ({ proposals, isMobile }: TableProps) => {
               )
             }
             secondary={
-              isMobile && (
-                <Container
-                  width={isMobile ? "100%" : "400px"}
-                  style={{ padding: isMobile ? "0 16px 0 16px" : "" }}
-                >
-                  <ToggleGroup
-                    options={Object.values(ProposalFilter).map(
-                      (filter) => filter.split(" ")[0]
-                    )}
-                    selected={currentFilter.split(" ")[0]}
-                    setSelected={(value) => {
-                      const proposalFilter = Object.values(ProposalFilter).find(
-                        (filter) => filter.split(" ")[0] === value
-                      );
-                      setCurrentFilter(proposalFilter || ProposalFilter.ALL);
-                    }}
-                  />
-                </Container>
-              )
+              <Container
+                width={isMobile ? "100%" : "400px"}
+                style={{ padding: isMobile ? "20px 16px 0 16px" : "" }}
+              >
+                <ToggleGroup
+                  options={Object.values(ProposalFilter).map(
+                    (filter) => filter.split(" ")[0]
+                  )}
+                  selected={currentFilter.split(" ")[0]}
+                  setSelected={(value) => {
+                    const proposalFilter = Object.values(ProposalFilter).find(
+                      (filter) => filter.split(" ")[0] === value
+                    );
+                    setCurrentFilter(proposalFilter || ProposalFilter.ALL);
+                  }}
+                />
+              </Container>
             }
             headerFont="rm_mono"
             headers={

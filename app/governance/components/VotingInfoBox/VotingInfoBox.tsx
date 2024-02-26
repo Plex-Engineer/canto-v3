@@ -44,7 +44,7 @@ export function VotingInfoBox({
           : { border: "1px solid var(--border-stroke-color, #b3b3b3)" }
       }
     >
-      <div className={styles.optionName}>
+      <div className={styles.option}>
         <Container direction="row">
           <div>
             <Text font="proto_mono" size="sm">
