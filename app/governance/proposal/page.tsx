@@ -68,6 +68,7 @@ export default function Page() {
         chainId: chainId,
         ethAccount: signer.account.address,
         proposalId: proposalId,
+        proposal: proposals.find((p) => p.proposal_id === Number(proposalId)),
         voteOption: voteOption,
       });
       txStore?.addNewFlow({

@@ -10,6 +10,8 @@ import Container from "@/components/container/container";
 import { Pagination } from "@/components/pagination/Pagination";
 import Spacer from "@/components/layout/spacer";
 import { ProposalRow } from "./ProposalRow";
+import Analytics from "@/provider/analytics";
+import { getAnalyticsProposalInfo } from "@/utils/analytics";
 
 interface TableProps {
   proposals: Proposal[];
@@ -27,6 +29,9 @@ const ProposalTable = ({ proposals }: TableProps) => {
   const router = useRouter();
   const handleRowClick = (proposalId: any) => {
     // Navigate to the appropriate page
+    Analytics.actions.events.governance.proposalClicked(
+      getAnalyticsProposalInfo(proposalId, proposals)
+    );
     router.push(`/governance/proposal?id=${proposalId}`);
   };
 
@@ -155,6 +160,7 @@ const ProposalTable = ({ proposals }: TableProps) => {
                     const proposalFilter = Object.values(ProposalFilter).find(
                       (filter) => filter.split(" ")[0] === value
                     );
+                    Analytics.actions.events.governance.tabSwitched(value);
                     setCurrentFilter(proposalFilter || ProposalFilter.ALL);
                   }}
                 />
