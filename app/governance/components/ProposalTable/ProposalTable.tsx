@@ -137,7 +137,13 @@ const ProposalTable = ({ proposals, isMobile }: TableProps) => {
             />
           </div>
           <div style={{ paddingLeft: "20px" }}>
-            <Text font="rm_mono">There are currently no active proposals</Text>
+            {isMobile ? (
+              <Text font="rm_mono">There are no active proposals</Text>
+            ) : (
+              <Text font="rm_mono">
+                There are currently no active proposals
+              </Text>
+            )}
           </div>
         </div>
       )}

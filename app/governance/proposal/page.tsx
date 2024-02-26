@@ -26,6 +26,7 @@ import {
 import Spacer from "@/components/layout/spacer";
 import useStaking from "@/hooks/staking/useStaking";
 import { VoteBarGraph } from "../components/votingChart/voteGraph";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 const VOTE_OPTION_COLORS = {
   [VoteOption.YES]: [
@@ -58,6 +59,7 @@ export default function Page() {
     chainId: chainId,
     userEthAddress: signer?.account.address,
   });
+  const { isMobile } = useScreenSize();
   // transaction
   function castVote(proposalId: number, voteOption: VoteOption | null) {
     if (signer) {

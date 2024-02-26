@@ -33,8 +33,10 @@ export default function GovernancePage() {
     <div>
       <div className={styles.container}>
         <Container
+          width="100%"
           className={styles.header}
           direction={isMobile ? "column" : "row"}
+          style={{ justifyContent: "space-between" }}
         >
           <div>
             <Text font="proto_mono" className={styles.title}>
