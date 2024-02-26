@@ -43,7 +43,7 @@ import { ProposalVoteTxParams } from "@/transactions/gov";
 import { Proposal } from "@/hooks/gov/interfaces/proposal";
 
 export function displayAnalyticsAmount(amount: string, decimals: number) {
-  return displayAmount(amount, decimals, { short: false, precision: decimals });
+  return displayAmount(amount, decimals, { short: false, precision: decimals < 0 ? 18 : decimals });
 }
 
 export function getAnalyticsTransactionFlowInfo(

@@ -210,6 +210,11 @@ export function validateAmbientLiquidityTxParams(
           getPriceFromTick(txParams.lowerTick),
           getPriceFromTick(txParams.upperTick)
         );
+
+    if(Number(currentPrice) <= Number(getPriceFromTick(txParams.lowerTick)) && Number(baseAmount) !== 0){
+      return {error: true, reason: TX_PARAM_ERRORS.AMBIENT_AMOUNT_ERROR()}
+    }    
+
     const baseCheck = validateWeiUserInputTokenAmount(
       baseAmount,
       "0",
@@ -228,6 +233,11 @@ export function validateAmbientLiquidityTxParams(
           getPriceFromTick(txParams.upperTick)
         )
       : txParams.amount;
+
+      if(Number(currentPrice) >= Number(getPriceFromTick(txParams.upperTick)) && Number(quoteAmount) !== 0){
+        return {error: true, reason: TX_PARAM_ERRORS.AMBIENT_AMOUNT_ERROR()}
+      }  
+      
     const quoteCheck = validateWeiUserInputTokenAmount(
       quoteAmount,
       "0",
