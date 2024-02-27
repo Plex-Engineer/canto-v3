@@ -99,28 +99,34 @@
       }
     }
   }
-  .header,
+  .header {
+    height: 40px !important;
+    width: 100% !important;
+  }
+  
   .row {
     height: 80px !important;
     width: 100% !important;
   }
-
-  .table {
-    grid-template-rows: 80px 1fr;
-  }
+  
 
   .container {
     padding: 0px;
     margin: 0px;
     min-width: 0px !important;
   }
-
+  .tableTitle{
+    padding-bottom: 1rem;
+    
+  }
   .title {
     align-items: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
     height: auto;
+    padding-top: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
-  .primaryTitle{
-    padding:0.5rem;
-  }
+  
 }
