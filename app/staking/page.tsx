@@ -19,7 +19,7 @@ import {
   GenerateMyStakingTableRow,
   GenerateUnbondingDelegationsTableRow,
   GenerateValidatorTableRow,
-} from "./components/validatorTableRow";
+} from "./components/tableRows";
 import { useMemo, useState } from "react";
 import { StakingModal } from "./components/stakingModal/StakingModal";
 import { Validator } from "@/hooks/staking/interfaces/validators";
@@ -37,7 +37,8 @@ import { Pagination } from "@/components/pagination/Pagination";
 import { levenshteinDistance } from "@/utils/staking/searchUtils";
 import { WalletClient } from "wagmi";
 import Analytics from "@/provider/analytics";
-import clsx from "clsx";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
+import { getAnalyticsStakingInfo } from "@/utils/analytics";
 
 export default function StakingPage() {
   // connected user info
@@ -49,7 +50,7 @@ export default function StakingPage() {
       chainId: chainId,
       userEthAddress: signer?.account.address,
     });
-
+  const { isMobile } = useScreenSize();
   // handle txs
   function handleRewardsClaimClick(
     signer: GetWalletClientResult | undefined,
@@ -265,6 +266,7 @@ export default function StakingPage() {
   return isLoading ? (
     <Splash themed />
   ) : (
+    //main content
     <div className={styles.container}>
       <div>
         <Spacer height="20px" />
@@ -273,7 +275,11 @@ export default function StakingPage() {
         STAKING
       </Text>
       <Spacer height="20px" />
-      <Container direction="row" gap={20} width="100%">
+      <Container
+        style={{ flexDirection: isMobile ? "column-reverse" : "row" }}
+        gap={20}
+        width="100%"
+      >
         <Container gap={20} width="100%">
           {userStaking && userStaking.unbonding.length > 0 && (
             <Table
@@ -297,7 +303,8 @@ export default function StakingPage() {
                 ...userStaking.unbonding.map((userStakingElement, index) =>
                   GenerateUnbondingDelegationsTableRow(
                     userStakingElement,
-                    index
+                    index,
+                    isMobile
                   )
                 ),
               ]}
@@ -307,6 +314,22 @@ export default function StakingPage() {
             <Table
               title="My Staking"
               headerFont="rm_mono"
+              onRowsClick={
+                isMobile
+                  ? userStaking.validators
+                      .filter(
+                        (e) =>
+                          Number(formatBalance(e.userDelegation.balance, 18)) >
+                          0.0000001
+                      )
+                      .sort((a, b) =>
+                        b.userDelegation.balance.localeCompare(
+                          a.userDelegation.balance
+                        )
+                      )
+                      .map((validator) => () => handleClick(validator))
+                  : undefined
+              }
               headers={[
                 {
                   value: "Name",
@@ -319,6 +342,7 @@ export default function StakingPage() {
                 {
                   value: "Total Stake",
                   ratio: 3,
+                  hideOnMobile: true,
                 },
                 {
                   value: "Commission",
@@ -327,6 +351,7 @@ export default function StakingPage() {
                 {
                   value: <div />,
                   ratio: 3,
+                  hideOnMobile: true,
                 },
               ]}
               content={[
@@ -342,33 +367,75 @@ export default function StakingPage() {
                     )
                   )
                   .map((userStakingElement, index) =>
-                    GenerateMyStakingTableRow(userStakingElement, index, () =>
-                      handleClick(userStakingElement)
+                    GenerateMyStakingTableRow(
+                      userStakingElement,
+                      index,
+                      () => handleClick(userStakingElement),
+                      isMobile
                     )
                   ),
               ]}
             />
           )}
+          {/* {isMobile && (
+            <Container width={isMobile ? "100%" : "200px"}>
+              <ToggleGroup
+                options={["ACTIVE", "INACTIVE"]}
+                selected={currentFilter}
+                setSelected={(value) => {
+                  Analytics.actions.events.staking.tabSwitched(value);
+                  setCurrentFilter(value);
+                  setCurrentPage(1);
+                  setSearchQuery("");
+                }}
+              />
+            </Container>
+          )} */}
           {validators.length > 0 && (
             <Table
-              title={"VALIDATORS"}
+              title={
+                <Container
+                  style={{ padding: isMobile ? "0px 0px 12px 8px" : "0" }}
+                >
+                  VALIDATORS
+                </Container>
+              }
+              onRowsClick={
+                isMobile
+                  ? currentFilter == "ACTIVE"
+                    ? paginatedvalidators.map(
+                        (validator) => () => handleClick(validator)
+                      )
+                    : undefined
+                  : undefined
+              }
               secondary={
                 <Container
-                  direction="row"
+                  //direction={isMobile ? "column" : "row"}
                   gap={20}
                   width="100%"
                   style={{
                     justifyContent: "flex-end",
+                    display: "flex",
+                    flexDirection: isMobile ? "column-reverse" : "row",
                   }}
                 >
-                  <Input
-                    height={38}
-                    type="search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={"Search..."}
-                  />
-                  <Container width="200px">
+                  <Container
+                    style={{ padding: isMobile ? "0 16px 0 16px" : "" }}
+                  >
+                    <Input
+                      height={38}
+                      type="search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder={"Search..."}
+                    />
+                  </Container>
+
+                  <Container
+                    width={isMobile ? "100%" : "200px"}
+                    style={{ padding: isMobile ? "0 16px 0 16px" : "" }}
+                  >
                     <ToggleGroup
                       options={["ACTIVE", "INACTIVE"]}
                       selected={currentFilter}
@@ -387,10 +454,23 @@ export default function StakingPage() {
                 {
                   value: "Rank",
                   ratio: 2,
+                  hideOnMobile: true,
                 },
                 {
-                  value: "Name",
-                  ratio: 6,
+                  value: !isMobile ? (
+                    "Name"
+                  ) : (
+                    <Container
+                      width="100%"
+                      style={{
+                        textAlign: "left",
+                        paddingLeft: "20px",
+                      }}
+                    >
+                      Name
+                    </Container>
+                  ),
+                  ratio: isMobile ? 5 : 6,
                 },
                 {
                   value: "Total Stake",
@@ -403,17 +483,22 @@ export default function StakingPage() {
                 {
                   value: <div />,
                   ratio: 4,
+                  hideOnMobile: true,
                 },
               ]}
               content={
                 paginatedvalidators.length > 0
                   ? [
                       ...paginatedvalidators.map((validator, index) =>
-                        GenerateValidatorTableRow(validator, index, () =>
-                          handleClick(validator)
+                        GenerateValidatorTableRow(
+                          validator,
+                          index,
+                          () => handleClick(validator),
+                          isMobile
                         )
                       ),
                       <Pagination
+                        isMobile={isMobile}
                         key="pagination"
                         currentPage={currentPage}
                         totalPages={totalPages}
@@ -438,72 +523,148 @@ export default function StakingPage() {
             />
           )}
         </Container>
-        <Container className={styles.infoCard}>
-          <Container direction="column" width="100%" height="100%">
-            <div className={styles.infoBox}>
-              <div>
-                <Text font="rm_mono">Total Staked </Text>
-              </div>
-              <Container direction="row" center={{ vertical: true }}>
-                <div style={{ marginRight: "5px" }}>
-                  <Text font="proto_mono" size="title">
-                    {displayAmount(
-                      totalStaked ? totalStaked.toFixed(2) : "0",
-                      0
-                    )}
-                  </Text>
-                </div>
-                <p> </p>
-                <Icon
-                  themed
-                  icon={{
-                    url: "/tokens/canto.svg",
-                    size: 24,
-                  }}
-                />
-              </Container>
-            </div>
-            <div className={styles.infoBox}>
-              <div>
-                <Text font="rm_mono">APR</Text>
-              </div>
-              <Container direction="row" center={{ vertical: true }}>
-                <Text font="proto_mono" size="title">
-                  {formatPercent((parseFloat(apr) / 100).toString())}
-                </Text>
-              </Container>
-            </div>
-            <div className={styles.infoBox}>
-              <div>
-                <Text font="rm_mono">Rewards</Text>
-              </div>
-              <Container direction="row" center={{ vertical: true }}>
-                <div style={{ marginRight: "5px" }}>
-                  <Text font="proto_mono" size="title">
-                    {totalRewards?.toFixed(5)}{" "}
-                  </Text>
-                  <Text> </Text>
-                </div>
-                <Icon
-                  themed
-                  icon={{
-                    url: "/tokens/canto.svg",
-                    size: 24,
-                  }}
-                />
-              </Container>
-            </div>
+
+        {isMobile && (
+          <div>
             <Spacer height="20px" />
-            <Button
-              width={"fill"}
-              height="large"
-              onClick={() =>
-                handleRewardsClaimClick(signer, allUserValidatorsAddresses)
-              }
-              disabled={!signer || !hasUserStaked}
+          </div>
+        )}
+
+        <Container
+          className={styles.infoCard}
+          width={isMobile ? "100%" : "30%"}
+          style={{
+            position: isMobile ? "relative" : "sticky",
+          }}
+          height={!isMobile ? "400px" : "320px"}
+        >
+          <Container
+            direction="column"
+            width="100%"
+            height="100%"
+            backgroundColor="#222222"
+          >
+            <Container
+              style={{
+                borderBottom: "1px solid #3d3d3d",
+                padding: "16px",
+              }}
             >
-              Claim Rewards
-            </Button>
+              <Text
+                font="proto_mono"
+                color="#FFFFFF"
+                size={isMobile ? "lg" : "sm"}
+              >
+                Staking Stats{" "}
+              </Text>
+            </Container>
+            <Container style={{ padding: "16px" }}>
+              <div className={styles.infoBox}>
+                <div style={{ marginBottom: "8px" }}>
+                  <Text
+                    font="rm_mono"
+                    color="#767676"
+                    size={isMobile ? "md" : "x-sm"}
+                  >
+                    Rewards
+                  </Text>
+                </div>
+                <Container direction="row" center={{ vertical: true }}>
+                  <Icon
+                    themed
+                    icon={{
+                      url: "/tokens/canto.svg",
+                      size: 20,
+                    }}
+                    style={{ filter: "invert(1)" }}
+                  />
+                  <div style={{ margin: "0 4px 0 4px" }}>
+                    <Text
+                      font="proto_mono"
+                      size={isMobile ? "title" : "x-lg"}
+                      color="#FFFFFF"
+                    >
+                      {totalRewards?.toFixed(5)}{" "}
+                    </Text>
+                    <Text> </Text>
+                  </div>
+                </Container>
+              </div>
+              <Container direction={isMobile ? "row" : "column"}>
+                <div
+                  className={styles.infoBox}
+                  style={{ width: isMobile ? "50%" : "" }}
+                >
+                  <div style={{ marginBottom: "8px" }}>
+                    <Text
+                      font="rm_mono"
+                      color="#767676"
+                      size={isMobile ? "md" : "x-sm"}
+                    >
+                      APR
+                    </Text>
+                  </div>
+                  <Container direction="row" center={{ vertical: true }}>
+                    <Text
+                      font="proto_mono"
+                      size={isMobile ? "x-lg" : "lg"}
+                      color="#FFFFFF"
+                    >
+                      {formatPercent((parseFloat(apr) / 100).toString())}
+                    </Text>
+                  </Container>
+                </div>
+                <div className={styles.infoBox}>
+                  <div style={{ marginBottom: "8px" }}>
+                    <Text
+                      font="rm_mono"
+                      color="#767676"
+                      size={isMobile ? "md" : "x-sm"}
+                    >
+                      Total Staked{" "}
+                    </Text>
+                  </div>
+                  <Container direction="row" center={{ vertical: true }}>
+                    <Icon
+                      icon={{
+                        url: "/tokens/canto.svg",
+                        size: 18,
+                      }}
+                      style={{ filter: "invert(1)" }}
+                      //color="primary"
+                    />
+                    <div style={{ margin: "0 4px 0 4px" }}>
+                      <Text
+                        font="proto_mono"
+                        size={isMobile ? "x-lg" : "lg"}
+                        color="#FFFFFF"
+                      >
+                        {displayAmount(
+                          totalStaked ? totalStaked.toFixed(2) : "0",
+                          0
+                        )}
+                      </Text>
+                    </div>
+                    <p> </p>
+                  </Container>
+                </div>
+              </Container>
+              <Spacer height="20px" />
+              <Container>
+                <Button
+                  width={"fill"}
+                  height="large"
+                  onClick={() =>
+                    handleRewardsClaimClick(signer, allUserValidatorsAddresses)
+                  }
+                  disabled={!signer || !hasUserStaked}
+                  color="secondary"
+                  themed={false}
+                >
+                  <Text font="proto_mono">Claim Staking Rewards</Text>
+                </Button>
+              </Container>
+            </Container>
           </Container>
         </Container>
       </Container>

@@ -6,9 +6,6 @@
   height: 100%;
   border: "none";
   padding: 16px 16px 0px 16px;
-  &:hover {
-    background: var(--card-sub-surface-color, #dfdfdf);
-  }
 }
 .row {
   display: flex;
@@ -17,15 +14,17 @@
   align-items: center;
 }
 
-.iconContainer {
+.icon {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 5px 10px 5px 10px;
-  &:hover {
-    background-color: var(--border-stroke-color, #b3b3b3);
-    z-index: 1;
+  @media  screen and (min-width: 768px) {
+    &:hover {
+      background-color: var(--border-stroke-color, #b3b3b3);
+      z-index: 1;
+    }
   }
 }
 .numbers {
@@ -40,19 +39,13 @@
   align-items: center;
   padding: 5px 10px 5px 10px;
   cursor: pointer;
-  &:hover {
-    background-color: var(--border-stroke-color, #b3b3b3);
-    z-index: 1;
+  @media  screen and (min-width: 768px) {
+    &:hover {
+      background-color: var(--border-stroke-color, #b3b3b3);
+      z-index: 1;
+    }
   }
 }
-.button {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 5px 10px 5px 10px;
-  &:hover {
-    background-color: var(--border-stroke-color, #b3b3b3);
-    z-index: 1;
-  }
-}
+
+
+
