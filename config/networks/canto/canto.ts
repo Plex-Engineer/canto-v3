@@ -10,14 +10,14 @@ import {
 const cantoTestnetBlockExplorerEVM = "https://testnet.tuber.build";
 
 const cantoMainBlockExplorerCosmos = "https://www.mintscan.io/canto";
-const cantoMainBlockExplorerEVM = "https://tuber.build";
+const cantoMainBlockExplorerEVM = "https://www.oklink.com/canto";
 
 // canto will have an EVM and COSMOS chain data
 const cantoMainnetBaseInfo = {
   name: "Canto",
   icon: "/icons/canto.svg",
   isTestChain: false,
-  rpcUrl: "https://canto-rpc.ansybl.io/",
+  rpcUrl: "https://mainnode.plexnode.org:8545",
   nativeCurrency: {
     name: "Canto",
     baseName: "acanto",
