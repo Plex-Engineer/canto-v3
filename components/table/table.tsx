@@ -36,13 +36,13 @@ const Table = (props: Props) => {
       </div>
       <div
         className={styles.table}
-        style={
-          !isMobile && !props.removeHeader
-            ? {
-                gridTemplateRows: "50px 1fr",
-              }
-            : {}
-        }
+        style={{
+          gridTemplateRows: !props.removeHeader
+            ? !isMobile
+              ? "50px 1fr"
+              : "40px 1fr"
+            : "20px 1fr",
+        }}
       >
         {!props.removeHeader ? (
           <div

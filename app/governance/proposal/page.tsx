@@ -280,9 +280,6 @@ export default function Page() {
               </div>
             </div>
           )}
-          <div>
-            <Spacer height="30px" />
-          </div>
 
           <div className={styles.graphContainer}>
             <VoteBarGraph
@@ -311,24 +308,32 @@ export default function Page() {
           <div className={styles.proposalInfoBox}>
             <div className={styles.proposalInfo}>
               <div>
-                <Text font="rm_mono" opacity={0.3} size="x-sm">
+                <Text
+                  font="rm_mono"
+                  opacity={0.3}
+                  size={isMobile ? "md" : "x-sm"}
+                >
                   Type
                 </Text>
               </div>
               <div>
-                <Text font="proto_mono" size="x-sm">
+                <Text font="proto_mono" size={isMobile ? "md" : "x-sm"}>
                   {formatProposalType(proposal.type_url)}
                 </Text>
               </div>
             </div>
             <div className={styles.proposalInfo}>
               <div>
-                <Text font="rm_mono" opacity={0.3} size="x-sm">
+                <Text
+                  font="rm_mono"
+                  opacity={0.3}
+                  size={isMobile ? "md" : "x-sm"}
+                >
                   Veto
                 </Text>
               </div>
               <div className={styles.displayAmount}>
-                <Text font="proto_mono" size="x-sm">
+                <Text font="proto_mono" size={isMobile ? "md" : "x-sm"}>
                   {PROPOSAL_VETO_THRESHOLD}
                 </Text>
                 {/* <div className={styles.icon}>
@@ -346,19 +351,27 @@ export default function Page() {
             </div>
             <div className={styles.proposalInfo}>
               <div>
-                <Text font="rm_mono" opacity={0.3} size="x-sm">
+                <Text
+                  font="rm_mono"
+                  opacity={0.3}
+                  size={isMobile ? "md" : "x-sm"}
+                >
                   Quorum{" "}
                 </Text>
               </div>
               <div>
-                <Text font="proto_mono" size="x-sm">
+                <Text font="proto_mono" size={isMobile ? "md" : "x-sm"}>
                   {PROPOSAL_QUORUM_VALUE}
                 </Text>
               </div>
             </div>
             <div className={styles.proposalInfoTimeLine}>
               <div style={{ marginBottom: "10px" }}>
-                <Text font="rm_mono" opacity={0.3} size="x-sm">
+                <Text
+                  font="rm_mono"
+                  opacity={0.3}
+                  size={isMobile ? "md" : "x-sm"}
+                >
                   Voting Timeline
                 </Text>
               </div>
@@ -367,12 +380,12 @@ export default function Page() {
                   <div className={styles.circle} />
                 </div>
                 <div className={styles.txt}>
-                  <Text font="rm_mono" size="x-sm">
+                  <Text font="rm_mono" size={isMobile ? "md" : "x-sm"}>
                     Created on
                   </Text>
                 </div>
                 <div>
-                  <Text font="rm_mono" size="x-sm">
+                  <Text font="rm_mono" size={isMobile ? "md" : "x-sm"}>
                     {formatTime(proposal.submit_time)}
                   </Text>
                 </div>
@@ -383,12 +396,12 @@ export default function Page() {
                   <div className={styles.circle} />
                 </div>
                 <div className={styles.txt}>
-                  <Text font="rm_mono" size="x-sm">
+                  <Text font="rm_mono" size={isMobile ? "md" : "x-sm"}>
                     Voting Ended on{" "}
                   </Text>
                 </div>
                 <div>
-                  <Text font="rm_mono" size="x-sm">
+                  <Text font="rm_mono" size={isMobile ? "md" : "x-sm"}>
                     {formatTime(proposal.voting_end_time)}
                   </Text>
                 </div>

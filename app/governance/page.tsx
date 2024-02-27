@@ -53,7 +53,7 @@ export default function GovernancePage() {
             style={{ marginTop: isMobile ? "16px" : "" }}
           >
             <Text size="sm" color="#7B7B7B">
-              Stake your $CANTO to participate in governance
+              Stake {isMobile ? "" : "your"} $CANTO to participate in governance
             </Text>
           </Container>
         </Container>

@@ -48,10 +48,7 @@ const Bar = ({ amount, totalVotes, size, isMobile }: BarProps) => {
           <Icon
             icon={{
               url: "/tokens/canto.svg",
-              size: {
-                width: 12,
-                height: 12,
-              },
+              size: isMobile ? 10 : 12,
             }}
             themed
           />
@@ -71,21 +68,36 @@ const VoteInfo = ({
   color,
   percentage,
   name,
+  isMobile,
 }: {
   color: string;
   percentage: number;
   name: string;
+  isMobile?: boolean;
 }) => {
   return (
     <div className={styles.voteOption}>
-      <div className={styles.circleContainer}>
-        <div className={styles.circle} style={{ backgroundColor: color }} />
-      </div>
-      <div className={styles.option}>
-        <Text font="proto_mono" size="xx-sm">
-          {name} ({percentage.toFixed(1)}%)
-        </Text>
-      </div>
+      <Container direction={isMobile ? "column" : "row"}>
+        <Container direction="row" style={{ justifyContent: "center" }}>
+          <div className={styles.circleContainer}>
+            <div className={styles.circle} style={{ backgroundColor: color }} />
+          </div>
+          <Text font="proto_mono" size={isMobile ? "sm" : "xx-sm"}>
+            {name}
+          </Text>{" "}
+        </Container>
+        <Container
+          style={{ alignItems: "center", paddingLeft: isMobile ? "" : "10px" }}
+        >
+          <Text
+            font="proto_mono"
+            size={isMobile ? "sm" : "xx-sm"}
+            opacity={0.4}
+          >
+            ({percentage.toFixed(1)}%)
+          </Text>
+        </Container>
+      </Container>
     </div>
   );
 };
@@ -135,21 +147,25 @@ export const VoteBarGraph = ({
           percentage={totalVotes > 0 ? (yes / totalVotes) * 100 : 0}
           name="YES"
           color="#0DFE17"
+          isMobile={isMobile}
         />
         <VoteInfo
           percentage={totalVotes > 0 ? (no / totalVotes) * 100 : 0}
           name="NO"
           color="#EF4444"
+          isMobile={isMobile}
         />
         <VoteInfo
           percentage={totalVotes > 0 ? (veto / totalVotes) * 100 : 0}
           name="VETO"
           color="#9747FF"
+          isMobile={isMobile}
         />
         <VoteInfo
           percentage={totalVotes > 0 ? (abstain / totalVotes) * 100 : 0}
           name="ABSTAIN"
           color="#EAD42A"
+          isMobile={isMobile}
         />
       </div>
     </div>

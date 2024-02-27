@@ -76,6 +76,7 @@ export const ProposalRow = ({
             paddingRight: "16px",
             borderRight: "2px solid",
             justifyContent: "center",
+            height: "14px",
           }}
         >
           <Text
@@ -92,6 +93,7 @@ export const ProposalRow = ({
             alignItems: "center",
             marginLeft: "15px",
             justifyContent: "center",
+            height: "14px",
           }}
         >
           <Text
