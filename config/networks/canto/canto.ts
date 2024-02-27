@@ -10,7 +10,7 @@ import {
 const cantoTestnetBlockExplorerEVM = "https://testnet.tuber.build";
 
 const cantoMainBlockExplorerCosmos = "https://www.mintscan.io/canto";
-const cantoMainBlockExplorerEVM = "https://tuber.build";
+const cantoMainBlockExplorerEVM = "https://www.oklink.com/canto";
 
 // canto will have an EVM and COSMOS chain data
 const cantoMainnetBaseInfo = {
