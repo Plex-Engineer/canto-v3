@@ -10,7 +10,7 @@ import Text from "@/components/text";
 import Icon from "@/components/icon/icon";
 import { displayAmount } from "@/utils/formatting/balances.utils";
 import Button from "@/components/button/button";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StakingTxTypes } from "@/transactions/staking";
 import { StakingTabs } from "../stakingTab/StakingTabs";
 import Selector from "@/components/selector/selector";
@@ -24,6 +24,8 @@ import {
   REDELEGATE_FEE,
   UNDELEGATE_FEE,
 } from "@/config/consts/fees";
+import BigNumber from "bignumber.js";
+import { TX_ERROR_TYPES } from "@/config/consts/errors";
 
 interface StakingModalParams {
   validator: ValidatorWithDelegations | null;
@@ -114,20 +116,40 @@ export const StakingModal = (props: StakingModalParams) => {
     }
   };
 
-  const txValidation = useMemo(
-    () => props.txValidation(inputAmount, selectedTx, validatorToRedelegate),
-    [inputAmount, selectedTx, validatorToRedelegate]
-  );
-
   if (!props.validator) {
     return;
   }
 
   const userDelegationBalance = props.validator.userDelegation.balance;
+
+  const maxDelegateAmount = () => {
+    const updatedBalance = BigNumber(props.cantoBalance).minus(
+      DELEGATE_FEE.amount
+    );
+    return updatedBalance.isNegative() ? "0" : updatedBalance.toString();
+  };
+
   const maxAmount =
     selectedTx == StakingTxTypes.DELEGATE
-      ? props.cantoBalance
+      ? maxDelegateAmount()
       : userDelegationBalance;
+
+  const txValidation = useMemo(
+    () => props.txValidation(inputAmount, selectedTx, validatorToRedelegate),
+    [
+      inputAmount,
+      selectedTx,
+      validatorToRedelegate,
+      props.cantoBalance,
+      userDelegationBalance,
+    ]
+  );
+
+  useEffect(() => {
+    if (userDelegationBalance === "0") {
+      setSelectedTx(StakingTxTypes.DELEGATE);
+    }
+  }, [userDelegationBalance]);
 
   return (
     <Container className={styles.modalContainer}>
@@ -263,7 +285,17 @@ export const StakingModal = (props: StakingModalParams) => {
       </div>
       <Spacer height="20px" />
       <div>
-        <Text size="x-sm" font="proto_mono">
+        <Text
+          size="x-sm"
+          font="proto_mono"
+          color={
+            txValidation.error &&
+            txValidation.reason ===
+              TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_STAKING
+              ? " var(--extra-failure-color, #ff0000)"
+              : ""
+          }
+        >
           GAS FEES :{" "}
           {displayAmount(feeMap(selectedTx), 18, {
             short: false,

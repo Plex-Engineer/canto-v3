@@ -91,6 +91,7 @@ export type AnalyticsStakingData = {
   stakingDelegation?: string;
   stakingWalletBalance?: string;
   stakingNewValidator?: string;
+  stakingDelegatedValidators?: string[];
 };
 
 export type AnalyticsTransactionFlowData =

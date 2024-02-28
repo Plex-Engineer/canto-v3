@@ -61,6 +61,7 @@ export default function StakingPage() {
         ethAccount: signer.account.address,
         txType: StakingTxTypes.CLAIM_REWARDS,
         validatorAddresses: validatorAddresses,
+        nativeBalance: userStaking?.cantoBalance ?? "0",
       });
       txStore?.addNewFlow({
         txFlow: newFlow,
@@ -90,6 +91,7 @@ export default function StakingPage() {
             amount: (
               convertToBigNumber(inputAmount, 18).data ?? "0"
             ).toString(),
+            nativeBalance: userStaking?.cantoBalance ?? "0",
           }
         : txType == StakingTxTypes.DELEGATE ||
             txType == StakingTxTypes.UNDELEGATE
@@ -261,6 +263,18 @@ export default function StakingPage() {
   function handleClick(validator: Validator) {
     selection.setValidator(validator.operator_address);
   }
+
+  const claimRewardsTxValidation = useMemo(
+    () =>
+      transaction.validateTxParams({
+        chainId: chainId,
+        ethAccount: signer?.account.address ?? "",
+        txType: StakingTxTypes.CLAIM_REWARDS,
+        validatorAddresses: allUserValidatorsAddresses,
+        nativeBalance: userStaking.cantoBalance,
+      }),
+    [userStaking.cantoBalance]
+  );
 
   return isLoading ? (
     <Splash themed />
@@ -500,7 +514,9 @@ export default function StakingPage() {
               onClick={() =>
                 handleRewardsClaimClick(signer, allUserValidatorsAddresses)
               }
-              disabled={!signer || !hasUserStaked}
+              disabled={
+                !signer || !hasUserStaked || claimRewardsTxValidation.error
+              }
             >
               Claim Rewards
             </Button>
