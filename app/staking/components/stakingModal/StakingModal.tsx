@@ -116,6 +116,23 @@ export const StakingModal = (props: StakingModalParams) => {
     }
   };
 
+  const txValidation = useMemo(
+    () => props.txValidation(inputAmount, selectedTx, validatorToRedelegate),
+    [
+      inputAmount,
+      selectedTx,
+      validatorToRedelegate,
+      props.cantoBalance,
+      props.validator?.userDelegation.balance,
+    ]
+  );
+
+  useEffect(() => {
+    if (userDelegationBalance === "0") {
+      setSelectedTx(StakingTxTypes.DELEGATE);
+    }
+  }, [props.validator?.userDelegation.balance]);
+
   if (!props.validator) {
     return;
   }
@@ -133,23 +150,6 @@ export const StakingModal = (props: StakingModalParams) => {
     selectedTx == StakingTxTypes.DELEGATE
       ? maxDelegateAmount()
       : userDelegationBalance;
-
-  const txValidation = useMemo(
-    () => props.txValidation(inputAmount, selectedTx, validatorToRedelegate),
-    [
-      inputAmount,
-      selectedTx,
-      validatorToRedelegate,
-      props.cantoBalance,
-      userDelegationBalance,
-    ]
-  );
-
-  useEffect(() => {
-    if (userDelegationBalance === "0") {
-      setSelectedTx(StakingTxTypes.DELEGATE);
-    }
-  }, [userDelegationBalance]);
 
   return (
     <Container className={styles.modalContainer}>
