@@ -292,7 +292,7 @@ export default function Page() {
             />
           </div>
           <div>
-            <Spacer height="50px" />
+            <Spacer height="20px" />
           </div>
         </div>
         <div
@@ -300,6 +300,7 @@ export default function Page() {
           style={{
             minWidth: isMobile ? "unset" : "360px",
             width: isMobile ? "100%" : "30%",
+            height: isMobile ? "440px" : "500px",
           }}
         >
           <div className={styles.detailsHeader}>
@@ -307,7 +308,7 @@ export default function Page() {
           </div>
           <div className={styles.proposalInfoBox}>
             <div className={styles.proposalInfo}>
-              <div>
+              <div style={{ paddingBottom: "8px" }}>
                 <Text
                   font="rm_mono"
                   opacity={0.3}
@@ -323,7 +324,7 @@ export default function Page() {
               </div>
             </div>
             <div className={styles.proposalInfo}>
-              <div>
+              <div style={{ paddingBottom: "8px" }}>
                 <Text
                   font="rm_mono"
                   opacity={0.3}
@@ -336,21 +337,10 @@ export default function Page() {
                 <Text font="proto_mono" size={isMobile ? "md" : "x-sm"}>
                   {PROPOSAL_VETO_THRESHOLD}
                 </Text>
-                {/* <div className={styles.icon}>
-                  <Image
-                    src="/tokens/canto.svg"
-                    width={16}
-                    height={16}
-                    alt="canto"
-                    style={{
-                      filter: "invert(var(--dark-mode))",
-                    }}
-                  />
-                </div> */}
               </div>
             </div>
             <div className={styles.proposalInfo}>
-              <div>
+              <div style={{ paddingBottom: "8px" }}>
                 <Text
                   font="rm_mono"
                   opacity={0.3}

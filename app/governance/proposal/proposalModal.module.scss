@@ -179,7 +179,7 @@
       background-color: var(--card-sub-surface-color, #dfdfdf);
       .detailsHeader {
         width: 100%;
-        padding: 20px 0px 20px 20px;
+        padding: 16px;
         border-bottom: 1px solid var(--border-stroke-color, #b3b3b3);
       }
 
@@ -225,7 +225,7 @@
         }
       }
       .separator {
-        height: 5rem;
+        height: 3rem;
         //padding-left: 60px;
         margin-left: 4px;
         border-left: 2px solid var(--graph-fill-color, #d0d0d0);
