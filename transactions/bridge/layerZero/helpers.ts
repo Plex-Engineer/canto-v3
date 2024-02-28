@@ -22,13 +22,9 @@ export async function estimateOFTSendGasFee(
   oftAddress: string,
   account: string,
   amount: string,
-  adapterParams: number[]
+  adapterParams: string // encoded bytes string
 ): PromiseWithError<BigNumber> {
   try {
-    const formattedAdapterParams = encodePacked(
-      { type: "uint16", value: adapterParams[0] },
-      { type: "uint256", value: adapterParams[1] }
-    );
     // get contract instance
     const { data: oftContract, error: oftError } = newContractInstance<
       typeof OFT_ABI
@@ -45,7 +41,7 @@ export async function estimateOFTSendGasFee(
         toAddressBytes,
         amount,
         false,
-        formattedAdapterParams
+        adapterParams
       )
       .call();
     return NO_ERROR(new BigNumber(gas[0] as string));
@@ -74,4 +70,42 @@ export async function checkUseAdapterParams(
   } catch (err) {
     return NEW_ERROR("checkUseAdapterParams" + err);
   }
+}
+
+export function createLzAdapterParams(
+  ethAddress: string,
+  toCanto: boolean
+): string {
+  if (toCanto) {
+    // airdrop native canto to user
+    return encodePacked(
+      {
+        value: 2, // version
+        type: "uint16",
+      },
+      {
+        value: 200000, // gas amount
+        type: "uint",
+      },
+      {
+        value: "1000000000000000000", // native for dst chain (1 CANTO)
+        type: "uint",
+      },
+      {
+        value: ethAddress, // address for dst chain
+        type: "address",
+      }
+    );
+  }
+  // return default adapter params
+  return encodePacked(
+    {
+      value: 1, // version
+      type: "uint16",
+    },
+    {
+      value: 200000, // gas amount
+      type: "uint",
+    }
+  );
 }
