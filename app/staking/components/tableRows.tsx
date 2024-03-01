@@ -240,9 +240,7 @@ export const GenerateUnbondingDelegationsTableRow = (
   <Container
     key={`name_${index}`}
     width={isMobile ? "100%" : ""}
-    center={{ vertical: true }}
     style={{
-      justifyContent: isMobile ? "left" : "center",
       alignItems: isMobile ? "left" : "center",
       paddingLeft: "16px",
     }}
