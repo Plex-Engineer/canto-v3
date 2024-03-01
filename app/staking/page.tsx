@@ -283,20 +283,61 @@ export default function StakingPage() {
         <Container gap={20} width="100%">
           {userStaking && userStaking.unbonding.length > 0 && (
             <Table
-              title="Unbonding Delegations"
+              title={
+                <Container
+                  style={{ padding: isMobile ? "0px 0px 8px 8px" : "0" }}
+                >
+                  UNBONDING DELEGATIONS
+                </Container>
+              }
               headerFont="rm_mono"
               headers={[
                 {
-                  value: "Name",
+                  value: !isMobile ? (
+                    "Name"
+                  ) : (
+                    <Container
+                      width="100%"
+                      style={{
+                        textAlign: "left",
+                        paddingLeft: "16px",
+                      }}
+                    >
+                      Name
+                    </Container>
+                  ),
+                  ratio: 5,
+                },
+                {
+                  value: !isMobile ? (
+                    "Undelegation"
+                  ) : (
+                    <Container
+                      width="100%"
+                      style={{
+                        textAlign: "left",
+                      }}
+                    >
+                      Undelegation
+                    </Container>
+                  ),
                   ratio: 3,
                 },
                 {
-                  value: "Undelegation",
-                  ratio: 2,
-                },
-                {
-                  value: "Completion Time",
-                  ratio: 5,
+                  value: !isMobile ? (
+                    "Completion Time"
+                  ) : (
+                    <Container
+                      width="100%"
+                      style={{
+                        textAlign: "left",
+                        paddingLeft: "16px",
+                      }}
+                    >
+                      Completion
+                    </Container>
+                  ),
+                  ratio: 4,
                 },
               ]}
               content={[
@@ -312,7 +353,13 @@ export default function StakingPage() {
           )}
           {hasUserStaked && userStaking && (
             <Table
-              title="My Staking"
+              title={
+                <Container
+                  style={{ padding: isMobile ? "0px 0px 8px 8px" : "0" }}
+                >
+                  MY STAKING
+                </Container>
+              }
               headerFont="rm_mono"
               onRowsClick={
                 isMobile
@@ -332,11 +379,34 @@ export default function StakingPage() {
               }
               headers={[
                 {
-                  value: "Name",
+                  value: !isMobile ? (
+                    "Name"
+                  ) : (
+                    <Container
+                      width="100%"
+                      style={{
+                        textAlign: "left",
+                        paddingLeft: "16px",
+                      }}
+                    >
+                      Name
+                    </Container>
+                  ),
                   ratio: 5,
                 },
                 {
-                  value: "My Stake",
+                  value: !isMobile ? (
+                    "My Stake"
+                  ) : (
+                    <Container
+                      width="100%"
+                      style={{
+                        textAlign: "left",
+                      }}
+                    >
+                      My Stake
+                    </Container>
+                  ),
                   ratio: 3,
                 },
                 {
@@ -345,7 +415,18 @@ export default function StakingPage() {
                   hideOnMobile: true,
                 },
                 {
-                  value: "Commission",
+                  value: !isMobile ? (
+                    "Commission"
+                  ) : (
+                    <Container
+                      width="100%"
+                      style={{
+                        textAlign: "left",
+                      }}
+                    >
+                      Commission
+                    </Container>
+                  ),
                   ratio: 3,
                 },
                 {
@@ -377,20 +458,6 @@ export default function StakingPage() {
               ]}
             />
           )}
-          {/* {isMobile && (
-            <Container width={isMobile ? "100%" : "200px"}>
-              <ToggleGroup
-                options={["ACTIVE", "INACTIVE"]}
-                selected={currentFilter}
-                setSelected={(value) => {
-                  Analytics.actions.events.staking.tabSwitched(value);
-                  setCurrentFilter(value);
-                  setCurrentPage(1);
-                  setSearchQuery("");
-                }}
-              />
-            </Container>
-          )} */}
           {validators.length > 0 && (
             <Table
               title={
@@ -420,7 +487,9 @@ export default function StakingPage() {
                     flexDirection: isMobile ? "column-reverse" : "row",
                   }}
                 >
-                  <Container style={{ padding: isMobile ? "0 8px 0 8px" : "" }}>
+                  <Container
+                    style={{ padding: isMobile ? "0 8px 8px 8px" : "" }}
+                  >
                     <Input
                       height={38}
                       type="search"
@@ -462,7 +531,7 @@ export default function StakingPage() {
                       width="100%"
                       style={{
                         textAlign: "left",
-                        paddingLeft: "20px",
+                        paddingLeft: "16px",
                       }}
                     >
                       Name
@@ -471,11 +540,33 @@ export default function StakingPage() {
                   ratio: isMobile ? 5 : 6,
                 },
                 {
-                  value: "Total Stake",
+                  value: !isMobile ? (
+                    "Total Stake"
+                  ) : (
+                    <Container
+                      width="100%"
+                      style={{
+                        textAlign: "left",
+                      }}
+                    >
+                      Total Stake
+                    </Container>
+                  ),
                   ratio: 4,
                 },
                 {
-                  value: "Commission",
+                  value: !isMobile ? (
+                    "Commission"
+                  ) : (
+                    <Container
+                      width="100%"
+                      style={{
+                        textAlign: "left",
+                      }}
+                    >
+                      Commission
+                    </Container>
+                  ),
                   ratio: 3,
                 },
                 {
