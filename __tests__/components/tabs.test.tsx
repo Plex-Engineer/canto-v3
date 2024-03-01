@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import Tabs from "@/components/tabs/tabs";

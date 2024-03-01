@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import '@testing-library/jest-dom';
 import { render, act } from '@testing-library/react';
 import Countdown from "@/components/timer/countdown";

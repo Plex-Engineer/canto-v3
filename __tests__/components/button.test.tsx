@@ -1,4 +1,6 @@
-import '@testing-library/jest-dom';
+/**
+ * @jest-environment jsdom
+ */import '@testing-library/jest-dom';
 import Button from "@/components/button/button";
 import { render, fireEvent } from '@testing-library/react';
 describe('Button Component', () => {
