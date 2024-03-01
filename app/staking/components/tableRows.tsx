@@ -38,6 +38,7 @@ export const GenerateValidatorTableRow = (
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
+          textAlign: "left",
         }}
       >
         {validator.description.moniker}

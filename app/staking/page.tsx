@@ -395,7 +395,7 @@ export default function StakingPage() {
             <Table
               title={
                 <Container
-                  style={{ padding: isMobile ? "0px 0px 12px 8px" : "0" }}
+                  style={{ padding: isMobile ? "0px 0px 8px 8px" : "0" }}
                 >
                   VALIDATORS
                 </Container>
@@ -420,9 +420,7 @@ export default function StakingPage() {
                     flexDirection: isMobile ? "column-reverse" : "row",
                   }}
                 >
-                  <Container
-                    style={{ padding: isMobile ? "0 16px 0 16px" : "" }}
-                  >
+                  <Container style={{ padding: isMobile ? "0 8px 0 8px" : "" }}>
                     <Input
                       height={38}
                       type="search"
@@ -434,7 +432,7 @@ export default function StakingPage() {
 
                   <Container
                     width={isMobile ? "100%" : "200px"}
-                    style={{ padding: isMobile ? "0 16px 0 16px" : "" }}
+                    style={{ padding: isMobile ? "0 8px 0 8px" : "" }}
                   >
                     <ToggleGroup
                       options={["ACTIVE", "INACTIVE"]}
