@@ -132,12 +132,15 @@
 @media screen and (max-width: 768px) {
   .modal {
     min-width: calc(100% - 2rem) !important;
-    width: calc(100% - 2rem) !important;
+    width: 100% !important;
     height: 100%;
     max-height: calc(100dvh - 2rem) !important;
     border-radius: 0px;
-
-    margin: 0 1rem;
+    //margin: 0 1rem;
+  }
+  .overlay{
+    align-items: flex-end;
+    width: 100% !important;
   }
   .close {
     top: 0;

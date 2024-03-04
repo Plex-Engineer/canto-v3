@@ -15,6 +15,7 @@ interface Props {
   height?: string;
   closeOnOverlayClick?: boolean;
   padded?: boolean;
+  isMobile?: boolean;
 }
 
 const Modal = ({
@@ -26,6 +27,7 @@ const Modal = ({
   open,
   padded = true,
   closeOnOverlayClick = true,
+  isMobile,
 }: Props) => {
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -52,6 +54,7 @@ const Modal = ({
       className={styles.overlay}
       onClick={closeOnOverlayClick ? handleClose : undefined}
       ref={ref}
+      style={{ width: isMobile ? "100vw" : "100%" }}
     >
       <div
         onClick={(e) => {
