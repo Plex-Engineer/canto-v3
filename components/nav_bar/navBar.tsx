@@ -128,7 +128,7 @@ const NavBar = () => {
           <Text size="sm">Pools</Text>
         </Link>
         <Link
-          href="/explore"
+          href="https://explore.canto.io/"
           className={clsx(
             styles["nav-link"],
             currentPath == "/explore" && styles.active
