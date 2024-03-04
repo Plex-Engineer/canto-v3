@@ -303,8 +303,7 @@ export default function StakingPage() {
                 ...userStaking.unbonding.map((userStakingElement, index) =>
                   GenerateUnbondingDelegationsTableRow(
                     userStakingElement,
-                    index,
-                    isMobile
+                    index
                   )
                 ),
               ]}
