@@ -24,8 +24,11 @@ export const GenerateValidatorTableRow = (
   ),
   <Container
     key={`name_${index}`}
+    width={isMobile ? "100%" : ""}
     style={{
       maxWidth: !isMobile ? "300px" : "150px",
+      textAlign: isMobile ? "left" : "center",
+      paddingLeft: isMobile ? "16px" : "",
     }}
   >
     <div>
