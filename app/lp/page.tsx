@@ -163,7 +163,10 @@ export default function Page() {
         //@ts-ignore
         title={pairNames[filteredPairs]}
         secondary={
-          <Container width="400px">
+          <Container
+            width={!isMobile ? "400px" : "100%"}
+            style={isMobile ? { paddingBottom: "1rem" } : {}}
+          >
             <ToggleGroup
               options={["all", "stable", "volatile"]}
               selected={filteredPairs}
