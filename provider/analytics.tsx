@@ -7,6 +7,7 @@ import { CTokenLendingTxTypes } from "@/transactions/lending";
 import { CantoDexTxTypes } from "@/transactions/pairs/cantoDex";
 import { AmbientTxType } from "@/transactions/pairs/ambient";
 import { StakingTxTypes } from "@/transactions/staking";
+import { VoteOption } from "@/transactions/gov";
 import posthog from "posthog-js";
 
 // (BRIDGE/LP/LENDING/...)
@@ -93,12 +94,19 @@ export type AnalyticsStakingData = {
   stakingNewValidator?: string;
 };
 
+export type AnalyticsGovernanceData = {
+  govProposalId?: Number,
+  govProposalTitle?: string,
+  govVoteOption?: VoteOption,
+};
+
 export type AnalyticsTransactionFlowData =
   | AnalyticsBridgeData
   | AnalyticsCantoLPData
   | AnalyticsAmbientLPData
   | AnalyticsLMData
-  | AnalyticsStakingData;
+  | AnalyticsStakingData
+  | AnalyticsGovernanceData;;
 
 // tx types (approve/mint/swap/...)
 type AnalyticsTransactionType = CantoFETxType;
@@ -235,6 +243,16 @@ class AnalyticsWrapper {
         },
         tabSwitched: (tab: string) => {
           posthog.capture("Staking Tab Switched", {
+            tab,
+          });
+        },
+      },
+      governance: {
+        proposalClicked: (params: AnalyticsGovernanceData) => {
+          posthog.capture("Proposal Clicked", params);
+        },
+        tabSwitched: (tab: string) => {
+          posthog.capture("Proposal Tab Switched", {
             tab,
           });
         },

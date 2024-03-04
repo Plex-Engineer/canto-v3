@@ -18,6 +18,7 @@ import Toggle from "@/components/toggle";
 import { areEqualAddresses } from "@/utils/address";
 import PopUp from "@/components/popup/popup";
 import { CantoDexTxTypes } from "@/transactions/pairs/cantoDex";
+import BigNumber from "bignumber.js";
 
 interface AddLiquidityProps {
   pair: CantoDexPairWithUserCTokenData;
@@ -91,6 +92,23 @@ export const AddLiquidityModal = ({
       : token.symbol;
   };
 
+  // function to get max input amount
+  const tokenBalance = (token: {
+    chainId: number;
+    address: string;
+    balance?: string;
+  }) => {
+    const updatedBalance = BigNumber(token.balance ?? "0").minus(
+      "1000000000000000000"
+    );
+    const wcantoAddress = getCantoCoreAddress(Number(token.chainId), "wcanto");
+    return areEqualAddresses(token.address, wcantoAddress ?? "")
+      ? updatedBalance.isNegative()
+        ? "0"
+        : updatedBalance.toString()
+      : token.balance ?? "0";
+  };
+
   return (
     <Container margin="sm">
       <div className={styles.iconTitle}>
@@ -107,7 +125,7 @@ export const AddLiquidityModal = ({
         IconUrl={pair.token1.logoURI}
         title={tokenSymbol(pair.token1)}
         min="1"
-        max={pair.token1.balance ?? "0"}
+        max={tokenBalance(pair.token1)}
         maxName="LP Modal"
         symbol={tokenSymbol(pair.token1)}
       />
@@ -121,7 +139,7 @@ export const AddLiquidityModal = ({
         IconUrl={pair.token2.logoURI}
         title={tokenSymbol(pair.token2)}
         min="1"
-        max={pair.token2.balance ?? "0"}
+        max={tokenBalance(pair.token2)}
         maxName="LP Modal"
         symbol={tokenSymbol(pair.token2)}
       />
