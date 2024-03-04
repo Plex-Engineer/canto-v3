@@ -27,8 +27,8 @@ const Table = (props: Props) => {
         <Text
           font="proto_mono"
           size="lg"
-          opacity={0.7}
-          className={isMobile ? styles.primaryTitle : undefined}
+          opacity={!isMobile ? 0.7 : 1}
+          className={isMobile ? styles.tableTitle : undefined}
         >
           {props.title}
         </Text>
@@ -36,13 +36,13 @@ const Table = (props: Props) => {
       </div>
       <div
         className={styles.table}
-        style={
-          !isMobile && !props.removeHeader
-            ? {
-                gridTemplateRows: "50px 1fr",
-              }
-            : {}
-        }
+        style={{
+          gridTemplateRows: !props.removeHeader
+            ? !isMobile
+              ? "50px 1fr"
+              : "40px 1fr"
+            : "20px 1fr",
+        }}
       >
         {!props.removeHeader ? (
           <div
