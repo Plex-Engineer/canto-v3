@@ -31,6 +31,7 @@ import { TransactionFlowType } from "@/transactions/flows";
 import { CTokenLendingTxTypes, cTokenLendingTx } from "@/transactions/lending";
 import { quoteRemoveLiquidity } from "@/utils/cantoDex";
 import { getTokenBalance } from "@/utils/tokens";
+import BigNumber from "bignumber.js";
 
 export async function cantoDexLPTx(
   txParams: CantoDexTransactionParams
@@ -93,14 +94,14 @@ export function validateCantoDexLPTxParams(
         validateWeiUserInputTokenAmount(
           txParams.amounts.amount1,
           "1",
-          token1.balance ?? "0",
+          tokenBalance(token1),
           token1.symbol,
           token1.decimals
         ),
         validateWeiUserInputTokenAmount(
           txParams.amounts.amount2,
           "1",
-          token2.balance ?? "0",
+          tokenBalance(token2),
           token2.symbol,
           token2.decimals
         ),
@@ -464,3 +465,17 @@ export async function stakeCantoDexLPTx(
     return NEW_ERROR("stakeCantoDexLPTx", err);
   }
 }
+
+
+// function to get max input amount
+const tokenBalance = (token: {
+  chainId: number;
+  address: string;
+  balance?: string;
+}) => {
+  const updatedBalance = BigNumber(token.balance ?? "0").minus("1000000000000000000");
+  const wcantoAddress = getCantoCoreAddress(Number(token.chainId), "wcanto");
+  return areEqualAddresses(token.address, wcantoAddress ?? "")
+    ? updatedBalance.isNegative() ? "0" : updatedBalance.toString()
+    : token.balance ?? "0"
+};

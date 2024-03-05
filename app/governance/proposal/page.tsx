@@ -26,6 +26,8 @@ import {
 import Spacer from "@/components/layout/spacer";
 import useStaking from "@/hooks/staking/useStaking";
 import { VoteBarGraph } from "../components/votingChart/voteGraph";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
+import Container from "@/components/container/container";
 
 const VOTE_OPTION_COLORS = {
   [VoteOption.YES]: [
@@ -58,6 +60,7 @@ export default function Page() {
     chainId: chainId,
     userEthAddress: signer?.account.address,
   });
+  const { isMobile } = useScreenSize();
   // transaction
   function castVote(proposalId: number, voteOption: VoteOption | null) {
     if (signer) {
@@ -68,6 +71,7 @@ export default function Page() {
         chainId: chainId,
         ethAccount: signer.account.address,
         proposalId: proposalId,
+        proposal: proposals.find((p) => p.proposal_id === Number(proposalId)),
         voteOption: voteOption,
       });
       txStore?.addNewFlow({
@@ -127,7 +131,7 @@ export default function Page() {
   return isProposalsLoading ? (
     <Splash themed />
   ) : (
-    <div className={styles.proposalContainer}>
+    <div className={styles.container}>
       <div className={styles.proposalHeaderContainer}>
         <div
           className={styles.backButtonContainer}
@@ -176,7 +180,12 @@ export default function Page() {
             </div>
           )}
         </div>
-        <div style={{ margin: "0px 0px 8px 0px" }}>
+        <div
+          style={{
+            margin: "0px 0px 8px 0px",
+            //maxWidth: isMobile ? "350px" : "",
+          }}
+        >
           <Text font="proto_mono" size="x-lg">
             {proposal.title}
           </Text>
@@ -187,45 +196,72 @@ export default function Page() {
         </div>
       </div>
       <div className={styles.proposalInfoContainer}>
-        <div className={styles.graphAndVoteContainer}>
+        <div
+          className={styles.graphAndVoteContainer}
+          style={{
+            minWidth: isMobile ? "unset" : "500px",
+            width: isMobile ? "100%" : "70%",
+          }}
+        >
           {isActive && (
-            <div className={styles.proposalCardContainer1}>
+            <div className={styles.votingOptionsContainer}>
               <div className={styles.detailsHeader}>
                 <Text font="proto_mono">Select an option to vote</Text>
               </div>
               <div
                 className={styles.votingBox}
-                style={
-                  isActive
-                    ? {
-                        height: "100%",
-                        padding: "10px 0px 0px 0px",
-                      }
-                    : {
-                        height: "100%",
-                        padding: "0px 0px 20px 0px",
-                      }
-                }
+                style={{
+                  height: "100%",
+                  padding: "20px 20px 20px 20px",
+                }}
               >
-                <div className={styles.proposalInfoRow1}>
-                  <VoteBox option={VoteOption.YES} />
-                  <VoteBox option={VoteOption.NO} />
-                </div>
+                <Container
+                  direction={isMobile ? "column" : "row"}
+                  style={{
+                    paddingBottom: " 16px",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Container
+                    style={{
+                      width: isMobile ? "100%" : "50%",
+                      marginRight: isMobile ? "" : "16px",
+                      paddingBottom: isMobile ? "16px" : "0px",
+                    }}
+                  >
+                    <VoteBox option={VoteOption.YES} />{" "}
+                  </Container>
+                  <Container style={{ width: isMobile ? "100%" : "50%" }}>
+                    <VoteBox option={VoteOption.NO} />{" "}
+                  </Container>
+                </Container>
 
-                <div className={styles.proposalInfoRow1}>
-                  <VoteBox option={VoteOption.VETO} />
-                  <VoteBox option={VoteOption.ABSTAIN} />
-                </div>
+                <Container
+                  direction={isMobile ? "column" : "row"}
+                  style={{
+                    paddingBottom: " 16px",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Container
+                    style={{
+                      width: isMobile ? "100%" : "50%",
+                      marginRight: isMobile ? "" : "16px",
+                      paddingBottom: isMobile ? "16px" : "0px",
+                    }}
+                  >
+                    <VoteBox option={VoteOption.VETO} />{" "}
+                  </Container>
+                  <Container style={{ width: isMobile ? "100%" : "50%" }}>
+                    <VoteBox option={VoteOption.ABSTAIN} />{" "}
+                  </Container>
+                </Container>
 
-                <div className={styles.proposalInfoRow1}>
+                <Container>
                   <div className={styles.VotingButton}>
                     <Button
                       width={200}
-                      disabled={
-                        !isActive ||
-                        !(userStaking.validators.length > 0) ||
-                        selectedVote == null
-                      }
+                      disabled={!isActive || selectedVote == null}
                       onClick={() =>
                         castVote(proposal.proposal_id, selectedVote)
                       }
@@ -233,13 +269,18 @@ export default function Page() {
                       SUBMIT VOTE
                     </Button>
                   </div>
-                </div>
+                </Container>
+                {/* {isMobile && (
+                  <div className={styles.proposalInfoRow1}>
+                    <VoteBox option={VoteOption.YES} />{" "}
+                    <VoteBox option={VoteOption.NO} />{" "}
+                    <VoteBox option={VoteOption.VETO} />{" "}
+                    <VoteBox option={VoteOption.ABSTAIN} />
+                  </div>
+                )} */}
               </div>
             </div>
           )}
-          <div>
-            <Spacer height="30px" />
-          </div>
 
           <div className={styles.graphContainer}>
             <VoteBarGraph
@@ -248,67 +289,80 @@ export default function Page() {
               abstain={Number(votesData[VoteOption.ABSTAIN].amount)}
               veto={Number(votesData[VoteOption.VETO].amount)}
               size={422}
+              isMobile={isMobile}
             />
           </div>
           <div>
-            <Spacer height="50px" />
+            <Spacer height="20px" />
           </div>
         </div>
-        <div className={styles.proposalCardContainer2}>
+        <div
+          className={styles.proposalCardContainer2}
+          style={{
+            minWidth: isMobile ? "unset" : "360px",
+            width: isMobile ? "100%" : "30%",
+            height: isMobile ? "440px" : "500px",
+          }}
+        >
           <div className={styles.detailsHeader}>
             <Text font="proto_mono">Proposal Details</Text>
           </div>
           <div className={styles.proposalInfoBox}>
             <div className={styles.proposalInfo}>
-              <div>
-                <Text font="rm_mono" opacity={0.3} size="x-sm">
+              <div style={{ paddingBottom: "8px" }}>
+                <Text
+                  font="rm_mono"
+                  opacity={0.3}
+                  size={isMobile ? "md" : "x-sm"}
+                >
                   Type
                 </Text>
               </div>
               <div>
-                <Text font="proto_mono" size="x-sm">
+                <Text font="proto_mono" size={isMobile ? "md" : "x-sm"}>
                   {formatProposalType(proposal.type_url)}
                 </Text>
               </div>
             </div>
             <div className={styles.proposalInfo}>
-              <div>
-                <Text font="rm_mono" opacity={0.3} size="x-sm">
+              <div style={{ paddingBottom: "8px" }}>
+                <Text
+                  font="rm_mono"
+                  opacity={0.3}
+                  size={isMobile ? "md" : "x-sm"}
+                >
                   Veto
                 </Text>
               </div>
               <div className={styles.displayAmount}>
-                <Text font="proto_mono" size="x-sm">
+                <Text font="proto_mono" size={isMobile ? "md" : "x-sm"}>
                   {PROPOSAL_VETO_THRESHOLD}
                 </Text>
-                {/* <div className={styles.icon}>
-                  <Image
-                    src="/tokens/canto.svg"
-                    width={16}
-                    height={16}
-                    alt="canto"
-                    style={{
-                      filter: "invert(var(--dark-mode))",
-                    }}
-                  />
-                </div> */}
               </div>
             </div>
             <div className={styles.proposalInfo}>
-              <div>
-                <Text font="rm_mono" opacity={0.3} size="x-sm">
+              <div style={{ paddingBottom: "8px" }}>
+                <Text
+                  font="rm_mono"
+                  opacity={0.3}
+                  size={isMobile ? "md" : "x-sm"}
+                >
                   Quorum{" "}
                 </Text>
               </div>
               <div>
-                <Text font="proto_mono" size="x-sm">
+                <Text font="proto_mono" size={isMobile ? "md" : "x-sm"}>
                   {PROPOSAL_QUORUM_VALUE}
                 </Text>
               </div>
             </div>
             <div className={styles.proposalInfoTimeLine}>
               <div style={{ marginBottom: "10px" }}>
-                <Text font="rm_mono" opacity={0.3} size="x-sm">
+                <Text
+                  font="rm_mono"
+                  opacity={0.3}
+                  size={isMobile ? "md" : "x-sm"}
+                >
                   Voting Timeline
                 </Text>
               </div>
@@ -317,12 +371,12 @@ export default function Page() {
                   <div className={styles.circle} />
                 </div>
                 <div className={styles.txt}>
-                  <Text font="rm_mono" size="x-sm">
-                    Proposal Created on
+                  <Text font="rm_mono" size={isMobile ? "md" : "x-sm"}>
+                    Created on
                   </Text>
                 </div>
                 <div>
-                  <Text font="rm_mono" size="x-sm">
+                  <Text font="rm_mono" size={isMobile ? "md" : "x-sm"}>
                     {formatTime(proposal.submit_time)}
                   </Text>
                 </div>
@@ -333,12 +387,12 @@ export default function Page() {
                   <div className={styles.circle} />
                 </div>
                 <div className={styles.txt}>
-                  <Text font="rm_mono" size="x-sm">
+                  <Text font="rm_mono" size={isMobile ? "md" : "x-sm"}>
                     Voting Ended on{" "}
                   </Text>
                 </div>
                 <div>
-                  <Text font="rm_mono" size="x-sm">
+                  <Text font="rm_mono" size={isMobile ? "md" : "x-sm"}>
                     {formatTime(proposal.voting_end_time)}
                   </Text>
                 </div>
