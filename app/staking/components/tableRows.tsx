@@ -193,75 +193,80 @@ export const GenerateUnbondingDelegationsTableRow = (
   userStakedValidator: UnbondingDelegation,
   index: number,
   isMobile?: boolean
-) => [
-  <Container
-    key={`name_${index}`}
-    width={isMobile ? "100%" : ""}
-    style={{
-      textAlign: isMobile ? "left" : "center",
-      paddingLeft: isMobile ? "16px" : "",
-    }}
-  >
-    <Text
-      font="rm_mono"
+) => {
+  const completionDate = new Date(userStakedValidator.completion_date);
+  return [
+    <Container
+      key={`name_${index}`}
+      width={isMobile ? "100%" : ""}
       style={{
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap",
-        maxWidth: !isMobile ? "300px" : "130px",
+        textAlign: isMobile ? "left" : "center",
+        paddingLeft: isMobile ? "16px" : "",
       }}
     >
-      {userStakedValidator.name}
-    </Text>
-  </Container>,
-  <Container
-    key={`mystake_${index}`}
-    direction="row"
-    gap="auto"
-    width={isMobile ? "100%" : ""}
-    center={{ vertical: true }}
-    style={{ justifyContent: isMobile ? "left" : "center" }}
-  >
-    <Text font="rm_mono">
-      {displayAmount(userStakedValidator.undelegation, 18, {
-        short: false,
-      })}{" "}
-    </Text>
-    <div> </div>
-    <Icon
-      style={{ marginLeft: "5px" }}
-      icon={{
-        url: "/tokens/canto.svg",
-        size: 16,
+      <Text
+        font="rm_mono"
+        style={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          maxWidth: !isMobile ? "300px" : "130px",
+        }}
+      >
+        {userStakedValidator.name}
+      </Text>
+    </Container>,
+    <Container
+      key={`mystake_${index}`}
+      direction="row"
+      gap="auto"
+      width={isMobile ? "100%" : ""}
+      center={{ vertical: true }}
+      style={{ justifyContent: isMobile ? "left" : "center" }}
+    >
+      <Text font="rm_mono">
+        {displayAmount(userStakedValidator.undelegation, 18, {
+          short: false,
+        })}{" "}
+      </Text>
+      <div> </div>
+      <Icon
+        style={{ marginLeft: "5px" }}
+        icon={{
+          url: "/tokens/canto.svg",
+          size: 16,
+        }}
+        themed={true}
+      />
+    </Container>,
+    <Container
+      key={`name_${index}`}
+      width={isMobile ? "100%" : ""}
+      style={{
+        alignItems: isMobile ? "left" : "center",
+        paddingLeft: "16px",
       }}
-      themed={true}
-    />
-  </Container>,
-  <Container
-    key={`name_${index}`}
-    width={isMobile ? "100%" : ""}
-    style={{
-      alignItems: isMobile ? "left" : "center",
-      paddingLeft: "16px",
-    }}
-  >
-    <Text font="rm_mono" style={{ textAlign: "left" }}>
-      {!isMobile
-        ? new Date(userStakedValidator.completion_date).toDateString() +
-          ", " +
-          new Date(userStakedValidator.completion_date).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          }) +
-          (new Date(userStakedValidator.completion_date).getHours() >=
-          Number(12)
-            ? "PM"
-            : "AM")
-        : new Date(
-            userStakedValidator.completion_date
-          ).toLocaleDateString()}{" "}
-      {/*this is to reduce the width of the completion time column on mobile */}
-    </Text>
-  </Container>,
-];
+    >
+      <Text font="rm_mono" style={{ textAlign: "left" }}>
+        {!isMobile
+          ? completionDate.toDateString() +
+            ", " +
+            completionDate.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            }) +
+            (completionDate.getHours() >= Number(12) ? "PM" : "AM")
+          : completionDate.getDate().toString().padStart(2, "0") +
+            "/" +
+            (completionDate.getMonth() + 1).toString().padStart(2, "0") +
+            " " + // Note: Month is zero-indexed
+            completionDate.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })}
+      </Text>
+    </Container>,
+  ];
+};
