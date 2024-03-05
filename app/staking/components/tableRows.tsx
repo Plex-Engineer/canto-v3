@@ -26,7 +26,6 @@ export const GenerateValidatorTableRow = (
     key={`name_${index}`}
     width={isMobile ? "100%" : ""}
     style={{
-      maxWidth: !isMobile ? "300px" : "150px",
       textAlign: isMobile ? "left" : "center",
       paddingLeft: isMobile ? "16px" : "",
     }}
@@ -38,6 +37,7 @@ export const GenerateValidatorTableRow = (
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
+          maxWidth: !isMobile ? "300px" : "140px",
         }}
       >
         {validator.description.moniker}
@@ -47,10 +47,13 @@ export const GenerateValidatorTableRow = (
   <Container
     key={`tokens_${index}`}
     direction="row"
-    center={{ horizontal: true, vertical: true }}
+    center={{ vertical: true }}
+    width={isMobile ? "100%" : ""}
     //gap="auto"
   >
-    <Text font="rm_mono">{displayAmount(validator.tokens, 18)} </Text>
+    <Text font="rm_mono" style={{ textAlign: isMobile ? "left" : "center" }}>
+      {displayAmount(validator.tokens, 18)}{" "}
+    </Text>
     <div> </div>
     <Icon
       style={{ marginLeft: "5px" }}
@@ -61,8 +64,8 @@ export const GenerateValidatorTableRow = (
       themed={true}
     />
   </Container>,
-  <Container key={`commission_${index}`}>
-    <Text font="rm_mono">
+  <Container key={`commission_${index}`} width={isMobile ? "100%" : ""}>
+    <Text font="rm_mono" style={{ textAlign: isMobile ? "left" : "center" }}>
       {displayAmount(validator.commission, -2, { precision: 2 })}%
     </Text>
   </Container>,
@@ -89,18 +92,38 @@ export const GenerateMyStakingTableRow = (
   onDelegate: (validator: Validator) => void,
   isMobile: boolean
 ) => [
-  <Container key={`name_${index}`}>
-    <Text font="rm_mono">{userStakedValidator?.description.moniker}</Text>
+  <Container
+    key={`name_${index}`}
+    width={isMobile ? "100%" : ""}
+    style={{
+      textAlign: isMobile ? "left" : "center",
+      paddingLeft: isMobile ? "16px" : "",
+    }}
+  >
+    <Text
+      font="rm_mono"
+      style={{
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+        maxWidth: !isMobile ? "300px" : "140px",
+      }}
+    >
+      {userStakedValidator?.description.moniker}
+    </Text>
   </Container>,
   <Container
     key={`mystake_${index}`}
     direction="row"
-    center={{ horizontal: true, vertical: true }}
+    width={isMobile ? "100%" : ""}
+    center={{ vertical: true }}
     gap="auto"
+    style={{ justifyContent: isMobile ? "left" : "center" }}
   >
-    <Text font="rm_mono">
+    <Text font="rm_mono" style={{ textAlign: isMobile ? "left" : "center" }}>
       {displayAmount(userStakedValidator.userDelegation.balance, 18, {
         short: false,
+        precision: 1,
       })}{" "}
     </Text>
     <div> </div>
@@ -117,7 +140,7 @@ export const GenerateMyStakingTableRow = (
     <Container
       key={`tokens_${index}`}
       direction="row"
-      center={{ horizontal: true, vertical: true }}
+      center={{ vertical: true }}
       gap="auto"
     >
       <Text font="rm_mono">
@@ -134,8 +157,13 @@ export const GenerateMyStakingTableRow = (
       />
     </Container>
   ),
-  <Container key={`commission_${index}`}>
-    <Text font="rm_mono">
+  <Container
+    key={`commission_${index}`}
+    width={isMobile ? "100%" : ""}
+    center={{ vertical: true }}
+    style={{ alignItems: isMobile ? "left" : "center" }}
+  >
+    <Text font="rm_mono" style={{ textAlign: isMobile ? "left" : "center" }}>
       {displayAmount(userStakedValidator?.commission, -2, {
         precision: 2,
       })}
@@ -163,18 +191,38 @@ export const GenerateMyStakingTableRow = (
 
 export const GenerateUnbondingDelegationsTableRow = (
   userStakedValidator: UnbondingDelegation,
-  index: number
+  index: number,
+  isMobile?: boolean
 ) => {
   const completionDate = new Date(userStakedValidator.completion_date);
   return [
-    <Container key={`name_${index}`}>
-      <Text font="rm_mono">{userStakedValidator.name}</Text>
+    <Container
+      key={`name_${index}`}
+      width={isMobile ? "100%" : ""}
+      style={{
+        textAlign: isMobile ? "left" : "center",
+        paddingLeft: isMobile ? "16px" : "",
+      }}
+    >
+      <Text
+        font="rm_mono"
+        style={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          maxWidth: !isMobile ? "300px" : "130px",
+        }}
+      >
+        {userStakedValidator.name}
+      </Text>
     </Container>,
     <Container
       key={`mystake_${index}`}
       direction="row"
-      center={{ horizontal: true, vertical: true }}
       gap="auto"
+      width={isMobile ? "100%" : ""}
+      center={{ vertical: true }}
+      style={{ justifyContent: isMobile ? "left" : "center" }}
     >
       <Text font="rm_mono">
         {displayAmount(userStakedValidator.undelegation, 18, {
@@ -191,16 +239,33 @@ export const GenerateUnbondingDelegationsTableRow = (
         themed={true}
       />
     </Container>,
-    <Container key={`name_${index}`}>
-      <Text font="rm_mono">
-        {completionDate.toLocaleDateString() +
-          ", " +
-          completionDate.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          }) +
-          (completionDate.getHours() >= Number(12) ? "PM" : "AM")}
+    <Container
+      key={`name_${index}`}
+      width={isMobile ? "100%" : ""}
+      style={{
+        alignItems: isMobile ? "left" : "center",
+        paddingLeft: "16px",
+      }}
+    >
+      <Text font="rm_mono" style={{ textAlign: "left" }}>
+        {!isMobile
+          ? completionDate.toDateString() +
+            ", " +
+            completionDate.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            }) +
+            (completionDate.getHours() >= Number(12) ? "PM" : "AM")
+          : completionDate.getDate().toString().padStart(2, "0") +
+            "/" +
+            (completionDate.getMonth() + 1).toString().padStart(2, "0") +
+            " " + // Note: Month is zero-indexed
+            completionDate.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })}
       </Text>
     </Container>,
   ];
