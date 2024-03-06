@@ -2,6 +2,10 @@ import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 import { checkTokenAllowance } from "@/utils/tokens";
 import { Transaction, TX_DESCRIPTIONS } from "../interfaces";
 import { _approveTx } from ".";
+import { ETH_MAINNET } from "@/config/networks";
+import { USDT_ETH_MAINNET_ADDRESS } from "@/config/consts/addresses";
+import { areEqualAddresses } from "@/utils/address";
+import BigNumber from "bignumber.js";
 
 /**
  * @notice creates a transaction to approve a token
@@ -45,7 +49,19 @@ export async function createApprovalTxs(
   }
   // create tx for each token that needs approval
   allowanceChecks.forEach((check, index) => {
-    if (!check.data) {
+    if (!check.data.hasEnoughAllowance) {
+      if (chainId === ETH_MAINNET.chainId && areEqualAddresses(tokens[index].address, USDT_ETH_MAINNET_ADDRESS) && !BigNumber(check.data.allowance).isZero()) {
+        txList.push(
+          _approveTx(
+            chainId,
+            ethAccount,
+            tokens[index].address,
+            spender.address,
+            "0",
+            TX_DESCRIPTIONS.APPROVE_TOKEN(tokens[index].symbol, spender.name)
+          )
+        );
+      }
       txList.push(
         _approveTx(
           chainId,

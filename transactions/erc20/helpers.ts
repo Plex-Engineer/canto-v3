@@ -23,6 +23,6 @@ export const _approveTx = (
   target: tokenAddress,
   abi: ERC20_ABI,
   method: "approve",
-  params: [spender, MAX_UINT256],
+  params: [spender, amount === "0" ? "0" : MAX_UINT256],
   value: "0",
 });
