@@ -5,7 +5,7 @@ import {
   ReturnWithError,
 } from "@/config/interfaces";
 import * as NETWORKS from "@/config/networks";
-import { GetWalletClientResult } from "wagmi/actions";
+import { Signer } from "@/hooks/helpers/useCantoSigner";
 import Web3, { Contract, ContractAbi } from "web3";
 
 /**
@@ -37,7 +37,7 @@ function getProviderWithoutSigner(rpcUrl: string): Web3 {
  * @param {number} chainId chainId to get contract instance for
  * @param {string} address address of contract
  * @param {ContractAbi} abi abi of contract
- * @param {GetWalletClientResult} options.signer signer to sign transaction with
+ * @param {Signer} options.signer signer to sign transaction with
  * @returns {ReturnWithError<Contract<T>>} contract instance or error
  */
 export function newContractInstance<T extends ContractAbi>(
@@ -45,7 +45,7 @@ export function newContractInstance<T extends ContractAbi>(
   address: string,
   abi: ContractAbi,
   options?: {
-    signer?: GetWalletClientResult;
+    signer?: Signer;
   }
 ): ReturnWithError<Contract<T>> {
   const rpc = getRpcUrlFromChainId(chainId);

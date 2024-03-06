@@ -5,10 +5,11 @@ import {
   UserTokenBalances,
   ERC20Token,
 } from "@/config/interfaces";
-import { fetchBalance, multicall } from "wagmi/actions";
+import { getBalance, multicall } from "@wagmi/core";
 import BigNumber from "bignumber.js";
 import { ERC20_ABI } from "@/config/abis";
 import { newContractInstance } from "../evm";
+import { wagmiConfig } from "@/provider/rainbowProvider";
 
 /**
  * @notice gets all token balances from ethereum chain
@@ -29,7 +30,7 @@ export async function getEVMTokenBalanceList(
       functionName: "balanceOf",
       args: [userEthAddress],
     }));
-    const data = await multicall({
+    const data = await multicall(wagmiConfig, {
       chainId,
       contracts: multicallConfig,
     });
@@ -43,7 +44,7 @@ export async function getEVMTokenBalanceList(
             : (result.result as number).toString();
         } else {
           // get native balance
-          const nativeBalance = await fetchBalance({
+          const nativeBalance = await getBalance(wagmiConfig, {
             address: userEthAddress as `0x${string}`,
             chainId,
           });

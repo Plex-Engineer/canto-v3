@@ -1,5 +1,5 @@
 "use client";
-import useCantoSigner from "@/hooks/helpers/useCantoSigner";
+import useCantoSigner, { Signer } from "@/hooks/helpers/useCantoSigner";
 import useStaking from "@/hooks/staking/useStaking";
 import styles from "./staking.module.scss";
 import Text from "@/components/text";
@@ -30,12 +30,10 @@ import {
 } from "@/transactions/staking";
 import { NEW_ERROR, Validation } from "@/config/interfaces";
 import ToggleGroup from "@/components/groupToggle/ToggleGroup";
-import { GetWalletClientResult } from "wagmi/actions";
 import Input from "@/components/input/input";
 import { PAGE_NUMBER } from "@/config/consts/config";
 import { Pagination } from "@/components/pagination/Pagination";
 import { levenshteinDistance } from "@/utils/staking/searchUtils";
-import { WalletClient } from "wagmi";
 import Analytics from "@/provider/analytics";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 import { getAnalyticsStakingInfo } from "@/utils/analytics";
@@ -53,7 +51,7 @@ export default function StakingPage() {
   const { isMobile } = useScreenSize();
   // handle txs
   function handleRewardsClaimClick(
-    signer: GetWalletClientResult | undefined,
+    signer: Signer | undefined,
     validatorAddresses: string[]
   ) {
     if (signer && signer.account) {
@@ -72,7 +70,7 @@ export default function StakingPage() {
   }
 
   const stakingTxParams = (
-    signer: WalletClient,
+    signer: Signer,
     inputAmount: string,
     txType: StakingTxTypes,
     validatorToRedelegate: Validator | null | undefined

@@ -1,30 +1,30 @@
-import { useEffect } from "react";
-import { useAccount, useConnect } from "wagmi";
+// import { useEffect } from "react";
+// import { useAccount, useConnect } from "wagmi";
 
-const AUTOCONNECTED_CONNECTOR_IDS = ["safe"];
+// const AUTOCONNECTED_CONNECTOR_IDS = ["safe"];
 
-function useAutoConnect() {
-  const { connect, connectors } = useConnect();
-  const { connector } = useAccount();
+// function useAutoConnect() {
+//   const { connect, connectors } = useConnect();
+//   const { connector } = useAccount();
 
-  const onDisconnect = () => {
-    const safeConnector = connectors.find(
-      (c) => c.id === AUTOCONNECTED_CONNECTOR_IDS[0] && c.ready
-    );
-    if (safeConnector) {
-      connect({ connector: safeConnector });
-    }
-  };
+//   const onDisconnect = () => {
+//     const safeConnector = connectors.find(
+//       (c) => c.id === AUTOCONNECTED_CONNECTOR_IDS[0] && c.ready
+//     );
+//     if (safeConnector) {
+//       connect({ connector: safeConnector });
+//     }
+//   };
 
-  useAccount({ onDisconnect });
+//   useAccount({ onDisconnect });
 
-  useEffect(() => {
-    const safeConnector = connectors.find(
-      (c) => c.id === AUTOCONNECTED_CONNECTOR_IDS[0] && c.ready
-    );
-    if (!safeConnector || connector === safeConnector) return;
-    connect({ connector: safeConnector });
-  }, [connectors, connector, connect]);
-}
+//   useEffect(() => {
+//     const safeConnector = connectors.find(
+//       (c) => c.id === AUTOCONNECTED_CONNECTOR_IDS[0] && c.ready
+//     );
+//     if (!safeConnector || connector === safeConnector) return;
+//     connect({ connector: safeConnector });
+//   }, [connectors, connector, connect]);
+// }
 
-export { useAutoConnect };
+// export { useAutoConnect };

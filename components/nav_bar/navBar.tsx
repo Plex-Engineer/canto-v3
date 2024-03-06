@@ -12,14 +12,14 @@ import { useEffect, useRef, useState } from "react";
 import Analytics from "@/provider/analytics";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import { useBalance } from "wagmi";
-import { useAutoConnect } from "@/provider/useAutoConnect";
+// import { useAutoConnect } from "@/provider/useAutoConnect";
 import Icon from "../icon/icon";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 
 const NavBar = () => {
   // This is used to connect safe as wallet,
   // if the app is opened in the safe context.
-  useAutoConnect();
+  // useAutoConnect();
   const { isMobile } = useScreenSize();
   const currentPath = usePathname();
   const searchParams = useSearchParams();
@@ -61,7 +61,6 @@ const NavBar = () => {
   }, [currentPath, searchParams, signer]);
   const balance = useBalance({
     address: signer?.account.address,
-    watch: true,
     chainId: signer?.chain.id,
   });
 
