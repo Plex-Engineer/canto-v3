@@ -103,7 +103,7 @@ export async function checkTokenAllowance(
   account: string,
   spender: string,
   amount: string
-): PromiseWithError<{ hasEnoughAllowance: boolean, allowance: string }> {
+): PromiseWithError<{ hasEnoughAllowance: boolean; allowance: string }> {
   try {
     const { data: tokenContract, error } = newContractInstance<
       typeof ERC20_ABI
@@ -113,10 +113,11 @@ export async function checkTokenAllowance(
       .allowance(account, spender)
       .call();
     return NO_ERROR({
-      hasEnoughAllowance: new BigNumber(allowance as string).isGreaterThanOrEqualTo(amount),
-      allowance: allowance as string
-    }
-    );
+      hasEnoughAllowance: new BigNumber(
+        allowance as string
+      ).isGreaterThanOrEqualTo(amount),
+      allowance: allowance as string,
+    });
   } catch (err) {
     return NEW_ERROR("checkTokenAllowance", err);
   }

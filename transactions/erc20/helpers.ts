@@ -6,7 +6,6 @@ import {
 } from "../interfaces";
 import { MAX_UINT256 } from "@/config/consts/addresses";
 
-
 export const _approveTx = (
   chainId: number,
   ethAccount: string,

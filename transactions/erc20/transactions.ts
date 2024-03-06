@@ -50,7 +50,12 @@ export async function createApprovalTxs(
   // create tx for each token that needs approval
   allowanceChecks.forEach((check, index) => {
     if (!check.data.hasEnoughAllowance) {
-      if (chainId === ETH_MAINNET.chainId && areEqualAddresses(tokens[index].address, USDT_ETH_MAINNET_ADDRESS) && !BigNumber(check.data.allowance).isZero()) {
+      if (
+        chainId === ETH_MAINNET.chainId &&
+        areEqualAddresses(tokens[index].address, USDT_ETH_MAINNET_ADDRESS) &&
+        !BigNumber(check.data.allowance).isZero()
+      ) {
+        // usdt requires approval to be reset to 0 before setting a new allowance
         txList.push(
           _approveTx(
             chainId,
