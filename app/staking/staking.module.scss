@@ -26,22 +26,43 @@
 }
 
 .infoCard {
-  background: var(--card-sub-surface-color, #dfdfdf);
+  //background: green;
   box-shadow: 6px 6px 0px 0px rgba(17, 17, 17, 0.15);
   border: 1px solid var(--border-stroke-color);
   display: flex;
   flex-direction: column;
   height: 400px;
-  padding: 24px;
-  position: sticky;
+  //padding: 24px;
   top: 20px;
   margin-top: 0;
-  width: 340px;
   .infoBox {
     display: flex;
     flex-direction: column;
-    height: 25%;
-    margin-top: 12px;
-    margin-bottom: 12px;
+    //height: 25%;
+    margin-top: 8px;
+    margin-bottom: 8px;
   }
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    border-top: 1px solid var(--border-stroke-color,#b3b3b3);
+    width: calc(100vw);
+    //gap: 1rem;
+    padding: 1rem;
+    &::after {
+      display: none;
+    }
+    &::before {
+      display: none;
+    }
+  }
+  // .infoBox{
+  //   display: flex;
+  //   flex-direction: column;
+  //   height: 25%;
+  //   margin-top: 12px;
+  //   margin-bottom: 12px;
+  //   background-color: var(--card-primary-color, #111111);
+  // }
 }

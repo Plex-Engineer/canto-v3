@@ -116,7 +116,6 @@ export const AmbientModal = (props: AmbientModalProps) => {
               pool={props.pool}
               sendTxFlow={props.sendTxFlow}
               verifyParams={props.verifyParams}
-              isMobile={props.isMobile}
             />
           </Container>
         )}

@@ -50,7 +50,7 @@ export const UserCantoDexPairRow = ({
     <Container
       key={pair.address}
       direction="row"
-      gap={10}
+      gap={isMobile ? 5 : 10}
       style={{
         padding: "0 16px",
       }}
@@ -59,7 +59,7 @@ export const UserCantoDexPairRow = ({
         horizontal: true,
       }}
     >
-      <Icon icon={{ url: pair.logoURI, size: 54 }} />
+      <Icon icon={{ url: pair.logoURI, size: isMobile ? 40 : 54 }} />
       <Text theme="primary-dark" key={pair.address + "symbol"}>
         {pair.symbol}
       </Text>
@@ -193,7 +193,7 @@ export const GeneralCantoDexPairRow = ({
   <Container
     key={pair.address}
     direction="row"
-    gap={10}
+    gap={isMobile ? 5 : 10}
     style={{
       padding: "0 16px",
     }}
@@ -202,7 +202,7 @@ export const GeneralCantoDexPairRow = ({
       horizontal: true,
     }}
   >
-    <Icon icon={{ url: pair.logoURI, size: 54 }} />
+    <Icon icon={{ url: pair.logoURI, size: isMobile ? 40 : 54 }} />
     <Text theme="primary-dark" key={pair.address + "symbol"}>
       {pair.symbol}
     </Text>
@@ -252,7 +252,7 @@ export const GeneralAmbientPairRow = ({
   <Container
     key={pool.address}
     direction="row"
-    gap={10}
+    gap={isMobile ? 5 : 10}
     style={{
       padding: "0 16px",
     }}
@@ -261,7 +261,7 @@ export const GeneralAmbientPairRow = ({
       horizontal: true,
     }}
   >
-    <Icon icon={{ url: pool.logoURI, size: 54 }} />
+    <Icon icon={{ url: pool.logoURI, size: isMobile ? 40 : 54 }} />
     <Text theme="primary-dark" key={pool.address + "symbol"}>
       {pool.symbol}
     </Text>
@@ -380,7 +380,7 @@ export const UserAmbientPairRow = ({
     <Container
       key={pool.address}
       direction="row"
-      gap={10}
+      gap={isMobile ? 5 : 10}
       style={{
         padding: "0 16px",
       }}
@@ -389,7 +389,7 @@ export const UserAmbientPairRow = ({
         horizontal: true,
       }}
     >
-      <Icon icon={{ url: pool.logoURI, size: 54 }} />
+      <Icon icon={{ url: pool.logoURI, size: isMobile ? 40 : 54 }} />
       <Text theme="primary-dark" key={pool.address + "symbol"}>
         {pool.symbol}
       </Text>

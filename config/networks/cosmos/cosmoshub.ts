@@ -13,7 +13,7 @@ export const COSMOS_HUB: CosmosNetwork = {
   icon: "/icons/atom.svg",
   name: "Cosmos Hub",
   isTestChain: false,
-  rpcUrl: "https://rpc-cosmoshub.ecostake.com",
+  rpcUrl: "https://cosmos-rpc.polkachu.com",
   restEndpoint: "https://rest-cosmoshub.ecostake.com",
   addressPrefix: "cosmos",
   checkAddress: function (address) {
