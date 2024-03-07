@@ -59,7 +59,7 @@ export async function signEVMTransaction(
     // make sure gas is at least base limit (21,000), then over estimate by 50%
     const { data: gasLimit, error: gasError } = percentOfAmount(
       gasEstimate < 21000 ? "21000" : gasEstimate.toString(),
-      150
+      165
     );
     if (gasError) throw gasError;
 
