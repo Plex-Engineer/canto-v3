@@ -31,8 +31,9 @@ import { _sendToCosmosTx, _wrapTx } from "./txCreators";
 import { displayAmount } from "@/utils/formatting";
 import { createApprovalTxs } from "@/transactions/erc20";
 import { BridgingMethod, getBridgeMethodInfo } from "..";
-import { fetchBlockNumber, fetchTransaction } from "wagmi/actions";
+import { getBlockNumber, getTransaction } from "@wagmi/core";
 import { getGBridgeQueueForUser } from "@/hooks/bridge/txHistory/gbridgeHistory";
+import { wagmiConfig } from "@/provider/rainbowProvider";
 
 type GravityBridgeInParams = {
   ethSender: string;
@@ -196,11 +197,11 @@ export async function checkGbridgeInTxStatus(
   try {
     // get tx and block number
     const [transaction, currentBlock] = await Promise.all([
-      fetchTransaction({
+      getTransaction(wagmiConfig, {
         chainId: ETH_MAINNET.chainId,
         hash: txHash as `0x${string}`,
       }),
-      fetchBlockNumber({ chainId: ETH_MAINNET.chainId }),
+      getBlockNumber(wagmiConfig, { chainId: ETH_MAINNET.chainId }),
     ]);
 
     // make sure transaction has actually succeeded
@@ -228,12 +229,11 @@ export async function checkGbridgeInTxStatus(
         // grab data from event
         if (event.confirmed === true) {
           return NO_ERROR({ status: "SUCCESS", completedIn: undefined });
-        } else {
-          return NO_ERROR({
-            status: "PENDING",
-            completedIn: Number(event.seconds_until_confirmed),
-          });
         }
+        return NO_ERROR({
+          status: "PENDING",
+          completedIn: Number(event.seconds_until_confirmed),
+        });
       }
     }
     // we made it through the whole gbridge queue and didn't find the transaction

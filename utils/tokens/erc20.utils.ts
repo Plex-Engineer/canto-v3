@@ -5,10 +5,11 @@ import {
   UserTokenBalances,
   ERC20Token,
 } from "@/config/interfaces";
-import { fetchBalance, multicall } from "wagmi/actions";
+import { getBalance, multicall } from "@wagmi/core";
 import BigNumber from "bignumber.js";
 import { ERC20_ABI } from "@/config/abis";
 import { newContractInstance } from "../evm";
+import { wagmiConfig } from "@/provider/rainbowProvider";
 
 /**
  * @notice gets all token balances from ethereum chain
@@ -29,7 +30,7 @@ export async function getEVMTokenBalanceList(
       functionName: "balanceOf",
       args: [userEthAddress],
     }));
-    const data = await multicall({
+    const data = await multicall(wagmiConfig, {
       chainId,
       contracts: multicallConfig,
     });
@@ -43,7 +44,7 @@ export async function getEVMTokenBalanceList(
             : (result.result as number).toString();
         } else {
           // get native balance
-          const nativeBalance = await fetchBalance({
+          const nativeBalance = await getBalance(wagmiConfig, {
             address: userEthAddress as `0x${string}`,
             chainId,
           });
@@ -103,7 +104,7 @@ export async function checkTokenAllowance(
   account: string,
   spender: string,
   amount: string
-): PromiseWithError<boolean> {
+): PromiseWithError<{ hasEnoughAllowance: boolean; allowance: string }> {
   try {
     const { data: tokenContract, error } = newContractInstance<
       typeof ERC20_ABI
@@ -112,9 +113,12 @@ export async function checkTokenAllowance(
     const allowance = await tokenContract.methods
       .allowance(account, spender)
       .call();
-    return NO_ERROR(
-      new BigNumber(allowance as string).isGreaterThanOrEqualTo(amount)
-    );
+    return NO_ERROR({
+      hasEnoughAllowance: new BigNumber(
+        allowance as string
+      ).isGreaterThanOrEqualTo(amount),
+      allowance: allowance as string,
+    });
   } catch (err) {
     return NEW_ERROR("checkTokenAllowance", err);
   }

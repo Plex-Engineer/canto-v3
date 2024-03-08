@@ -1,9 +1,10 @@
-import { waitForTransaction as evmWait } from "wagmi/actions";
+import { waitForTransactionReceipt as evmWait } from "@wagmi/core";
 import { Transaction } from "../interfaces";
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 import { signEVMTransaction } from "./evm";
 import { signKeplrTx } from "./keplr";
 import { signCosmosEIPTx, waitForCosmosTx } from "./cosmosEIP/signCosmosEIP";
+import { wagmiConfig } from "@/provider/rainbowProvider";
 
 /**
  * @notice signs a single
@@ -46,8 +47,8 @@ export async function waitForTransaction(
   error: any;
 }> {
   switch (txType) {
-    case "EVM":
-      const receipt = await evmWait({
+    case "EVM": {
+      const receipt = await evmWait(wagmiConfig, {
         chainId: chainId as number,
         hash: hash as `0x${string}`,
         confirmations: 1,
@@ -56,6 +57,7 @@ export async function waitForTransaction(
         status: receipt.status,
         error: receipt.logs,
       });
+    }
     case "COSMOS":
     case "KEPLR":
       return waitForCosmosTx(chainId, hash);

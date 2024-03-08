@@ -3,8 +3,9 @@ import { AmbientTransactionParams } from "@/transactions/pairs/ambient";
 import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 import useLP from "@/hooks/pairs/lpCombo/useLP";
 import { useState, useEffect } from "react";
-import { fetchBlockNumber } from "@wagmi/core";
 import { CANTO_MAINNET_EVM } from "@/config/networks";
+import { getBlockNumber } from "@wagmi/core";
+import { wagmiConfig } from "@/provider/rainbowProvider";
 
 export default function usePool() {
   const { txStore, signer, chainId } = useCantoSigner();
@@ -80,7 +81,7 @@ export default function usePool() {
     let prevBlockNumber = BigInt(7841750);
     let remBlocksInEpoch = BigInt(104272);
     try {
-      const blockNumber = await fetchBlockNumber({
+      const blockNumber = await getBlockNumber(wagmiConfig, {
         chainId: CANTO_MAINNET_EVM.chainId,
       });
       if (blockNumber) {

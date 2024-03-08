@@ -6,7 +6,6 @@ import {
 } from "../interfaces";
 import { MAX_UINT256 } from "@/config/consts/addresses";
 
-
 export const _approveTx = (
   chainId: number,
   ethAccount: string,
@@ -23,6 +22,6 @@ export const _approveTx = (
   target: tokenAddress,
   abi: ERC20_ABI,
   method: "approve",
-  params: [spender, MAX_UINT256],
+  params: [spender, amount === "0" ? "0" : MAX_UINT256],
   value: "0",
 });

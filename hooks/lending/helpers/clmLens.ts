@@ -8,7 +8,8 @@ import { UserCTokenDetails } from "@/hooks/lending/interfaces/tokens";
 import { isValidEthAddress } from "@/utils/address";
 import { CLM_LENS_ABI, COMPTROLLER_ABI } from "@/config/abis";
 import { getCantoCoreAddress } from "@/config/consts/addresses";
-import { multicall } from "wagmi/actions";
+import { multicall } from "@wagmi/core";
+import { wagmiConfig } from "@/provider/rainbowProvider";
 
 /**
  * @notice Gets user data from CLM Lens
@@ -65,10 +66,13 @@ export async function getUserCLMLensData(
         args: [userEthAddress],
       },
     ] as const;
-    const [cTokenBalances, accountLimits, accruedRewards] = await multicall({
-      chainId,
-      contracts: contractCalls,
-    });
+    const [cTokenBalances, accountLimits, accruedRewards] = await multicall(
+      wagmiConfig,
+      {
+        chainId,
+        contracts: contractCalls,
+      }
+    );
 
     // check all results are present and successful
     if (
