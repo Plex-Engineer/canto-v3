@@ -8,6 +8,7 @@ import BridgeInProgress from "./components/bridgeInProgress";
 import styles from "./bridge.module.scss";
 import useBridgingInProgess from "@/hooks/bridge/useBridgingInProgress";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
+import EthBridgeIn from "./ethBridgeIn/BridgeIn";
 
 export default function BridgePage() {
   const bridgeCombo = useBridgeCombo();
@@ -37,6 +38,10 @@ export default function BridgePage() {
             shadows
             defaultIndex={Direction.direction === "in" ? 0 : 1}
             tabs={[
+              {
+                title: "ETH BRIDGE IN",
+                content: <EthBridgeIn key={"eth-bridge-in"} />,
+              },
               {
                 title: "BRIDGE IN",
                 content: <Bridging key={"bridge-in"} props={bridgeCombo} />,
