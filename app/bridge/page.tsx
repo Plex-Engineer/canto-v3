@@ -9,12 +9,15 @@ import styles from "./bridge.module.scss";
 import useBridgingInProgess from "@/hooks/bridge/useBridgingInProgress";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 import EthBridgeIn from "./ethBridgeIn/BridgeIn";
+import { useState } from "react";
 
 export default function BridgePage() {
   const bridgeCombo = useBridgeCombo();
   const { Direction } = bridgeCombo;
   const bridgeProgress = useBridgingInProgess();
   const { isMobile } = useScreenSize();
+
+  const [ethBridgeIn, setEthBridgeIn] = useState(true);
 
   return (
     <>
@@ -39,12 +42,15 @@ export default function BridgePage() {
             defaultIndex={Direction.direction === "in" ? 0 : 1}
             tabs={[
               {
-                title: "ETH BRIDGE IN",
-                content: <EthBridgeIn key={"eth-bridge-in"} />,
-              },
-              {
                 title: "BRIDGE IN",
-                content: <Bridging key={"bridge-in"} props={bridgeCombo} />,
+                content: ethBridgeIn ? (
+                  <EthBridgeIn
+                    key={"eth-bridge-in"}
+                    setEthBridgeIn={() => setEthBridgeIn(false)}
+                  />
+                ) : (
+                  <Bridging key={"bridge-in"} props={bridgeCombo} />
+                ),
                 onClick: () => Direction.setDirection("in"),
               },
               {

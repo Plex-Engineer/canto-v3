@@ -12,7 +12,10 @@ import Input from "@/components/input/input";
 import Button from "@/components/button/button";
 import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
 
-const EthBridgeIn = () => {
+interface EthBridgeInProps {
+  setEthBridgeIn: () => void;
+}
+const EthBridgeIn = ({ setEthBridgeIn }: EthBridgeInProps) => {
   const {
     fromNetwork,
     toNetwork,
@@ -65,6 +68,18 @@ const EthBridgeIn = () => {
             flexDirection: "column",
           }}
         >
+          <Text
+            style={{
+              fontSize: "10px",
+              textDecoration: "underline",
+              margin: "0 21%",
+              cursor: "pointer",
+            }}
+            theme="secondary-dark"
+            onClick={setEthBridgeIn}
+          >
+            bridge from other network
+          </Text>
           <Spacer height="40px" />
           <Container width="100%" gap={14}>
             <Text size="sm">Select Token and Enter Amount</Text>
