@@ -1,0 +1,24 @@
+.networkInfo {
+  display: flex;
+  flex-direction: row;
+  margin: 0 25%;
+  flex-grow: 1;
+  align-items: flex-end;
+}
+
+.networkIcon {
+  text-align: center;
+}
+
+.dot {
+  flex-grow: 1;
+  height: 2px;
+  margin: 6px 6px 70px 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    #a7a7a7,
+    #a7a7a7 2px,
+    transparent 1px,
+    transparent 10px
+  );
+}

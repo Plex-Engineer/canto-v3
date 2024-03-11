@@ -1,5 +1,6 @@
 import Container from "@/components/container/container";
-import styles from "../bridge.module.scss";
+import mainStyles from "../bridge.module.scss";
+import ethStyles from "./ethBridge.module.scss";
 import useEthBridgeIn from "./bridgeInHook";
 import Selector from "@/components/selector/selector";
 import Text from "@/components/text";
@@ -36,61 +37,35 @@ const EthBridgeIn = () => {
 
   return (
     <>
-      <section className={styles.container}>
+      <section className={mainStyles.container}>
+        <div className={ethStyles.networkInfo}>
+          <div className={ethStyles.networkIcon}>
+            <Image
+              src={fromNetwork.icon}
+              alt={fromNetwork.name}
+              width={90}
+              height={90}
+            />
+            <Text>{fromNetwork.name}</Text>
+          </div>
+          <div className={ethStyles.dot}></div>
+          <div className={ethStyles.networkIcon}>
+            <Image
+              src={toNetwork.icon}
+              alt={toNetwork.name}
+              width={90}
+              height={90}
+            />
+            <Text>{toNetwork.name}</Text>
+          </div>
+        </div>
         <div
-          className={styles["network-selection"]}
+          className={mainStyles["network-selection"]}
           style={{
             flexDirection: "column",
           }}
         >
-          <Container width="100%" gap={14}>
-            <div className={styles["network-box"]}>
-              <Text
-                theme="secondary-dark"
-                size="sm"
-                style={{
-                  width: "60px",
-                }}
-              >
-                From
-              </Text>
-              <div className={styles.token}>
-                <Image
-                  src={fromNetwork.icon}
-                  alt={fromNetwork.name}
-                  width={30}
-                  height={30}
-                />
-                <Text size="md" font="proto_mono">
-                  {fromNetwork.name}
-                </Text>
-              </div>
-            </div>
-            <div className={styles["network-box"]}>
-              <Text
-                theme="secondary-dark"
-                size="sm"
-                style={{
-                  width: "60px",
-                }}
-              >
-                To
-              </Text>
-
-              <div className={styles.token}>
-                <Image
-                  src={toNetwork.icon}
-                  alt={toNetwork.name}
-                  width={30}
-                  height={30}
-                />
-                <Text size="md" font="proto_mono">
-                  {toNetwork.name}
-                </Text>
-              </div>
-            </div>
-          </Container>
-          <Spacer height="20px" />
+          <Spacer height="40px" />
           <Container width="100%" gap={14}>
             <Text size="sm">Select Token and Enter Amount</Text>
             <Container
@@ -140,7 +115,7 @@ const EthBridgeIn = () => {
                   onChange={(val) => {
                     setAmount(val.target.value);
                   }}
-                  className={styles["input"]}
+                  className={mainStyles["input"]}
                 />
               </Container>
             </Container>
