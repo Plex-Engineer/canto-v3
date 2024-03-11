@@ -394,7 +394,7 @@ const useTransactionStore = create<TransactionStore>()(
               await waitForTransaction(tx.tx.type, tx.tx.chainId, txHash);
             // check receipt for error
             if (txReceiptError || receipt.status !== "success") {
-              throw Error(receipt.error);
+              throw txReceiptError ?? Error(receipt.error);
             }
 
             // transaction was a success so we can set status and
