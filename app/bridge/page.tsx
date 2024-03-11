@@ -49,7 +49,13 @@ export default function BridgePage() {
                     setEthBridgeIn={() => setEthBridgeIn(false)}
                   />
                 ) : (
-                  <Bridging key={"bridge-in"} props={bridgeCombo} />
+                  <Bridging
+                    key={"bridge-in"}
+                    props={{
+                      ...bridgeCombo,
+                      setEthBridgeIn: () => setEthBridgeIn(true),
+                    }}
+                  />
                 ),
                 onClick: () => Direction.setDirection("in"),
               },

@@ -136,7 +136,7 @@ const EthBridgeIn = ({ setEthBridgeIn }: EthBridgeInProps) => {
             </Container>
           </Container>
         </div>
-        <Spacer height="20px" />
+        <Spacer height="40px" />
         <Button
           width="fill"
           disabled={false && amountCheck.error}

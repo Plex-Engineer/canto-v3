@@ -22,7 +22,11 @@ import { GRAVITY_BRIDGE } from "@/config/networks";
 import { TX_ERROR_TYPES } from "@/config/consts/errors";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 
-const Bridging = ({ props }: { props: BridgeComboReturn }) => {
+const Bridging = ({
+  props,
+}: {
+  props: BridgeComboReturn & { setEthBridgeIn?: () => void };
+}) => {
   const {
     Amount,
     Direction,
@@ -33,6 +37,7 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
     networkName,
     feesHook: fees,
     feesSelection,
+    setEthBridgeIn,
   } = props;
   const { fromNetwork, toNetwork, token, method } = bridge.selections;
   const { selectedGBridgeFee, setSelectedGBridgeFee, totalChainFee } =
@@ -114,7 +119,20 @@ const Bridging = ({ props }: { props: BridgeComboReturn }) => {
             {bridge.direction === "in" ? (
               <>
                 <Text size="sm">Select Network</Text>
-
+                {setEthBridgeIn && (
+                  <Text
+                    style={{
+                      fontSize: "10px",
+                      textDecoration: "underline",
+                      cursor: "pointer",
+                      marginTop: "-10px",
+                    }}
+                    theme="secondary-dark"
+                    onClick={setEthBridgeIn}
+                  >
+                    bridge from Ethereum
+                  </Text>
+                )}
                 <Selector
                   label={{
                     text: "From",
