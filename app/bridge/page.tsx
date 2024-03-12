@@ -9,7 +9,9 @@ import styles from "./bridge.module.scss";
 import useBridgingInProgess from "@/hooks/bridge/useBridgingInProgress";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 import EthBridgeIn from "./ethBridgeIn/BridgeIn";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getSendToCosmosEvents } from "@/utils/bridge";
+import useCantoSigner from "@/hooks/helpers/useCantoSigner";
 
 export default function BridgePage() {
   const bridgeCombo = useBridgeCombo();
@@ -19,6 +21,14 @@ export default function BridgePage() {
 
   const [ethBridgeIn, setEthBridgeIn] = useState(true);
 
+  const { signer } = useCantoSigner();
+  const [bridgeHistory, setBridgeHistory] = useState<any>(null);
+  useEffect(() => {
+    if (signer?.account.address) {
+      getSendToCosmosEvents(signer.account.address).then(setBridgeHistory);
+    }
+  }, [signer?.account.address]);
+  console.log(bridgeHistory);
   return (
     <>
       <AnimatedBackground
