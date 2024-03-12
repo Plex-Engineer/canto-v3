@@ -9,7 +9,10 @@ import {
   PromiseWithError,
   ReturnWithError,
 } from "@/config/interfaces";
-import { estimateOFTSendGasFee } from "@/transactions/bridge/layerZero/helpers";
+import {
+  createLzAdapterParams,
+  estimateOFTSendGasFee,
+} from "@/transactions/bridge/layerZero/helpers";
 import { ZERO_ADDRESS } from "@/config/consts/addresses";
 import BigNumber from "bignumber.js";
 import { isOFTToken } from "@/utils/tokens";
@@ -150,7 +153,7 @@ async function getLZFees(
       token.address,
       ZERO_ADDRESS,
       new BigNumber(1).multipliedBy(10 ** token.decimals).toString(),
-      [1, 200000]
+      createLzAdapterParams(ZERO_ADDRESS, direction === "in")
     );
     if (error) throw error;
     return NO_ERROR({

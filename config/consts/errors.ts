@@ -31,6 +31,7 @@ export const TX_PARAM_ERRORS = {
     `${
       min ? "Minimum" : "Maximum"
     } execution price must be less than or equal to ${price}`,
+  AMBIENT_AMOUNT_ERROR: () => "Amount must be 0 in selected price range",
 };
 export const TX_SIGN_ERRORS = {
   INCORRECT_TX_TYPE: (txType: string) => `Incorrect tx type ${txType}`,

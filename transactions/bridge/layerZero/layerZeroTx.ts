@@ -19,7 +19,11 @@ import { getTokenBalance, isOFTToken } from "@/utils/tokens";
 import LZ_CHAIN_IDS from "@/config/jsons/layerZeroChainIds.json";
 import { getMessagesBySrcTxHash } from "@layerzerolabs/scan-client";
 import Web3 from "web3";
-import { checkUseAdapterParams, estimateOFTSendGasFee } from "./helpers";
+import {
+  checkUseAdapterParams,
+  createLzAdapterParams,
+  estimateOFTSendGasFee,
+} from "./helpers";
 import { createApprovalTxs } from "@/transactions/erc20";
 import { _oftTransferTx } from "./txCreators";
 import { displayAmount } from "@/utils/formatting";
@@ -69,16 +73,36 @@ export async function bridgeLayerZeroTx(
       txParams.ethSender
     );
 
+    /** create adapter params */
+    let useAdapterParams = true;
+    if (txParams.token.oftHasAdapterParams) {
+      const { data: needsAdapterParams, error: adapterParamsError } =
+        await checkUseAdapterParams(
+          txParams.token.chainId,
+          txParams.token.address
+        );
+      if (adapterParamsError) throw adapterParamsError;
+      useAdapterParams = needsAdapterParams;
+    }
+    const adapterParams = useAdapterParams
+      ? createLzAdapterParams(
+          txParams.ethSender,
+          isCantoChainId(txParams.toNetworkChainId)
+        )
+      : "0x";
+
     /** estimate gas */
-    let { data: gas, error: gasError } = await estimateOFTSendGasFee(
+    const { data: sendGasFee, error: gasError } = await estimateOFTSendGasFee(
       txParams.token.chainId,
       toLZChainId,
       txParams.token.address,
       txParams.ethSender,
       txParams.amount,
-      [1, 200000]
+      adapterParams
     );
     if (gasError) throw gasError;
+
+    let totalGas = sendGasFee;
 
     /** check if proxy OFT */
     if (txParams.token.isOFTProxy) {
@@ -112,21 +136,9 @@ export async function bridgeLayerZeroTx(
         // if OFT balance is less than amount, then user needs to deposit
         // Native OFT contract will handle the deposit (just send extra gas to cover deposit amount)
         if (oftBalance.lt(txParams.amount)) {
-          gas = gas.plus(txParams.amount).minus(oftBalance);
+          totalGas = totalGas.plus(txParams.amount).minus(oftBalance);
         }
       }
-    }
-
-    /** check adapter params */
-    let needsAdapterParams = true;
-    if (txParams.token.oftHasAdapterParams) {
-      const { data: adapterParams, error: adapterParamsError } =
-        await checkUseAdapterParams(
-          txParams.token.chainId,
-          txParams.token.address
-        );
-      if (adapterParamsError) throw adapterParamsError;
-      needsAdapterParams = adapterParams;
     }
 
     /** push LZ tx */
@@ -138,8 +150,8 @@ export async function bridgeLayerZeroTx(
         toAddressBytes,
         txParams.token.address,
         txParams.amount,
-        gas.toString(),
-        needsAdapterParams,
+        totalGas.toString(),
+        adapterParams,
         TX_DESCRIPTIONS.BRIDGE(
           txParams.token.symbol,
           displayAmount(txParams.amount, txParams.token.decimals),

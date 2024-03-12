@@ -12,9 +12,6 @@ import {
 } from "@/transactions/interfaces";
 import { BridgingMethod } from "..";
 
-// if useCustomAdapterParams is true, we must pass in adapter params
-const DEFAULT_ADAPTER_PARAMS =
-  "0x00010000000000000000000000000000000000000000000000000000000000030d40";
 export const _oftTransferTx = (
   chainId: number,
   toLZChainId: number,
@@ -23,7 +20,7 @@ export const _oftTransferTx = (
   tokenAddress: string,
   amount: string,
   gas: string,
-  needAdapterParams: boolean,
+  adapterParams: string,
   description: TransactionDescription,
   bridgeInfo: { direction: "in" | "out"; amountFormatted: string }
 ): Transaction => ({
@@ -46,11 +43,7 @@ export const _oftTransferTx = (
     toLZChainId,
     toAddressBytes,
     amount,
-    [
-      ethAddress,
-      ZERO_ADDRESS,
-      needAdapterParams ? DEFAULT_ADAPTER_PARAMS : "0x",
-    ],
+    [ethAddress, ZERO_ADDRESS, adapterParams],
   ],
   value: gas,
 });

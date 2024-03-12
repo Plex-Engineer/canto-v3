@@ -29,17 +29,17 @@ import {
 } from "@/utils/ambient/liquidityControllers";
 import { Validation } from "@/config/interfaces";
 import Analytics from "@/provider/analytics";
+import BigNumber from "bignumber.js";
+import useScreenSize from "@/hooks/helpers/useScreenSize";
 interface NewPositionModalProps {
   pool: AmbientPool;
   sendTxFlow: (params: Partial<AmbientTransactionParams>) => void;
   verifyParams: (params: Partial<AmbientTransactionParams>) => Validation;
-  isMobile?: boolean;
 }
 export const NewAmbientPositionModal = ({
   pool,
   sendTxFlow,
   verifyParams,
-  isMobile,
 }: NewPositionModalProps) => {
   const { base: baseToken, quote: quoteToken } = pool;
   const positionManager = useNewAmbientPositionManager(pool);
@@ -84,7 +84,12 @@ export const NewAmbientPositionModal = ({
 
   const percentDiff = (currentPrice: number, selectedPrice: number) =>
     formatPercent(((selectedPrice - currentPrice) / currentPrice).toString());
-
+  function getWeiRangePrice(priceFormatted: string): string {
+    const scale = BigNumber(10).pow(pool.base.decimals - pool.quote.decimals);
+    const priceWei = scale.multipliedBy(priceFormatted).toString();
+    return priceWei;
+  }
+  const { isMobile } = useScreenSize();
   return (
     <Container
       width={
@@ -159,6 +164,12 @@ export const NewAmbientPositionModal = ({
             max={baseToken.balance ?? "0"}
             maxName="LP Modal"
             symbol={baseToken.symbol}
+            ambientAmountError={
+              Number(pool.stats.lastPriceSwap) <=
+                Number(
+                  getWeiRangePrice(positionManager.options.minRangePrice)
+                ) && Number(positionManager.options.amountBase) !== 0
+            }
           />
           <Spacer height="12px" />
           <Amount
@@ -173,6 +184,12 @@ export const NewAmbientPositionModal = ({
             max={quoteToken.balance ?? "0"}
             maxName="LP Modal"
             symbol={quoteToken.symbol}
+            ambientAmountError={
+              Number(pool.stats.lastPriceSwap) >=
+                Number(
+                  getWeiRangePrice(positionManager.options.maxRangePrice)
+                ) && Number(positionManager.options.amountQuote) !== 0
+            }
           />
           <Spacer height="20px" />
           <Container className={styles.card}>

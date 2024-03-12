@@ -8,6 +8,8 @@ import clsx from "clsx";
 import Spacer from "../layout/spacer";
 import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
 import Analytics from "@/provider/analytics";
+import { TX_PARAM_ERRORS } from "@/config/consts/errors";
+
 interface Props {
   IconUrl: string;
   title: string;
@@ -23,6 +25,7 @@ interface Props {
   };
   extraNode?: React.ReactNode;
   maxName?: string;
+  ambientAmountError?: boolean;
 }
 const Amount = (props: Props) => {
   const [focused, setFocused] = useState(false);
@@ -74,13 +77,15 @@ const Amount = (props: Props) => {
   // deal with error inputs
   const inputError = useMemo(
     () =>
-      validateNonWeiUserInputTokenAmount(
-        props.value,
-        props.min,
-        props.limit?.limit ?? props.max,
-        props.symbol,
-        props.decimals
-      ),
+      !props.ambientAmountError
+        ? validateNonWeiUserInputTokenAmount(
+            props.value,
+            props.min,
+            props.limit?.limit ?? props.max,
+            props.symbol,
+            props.decimals
+          )
+        : { error: true, reason: TX_PARAM_ERRORS.AMBIENT_AMOUNT_ERROR() },
     [
       props.value,
       props.max,
@@ -88,6 +93,7 @@ const Amount = (props: Props) => {
       props.decimals,
       props.symbol,
       props.limit?.limit,
+      props.ambientAmountError,
     ]
   );
 
