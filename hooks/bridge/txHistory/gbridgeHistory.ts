@@ -1,5 +1,5 @@
 import { GRAVITY_BRIDGE_ABI } from "@/config/abis";
-import { GRAVITY_BRIDGE_ETH_ADDRESS } from "@/config/consts/addresses";
+import { GRAVITY_BRIDGE_ETH_ADDRESSES } from "@/config/consts/addresses";
 import { GRAVITY_BRIDGE_API_URL } from "@/config/api";
 import {
   NEW_ERROR,
@@ -24,9 +24,8 @@ export async function getUserGBridgeInHistory(
   if (eventError) {
     return NEW_ERROR("getUserGBridgeInHistory::" + eventError.message);
   }
-  const { data: queue, error: queueError } = await getGBridgeQueueForUser(
-    ethAccount
-  );
+  const { data: queue, error: queueError } =
+    await getGBridgeQueueForUser(ethAccount);
   if (queueError) {
     return NEW_ERROR("getUserGBridgeInHistory::" + queueError.message);
   }
@@ -69,7 +68,7 @@ async function getUserGBridgeInEvents(
   // create contract instance
   const { data: gBridgeContract, error } = newContractInstance<
     typeof GRAVITY_BRIDGE_ABI
-  >(chainId, GRAVITY_BRIDGE_ETH_ADDRESS, GRAVITY_BRIDGE_ABI);
+  >(chainId, GRAVITY_BRIDGE_ETH_ADDRESSES.gravityBridge, GRAVITY_BRIDGE_ABI);
   if (error) return NEW_ERROR("getUserGBridgeInEvents::" + errMsg(error));
   try {
     // filter by eth sender

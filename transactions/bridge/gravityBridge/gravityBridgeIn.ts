@@ -1,5 +1,5 @@
 import {
-  GRAVITY_BRIDGE_ETH_ADDRESS,
+  GRAVITY_BRIDGE_ETH_ADDRESSES,
   WETH_MAINNET_ADDRESS,
 } from "@/config/consts/addresses";
 import { TX_PARAM_ERRORS } from "@/config/consts/errors";
@@ -118,7 +118,10 @@ export async function gravityBridgeInTx(
         txParams.ethSender,
         [{ address: txParams.token.address, symbol: txParams.token.symbol }],
         [txParams.amount],
-        { address: GRAVITY_BRIDGE_ETH_ADDRESS, name: "Gravity Bridge" }
+        {
+          address: GRAVITY_BRIDGE_ETH_ADDRESSES.gravityBridge,
+          name: "Gravity Bridge",
+        }
       );
     if (allowanceError) throw allowanceError;
     txList.push(...allowanceTxs);

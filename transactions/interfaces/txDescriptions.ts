@@ -134,6 +134,7 @@ export enum CantoFETxType {
   // GBRIDGE
   GENERATE_PUBLIC_KEY_COSMOS = "generatePublicKeyCosmos",
   SEND_TO_COSMOS = "sendToCosmos",
+  SEND_ETH_TO_COSMOS = "sendEthToCosmos",
   SEND_TO_ETH = "sendToEth",
   WRAP_ETH = "wrapEth",
   // LZ OFT

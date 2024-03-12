@@ -7,7 +7,7 @@ import { ERC20Token, OFTToken } from "@/config/interfaces";
 import { useBalance } from "wagmi";
 import { checkTokenAllowance, isOFTToken } from "@/utils/tokens";
 import {
-  GRAVITY_BRIDGE_ETH_ADDRESS,
+  GRAVITY_BRIDGE_ETH_ADDRESSES,
   MAX_UINT256,
   ZERO_ADDRESS,
 } from "@/config/consts/addresses";
@@ -17,7 +17,10 @@ import { bridgeLayerZeroTx } from "@/transactions/bridge/layerZero/layerZeroTx";
 import { Transaction } from "@/transactions/interfaces";
 import { _approveTx } from "@/transactions/erc20";
 import { signTransaction, waitForTransaction } from "@/transactions/signTx";
-import { _sendToCosmosTx } from "@/transactions/bridge/gravityBridge/txCreators";
+import {
+  _sendEthToCosmosTx,
+  _sendToCosmosTx,
+} from "@/transactions/bridge/gravityBridge/txCreators";
 import { checkCantoPubKey, ethToCantoAddress } from "@/utils/address";
 import { generateCantoPublicKeyWithTx } from "@/transactions/cosmos/publicKey";
 
@@ -126,7 +129,7 @@ export default function useEthBridgeIn() {
           fromNetwork.chainId,
           selectedToken.address,
           signer.account.address,
-          GRAVITY_BRIDGE_ETH_ADDRESS,
+          GRAVITY_BRIDGE_ETH_ADDRESSES.gravityBridge,
           "0"
         );
         if (error) {
@@ -179,7 +182,7 @@ export default function useEthBridgeIn() {
             fromNetwork.chainId,
             signer.account.address,
             selectedToken.address,
-            GRAVITY_BRIDGE_ETH_ADDRESS,
+            GRAVITY_BRIDGE_ETH_ADDRESSES.gravityBridge,
             MAX_UINT256,
             txDescription
           );
@@ -233,7 +236,20 @@ export default function useEthBridgeIn() {
           );
           break;
         }
-        case TxType.SEND_ETH_TO_COSMOS:
+        case TxType.SEND_ETH_TO_COSMOS: {
+          /** convert sender address to canto address */
+          const { data: cantoReceiver, error: ethToCantoError } =
+            await ethToCantoAddress(signer.account.address);
+          if (ethToCantoError) throw ethToCantoError;
+          tx = _sendEthToCosmosTx(
+            fromNetwork.chainId,
+            signer.account.address,
+            cantoReceiver,
+            bnAmount,
+            txDescription
+          );
+          break;
+        }
         default:
           throw new Error("invalid tx");
       }

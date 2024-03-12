@@ -545,3 +545,24 @@ export const GRAVITY_BRIDGE_ABI = [
     type: "function",
   },
 ] as const;
+
+export const SEND_ETH_TO_COSMOS_ABI = [
+  {
+    inputs: [],
+    stateMutability: "nonpayable",
+    type: "constructor",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "_destination",
+        type: "string",
+      },
+    ],
+    name: "sendToCosmos",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+] as const;

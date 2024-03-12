@@ -4,8 +4,11 @@ export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const MAX_UINT256 =
   "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
 
-export const GRAVITY_BRIDGE_ETH_ADDRESS =
-  "0xa4108aA1Ec4967F8b52220a4f7e94A8201F2D906";
+// eth gravity bridge addresses
+export const GRAVITY_BRIDGE_ETH_ADDRESSES = {
+  gravityBridge: "0xa4108aA1Ec4967F8b52220a4f7e94A8201F2D906",
+  sendEth: "0x0319f25a52144228f261203415d5176da0ad45ea",
+};
 export const WETH_MAINNET_ADDRESS =
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const USDT_ETH_MAINNET_ADDRESS =

@@ -4,8 +4,12 @@ import {
   CantoFETxType,
 } from "@/transactions/interfaces";
 import { BridgingMethod } from "..";
-import { GRAVITY_BRIDGE_ETH_ADDRESS } from "@/config/consts/addresses";
-import { GRAVITY_BRIDGE_ABI, WETH_ABI } from "@/config/abis";
+import { GRAVITY_BRIDGE_ETH_ADDRESSES } from "@/config/consts/addresses";
+import {
+  GRAVITY_BRIDGE_ABI,
+  SEND_ETH_TO_COSMOS_ABI,
+  WETH_ABI,
+} from "@/config/abis";
 import { createMsgsSendToEth } from "@/transactions/cosmos/messages/gravitySendToEth/sendToEth";
 
 /**
@@ -32,11 +36,30 @@ export const _sendToCosmosTx = (
   feTxType: CantoFETxType.SEND_TO_COSMOS,
   chainId: chainId,
   type: "EVM",
-  target: GRAVITY_BRIDGE_ETH_ADDRESS,
+  target: GRAVITY_BRIDGE_ETH_ADDRESSES.gravityBridge,
   abi: GRAVITY_BRIDGE_ABI,
   method: "sendToCosmos",
   params: [tokenAddress, cantoReceiverAddress, amount],
   value: "0",
+});
+
+export const _sendEthToCosmosTx = (
+  chainId: number,
+  fromEthAddress: string,
+  cantoReceiverAddress: string,
+  amount: string,
+  description: TransactionDescription
+): Transaction => ({
+  fromAddress: fromEthAddress,
+  description,
+  feTxType: CantoFETxType.SEND_ETH_TO_COSMOS,
+  chainId: chainId,
+  type: "EVM",
+  target: GRAVITY_BRIDGE_ETH_ADDRESSES.sendEth,
+  abi: SEND_ETH_TO_COSMOS_ABI,
+  method: "sendToCosmos",
+  params: [cantoReceiverAddress],
+  value: amount,
 });
 
 export const _wrapTx = (
