@@ -23,6 +23,7 @@ import {
 } from "@/transactions/bridge/gravityBridge/txCreators";
 import { checkCantoPubKey, ethToCantoAddress } from "@/utils/address";
 import { generateCantoPublicKeyWithTx } from "@/transactions/cosmos/publicKey";
+import { useToast } from "@/components/toast";
 
 // constants
 const fromNetwork = ETH_MAINNET;
@@ -42,12 +43,11 @@ enum TxType {
   SEND_OFT = "bridge in oft",
 }
 
+// success and error will be dealt with in the toast, button state is either ready or confirming
 enum TxStatus {
   NONE = "none",
   SIGNING = "signing...",
   CONFIRMING = "confirming...",
-  SUCCESS = "success",
-  ERROR = "error",
 }
 
 export default function useEthBridgeIn() {
@@ -165,8 +165,13 @@ export default function useEthBridgeIn() {
     return TxType.SEND_TO_COSMOS;
   }, [selectedToken, bnAmount, currentTokenAllowance, hasPubKey]);
 
+  // Toast for tx status
+  const toast = useToast();
   const [txStatus, setTxStatus] = useState<TxStatus>(TxStatus.NONE);
+
   async function onBridgeIn() {
+    // if already signing or confirming, do nothing
+    if (txStatus !== TxStatus.NONE) return;
     try {
       setTxStatus(TxStatus.SIGNING);
       // basic check
@@ -267,9 +272,18 @@ export default function useEthBridgeIn() {
         throw Error(receipt.error);
 
       // if everything is successful
-      setTxStatus(TxStatus.SUCCESS);
+      toast.add({
+        primary: "Transaction Successful",
+        secondary: txType,
+        state: "success",
+      });
     } catch (err) {
-      setTxStatus(TxStatus.ERROR);
+      toast.add({
+        primary: "Transaction Error",
+        secondary: txType,
+        state: "failure",
+      });
+      setTxStatus(TxStatus.NONE);
       console.error(err);
     }
   }

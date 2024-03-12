@@ -28,7 +28,7 @@ export default function BridgePage() {
       getSendToCosmosEvents(signer.account.address).then(setBridgeHistory);
     }
   }, [signer?.account.address]);
-  console.log(bridgeHistory);
+
   return (
     <>
       <AnimatedBackground

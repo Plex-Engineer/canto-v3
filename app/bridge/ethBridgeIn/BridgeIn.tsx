@@ -32,7 +32,7 @@ const EthBridgeIn = ({ setEthBridgeIn }: EthBridgeInProps) => {
 
   const amountCheck = validateNonWeiUserInputTokenAmount(
     amount,
-    "0",
+    "1",
     selectedToken?.balance ?? "0",
     selectedToken?.symbol ?? "",
     selectedToken?.decimals ?? 0
@@ -137,14 +137,10 @@ const EthBridgeIn = ({ setEthBridgeIn }: EthBridgeInProps) => {
           </Container>
         </div>
         <Spacer height="40px" />
-        <Button
-          width="fill"
-          disabled={false && amountCheck.error}
-          onClick={onBridgeIn}
-        >
+        <Button width="fill" disabled={amountCheck.error} onClick={onBridgeIn}>
           {txStatus !== "none"
             ? txStatus
-            : amountCheck.error
+            : amountCheck.error && amount !== "0"
               ? amountCheck.reason
               : txText}
         </Button>
