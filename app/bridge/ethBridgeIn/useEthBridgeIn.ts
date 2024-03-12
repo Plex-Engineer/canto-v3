@@ -24,6 +24,9 @@ import {
 import { checkCantoPubKey, ethToCantoAddress } from "@/utils/address";
 import { generateCantoPublicKeyWithTx } from "@/transactions/cosmos/publicKey";
 import { useToast } from "@/components/toast";
+import useBridgingFees from "@/hooks/bridge/useBridgingFees";
+import { BridgingMethod } from "@/transactions/bridge";
+import { BridgeToken } from "@/hooks/bridge/interfaces/tokens";
 
 // constants
 const fromNetwork = ETH_MAINNET;
@@ -35,13 +38,29 @@ const availableTokens =
 
 // possible transactions to make
 enum TxType {
-  LOADING = "loading...",
-  GEN_PUB_KEY = "generate public key",
-  APPROVE = "approve token",
-  SEND_TO_COSMOS = "bridge in cosmos",
-  SEND_ETH_TO_COSMOS = "bridge in eth to cosmos",
-  SEND_OFT = "bridge in oft",
+  LOADING,
+  GEN_PUB_KEY,
+  APPROVE,
+  SEND_TO_COSMOS,
+  SEND_ETH_TO_COSMOS,
+  SEND_OFT,
 }
+
+const txText = (txType: TxType) => {
+  switch (txType) {
+    case TxType.GEN_PUB_KEY:
+      return "generate public key";
+    case TxType.APPROVE:
+      return "approve token";
+    case TxType.SEND_TO_COSMOS:
+    case TxType.SEND_ETH_TO_COSMOS:
+    case TxType.SEND_OFT:
+      return "bridge in";
+    case TxType.LOADING:
+    default:
+      return "loading...";
+  }
+};
 
 // success and error will be dealt with in the toast, button state is either ready or confirming
 enum TxStatus {
@@ -54,7 +73,10 @@ export default function useEthBridgeIn() {
   // get current connected account
   const { signer } = useCantoSigner();
 
-  // user canto public key
+  // useEffects will need to be retriggered after tx status changes
+  const [txStatus, setTxStatus] = useState<TxStatus>(TxStatus.NONE);
+
+  // user canto public key (retrigger after signer changes or tx status changes)
   const [hasPubKey, setHasPubKey] = useState<boolean>(false);
   useEffect(() => {
     async function checkPubKey() {
@@ -76,7 +98,7 @@ export default function useEthBridgeIn() {
       }
     }
     checkPubKey();
-  }, [signer?.account.address]);
+  }, [signer?.account.address, txStatus]);
 
   const { data: ethBalance } = useBalance({
     chainId: fromNetwork.chainId,
@@ -112,7 +134,7 @@ export default function useEthBridgeIn() {
     [amount, selectedToken?.decimals]
   );
 
-  // just grab once when token is selected
+  // just grab once when token is selected (retriggger when txStatus changes since could be approval)
   const [currentTokenAllowance, setCurrentTokenAllowance] = useState<
     string | null
   >(null);
@@ -142,8 +164,7 @@ export default function useEthBridgeIn() {
       }
     }
     getAllowance();
-    setTxStatus(TxStatus.NONE);
-  }, [selectedToken, signer?.account.address]);
+  }, [selectedToken, signer?.account.address, txStatus]);
 
   // Transactions
 
@@ -159,7 +180,10 @@ export default function useEthBridgeIn() {
     if (selectedToken.address === ZERO_ADDRESS)
       return TxType.SEND_ETH_TO_COSMOS;
     // amount greater than allowance
-    if (greaterThan(bnAmount, currentTokenAllowance ?? "0"))
+    if (
+      greaterThan(bnAmount, currentTokenAllowance ?? "0") ||
+      currentTokenAllowance === "0"
+    )
       return TxType.APPROVE;
     // gbridge token ready to send
     return TxType.SEND_TO_COSMOS;
@@ -167,7 +191,6 @@ export default function useEthBridgeIn() {
 
   // Toast for tx status
   const toast = useToast();
-  const [txStatus, setTxStatus] = useState<TxStatus>(TxStatus.NONE);
 
   async function onBridgeIn() {
     // if already signing or confirming, do nothing
@@ -274,19 +297,32 @@ export default function useEthBridgeIn() {
       // if everything is successful
       toast.add({
         primary: "Transaction Successful",
-        secondary: txType,
+        secondary: txText(txType),
         state: "success",
       });
+      setTxStatus(TxStatus.NONE);
     } catch (err) {
       toast.add({
         primary: "Transaction Error",
-        secondary: txType,
+        secondary: txText(txType),
         state: "failure",
       });
       setTxStatus(TxStatus.NONE);
       console.error(err);
     }
   }
+
+  const fees = useBridgingFees({
+    direction: "in",
+    token: selectedToken as BridgeToken,
+    fromNetwork,
+    toNetwork,
+    method:
+      txType === TxType.SEND_OFT
+        ? BridgingMethod.LAYER_ZERO
+        : BridgingMethod.GRAVITY_BRIDGE,
+    ethSender: signer?.account.address,
+  });
 
   return {
     fromNetwork,
@@ -296,8 +332,9 @@ export default function useEthBridgeIn() {
     setSelectedTokenId,
     amount,
     setAmount,
-    txText: txType,
+    txText: txText(txType),
     txStatus,
     onBridgeIn,
+    fees,
   };
 }

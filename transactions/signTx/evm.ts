@@ -7,7 +7,10 @@ import { percentOfAmount } from "@/utils/math";
 import { BaseError } from "viem";
 import { Signer } from "@/hooks/helpers/useCantoSigner";
 import { wagmiConfig } from "@/provider/rainbowProvider";
+import { getNetworkInfoFromChainId, isEVMNetwork } from "@/utils/networks";
+import Web3 from "web3";
 
+const GAS_OVER_ESTIMATE = 120;
 /**
  * @notice signs evm transaction
  * @param {Transaction} tx transaction to perform
@@ -53,7 +56,7 @@ export async function signEVMTransaction(
     // make sure gas is at least base limit (21,000), then over estimate by 50%
     const { data: gasLimit, error: gasError } = percentOfAmount(
       gasEstimate < 21000 ? "21000" : gasEstimate.toString(),
-      165
+      GAS_OVER_ESTIMATE
     );
     if (gasError) throw gasError;
 
@@ -106,5 +109,46 @@ export async function getEvmSignerOnChainId(
     return NO_ERROR(signer);
   } catch (err) {
     return NEW_ERROR("getEvmSignerOnChainId", err);
+  }
+}
+
+export async function estimateGas(tx: Transaction): PromiseWithError<string> {
+  try {
+    if (tx.type !== "EVM")
+      throw Error(TX_SIGN_ERRORS.INCORRECT_TX_TYPE(tx.type));
+
+    if (typeof tx.chainId !== "number")
+      throw Error(TX_SIGN_ERRORS.INVALID_CHAIN_ID(tx.chainId));
+
+    const { data: network, error } = getNetworkInfoFromChainId(tx.chainId);
+    if (error) throw error;
+    if (!isEVMNetwork(network)) throw new Error("Invalid network");
+
+    // get contract instance
+    const { data: contractInstance, error: contractError } =
+      newContractInstance<typeof tx.abi>(tx.chainId, tx.target, tx.abi);
+    if (contractError) throw contractError;
+
+    const gasEstimate = await contractInstance.methods[tx.method](
+      ...(tx.params as [])
+    ).estimateGas({
+      from: tx.fromAddress,
+      value: tx.value,
+    });
+    if (!gasEstimate) throw new Error("estimateGas: no gas estimate");
+
+    const currentGasPrice = await new Web3(network.rpcUrl).eth.getGasPrice();
+    if (!currentGasPrice) throw new Error("estimateGas: no gas price");
+
+    return NO_ERROR(
+      (
+        (BigInt(gasEstimate) *
+          BigInt(currentGasPrice) *
+          BigInt(GAS_OVER_ESTIMATE)) /
+        BigInt(100)
+      ).toString()
+    );
+  } catch (err) {
+    return NEW_ERROR("estimateGas", err);
   }
 }

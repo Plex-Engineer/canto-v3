@@ -21,6 +21,11 @@ import {
 } from "@/transactions/bridge/gravityBridge/gravityFees";
 import { BridgeFeesByMethod } from "./interfaces/bridgeFees";
 import { CONVERT_FEE, IBC_FEE } from "@/config/consts/fees";
+import {
+  _sendEthToCosmosTx,
+  _sendToCosmosTx,
+} from "@/transactions/bridge/gravityBridge/txCreators";
+import { estimateGas } from "@/transactions/signTx/evm";
 
 export type BridgingFeesReturn =
   | {
@@ -36,6 +41,7 @@ type BridgingFeesProps = {
   method: BridgingMethod | null;
   fromNetwork: BaseNetwork | null;
   toNetwork: BaseNetwork | null;
+  ethSender?: string;
 };
 /**
  * This hook will keep track of the current fees expected to be paid by the user for bridging
@@ -47,6 +53,7 @@ export default function useBridgingFees({
   method,
   fromNetwork,
   toNetwork,
+  ethSender,
 }: BridgingFeesProps): BridgingFeesReturn {
   // loading state
   const [isLoading, setIsLoading] = useState(false);
@@ -72,6 +79,7 @@ export default function useBridgingFees({
           method,
           fromNetwork,
           toNetwork,
+          ethSender,
         });
 
         // set error or fees
@@ -113,6 +121,7 @@ async function getFees({
   token,
   toNetwork,
   fromNetwork,
+  ethSender,
 }: BridgingFeesProps): PromiseWithError<BridgeFeesByMethod> {
   // check props to make sure they exist
   if (!(token && method && fromNetwork && toNetwork))
@@ -124,7 +133,7 @@ async function getFees({
       return getLZFees(direction, token, fromNetwork, toNetwork);
     case BridgingMethod.GRAVITY_BRIDGE:
       return direction === "in"
-        ? NO_ERROR({ method: null })
+        ? getGravityBridgeInFees(token, ethSender)
         : getGravityBridgeOutFees(token);
     case BridgingMethod.IBC:
       return direction === "in" ? NO_ERROR({ method: null }) : getIBCOutFees();
@@ -172,6 +181,44 @@ async function getLZFees(
     });
   } catch (err) {
     return NEW_ERROR("getLZFees", err);
+  }
+}
+
+async function getGravityBridgeInFees(
+  token: BridgeToken,
+  ethSender?: string
+): PromiseWithError<BridgeFeesByMethod> {
+  try {
+    // check for token address (should always be there)
+    if (!token.address) throw new Error("Invalid token");
+    const txDescription = { title: "", description: "" };
+    const tx =
+      token.address === ZERO_ADDRESS
+        ? _sendEthToCosmosTx(
+            token.chainId,
+            ZERO_ADDRESS,
+            ZERO_ADDRESS,
+            "1",
+            txDescription
+          )
+        : _sendToCosmosTx(
+            token.chainId,
+            ethSender || ZERO_ADDRESS,
+            "gravity192pktgwlmva8398sev649ryp04e3ygcvfy46xm",
+            token.address,
+            "1",
+            txDescription,
+            { direction: "in", amountFormatted: "" }
+          );
+    const { data, error } = await estimateGas(tx);
+    if (error) throw error;
+    return NO_ERROR({
+      method: BridgingMethod.GRAVITY_BRIDGE,
+      direction: "in",
+      gasFee: data,
+    });
+  } catch (err) {
+    return NEW_ERROR("getGravityBridgeInFees", err);
   }
 }
 async function getGravityBridgeOutFees(

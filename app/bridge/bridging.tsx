@@ -464,7 +464,7 @@ const formattedFeesForConfirmation = (
             : undefined;
 };
 
-function LoadingTextAnim() {
+export function LoadingTextAnim() {
   const [value, setValue] = useState("loading fees");
 
   useEffect(() => {

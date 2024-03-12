@@ -11,6 +11,8 @@ import { displayAmount, sortTokens } from "@/utils/formatting";
 import Input from "@/components/input/input";
 import Button from "@/components/button/button";
 import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
+import { LoadingTextAnim } from "../bridging";
+import { BridgingMethod } from "@/transactions/bridge";
 
 interface EthBridgeInProps {
   setEthBridgeIn: () => void;
@@ -27,6 +29,7 @@ const EthBridgeIn = ({ setEthBridgeIn }: EthBridgeInProps) => {
     txText,
     txStatus,
     onBridgeIn,
+    fees,
   } = useEthBridgeIn();
   const { isMobile } = useScreenSize();
 
@@ -136,7 +139,34 @@ const EthBridgeIn = ({ setEthBridgeIn }: EthBridgeInProps) => {
             </Container>
           </Container>
         </div>
-        <Spacer height="40px" />
+        <Spacer height="20px" />
+        <>
+          {fees.isLoading ? (
+            <LoadingTextAnim />
+          ) : (
+            <Text font="proto_mono" size="x-sm">
+              {txText === "bridge in" ? (
+                fees.error !== null ? (
+                  "error loading fees"
+                ) : fees.method === BridgingMethod.LAYER_ZERO ? (
+                  `Fee: ${displayAmount(fees.lzFee.amount, 18, {
+                    symbol: "ETH",
+                    maxSmallBalance: 0,
+                  })}`
+                ) : fees.method === BridgingMethod.GRAVITY_BRIDGE &&
+                  fees.direction === "in" ? (
+                  `Fee: ${displayAmount(fees.gasFee, 18, {
+                    symbol: "ETH",
+                  })}`
+                ) : (
+                  <Spacer height="20px" />
+                )
+              ) : (
+                <Spacer height="20px" />
+              )}
+            </Text>
+          )}
+        </>
         <Button width="fill" disabled={amountCheck.error} onClick={onBridgeIn}>
           {txStatus !== "none"
             ? txStatus

@@ -24,7 +24,7 @@ type FeeTier = {
 type GravityBridgeFees = {
   method: BridgingMethod.GRAVITY_BRIDGE;
 } & (
-  | { direction: "in" }
+  | { direction: "in"; gasFee: string }
   | {
       direction: "out";
       description: string;
