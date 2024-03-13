@@ -81,8 +81,8 @@ export async function getGravityBridgeFeesFromToken(
     // return fee tiers with USD prices
     return NO_ERROR({
       slow: feeTier(50000),
-      medium: feeTier(400000),
-      fast: feeTier(750000),
+      medium: feeTier(350000),
+      fast: feeTier(600000),
     });
   } catch (err) {
     return NEW_ERROR("getGravityBridgeFeesFromToken", err);

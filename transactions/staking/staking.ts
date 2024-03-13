@@ -20,8 +20,10 @@ import {
   TxCreatorFunctionReturn,
 } from "@/transactions/interfaces";
 import { isValidEthAddress } from "@/utils/address";
-import { TX_PARAM_ERRORS } from "@/config/consts/errors";
+import { TX_ERROR_TYPES, TX_PARAM_ERRORS } from "@/config/consts/errors";
 import { validateWeiUserInputTokenAmount } from "@/utils/math";
+import BigNumber from "bignumber.js";
+import { DELEGATE_FEE, UNDELEGATE_FEE, REDELEGATE_FEE, CLAIM_STAKING_REWARD_FEE } from "@/config/consts/fees";
 
 export async function stakingTx(
   txParams: StakingTransactionParams
@@ -188,15 +190,23 @@ export function validateStakingTxParams(
   // switch depending on tx type
   switch (txParams.txType) {
     case StakingTxTypes.DELEGATE:
+       // check if user has enough gas balance
+       if(BigNumber(txParams.nativeBalance).isLessThan(DELEGATE_FEE.amount)){
+        return { error: true, reason: TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_STAKING };
+      }
       // amount just has to be less than canto balance
       return validateWeiUserInputTokenAmount(
         txParams.amount,
         "1",
-        txParams.nativeBalance,
+        maxDelegateAmount(txParams.nativeBalance),
         "CANTO",
         18
       );
     case StakingTxTypes.UNDELEGATE:
+      // check if user has enough gas balance
+      if(BigNumber(txParams.nativeBalance).isLessThan(UNDELEGATE_FEE.amount)){
+        return { error: true, reason: TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_STAKING };
+      }
       // just need to make sure amount is less than user delegation balance
       return validateWeiUserInputTokenAmount(
         txParams.amount,
@@ -206,6 +216,10 @@ export function validateStakingTxParams(
         18
       );
     case StakingTxTypes.REDELEGATE: {
+       // check if user has enough gas balance
+       if(BigNumber(txParams.nativeBalance).isLessThan(REDELEGATE_FEE.amount)){
+        return { error: true, reason: TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_STAKING };
+      }
       //make sure newValidatorAddress is different than validatorAddress
       if (txParams.validator.operator_address == txParams.newValidatorAddress) {
         return { error: true, reason: "Same validator Addresses provided" };
@@ -223,9 +237,19 @@ export function validateStakingTxParams(
       );
     }
     case StakingTxTypes.CLAIM_REWARDS: {
+       // check if user has enough gas balance
+       if(BigNumber(txParams.nativeBalance).isLessThan(CLAIM_STAKING_REWARD_FEE.amount)){
+        return { error: true, reason: TX_ERROR_TYPES.NOT_ENOUGH_NATIVE_BALANCE_STAKING };
+      }
       return { error: false };
     }
     default:
       return { error: true, reason: "reason: tx type not found" };
   }
+}
+
+// function to get max delegate amount
+const maxDelegateAmount = (balance : string) => {
+  const updatedBalance  = BigNumber(balance).minus(DELEGATE_FEE.amount)
+  return updatedBalance.isNegative() ? "0" : updatedBalance.toString()
 }

@@ -385,9 +385,19 @@ function getStakingTransactionFlowData(
           18
         ),
         stakingNewValidator: stakingTxParams.newValidatorName,
+        stakingWalletBalance: displayAnalyticsAmount(
+          stakingTxParams.nativeBalance ?? "0",
+          18
+        ),
       };
     case StakingTxTypes.CLAIM_REWARDS:
-      return {};
+      return {
+        stakingDelegatedValidators: stakingTxParams.validatorAddresses,
+        stakingWalletBalance: displayAnalyticsAmount(
+          stakingTxParams.nativeBalance ?? "0",
+          18
+        ),
+      };
     default:
       return {};
   }
