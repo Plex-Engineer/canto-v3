@@ -99,6 +99,7 @@ export default function useBridgingFees({
       fromNetwork?.id,
       toNetwork?.id,
       direction,
+      ethSender,
     ],
     timeout: 1000,
   });
@@ -204,7 +205,7 @@ async function getGravityBridgeInFees(
         : _sendToCosmosTx(
             token.chainId,
             ethSender || ZERO_ADDRESS,
-            "gravity192pktgwlmva8398sev649ryp04e3ygcvfy46xm",
+            "gravity1",
             token.address,
             "1",
             txDescription,
