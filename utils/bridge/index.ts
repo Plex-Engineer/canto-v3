@@ -1,5 +1,6 @@
 import { tryFetch } from "../async";
 type BridgeTx = {
+  blockTimestamp: string;
   transactionHash: string;
   _sender: string;
   _destination: string;
@@ -7,7 +8,9 @@ type BridgeTx = {
   _tokenContract: string;
 };
 
-export async function getSendToCosmosEvents(ethAddress: string) {
+export async function getSendToCosmosEvents(
+  ethAddress: string
+): Promise<BridgeTx[]> {
   const { data, error } = await tryFetch<{
     data: { sendToCosmosEvents: BridgeTx[] };
   }>(

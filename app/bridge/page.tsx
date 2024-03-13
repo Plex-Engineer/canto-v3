@@ -9,25 +9,19 @@ import styles from "./bridge.module.scss";
 import useBridgingInProgess from "@/hooks/bridge/useBridgingInProgress";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 import EthBridgeIn from "./ethBridgeIn/BridgeIn";
-import { useEffect, useState } from "react";
-import { getSendToCosmosEvents } from "@/utils/bridge";
-import useCantoSigner from "@/hooks/helpers/useCantoSigner";
+import { useState } from "react";
+import useBridgeHistory from "@/hooks/bridge/useBridgeHistory";
+import BridgeHistory from "./components/bridgeHistory";
 
 export default function BridgePage() {
   const bridgeCombo = useBridgeCombo();
   const { Direction } = bridgeCombo;
-  const bridgeProgress = useBridgingInProgess();
+
   const { isMobile } = useScreenSize();
 
   const [ethBridgeIn, setEthBridgeIn] = useState(true);
 
-  const { signer } = useCantoSigner();
-  const [bridgeHistory, setBridgeHistory] = useState<any>(null);
-  useEffect(() => {
-    if (signer?.account.address) {
-      getSendToCosmosEvents(signer.account.address).then(setBridgeHistory);
-    }
-  }, [signer?.account.address]);
+  const bridgeHistory = useBridgeHistory();
 
   return (
     <>
@@ -74,23 +68,32 @@ export default function BridgePage() {
                 content: <Bridging key={"bridge-out"} props={bridgeCombo} />,
                 onClick: () => Direction.setDirection("out"),
               },
+              // {
+              //   title: "IN PROGRESS",
+              //   extraTitle:
+              //     bridgeProgress.inProgressTxs.pending.length > 0 ? (
+              //       <div className={styles.notification}>
+              //         {bridgeProgress.inProgressTxs.pending.length.toString()}
+              //       </div>
+              //     ) : null,
+              //   content: (
+              //     <BridgeInProgress
+              //       key={"in-progress"}
+              //       txs={bridgeProgress.inProgressTxs}
+              //       clearTxs={bridgeProgress.clearTxs}
+              //       setTxBridgeStatus={bridgeProgress.setTxBridgeStatus}
+              //     />
+              //   ),
+              //   hideOnMobile: true,
+              // },
               {
-                title: "IN PROGRESS",
-                extraTitle:
-                  bridgeProgress.inProgressTxs.pending.length > 0 ? (
-                    <div className={styles.notification}>
-                      {bridgeProgress.inProgressTxs.pending.length.toString()}
-                    </div>
-                  ) : null,
+                title: "HISTORY",
                 content: (
-                  <BridgeInProgress
-                    key={"in-progress"}
-                    txs={bridgeProgress.inProgressTxs}
-                    clearTxs={bridgeProgress.clearTxs}
-                    setTxBridgeStatus={bridgeProgress.setTxBridgeStatus}
+                  <BridgeHistory
+                    key={"history"}
+                    txList={bridgeHistory?.txList ?? []}
                   />
                 ),
-                hideOnMobile: true,
               },
             ]}
           />
