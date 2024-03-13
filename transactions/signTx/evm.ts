@@ -11,7 +11,7 @@ import { newContractInstance } from "@/utils/evm";
 import { percentOfAmount } from "@/utils/math";
 import { asyncCallWithTimeout } from "@/utils/async";
 import { BaseError } from "viem";
-import { TransactionReceipt } from "web3";
+import { BaseWeb3Error, TransactionReceipt } from "web3";
 import { WalletClient } from "wagmi";
 
 /**
@@ -73,6 +73,9 @@ export async function signEVMTransaction(
 
     return NO_ERROR(transaction.transactionHash as `0x${string}`);
   } catch (err) {
+    if (err instanceof BaseWeb3Error) {
+      return NEW_ERROR("performEVMTransaction", err.toJSON().innerError);
+    }
     if (err instanceof BaseError) {
       console.log(err.shortMessage);
       return NEW_ERROR("performEVMTransaction::" + err.shortMessage);
