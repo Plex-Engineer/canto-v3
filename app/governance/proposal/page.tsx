@@ -281,6 +281,11 @@ export default function Page() {
               </div>
             </div>
           )}
+          {isActive && (
+            <div>
+              <Spacer height="20px" />
+            </div>
+          )}
 
           <div className={styles.graphContainer}>
             <VoteBarGraph
@@ -292,10 +297,12 @@ export default function Page() {
               isMobile={isMobile}
             />
           </div>
+        </div>
+        {isMobile && (
           <div>
             <Spacer height="20px" />
           </div>
-        </div>
+        )}
         <div
           className={styles.proposalCardContainer2}
           style={{
@@ -401,6 +408,11 @@ export default function Page() {
           </div>
         </div>
       </div>
+      {!isMobile && (
+        <div>
+          <Spacer height="30px" />
+        </div>
+      )}
     </div>
   );
 }
