@@ -145,7 +145,7 @@ const EthBridgeIn = ({ setEthBridgeIn }: EthBridgeInProps) => {
             <LoadingTextAnim />
           ) : (
             <Text font="proto_mono" size="x-sm">
-              {txText === "bridge in" ? (
+              {txText === "bridge in" && selectedToken?.balance !== "0" ? (
                 fees.error !== null ? (
                   "error loading fees"
                 ) : fees.method === BridgingMethod.LAYER_ZERO ? (

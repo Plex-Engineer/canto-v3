@@ -73,7 +73,7 @@ export default function useBridgingFees({
     callback: () => {
       async function fetchFees() {
         // get fees
-        const { data: fees, error } = await getFees({
+        const { data: fees, error: feeError } = await getFees({
           direction,
           token,
           method,
@@ -83,10 +83,10 @@ export default function useBridgingFees({
         });
 
         // set error or fees
-        if (error) {
-          setError(error.message);
+        if (feeError) {
+          setError(() => feeError.message);
         } else {
-          setFees(fees);
+          setFees(() => fees);
         }
         // stop loading
         setIsLoading(false);
