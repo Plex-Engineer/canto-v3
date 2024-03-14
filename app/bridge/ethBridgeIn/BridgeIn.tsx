@@ -11,8 +11,9 @@ import { displayAmount, sortTokens } from "@/utils/formatting";
 import Input from "@/components/input/input";
 import Button from "@/components/button/button";
 import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
-import { LoadingTextAnim } from "../bridging";
 import { BridgingMethod } from "@/transactions/bridge";
+import { LoadingTextAnim } from "@/components/loadingText/loadingText";
+import { useMemo } from "react";
 
 interface EthBridgeInProps {
   setEthBridgeIn: () => void;
@@ -40,6 +41,8 @@ const EthBridgeIn = ({ setEthBridgeIn }: EthBridgeInProps) => {
     selectedToken?.symbol ?? "",
     selectedToken?.decimals ?? 0
   );
+
+  const txInProgress = useMemo(() => txStatus !== "none", [txStatus]);
 
   return (
     <>
@@ -142,7 +145,7 @@ const EthBridgeIn = ({ setEthBridgeIn }: EthBridgeInProps) => {
         <Spacer height="20px" />
         <>
           {fees.isLoading ? (
-            <LoadingTextAnim />
+            <LoadingTextAnim text="loading fees" />
           ) : (
             <Text font="proto_mono" size="x-sm">
               {txText === "bridge in" && selectedToken?.balance !== "0" ? (
@@ -167,8 +170,14 @@ const EthBridgeIn = ({ setEthBridgeIn }: EthBridgeInProps) => {
             </Text>
           )}
         </>
-        <Button width="fill" disabled={amountCheck.error} onClick={onBridgeIn}>
-          {txStatus !== "none"
+        <Button
+          width="fill"
+          disabled={amountCheck.error || txInProgress}
+          onClick={onBridgeIn}
+          isLoading={txInProgress}
+          color="primary"
+        >
+          {txInProgress
             ? txStatus
             : amountCheck.error && amount !== "0"
               ? amountCheck.reason

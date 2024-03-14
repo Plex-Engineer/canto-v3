@@ -21,6 +21,7 @@ import GravityConfirmationModal from "./components/gravityConfirmationModal";
 import { GRAVITY_BRIDGE } from "@/config/networks";
 import { TX_ERROR_TYPES } from "@/config/consts/errors";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
+import { LoadingTextAnim } from "@/components/loadingText/loadingText";
 
 const Bridging = ({
   props,
@@ -464,26 +465,6 @@ const formattedFeesForConfirmation = (
             : undefined;
 };
 
-export function LoadingTextAnim() {
-  const [value, setValue] = useState("loading fees");
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (value === "loading fees...") {
-        setValue("loading fees");
-      } else {
-        setValue(value + ".");
-      }
-    }, 200);
-    return () => clearInterval(interval);
-  });
-  return (
-    <Text font="proto_mono" size="x-sm" className={styles.blink}>
-      {value}
-    </Text>
-  );
-}
-
 // props are return type of useBridgingFees
 const FeesSection = ({
   props,
@@ -501,7 +482,7 @@ const FeesSection = ({
   notEnoughNativeBalance: boolean;
 }) => {
   return props.isLoading ? (
-    <LoadingTextAnim />
+    <LoadingTextAnim text="loading fees" />
   ) : props.error !== null ? (
     <Text font="proto_mono" size="x-sm">
       error loading fees {props.error}

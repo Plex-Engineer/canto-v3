@@ -65,8 +65,8 @@ const txText = (txType: TxType) => {
 // success and error will be dealt with in the toast, button state is either ready or confirming
 enum TxStatus {
   NONE = "none",
-  SIGNING = "signing...",
-  CONFIRMING = "confirming...",
+  SIGNING = "signing",
+  CONFIRMING = "confirming",
 }
 
 export default function useEthBridgeIn() {

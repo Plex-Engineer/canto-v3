@@ -210,10 +210,10 @@ const Button = (props: ButtonProps) => {
           style={{
             filter:
               props.color == "primary"
-                ? "invert(var(--light-mode))"
+                ? "invert(var(--dark-mode))"
                 : props.color == "accent"
                   ? "invert(0)"
-                  : "invert(var(--dark-mode))",
+                  : "invert(var(--light-mode))",
           }}
           alt="icon"
           width={props.icon.size || 16}
