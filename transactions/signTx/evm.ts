@@ -3,6 +3,7 @@ import {
   getWalletClient,
   switchNetwork,
   getNetwork,
+  fetchFeeData,
 } from "wagmi/actions";
 import { Transaction } from "../interfaces";
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
@@ -59,15 +60,22 @@ export async function signEVMTransaction(
     // make sure gas is at least base limit (21,000), then over estimate by 50%
     const { data: gasLimit, error: gasError } = percentOfAmount(
       gasEstimate < 21000 ? "21000" : gasEstimate.toString(),
-      165
+      125
     );
     if (gasError) throw gasError;
 
-    const transaction = await contractInstance.methods[tx.method](...(tx.params as [])).send({
+    const { maxPriorityFeePerGas } = await fetchFeeData({
+      chainId: tx.chainId,
+    });
+
+    const transaction = await contractInstance.methods[tx.method](
+      ...(tx.params as [])
+    ).send({
       from: tx.fromAddress,
       value: tx.value,
       gas: gasLimit,
-    })
+      maxPriorityFeePerGas: maxPriorityFeePerGas?.toString(),
+    });
     if (!transaction.transactionHash)
       throw new Error("performEVMTransaction: no tx hash");
 
