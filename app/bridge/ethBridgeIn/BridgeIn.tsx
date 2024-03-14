@@ -57,7 +57,10 @@ const EthBridgeIn = ({ setEthBridgeIn }: EthBridgeInProps) => {
             />
             <Text>{fromNetwork.name}</Text>
           </div>
-          <div className={ethStyles.dot}></div>
+          {/* <div className={ethStyles.dot} /> */}
+
+          <div className={ethStyles["dot-flashing"]} />
+
           <div className={ethStyles.networkIcon}>
             <Image
               src={toNetwork.icon}
