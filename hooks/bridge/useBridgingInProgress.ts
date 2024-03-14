@@ -33,10 +33,11 @@ export default function useBridgingInProgess() {
             tx.tx.bridge &&
             tx.tx.bridge.showInProgress
           ) {
-            tx.tx.bridge.lastStatus === "PENDING" ||
-            tx.tx.bridge.lastStatus === "NONE"
-              ? pendingTxs.push({ ...tx, txIndex: idx, flowId: flow.id })
-              : completedTxs.push({ ...tx, txIndex: idx, flowId: flow.id });
+            if (tx.tx.bridge.lastStatus === "PENDING") {
+              pendingTxs.push({ ...tx, txIndex: idx, flowId: flow.id });
+            } else if (tx.tx.bridge.lastStatus === "SUCCESS") {
+              completedTxs.push({ ...tx, txIndex: idx, flowId: flow.id });
+            }
           }
         });
       }
