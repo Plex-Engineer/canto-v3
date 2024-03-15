@@ -47,4 +47,5 @@ export enum TX_ERROR_TYPES {
   NOT_ENOUGH_NATIVE_BALANCE_LZ = "Not enough native tokens for Layer Zero fee",
   NOT_ENOUGH_NATIVE_BALANCE_GRAVITY_BRIDGE = "Not enough native balance for Gravity Bridge fee",
   NOT_ENOUGH_NATIVE_BALANCE_IBC = "Not enough native balance for IBC fee",
+  NOT_ENOUGH_NATIVE_BALANCE_STAKING = "Not enough native balance for Staking transaction fee",
 }
