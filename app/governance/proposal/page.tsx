@@ -28,6 +28,8 @@ import useStaking from "@/hooks/staking/useStaking";
 import { VoteBarGraph } from "../components/votingChart/voteGraph";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 import Container from "@/components/container/container";
+import useUserStaking from "@/hooks/staking/userStaking";
+import { formatBalance } from "@/utils/formatting";
 
 const VOTE_OPTION_COLORS = {
   [VoteOption.YES]: [
@@ -56,10 +58,21 @@ export default function Page() {
     chainId: chainId,
   });
 
-  const { userStaking } = useStaking({
+  // const { userStaking } = useStaking({
+  //   chainId: chainId,
+  //   userEthAddress: signer?.account.address,
+  // });
+  const userData = useUserStaking({
     chainId: chainId,
     userEthAddress: signer?.account.address,
   });
+  const totalStakedAmount =
+    userData.userStaking && userData?.userStaking.length > 0
+      ? userData?.userStaking.reduce((totalStaked: number, entry) => {
+          const balanceAsInt: number = Number(formatBalance(entry.balance, 18));
+          return totalStaked + balanceAsInt;
+        }, 0)
+      : 0;
   const { isMobile } = useScreenSize();
   // transaction
   function castVote(proposalId: number, voteOption: VoteOption | null) {
@@ -261,7 +274,11 @@ export default function Page() {
                   <div className={styles.VotingButton}>
                     <Button
                       width={200}
-                      disabled={!isActive || selectedVote == null}
+                      disabled={
+                        !isActive ||
+                        selectedVote == null ||
+                        totalStakedAmount <= 0
+                      }
                       onClick={() =>
                         castVote(proposal.proposal_id, selectedVote)
                       }
@@ -387,9 +404,15 @@ export default function Page() {
                   <div className={styles.circle} />
                 </div>
                 <div className={styles.txt}>
-                  <Text font="rm_mono" size={isMobile ? "md" : "x-sm"}>
-                    Voting Ended on{" "}
-                  </Text>
+                  {isActive ? (
+                    <Text font="rm_mono" size={isMobile ? "md" : "x-sm"}>
+                      Voting closes at{" "}
+                    </Text>
+                  ) : (
+                    <Text font="rm_mono" size={isMobile ? "md" : "x-sm"}>
+                      Voting Ended on{" "}
+                    </Text>
+                  )}
                 </div>
                 <div>
                   <Text font="rm_mono" size={isMobile ? "md" : "x-sm"}>

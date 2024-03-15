@@ -4,12 +4,11 @@ import {
   StakingHookInputParams,
   UserStakingHookReturn,
 } from "./interfaces/hookParams";
-import { ValidatorWithDelegations } from "./interfaces/validators";
 
 export default function useUserStaking(
   params: StakingHookInputParams,
   options?: { refetchInterval?: number }
-): UserStakingHookReturn | undefined {
+): UserStakingHookReturn {
   const { data: staking, isLoading } = useQuery(
     ["staking", params.chainId, params.userEthAddress],
     async () => {
@@ -17,16 +16,11 @@ export default function useUserStaking(
         getAllUserStakingData(params.chainId, params.userEthAddress),
       ]);
 
-      // check if all validators error
-      //if (allValidators.error) throw allValidators.error;
-
-      // if user staking data error, return all validators only
       if (userStaking.error) {
         return {
           userStaking: [],
         };
       }
-      // combine user delegation data with validator data
       const userValidators: {
         validator_address: string;
         balance: string;
@@ -39,10 +33,6 @@ export default function useUserStaking(
         userStaking.data.delegations.length > 0
       ) {
         userStaking.data.delegations.forEach((delegation) => {
-          // const validator = allValidators.data.find(
-          //   (val) =>
-          //     val.operator_address === delegation.delegation.validator_address
-          // );
           const rewards =
             userStaking.data.rewards.rewards
               .find(
@@ -68,5 +58,5 @@ export default function useUserStaking(
       },
     }
   );
-  return staking;
+  return staking ? staking : { userStaking: [] };
 }
