@@ -30,3 +30,11 @@ export interface StakingHookReturn {
     cantoBalance: string;
   };
 }
+
+export interface UserStakingHookReturn {
+  userStaking: {
+    validator_address: string;
+    balance: string;
+    rewards: string;
+  }[];
+}
