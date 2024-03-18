@@ -76,10 +76,6 @@ export async function signEVMTransaction(
     if (err instanceof BaseWeb3Error && err.toJSON().innerError) {
       return NEW_ERROR("performEVMTransaction", err.toJSON().innerError);
     }
-    if (err instanceof BaseError) {
-      console.log(err.shortMessage);
-      return NEW_ERROR("performEVMTransaction", err);
-    }
     return NEW_ERROR("performEVMTransaction", err);
   }
 }
