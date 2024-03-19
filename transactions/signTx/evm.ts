@@ -73,12 +73,8 @@ export async function signEVMTransaction(
 
     return NO_ERROR(transaction.transactionHash as `0x${string}`);
   } catch (err) {
-    if (err instanceof BaseWeb3Error) {
+    if (err instanceof BaseWeb3Error && err.toJSON().innerError) {
       return NEW_ERROR("performEVMTransaction", err.toJSON().innerError);
-    }
-    if (err instanceof BaseError) {
-      console.log(err.shortMessage);
-      return NEW_ERROR("performEVMTransaction::" + err.shortMessage);
     }
     return NEW_ERROR("performEVMTransaction", err);
   }
