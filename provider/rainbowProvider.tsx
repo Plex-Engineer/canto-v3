@@ -73,13 +73,7 @@ export const wagmiConfig = getDefaultConfig({
     },
     {
       groupName: "Other",
-      wallets: [
-        safeWallet,
-        coinbaseWallet,
-        okxWallet,
-        rabbyWallet,
-        rainbowWallet,
-      ],
+      wallets: [safeWallet, okxWallet, rabbyWallet],
     },
   ],
   chains: chains as any,
