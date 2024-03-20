@@ -9,6 +9,7 @@ import { checkTokenAllowance, isOFTToken } from "@/utils/tokens";
 import {
   GRAVITY_BRIDGE_ETH_ADDRESSES,
   MAX_UINT256,
+  USDT_ETH_MAINNET_ADDRESS,
   ZERO_ADDRESS,
 } from "@/config/consts/addresses";
 import { greaterThan } from "@/utils/math";
@@ -21,12 +22,17 @@ import {
   _sendEthToCosmosTx,
   _sendToCosmosTx,
 } from "@/transactions/bridge/gravityBridge/txCreators";
-import { checkCantoPubKey, ethToCantoAddress } from "@/utils/address";
+import {
+  areEqualAddresses,
+  checkCantoPubKey,
+  ethToCantoAddress,
+} from "@/utils/address";
 import { generateCantoPublicKeyWithTx } from "@/transactions/cosmos/publicKey";
 import { useToast } from "@/components/toast";
 import useBridgingFees from "@/hooks/bridge/useBridgingFees";
 import { BridgingMethod } from "@/transactions/bridge";
 import { BridgeToken } from "@/hooks/bridge/interfaces/tokens";
+import BigNumber from "bignumber.js";
 
 // constants
 const fromNetwork = ETH_MAINNET;
@@ -38,8 +44,10 @@ const availableTokens =
 
 // possible transactions to make
 enum TxType {
+  CONNECT_WALLET,
   LOADING,
   GEN_PUB_KEY,
+  RESET_USDT_ALLOWANCE,
   APPROVE,
   SEND_TO_COSMOS,
   SEND_ETH_TO_COSMOS,
@@ -48,8 +56,12 @@ enum TxType {
 
 const txText = (txType: TxType) => {
   switch (txType) {
+    case TxType.CONNECT_WALLET:
+      return "connect wallet";
     case TxType.GEN_PUB_KEY:
-      return "generate public key";
+      return "create canto account";
+    case TxType.RESET_USDT_ALLOWANCE:
+      return "reset usdt allowance";
     case TxType.APPROVE:
       return "approve token";
     case TxType.SEND_TO_COSMOS:
@@ -170,6 +182,8 @@ export default function useEthBridgeIn() {
 
   // current tx type
   const txType = useMemo(() => {
+    // no signer
+    if (!signer) return TxType.CONNECT_WALLET;
     // no token
     if (!selectedToken) return TxType.LOADING;
     // oft token
@@ -183,11 +197,18 @@ export default function useEthBridgeIn() {
     if (
       greaterThan(bnAmount, currentTokenAllowance ?? "0") ||
       currentTokenAllowance === "0"
-    )
+    ) {
+      // check if USDT and needs to reset allowance
+      if (
+        areEqualAddresses(selectedToken.address, USDT_ETH_MAINNET_ADDRESS) &&
+        !BigNumber(currentTokenAllowance ?? "0").isZero()
+      )
+        return TxType.RESET_USDT_ALLOWANCE;
       return TxType.APPROVE;
+    }
     // gbridge token ready to send
     return TxType.SEND_TO_COSMOS;
-  }, [selectedToken, bnAmount, currentTokenAllowance, hasPubKey]);
+  }, [selectedToken, bnAmount, currentTokenAllowance, hasPubKey, signer]);
 
   // Toast for tx status
   const toast = useToast();
@@ -205,6 +226,18 @@ export default function useEthBridgeIn() {
       let tx: Transaction;
       const txDescription = { title: "", description: "" };
       switch (txType) {
+        case TxType.RESET_USDT_ALLOWANCE: {
+          // usdt requires approval to be reset to 0 before setting a new allowance
+          tx = _approveTx(
+            fromNetwork.chainId,
+            signer.account.address,
+            selectedToken.address,
+            GRAVITY_BRIDGE_ETH_ADDRESSES.gravityBridge,
+            "0",
+            txDescription
+          );
+          break;
+        }
         case TxType.APPROVE: {
           tx = _approveTx(
             fromNetwork.chainId,
