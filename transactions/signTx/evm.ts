@@ -1,4 +1,5 @@
 import { getAccount, getWalletClient, switchChain } from "@wagmi/core";
+import { estimateGas as wagmiEstimateGas } from "@wagmi/core";
 import { Transaction } from "../interfaces";
 import { NEW_ERROR, NO_ERROR, PromiseWithError } from "@/config/interfaces";
 import { TX_SIGN_ERRORS } from "@/config/consts/errors";
@@ -47,12 +48,13 @@ export async function signEVMTransaction(
     if (contractError) throw contractError;
 
     // estimate gas so that metamask can show gas fee
-    const gasEstimate = await contractInstance.methods[tx.method](
-      ...(tx.params as [])
-    ).estimateGas({
-      from: tx.fromAddress,
-      value: tx.value,
-    });
+    const gasEstimate = await wagmiEstimateGas(wagmiConfig, {
+      account:  tx.fromAddress,
+      to: tx.target as `0x${string}`,
+      data: contractInstance.methods[tx.method](...(tx.params as [])).encodeABI() as `0x${string}`,
+      value: BigInt(tx.value),
+      chainId: tx.chainId,
+    })
     // make sure gas is at least base limit (21,000), then over estimate by 50%
     const { data: gasLimit, error: gasError } = percentOfAmount(
       gasEstimate < 21000 ? "21000" : gasEstimate.toString(),
