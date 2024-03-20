@@ -68,12 +68,15 @@ export const wagmiConfig = getDefaultConfig({
   projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID as string,
   wallets: [
     {
-      groupName: "Recommended",
-      wallets: [injectedWallet, metaMaskWallet, walletConnectWallet],
-    },
-    {
-      groupName: "Other",
-      wallets: [safeWallet, okxWallet, rabbyWallet],
+      groupName: "Wallets",
+      wallets: [
+        injectedWallet,
+        metaMaskWallet,
+        walletConnectWallet,
+        safeWallet,
+        okxWallet,
+        rabbyWallet,
+      ],
     },
   ],
   chains: chains as any,
