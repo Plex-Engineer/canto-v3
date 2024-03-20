@@ -5,13 +5,26 @@ import {
   RainbowKitProvider,
   getDefaultConfig,
   Chain,
+  connectorsForWallets,
 } from "@rainbow-me/rainbowkit";
-import { useChainId, WagmiProvider } from "wagmi";
+import {
+  injectedWallet,
+  safeWallet,
+  coinbaseWallet,
+  metaMaskWallet,
+  okxWallet,
+  rabbyWallet,
+  rainbowWallet,
+  walletConnectWallet,
+} from "@rainbow-me/rainbowkit/wallets";
+import { createConfig, useChainId, WagmiProvider } from "wagmi";
 import * as EVM_CHAINS from "@/config/networks/evm";
 import { cantoTheme } from "./util";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { getNetworkInfoFromChainId } from "@/utils/networks";
+import { mainnet } from "viem/chains";
+import { defineChain, http } from "viem";
 
 const chains = [...Object.values(EVM_CHAINS)].map((network) => {
   const contractInfo = network.multicall3Address
@@ -20,6 +33,7 @@ const chains = [...Object.values(EVM_CHAINS)].map((network) => {
       }
     : {};
   return {
+    ...network,
     id: Number(network.chainId),
     iconUrl: network.icon,
     name: network.name,
@@ -49,6 +63,28 @@ const chains = [...Object.values(EVM_CHAINS)].map((network) => {
   } as const satisfies Chain;
 });
 
+export const wagmiConfig = getDefaultConfig({
+  appName: "Canto v3",
+  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID as string,
+  wallets: [
+    {
+      groupName: "Recommended",
+      wallets: [injectedWallet, metaMaskWallet, walletConnectWallet],
+    },
+    {
+      groupName: "Other",
+      wallets: [
+        safeWallet,
+        coinbaseWallet,
+        okxWallet,
+        rabbyWallet,
+        rainbowWallet,
+      ],
+    },
+  ],
+  chains: chains as any,
+});
+
 // const wagmiConfig = createConfig({
 //   autoConnect: true,
 //   connectors: [
@@ -64,11 +100,6 @@ const chains = [...Object.values(EVM_CHAINS)].map((network) => {
 //   publicClient,
 // });
 
-export const wagmiConfig = getDefaultConfig({
-  appName: "Canto v3",
-  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID as string,
-  chains: chains as any,
-});
 const queryClient = new QueryClient();
 
 const CustomAvatar: AvatarComponent = ({ ensImage }) => {
