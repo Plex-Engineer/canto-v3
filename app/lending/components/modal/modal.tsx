@@ -248,74 +248,85 @@ export const LendingModal = (props: Props) => {
       : {};
 
     return (
-      <div className={styles.content} key={cToken.address + isSupplyModal}>
-        <Spacer height="20px" />
-        <Image
-          src={cToken.underlying.logoURI}
-          width={50}
-          height={50}
-          alt={"Transaction"}
-        />
-        <Spacer height="10px" />
-
-        <Text font="proto_mono" size="lg">
-          {cToken.underlying.symbol}
-        </Text>
-        <Spacer height="20px" />
-
-        <Amount
-          decimals={cToken.underlying.decimals}
-          value={amount}
-          onChange={(val, wasMax) => {
-            wasMax ? setMaxClicked(true) : setMaxClicked(false);
-            setAmount(val.target.value);
-          }}
-          IconUrl={cToken.underlying.logoURI}
-          title={cToken.underlying.symbol}
-          max={maxAmount}
-          maxName="Lending Market Modal"
-          min="1"
-          symbol={cToken.underlying.symbol}
-          {...limitProps}
-          extraNode={
-            limits ? (
-              <BorrowLimits
-                maxBorrow={maxAmount}
-                currentAmount={amount}
-                setAmount={setAmount}
-                limits={limits}
-                decimals={cToken.underlying.decimals}
-              />
-            ) : undefined
-          }
-        />
-        <Spacer height="20px" />
-
-        <Container width="100%" gap={20}>
-          <APRs
-            cToken={cToken}
-            isSupply={isSupplyModal}
-            transaction={transaction}
-          />
-          <Balances
-            cToken={cToken}
-            isSupply={isSupplyModal}
-            liquidityLeft={position.liquidity}
-          />
-        </Container>
-        <div
-          style={{
-            width: "100%",
-          }}
-        >
+      <div>
+        <div className={styles.content} key={cToken.address + isSupplyModal}>
           <Spacer height="20px" />
-          <Button
-            width={"fill"}
-            disabled={paramCheck.error}
-            onClick={() => transaction.performTx(...txParams)}
+
+          <Image
+            src={cToken.underlying.logoURI}
+            width={50}
+            height={50}
+            alt={"Transaction"}
+          />
+          <Spacer height="10px" />
+
+          <Text font="proto_mono" size="lg">
+            {cToken.underlying.symbol}
+          </Text>
+          <Spacer height="20px" />
+
+          <Amount
+            decimals={cToken.underlying.decimals}
+            value={amount}
+            onChange={(val, wasMax) => {
+              wasMax ? setMaxClicked(true) : setMaxClicked(false);
+              setAmount(val.target.value);
+            }}
+            IconUrl={cToken.underlying.logoURI}
+            title={cToken.underlying.symbol}
+            max={maxAmount}
+            maxName="Lending Market Modal"
+            min="1"
+            symbol={cToken.underlying.symbol}
+            {...limitProps}
+            extraNode={
+              limits ? (
+                <BorrowLimits
+                  maxBorrow={maxAmount}
+                  currentAmount={amount}
+                  setAmount={setAmount}
+                  limits={limits}
+                  decimals={cToken.underlying.decimals}
+                />
+              ) : undefined
+            }
+          />
+          <Spacer height="20px" />
+
+          <div style={{ height: "150px", width: "100%" }}>
+            <Container
+              width="100%"
+              gap={20}
+              style={{ overflowY: "auto" }}
+              height="100%"
+            >
+              <APRs
+                cToken={cToken}
+                isSupply={isSupplyModal}
+                transaction={transaction}
+              />
+              <Balances
+                cToken={cToken}
+                isSupply={isSupplyModal}
+                liquidityLeft={position.liquidity}
+              />
+            </Container>
+          </div>
+          <div
+            style={{
+              width: "100%",
+              position: "sticky",
+            }}
           >
-            CONFIRM
-          </Button>
+            <Spacer height="20px" />
+            <Button
+              width={"fill"}
+              disabled={paramCheck.error}
+              onClick={() => transaction.performTx(...txParams)}
+            >
+              CONFIRM
+            </Button>
+          </div>
         </div>
       </div>
     );
