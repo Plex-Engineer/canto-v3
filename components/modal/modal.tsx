@@ -89,7 +89,7 @@ const Modal = ({
           )}
           <div
             className={styles.body}
-            style={{ maxHeight: "calc(100vh - 120px)", overflowY: "auto" }}
+            //style={{ maxHeight: "calc(100vh - 120px)", overflowY: "auto" }}
           >
             {children}
           </div>
