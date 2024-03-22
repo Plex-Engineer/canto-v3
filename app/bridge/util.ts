@@ -13,6 +13,7 @@ import { convertToBigNumber } from "@/utils/formatting";
 import { connectToKeplr } from "@/utils/keplr";
 import { percentOfAmount, validateWeiUserInputTokenAmount } from "@/utils/math";
 import { getNetworkInfoFromChainId, isCosmosNetwork } from "@/utils/networks";
+import { isOFTToken } from "@/utils/tokens";
 import BigNumber from "bignumber.js";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -226,7 +227,14 @@ export default function useBridgeCombo(): BridgeComboReturn {
     // validate amount
     const amountCheck = validateWeiUserInputTokenAmount(
       amountAsBigNumberString,
-      "1",
+      isOFTToken(bridge.selections.token)
+        ? BigNumber(10)
+            .pow(
+              bridge.selections.token.decimals -
+                bridge.selections.token.sharedDecimals
+            )
+            .toString()
+        : "1",
       maxBridgeAmount,
       bridge.selections.token?.symbol ?? "",
       bridge.selections.token?.decimals ?? 0

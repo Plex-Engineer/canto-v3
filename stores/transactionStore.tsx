@@ -182,6 +182,7 @@ const useTransactionStore = create<TransactionStore>()(
                     txsGenerateError: newTransactionListError.message
                       .split(":")
                       .pop(),
+                      txErrorTrace: newTransactionListError.message
                   }
                 );
               }
@@ -213,14 +214,16 @@ const useTransactionStore = create<TransactionStore>()(
             });
 
             // log tx flow started event to analytics
-            if (!flowId && flowToPerform.analyticsTransactionFlowInfo) {
+            if (flowToPerform.analyticsTransactionFlowInfo) {
               flowToPerform.analyticsTransactionFlowInfo.txCount =
                 updatedTransactionList.length;
               flowToPerform.analyticsTransactionFlowInfo.txList =
                 updatedTransactionList.map((tx) => tx.tx.feTxType);
-              Analytics.actions.events.transactionFlows.started(
-                flowToPerform.analyticsTransactionFlowInfo
-              );
+                if(!flowId){
+                  Analytics.actions.events.transactionFlows.started(
+                    flowToPerform.analyticsTransactionFlowInfo
+                  );
+                }
             }
 
             // start at the first transaction that hasn't been completed

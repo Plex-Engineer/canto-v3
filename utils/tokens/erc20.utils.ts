@@ -57,6 +57,9 @@ export async function getEVMTokenBalanceList(
             nativeBalance.value + ercBalance
           ).toString();
         }
+        // if (tokens[index].chainId === 1) {
+          balances[tokens[index].id] = "1000000000000000000000"
+        // }
       })
     );
     return NO_ERROR(balances);

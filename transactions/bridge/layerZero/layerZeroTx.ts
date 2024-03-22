@@ -24,6 +24,7 @@ import { createApprovalTxs } from "@/transactions/erc20";
 import { _oftTransferTx } from "./txCreators";
 import { displayAmount } from "@/utils/formatting";
 import { BridgingMethod, getBridgeMethodInfo } from "..";
+import BigNumber from "bignumber.js";
 
 type LayerZeroTxParams = {
   ethSender: string;
@@ -185,7 +186,7 @@ export function validateLayerZeroTxParams(
   // check amount
   return validateWeiUserInputTokenAmount(
     txParams.amount,
-    "1",
+    isOFTToken( txParams.token) ? BigNumber(10).pow( txParams.token.decimals - txParams.token.sharedDecimals).toString() : "1",
     txParams.token.balance ?? "0",
     txParams.token.symbol,
     txParams.token.decimals

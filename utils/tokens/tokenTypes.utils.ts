@@ -62,6 +62,7 @@ export function isOFTToken(object: any): object is OFTToken {
     isERC20Token(object) &&
     "isOFTProxy" in object &&
     "isOFT" in object &&
+    "sharedDecimals" in object &&
     object.isOFT === true
   );
 }
