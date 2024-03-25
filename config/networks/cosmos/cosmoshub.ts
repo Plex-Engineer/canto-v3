@@ -15,7 +15,8 @@ export const COSMOS_HUB: CosmosNetwork = {
   isTestChain: false,
   rpcUrl:
     "https://cosmos.blockpi.network/rpc/v1/4f6362319a874ebfd2fcabb3b5d54a8549104b26",
-  restEndpoint: "https://rest-cosmoshub.ecostake.com",
+  restEndpoint:
+    "https://cosmos.blockpi.network/lcd/v1/4f6362319a874ebfd2fcabb3b5d54a8549104b26",
   addressPrefix: "cosmos",
   checkAddress: function (address) {
     return checkCosmosAddress(this.addressPrefix)(address);
