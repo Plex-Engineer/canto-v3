@@ -17,6 +17,7 @@ export const COSMOS_HUB: CosmosNetwork = {
     "https://cosmos.blockpi.network/rpc/v1/4f6362319a874ebfd2fcabb3b5d54a8549104b26",
   restEndpoint:
     "https://cosmos.blockpi.network/lcd/v1/4f6362319a874ebfd2fcabb3b5d54a8549104b26",
+  latestBlockEndpoint: "/cosmos/base/tendermint/v1beta1",
   addressPrefix: "cosmos",
   checkAddress: function (address) {
     return checkCosmosAddress(this.addressPrefix)(address);
