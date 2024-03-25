@@ -22,6 +22,8 @@ import { GRAVITY_BRIDGE } from "@/config/networks";
 import { TX_ERROR_TYPES } from "@/config/consts/errors";
 import useScreenSize from "@/hooks/helpers/useScreenSize";
 import { LoadingTextAnim } from "@/components/loadingText/loadingText";
+import { isOFTToken } from "@/utils/tokens";
+import BigNumber from "bignumber.js";
 
 const Bridging = ({
   props,
@@ -293,7 +295,13 @@ const Bridging = ({
                   type="amount"
                   height={64}
                   balance={token?.balance ?? "0"}
-                  tokenMin="0"
+                  tokenMin={
+                    isOFTToken(token)
+                      ? BigNumber(10)
+                          .pow(token.decimals - token.sharedDecimals)
+                          .toString()
+                      : "0"
+                  }
                   tokenMax={Amount.maxBridgeAmount}
                   decimals={token?.decimals ?? 0}
                   placeholder="0.0"

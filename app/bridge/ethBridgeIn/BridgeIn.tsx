@@ -14,6 +14,8 @@ import { validateNonWeiUserInputTokenAmount } from "@/utils/math";
 import { BridgingMethod } from "@/transactions/bridge";
 import { LoadingTextAnim } from "@/components/loadingText/loadingText";
 import { useMemo } from "react";
+import { isOFTToken } from "@/utils/tokens";
+import BigNumber from "bignumber.js";
 
 interface EthBridgeInProps {
   setEthBridgeIn: () => void;
@@ -36,7 +38,11 @@ const EthBridgeIn = ({ setEthBridgeIn }: EthBridgeInProps) => {
 
   const amountCheck = validateNonWeiUserInputTokenAmount(
     amount,
-    "1",
+    isOFTToken(selectedToken)
+      ? BigNumber(10)
+          .pow(selectedToken.decimals - selectedToken.sharedDecimals)
+          .toString()
+      : "1",
     selectedToken?.balance ?? "0",
     selectedToken?.symbol ?? "",
     selectedToken?.decimals ?? 0
@@ -131,7 +137,16 @@ const EthBridgeIn = ({ setEthBridgeIn }: EthBridgeInProps) => {
                   type="amount"
                   height={64}
                   balance={selectedToken?.balance ?? "0"}
-                  tokenMin="0"
+                  tokenMin={
+                    isOFTToken(selectedToken)
+                      ? BigNumber(10)
+                          .pow(
+                            selectedToken.decimals -
+                              selectedToken.sharedDecimals
+                          )
+                          .toString()
+                      : "0"
+                  }
                   tokenMax={selectedToken?.balance ?? "0"}
                   decimals={selectedToken?.decimals ?? 0}
                   placeholder="0.0"
