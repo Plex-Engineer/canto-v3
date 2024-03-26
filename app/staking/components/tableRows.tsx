@@ -255,8 +255,7 @@ export const GenerateUnbondingDelegationsTableRow = (
               hour: "2-digit",
               minute: "2-digit",
               hour12: true,
-            }) +
-            (completionDate.getHours() >= Number(12) ? "PM" : "AM")
+            })
           : completionDate.getDate().toString().padStart(2, "0") +
             "/" +
             (completionDate.getMonth() + 1).toString().padStart(2, "0") +
