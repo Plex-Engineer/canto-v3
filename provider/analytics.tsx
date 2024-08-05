@@ -61,6 +61,7 @@ export type AnalyticsAmbientLPData = {
   ambientLp?: string;
   ambientLpBaseToken?: string;
   ambientLpQuoteToken?: string;
+  ambientIsAmountBase?: boolean;
   ambientLpBaseAmount?: string;
   ambientLpQuoteAmount?: string;
   ambientLpBaseBalance?: string;
@@ -162,9 +163,11 @@ class AnalyticsWrapper {
         });
       },
       connections: {
-        walletConnect: (connected: boolean) => {
+        walletConnect: (connected: boolean, chainId?: number) => {
           if (connected) {
-            posthog.capture("Wallet Connected");
+            posthog.capture("Wallet Connected", {
+              chainId,
+            });
           } else {
             posthog.capture("Wallet Disconnected");
           }

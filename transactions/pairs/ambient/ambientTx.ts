@@ -101,16 +101,16 @@ async function addConLiquidity(
       quoteAmount = getConcQuoteTokensFromBaseTokens(
         txParams.amount,
         txParams.pool.stats.lastPriceSwap,
-        getPriceFromTick(txParams.lowerTick),
-        getPriceFromTick(txParams.upperTick)
+        txParams.lowerTick,
+        txParams.upperTick
       );
     } else {
       quoteAmount = txParams.amount;
       baseAmount = getConcBaseTokensFromQuoteTokens(
         txParams.amount,
         txParams.pool.stats.lastPriceSwap,
-        getPriceFromTick(txParams.lowerTick),
-        getPriceFromTick(txParams.upperTick)
+        txParams.lowerTick,
+        txParams.upperTick
       );
     }
 
@@ -207,8 +207,8 @@ export function validateAmbientLiquidityTxParams(
       : getConcBaseTokensFromQuoteTokens(
           txParams.amount,
           currentPrice,
-          getPriceFromTick(txParams.lowerTick),
-          getPriceFromTick(txParams.upperTick)
+          txParams.lowerTick,
+          txParams.upperTick
         );
 
     if(Number(currentPrice) <= Number(getPriceFromTick(txParams.lowerTick)) && Number(baseAmount) !== 0){
@@ -229,8 +229,8 @@ export function validateAmbientLiquidityTxParams(
       ? getConcQuoteTokensFromBaseTokens(
           txParams.amount,
           currentPrice,
-          getPriceFromTick(txParams.lowerTick),
-          getPriceFromTick(txParams.upperTick)
+          txParams.lowerTick,
+          txParams.upperTick
         )
       : txParams.amount;
 

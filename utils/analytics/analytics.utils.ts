@@ -189,6 +189,7 @@ function getAmbientLiquidityTransactionFlowData(
     return {
       ...poolData,
       ambientLpIsAdvanced: ambientLiquidityTxParams.isAdvanced ?? false,
+      ambientIsAmountBase: ambientLiquidityTxParams.isAmountBase,
       ambientLpBaseAmount: baseAmount,
       ambientLpQuoteAmount: quoteAmount,
       ambientLpBaseBalance: baseBalance,

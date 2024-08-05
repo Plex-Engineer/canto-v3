@@ -11,7 +11,7 @@ import {
   convertTokenAmountToNote,
   percentOfAmount,
 } from "../math";
-import { getPriceFromTick } from "./ambientMath.utils";
+import { getPriceFromTick, getTickFromPrice } from "./ambientMath.utils";
 import { AmbientPool } from "@/hooks/pairs/newAmbient/interfaces/ambientPools";
 import { convertToBigNumber, formatBalance } from "../formatting";
 
@@ -27,9 +27,11 @@ import { convertToBigNumber, formatBalance } from "../formatting";
 export function getConcQuoteTokensFromBaseTokens(
   amount: string,
   currentPrice: string,
-  minPrice: string,
-  maxPrice: string
+  lowerTick: number,
+  upperTick: number
 ): string {
+  const minPrice = getPriceFromTick(lowerTick)
+  const maxPrice = getPriceFromTick(upperTick)
   // check if zero or current price is below min price
   if (
     !amount ||
@@ -51,8 +53,8 @@ export function getConcQuoteTokensFromBaseTokens(
     Number(minPrice),
     Number(maxPrice)
   );
-  // overestimate amount by 1%
-  const quoteEstimate = percentOfAmount(quoteTokens.toString(), 101);
+  // overestimate amount by 3%
+  const quoteEstimate = percentOfAmount(quoteTokens.toString(), 103);
   if (quoteEstimate.error) {
     return "0";
   }
@@ -71,9 +73,11 @@ export function getConcQuoteTokensFromBaseTokens(
 export function getConcBaseTokensFromQuoteTokens(
   amount: string,
   currentPrice: string,
-  minPrice: string,
-  maxPrice: string
+  lowerTick: number,
+  upperTick: number
 ): string {
+  const minPrice = getPriceFromTick(lowerTick)
+  const maxPrice = getPriceFromTick(upperTick)
   // check if zero or over max price
   if (
     !amount ||
@@ -95,8 +99,8 @@ export function getConcBaseTokensFromQuoteTokens(
     Number(minPrice),
     Number(maxPrice)
   );
-  // overestimate amount by 1%
-  const baseEstimate = percentOfAmount(baseTokens.toString(), 101);
+  // overestimate amount by 3%
+  const baseEstimate = percentOfAmount(baseTokens.toString(), 103);
   if (baseEstimate.error) {
     return "0";
   }
@@ -250,8 +254,8 @@ export function getDisplayTokenAmountFromRange(
     const quoteEstimateWei = getConcQuoteTokensFromBaseTokens(
       weiAmount,
       pool.stats.lastPriceSwap,
-      minPriceWei,
-      maxPriceWei
+      getTickFromPrice(minPriceWei),
+      getTickFromPrice(maxPriceWei)
     );
     return formatBalance(quoteEstimateWei, pool.quote.decimals, {
       precision: pool.quote.decimals,
@@ -261,8 +265,8 @@ export function getDisplayTokenAmountFromRange(
     const baseEstimateWei = getConcBaseTokensFromQuoteTokens(
       weiAmount,
       pool.stats.lastPriceSwap,
-      minPriceWei,
-      maxPriceWei
+      getTickFromPrice(minPriceWei),
+      getTickFromPrice(maxPriceWei)
     );
     return formatBalance(baseEstimateWei, pool.base.decimals, {
       precision: pool.base.decimals,

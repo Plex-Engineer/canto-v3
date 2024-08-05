@@ -28,12 +28,22 @@ const NavBar = () => {
   const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
 
   useEffect(() => {
+    const connectWalletEvent = async () => {
+      try {
+        const chainId = await signer?.getChainId();
+        Analytics.actions.events.connections.walletConnect(true, chainId);
+      } catch (error) {
+        Analytics.actions.events.connections.walletConnect(true);
+        console.error(error);
+      }
+    };
+
     if (signer?.account.address) {
       Analytics.actions.people.registerWallet(signer.account.address);
       Analytics.actions.identify(signer.account.address, {
         account: signer.account.address,
       });
-      Analytics.actions.events.connections.walletConnect(true);
+      connectWalletEvent();
     }
   }, [signer]);
 
