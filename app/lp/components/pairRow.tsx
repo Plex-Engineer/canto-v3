@@ -448,8 +448,7 @@ export const UserAmbientPairRow = ({
         <InfoPop>
           <Container>
             <Text size="sm" theme="secondary-dark">
-              Rewards will be released in{" "}
-              <Countdown endTimestamp={rewardTime} />
+              Rewards will be released by the end of the week.
             </Text>
           </Container>
         </InfoPop>

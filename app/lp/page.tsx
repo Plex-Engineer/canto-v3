@@ -143,7 +143,6 @@ export default function Page() {
               ...pairs.userCantoDex.map((pair) =>
                 UserCantoDexPairRow({
                   pair,
-
                   onManage: (pairAddress) => {
                     Analytics.actions.events.liquidityPool.manageLPClicked(
                       getAnalyticsCantoLiquidityPoolInfo(pair)
