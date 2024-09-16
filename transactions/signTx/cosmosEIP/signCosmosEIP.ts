@@ -26,6 +26,7 @@ import {
   signTypedData,
   type SignTypedDataArgs,
 } from "@wagmi/core";
+import { areEqualAddresses } from "@/utils/address";
 
 export async function signCosmosEIPTx(
   tx: Transaction
@@ -91,6 +92,12 @@ async function signAndBroadcastCosmosTransaction(
   tx: UnsignedCosmosMessages
 ): PromiseWithError<any> {
   try {
+    // check if wallet is supported
+    const {error} = await checkWalletSupport(context.chain.chainId, context.ethAddress)
+    if (error) {
+      return NEW_ERROR("signAndBroadcastCosmosTransaction", error);
+    }
+
     // create correct fee object for EIP712
     const feeObj = generateFeeObj(tx.fee, context.sender.accountAddress);
 
@@ -119,8 +126,9 @@ async function signAndBroadcastCosmosTransaction(
     if (!context.sender.pubkey) {
       // create a public key for the user IFF EIP712 Canto is used (since through metamask)
       try {
-        const signature = await signMessage({
-          message:"Welcome to Canto! \n\nPlease sign this message to generate your Canto account.",
+        const signature = await window.ethereum.request({
+          method: "personal_sign",
+          params: [context.ethAddress, "generate_pubkey"],
         });
         context.sender.pubkey = signatureToPubkey(
           signature,
@@ -152,7 +160,12 @@ async function signAndBroadcastCosmosTransaction(
     );
 
     // get signature from metamask
-    const signature = await signTypedData(eipToSign as SignTypedDataArgs);
+
+    const signature = await window.ethereum.request({
+      method: "eth_signTypedData_v4",
+      params: [context.ethAddress, JSON.stringify(eipToSign)],
+    });
+
     const signedTx = createTxRawEIP712(
       cosmosPayload.legacyAmino.body,
       cosmosPayload.legacyAmino.authInfo,
@@ -291,5 +304,39 @@ export async function getCosmosTxDetailsFromHash(
     return NO_ERROR(response);
   } catch (err) {
     return NEW_ERROR("getCosmosTxDetailsFromHash", err);
+  }
+}
+
+export async function checkWalletSupport(
+  chainId: number,
+  ethAddress: string
+): PromiseWithError<{
+  isSupported: boolean;
+}> {
+  try{
+    // check ethereum provider
+    if(!window || !window.ethereum){
+      throw new Error("No provider found::Wallet not supported");
+    }
+  
+    // check matching account
+    const connectedAccounts: string[] = await window.ethereum.request({ method: "eth_accounts" })
+    if(!connectedAccounts || connectedAccounts.length === 0){
+      throw new Error("No connected accounts::Wallet not supported");
+    }
+    const matchingAccountIndex = connectedAccounts.findIndex(address => areEqualAddresses(address, ethAddress));
+    if(matchingAccountIndex === -1){
+      throw new Error(`No matching account::${connectedAccounts.join(', ')}::${ethAddress}::Wallet not supported`);
+    }
+  
+    // check chainId
+    const connectedChainId =  await window.ethereum.request({ method: "eth_chainId" });
+    if(!connectedChainId || parseInt(connectedChainId, 16) !== chainId){
+      throw new Error(`ChainId not matched::${parseInt(connectedChainId, 16)}::${chainId}::Wallet not supported`);
+    }
+
+    return NO_ERROR({ isSupported: true });
+  } catch(err){
+    return NEW_ERROR("checkWalletSupport", err);
   }
 }
