@@ -29,7 +29,7 @@ export async function getCantoAccountMetaData(
     const { data, error } =
     await tryFetchWithRetry<CantoAccountReturn>(
       `${cantoNetwork.restEndpoint}/cosmos/auth/v1beta1/accounts/${cantoAddress}`,
-      5
+      2
     );
     if (error) throw error;
 

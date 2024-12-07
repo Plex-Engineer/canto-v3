@@ -5,8 +5,8 @@ import Container from "../container/container";
 import Spacer from "../layout/spacer";
 import {
   dateToMomentsAgo,
-  formatError,
   formatSecondsToMinutes,
+  parseError,
 } from "@/utils/formatting";
 import StatusIcon from "../icon/statusIcon";
 import { useQuery } from "react-query";
@@ -120,7 +120,7 @@ const TxItem = (props: TxItemProps) => {
           )}
           {props.tx.error && (
             <Text size="sm" style={{ color: "var(--extra-failure-color,red)" }}>
-              {formatError(props.tx.error)}
+              {parseError(props.tx)}
             </Text>
           )}
         </div>
