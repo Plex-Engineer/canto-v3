@@ -27,12 +27,24 @@ const GravityConfirmationModal = ({
 
   async function handleConfirm() {
     try {
-      await switchNetwork({ chainId: GRAVITY_BRIGDE_EVM.chainId });
-      const network = getNetwork();
-      if (!network.chain || network.chain.id !== GRAVITY_BRIGDE_EVM.chainId) {
-        throw new Error(TX_SIGN_ERRORS.SWITCH_CHAIN_ERROR());
-      }
+      if (!window.ethereum) throw new Error("No ethereum provider found");
 
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: `0x${GRAVITY_BRIGDE_EVM.chainId.toString(16)}`,
+            chainName: GRAVITY_BRIGDE_EVM.name,
+            rpcUrls: [GRAVITY_BRIGDE_EVM.rpcUrl],
+            iconUrls: [GRAVITY_BRIGDE_EVM.icon],
+            nativeCurrency: {
+              name: GRAVITY_BRIGDE_EVM.nativeCurrency.name,
+              symbol: GRAVITY_BRIGDE_EVM.nativeCurrency.symbol,
+              decimals: GRAVITY_BRIGDE_EVM.nativeCurrency.decimals,
+            },
+          },
+        ],
+      });
       setAddChainError(null);
       onConfirm();
     } catch (err) {

@@ -9,7 +9,7 @@ export const GRAVITY_BRIGDE_EVM: EVMNetwork = {
   icon: "/icons/grav.svg",
   name: "Gravity Bridge",
   isTestChain: false,
-  rpcUrl: "https://info.gravitychain.io:8545",
+  rpcUrl: "https://gravity.plexnode.wtf",
   nativeCurrency: {
     name: "Graviton",
     baseName: "ugraviton",
